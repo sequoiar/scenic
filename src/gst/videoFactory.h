@@ -38,92 +38,33 @@ namespace videofactory
 
 #ifdef __COMMAND_LINE__
     /// Convert command line options to ipcp
-    static MapMsg rxOptionsToIPCP(const OptionArgs &options)
+    static void rxOptionsToIPCP(MapMsg &options)
     {
         // FIXME: remove unused keys
-        MapMsg ipcpMsg(options.toMapMsg());
-        ipcpMsg["port"] = ipcpMsg["videoport"];
-        ipcpMsg["codec"] = ipcpMsg["videocodec"];
-        ipcpMsg["sink"] = ipcpMsg["videosink"];
-        ipcpMsg["device"] = ipcpMsg["videodevice"];
-        ipcpMsg["location"] = ipcpMsg["videolocation"];
-
-        return ipcpMsg;
+        options["port"] = options["videoport"];
+        options["codec"] = options["videocodec"];
+        options["sink"] = options["videosink"];
+        options["device"] = options["videodevice"];
+        options["location"] = options["videolocation"];
     }
 
     /// Convert command line options to ipcp
-    static MapMsg txOptionsToIPCP(const OptionArgs &options)
+    static void txOptionsToIPCP(MapMsg &options)
     {
-        MapMsg ipcpMsg(options.toMapMsg());
-        ipcpMsg["port"] = ipcpMsg["videoport"];
-        ipcpMsg["codec"] = ipcpMsg["videocodec"];
-        ipcpMsg["source"] = ipcpMsg["videosource"];
-        ipcpMsg["device"] = ipcpMsg["videodevice"];
-        ipcpMsg["location"] = ipcpMsg["videolocation"];
-        ipcpMsg["bitrate"] = ipcpMsg["videobitrate"];
-        ipcpMsg["quality"] = ipcpMsg["videoquality"];
-
-        return ipcpMsg;
+        options["port"] = options["videoport"];
+        options["codec"] = options["videocodec"];
+        options["source"] = options["videosource"];
+        options["device"] = options["videodevice"];
+        options["location"] = options["videolocation"];
+        options["bitrate"] = options["videobitrate"];
+        options["quality"] = options["videoquality"];
     }
 #endif // __COMMAND_LINE__
-
-    static void setRxDefaults(MapMsg &msg)
-    {
-        if (!msg["multicast-interface"])
-            msg["multicast-interface"] = "";
-
-        if (!msg["shared-video-id"])
-            msg["shared-video-id"] = "shared_memory";
-
-        if(!msg["screen"])
-            msg["screen"] = 0;
-
-        if(!msg["sink"])
-            msg["sink"] = "xvimagesink";
-
-        if (!msg["address"])
-            msg["address"] = "127.0.0.1";
-    }
-
-    static void setTxDefaults(MapMsg &msg)
-    {
-        if (!msg["device"]) 
-            msg["device"] = ""; 
-
-        if (!msg["location"]) 
-            msg["location"] = ""; 
-
-        if (!msg["quality"])
-            msg["quality"] = 0;
-
-        // Only use quality if we're using theora or no bitrate has been set
-        if (msg["quality"])
-            if (msg["bitrate"])
-            {
-                LOG_WARNING("Ignoring quality setting for " << msg["codec"]);
-                msg["quality"] = 0;
-            }
-
-        // If quality is != 0, then we know that we're using theora from the previous check
-        if (!msg["bitrate"])
-        {
-            if (!msg["quality"])
-                msg["bitrate"] = 3000000; // quality and bitrate are mutually exclusive
-        }
-
-
-        if (!msg["camera-number"])
-            msg["camera-number"] = -1;
-
-        if (!msg["address"])
-            msg["address"] = "127.0.0.1";
-    }
 
 
     static shared_ptr<VideoReceiver> 
         buildVideoReceiver(MapMsg &msg)
         {
-            setRxDefaults(msg);
             shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
 
             // get caps here
@@ -141,7 +82,6 @@ namespace videofactory
     static shared_ptr<VideoSender> 
         buildVideoSender(MapMsg &msg)
         {
-            setTxDefaults(msg);
             shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(msg));
 
             shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID)); 

@@ -25,6 +25,7 @@
 #include "playback.h"
 #include "pipeline.h"
 #include "gutil.h"
+#include "mapMsg.h"
 
 
 void playback::start()

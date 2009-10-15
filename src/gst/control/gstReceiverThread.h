@@ -55,10 +55,12 @@ class GstReceiverThread
             : video_(), audio_() {}
         ~GstReceiverThread();
     private:
-        /// incomming audio_start request 
+        /// incoming audio_start request 
         void audio_init(MapMsg& msg);
-        /// incomming video_start request 
+        /// incoming video_start request 
         void video_init(MapMsg& msg);
+        void setVideoDefaults(MapMsg& msg);
+        void setAudioDefaults(MapMsg& msg);
         /// handle messages 
         bool subHandleMsg(MapMsg&);
         void updateJitterBuffer(MapMsg&);

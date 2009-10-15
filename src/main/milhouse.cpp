@@ -31,81 +31,132 @@
 #include "gst/audioFactory.h"
 #undef __COMMAND_LINE__
 
+#include "milhouse.h"
 #include "milhouseLogger.h"
+#include "programOptions.h"
 
-namespace pof 
-{
-    short run(int argc, char **argv);
-    void addOptions(OptionArgs &options);
-}
 
 int telnetServer(int, int);
 
+namespace po = boost::program_options;
 
-void pof::addOptions(OptionArgs &options)
-{
-    options.addBool("receiver", 'r', "");
-    options.addBool("sender", 's', "");
-    options.addString("address", 'i', "", "provide ip address of remote host");
-    options.addString("videocodec", 'v', "", "mpeg4 h263 h264 theora");
-    options.addString("audiocodec", 'a', "", "vorbis raw mp3");
-    options.addString("videosink", 'k', "", "xvimagesink glimagesink");
-    options.addString("audiosink", 'l', "", "jackaudiosink alsasink pulsesink");
-    options.addInt("audioport", 't', "", "portnum");
-    options.addInt("videoport", 'p', "", "portnum");
-    options.addBool("fullscreen", 'f', "");
-    options.addString("shared-video-id", 'B', "", "shared_memory");
-    options.addBool("deinterlace", 'o', "");
-    options.addString("videodevice", 'd', "", "/dev/video0 /dev/video1");
-    options.addString("audiodevice", 'q', "", "hw:0 hw:2 plughw:0 plughw:2");
-    options.addString("videolocation", 'L', "", "<filename>");
-    options.addString("audiolocation", 'K', "", "<filename>");
-    options.addInt("screen", 'n', "", "xinerama screen num");
-    options.addBool("version", 'w', "");
-    options.addInt("numchannels", 'c', "", "1-8 raw, 1-2 mp3, 1-40 vorbis");
-    options.addInt("videobitrate", 'x', "", "3000000");
-    options.addInt("videoquality", 'X', "", "use quality setting instead of videobitrate, 0-63 (theora only)");
-    options.addString("audiosource", 'e', "", "jackaudiosrc alsasrc pulsesrc");
-    options.addString("videosource", 'u', "", "v4l2src v4lsrc dv1394src");
-    options.addInt("timeout", 'z', "", "time in ms to wait before quitting, 0 means run indefinitely");
-    options.addInt("audio-buffer-usec", 'b', "", "length of receiver's audio buffer in microseconds, must be > 10000");
-    options.addInt("jitterbuffer", 'g', "", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
-    options.addInt("camera-number", 'G', "", "camera id for dc1394");
-    options.addString("multicast-interface", 'I', "", "interface to use for multicast");
-    options.addBool("enable-controls", 'j', "");
-    options.addBool("disable-jack-autoconnect", 'J', "");
-    options.addString("jack-client-name", 'O', "", "name of jack-client");
-    options.addBool("caps-out-of-band", 'C', "");
-    options.addString("debug", 'D', "", "level of logging verbosity (string/int) "
-            "[critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6], default=info");
-    //telnetServer param
-    options.addInt("serverport", 'y', "", "run as server and listen on this port");
-}
-
-
-short pof::run(int argc, char **argv)
+void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo, bool disableAudio)
 {
     using boost::shared_ptr;
 
-    OptionArgs options;
-    addOptions(options);
+    LOG_DEBUG("Running as receiver");
+    shared_ptr<VideoReceiver> vRx;
+    shared_ptr<AudioReceiver> aRx;
 
-    options.parse(argc, argv);
+    if (options["enable-controls"].as<bool>())
+        RtpReceiver::enableControl();
 
-    if (argc == 1)  // we printed help msg in parse, no need to continue
-        return 0;
+    if (!disableVideo)       
+    {
+        MapMsg ipcp(ProgramOptions::toMapMsg(options));
+        videofactory::rxOptionsToIPCP(ipcp);
+        vRx = videofactory::buildVideoReceiver(ipcp);
+    }
+    if (!disableAudio)
+    {
+        MapMsg ipcp(ProgramOptions::toMapMsg(options));
+        audiofactory::rxOptionsToIPCP(ipcp);
+        aRx = audiofactory::buildAudioReceiver(ipcp);
 
-    if (!options["debug"])
-        options["debug"] = "info";
+        if (options["disable-jack-autoconnect"].as<bool>())
+            MessageDispatcher::sendMessage("disable-jack-autoconnect");
+    }
 
-    if (options["serverport"])
-        return telnetServer(options["sender"], options["serverport"]);
+    playback::start();
 
-    MilhouseLogger logger(options["debug"]); // just instantiate, his base class will know what to do 
+    /// These options are more like commands, they are dispatched after playback starts
+    if (options.count("jitterbuffer"))
+        RtpReceiver::setLatency(options["jitterbuffer"].as<int>());
+
+    if (!disableVideo)
+    {
+        if(options["fullscreen"].as<bool>())
+            MessageDispatcher::sendMessage("fullscreen");
+    }
+
+    LOG_DEBUG("Running main loop");
+    gutil::runMainLoop(options["timeout"].as<int>());
+    LOG_DEBUG("main loop has finished");
+
+    playback::stop();
+}
+
+
+void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, bool disableAudio)
+{
+    using boost::shared_ptr;
+
+    LOG_DEBUG("Running as sender");
+    shared_ptr<VideoSender> vTx;
+    shared_ptr<AudioSender> aTx;
+
+    if (options["enable-controls"].as<bool>())
+        RtpSender::enableControl();
+
+    if (!disableVideo)
+    {
+        MapMsg ipcp(ProgramOptions::toMapMsg(options));
+        videofactory::txOptionsToIPCP(ipcp);
+        vTx = videofactory::buildVideoSender(ipcp);
+    }
+
+    if (!disableAudio)
+    {
+        MapMsg ipcp(ProgramOptions::toMapMsg(options));
+        audiofactory::txOptionsToIPCP(ipcp);
+        aTx = audiofactory::buildAudioSender(ipcp);
+
+        if (options["disable-jack-autoconnect"].as<bool>())
+            MessageDispatcher::sendMessage("disable-jack-autoconnect");
+    }
+
+    playback::start();
+
+    gutil::runMainLoop(options["timeout"].as<int>());
+
+    playback::stop();
+}
+
+
+short Milhouse::usage(const po::options_description &desc)
+{
+    std::cout << desc << "\n";
+    return 0;
+}
+
+
+short Milhouse::run(int argc, char **argv)
+{
+    po::options_description desc(ProgramOptions::createDefaultOptions());
+    po::variables_map options;
+    po::store(po::parse_command_line(argc, argv, desc), options);
+    po::notify(options);
+
+#ifdef SVNVERSION
+    std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
+#else
+    std::cout << "Ver:" << PACKAGE_VERSION << std::endl;
+#endif
+
+    if (options.count("help") or argc == 1) 
+        return usage(desc);
+
+    if (options.count("serverport"))
+        return telnetServer(options["sender"].as<bool>(), options["serverport"].as<int>());
+
+    MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
+
+    if (logger.gstDebug())
+        playback::makeVerbose();
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
 
-    if (options["version"])
+    if (options["version"].as<bool>())
     {
 #ifdef SVNVERSION
         LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
@@ -115,108 +166,56 @@ short pof::run(int argc, char **argv)
         return 0;
     }
 
-    if ((!options["sender"] and !options["receiver"]) or (options["sender"] and options["receiver"]))
-        THROW_CRITICAL("argument error: must be sender OR receiver. see --help"); 
-
-    if (options["enable-controls"])
+    // FIXME: move these checks up to port comparison into separate function
+    if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
+            or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
-        if (options["receiver"] )
-            RtpReceiver::enableControl();
-        else if (options["sender"])   // sender
-            RtpSender::enableControl();
+        LOG_ERROR("argument error: must be sender OR receiver."); 
+        return 1;
     }
 
-    // Must have these arguments
-    int disableVideo = !options["videocodec"] and !options["videoport"];
-    int disableAudio = !options["audiocodec"] and !options["audioport"];
+    bool disableVideo = !options.count("videocodec") and !options.count("videoport");
+    bool disableAudio = !options.count("audiocodec") and !options.count("audioport");
 
-    if (disableVideo)
-        LOG_DEBUG("Video disabled.");
-    if (disableAudio) 
-        LOG_DEBUG("Audio disabled.");
 
     if (disableVideo and disableAudio)
-        THROW_CRITICAL("argument error: must provide video and/or audio parameters. see --help");
-
-    if (options["videoport"] == options["audioport"])
-        THROW_CRITICAL("argument error: videoport and audioport cannot be equal"); // Fail early, other port checks do happen later too
-
-    if (options["receiver"]) 
     {
-        LOG_DEBUG("Running as receiver");
-        shared_ptr<VideoReceiver> vRx;
-        shared_ptr<AudioReceiver> aRx;
-
-
-        if (!disableVideo)       
-        {
-            MapMsg ipcp(videofactory::rxOptionsToIPCP(options));
-            vRx = videofactory::buildVideoReceiver(ipcp);
-        }
-        if (!disableAudio)
-        {
-            MapMsg ipcp(audiofactory::rxOptionsToIPCP(options));
-            aRx = audiofactory::buildAudioReceiver(ipcp);
-
-            if (options["disable-jack-autoconnect"])
-                MessageDispatcher::sendMessage("disable-jack-autoconnect");
-        }
-
-        if (logger.gstDebug())
-            playback::makeVerbose();
-
-        playback::start();
-
-        /// These options are more like commands, they are dispatched after playback starts
-        if (options["jitterbuffer"])
-            RtpReceiver::setLatency(options["jitterbuffer"]);
-
-        if (!disableVideo)
-        {
-            if(options["fullscreen"])
-                MessageDispatcher::sendMessage("fullscreen");
-        }
-
-        if (!options["timeout"]) // run for infinite amount of time
-            options["timeout"] = 0;
-
-        gutil::runMainLoop(options["timeout"]);
-
-        playback::stop();
+        LOG_ERROR("argument error: must provide video and/or audio parameters. see --help");
+        return 1;
     }
+
+    if (disableVideo)
+    {
+        LOG_DEBUG("Video disabled.");
+        if (!(options.count("audioport") and options.count("audiocodec")))
+        {
+            LOG_ERROR("Must specify both audioport and audiocodec");
+            return 1;
+        }
+    }
+    if (disableAudio) 
+    {
+        LOG_DEBUG("Audio disabled.");
+        if (!(options.count("videoport") and options.count("videocodec")))
+        {
+            LOG_ERROR("Must specify both videoport and videocodec");
+            return 1;
+        }
+    }
+
+    // Fail early, other port checks do happen later too
+    if (!disableAudio and !disableVideo)
+        if (options["videoport"].as<int>() == options["audioport"].as<int>())
+        {
+            LOG_ERROR("argument error: videoport and audioport cannot be equal"); 
+            return 1;
+        }
+
+    if (options["receiver"].as<bool>()) 
+        runAsReceiver(options, disableVideo, disableAudio);
     else 
-    {
-        LOG_DEBUG("Running as sender");
-        shared_ptr<VideoSender> vTx;
-        shared_ptr<AudioSender> aTx;
+        runAsSender(options, disableVideo, disableAudio);
 
-        if (!disableVideo)
-        {
-            MapMsg ipcp(videofactory::txOptionsToIPCP(options));
-            vTx = videofactory::buildVideoSender(ipcp);
-        }
-
-        if (!disableAudio)
-        {
-            MapMsg ipcp(audiofactory::txOptionsToIPCP(options));
-            aTx = audiofactory::buildAudioSender(ipcp);
-
-            if (options["disable-jack-autoconnect"])
-                MessageDispatcher::sendMessage("disable-jack-autoconnect");
-        }
-
-        if (logger.gstDebug())
-            playback::makeVerbose();
-
-        playback::start();
-
-        if (!options["timeout"]) // run for finite amount of time
-            options["timeout"] = 0;
-
-        gutil::runMainLoop(options["timeout"]);
-
-        playback::stop();
-    }
     return 0;
 }
 
@@ -231,14 +230,16 @@ void onExit()
 int main(int argc, char **argv)
 {
     int ret = 0;
-    atexit (onExit);
+    atexit(onExit);
+
     try {
         signal_handlers::setHandlers();
-        ret = pof::run(argc, argv);
+        Milhouse milhouse;
+        ret = milhouse.run(argc, argv);
     }
     catch (const std::exception &e)
     {
-        //std::cout << "Main Thread LEAVING with exception: " << e.what() << std::endl;
+        std::cout << "Main Thread LEAVING with exception: " << e.what() << std::endl;
         ret = 1;
     }
     return ret;

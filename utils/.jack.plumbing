@@ -1,7 +1,7 @@
 ; for postures02
 ;
 ; milhouse_postures01   -> pd_input0
-; capture_p1            -> pd_input1
+; capture1            -> pd_input1
 ; milhouse_postures03   -> pd_input2
 ; pd_output0            -> milhouse_postures02
 ; pd_output1            -> playback1

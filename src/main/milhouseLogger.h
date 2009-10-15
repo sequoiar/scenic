@@ -21,6 +21,8 @@
  *
  */
 
+#ifndef _MILHOUSE_LOGGER_H_
+#define _MILHOUSE_LOGGER_H_
 
 #include "ConcurrentQueue.h"
 #include "util.h"
@@ -41,3 +43,4 @@ class MilhouseLogger
         bool gstDebug_;
 };
 
+#endif // _MILHOUSE_LOGGER_H_

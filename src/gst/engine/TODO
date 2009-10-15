@@ -1,5 +1,5 @@
 NTA:
--fix exceptions/error messages
+-fix exceptions/error messages, see http://www.parashift.com/c++-faq-lite/exceptions.html#faq-17.10
 -set resolution
 -set framerate
 -set window title
@@ -7,7 +7,7 @@ NTA:
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 
 provide info
 -use osc style path for tcp messages
--use boost signals.slots instead of current msg passing/handling 
+-use boost signals2 instead of current msg passing/handling 
 -if we have a sender and receiver going, the receiver should for now gracefully ignore subsequent senders after the first sender goes out
 
 HELLO_WORLD:

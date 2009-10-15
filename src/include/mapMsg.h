@@ -76,22 +76,23 @@ std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 /// key/value map where value is a string, a float, an int, a vector StrIntFloat
 class MapMsg
 {
-public:
+    public:
     typedef std::map<std::string, StrIntFloat> MapMsg_;
     typedef const std::pair<const std::string,StrIntFloat>* Item;
-    MapMsg():map_(),it_(),post_end_(false){}
+    MapMsg() :
+        map_(), it_(), post_end_(false){}
     MapMsg(std::string command):map_(),it_(),post_end_(false){ (*this)() = command;}
     MapMsg(std::string command,bool p):map_(),it_(),post_end_(p){ (*this)() = command;}
     StrIntFloat &operator()() { return (*this)["command"]; }
-    StrIntFloat &operator[](const std::string& str);
-    void tokenize(const std::string& str) { tokenize(str,*this); }
-    bool stringify(std::string& str) const { return stringify(*this,str); }
-    void clear(){map_.clear();}
+    StrIntFloat &operator[] (const std::string& str);
+    void tokenize(const std::string& str) { tokenize(str, *this); }
+    bool stringify(std::string& str) const { return stringify(*this, str); }
+    void clear() { map_.clear(); }
 
     ~MapMsg(){ if(post_end_)try{ post();}catch(std::exception e){ LOG_DEBUG(e.what());} }
 
-/** Used by code that needs to post messages but does not use 
- * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
+    /** Used by code that needs to post messages but does not use 
+     * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
 
     bool post();
 
@@ -103,7 +104,7 @@ public:
             virtual void operator()(MapMsg&){}
             virtual ~Subscriber();
     };
-private:
+    private:
     friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
     friend Item GetBegin(MapMsg& m);
     friend Item GetNext(MapMsg& m);

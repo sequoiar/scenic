@@ -25,12 +25,10 @@
 
 #include "tcp/asioThread.h"
 
-class Logger
-    : public Log::Subscriber
-{
+class Logger : public Log::Subscriber {
     public:
-        Logger(MsgThread& tcp)
-            : queue_(tcp.getQueue()),level_(){}
+        Logger(MsgThread& tcp) : 
+            queue_(tcp.getQueue()), level_() {}
         QueuePair& queue_;
         void operator()(LogLevel&, std::string& msg);
         void setLevel(int level){ LOG_DEBUG(level); level_ = level;}
@@ -38,39 +36,30 @@ class Logger
 };
 
 
-#ifdef MAPLOGS
 void Logger::operator()(LogLevel& level, std::string& msg)
 {
     if(level_ >= level)
     {
-    MapMsg m("log");
-    m["level"] = level;
-    m["msg"] = msg;
-    queue_.push(m);
+        MapMsg m("log");
+        m["level"] = level;
+        m["msg"] = msg;
+        queue_.push(m);
     }
     std::cout << msg;// << std::endl;
 }
-#else
-void Logger::operator()(LogLevel& , std::string& msg)
-{
-    std::cout << msg;// << std::endl;
-}
-#endif
+
 /** Main command line entry point
  * launches the threads and dispatches
  * MapMsg between the threads
-*/
-class MainModule
-    : public BaseModule
-{
+ */
+class MainModule : public BaseModule {
     public:
         bool run();
 
-        MainModule(bool send, int port)
-            : tcpThread_(MsgThreadFactory::Tcp(port, true)),
-              gstThread_(MsgThreadFactory::Gst(send)),
-              func(gstThread_), msg_count(0)
-        {}
+        MainModule(bool send, int port) : tcpThread_(MsgThreadFactory::Tcp(port, true)),
+            gstThread_(MsgThreadFactory::Gst(send)),
+            func(gstThread_), msg_count(0)
+    {}
 
         ~MainModule()
         {
@@ -159,7 +148,7 @@ bool MainModule::run()
                     tmsg = tcp_queue.timed_pop(1);
                 }
             }
-            usleep(MILLISEC_WAIT*1000);
+            usleep(MILLISEC_WAIT * 1000);
         }
     }
     catch(ErrorExcept e)
@@ -174,14 +163,14 @@ bool MainModule::run()
 }
 
 
-int telnetServer(int s,int p)
+int telnetServer(int s, int p)
 {
     try
     {
         MainModule m(s,p);
 
         m.run();
-        
+
     }
     catch(std::exception e)
     {

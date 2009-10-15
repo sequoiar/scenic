@@ -35,87 +35,34 @@ namespace audiofactory
 {
     using boost::shared_ptr;
 
-    static const int AUDIO_BUFFER_USEC = AudioSinkConfig::DEFAULT_BUFFER_TIME;
     static const int MSG_ID = 1;
 
 
 #ifdef __COMMAND_LINE__
     /// Convert command line options to ipcp
-    static MapMsg rxOptionsToIPCP(const OptionArgs &options)
+    static void rxOptionsToIPCP(MapMsg &options)
     {
-        // FIXME: remove unused keys
-        MapMsg ipcpMsg(options.toMapMsg());
-        ipcpMsg["port"] = ipcpMsg["audioport"];
-        ipcpMsg["codec"] = ipcpMsg["audiocodec"];
-        ipcpMsg["sink"] = ipcpMsg["audiosink"];
-        ipcpMsg["device"] = ipcpMsg["audiodevice"];
-        ipcpMsg["location"] = ipcpMsg["audiolocation"];
-
-        return ipcpMsg;
+        options["port"] = options["audioport"];
+        options["codec"] = options["audiocodec"];
+        options["sink"] = options["audiosink"];
+        options["device"] = options["audiodevice"];
+        options["location"] = options["audiolocation"];
     }
 
     /// Convert command line options to ipcp
-    static MapMsg txOptionsToIPCP(const OptionArgs &options)
+    static void txOptionsToIPCP(MapMsg &options)
     {
-        MapMsg ipcpMsg(options.toMapMsg());
-        ipcpMsg["port"] = ipcpMsg["audioport"];
-        ipcpMsg["codec"] = ipcpMsg["audiocodec"];
-        ipcpMsg["source"] = ipcpMsg["audiosource"];
-        ipcpMsg["device"] = ipcpMsg["audiodevice"];
-        ipcpMsg["location"] = ipcpMsg["audiolocation"];
-        ipcpMsg["bitrate"] = ipcpMsg["audiobitrate"];
-
-        return ipcpMsg;
+        options["port"] = options["audioport"];
+        options["codec"] = options["audiocodec"];
+        options["source"] = options["audiosource"];
+        options["device"] = options["audiodevice"];
+        options["location"] = options["audiolocation"];
     }
 #endif // __COMMAND_LINE__
-
-    static void setRxDefaults(MapMsg &msg)
-    {
-        if (!msg["numchannels"]) 
-            msg["numchannels"] = 2;
-
-        if (!msg["device"])
-            msg["device"] = "";
-
-        if (!msg["audio-buffer-usec"])
-            msg["audio-buffer-usec"] = audiofactory::AUDIO_BUFFER_USEC;
-
-        if (!msg["sink"])
-            msg["sink"] = "jackaudiosink";
-        
-        if (!msg["multicast-interface"])
-            msg["multicast-interface"] = "";
-        
-        if (!msg["address"])
-            msg["address"] = "127.0.0.1";
-        
-        if (!msg["jack-client-name"])
-            msg["jack-client-name"] = "";
-    }
-    
-    static void setTxDefaults(MapMsg &msg)
-    {
-        if (!msg["numchannels"]) 
-            msg["numchannels"] = 2;
-
-        if (!msg["device"])
-            msg["device"] = "";
-
-        if (!msg["location"])
-            msg["location"] = "";
-        
-        if (!msg["address"])
-            msg["address"] = "127.0.0.1";
-
-        if (!msg["jack-client-name"])
-            msg["jack-client-name"] = "";
-    }
 
     static shared_ptr<AudioSender> 
         buildAudioSender(MapMsg &msg)
         {
-            setTxDefaults(msg);
-
             shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(msg));           
 
             shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID));
@@ -132,8 +79,6 @@ namespace audiofactory
     static shared_ptr<AudioReceiver> 
         buildAudioReceiver(MapMsg &msg)
         {
-            setRxDefaults(msg);
-
             shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(msg));
 
             std::string caps(CapsParser::getAudioCaps(msg["codec"],

@@ -1,4 +1,4 @@
-/* util.h
+/* programOptions.h
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -20,13 +20,19 @@
  *
  */
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#ifndef __PROGRAM_OPTIONS_H__
+#define __PROGRAM_OPTIONS_H__
 
-#include "lassert.h"
-#include "util/logWriter.h"
-#include "util/fileUtil.h"
-#include "util/sigint.h"
+#include <boost/program_options.hpp>
+#include "mapMsg.h"
 
+class ProgramOptions
+{
+    public:
+        static boost::program_options::options_description createDefaultOptions();
+        static MapMsg toMapMsg(const boost::program_options::variables_map &options);
+        static MapMsg defaultMapMsg();
+};
 
-#endif
+#endif // __PROGRAM_OPTIONS_H__
+

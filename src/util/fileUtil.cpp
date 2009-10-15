@@ -1,4 +1,4 @@
-/* util.h
+/* fileUtil.cpp
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -20,13 +20,16 @@
  *
  */
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#include "fileUtil.h"
+#include <fstream>
 
-#include "lassert.h"
-#include "util/logWriter.h"
-#include "util/fileUtil.h"
-#include "util/sigint.h"
-
-
-#endif
+bool fileExists(const std::string &path)
+{
+    std::fstream in;
+    in.open(path.c_str(), std::fstream::in);
+    if (in.fail()) // file doesn't exist
+        return false;
+ 
+    in.close();
+    return true;
+}

@@ -37,10 +37,13 @@ class GstSenderThread
         ~GstSenderThread();
         virtual void start(MapMsg& ); 
     private:
-        /// incomming audio_start request 
+        /// incoming audio_start request 
         void audio_init(MapMsg& msg);
-        /// incomming video_start request 
+        /// incoming video_start request 
         void video_init(MapMsg& msg);
+        
+        void setVideoDefaults(MapMsg& msg);
+        void setAudioDefaults(MapMsg& msg);
 
         boost::shared_ptr<SenderBase> video_;
         boost::shared_ptr<SenderBase> audio_;

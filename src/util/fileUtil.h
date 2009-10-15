@@ -1,4 +1,4 @@
-/* hostIP.h
+/* fileUtil.h
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -20,12 +20,11 @@
  *
  */
 
-#ifndef _HOST_IP_H_
-#define _HOST_IP_H_
+#ifndef _FILE_UTIL_H_
+#define _FILE_UTIL_H_
 
 #include <string>
 bool fileExists(const std::string &fullyQualifiedPathName);
 
-
-#endif // _HOST_IP_H_
+#endif // _FILE_UTIL_H_
 

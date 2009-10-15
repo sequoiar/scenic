@@ -1,4 +1,5 @@
-/* hostIP.cpp
+
+/* milhouse.h
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -20,18 +21,20 @@
  *
  */
 
-#include "util.h"
-#include <fstream>
+#ifndef _MILHOUSE_H_
+#define _MILHOUSE_H_
 
+#include <boost/program_options.hpp>
 
+class Milhouse {
+    private:
+        short usage(const boost::program_options::options_description &desc);
+        boost::program_options::options_description createOptionsDescription();
+        void runAsReceiver(const boost::program_options::variables_map &options, bool disableVideo, bool disablAudio);
+        void runAsSender(const boost::program_options::variables_map &options, bool disableVideo, bool disablAudio);
 
-bool fileExists(const std::string &path)
-{
-    std::fstream in;
-    in.open(path.c_str(), std::fstream::in);
-    if (in.fail()) // file doesn't exist
-        return false;
- 
-    in.close();
-    return true;
-}
+    public:
+        short run(int argc, char **argv);
+};
+
+#endif // _MILHOUSE_H_

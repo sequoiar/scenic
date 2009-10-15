@@ -31,6 +31,8 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
+#include "programOptions.h"
+
 /**
  * The IPCP protocol is a home-made TCP ASCII protocol similar to telnet. 
  *
@@ -192,12 +194,119 @@ GstReceiverThread::~GstReceiverThread()
 {
 }
 
+
+void GstReceiverThread::setVideoDefaults(MapMsg &msg)
+{
+    static MapMsg defaults(ProgramOptions::defaultMapMsg());
+
+    if (!msg["multicast-interface"])
+        msg["multicast-interface"] = defaults["multicast-interface"];
+
+    if (!msg["shared-video-id"])
+        msg["shared-video-id"] = defaults["shared-video-id"];
+
+    if(!msg["screen"])
+        msg["screen"] = defaults["screen"];
+
+    if(!msg["sink"])
+        msg["sink"] = defaults["videosink"];
+
+    if (!msg["address"])
+        msg["address"] = defaults["address"];
+}
+
+
+void GstSenderThread::setVideoDefaults(MapMsg &msg)
+{
+    static MapMsg defaults(ProgramOptions::defaultMapMsg());
+
+    if (!msg["device"]) 
+        msg["device"] = defaults["videodevice"]; 
+
+    if (!msg["location"]) 
+        msg["location"] = defaults["videolocation"]; 
+
+    if (!msg["quality"])
+        msg["quality"] = defaults["videoquality"];
+
+    // Only use quality if we're using theora or no bitrate has been set
+    if (msg["quality"])
+        if (msg["bitrate"])
+        {
+            LOG_WARNING("Ignoring quality setting for " << msg["codec"]);
+            msg["quality"] = defaults["videoquality"];
+        }
+
+    // If quality is != 0, then we know that we're using theora from the previous check
+    if (!msg["bitrate"])
+    {
+        if (!msg["quality"])
+            msg["bitrate"] = defaults["videobitrate"]; // quality and bitrate are mutually exclusive
+    }
+
+    if (!msg["camera-number"])
+        msg["camera-number"] = defaults["camera-number"];
+
+    if (!msg["address"])
+        msg["address"] = defaults["address"];
+}
+
+
+void GstReceiverThread::setAudioDefaults(MapMsg &msg)
+{
+    static MapMsg defaults(ProgramOptions::defaultMapMsg());
+
+    if (!msg["numchannels"]) 
+        msg["numchannels"] = defaults["numchannels"];
+
+    if (!msg["device"])
+        msg["device"] = defaults["audiodevice"];
+
+    if (!msg["audio-buffer-usec"])
+        msg["audio-buffer-usec"] = defaults["audio-buffer-usec"];
+
+    if (!msg["sink"])
+        msg["sink"] = defaults["jackaudiosink"];
+
+    if (!msg["multicast-interface"])
+        msg["multicast-interface"] = defaults["multicast-interface"]; 
+
+    if (!msg["address"])
+        msg["address"] = defaults["address"];
+
+    if (!msg["jack-client-name"])
+        msg["jack-client-name"] = defaults["jack-client-name"];
+}
+
+
+void GstSenderThread::setAudioDefaults(MapMsg &msg)
+{
+    static MapMsg defaults(ProgramOptions::defaultMapMsg());
+
+    if (!msg["numchannels"]) 
+        msg["numchannels"] = defaults["numchannels"];
+
+    if (!msg["device"])
+        msg["device"] = defaults["audiodevice"]; 
+
+    if (!msg["location"])
+        msg["location"] = defaults["audiolocation"];
+
+    if (!msg["address"])
+        msg["address"] = defaults["address"];
+
+    if (!msg["jack-client-name"])
+        msg["jack-client-name"] = defaults["jack-client-name"];
+}
+
+
 void GstReceiverThread::video_init(MapMsg& msg)
 {
     video_.reset();
- 
+
     try
     {
+        setVideoDefaults(msg);
         video_ = videofactory::buildVideoReceiver(msg);
     }
     catch(ErrorExcept e)
@@ -214,6 +323,7 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 
     try
     {
+        setAudioDefaults(msg);
         audio_ = audiofactory::buildAudioReceiver(msg);
     }
     catch(ErrorExcept e)
@@ -234,6 +344,7 @@ void GstSenderThread::video_init(MapMsg& msg)
 
     try
     {
+        setVideoDefaults(msg);
         video_ = videofactory::buildVideoSender(msg);
     }
     catch(ErrorExcept e)
@@ -250,6 +361,7 @@ void GstSenderThread::audio_init(MapMsg& msg)
 
     try
     {
+        setAudioDefaults(msg);
         audio_ = audiofactory::buildAudioSender(msg);
     }
     catch(ErrorExcept e)
