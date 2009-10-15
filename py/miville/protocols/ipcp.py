@@ -49,7 +49,7 @@ class IPCP(LineReceiver):
         self.r = re.compile(r'("([^"\\]|\\.)*"|[^ ]+)')
         self.callbacks = {}
 
-    def add_callback(self, cmd, name=None):
+    def add_ipcp_callback(self, cmd, name=None):
         """
         Registers a callback function for an incoming IPCP message. 
         """
@@ -313,7 +313,7 @@ if __name__ == "__main__":
 
     # When connected, send a line
     def connectionReady(protocol):
-        protocol.add_callback('You', test)
+        protocol.add_ipcp_callback('You', test)
         protocol.connectionLost = grrr
         protocol.sendLine('Hey there')
         protocol.send_cmd('test', 23.3, 34, 'gros bouton', 1)

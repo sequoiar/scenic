@@ -26,7 +26,7 @@ from twisted.internet import reactor
 from miville.settings import Settings, GlobalSetting, MediaSetting
 import miville.utils.log
 import time
-import miville.engines
+import miville.services
 
 #del gst_client.log
 #gst_client.log = miville.utils.log.start('error', 1, 0, 'gst')
@@ -44,7 +44,7 @@ def create_simple_video_tx_setting(settings):
     media_setting_mpeg4_basic = settings.get_media_setting('mpeg4_basic_tx')
     media_setting_mpeg4_basic.settings['bitrate'] = 2048000
     media_setting_mpeg4_basic.settings['codec'] = 'mpeg4'
-    media_setting_mpeg4_basic.settings['engine'] = 'Gst'
+    media_setting_mpeg4_basic.settings['service'] = 'Gst'
     media_setting_mpeg4_basic.settings['source'] = 'videotestsrc'
     media_setting_mpeg4_basic.settings['GstPort'] = 11111
     media_setting_mpeg4_basic.settings['GstAddress'] = "127.0.0.1"    
@@ -55,7 +55,7 @@ def create_simple_video_rx_setting(settings):
     media_setting_mpeg4_basic = settings.get_media_setting('mpeg4_basic_rx')
     media_setting_mpeg4_basic.settings['bitrate'] = 2048000
     media_setting_mpeg4_basic.settings['codec'] = 'mpeg4'
-    media_setting_mpeg4_basic.settings['engine'] = 'Gst'
+    media_setting_mpeg4_basic.settings['service'] = 'Gst'
     media_setting_mpeg4_basic.settings['GstPort'] = 11111
     media_setting_mpeg4_basic.settings['GstAddress'] = "127.0.0.1"
     return (id,media_setting_mpeg4_basic)

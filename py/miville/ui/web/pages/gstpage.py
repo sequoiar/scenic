@@ -35,52 +35,52 @@ from miville.utils import Observer, log
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
 
-from miville.engines.gstchannel import get_all_gst_channels
+from miville.services.servicescomchan import get_all_gst_channels
 
 from miville.errors import *
 
 
 log = log.start('debug', 1, 0, 'gstpage')
 
-def print_engine_process_log(engine):
+def print_service_process_log(service):
     txt = ""
     try:
         txt += "<h3>Process output log</h3>"
-        for index,msg in enumerate(engine.output_logger.get()):
+        for index,msg in enumerate(service.output_logger.get()):
             txt += "<p><b>%d</b>  %s</p>" % (index+1, msg)
     except Exception, e:
-        txt += "<h2>ERROR in print_engine_process_log: %s </h2>" % e
+        txt += "<h2>ERROR in print_service_process_log: %s </h2>" % e
     return txt
 
-def print_engine_telnet_log(engine):
+def print_service_telnet_log(service):
     txt = ""
     try:
         txt += "<h3>Telnet log</h3>"
-        for index,msg in enumerate(engine.logger.get()):
+        for index,msg in enumerate(service.logger.get()):
             txt += "<p><b>%d</b>  %s</p>" % (index+1, msg)
     except Exception, e:
-        txt += "<h2>ERROR in print_engine_telnet_log: %s </h2>" % e
+        txt += "<h2>ERROR in print_service_telnet_log: %s </h2>" % e
     return txt
 
-def print_engine_acks(engine):
+def print_service_acks(service):
     
     txt = ""
     try:
         txt += "<h3>Acknowledgments:</h3>"
-        for item in engine.acknowledgments:
+        for item in service.acknowledgments:
             timestamp = item[0]
             msg = item[1]
             timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
             txt += "<p><b>%s</b> %s</p>" % (timestamp_str, msg)
     except Exception, e:
-        txt += "<h2>ERROR in print_engine_acks: %s </h2>" % e    
+        txt += "<h2>ERROR in print_service_acks: %s </h2>" % e    
     return txt
 
-def print_engine_rtp_stats(engine):
+def print_service_rtp_stats(service):
     txt = ""
     try:
         txt += "<h3>RTP stats</h3>"
-        for stream, stat in engine.rtp_stats.iteritems():
+        for stream, stat in service.rtp_stats.iteritems():
             txt += "<h4>RTP stats for %s</h4>" % stream
             for name, ring in stat.iteritems():
                 stats = ring.get()
@@ -93,34 +93,34 @@ def print_engine_rtp_stats(engine):
                         value = val[1]
                         txt += "<p><b>%d</b>  %s %s = %s</p>" % (index+1, timestamp_str, name, value)
     except Exception, e:
-        txt += "<h2>ERROR in print_engine_rtp_stats: %s </h2>" % e
+        txt += "<h2>ERROR in print_service_rtp_stats: %s </h2>" % e
     return txt
 
 
-def print_engine_summary(engine):
+def print_service_summary(service):
     txt = ""
     try:
-        txt += "<h3>" + str(engine) + "</h3>"
-        txt += "<p>mode   = " + engine.mode + "</p>"
-        txt += "<p>group  = " + engine.group_name + "</p>"
-        txt += "<p>streams= " + str(engine.stream_names) + "</p>"
-        txt += "<p>process= " + str(engine.proc_path) + "</p>"
-        txt += "<p>args   = " + str(engine.args)  + "</p>"
-        txt += "<p>pid    = " + str(engine.pid) + "</p>"
-        txt += "<p>state  = " + str(engine.get_status()) + "</p>"
-        txt += "<p>port   = " + str(engine.gst_port) + "</p>"
-        txt += "<p>ip     = " + str(engine.gst_address) + "</p>"
-        txt += "<p>version= " + str(engine.get_version_str()) + "</p>"
+        txt += "<h3>" + str(service) + "</h3>"
+        txt += "<p>mode   = " + service.mode + "</p>"
+        txt += "<p>group  = " + service.group_name + "</p>"
+        txt += "<p>streams= " + str(service.stream_names) + "</p>"
+        txt += "<p>process= " + str(service.proc_path) + "</p>"
+        txt += "<p>args   = " + str(service.args)  + "</p>"
+        txt += "<p>pid    = " + str(service.pid) + "</p>"
+        txt += "<p>state  = " + str(service.get_status()) + "</p>"
+        txt += "<p>port   = " + str(service.gst_port) + "</p>"
+        txt += "<p>ip     = " + str(service.gst_address) + "</p>"
+        txt += "<p>version= " + str(service.get_version_str()) + "</p>"
     except Exception, e:
-        txt += "<h2>ERROR in print_engine_summary: %s </h2>" % e
+        txt += "<h2>ERROR in print_service_summary: %s </h2>" % e
     return txt
 
-def print_engine(engine):
+def print_service(service):
     txt = ""
     try:
-        txt += print_engine_summary(engine)
+        txt += print_service_summary(service)
         txt += "<h3>Telnet commands</h3>"
-        for cmd in engine.commands:
+        for cmd in service.commands:
             command = cmd[0]
             txt += "<p><b>" + command + ": </b>"
             params = cmd[1]
@@ -138,18 +138,18 @@ def print_engine(engine):
                         txt += str(p[0]) + "= <i>" + v + "</i> "
             txt += "</p>"  
         
-        txt += print_engine_acks(engine)    
-        txt += print_engine_rtp_stats(engine)
-        txt += print_engine_telnet_log(engine)
-        txt += print_engine_process_log(engine)       
+        txt += print_service_acks(service)    
+        txt += print_service_rtp_stats(service)
+        txt += print_service_telnet_log(service)
+        txt += print_service_process_log(service)       
     except Exception, e:
-        txt += "<h2>ERROR in print_engine: %s </h2>" % e
+        txt += "<h2>ERROR in print_service: %s </h2>" % e
     return txt
 
-def print_proc_params(params, proc_name, engine):
+def print_proc_params(params, proc_name, service):
     txt = ""
     txt += "<h2>" + proc_name + "</h2>"
-    txt += print_engine(engine)
+    txt += print_service(service)
     return txt
 
 def print_channel(channel):
@@ -171,26 +171,26 @@ def print_channel(channel):
             txt += "<p>No active rx process</p>"
         else:
             for sync_group, params in channel.receiver_procs_params.iteritems():
-                engine = channel.receiver_engines[counter]
+                service = channel.receiver_services[counter]
                 counter += 1
-                txt += print_proc_params(params, "Rx process " + str(counter), engine)
+                txt += print_proc_params(params, "Rx process " + str(counter), service)
             
         counter = 0
         if not channel.sender_procs_params:
             txt += "<p>No active tx process</p>"
         else:
             for sync_group, params in channel.sender_procs_params.iteritems():
-                engine = channel.sender_engines[counter]
+                service = channel.sender_services[counter]
                 counter += 1
-                txt += print_proc_params(params, "Tx process " + str(counter), engine) 
+                txt += print_proc_params(params, "Tx process " + str(counter), service) 
         
-        channel.sender_engines
+        channel.sender_services
     except Exception, e:
         txt += "<h2>ERROR in print_channel: %s </h2>" % e
     return txt
 
 def print_gst():
-    txt = "<h1>Propulseart Gst engines</h1>"
+    txt = "<h1>Propulseart Gst services</h1>"
     channels_dict = get_all_gst_channels()
     for contact, channel in channels_dict.iteritems():
         txt += "<h2>Contact: %s</2>" % contact

@@ -92,7 +92,7 @@ class Test_001_Gen_Settings(TestBase):
       
 	self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=codec:mpeg4', 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=bitrate:2048000','modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=engine:Gst', 'modified')
+        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=service:Gst', 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstPort:11111' , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstAddress:127.0.0.1', 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=source:v4l2src', 'modified')       
@@ -139,7 +139,7 @@ class Test_001_Gen_Settings(TestBase):
         # list again, check that the new setting is there
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=codec:mpeg4'           , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=GstPort:11111'         , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=source:v4l2src'   , 'modified')       

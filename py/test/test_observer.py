@@ -25,7 +25,6 @@ from twisted.trial import unittest
 from miville.utils.observer import Observer
 from miville.utils.observer import Subject
 
-
 class lillController():
     def __init__(self):
         pass
@@ -176,10 +175,28 @@ class GoodSubject(Subject):
     def a_test_function(self):
             self.notify('a_test_function',self.fun)
             
-    
 ############################################
-    
-        
-    
-        
-        
+
+
+class Test_Encapsulated_Observer(unittest.TestCase):
+    def test_01_encapsulated(self):
+        class DummyObserver(Observer):
+            def __init__(self):
+                Observer.__init__(self)
+                self.updated = False # for test purposes
+            def update(self, origin, key, value):
+                self.updated = True# for test purposes
+                #print("update: %s:%s:%s" % (origin, key, value))
+                #raise Exception("Hey")
+        class Encapsulater(object):
+            def __init__(self, test_case):
+                self.subject = Subject()
+                self.test_case = test_case
+            def notify_my_observers(self):
+                self.subject.notify(None, "data", "key")
+        obs = DummyObserver()
+        encapsulater = Encapsulater(self)
+        obs.append(encapsulater.subject)
+        encapsulater.notify_my_observers()
+        if not obs.updated:
+            self.fail("never updated")

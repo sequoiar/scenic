@@ -101,7 +101,7 @@ void RtpBin::parseSourceStats(GObject * source, RtpBin *context)
     
     /* simply dump the stats structure */
     // gchar *str = gst_structure_to_string (stats);
-    // g_print ("source stats: %s\n", str);
+    // LOG_DEBUG("source stats: " << str);
 
     context->subParseSourceStats(stats);  // let our subclasses parse the stats
 

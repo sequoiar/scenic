@@ -197,14 +197,14 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.media_settings.append("%s_tx" % name)
         self.tst("settings --type media --add %s_tx" % name, "Media setting added")
         self.tst('settings --type media --mediasetting %s_tx  --modify settings=codec:%s' % (name,codec) , 'modified')
-        self.tst('settings --type media --mediasetting %s_tx  --modify settings=engine:Gst' % (name) , 'modified')
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=service:Gst' % (name) , 'modified')
         self.tst('settings --type media --mediasetting %s_tx  --modify settings=source:%s' % (name,source)    , 'modified')       
         self.tst('settings --type media --mediasetting %s_tx  --modify settings=channels:%d' % (name, channels) , 'modified')         
             
         self.media_settings.append("%s_rx" % name)
         self.tst("settings --type media --add %s_rx" % name , "Media setting added")
         self.tst('settings --type media --mediasetting %s_rx  --modify settings=codec:%s' % (name,codec) , 'modified')    
-        self.tst('settings --type media --mediasetting %s_rx  --modify settings=engine:Gst'% (name), 'modified')
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=service:Gst'% (name), 'modified')
         self.tst('settings --type media --mediasetting %s_rx  --modify settings=source:%s' % (name, source) , 'modified') 
         self.tst('settings --type media --mediasetting %s_rx  --modify settings=channels:%d' % (name, channels) , 'modified')
         self.tst('settings --type media --mediasetting %s_rx  --modify settings=audio_buffer_usec:30000' % (name), 'modified')              
@@ -216,7 +216,7 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --type media --add %s_rx" % name, "Media setting added")
         self.tst('settings --type media --mediasetting %s_rx  --modify settings=codec:%s' % (name,codec) , 'modified')
         self.tst('settings --type media --mediasetting %s_rx  --modify settings=bitrate:2048000' % name       , 'modified')
-        self.tst('settings --type media --mediasetting %s_rx  --modify settings=engine:Gst'  % name          , 'modified')
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=service:Gst'  % name          , 'modified')
         self.tst('settings --type media --mediasetting %s_rx  --modify settings=source:%s' % ( name , source)  , 'modified') 
                                                              
 
@@ -224,7 +224,7 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --type media --add %s_tx" % name, "Media setting added")
         self.tst('settings --type media --mediasetting %s_tx  --modify settings=codec:%s' % (name,codec)           , 'modified')
         self.tst('settings --type media --mediasetting %s_tx  --modify settings=bitrate:%d' % (name,bitrate)      , 'modified')
-        self.tst('settings --type media --mediasetting %s_tx  --modify settings=engine:Gst'   % name         , 'modified')
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=service:Gst'   % name         , 'modified')
         self.tst('settings --type media --mediasetting %s_tx  --modify settings=source:%s' % (name, source)   , 'modified')       
         
 

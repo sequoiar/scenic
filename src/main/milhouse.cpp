@@ -92,11 +92,6 @@ short pof::run(int argc, char **argv)
 
     options.parse(argc, argv);
 
-#ifdef SVNVERSION
-    std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
-#else
-    std::cout << "Ver:" << PACKAGE_VERSION << std::endl;
-#endif
     if (argc == 1)  // we printed help msg in parse, no need to continue
         return 0;
 
@@ -113,9 +108,9 @@ short pof::run(int argc, char **argv)
     if (options["version"])
     {
 #ifdef SVNVERSION
-            LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
+        LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
 #else
-            LOG_INFO("version " << PACKAGE_VERSION << std::endl);
+        LOG_INFO("version " << PACKAGE_VERSION << std::endl);
 #endif
         return 0;
     }
@@ -243,7 +238,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Main Thread LEAVING with exception: " << e.what() << std::endl;
+        //std::cout << "Main Thread LEAVING with exception: " << e.what() << std::endl;
         ret = 1;
     }
     return ret;

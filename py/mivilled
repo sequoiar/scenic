@@ -28,10 +28,40 @@ See the MivilleConfiguration class in miville/core.py
 """
 import sys
 from optparse import OptionParser
-from miville.configuration import MivilleConfiguration
+from miville.options import MivilleConfiguration
 
 __version__ = "0.1.3-a"
 VERSION = __version__
+
+def moo():
+    """
+    This image is:
+    Copyright (C) 2003, Vijay Kumar
+    Permission is granted to copy, distribute and/or modify this image under the terms either:
+    
+    * the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version, or
+    * the GNU Free Documentation License, Version 1.1 or any later version published by the Free Software Foundation; with the no Invariant Sections, with no Front-Cover Texts and with no Back-Cover Texts.
+    """
+    print("""
+    _-`````-,           ,- '- .    
+  .'   .- - |          | - .   `.  
+ /.'  /                     `.   \ 
+:/   :      _...   ..._      ``   :
+::   :     /._ .`:'_.._\.    ||   :
+::    `._ ./  ,`  :    \ . _.''   .
+`:.      |   |  -.  \-. \|_       / 
+  \:._ _/  ..'  .@)  \@) ` `\ ,.'  
+     _/,--'       .- .\,-.`--`.    
+       ,'/''     (( \ `  )     
+        /'/'  \    `-'  (      
+         '/''  `._,-----'      
+          ''/'    .,---'       
+           ''/'      ;:            
+             ''/''  ''/        
+               ''/''/''        
+                 '/'/'         
+                  `;               
+    """)
 
 if __name__ == '__main__':
     """
@@ -47,6 +77,8 @@ if __name__ == '__main__':
         help="""Communication channel listen only to those network interfaces IP. Use this flag many times if needed. Default is all. Example: -i 127.0.0.1 -i 10.10.10.55""")
     parser.add_option("-m", "--miville-home", type="string", \
         help="Path to miville configuration files. (dot files)")
+    parser.add_option("-M", "--moo", action="store_true", \
+        help="There is no easter egg in this program.")
     parser.add_option("-C", "--disable-escape-sequences", action="store_true", \
         help="Disables ANSI escape sequences in shell and telnet clients.")
     parser.add_option("-j", "--restart-jackd", action="store_true", \
@@ -58,6 +90,9 @@ if __name__ == '__main__':
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", \
         help="Sets the output to be verbose.")
     (options, args) = parser.parse_args()
+    if options.moo:
+        moo()
+        sys.exit(0)
     from miville.core import *
     # configure miville
     config = MivilleConfiguration()
@@ -91,7 +126,8 @@ if __name__ == '__main__':
     for terminal in ['xterm', 'rxvt']:
         if terminal.find and config.enable_escape_sequences:
             hostname = socket.gethostname()
-            sys.stdout.write(']2;miville on ' + hostname + '')
+            title = "mivilled on %s #%d" % (hostname, options.offset)
+            sys.stdout.write(']2;%s' % (title))
     try:
         main(config)
         reactor.run()

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
 # Miville
@@ -20,9 +21,11 @@
 
 # System import
 import time
+from twisted.python import failure
 
 #App imports
-from miville.ui.web.web import Widget, expose
+from miville.ui.web.web import expose
+from miville.ui.web.web import Widget
 from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
@@ -38,57 +41,82 @@ class Streams(Widget):
         Starts the streams
 
         Called from the javascript widget.
-        :param contact: name of the contact
+        :param contact: unicode name of the contact
         """
         # self.api.select_contact(self, contact)
-        self.api.notify(self, contact, 'will_start_streams_with_contact') # XXX FIXME HACK
-        self.api.start_streams(self, contact)
+        self.api.notify(self, contact, 'will_start_streams_with_contact') # XXX FIXME HACK sending this for addressbook web widget.
+        deferred = self.api.start_streams(self, contact)
+        #def _cb(result, self):
+        #deferred.addCallback(_cb, self)
         return False
         
     def rc_stop_streams(self, contact):
         """
-        Stops the streams
+        Javascripts wants to stop the streams
+        :param contact: unicode  contact name
 
         Called from the javascript widget.
         """
-        self.api.stop_streams(self, contact)
+        deferred = self.api.stop_streams(self, contact)
         return False
         
     def rc_update_settings(self):
         """
-        Updates the settings
+        Javascript wants to update the settings
 
         Called from the javascript widget.
         """
-        self.api.list_global_setting(self)
+        self.api.list_profiles(self)
         return False
         
     def rc_set_setting(self, contact, setting):
         """
-        Modifies the settings for a contact
+        Javascript wants to modify the settings for a contact
 
         Called from the javascript client.
+        :param contact: unicode  contact name
+        :param setting: int Profile ID
         """
-        self.api.modify_contact(self, contact, setting=setting)
+        self.api.modify_contact(self, contact, profile_id=setting)
         return False
         
-    def cb_list_global_setting(self, origin, data):
+    def cb_list_profiles(self, origin, data): #TODO:rename this ugly method name
         """
-        Called from the python API when 'list_global_settings' notification occurs
+        The API gives responds with the list of profiles.
+        
+        when 'list_profiles' notification occurs
         """
         preset_settings = []
         user_settings = []
-        for id, setting in data[0].items():
-            if setting.is_preset:
-                preset_settings.append({'id':id, 'name':setting.name}) 
-            else:
-                user_settings.append({'id':id, 'name':setting.name}) 
-            log.debug('LIST GLOB: %s' % id)
-            log.debug('LIST GLOB: %s' % setting.name)
-            log.debug('LIST GLOB: %s' % setting.is_preset)
-        preset_settings.sort(key=lambda x:(x['name'].lower))
-        user_settings.sort(key=lambda x:(x['name'].lower))
+        profiles = data
+        for profile in profiles:
+            preset_settings.append({
+                'id':profile.id, 
+                'name':profile.name
+                })
         self.callRemote('update_settings', preset_settings, user_settings)
-        
 
+    #def cb_remote_started_streams(self, origin, data):
+    #    """
+    #    The API tells us that the remote Alice has started streams with us. (Bob)
+    #    
+    #    sets the contact stream_state to streaming when started from remote.
+    #    """
+    #    log.debug("cb_remote_started_streams %s %s" % (origin, data))
+    #    if isinstance(data, failure.Failure):
+    #        pass
+    #    else:
+    #        pass
+
+    #def cb_remote_stopped_streams(self, origin, data):
+    #    """
+    #    sets the contact stream_state to stopped when stopped from remote.
+    #    """
+    #    log.debug("cb_remote_stopped_streams %s %s" % (origin, data))
+    #    if isinstance(data, failure.Failure):
+    #        pass
+    #    else:
+    #        pass
+    
     expose(locals())
+

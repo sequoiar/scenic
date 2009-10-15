@@ -211,7 +211,7 @@ class MivilleTester(object):
         Succeeds otherwise.
         """
         if message is None:
-            message = "Expected %s but did not get it." % (expected)
+            message = "Expected \"%s\" but did not get it." % (expected)
         # other listed expectations are child classes of Exception
         index = self.telnet_process.expect([expected, pexpect.EOF, pexpect.TIMEOUT], timeout=timeout) # 2 seconds max
         #self.evalTest(index, message)
@@ -228,7 +228,7 @@ class MivilleTester(object):
         self.telnet_process.sendline(command)
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         # self.sleep(0.1)
-        self.expectTest(expected, err)
+        self.expectTest(expected, err, timeout=timeout)
         #self.telnet_process.readlines()
         #self.miville_process.readlines()
         # self.sleep(0.1)

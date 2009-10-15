@@ -208,7 +208,6 @@ Addressbook.methods(
 		}
 	},		
 
-
 	/**
 	 * -------------------------
 	 * Called from python Server
@@ -336,9 +335,9 @@ Addressbook.methods(
 			var stream_state = li.getChildren()[1];
 			stream_state.removeClass('spinner_small');
 			stream_state.removeClass('streaming');
-			if (item['stream_state'] == 1) {
+			if (item['stream_state'] == 1) { // starting...
 				stream_state.addClass('spinner_small');
-			} else if (item['stream_state'] == 2) {
+			} else if (item['stream_state'] == 2) { // streaming
 				stream_state.addClass('streaming');
 			}
 			

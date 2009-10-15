@@ -41,7 +41,7 @@ from miville import api
 #import streams
 from miville.utils import log, Subject, common
 from miville import addressbook
-from miville import settings
+#from miville import settings
 from miville.protocols import com_chan
 from miville import connectors
 from miville import devices
@@ -73,12 +73,8 @@ class Core(Subject):
         self.load_uis()
         # TODO: rename this addressbook !
         self.adb = addressbook.AddressBook(self.config.addressbook_filename, self.api)
-        #self.engines = self.find_engines()
-        # create the settings collection
-        settings.PRESETS_FILENAME = self.config.settings_presets_filename
-        settings.SETTINGS_FILENAME = self.config.settings_filename
-        self.settings = settings.Settings()
-        #self.curr_setting = self.settings.select()
+        #self.services = self.find_services()
+        
         # TODO: causes a couldn't listen error if another miville runs on the same port. 
         # and makes the application crash. 
         # maybe something more elegant could be done.
@@ -116,20 +112,22 @@ class Core(Subject):
                 log.error("Port unavailable. There is probably an other miville running on this machine. Try with -o option.")
                 log.error("Exiting.")
                 exit(1) # ends the program
+                raise
             except Exception, e:
                 log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
                 traceback.print_exc()
+                raise
 
-#     def find_engines(self):
+#     def find_services(self):
 #         """
-#         Find all the different audio/video/data engines
+#         Find all the different audio/video/data services
 #         """
-#         engines = {}
+#         services = {}
 #         for kind in ('audio', 'video'):
 #             mods = getModule('streams.' + kind).iterModules()
-#             for engine in mods:
-#                 engines[engine.name] = engine
-#         return engines
+#             for service in mods:
+#                 services[service.name] = service
+#         return services
 
 def main(config_object):    
     """

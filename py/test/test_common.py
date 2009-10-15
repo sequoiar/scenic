@@ -64,6 +64,22 @@ class TestSimple(unittest.TestCase):
         jzs = jerzy.generate_new_ports(17)
         self.assertTrue(len(jzs) == 17)
         self.assertTrue(84 not in jzs)
+    
+    def test_free_port(self):
+        #TODO: improve this test
+        alloc = PortNumberGenerator(1, 2)
+        a = alloc.get_current_port()
+        self.assertTrue(a == None)
+        b = alloc.generate_new_port()
+        self.assertTrue(b == 1)
+        c = alloc.generate_new_port()
+        self.assertTrue(c == 3)
+        alloc.free_port(c)
+        if c in alloc.get_all():
+            self.fail("Port %d should have been freed." % (c))
+        
+        
+        
         
            
 class TestCommon(unittest.TestCase):

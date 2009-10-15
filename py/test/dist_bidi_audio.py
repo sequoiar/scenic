@@ -63,7 +63,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         # add media receiver setting 
         self.tst("settings --type media --add audio_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=codec:raw', 'modified')    
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=engine:Gst', 'modified')
+        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=service:Gst', 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=GstPort:11111' , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=GstAddress:127.0.0.1', 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=source:audiotestsrc', 'modified') 
@@ -97,7 +97,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         # add media setting 
         self.tst("settings --type media --add audio_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=codec:raw'           , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=GstPort:11112'         , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=source:audiotestsrc'   , 'modified')       

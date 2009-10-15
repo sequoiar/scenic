@@ -91,7 +91,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         # add media receiver setting 
         self.tst("settings --type media --add audio_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=codec:raw', 'modified')    
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=engine:Gst', 'modified')
+        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=service:Gst', 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=source:jackaudiosrc', 'modified') 
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=channels:8', 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=audio_buffer_usec:30000', 'modified')      
@@ -110,7 +110,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add mpeg4_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=codec:mpeg4'           , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=source:v4l2src'   , 'modified') 
         
 
@@ -145,7 +145,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add h263_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting h263_basic_rx  --modify settings=codec:h263'           , 'modified')
         self.tst('settings --type media --mediasetting h263_basic_rx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting h263_basic_rx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting h263_basic_rx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting h263_basic_rx  --modify settings=source:v4l2src'   , 'modified') 
 
 
@@ -178,7 +178,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add h264_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting h264_basic_rx  --modify settings=codec:h264'           , 'modified')
         self.tst('settings --type media --mediasetting h264_basic_rx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting h264_basic_rx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting h264_basic_rx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting h264_basic_rx  --modify settings=source:v4l2src'   , 'modified') 
 
           # add subgroup
@@ -210,7 +210,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add theora_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting theora_basic_rx  --modify settings=codec:theora'           , 'modified')
         self.tst('settings --type media --mediasetting theora_basic_rx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting theora_basic_rx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting theora_basic_rx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting theora_basic_rx  --modify settings=source:v4l2src'   , 'modified') 
 
           # add subgroup
@@ -244,7 +244,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         # add media setting 
         self.tst("settings --type media --add audio_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=codec:raw'           , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=source:jackaudiosrc'   , 'modified')       
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=channels:8', 'modified')
 
@@ -259,7 +259,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add mpeg4_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=codec:mpeg4'           , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=source:v4l2src'   , 'modified')       
 
 
@@ -294,7 +294,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add h263_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting h263_basic_tx  --modify settings=codec:h263'           , 'modified')
         self.tst('settings --type media --mediasetting h263_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting h263_basic_tx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting h263_basic_tx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting h263_basic_tx  --modify settings=source:v4l2src'   , 'modified')       
 
 
@@ -326,7 +326,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add h264_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting h264_basic_tx  --modify settings=codec:h264'           , 'modified')
         self.tst('settings --type media --mediasetting h264_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting h264_basic_tx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting h264_basic_tx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting h264_basic_tx  --modify settings=source:v4l2src'   , 'modified')       
 
 
@@ -358,7 +358,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add theora_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting theora_basic_tx  --modify settings=codec:theora'           , 'modified')
         self.tst('settings --type media --mediasetting theora_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting theora_basic_tx  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting theora_basic_tx  --modify settings=service:Gst'            , 'modified')
         self.tst('settings --type media --mediasetting theora_basic_tx  --modify settings=source:v4l2src'   , 'modified')       
 
 

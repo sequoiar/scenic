@@ -21,19 +21,18 @@
 """
 Exceptions that might be raised within the miville software.
 """
-### Settings ###
-class StreamsError(Exception):
+class StreamError(Exception):
     """
-    Master Exception Class for the streams.
+    Any error raise by a stream, or when trying to start/stop a service stream.
     """
     pass
 
-
-class SettingsError(Exception):
-    """
-    Master Exception Class for the settings.
-    """
-    pass
+# DEPRECATED
+# class SettingsError(Exception):
+#     """
+#     Master Exception Class for the settings.
+#     """
+#     pass
 
 ### Address Book ###
 class AddressBookError(Exception):

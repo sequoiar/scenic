@@ -24,6 +24,7 @@ by any other modules.
 # System imports
 import sys
 import os
+import warnings
 
 # Twisted imports
 from twisted.python.modules import getModule
@@ -43,8 +44,13 @@ _allocated_ports = []
 
 class PortNumberGenerator(object):
     """
-    Allocates TCP/UDP port numbers using a global variable to store the already allocated ports.
+    Allocates unique TCP/UDP port numbers.
+    using a global variable to store the already allocated ports.
     """
+    #TODO: stay within a max port number range.
+    #TODO: use a set instead of a list to make sure they are unique?
+    #FIXME: this will eventually overflow. 
+    #TODO: handle case when it overflows. Use an other algoruthm
     def __init__(self, first_port, increment):
         """
         :param first_port: First port offset to allocate ports
@@ -53,31 +59,58 @@ class PortNumberGenerator(object):
         self.first_port = first_port
         self.current_port = None
         self.increment = increment
-    
+        warnings.warn("PortNumberGenerator will eventually overflow.")
+
     def get_current_port(self):
+        """
+        Returns the most recenlty allocated port number.
+        None if None has been allocated so far.
+        """
         return self.current_port
     
+    def get_all(self):
+        global _allocated_ports
+        return _allocated_ports
+    
     def generate_new_ports(self, count):
+        """
+        Generates many new port numbers.
+        returns a list of allocated numbers.
+        """
         ports = []
         for i in range(count):
             x = self.generate_new_port()
             ports.append(x)
         return ports
         
+    def free_port(self, port_num):
+        """
+        Deletes a port number from the list of allocated ports.
+        """
+        # TODO: better error handling. maybe a better exception type
+        global _allocated_ports
+        if port_num not in _allocated_ports:
+            raise Exception("Port %d not allocated !" % (port_num))
+        else:
+            _allocated_ports.pop(_allocated_ports.index(port_num))
+            self.current_port = None # TODO: anything better to do here?
+            # TODO: decrement next port index ???
+            
     def generate_new_port(self):
+        """
+        Allocates a single new port number 
+        """
         global _allocated_ports 
         found = False
         candidate = self.current_port
         if not self.current_port:
             candidate = self.first_port - self.increment
-        
         while not found:
             candidate += self.increment
             if candidate not in _allocated_ports:
                 self.current_port = candidate
                 _allocated_ports.append(self.current_port)
                 found = True
-                
         return self.get_current_port()
 
 

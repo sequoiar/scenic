@@ -297,14 +297,14 @@ class ConnectionBasic(Connection):
         """
         Receives the settings for the streams.
 
-        :param settings: dict kind => dict "stream" ... whose keys are "name" and "engine"
+        :param settings: dict kind => dict "stream" ... whose keys are "name" and "service"
         """
 #        self.com_chan.delete(self.settings)
         self.api.select_streams(self, 'receive')
         for kind, stream in settings.items():
             name = stream.pop('name') + '.rem'
-            engine = stream.pop('engine')
-            self.api.add_stream(self, name, kind, engine)
+            service = stream.pop('service')
+            self.api.add_stream(self, name, kind, service)
             for attr, value in stream.items():
                 self.api.set_stream(self, name, kind, attr, value)
         self.api.start_streams(self, None, self.com_chan)
@@ -321,8 +321,8 @@ class ConnectionBasic(Connection):
             kind = self.api.streams.get_kind(stream)
             if not kind:
                 continue
-            engine = stream.__module__.rpartition('.')[2]
-            params = {'name':name.partition('_')[2], 'engine':engine}
+            service = stream.__module__.rpartition('.')[2]
+            params = {'name':name.partition('_')[2], 'service':service}
             for key, value in stream.__dict__.items():
                 if (key[0] != '_' and value):
                     params[key] = value

@@ -18,7 +18,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 Public API of Miville
 
@@ -52,6 +51,8 @@ import pprint
 import repr
 
 from twisted.internet import reactor
+from twisted.python import failure
+from twisted.internet import defer
 
 # App imports
 from miville.errors import *
@@ -62,36 +63,17 @@ from miville.devices import firewire
 from miville import network
 from miville import addressbook # for network_test_*
 from miville.protocols import pinger
-from miville import settings
-from miville import engines
 from miville.utils import log
 from miville.utils.common import string_to_number 
+from miville.streams import manager as streams_manager
+from miville.streams import conf
 
 log = log.start('debug', 1, 0, 'api') # added by hugo
 
-
-    
-def modify(who, name_of_who, what, new_value):
-    """
-    Given an object reference, returns a command that modifies the value of a member
-    of that object. this command string can then be used by exec to do its work
-    """
-    # TODO: remove this function from here please ! 
-    members = dir(who)
-    if not what in members:
-        raise SettingsError, "Property \"" + what + "\" does not exist"
-    value = str(new_value)
-    if isinstance(new_value, str):
-        value = repr.repr(new_value)
-    cmd = "%s.%s = %s" % (name_of_who, what, value )
-    return cmd    
-   
 class ControllerApi(object):
     """
     The API of the application. 
-
     Most of the methods in this class are the use cases of the application. 
-    
     It is the "model" in the MVC pattern.
     The controller API that all controllers (such as cli.CliController) must use.
     """
@@ -99,7 +81,6 @@ class ControllerApi(object):
     def __init__(self, notify):
         """
         This class has a notify method inherited (using prototyping) from the utils.observer.Subject class.
-        
         Since its notify method is given by the core, all the core's observers observe this class.
         :param notify: the notify method that it will use. 
         """
@@ -108,23 +89,30 @@ class ControllerApi(object):
     def _start(self, core):
         """
         Starts the API once all parts have been loaded.
-        
         Some attributes are defined here, but should be defined in __init__ 
         """
-        self.settings = core.settings
         self.core = core
         self.adb = core.adb
-#        self.all_streams = core.curr_setting.streams
-#        self.curr_streams = 'send'
-#        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
+        
         network.start(self, self.core.config.iperf_port + self.core.config.port_numbers_offset, self.core.config.listen_to_interfaces)
         pinger.start(self)
         firewire.start(self)
-        engines.init_connection_listeners(self)
-        self.devices_toggle_kill_jackd_enabled(self.get_config("restart_jackd"))
+        streams_manager.start(self) # XXX order matters
+        self.streams_manager = streams_manager.get_single_manager()
+        self.config_db = conf.get_single_db()
+        self.devices_toggle_kill_jackd_enabled(self.get_config("restart_jackd")) # XXX : usually you might not want this. In the config it might be False.
     
+    def get_config(self, key):
+        """
+        get the value of a miville configuration option.
+        
+        might raise KeyError
+        """
+        return self.core.config.__dict__[key]
+ 
+    ### TCP server ### ------------------------------------------------------
     def listen_tcp(self, port, factory, interfaces='', listen_queue_size=50):
         """
         Wraps reactor.listenTCP
@@ -141,8 +129,7 @@ class ControllerApi(object):
                 log.debug("listenTCP:%s %s %s %s" % (port, factory, listen_queue_size, interface))
                 reactor.listenTCP(port, factory, listen_queue_size, interface)
 
-
-    ### Contacts ###
+    ### Contacts ### ---------------------------------------------------
     def get_contacts(self, caller):
         """
         Get the list of all the contacts.
@@ -245,17 +232,62 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result) # implicit key: 'delete_contact'
 
-    def modify_contact(self, caller, name=None, new_name=None, address=None, port=None, auto_answer=None, setting=None):
+    def list_profiles(self, caller):
+        """
+        Lists all available profiles.
+        Notifies the observers with a list of profiles.
+        """
+        log.debug("list_profiles")
+        db = self.config_db
+        result = db.profiles.values() # id:profile
+        self.notify(caller, result)
+    
+    def get_profile_details(self, caller, profile_id):
+        """
+        Lists all available profiles.
+        Notifies the observers with a list of profiles.
+        """
+        # TODO: don't we have anything to send from here?
+        log.debug("get_profile_details")
+        result = profile_id
+        self.notify(caller, result)
+
+    def modify_contact(self, caller, name=None, new_name=None, address=None, port=None, auto_answer=None, profile_id=None):
         """
         Changes one or more attributes of a contact.
         If no name is given, modify the selected contact.
         """
         try:
-            result = self.adb.modify(name, new_name, address, port, auto_answer, setting)
+            result = self.adb.modify(name, new_name, address, port, auto_answer, profile_id)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
-
+    
+    
+    def modify_contact_attr(self, caller, contact_name, attr_name, attr_value):
+        """
+        Modifies one and only one attribute of a contact.
+        If selected_contact is None, uses the selected contact.
+        
+        Returns None.
+        :param contact_name: unicode or None
+        :param attr_name: str
+        :attr_value: int or str or unicode or bool
+        
+        Currently implemented attrbutes ::
+          * address : str
+          * port : int
+          * profile_id : int
+          * auto_answer : bool
+        """
+        try:
+            self.adb.modify_contact_attr(contact_name, attr_name, attr_value)
+            #TODO: what if contact name is None?
+            result = (contact_name, attr_name, attr_value)
+        except AddressBookError, e:
+            result = failure.Failure(e)
+        self.notify(caller, result)
+        
     def duplicate_contact(self, caller, name=None, new_name=None):
         """
         Adds a copy of the named contact in the Address Book and add the string
@@ -279,461 +311,152 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result)
 
-    ### Settings ###
-    
-    def modify_media_stream(self, caller, global_setting_name, stream_subgroup_name, media_stream_name, attribute, new_value ):
-        try:
-            result = None
-            log.info("modify_media_stream")
-            glob = self.settings.get_global_setting(global_setting_name)
-            sub = glob.get_stream_subgroup(stream_subgroup_name)
-            stream = sub.get_media_stream(media_stream_name)
-            cmd = modify(stream,'stream', attribute, new_value)
-            exec(cmd) 
-            #result = True
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)        
-    
-    def erase_media_stream (self, caller, global_setting_name, stream_subgroup_name, media_stream_name):
-        try:
-            result = None
-            log.info("erase_media_stream")
-            global_setting = self.settings.get_global_setting(global_setting_name)
-            stream_subgroup= global_setting.get_stream_subgroup(stream_subgroup_name) 
-            result = stream_subgroup.erase_media_stream(media_stream_name)
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-            
-    def list_media_stream(self, caller, global_setting_name, stream_subgroup_name):
-        try:
-            result = None
-            log.info("list_media_stream")
-            global_setting = self.settings.get_global_setting(global_setting_name)
-            stream_subgroup= global_setting.get_stream_subgroup(stream_subgroup_name) 
-            result =  stream_subgroup.list_media_stream()
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-
-    def add_media_stream (self, caller, type_name, global_setting_name, stream_subgroup_name):
-        try:
-            result = None
-            log.info("add_media_stream")
-            glob = self.settings.get_global_setting(global_setting_name)
-            subgroup = glob.get_stream_subgroup(stream_subgroup_name)
-            result = subgroup.add_media_stream(type_name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-    def erase_stream_subgroup (self, caller, name, global_setting_name, stream_subgroup_name):
-        try:
-            result = None
-            log.info("erase_media_stream")
-            glob = self.settings.get_global_setting(global_setting_name)
-            subgroup = glob.get_stream_subgroup(stream_subgroup_name)
-            result = subgroup.erase_media_stream(type_name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-    
-    def get_config(self, key):
+    def list_streams(self, caller):
         """
-        get the value of a miville configuration option.
+        Lists all active streams
+        
+        Notifies with a list of all streams.
         """
-        return self.core.config.__dict__[key]
-
-    def list_stream_subgroup (self, caller, global_setting_name):
-        try:
-            result = None
-            log.info("list_stream_subgroup")
-            result = self.settings.get_global_setting(global_setting_name).list_stream_subgroup() 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def add_stream_subgroup (self, caller, name, global_setting_name):
-        try:
-            result = None
-            log.info("add_stream_subgroup")
-            result = self.settings.get_global_setting(global_setting_name).add_stream_subgroup(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-            
-    def erase_stream_subgroup (self, caller, name, global_setting_name):
-        try:
-            result = None
-            log.info("erase_stream_subgroup")
-            result = self.settings.get_global_setting(global_setting_name).erase_stream_subgroup(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-    def modify_stream_subgroup (self, caller, global_setting_name,  name, attribute, new_value):
-        try:
-            result = None
-            log.info("modify_stream_subgroup")
-            glob = self.settings.get_global_setting(global_setting_name)
-            sub = glob.get_stream_subgroup(name)
-            cmd = modify(sub,'sub', attribute, new_value)
-            exec(cmd) 
-            #result = True
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def duplicate_stream_subgroup (self, caller, name, global_setting_name):
-        try:
-            result = None
-            log.info("duplicate_stream_subgroup")
-            result = self.settings.get_global_setting(global_setting_name).duplicate_stream_subgroup(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def select_stream_subgroup (self, caller, name, global_setting_name):
-        try:
-            result = None
-            log.info("select_stream_subgroup")
-            result = self.settings.get_global_setting(global_setting_name).select_stream_subgroup(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-
-        
-    def list_media_setting (self, caller):
-        try:
-            result = None
-            log.info("list_media_setting")
-            result = self.settings.list_media_setting() 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def add_media_setting (self, caller, name):
-        try:
-            result = None
-            log.info("add_media_setting")
-            result = self.settings.add_media_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)      
-        
-    def erase_media_setting (self, caller, name):
-        try:
-            result = None
-            log.info("erase_media_setting")
-            result = self.settings.erase_media_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-
-            
-       
-    def modify_media_setting (self, caller, name, attribute, value):
-            
-        try:
-            result = None
-            log.info("modify_media_setting")
-            x = self.settings.get_media_setting(name)
-            if attribute == 'settings':
-                key, sep, string_value = value.partition(':')
-#                key = toks[0]
-#                string_value = toks[2]
-                # this removes the setting element because the 
-                # content is None
-                if not string_value:
-                    x.settings.pop(key)
-                else:
-                    # first, check for a number:
-                    num = string_to_number(string_value)
-                    if num == None:
-                        x.settings[key] = string_value
-                    else:
-                        x.settings[key] = num
-            else:
-                cmd = modify(x, 'x', attribute, value)
-                exec(cmd) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def duplicate_media_setting (self, caller, name):
-        try:
-            result = None
-            log.info("duplicate_media_setting")
-            result = self.settings.duplicate_media_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def select_media_setting (self, caller, name):
-        try:
-            result = None
-            log.info("select_media_setting")
-            result = self.settings.select_media_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def keep_media_setting (self, caller):
-        try:
-            result = None
-            log.info("keep_media_setting")
-            result = self.settings.keep_media_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-    def pretty_list_settings(self, caller):    
-        try:
-            result = None
-            log.info("pretty_list_settings")
-            result = self.settings.pretty_list_settings() 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-               
-    def list_global_setting (self, caller):
-        try:
-            result = None
-            log.info("list_global_settings")
-            result = self.settings.list_global_setting() 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def add_global_setting (self, caller, name):
-        try:
-            result = None
-            log.info("add_global_setting")
-            result = self.settings.add_global_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def type_global_setting (self, caller, name):
-        try:
-            result = None
-            log.info("type_global_setting")
-            result = self.settings.type_global_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def erase_global_setting (self, caller, name):
-        try:
-            result = None
-            log.info("erase_global_setting")
-            result = self.settings.erase_global_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def modify_global_setting (self, caller, global_setting_name, attribute, value):
-        try:
-            result = None
-            log.info("modify_global_setting")
-            glob = self.settings.get_global_setting(global_setting_name)
-            # result = glob.modify_global_setting(attribute, value)
-            cmd = modify(glob, 'glob', attribute, value)
-            try:
-                exec(cmd)
-            except Exception, err:
-              result = err
-              self.notify(caller, result)   
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def duplicate_global_setting (self, caller, name):
-        try:
-            result = None
-            log.info("duplicate_global_setting")
-            result = self.settings.duplicate_global_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def select_global_setting (self, caller, name):
-        try:
-            result = None
-            log.info("select_global_setting")
-            result = self.settings.select_global_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
+        # TODO: add contact or service arg
+        all = self.streams_manager.list_all_streams()
+        log.debug("list_streams: %s" % (all))
+        notif = all
+        self.notify(caller, notif)
     
-    def load_settings (self, caller):
-        try:
-            result = None
-            log.info("load_global_setting")
-            result = self.settings.load() 
-        except SettingsError, err:
-            result = err
-        except InstallFileError, err:
-            result = err
-        self.notify(caller, result)       
-        
-    def save_settings (self, caller, offset=0):
-        log.info("ControllerApi.save_settings")
-        try:
-            result = None
-            result = self.settings.save(offset)
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)
-        
-        
-    def description_global_setting (self, caller, name):
-        try:
-            result = None
-            log.info("description_global_setting")
-            result = self.settings.description_global_setting(name) 
-        except SettingsError, err:
-            result = err
-        self.notify(caller, result)      
-        
-
-    ### Streams ###
+    def list_streams_for_contact(contact):
+        """
+        Returns the list of streams for a contact.
+        :param contact: addressbook.Contact instance.
+        """
+        return self.streams_manager.list_streams_for_contact(contact)
     
-    def start_streams_tmp(self, caller, contact_name):
-        """
-        DEPRECATED
-        """
-        contact = self.get_contact(contact_name)
-        if contact:
-            if contact.state == CONNECTED:
-                contact.stream_state = 2 # STARTED
-            elif contact.state == DISCONNECTED:
-                deferred = self.start_connection(caller, contact)
-                if deferred:
-                    deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
-                    deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
-    
-    def start_streams_from_deferred(self, defer_result, caller, contact_name):
-        """
-        Called from deferred returned by start_connection when start_streams() was called without
-        being connected to a contact.
-        """
-#        self.start_streams_tmp(caller, contact_name) DEPRECATED
-        log.info('start_streams_from_deferred %s %s %s' % (defer_result, caller, contact_name))
-        reactor.callLater(1, self.start_streams, caller, contact_name) # let's wait a few seconds more
-    
-    def start_connection_error_from_defer(self, error, caller, contact_name):
-        """
-        Called from deferred returned by start_connection when start_streams() was called without
-        being connected to a contact.
-        """
-        log.debug('Defer error: %s' % error)
-    
-    def stop_streams_tmp(self, caller, contact_name):
-        contact = self.get_contact(contact_name)
-        contact.stream_state = 0        
-        log.debug('stop_streams_tmp called. Doesnt really stop the streams ! FIXME')
-        
     def start_streams(self, caller, contact_name):
         """
         Starts audio/video streaming with a contact. 
+        
+        IMPORTANT: there are also remote_start_streams and remote_stopped_streams notification 
+        that are called directly from the StreamsManager.
         """
+        #TODO: use constants for these !
+        # stream_state 0 = stopped
+        # stream_state 1 = starting
+        # stream_state 2 = streaming
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
-        log.warning('selecting contact %s. Maybe this should be deprecated.' % (contact_name))
         contact = self.get_contact(contact_name)
+        if isinstance(contact, AddressBookError):
+            #FIXME: for now we crash. The adb should not return exceptions !!!!
+            raise contact
+        
+        contact.stream_state = 1 # STARTING # FIXME
+        # TODO: check contact.stream_state
+        #if contact.state == CONNECTED:
+        #    contact.stream_state = 2 # STARTED
+        #elif contact.state == DISCONNECTED:
+        deferred = self.streams_manager.start(contact)
+        def _cb_success(result, self, caller, contact_name):
+            msg = "Successfully started to stream with %s.\n" % (contact_name)
+            msg += "%s" % (result)
+            contact = self.get_contact(contact_name)
+            contact.stream_state = 2 # STARTED
+            notif = {
+                "contact_name":contact_name,
+                "contact":contact,
+                "message":msg,
+                "success":True
+                }
+            self.notify(caller, notif, "start_streams")
+            return result
+        def _eb_failure(err, self, caller, contact_name):
+            contact = self.get_contact(contact_name)
+            contact.stream_state = 0 # STOPPED
+            msg = "Could not start to stream with %s.\n%s" % (contact_name, str(err.getErrorMessage()))
+            notif = {
+                "contact_name":contact_name,
+                "contact":contact,
+                "message":msg,
+                "success":False
+                }
+            self.notify(caller, notif, "start_streams")
+            return err
+        deferred.addCallback(_cb_success, self, caller, contact_name)
+        deferred.addErrback(_eb_failure, self, caller, contact_name)
+        return deferred
+    
+    def remote_stopped_streams(self, caller, notif):
+        """
+        Called from the StreamsManager when remote host has stopped to stream.
+        
+        :param caller: Always None
+        :param notif: dict with keys  
+            {
+            "contact":contact_infos.contact,
+            "contact_name":contact_name,
+            "message":msg,
+            "success":False,
+            }
+        """
+        self.notify(caller, notif)
+        notif["contact"].stream_state = 0 # FIXME remove this
 
-        # self.select_contact(caller, contact_name) # THIS WILL CAUSE VERY WEIRD BUGS in CLI FIXME XXX TODO !!!!
-        if isinstance(contact, Exception):
-            err = contact
-            log.error('Error in start_streams', err.message)
-            self.notify(caller, err)
+    def remote_started_streams(self, caller, notif):
+        """
+        Called from the StreamsManager when remote host has started to stream.
+        
+        :param caller: Always None
+        :param notif: dict with keys  
+            {
+            "contact":contact_infos.contact,
+            "contact_name":contact_name,
+            "message":msg,
+            "success":False,
+            }
+        """
+        if notif["success"]:
+            notif["contact"].stream_state = 2 # FIXME remove this
         else:
-            if contact is not None:
-                if contact.state == CONNECTED:
-                    try:
-                        contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
-                        settings_com_channel.start_streaming(global_setting, contact)
-                        # global_setting.start_streaming(self, contact.address, settings_com_channel)
-                        # NOTIFY IS FROM engines.gstchannel.py:notify_started
-                        # self.notify(caller, {'started':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
-                    except AddressBookError, e:
-                        self.notify(caller, AddressBookError("Addressbook Error while trying to start streaming:" + e.message)) #, "error")   
-                    except SettingsError, err:
-                        self.notify(caller, err)
-                    except StreamsError, err:
-                        self.notify(caller, err)
-                    except Exception, err:
-                        self.notify(caller, err)
-                elif contact.state == DISCONNECTED:
-                    deferred = self.start_connection(caller, contact)
-                    if deferred:
-                        deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
-                        deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+            notif["contact"].stream_state = 0 # FIXME remove this
+        self.notify(caller, notif)
                             
     def stop_streams(self, caller, contact_name):
         """
         Stop all the streams (audio, video and data) for a given contact.
+        
+        IMPORTANT: there are also remote_start_streams and remote_stopped_streams notification 
+        that are called directly from the StreamsManager.
         """
-        log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
-        try:
-            contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
-            settings_com_channel.stop_streaming(contact.address)
-            #self.notify(caller, "streaming stopped")
-            # self.notify(caller, {'stopped':True, 'msg':"streaming stopped"}) # FIXME XXX TODO: should not be called from here but from the engines.
-        except AddressBookError, e:
-            log.error("AddressBookError in stop_streams: " + str(e))
-            self.notify(caller, AddressBookError("Please select a contact prior to stop streaming." + e.message)) #, "error")
-            #TODO: change key for 'streams_error'
-        except SettingsError, err:
-            log.error("SettingsError in stop_streams: " + str(e))
-            self.notify(caller, err)
-        except StreamsError, err:
-            log.error("StreamsError in stop_streams: " + str(e))
-            self.notify(caller, err)
-        else:
-            # this should be done in a more standard way. FIXME XXX TODO
-            contact.stream_state = 0 # FIXME
-                        
-    def _get_gst_com_chan_from_contact_name(self, contact_name):
-        """
-        Starts all the sub-streams. (audio, video and data)
-                
-        address: string or None (IP)
-        TO BE REMOVED FROM THE MAIN API
-        """
-        caller = None
-        contact = self.adb.get_contact(contact_name)    
-        if contact.state != addressbook.CONNECTED:
-            raise AddressBookError, "You must be joined with the contact prior to start streaming."
-        try:
-            settings_com_channel = engines.get_channel_for_contact('Gst',contact_name)
-        except KeyError, e:
-            raise StreamsError, "No settings channel for contact"
-        id  = contact.setting
-        try:
-            global_setting = self.settings.get_global_setting_from_id(id)
-        except SettingsError, err:
-            raise
-            #log.error('SettingError :' + err.message)
-            #global_setting = None
-        return contact, global_setting, settings_com_channel 
+        log.info('ControllerApi.stop_streams, contact= ' + str(contact_name))
+        contact = self.get_contact(contact_name)
+        # TODO: check contact.state
+        deferred = self.streams_manager.stop(contact)
+        def _cb_success(result, self, caller, contact_name):
+            contact = self.get_contact(contact_name)
+            contact.stream_state = 0 # STOPPED
+            msg = "Successfully stopped to stream with %s.\n%s" % (contact_name, str(result))
+            notif = {
+                "contact_name":contact_name,
+                "contact":contact,
+                "message":msg,
+                "success":True
+                }
+            self.notify(caller, notif, "stop_streams")
+            return result
+        def _eb_failure(err, self, caller, contact_name):
+            contact = self.get_contact(contact_name)
+            contact.stream_state = 0 # STOPPED
+            msg = "Error stopping streaming with %s.\n%s\nThere should be no stream left." % (contact_name, str(err.getErrorMessage()))
+            notif = {
+                "contact_name":contact_name,
+                "contact":contact,
+                "message":msg,
+                "success":False
+                }
+            self.notify(caller, notif, "stop_streams")
+            return err
+        deferred.addCallback(_cb_success, self, caller, contact_name)
+        deferred.addErrback(_eb_failure, self, caller, contact_name)
+        return deferred
 
-    ### Connect ###
+    ### Connect with com_chan ### ------------------------------------------------------
     def start_connection(self, caller, contact=None):
         """
         Connects (JOIN) to a contact. 
@@ -798,19 +521,35 @@ class ControllerApi(object):
 
     def refuse_connection(self, caller, connection):
         connection.refuse()
-        self.notify(caller, 'You refuse the connection.', 'info')
+        self.notify(caller, 'You refused the connection.', 'info')
 
     def set_connection(self, address, port, connector):
         self.connection = (address, port, connector)
 
-
     def get_default_port(self, connector):
+        """
+        Returns the default port for a connector
+        """
         return self.connectors[connector].PORT
     
     def get_com_chan_port(self):
+        """
+        Returns the port for the com_chan
+        """
         return self.core.com_chan_port
    
-    ### devices ###
+    ### devices ### ----------------------------------------------------------------
+    def devices_list_all(self, caller):
+        """
+        Gets the list of all devices.
+        """
+        devices_list = []
+        for manager in devices.managers.values():
+            for driver in manager.drivers.values():
+                for device in driver.devices.values():
+                    devices_list.append(device)
+        self.notify(caller, devices_list, 'devices_list_all')
+        # TODO Return a Deferred !
 
     def device_list_attributes(self, caller, driver_kind, driver_name, device_name): 
         """
@@ -825,11 +564,40 @@ class ControllerApi(object):
             self.notify(caller, e.message, 'info')
         else:
             self.notify(caller, attributes, 'device_list_attributes') # dict
+        # TODO Return a Deferred !
+
+    def devices_toggle_kill_jackd_enabled(self, enabled=False):
+        """
+        Enables or disables the auto kill and resurrect jackd when it seems to be frozen.
+        Called at startup with the value in the miville options.
+        """
+        try:
+            devices.jackd.toggle_kill_jackd_enabled(enabled)
+        except Exception, e:
+            log.error(e.message)
+        # TODO Return a Deferred !
+    
+    def set_video_standard(self, caller, value=None):
+        """
+        Easily sets the video standard. (norm)
+        
+        Valid string values are "ntsc", "secam" and "pal".
+        If value is None, sets it according to the time zone.
+        """
+        return devices.set_video_standard(caller, value)
+        # TODO Return a Deferred !
+    
+    def reset_firewire_bus(self, caller):
+        """
+        Resets the firewire (ieee1394) bus.
+        """
+        # TODO: add bus number ?
+        firewire.firewire_bus_reset(caller)
+        # TODO Return a Deferred !
 
     def device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
         """
         Modifies a device's attribute
-        
         
         :param driver_kind: 'video', 'audio' or 'data'
         :param driver_name: 'alsa', 'v4l2'
@@ -841,17 +609,7 @@ class ControllerApi(object):
         except DeviceError, e:
             self.notify(caller, e.message, 'info') # TODO: there should be a 'user_error' key.
         # TODO: modify method name in CLI
-
-    def devices_list_all(self, caller):
-        """
-        Gets the list of all devices.
-        """
-        devices_list = []
-        for manager in devices.managers.values():
-            for driver in manager.drivers.values():
-                for device in driver.devices.values():
-                    devices_list.append(device)
-        self.notify(caller, devices_list, 'devices_list_all')
+        # TODO Return a Deferred !
 
     def devices_list(self, caller, driver_kind):
         """
@@ -870,79 +628,7 @@ class ControllerApi(object):
             for device in driver.devices.values():
                 devices_list.append(device)
         self.notify(caller, devices_list, 'devices_list') # with a dict
-    
-    ### devices ###
-
-    def device_list_attributes(self, caller, driver_kind, driver_name, device_name): 
-        """
-        :param driver_kind: 'video', 'audio' or 'data'
-        :param driver_name: 'alsa', 'v4l2'
-        :param device_name: '/dev/video0', 'hw:1'
-        """
-        # TODO: updatre CLI to correct method name.
-        try:
-            attributes = devices.list_attributes(caller, driver_kind, driver_name, device_name)
-        except DeviceError, e:
-            self.notify(caller, e.message, 'info')
-        else:
-            self.notify(caller, attributes, 'device_list_attributes') # dict
-
-    def devices_toggle_kill_jackd_enabled(self, enabled=False):
-        """
-        Enables or disables the auto kill and resurrect jackd when it seems to be frozen.
-        """
-        try:
-            devices.jackd.toggle_kill_jackd_enabled(enabled)
-        except Exception, e:
-            log.error(e.message)
-    
-    def set_video_standard(self, caller, value=None):
-        """
-        Easily sets the video standard. (norm)
-        
-        Valid string values are "ntsc", "secam" and "pal".
-        If value is None, sets it according to the time zone.
-        """
-        return devices.set_video_standard(caller, value)
-    
-    def reset_firewire_bus(self, caller):
-        """
-        Resets the firewire (ieee1394) bus.
-        """
-        # TODO: add bus number ?
-        firewire.firewire_bus_reset(caller)
-
-    def device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
-        """
-        Modifies a device's attribute
-        
-        
-        :param driver_kind: 'video', 'audio' or 'data'
-        :param driver_name: 'alsa', 'v4l2'
-        :param device_name: '/dev/video0', 'hw:1'
-        :param attribute_name:
-        """
-        try:
-            devices.modify_attribute(caller, driver_kind, driver_name, device_name, attribute_name, value)
-        except DeviceError, e:
-            self.notify(caller, e.message, 'info') # TODO: there should be a 'user_error' key.
-
-        # TODO: modify method name in CLI
-
-    def devices_list(self, caller, driver_kind):
-        try: 
-            manager = devices.managers[driver_kind]
-        except KeyError:
-            self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
-            return
-
-        #self.notify(caller, 'you called devices_list', 'devices_list')
-        # TODO: make asynchronous
-        devices_list = []
-        for driver in manager.drivers.values():
-            for device in driver.devices.values():
-                devices_list.append(device)
-        self.notify(caller, devices_list, 'devices_list') # with a dict
+        # TODO Return a Deferred !
     
     # network test use cases ----------------------------------------------------
     def network_test_start(self, caller, bandwidth=1, duration=10, kind="localtoremote", contact=None, unit='M'):
@@ -1015,6 +701,7 @@ class ControllerApi(object):
                             # the API has already been notified with network_test_error key
                             pass
                             # self.notify(caller, "An error occuring while trying to start network test.", "network_test_error")
+        # TODO Return a Deferred !
 
     def network_test_abort(self, caller, contact_name=None):
         """
@@ -1037,6 +724,7 @@ class ControllerApi(object):
                     self.notify(caller, "No network tester for contact", "network_test_error")
                 else:
                     tester.abort_test(caller)
+        # TODO Return a Deferred !
                     
 # 
 #     def network_test_enable_autoaccept(self, caller, enabled=True):
@@ -1100,4 +788,5 @@ class ControllerApi(object):
                             self.notify(caller, "Starting pinger test with contact %s" % (contact.name), "info")
                         else:
                             self.notify(caller, "An error occuring while trying to do a pinger test.", "error")
+        # TODO Return a Deferred !
 

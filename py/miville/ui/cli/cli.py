@@ -40,9 +40,7 @@ What happens when the user types "c -l":
  * which finally calls CliView._get_contacts() with a dict of contacts 
    as an argument. (the key are the contact names)
    It is the contacts attributes of the AddressBook instance.
-   
 """
-
 # System imports
 import optparse
 import re
@@ -50,7 +48,8 @@ import os
 import socket
 
 # Twisted imports
-from twisted.internet import reactor, protocol
+from twisted.internet import protocol
+from twisted.internet import reactor
 #from twisted.conch import telnet
 try:
     from twisted.conch import recvline
@@ -58,24 +57,24 @@ try:
     from twisted.conch.telnet import TelnetTransport, TelnetBootstrapProtocol
 except ImportError:
     raise ImportError, 'If you want to use the Telnet interface, you need to install twisted.conch.'
+from twisted.python import failure
 
 #App imports
 from miville.utils import Observer, log # also imports Observer and Subject from miville.utils/observer.py
-
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
-from miville.settings import Settings
-# from streams.stream import AudioStream, VideoStream, DataStream
+from miville.streams import conf
 
-
+_api = None
 log = log.start('debug', 1, 0, 'cli')
 
 ESC = chr(27)
 enable_escape_sequences = True # disable this if you want not to show bold text, clear terminal page, etc.
 
 class TelnetServer(recvline.HistoricRecvLine):
-    """A Telnet server to control the application from a command line interface."""
-
+    """
+    A Telnet server to control the application from a command line interface.
+    """
     def __init__(self):
         self.prompt = "pof: "
         self.ps = (self.prompt,)
@@ -137,6 +136,7 @@ class TelnetServer(recvline.HistoricRecvLine):
             self.write_prompt()
 
     def connectionMade(self):
+        global _api
         global enable_escape_sequences 
         self.addr = self.terminal.transport.getPeer()
         # overwrite twisted terminal.nextLine method with our own to fix a bug 
@@ -160,12 +160,18 @@ class TelnetServer(recvline.HistoricRecvLine):
         self.keyHandlers.update({'\x01': self.handle_HOME,
                                  '\x05': self.handle_END, # TODO add control-D for quit
                                  t.TAB: self.completion})
-
         log.info("%s is connecting in Telnet on port %s" % (self.addr.host, self.addr.port))
         self.write("Welcome to Sropulpof!")
         hostname = socket.gethostname()
         if enable_escape_sequences:
-            msg = ']2;telnet miville to %s' % hostname
+            number = 0 
+            if _api is not None:
+                try:
+                    number = _api.config.port_numbers_offset # (core is api.... )
+                except Exception, e:
+                    log.error("connectionMade: %s Trying to get port offset." % (str(e)))
+            msg = 'telnet miville to %s #%d' % (hostname, number)
+            msg = ']2;%s' % (msg)
             self.terminal.write("%s" % (msg.encode('utf-8')))
         self.write_prompt()
 
@@ -186,7 +192,10 @@ class TelnetServer(recvline.HistoricRecvLine):
                 log.info('Could not write .cli_history file.')
             else:
                 if len(self.historyLines) > 50:
-                    self.history_file.write('\n'.join(self.historyLines[-50:]))
+                    try:
+                        self.history_file.write('\n'.join(self.historyLines[-50:]))
+                    except TypeError, e:
+                        log.error(".history_file.write(...historyLines:"  + e.message)
                 else:
                     try:
                         self.history_file.write('\n'.join(self.historyLines))
@@ -194,8 +203,10 @@ class TelnetServer(recvline.HistoricRecvLine):
                         log.error(e.message)
                 self.history_file.close()
         self.historyPosition = len(self.historyLines)
-        
-        recvline.RecvLine.handle_RETURN(self)
+        try:
+            recvline.RecvLine.handle_RETURN(self)
+        except:
+            raise # this seems to cause errors sometimes...    
     
     def completion(self):
         # rudimentary command completion
@@ -240,7 +251,6 @@ class TelnetServer(recvline.HistoricRecvLine):
     def write_prompt(self):
         self.terminal.write(self.prompt)
 
-
 class CliController(TelnetServer):
     """ 
     Command line parsers for each command
@@ -258,9 +268,6 @@ class CliController(TelnetServer):
         # build a dict of all semi-private methods
         self.callbacks = find_callbacks(self)
         self.shortcuts = {'c': 'contacts',
-                          #'a': 'audio',
-                          #'v': 'video',
-                          's': 'settings',
                           'z': 'streams',
                           'j': 'join',
                           'e': 'exit',
@@ -268,8 +275,11 @@ class CliController(TelnetServer):
                           'n': 'network',
                           'd': 'devices',
                           'h': 'help',
-                          'p': 'ping'
+                          'p': 'ping',
+                          's': 'profile',
                           }
+                      #'a': 'audio',
+                      #'v': 'video',
 
     def parse(self, line):
         """
@@ -310,109 +320,13 @@ class CliController(TelnetServer):
         s = str(line)
         log.info("pyt: " + s)
         
-    def _settings(self, line):
-        
-        cp = CliParser(self, prog=line[0], description="Manages the settings.")
-        cp.add_option("-l", "--list", action='store_true', help="List all the settings")
-        cp.add_option("-a", "--add", type="string", help="Add a setting")
-        cp.add_option("-t", "--type", type="string", help="Type of setting (global, streamsubgroup, stream or media )")
-        cp.add_option("-e", "--erase", "--remove", "--delete", type="string", help="Erase a setting")
-        cp.add_option("-m", "--modify", type="string", help="Modify a setting")
-        cp.add_option("-d", "--duplicate", action="store_true", help="Duplicate a setting")
-        cp.add_option("-s", "--select", help="Select a setting")
-        cp.add_option("-k", "--save", action="store_true", help="Save user settings")
-        cp.add_option("-o", "--load", action="store_true", help="Load presets and user settings (overwrites current settings)")
-       
-        # options to select global setting to use when manipulating streamgroups and streams
-        cp.add_option("-g", "--globalsetting", type="string", help="The global setting name to use when editing global settings")
-        cp.add_option("-p", "--subgroup", type="string", help="The stream subgroup name to use when editing media streams")
-        cp.add_option("-n", "--mediasetting", type="string", help="The media setting name to use when editing media settings")
-        cp.add_option("-i", "--mediastream", type="string", help="The media stream name to use when editing media streams")
-        
-        cp.add_option("-x", "--xlist", action='store_true', help="List settings hierarchy")      
-        cp.add_option("-y", "--id_offset", type="string", help="Offset the ids by the given amount when saving settings")
-        cp.add_option("-z", "--description", action='store_true', help="Display description")
-        (options, args) = cp.parse_args(line)
-        
-        if options.xlist:
-            self.core.pretty_list_settings(self)
-        elif options.save:
-            offset = 0
-            if options.id_offset != None:
-                offset = int(options.id_offset)
-            self.core.save_settings(self, offset)
-        elif options.load:
-            self.core.load_settings(self)
-        elif options.description:
-            cp.print_description() 
-        elif options.type:
-            if options.modify:
-                tokens  = options.modify.split("=")
-                attribute = tokens[0]
-                new_value = tokens[1]
-            if options.type == 'global':   
-                if options.list:
-                    self.core.list_global_setting(self)
-                elif options.add:
-                    self.core.add_global_setting(self, options.add) # options.type
-                elif options.erase:
-                    self.core.erase_global_setting(self,options.erase)
-                elif options.modify:
-                    self.core.modify_global_setting(self, options.globalsetting, attribute, new_value)
-                elif options.duplicate:
-                    self.core.duplicate_global_setting(self,None)
-                elif options.select:
-                    self.core.select_global_setting(self,options.select)
-                
-            elif options.type == 'media':
-                if options.list:
-                    self.core.list_media_setting(self)
-                elif options.add:
-                    self.core.add_media_setting(self, options.add) # options.type
-                elif options.erase:
-                    self.core.erase_media_setting(self,options.erase)
-                elif options.modify:
-                    self.core.modify_media_setting(self,options.mediasetting, attribute, new_value)
-                elif options.duplicate:
-                    self.core.duplicate_media_setting(self,None)
-                elif options.select:
-                    self.core.select_media_setting(self,options.select)
-            elif options.type == 'streamsubgroup':
-                if options.list:
-                    self.core.list_stream_subgroup(self, options.globalsetting)
-                elif options.add:
-                    self.core.add_stream_subgroup(self, options.add, options.globalsetting) # options.type
-                elif options.erase:
-                    self.core.erase_stream_subgroup(self,options.erase, options.globalsetting)
-                elif options.modify:
-                    self.core.modify_stream_subgroup(self, options.globalsetting, options.subgroup, attribute, new_value)
-                elif options.duplicate:
-                    self.core.duplicate_stream_subgroup(self,None, options.globalsetting)
-                elif options.select:
-                    self.core.select_stream_subgroup(self,options.select, options.globalsetting)
-            elif options.type == 'stream':
-                if options.list:
-                    self.core.list_media_stream(self, options.globalsetting, options.subgroup)
-                elif options.add:
-                    self.core.add_media_stream(self, options.add, options.globalsetting, options.subgroup) # options.type
-                elif options.erase:
-                    self.core.erase_media_stream(self, options.globalsetting, options.subgroup, options.erase)
-                elif options.modify:
-                    self.core.modify_media_stream(self, options.globalsetting, options.subgroup, options.mediastream, attribute, new_value )
-                elif options.duplicate:
-                    self.core.duplicate_media_stream(self, options.globalsetting, options.subgroup)
-                elif options.select:
-                    self.core.select_media_stream(self,options.select, options.globalsetting, options.subgroup) 
-        else:    
-            cp.print_help()
-                
-    
     def _contacts(self, line):
         cp = CliParser(self, prog=line[0], description="Manages the address book.")
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
         cp.add_option("-a", "--add", type="string", help="Add a contact")
         cp.add_option("-e", "--erase", "--remove", "--delete", action='store_true', help="Erase a contact")
         cp.add_option("-m", "--modify", action="store_true", help="Modify a contact")
+        cp.add_option("-M", "--modify-attr", action="store_true", help="Modify a single contact attribute.")
         cp.add_option("-d", "--duplicate", action="store_true", help="Duplicate a contact")
         cp.add_option("-s", "--select", help="Select a contact")
         cp.add_option("-k", "--keep", "--save", action="store_true", help="Keep (save) an auto-created contact (a caller)")
@@ -445,7 +359,7 @@ class CliController(TelnetServer):
                 new_name = None
                 address = None
                 port = None
-                setting = None
+                profile_id = None
                 auto_answer = None
                 for i, arg in enumerate(args):
                     if i > 0:
@@ -459,8 +373,8 @@ class CliController(TelnetServer):
                                 address = value
                             elif key == 'port':
                                 port = value
-                            elif key == 'setting':
-                                setting = value
+                            elif key == 'profile':
+                                profile_id = value
                             elif key == 'auto_answer':
                                 if value in (1, 'True', 'true', 'TRUE'):
                                     auto_answer = True
@@ -486,9 +400,30 @@ class CliController(TelnetServer):
                             else:
                                 self.write("Not a valid value for auto_answer", False)
 
-                self.core.modify_contact(self, name, new_name, address, port, auto_answer=auto_answer, setting=setting)
+                self.core.modify_contact(self, name, new_name, address, port, auto_answer=auto_answer, profile_id=profile_id)
             else:
                 self.write('You need to give at least one argument.', True)
+        elif options.modify_attr: # WAY SIMPLER. TODO: delete previous way to modify contact.
+            log.debug("modify_attr. len(args):%d. args:%s" % (len(args), args))
+            if len(args) < 3: # FIXME: 0th arg is in args list !!!!!!!!
+                self.write("modify_attr: You must provided 2 arguments: attr_name attr_value")
+            else:
+                attr_name = str(args[1])
+                types = {"address":str, "port":int, "profile_id":int, "auto_answer":bool}
+                try:
+                    _type = types[attr_name] # type casting using a mapping dict.
+                    log.debug("type: %s" % (_type))
+                    val = _type(args[2])
+                    if _type is bool:
+                        if args[2] == "0":
+                            val = False # important. otherwise any str in casted to True
+                except TypeError, e:
+                    self.write("Wrong argument type of %s for attribute %s." % (args[1], attr_name))
+                except KeyError, e:
+                    self.write("No contact attribute %s" % (attr_name))
+                else:
+                    contact_name = None # will use selected contact.
+                    self.core.modify_contact_attr(self, None, attr_name, val)
         elif options.duplicate:
             name = None
             new_name = None
@@ -519,23 +454,56 @@ class CliController(TelnetServer):
                 self.core.save_client_contact(self, args[1], args[2])
         else:
             cp.print_help()
-
     
-
     def _streams(self, line):
         cp = CliParser(self, prog=line[0], description="Manage the wrapper stream.")
         cp.add_option("-s", "--start", type="string", help="Start streaming with specified contact")
         cp.add_option("-i", "--stop", "--interrupt", type="string", help="Stop a stream of playing")
+        cp.add_option("-l", "--list", action='store_true', help="List running streams")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
         (options, args) = cp.parse_args(line)
         kind = 'streams'
         if options.start:
             contact_name = options.start
-            self.core.start_streams(self, contact_name)
+            #try:
+            self.core.start_streams(self, unicode(contact_name))
+            #except Exception, e: #TODO: only adb err
+            #    log.error(e.message)
+            #    self.write("error " + e.message)
         elif options.stop:
             contact_name = options.stop
             self.core.stop_streams(self, contact_name)
+        elif options.list:
+            self.core.list_streams(self) # TODO: add contact or service arg.
+        elif options.description:
+            cp.print_description()
+        else:
+            cp.print_help()
+
+    def _profile(self, line):
+        """
+        Get infos on streams configuration profiles.
+        """
+        cp = CliParser(self, prog=line[0], description="Lists and chooses configuration profiles.")
+        cp.add_option("-s", "--select", type="int", help="Assign the profile ID to the currently selected contact.")
+        cp.add_option("-d", "--details", type="int", help="Prints infos on the provided profile ID.")
+        cp.add_option("-l", "--list", action="store_true", help="Lists all the profiles available.")
+        cp.add_option("-z", "--description", action='store_true', help="Display description")
+        (options, args) = cp.parse_args(line)
+        if options.list:
+            self.core.list_profiles(self)
+        elif options.details:
+            profile_id = options.details
+            self.core.get_profile_details(self, profile_id)
+        elif options.select:
+            if len(args) > 1:
+                profile_id = options.select
+                contact_name = args[1]
+                log.debug("Set profile %d for contact %s" % (profile_id, contact_name))
+                self.core.modify_contact(self, name=contact_name, profile_id=profile_id)
+            else:
+                self.write("Error: You should give a contact as an option value and a contact as argument.\nUsage: -s <id> <contact_name>")
         elif options.description:
             cp.print_description()
         else:
@@ -563,7 +531,7 @@ class CliController(TelnetServer):
         Prints the description of each available command
         """
         for cmd in self.callbacks.keys():
-            if cmd == 'ask' or cmd == 'help':
+            if cmd == 'ask' or cmd == 'help' or cmd == 'firereset' or cmd == 'norm':
                 # crash or infinite recursion...
                 pass
             else:
@@ -579,20 +547,32 @@ class CliController(TelnetServer):
         """
         Displays list of commands
         """
-        
         cp = CliParser(self, prog=line[0], description="Prints descriptions of all commands.")
         #cp.add_option("-l", "--list", help="List all commands in Sropulpof.")
         #cp.add_option("-z", "--description", action='store_true', help="Display description")
-        
         (options, args) = cp.parse_args(line)
-        
         #if len(args) > 1 or len(options) > 1 :
         #    if options.list:
         #        self.print_all_commands()
         #elif options.usage:
         #    cp.print_usage()
         #else:
-        self.print_all_commands()
+        #self.print_all_commands()
+        self.write("Real help is disabled for now") # TODO: it calls the optionparser...
+        self.write("""
+List of commands:
+  c = contacts
+  z = streams
+  j = join
+  e = exit
+  q = quit
+  n = network
+  d = devices
+  h = help
+  p = ping
+  s = profile
+        """)
+        self.write_prompt()
 
     def _norm(self, line):                                                                       
         """                                                                                      
@@ -601,12 +581,10 @@ class CliController(TelnetServer):
         Valid string values are "ntsc", "secam" and "pal".                                       
         If value is None, sets it according to the time zone.                                    
         """                                                                                      
-                                                                                                 
         cp = CliParser(self, prog=line[0], description="Easily sets the video standard.")        
         # strings options                                                                        
         cp.add_option("-n", "--norm", type='string', default="ntsc", help="Specifies the norm such as 'ntsc', 'pal' or 'secam'")
         (options, args) = cp.parse_args(line)                                                    
-        
         if options.norm:                                                                         
             value = self.core.set_video_standard(self, options.norm)
             self.write("\nSet video standard to %s\n" % (value))
@@ -623,23 +601,18 @@ class CliController(TelnetServer):
         devices -t v4l2 -d /dev/video0 -m norm ntsc  : modifies an attribute for a device
         """
         cp = CliParser(self, prog=line[0], description="Manages the audio/video/data devices.")
-        
         # booleans (action)
         cp.add_option("-l", "--list", action='store_true', help="Lists all the drivers and devices: devices -l")
         cp.add_option("-L", "--list-all", action='store_true', help="Lists everything. No arg needed.")
         cp.add_option("-a", "--attributes", action='store_true', help="Lists attributes for a device: devices -t v4l2 -d /dev/video0 -a")
         cp.add_option("-z", "--description", action='store_true', help="Displays description")
-       
         # strings options
         cp.add_option("-k", "--kind", type='string', help="Specifies a kind of devices, such as 'video', 'audio' or 'data'")
         cp.add_option("-t", "--driver", type="string", help="Specifies a driver.")
         cp.add_option("-d", "--device", type="string", help="Specifies a device.")
-        
         # modifiers
         cp.add_option("-m", "--modify", type="string", help="Modifies the value of an attribute: devices -t v4l2 -d /dev/video0 -m norm ntsc")
-        
         (options, args) = cp.parse_args(line)
-        
         # USE CASES:
         # 0) devices_list_all
         if options.list_all:
@@ -653,7 +626,6 @@ class CliController(TelnetServer):
             else:
                 self.write("Please specify a driver kind such as 'video' or 'audio'")
                 cp.print_help()
-
         # 2) device_list_attributes
         elif options.attributes:
             if options.driver and options.device and options.kind:
@@ -662,7 +634,6 @@ class CliController(TelnetServer):
             else:
                 self.write("Please specify a driver kind, a device and a driver.")
                 cp.print_help()
-
         # 3) device_modify_attribute
         elif options.modify:
             if options.driver and options.device and options.kind and len(args) == 2:
@@ -673,14 +644,12 @@ class CliController(TelnetServer):
             else:
                 self.write("Please specify a driver, a driver kind and a device")
                 cp.print_help()
-        
         # HELP:
         elif options.description:
             cp.print_description()
         else:
             cp.print_help()
         self.write_prompt()
-
 
     def _network(self, line):
         """
@@ -691,24 +660,20 @@ class CliController(TelnetServer):
         """
         # TODO: add contact (-c) argument
         cp = CliParser(self, prog=line[0], description="Manages the audio/video/data devices.")
-        
         # booleans (action)
         cp.add_option("-z", "--description", action='store_true', help="Displays description") # TODO: add examples
         cp.add_option("-s", "--start", action='store_true', help="Starts a test")
         # TODO: implement this
         #cp.add_option("-q", "--stop", action='store_true', help="Stops the current test")
         #cp.add_option("-h", "--help", action='store_true', help="Displays help")
-        
         # strings options
         cp.add_option("-k", "--kind", type='string', help="Kind of network test. (locaotoremote | remotetolocal tradeoff | dualtest)")
         #cp.add_option("-c", "--contact", type='string', help="Specifies a contact to test with")
         cp.add_option("-u", "--unit", type='string', help="Unit for bandwidth. Either M or K.")
-        
         # int options
         cp.add_option("-b", "--bandwidth", type="int", help="Bandwidth in megabits. (default:1)")
         cp.add_option("-t", "--time", type="int", help="Duration in seconds. (default:10)")
         (options, args) = cp.parse_args(line)
-        
         # default values : 
         bandwidth = 1
         duration = 10 
@@ -739,6 +704,8 @@ class CliController(TelnetServer):
         """
         Starts a pinger test.
         """
+        cp = CliParser(self, prog=line[0], description="Sends a ping to the remote contact.")
+        (options, args) = cp.parse_args(line)
         self.core.pinger_start(self) # arg should be caller.
         self.write_prompt()
 
@@ -746,6 +713,9 @@ class CliController(TelnetServer):
         """
         Resets the firewire bus.
         """
+        cp = CliParser(self, prog=line[0], description="Resets the firewire bus.")
+        (options, args) = cp.parse_args(line)
+        # the rest should not be called in case we asked for help....
         self.core.reset_firewire_bus(self)
         self.write_prompt()
 
@@ -831,7 +801,6 @@ class CliParser(optparse.OptionParser):
             opt = "-" + ch
             option = self._short_opt.get(opt)
             i += 1                      # we have consumed a character
-
             if not option:
                 raise optparse.BadOptionError(opt)
             if option.takes_value():
@@ -840,7 +809,6 @@ class CliParser(optparse.OptionParser):
                 if i < len(arg):
                     rargs.insert(0, arg[i:])
                     stop = True
-
                 nargs = option.nargs
                 if len(rargs) < nargs:
                     if nargs == 1:
@@ -850,24 +818,19 @@ class CliParser(optparse.OptionParser):
                         self.error(optparse._("%s option requires %d arguments")
                                    % (opt, nargs))
                         return
-
                 elif nargs == 1:
                     value = rargs.pop(0)
                 else:
                     value = tuple(rargs[0:nargs])
                     del rargs[0:nargs]
-
             else:                       # option doesn't take a value
                 value = None
-
             option.process(opt, value, values, self)
-
             if stop:
                 break
 
     def _process_long_opt(self, rargs, values):
         arg = rargs.pop(0)
-
         # Value explicitly attached to arg?  Pretend it's the next
         # argument.
         if "=" in arg:
@@ -877,7 +840,6 @@ class CliParser(optparse.OptionParser):
         else:
             opt = arg
             had_explicit_value = False
-
         opt = self._match_long_opt(opt)
         option = self._long_opt[opt]
         if option.takes_value():
@@ -895,13 +857,10 @@ class CliParser(optparse.OptionParser):
             else:
                 value = tuple(rargs[0:nargs])
                 del rargs[0:nargs]
-
         elif had_explicit_value:
             self.error(optparse._("%s option does not take a value") % opt)
-
         else:
             value = None
-
         option.process(opt, value, values, self)
 
 
@@ -910,11 +869,11 @@ class CliView(Observer):
     Command-line interface results printer. 
     The View (Observer) in the MVC pattern. 
     """
-    
     def __init__(self, subject, controller):
         Observer.__init__(self, subject)
         self.controller = controller
         self.callbacks = find_callbacks(self)
+        self._subject = subject # XXX added this to fix a bug... 
 
     def update(self, origin, key, data):
         """
@@ -934,300 +893,8 @@ class CliView(Observer):
         self.controller.write(msg)
         if prompt:
             self.controller.write_prompt()
-            
-    ### Settings
-    
-    def _modify_media_stream(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not modify media stream.\nReason: ' +  str(data))
-            else:
-                self.write('Stream settings modified')
-
-    
-    def _erase_media_stream(self,origin,data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not erase media stream.\nReason: ' +  str(data))
-            else:
-                self.write('Media stream removed')        
-        
-    def _add_media_stream(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not add media stream.\nReason: ' +  str(data))
-            else:
-                self.write('Media stream added')
-                    
-    
-    def _list_media_stream(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not list media streams.\nReason: ' +  str(data))
-            else:
-                (media_streams, selected_media_stream) = data
-                if len(media_streams) == 0:
-                    self.write('There are no media streams\n')
-                else:
-                    txt = ""
-                    for media_stream in media_streams:
-                        name = media_stream.name
-                        setting = str(media_stream.setting)
-                        if name == selected_media_stream:
-                            name = bold(name + ": <---")
-                        port = media_stream.port
-                        port = str(port)
-                        gain = str(media_stream.gain_levels)
-                        sync = str(media_stream.sync_group)
-                        enabled = str(media_stream.enabled)
-                        txt += """%(name)s:
-    enabled       : %(enabled)s
-    port          : %(port)s
-    gain levels   : %(gain)s
-    media setting : %(setting)s
-    sync group    : %(sync)s
-""" % locals()
-                    self.write( txt )
-                        
-    
-    def _list_stream_subgroup(self, origin, data): # list media settings
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not list media settings.\nReason: ' +  str(data))
-            else:
-                (stream_subgroups, selected_stream_subgroup) = data
-                if len(stream_subgroups) == 0:
-                    self.write('There are no streamsubgroup settings\n')
-                else:
-                    txt = ''
-                    for k in stream_subgroups.keys():
-                        sub_group = stream_subgroups[k]
-                        name = sub_group.name
-                        if name == selected_stream_subgroup:
-                            name = bold(name + ": <---")
-                        enabled = str(sub_group.enabled)
-                        mode = str(sub_group.mode)
-                        port = str(sub_group.port)
-                        container = str(sub_group.container)
-                        txt += """%(name)s:
-    id        : %(k)3d
-    enabled   : %(enabled)s
-    mode      : %(mode)s
-    port      : %(port)s
-    container : %(container)s """ % locals()
-                        self.write( txt )
-
-
-    def _add_stream_subgroup(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not add stream  settings.\nReason: ' +  str(data))
-            else:
-                self.write('Stream subgroup added')
-
-
-    def _erase_stream_subgroup(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not erase stream  settings.\nReason: ' +  str(data))
-            else:
-                self.write('Stream subgroup removed')
-
-    def _modify_stream_subgroup(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not modify stream  settings.\nReason: ' +  str(data))
-            else:
-                self.write('Stream settings modified')
-
-    def _duplicate_stream_subgroup(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not duplicate stream  settings.\nReason: ' +  str(data))
-            else:
-                self.write('stream settings duplicate')
-
-    def _select_stream_subgroup(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not select stream  settings.\nReason: ' +  str(data))
-            else:
-                self.write('Stream settings select')
-    
-    def _list_media_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not list media settings.\nReason: ' +  str(data))
-            else:
-                (media_settings, selected_media_setting) = data
-                if len(media_settings) == 0:
-                    self.write('There are no media settings\n')
-                else:
-                    txt = ''
-                    for k in media_settings.keys():
-                        name = media_settings[k].name
-                        settings_ = "\n" #str(media_settings[k].settings)
-                        for setting_name, setting_value in media_settings[k].settings.iteritems():
-                            settings_ += "                " + str(setting_name) + ':' + str(setting_value) + "\n"
-                        if name == selected_media_setting:
-                            name = bold(name + ": <---")
-                        others = "None"
-                        txt += """%(name)s:
-    id      : %(k)3d
-    settings: %(settings_)s\n""" % locals()
-                    self.write( txt )
-
-    def _add_media_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not add media setting.\nReason: ' +  str(data))
-            else:
-                self.write('Media setting added')
-
-    def _erase_media_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not erase media setting.\nReason: ' +  str(data))
-            else:
-                self.write('Media setting removed')
-
-    def _modify_media_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not modify media setting.\nReason: ' +  str(data))
-            else:
-                self.write('Media setting modified')
-
-    def _duplicate_media_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not duplicate media setting.\nReason: ' +  str(data))
-            else:
-                self.write('Media setting duplicated')
-
-    def _select_media_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not select media setting.\nReason: ' +  str(data))
-            else:
-                self.write('Media setting selected')
-    
-    def _pretty_list_settings(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not list global settings.\nReason: ' +  str(data))
-            else:
-                got_some = False
-                (global_settings, media_settings) = data
-                txt = "GLOBAL SETTINGS:\n"
-                for k, v in global_settings.iteritems():
-                    txt += "\n[" + str(k) + "] global setting  " + v.name + "\n"
-                    for gid,group in v.stream_subgroups.iteritems():
-                        txt += "  [" + str(gid) + "] stream sub group " + group.name + "\n"
-                        txt += "   enabled: " + str(group.enabled) + "\n"
-                        txt += "   mode: " + str(group.mode) + "\n"
-                        for stream in group.media_streams:
-                            txt += "   [" + stream.name + "] stream\n"
-                            txt += "    enabled: " + str(stream.enabled) + "\n"
-                            txt += "    sync: " + stream.sync_group + "\n"
-                            txt += "    port: " + str(stream.port) + "\n"
-                            txt += "    media setting: %s\n" % str(stream.setting)
-                            try:
-                                media_setting = Settings.get_media_setting_from_id(stream.setting)
-                                txt += "      [" + str(media_setting.id) + "] media setting '" + media_setting.name + "'\n"
-                                for key, value in media_setting.settings.iteritems():
-                                    txt += "       %s : %s\n" % (key, str(value))
-                            except:
-                                txt += "     media setting N/A\n"
-                        
-                txt += "\nAll MEDIA SETTINGS...\n"
-                for k, v in media_settings.iteritems():
-                    txt += " [" + str(k) + "] " + v.name + "\n"
-                    for key, value in v.settings.iteritems():
-                        txt += "  %s : %s\n" % (key, str(value))
-                self.write( txt )
-                    
-    
-    def _list_global_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not list global settings.\nReason: ' +  str(data))
-            else:
-                (global_settings, selected_global_setting) = data
-                if len(global_settings) == 0:
-                    self.write('There are no global settings\n')
-                else:
-                    txt = ''
-                    for k in global_settings.keys():
-                        comm = global_settings[k].communication
-                        name = global_settings[k].name
-                        if name == selected_global_setting:
-                            name = bold(name + ": <---")
-                        others = "None"
-                        txt += """%(name)s:
-    id:            %(k)3d
-    communication: %(comm)s
-    others:        %(others)s\n""" % locals()
-                    self.write( txt )
-
-    def _add_global_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not add settings.\nReason: ' +  str(data) )
-            else:
-                self.write('Global setting added')
-
-    def _erase_global_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not erase settings.\nReason: ' +  str(data))
-            else:
-                self.write('Global setting removed')
-
-    def _modify_global_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not modify global settings.\nReason: ' +  str(data))
-            else:
-                self.write('Global setting modified')
-
-    def _duplicate_global_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not duplicate settings.\nReason: ' +  str(data))
-            else:
-                self.write('Global setting duplicated')
-
-    def _select_global_setting(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not select settings.\nReason: ' +  str(data))
-            else:
-                self.write('Global setting selected')
-
-    def _load_settings(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not load settings.\nReason: ' +  str(data))
-            else:
-                self.write('Settings loaded')
-
-    def _save_settings(self, origin, data):
-        if origin is self.controller:
-            if isinstance(data, Exception):
-                self.write('Could not save settings.\nReason: ' +  str(data))
-            else:
-                self.write('Settings saved')
-
-#    def _description_global_setting(self, origin, data):
-#        if origin is self.controller:
-#            if isinstance(data, Exception):
-#                self.write('Could not describe settings.\nReason: ' +  str(data))
-#            else:
-#                self.write('Settings added')
     
     ### Contacts
-    
     def _get_contacts(self, origin, data):
         """
         called by api.py:
@@ -1251,7 +918,7 @@ class CliView(Observer):
                 #if contact.kind:
                 msg.append("\tkind        : %s" % str(contact.kind))
                 msg.append("\tauto_answer : %s" % str(contact.auto_answer))
-                msg.append("\tsetting     : %s" % str(contact.setting))
+                msg.append("\tprofile     : %s" % str(contact.profile_id))
             msg_out = "\n".join(msg)
             self.write(msg_out)
 
@@ -1261,6 +928,61 @@ class CliView(Observer):
                 self.write('Could not add contact.\nReason: %s.' % data)
             else:
                 self.write('Contact added')
+        
+    def _list_profiles(self, origin, data):
+        """
+        Listing config db profiles.
+        """
+        # TODO: use data instead of calling conf db directly
+        #TODO: make it prettier
+        log.debug("list_profiles :" + str(data))
+        txt = ""
+        if origin is self.controller:
+            db = conf.get_single_db()
+            #db = self.subject.config_db # FIXME: using an attribute of the API
+            for profile in db.profiles.itervalues():
+                txt += " * Profile #%d: \"%s\"\n" % (profile.id, profile.name)
+                # for setting_id in profile.settings:
+                #     setting = db.get_setting(setting_id)
+                #     txt += "   - %s:\n" % (setting.name)
+                    #for name, value in setting.entries.iteritems():
+                    #    field = db.get_field(name)
+                    #    desc = field.desc
+                    #    PADDING_SIZE = 30
+                    #    length = PADDING_SIZE - len(desc)
+                    #    if length < 0:
+                    #        lenght = 0
+                    #    padding = " " * length
+                    #    txt += "     - %s: %s %s\n" % (desc, padding, value)
+                    #    field = db.get_field(name)
+            self.write(txt)
+
+    def _get_profile_details(self, origin, data):
+        """
+        Listing config db profiles.
+        """
+        # TODO: the api isn't much of any help
+        profile_id = data
+        log.debug("get_profile_details :" + str(data))
+        txt = ""
+        if origin is self.controller:
+            db = conf.get_single_db()
+            profile = db.get_profile(profile_id)
+            txt += "Profile #%d: \"%s\"\n" % (profile.id, profile.name)
+            for setting_id in profile.settings:
+                setting = db.get_setting(setting_id)
+                txt += " * %s:\n" % (setting.name)
+                for name, value in setting.entries.iteritems():
+                    field = db.get_field(name)
+                    desc = field.desc
+                    PADDING_SIZE = 50
+                    length = PADDING_SIZE - len(desc)
+                    if length < 0:
+                        lenght = 0
+                    padding = "." * length
+                    txt += "     %s %s %s\n" % (desc, padding, value)
+                    field = db.get_field(name)
+            self.write(txt)
 
     def _delete_contact(self, origin, data):
         if origin is self.controller:
@@ -1296,16 +1018,17 @@ class CliView(Observer):
                 self.write('Could not select this contact.\nReason: %s' % data)
             else:
                 self.write('Contact selected')
-
-    def _audio_set(self, origin, ((state, attr, value), name)):
-        """
-        
-        """
+    def _modify_contact_attr(self, origin, data):
         if origin is self.controller:
-            if state:
-                self.write('%s of audio stream %s is set to %s.' % (attr, name, value))
+            if isinstance(data, failure.Failure):
+                self.write(data.getErrorMessage())
             else:
-                self.write('Unable to set %s of audio stream %s.' % (attr, name))
+                #self.write(str(data))
+                #TODO: what if contact name is None?
+                contact = data[0]
+                attr_name = data[1]
+                msg = "Modified %s contact attribute %s with success." % (contact, attr_name)
+                self.write(msg)
                 
     def _not_found(self, origin, (name, kind)): # _not_found(self, origin, name, kind)
         """
@@ -1316,234 +1039,30 @@ class CliView(Observer):
         if origin is self.controller:
             self.write('There\'s no %s stream with the name %s' % (kind, name))
 
-    def _audio_settings(self, origin, (data, name)):
-        if origin is self.controller:
-            if data:
-                if data._state == 0:
-                    state = 'idle'
-                elif data._state == 1:
-                    state = 'playing'
-                else:
-                    state = 'unknown'
-                msg = [bold('Audio Stream: ' + name)]
-                msg.append('\nstatus: ')
-                msg.append(state)
-                msg.append('\ncontainer: ')
-                msg.append(str(data.container))
-                msg.append('\ncodec: ')
-                msg.append(str(data.codec))
-                msg.append('\ncodec settings: ')
-                msg.append(str(data.codec_settings))
-                msg.append('\nbitdepth: ')
-                msg.append(str(data.bitdepth))
-                msg.append('\nsamplerate: ')
-                msg.append(str(data.sample_rate))
-                msg.append('\nchannels: ')
-                msg.append(str(data.channels))
-                msg.append('\nbuffer: ')
-                msg.append(str(data.buffer))
-                msg.append('\nport: ')
-                msg.append(str(data.port))
-                msg.append('\nsource: ')
-                msg.append(str(data.source))
-                self.write("".join(msg))
-            else:
-                self._not_found(origin, (name, 'audio'))
-                
-            
-    def _audio_add(self, origin, (data, name)):
-        if origin is self.controller:
-            if data == 1:
-                self.write('Audio stream %s created.' % name)
-            elif data == 0:
-                self.write("Cannot create audio stream. Name '%s' already use." % name)
-            else:
-                self.write('Unable to create the audio stream %s.' % name)
-
-    def _audio_delete(self, origin, (data, name)):
-        if origin is self.controller:
-            if data == 1:
-                self.write('Audio stream %s deleted.' % name)
-            elif data == 0:
-                self._not_found(origin, (name, 'audio')) 
-            else:
-                self.write('Unable to delete the audio stream %s.' % name)
-
-    def _audio_rename(self, origin, (data, name, new_name)):
-        if origin is self.controller:
-            if data == 1:
-                self.write('Audio stream %s rename to %s.' % (name, new_name))
-            elif data == 0:
-                self._not_found(origin, (name, 'audio')) 
-            else:
-                self.write('Unable to rename the audio stream %s.' % name)
-
-
-    def _audio_list(self, origin, data):
-        if origin is self.controller:
-            if data:
-                names = [stream[0] for stream in data]
-                self.write("\n".join(names))
-            else:
-                self.write('There is no audio stream.')
-
-    def _audio_sending_started(self, origin, data):
-        if data:
-            self.write('\nAudio sending started.')
-        else:
-            self.write('\nUnable to start audio sending.')
-
-    def _audio_sending_stopped(self, origin, data):
-        if data:
-            self.write('\nAudio sending stopped.')
-        else:
-            self.write('\nUnable to stop audio sending.')
-
-
-    def _video_settings(self, origin, (data, name)):
-        if origin is self.controller:
-            if data:
-                if data._state == 0:
-                    state = 'idle'
-                elif data._state == 1:
-                    state = 'playing'
-                else:
-                    state = 'unknown'
-                msg = [bold('Video Stream: ' + name)]
-                msg.append('\nstatus: ')
-                msg.append(state)
-                msg.append('\ncontainer: ')
-                msg.append(str(data.container))
-                msg.append('\ncodec: ')
-                msg.append(str(data.codec))
-                msg.append('\ncodec settings: ')
-                msg.append(str(data.codec_settings))
-                msg.append('\nwidth: ')
-                msg.append(str(data.width))
-                msg.append('\nheight: ')
-                msg.append(str(data.height))
-                msg.append('\nbuffer: ')
-                msg.append(str(data.buffer))
-                msg.append('\nport: ')
-                msg.append(str(data.port))
-                msg.append('\nsource: ')
-                msg.append(str(data.source))
-                self.write("".join(msg))
-            else:
-                self._not_found(origin, (name, 'video'))
-            
-    def _video_add(self, origin, (data, name)):
-        if origin is self.controller:
-            if data == 1:
-                self.write('Video stream %s created.' % name)
-            elif data == 0:
-                self.write("Cannot create video stream. Name '%s' already use." % name)
-            else:
-                self.write('Unable to create the video stream %s.' % name)
-
-    def _video_delete(self, origin, (data, name)):
-        if origin is self.controller:
-            if data == 1:
-                self.write('Video stream %s deleted.' % name)
-            elif data == 0:
-                self._not_found(origin, (name, 'video'))
-            else:
-                self.write('Unable to delete the video stream %s.' % name)
-
-    def _video_rename(self, origin, (data, name, new_name)):
-        if origin is self.controller:
-            if data == 1:
-                self.write('Video stream %s rename to %s.' % (name, new_name))
-            elif data == 0:
-                self._not_found(origin, (name, 'video'))
-            else:
-                self.write('Unable to rename the video stream %s.' % name)
-
-
-    def _video_list(self, origin, data):
-        if origin is self.controller:
-            if data:
-                names = [stream[0] for stream in data]
-                self.write("\n".join(names))
-            else:
-                self.write('There is no video stream.')
-
-    def _video_set(self, origin, ((state, attr, value), name)):
-        if origin is self.controller:
-            if state:
-                self.write('%s of video stream %s is set to %s.' % (attr, name, value))
-            else:
-                self.write('Unable to set %s of video stream %s.' % (attr, name))
-
-    def _video_sending_started(self, origin, data):
-        if data:
-            self.write('\nVideo sending started.')
-        else:
-            self.write('\nUnable to start video sending.')
-
-    def _video_sending_stopped(self, origin, data):
-        if data:
-            self.write('\nVideo sending stopped.')
-        else:
-            self.write('\nUnable to stop video sending.')
-
-
-    def _streams_list(self, origin, (streams, data)):
-        if origin is self.controller:
-            names = []
-            for attr, value in data.items():
-                if attr != "streams" and attr[0] != '_':
-                    names.append(attr + ': ' + str(value))
-            if names:
-                names.append('------------')
-            if streams:
-                for stream in streams:
-                     kind = '?'
-                # TODO ! 
-                #     if isinstance(stream[1], AudioStream):
-                #         kind = 'audio'
-                #     elif isinstance(stream[1], VideoStream):
-                #         kind = 'video'
-                     names.append(stream[0] + ' (' + kind + ')')
-            else:
-                names.append('There is no stream.')
-            self.write("\n".join(names))
-
-    def _set_streams(self, origin, (state, attr, value)):
-        if state:
-            self.write('The %s of the master stream is now set to %s' % (attr, value))
-        elif origin is self.controller:
-            self.write('Unable to set the %s of the master stream' % attr)
-
-    def _select_streams(self, origin, (name, value)):
-        if value:
-            self.write('The selected master stream is now  %s' % name)
-        elif origin is self.controller:
-            self.write('Unable to select %s as the master stream, it does\'nt exist.' % name)
-
     def _start_streams(self, origin, data):
-        self.write(str(data))
+        self.write(str(data["message"]))
+        #TODO: more !
+
+    def _remote_started_stream(self, origin, data):
+        self.write(str(data["message"]))
+
+    def _remote_stopped_stream(self, origin, data):
+        self.write(str(data["message"]))
 
     def _stop_streams(self, origin, data):
-        self.write(data)
+        self.write(str(data["message"]))
 
-    def _list_streams(self, origin, (data, curr)):
+    def _list_streams(self, origin, data):
         if origin is self.controller:
-            msg = []
-            for name, streams in data.items():
-                if name == curr:
-                    msg.append(bold(name + ": <---"))
-                else:
-                    msg.append(name + ":")
-                for attr, value in streams.__dict__.items():
-                    if attr[0] != '_':
-                        msg.append("\t%s: %s" % (attr, value))
-            self.write("\n".join(msg))
+            txt = "List of all streams:\n"
+            for stream in data:
+                contact_name = stream._contact_infos.contact.name # FIXME _contact_infos : remove "_"
+                txt += " * %s: \"%s\" with %s\n" % (stream.service.name, stream.identifier, contact_name)
+            self.write(txt)
 
     def _ask(self, origin, data):
         self.controller.block = self.controller._ask
         self.controller.remote = data['connection']
-
         if data.has_key('name'):
             caption = '%s is inviting you. (address: %s) Do you accept? [Y/n]:' % (data['name'], data['address'])
         else:
@@ -1794,7 +1313,6 @@ class CliView(Observer):
                     txt += "\t%s: %s\n" % (k, str(host_data[k]))
         self.write(txt, True)
         
-
 def bold(msg):
     global enable_escape_sequences 
     if enable_escape_sequences:
@@ -1822,11 +1340,12 @@ def add_quotes(input):
         input += ':' + ','.join(new_args)
     return input
 
-
 def start(subject, port=14444, interfaces=''):
     """
     This runs the telnet server on specifed port 
     """
+    global _api
+    _api = subject
     factory = protocol.ServerFactory()
     factory.protocol = lambda: TelnetTransport(TelnetBootstrapProtocol,
                                                insults.ServerProtocol,

@@ -29,13 +29,17 @@ class Observer(object):
     It's possible for an Observer to watch many Subject.
     """
     
-    def __init__(self, subjects):
+    def __init__(self, subjects=None):
+        """
+        :param subjects: list of Subject instances if you want.
+        """
         self.subjects = []
-        if isinstance(subjects, tuple):
-            for subject in subjects:
-                self.append(subject)
-        else:
-            self.append(subjects)
+        if subjects is not None:
+            if isinstance(subjects, tuple) or isinstance(subjects, list):
+                for subject in subjects:
+                    self.append(subject)
+            else:
+                self.append(subjects)
         
     def append(self, subject):
         """
@@ -45,6 +49,8 @@ class Observer(object):
             self.subjects.append(subject)        
             subject._attach(self)   # should we make an excepption/error message
                                     # if subject isn't a Subject instance ?
+        else:
+            raise TypeError("subject should be an instance of Subject")
         
     def update(self, origin, key, value):
         """Called when an attribute of the observed object is changed.
@@ -84,5 +90,4 @@ class Subject(object):
             key = common.get_def_name()
         for observer in self.observers.itervalues():
             observer.update(caller, key, value)
-            
             

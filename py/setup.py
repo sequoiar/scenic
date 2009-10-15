@@ -17,20 +17,20 @@ For distribution packages::
 """
 from setuptools import find_packages
 from setuptools import setup
-__version__ = "0.1.3-a"
+__version__ = "0.2"
 
 # how I generated that list : 
 #packages = find_packages(exclude=["test", "miville.py"]),
 #print 'PACKAGES:', packages
 
-packages = [
+miville_packages = [
     'miville',
     'miville.connectors',
     'miville.utils',
     'miville.ui',
     'miville.devices',
     'miville.protocols',
-    'miville.engines',
+    'miville.streams',
     'miville.connectors.basic',
     'miville.connectors.sip',
     'miville.ui.cli',
@@ -59,16 +59,17 @@ setup(
     description = "Miville, interface to the milhouse streaming tool.",
     long_description = """Miville software, a component of the PropulseART project
     Requires: twisted, nevow.""",
-    install_requires = ['twisted'], # , 'nevow']
+    install_requires = [], #'twisted'], # , 'nevow']
     # The dependency to the 'nevow' package is not specified here, since there is a bug 
     # in nevow, which installs it using easy_install even when the nevow ubuntu package is already installed. 
     # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
+    # we removed twisted as well, since we prefer the user to install it himself.
     scripts = ["restart_jackd.py", "mivilled"], #, "miville.py"
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,
     #packages = ['miville'],
-    packages = packages,
+    packages = miville_packages,
     package_data = {
         "":["*.rst", "*.png", "*.jpg", "*.css", "*.js", "*.xml", '*.txt', 'off']
     }

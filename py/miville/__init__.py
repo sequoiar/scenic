@@ -29,7 +29,7 @@ __all__ = [
     'connectors',
     'core', 
     'devices', 
-    'engines',
+    'services',
     'errors', 
     'network',
     'protocols',

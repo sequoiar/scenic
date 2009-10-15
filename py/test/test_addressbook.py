@@ -49,7 +49,6 @@ class DummyApi(object):
         return 2222
             
 class Test_1_Ip_range(unittest.TestCase):
-    
     def test_ip_range(self):
         addresses = {'123.123.123.123':True,
                      u'123.123.123.123':True,
@@ -57,7 +56,6 @@ class Test_1_Ip_range(unittest.TestCase):
                      '123.123.0.123':True,
                      '123.-1.123.123':False
                      }
-    
         for address, result in addresses.items():
             try:
                 test_result = ip_range(address)
@@ -65,10 +63,8 @@ class Test_1_Ip_range(unittest.TestCase):
                 test_result = False
             self.assertEqual(test_result, result,
                              'Problem testing IP range for this address: %s. (%s, %s)' % (address, result, test_result))
-        
   
 class Test_2_Contact(unittest.TestCase):
-    
     def test_1_name(self):
         names = {'':False,
                  'a':True,
@@ -78,7 +74,6 @@ class Test_2_Contact(unittest.TestCase):
                  u'Etienne':True,
                  UALPHABET:True
                  }
-        
         for name, result in names.items():
             try:
                 contact = Contact(name, []) # put a list as address to be sure to validate in set_kind
@@ -89,7 +84,6 @@ class Test_2_Contact(unittest.TestCase):
             else:
                 self.assertEqual(contact.name, name, 'In and out name doesn\'t match: %s -> %s.' % (name, contact.name))
                 del contact
-
             self.assertEqual(test_result, result, 'Problem validating name: %s. (%s, %s)' % (name, test_result, result))
             
     def test_2_kind_address(self):
@@ -108,7 +102,6 @@ class Test_2_Contact(unittest.TestCase):
                      (u'23.123.45.222', True, 'ip', 'basic'),
                      (u'Jean@23.123.45.222', True, 'sip_ip', 'sip')
                      )
-        
         for address in addresses:
             try:
                 contact = Contact('a', address[0])
@@ -121,7 +114,6 @@ class Test_2_Contact(unittest.TestCase):
                 self.assertEqual(contact.address, address[0], 'In and out not matching for this address: %s -> %s.' % (address[0], contact.kind))
                 self.assertEqual(contact.connector, address[3], 'In and out not matching for this connector: %s -> %s.' % (address[0], contact.kind))
                 del contact
-                
             self.assertEqual(test_result, address[1], 'Problem validating address: %s. (%s, %s)' % (address[0], test_result, address[1]))
                     
     def test_3_port(self):
@@ -142,7 +134,6 @@ class Test_2_Contact(unittest.TestCase):
                  ('2test5', False),
                  (u'34ten5', False)
                  )
-        
         for port in ports:
             try:
                 contact = Contact('ab', [], port[0]) # put a list as address to be sure to validate in set_kind
@@ -156,7 +147,6 @@ class Test_2_Contact(unittest.TestCase):
                 else:
                     self.assertEqual(contact.port, int(port[0]), 'In and out port doesn\'t match: %s -> %s.' % (port[0], contact.port))
                 del contact
-
             self.assertEqual(test_result, port[1], 'Problem validating port: %s. (%s, %s)' % (port[0], test_result, port[1]))
    
     def test_4_connector(self):
@@ -168,12 +158,10 @@ class Test_2_Contact(unittest.TestCase):
                      (None, 'best@vroumm.org', 'sip'),
                      (None, '230.23.23.23', 'basic')
                      )
-        
         for connector in connectors:
             contact = Contact('ab', connector[1], connector=connector[0]) # put a list as address to be sure to validate in set_kind
             self.assertEqual(contact.connector, connector[2], 'In and out connector doesn\'t match: %s should give %s.' % (contact.connector, connector[2]))
             del contact
-
         # with contact.connector set to 'other'
         connectors = (('test', [], 'test'),
                      (None, [], 'other'),
@@ -182,36 +170,31 @@ class Test_2_Contact(unittest.TestCase):
                      (None, 'best@vroumm.org', 'other'),
                      (None, '230.23.23.23', 'other')
                      )
-        
         for connector in connectors:
             contact = Contact('ab', connector[1], connector='other') # put a list as address to be sure to validate in set_kind
             contact.assign_connector(connector[0])
             self.assertEqual(contact.connector, connector[2], 'In and out connector doesn\'t match: %s should give %s.' % (contact.connector, connector[2]))
             del contact
 
-    def test_5_setting(self):
-        settings = {0:True,
+    def test_5_profile_id(self):
+        profile_ids = {0:True,
                    1:True,
                    122:True,
                    '123.123.0.123':False
                    }
-    
-        for setting, result in settings.items():
+        for profile_id, result in profile_ids.items():
             try:
-                contact = Contact('ab', [], setting=setting) # put a list as address to be sure to validate in set_kind
+                contact = Contact('ab', [], profile_id=profile_id) # put a list as address to be sure to validate in set_kind
                 if contact:
                     test_result = True
             except AddressBookError:
                 test_result = False
             else:
-                self.assertEqual(contact.setting, setting, 'In and out not matching for this address: %s -> %s.' % (setting, contact.setting))
+                self.assertEqual(contact.profile_id, profile_id, 'In and out not matching for this address: %s -> %s.' % (profile_id, contact.profile_id))
                 del contact
-                
-            self.assertEqual(test_result, result, 'Problem validating address: %s. (%s, %s)' % (setting, test_result, result))
-            
+            self.assertEqual(test_result, result, 'Problem validating address: %s. (%s, %s)' % (profile_id, test_result, result))
 
 class Test_3_AddressBook(unittest.TestCase):
-    
     filenames = {'':False,
                   u'':False,
                   'a':True,
@@ -221,9 +204,7 @@ class Test_3_AddressBook(unittest.TestCase):
                   ALPHABET:True,
                   UALPHABET:True
                   }
-    
     base_file = 'test'
-    
     api = DummyApi()
 
     def setUp(self):
@@ -246,7 +227,6 @@ class Test_3_AddressBook(unittest.TestCase):
                 test_result = False
             else:
                 del adb
-            
             self.assertEqual(result, test_result, 'Problem validating AddressBook creation. <%s> %s:%s' % (filename, result, test_result))
 
     def test_2_read_write_add(self):

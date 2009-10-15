@@ -20,30 +20,23 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-This module is an html page for settings information
-
-
+This module is an HTML page for processes information
 """
-
 import commands
-
 try:
     from nevow import rend
 except ImportError:
     raise ImportError, 'If you want to use the Web interface, you need to install Nevow.'
-
 #App imports
 from miville.utils import Observer, log
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
 from miville.errors import *
 
-
 log = log.start('debug', 1, 0, 'procspage')
 
-
 def print_head():
-    txt=u"""
+    txt = u"""
 <head>
 <style type="text/css">
 h1 {
@@ -71,7 +64,7 @@ h3 {
 }
 </style>
 </head>
-"""
+    """
     return txt
 
 def doit(cmd):
@@ -80,15 +73,15 @@ def doit(cmd):
     output = status[1]
     return output.split('\n')
 
-
 def ps(cmd):
-    
+    """
+    Runs a command
+    """
     lines = []
     lines.append('<b>')
     lines.append(cmd)
     lines.append('</b>')
     pslines = doit(cmd)
-    
     for line in pslines:
         if line.find('sh -c { ps ax |') == -1:
             lines.append(line)
@@ -96,37 +89,31 @@ def ps(cmd):
     lines.append('<p></p>')
     lines.append('<p>==========</p>')
     lines.append('<p></p>')
-    
     return lines
 
 def print_procs():
-
+    """
+    The contents of the HTML page.
+    Returns unicode string
+    """
     s = "<p>"
     lines = []
-    
-    lines += ps('ps ax | grep miville')
-    lines += ps('ps ax | grep milhouse')
-    lines += ps('ps ax | grep iperf')
-    lines += ps('ps ax | grep jack')
+    lines += ps('ps ax | grep miville | grep -v grep')
+    lines += ps('ps ax | grep milhouse | grep -v grep')
+    lines += ps('ps ax | grep iperf | grep -v grep')
+    lines += ps('ps ax | grep jackd | grep -v grep')
     s += "</p><p>".join(lines) + "</p>"    
     return s
 
 class ProcsPage(rend.Page):
     def renderHTTP(self, ctx):
-        square_head = print_head()
-        beau_body =  print_procs()
-           
-        html = u"""
-        <html>
-        """
-        html += square_head 
-        html += u"""<body>
-        
-            """
-        html += beau_body     
-        
+        head = print_head()
+        contents =  print_procs()
+        html = u"""\n<html>\n"""
+        html += head 
+        html += u"""\n<body>\n"""
+        html += contents
         html += u"""
-        
         </body>
         </html>
         """ 

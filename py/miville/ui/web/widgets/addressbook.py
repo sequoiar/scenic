@@ -22,10 +22,13 @@
 import time
 import traceback
 #App imports
-from miville.ui.web.web import Widget, expose
+from miville.ui.web.web import expose
+from miville.ui.web.web import Widget
 from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
+
+from twisted.python import failure
 
 log = log.start('debug', 1, 0, 'web_adb')
 
@@ -45,8 +48,11 @@ class Addressbook(Widget):
         Widget.__init__(self, api, template)
         self.connections = {}
         self._currently_selected_contact = None # adding this to avoid using api.select_contact
-        
+
     def rc_get_list(self):
+        """
+        Javascript wants the list of contacts.
+        """
         self.api.get_contacts(self)
         return False
         
@@ -67,18 +73,23 @@ class Addressbook(Widget):
             adb.append({'name':contact.name,
                         'state':contact.state,
                         'auto_answer':contact.auto_answer,
-                        'setting':contact.setting,
+                        'setting':contact.profile_id, #TODO: rename to profile
                         'auto_created':contact.auto_created,
                         'stream_state':contact.stream_state})
         log.info('receive update: get_contacts %r %s' % (self, data))
         self.callRemote('update_list', adb)
         
     def rc_get_contact(self, name):
+        """
+        Javascript wants a contact's infos.
+        """
         self.api.get_contact(name, self)
         return False
     
     def cb_get_contact(self, origin, data):
         """
+        The API answers with a contact's infos.
+        
         Called from Python API when get_contact notification is triggered
         """
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'get_contact'))
@@ -93,8 +104,9 @@ class Addressbook(Widget):
 
     def rc_start_connection(self, name):
         """
+        Javascripts want to connect/join a contact.
+        
         connects to a remote contact.
-
         called from Javascript widget
         """
         contact = self.api.get_contact(name)
@@ -107,6 +119,8 @@ class Addressbook(Widget):
     
     def cb_start_connection(self, origin, data):
         """
+        The API tells us it has connected/joined a contact.
+        
         Called from Python API when start_connection notification is triggered
         """
         port = "PORT" # TODO FIXME XXX where should that var come from ?
@@ -133,6 +147,8 @@ class Addressbook(Widget):
 
     def cb_connection_failed(self, origin, data):
         """
+        The API tells us it could not connect/join a contact.
+        
         Called from Python API when connection_failed notification is triggered
         """
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'connection_failed'))
@@ -150,6 +166,8 @@ class Addressbook(Widget):
 
     def cb_ask(self, origin, data):
         """
+        The API tells us that a contact is inviting us to join/connect with it.
+        
         Called from Python API when ask notification is triggered
         """
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'ask'))
@@ -166,6 +184,8 @@ class Addressbook(Widget):
     
     def cb_ask_timeout(self, origin, data):
         """
+        The API tells us that it is too late to answer yes. (to join/connect a contact)
+        
         Called from Python API when ask_timeout notification is triggered
         """
         log.debug('notify(\'%s\', \'%s\', \'ask_timeout\')' % (origin, data))
@@ -177,23 +197,34 @@ class Addressbook(Widget):
         
     def cb_answer(self, origin, data):
         """
+        The API tells us that the remote contact answered yes? (I think)
+        
         Called from Python API when answer notification is triggered
         """
         self.callRemote('update_status', data['name'], data['msg'])
     
     def rc_accept(self, connection):
+        """
+        Javascripts want to accept to connect/join a contact.
+        """
         if self.connections.has_key(connection):
             self.api.accept_connection(self, self.connections[connection])
             del self.connections[connection]
         return False
 
     def cb_accept_connection(self, origin, data):
+        """
+        The API confirms us that we accepted to join/connect a contact.
+        """
         basic_server = data['connection'] # BasicServer instance
         contact = self.api.client_contact(basic_server.addr.host, basic_server.client_port)
         # contact = connection.contact
         self.callRemote('update_status', contact.name, "Connected.", "You accepted the connection.")
 
     def rc_refuse(self, connection):
+        """
+        Javascripts want to refuse to connect/join a contact.
+        """
         if self.connections.has_key(connection):
             self.api.refuse_connection(self, self.connections[connection])
             del self.connections[connection]
@@ -201,7 +232,7 @@ class Addressbook(Widget):
     
     def cb_stop_connection(self, origin, data):
         """
-        Called from Python API when stop_connection notification is triggered
+        The API tells us that we successfully (or not) stopped the connect/join to a contact.
         """
         if origin is self and data.has_key('exception'):
             if data.has_key('name'):
@@ -217,6 +248,9 @@ class Addressbook(Widget):
             self.callRemote('update_status', data['name'], data['msg'])
         
     def rc_stop_connection(self, name):
+        """
+        Javascript wants to disconnect/unjoin a contact.
+        """
         contact = self.api.get_contact(name)
         if isinstance(contact, Exception):
             self.callRemote('error', contact.message)
@@ -227,6 +261,7 @@ class Addressbook(Widget):
     def cb_info(self, origin, data):
         """
         Called from Python API when info notification is triggered
+        This should be DEPRECATED.
         """
         if isinstance(data, dict):
             if data.has_key('context'):
@@ -255,10 +290,16 @@ class Addressbook(Widget):
             log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'info'))
 
     def rc_add_contact(self, name, address, port, auto_answer):
+        """
+        Javascript wants to add a contact.
+        """
         self.api.add_contact(self, name, address, port, auto_answer=auto_answer)
         return False
     
     def rc_remove_contact(self, name):
+        """
+        Javascript wants to remove a contact.
+        """
         log.debug('rc_remove_contact')
         self.api.delete_contact(self, name)
         return False
@@ -270,6 +311,9 @@ class Addressbook(Widget):
         self.api.get_contacts(self)
 
     def rc_modify_contact(self, name, new_name, address, port, auto_answer):
+        """
+        Javascript wants to modify a contact.
+        """
         self.api.modify_contact(self, name, new_name, address, port, auto_answer)
         return False
     
@@ -283,11 +327,13 @@ class Addressbook(Widget):
                 self.callRemote('error', data.message)
             else:
                 self.callRemote('contact_saved', data)
-
     cb_add_contact = cb_modify_contact
     cb_save_client_contact = cb_modify_contact
     
     def rc_keep_contact(self, name, new_name, auto_answer):
+        """
+        Javascript wants to save the changes it has done to a contact.
+        """
         self.api.save_client_contact(self, name, new_name, auto_answer)
         return False
     
@@ -315,39 +361,30 @@ class Addressbook(Widget):
          * 'started : bool
          * 'contact_name' : str
          * 'msg': str
+        IMPORTANT: right now, it is not a dict! Just a str
         """
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'start_streams'))
         #  START_STREAMS {'started': True, 'msg': 'streaming started'}
-        if isinstance(data, Exception):
-            log.error('Could not start streaming ' + data.message)
+        if not data["success"]:
+            log.error('Could not start streaming ' + data["message"])
             #contact = self.api.get_contact() # TODO FIXME XXX WEIRD BUG OCCURS MAYBE
-            contact = self._currently_selected_contact
-            if contact is None:
-                log.error('Could not detect with which contact we are starting to stream.')
-            #if isinstance(contact, Exception):
-            #    log.error('Could not get current contact: ' + contact.message)
-            else:
-                contact_name = contact.name
-                self.callRemote('update_status', contact_name, '%s: %s' % (data.__class__.__name__, data.message), 'Could not start streaming. (%s) %s' % (data.__class__.__name__, data.message))
-                traceback.print_exc()
+            contact = data["contact"]
+            contact_name = data["contact_name"]
+            self.callRemote('update_status', 
+                contact_name, 
+                '%s' % (data["message"]), 
+                'Could not start streaming. %s' % (data["message"]))
         else:
+            # success ! 
+            contact_name = data["contact_name"]
+            contact = data["contact"]
+            self.callRemote('update_selected', contact_name)
+            profile_id = contact.profile_id
             try:
-                started = data['started'] is True
-                if started:
-                    #log.warning('TODO:self.callRemote()')
-                    contact_name = data['contact_name']
-                    #self.api.select_contact(self, contact_name)
-                    self.callRemote('update_selected', contact_name) # works ! selects the contact to which we stream
-                    contact = self.api.get_contact(contact_name)
-                    log.debug('(contact name=%s).stream_state: %s' % (contact_name, contact.stream_state))
-                    self.api.get_contacts(self)
-                    setting_name = data['setting_name']
-                    self.callRemote('update_status', contact_name, 'Streaming (%s)' % (setting_name), 'Currently streaming. (%s)' % (setting_name))
-                    # updates list
-                else:
-                    log.warning('TODO:self.callRemote()')
-            except KeyError, e:
-                log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+                setting_name = self.api.config_db.get_profile(profile_id).name # FIXME hack
+            except:
+                raise # FIXME
+            self.callRemote('update_status', contact_name, 'Streaming (%s)' % (setting_name), 'Currently streaming. (%s)' % (setting_name))
 
     def cb_stop_streams(self, origin, data):
         """
@@ -360,31 +397,49 @@ class Addressbook(Widget):
         """
         log.debug("STOP_STREAMS " + str(data))
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'stop_streams'))
-        try:
-            if type(data) is str:
-                log.error("KeyError: data in stop_streams should be a dict !") 
-            elif isinstance(data, Exception):
-                log.error('Error trying to stop streams: ' + data.message)
+        if isinstance(data, failure.Failure):
+            msg = data.getErrorMessage()
+            #log.error(msg)
+        else:
+            contact = data["contact"]
+            contact_name = data["contact_name"]
+            self.callRemote('update_selected', contact_name)
+            self.callRemote('update_status', contact_name, 'Stopped streaming', 'Stopped streaming.')
+
+    def cb_remote_started_streams(self, origin, data):
+        """
+        The API tells us that the remote Alice has started streams with us. (Bob)
+        
+        sets the contact stream_state to streaming when started from remote.
+        """
+        log.debug("cb_remote_started_streams %s %s" % (origin, data))
+        if isinstance(data, failure.Failure):
+            pass
+        else:
+            if data["success"]: 
+                contact = data["contact"] #:contact_infos.contact,
+                contact_name = data["contact_name"] #:contact_name,
+                message = "Started to stream. " + str(data["message"]) #:msg,
+                self.callRemote('update_selected', contact_name)
+                self.callRemote('update_status', contact_name, message, message)
             else:
-                try:
-                    stopped = data['stopped'] is True
-                except KeyError, e:
-                    log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
-                else:
-                    stopped = True
-                if stopped:
-                    #log.warning('TODO:self.callRemote()')
-                    contact_name = data['contact_name']
-                    self.callRemote('update_selected', contact_name)
-                    #self.api.select_contact(self, contact_name)
-                    contact = self.api.get_contact(contact_name)
-                    log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
-                    self.callRemote('update_status', contact_name, 'Stopped streaming', 'Stopped streaming.')
-                    self.api.get_contacts(self)  # updates list
-                else:
-                    log.warning('TODO:self.callRemote()')
-        except Exception, e:
-            log.error('Error in cb_stop_streams : ' + e.message)
+                log.error("cb_remote_started_streams success is False.")
 
-
+    def cb_remote_stopped_streams(self, origin, data):
+        """
+        sets the contact stream_state to stopped when stopped from remote.
+        """
+        log.debug("cb_remote_stopped_streams %s %s" % (origin, data))
+        if isinstance(data, failure.Failure):
+            pass
+        else:
+            if data["success"]: 
+                contact = data["contact"] #:contact_infos.contact,
+                contact_name = data["contact_name"] #:contact_name,
+                message = "Stream stopped. " + str(data["message"]) #:msg,
+                self.callRemote('update_selected', contact_name)
+                self.callRemote('update_status', contact_name, message, message)
+            else:
+                log.error("cb_remote_started_streams success is False.")
+    # important
     expose(locals())

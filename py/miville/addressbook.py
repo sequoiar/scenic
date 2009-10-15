@@ -36,6 +36,7 @@ import warnings
 # Twisted imports
 from twisted.spread.jelly import jelly, unjelly
 from twisted.internet import reactor
+#from twisted.python import failure
 
 # App imports
 from miville.utils import log
@@ -44,8 +45,7 @@ from miville.utils.i18n import to_utf
 from miville.errors import AddressBookError, AddressBookNameError, AddressBookAddressError
 from miville.connectors.states import DISCONNECTED, CONNECTED 
 
-log = log.start('debug', 1, 0, 'adb')
-
+log = log.start('info', 1, 0, 'adb')
 
 class AddressBook(object):
     """
@@ -72,15 +72,15 @@ class AddressBook(object):
         self.read()
         Contact.adb = self
 
-    def add(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, setting=0):
+    def add(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, profile_id=0):
         """
         Adds a contact to the Address Book.
         
         Name and address are mandatory, port is optional and if connector is
         None, it will be deduce from the address type. Setting is set to 0
-        (base setting) by default.
+        (default profile_id).
 
-        Address, port and setting are validated and exception are raise
+        Address, port and profile_id are validated and exception are raise
         on problems.
         """
         name = to_utf(name)
@@ -91,7 +91,7 @@ class AddressBook(object):
         address_taken = self.find_contact(address, port, connector)
         if address_taken:
             raise AddressBookAddressError, 'The contact %s is already using this address.' % address_taken.name
-        self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, setting)
+        self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, profile_id)
         log.debug("adding contact %s %s" % (name, address))
         self.write()
         return name
@@ -108,18 +108,49 @@ class AddressBook(object):
         self.write()
         return True
 
-    def modify(self, name=None, new_name=None, address=None, port=None, auto_answer=None, setting=None, connector=None):
+    def modify_contact_attr(self, contact_name, attr_name, attr_value):
+        """
+        Modifies one and only one attribute of a contact.
+        If selected_contact is None, uses the selected contact.
+        
+        Returns None.
+        :param contact_name: unicode or None
+        :param attr_name: str
+        :attr_value: int or str or unicode or bool
+        
+        Currently implemented attrbutes ::
+          * address : str
+          * port : int
+          * profile_id : int
+          * auto_answer : bool
+        """
+        name = self._get_name(contact_name)
+        contact = self.contacts[name]
+        if attr_name == "address":
+            contact.set_address(attr_value)
+        elif attr_name == "port":
+            contact.set_port(attr_value)
+        elif attr_name == "profile_id":
+            contact.profile_id = int(attr_value)
+        elif attr_name == "auto_answer":
+            contact.auto_answer = bool(attr_value)
+        else:
+            raise AddressBookError("Changing %s attribute is not implemented." % (attr_name))
+        
+        
+    def modify(self, name=None, new_name=None, address=None, port=None, auto_answer=None, profile_id=None, connector=None):
         """
         Changes one or more attributes of a contact.
         If no name is given, modify the selected contact.
+        This method should have a wonderful documentation string.
         """
         name = self._get_name(name)
         contact = self.contacts[name]
 
-        if new_name is None and setting is None and address is None and port is None and auto_answer is None:
+        if new_name is None and profile_id is None and address is None and port is None and auto_answer is None:
             raise AddressBookError, 'No property to change.'
 
-        address_taken = self.find_contact((address or contact.address), (port or contact.port), (connector or contact.connector))
+        address_taken = self.find_contact((address or contact.address), (port or contact.port), (connector or contact.connector)) # FIXME !!!!!!! What does that mean??
         if address_taken and address_taken.name != contact.name:
             raise AddressBookAddressError, 'A contact already uses the address "%s"' % address_taken.name
 
@@ -138,7 +169,7 @@ class AddressBook(object):
         contact.assign_connector(connector)
         if auto_answer != None:
             contact.auto_answer = auto_answer
-        contact.setting = setting
+        contact.profile_id = profile_id
         
 #        self.write()
         if new_name:
@@ -311,19 +342,19 @@ class AddressBook(object):
                 else:
                     serialized = True
             if serialized:
-                log.info("Successfully loaded the addressbook.")
+                log.debug("Successfully loaded the addressbook.")
                 # get the selected contact and remove it from the contacts dict
                 try:
                     self.selected = self.contacts['_selected']
                     del self.contacts['_selected']
-                    log.info('remove _selected pseudo-contact')
+                    log.debug('remove _selected pseudo-contact')
                 except KeyError, e:
                     log.error(e.message)
                 # add the connection attributes to all the contacts
                 # and set the state to DISCONNECTD (change this in the future
                 # to support recovery)
                 for contact in self.contacts.values():
-                    log.info('Contact %s has been set to DISCONNECTED'  % (contact.name))
+                    log.debug('Contact %s has been set to DISCONNECTED'  % (contact.name))
                     contact.connection = None
                     contact.state = DISCONNECTED
                     contact.stream_state = 0
@@ -375,7 +406,6 @@ class AddressBook(object):
                 else:
                     pickle.dump(contacts, adb_file, 1)
                 adb_file.close()
-                
 
 class Contact(object):
     """
@@ -383,13 +413,13 @@ class Contact(object):
     """
     adb = None
 
-    def __init__(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, setting=0):
+    def __init__(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, profile_id=0):
         """
         Name and address are mandatory, port is optional and if connector is
         None, it will be deduce from the address type. Setting is set to 0
-        (base setting) by default.
+        (base profile_id) by default.
 
-        Name, address, port and setting are validated and exception are raise
+        Name, address, port and profile_id are validated and exception are raise
         on problems.
 
         """
@@ -411,16 +441,16 @@ class Contact(object):
         if connector:
             self.assign_connector(connector)
 
-        if not isinstance(setting, int):    #TODO: validate if the setting exist
-            raise AddressBookError, "The 'setting' arguments should be an integer. Got %s of type %s." % (setting, type(setting))
-        self.setting = setting
+        if not isinstance(profile_id, int):    #TODO: validate if the profile_id exist
+            raise AddressBookError, "The 'profile_id' arguments should be an integer. Got %s of type %s." % (profile_id, type(profile_id))
+        self.profile_id = profile_id
 
     def __setattr__(self, name, value):
         """
         Catch all attribute changes and call Addressbook.write() (and api.notify())
         on change.
         """
-        if name == 'setting':
+        if name == 'profile_id':
             if value != None:
                 value = int(value)
                 
@@ -432,7 +462,7 @@ class Contact(object):
                                     'state',
                                     'stream_state',
                                     'auto_answer',
-                                    'setting',
+                                    'profile_id',
                                     'connector'):
             current_value = getattr(self, name, None)
             if current_value != value and current_value is not None:
@@ -460,13 +490,13 @@ class Contact(object):
                 self.address = address.encode('utf-8')
 
 # Not necessary, set the attribute directly, check __setattr__ above for more detail    
-#    def set_setting(self, setting):
+#    def set_profile_id(self, profile_id):
 #        """
-#        Sets the setting attribute. 
+#        Sets the profile_id attribute. 
 #        """
-#        if setting != None:
-#            id = int(setting)
-#            self.setting = id
+#        if profile_id != None:
+#            id = int(profile_id)
+#            self.profile_id = id
             
     def set_port(self, port):
         """
@@ -507,7 +537,6 @@ class Contact(object):
         """
         # keep it to see if there's a change, if yes update connector
         prev_kind = self.kind
-
         kind = None
         if isinstance(address, UnicodeType):
             address = address.encode('utf-8')
@@ -554,12 +583,12 @@ class Contact(object):
             elif self.kind != 'group':
                 self.connector = 'basic'
 
-
 def ip_range(address):
     """
     Validate that each number of an IP address is between 0 and 255.
     The address should be a string of the format '123.123.123.123'.
     """
+    #TODO: rename this function
     nums = [int(i) for i in address.split('.')]
     for num in nums:
         if num < 0 or num > 255:

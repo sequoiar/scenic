@@ -25,7 +25,7 @@ import sys
 
 from twisted.internet import reactor 
 
-from miville.configuration import MivilleConfiguration
+from miville.options import MivilleConfiguration
 from miville import core #  as miville
 from miville.utils.observer import Observer
 from miville.ui.cli import CliView

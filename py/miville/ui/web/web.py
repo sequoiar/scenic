@@ -107,8 +107,8 @@ from miville.utils import Observer, log
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
 
-from miville.ui.web.pages.settingspage import SettingsPage
-from miville.ui.web.pages.gstpage import GstPage
+#from miville.ui.web.pages.settingspage import SettingsPage
+#from miville.ui.web.pages.gstpage import GstPage
 from miville.ui.web.pages.procspage import ProcsPage
 
 log = log.start('debug', 1, 0, 'web')
@@ -142,7 +142,7 @@ def import_widgets():
             else:
                 try:
                     mod = widget.load()
-                    log.debug('Loaded the module %s' % widget.name)
+                    log.debug('Loaded the module %s' % (widget.name.split(".")[-1]))
                 except:
                     log.error('Unable to load the module %s' % widget.name)
                     raise
@@ -254,10 +254,10 @@ class Index(LivePage, Observer):
 
     def childFactory(self, ctx, name):
         log.info("childFactory %s %s" % (ctx, name) )
-        if name.lower().startswith("settings"):
-            return SettingsPage()
-        if name.lower().startswith("gst"):
-            return GstPage()
+        #if name.lower().startswith("settings"):
+        #    return SettingsPage()
+        #if name.lower().startswith("gst"):
+        #    return GstPage()
         if name.lower().startswith("procs"):
             return ProcsPage()
 
@@ -409,7 +409,7 @@ class Widget(LiveFragment):
     *Note: we use the deprecated LiveFragment instead of LiveElement because
     i18n need the context, so it doesn't work with LiveElement.* 
 
-    Every method of a Widget that starts with "cb_" catches a callback for Miville 
+    Every method of a Widget that starts with "cb_" catches a callback for Miville API 
     Subject notification.
     """
 
@@ -438,6 +438,7 @@ class Widget(LiveFragment):
         self.jsClass = to_utf(class_name)
         LiveFragment.__init__(self)
         self.callbacks = find_callbacks(self, 'cb_')
+        log.debug("Found API callbacks : %s" % (self.callbacks.keys()))
         self.api = api
 
     def rend(self, ctx, data):

@@ -56,7 +56,6 @@ Streams.methods(
 		self.callRemote('rc_update_settings');
 	},
 
-	
 	/**
 	 * -----------------
 	 * Utility methods
@@ -88,7 +87,6 @@ Streams.methods(
 		self.upd_global_slct(event);
 	},
 
-
 	/**
 	 * -----------------------------
 	 * Called from the python Server
@@ -96,10 +94,10 @@ Streams.methods(
 	 */
 
 	/**
-	 * Update the global settings menu to reflect the state of the server.
+	 * Update the settings menu to reflect the state of the server.
 	 * (call from server)
 	 * 
-	 * @member Addressbook
+	 * @member Streams
      * @param {array} presets An array of preset setting object. 
      * @param {array} users An array of user setting object. 
 	 */
@@ -109,22 +107,22 @@ Streams.methods(
 			self.global_slct.empty();
 			self.global_slct.disabled = false;
 			
-			// populate the user settings
-			if (users.length > 0) {
-				// add the user section title
-				var optgroup = new Element('optgroup', {
-					'label': self.user_str
-				});
-				optgroup.inject(self.global_slct);
-				
-				users.each(function(setting){
-					var opt = new Element('option', {
-						'html': setting.name,
-						'value': setting.id
-					});
-					opt.inject(optgroup);
-				});
-			}
+			// // populate the user settings
+			// if (users.length > 0) {
+			// 	// add the user section title
+			// 	var optgroup = new Element('optgroup', {
+			// 		'label': self.user_str
+			// 	});
+			// 	optgroup.inject(self.global_slct);
+			// 	
+			// 	users.each(function(setting){
+			// 		var opt = new Element('option', {
+			// 			'html': setting.name,
+			// 			'value': setting.id
+			// 		});
+			// 		opt.inject(optgroup);
+			// 	});
+			// }
 			
 			// populate the user settings
 			if (presets.length > 0) {
@@ -150,7 +148,6 @@ Streams.methods(
 		}
 		
 	},
-
 
 	/**
 	 * -----------------------------
@@ -334,3 +331,4 @@ Streams.methods(
 	}
 	
 );
+
