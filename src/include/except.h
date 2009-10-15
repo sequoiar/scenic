@@ -22,8 +22,7 @@
 #ifndef _EXCEPT_H_
 #define _EXCEPT_H_
 
-#include <exception>
-#include <string>
+#include <stdexcept>
 
 /**
  * exception classes 
@@ -31,9 +30,8 @@
  * http://www.boost.org/community/error_handling.html
  * for best practices
  * http://www.boost.org/community/exception_safety.html
+ * http://www.parashift.com/c++-faq-lite/exceptions.html#faq-17
  *
- * FIXME remove types that can throw on copy constructor
- * i.e. string
  */
 
 
@@ -50,27 +48,18 @@ enum LogLevel {
 };
 
 /** base exception class */
-class Except : public virtual std::exception
+class Except : public std::runtime_error
 {
     public:
         LogLevel log_;
         int errno_; //TODO used?
 
-        Except(const char* log_msg, int err) :
+        Except(const char* log_msg, int err) : std::runtime_error(log_msg),
             log_(WARNING), errno_(err)
-    {
-        int i;
-        for(i = 0; i < BUFFER_SIZE - 1 and log_msg[i]; ++i)
-            buff[i] = log_msg[i];
-        for(; i < BUFFER_SIZE; ++i)
-            buff[i] = 0;
-    }
-        Except() : 
+    {}
+        Except() : std::runtime_error(""),
             log_(NONE), errno_(0)
     {}
-        enum { BUFFER_SIZE = 255 };
-        char buff[BUFFER_SIZE];
-        const char * what() { return buff; }
         virtual ~Except() throw() {}
 };
 
@@ -88,7 +77,7 @@ class ErrorExcept : public Except
 class CriticalExcept : public Except
 {
     public:
-        CriticalExcept(const char* log_msg, int err = 0) : Except(log_msg,err)
+        CriticalExcept(const char* log_msg, int err = 0) : Except(log_msg, err)
     { 
         log_ = CRITICAL;
     }
