@@ -147,7 +147,7 @@ class MilhouseService(object):
             if self.streams.has_key(verif_key):
                 stream = self.streams[verif_key]
                 if stream.state in [states.STATE_STREAMING, states.STATE_STARTING]:
-                    log.error("Found milhouse stream %s %s in state %s" % (verif_key, stream, streams.state))
+                    log.error("Found milhouse stream %s %s in state %s" % (verif_key, stream, stream.state))
                     return defer.fail(failure.Failure(states.StreamError("""Could not start Milhouse Service. There is already a Milhouse stream for the contact "%s".""" % (contact_name))))
                 else:
                     #XXX

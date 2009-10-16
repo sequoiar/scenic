@@ -87,10 +87,10 @@ class MivilleTester(object):
         self.verbose = True
         self.color = 'CYAN'
         self.logfile_prefix = "default"
-        self.telnet_logfile = sys.stdout #child.logfile 
-        self.miville_logfile = sys.stdout #child.logfile 
         #override attributes
         self.__dict__.update(kwargs)
+        self.telnet_logfile = sys.stdout #child.logfile 
+        self.miville_logfile = sys.stdout #open("./miville%d.log" % (self.port_offset), 'w') #child.logfile 
         # non-overridable attributes
         self.miville_process = None
         self.telnet_process = None

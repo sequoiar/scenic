@@ -24,6 +24,7 @@ Tests if miville can stream between two alice mivilles.
 """
 
 import unittest
+import sys
 from test import lib_miville_telnet as libmi
 
 libmi.kill_all_running_miville()
@@ -36,6 +37,8 @@ bob = libmi.MivilleTester(port_offset=3, verbose=VERBOSE, use_tmp_home=True)
 bob.start_miville_process()
 bob.start_telnet_process()
 
+import time
+
 class Test_Miville_Streams(unittest.TestCase):
     def setUp(self):
         global alice
@@ -45,7 +48,26 @@ class Test_Miville_Streams(unittest.TestCase):
         bob.unittest = self
         self.bob = bob
 
+    def _send_expect_non_blocking(self, which_peer, command, expected, timeout=2.0):
+        which_peer.telnet_process.sendline(command)
+        got_it = False
+        start_time = time.time()
+        end_time = start_time + timeout
+        while not got_it:
+            now = time.time()
+            if now > end_time:
+                break
+            # check if got expected
+            index = which_peer.telnet_process.expect([expected, libmi.pexpect.EOF, libmi.pexpect.TIMEOUT], timeout=0.1)
+            if index == 0: #what we expect
+                got_it = True
+            #self._flush_both()
+            time.sleep(0.1)
+        if not got_it:
+            self.fail("Expected \"%s\" but did not get it." % (expected))
+
     def _flush_both(self):
+        # stdout, not telnet output
         self.alice.flush()
         self.bob.flush()
         
@@ -72,13 +94,10 @@ class Test_Miville_Streams(unittest.TestCase):
         self.alice.expectTest('accepted', 'Connection not successful.')
         self._flush_both()
     
-#    def test_04_start_streams(self):
-#        self.alice.tst("z -s Bob", "Successfully started to stream with", timeout=5) # very long timeout
-#        self._flush_both()
-#
-#    def test_05_stop_streams(self):
-#        self.bob.tst("z -i Alice", "Successfully stopped to stream with", timeout=5) # very long timeout
-#        self._flush_both()
+    #def test_04_start_stop_streams(self):
+    #    self._send_expect_non_blocking(alice, "z -s Bob", "Successfully started to stream", timeout=10.0)
+    #    self._send_expect_non_blocking(alice, "z -i Bob", "Successfully stopped to stream", timeout=10.0)
+    #test_04_start_stop_streams.skip = True
 
     def test_04_start_streams(self):
         # FIXME: doesnt actually test anything
