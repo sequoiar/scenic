@@ -33,6 +33,7 @@ import types
 # Twisted imports
 import twisted.python.log as tw_log
 import twisted
+from twisted.internet import fdesc
 # deal with older version of twisted (in Ubuntu and other)
 version = int(twisted.__version__.split('.')[0])
 if version < 8:
@@ -59,7 +60,7 @@ class CoreLogger(LoggerClass):
 
 logging.setLoggerClass(CoreLogger)
 
-def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
+def start(level='info', to_stdout=True, to_file=False, log_name='twisted'):
     """
     Starts the logging for a single module.
 
@@ -72,6 +73,7 @@ def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
     set_level(level, log_name)
     if to_stdout:
         so_handler = logging.StreamHandler(sys.stdout)
+#        fdesc.setNonBlocking(so_handler.stream)
         so_handler.setFormatter(formatter)
         logger.addHandler(so_handler)
     if to_file:
@@ -82,6 +84,7 @@ def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
         else:
     #        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
             file_handler = logging.FileHandler(log_file)
+            #fdesc.setNonBlocking(file_handler.stream)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
     if log_name == 'twisted':
@@ -96,6 +99,12 @@ def stop():
     """
     logging.shutdown()
 
+class LogError(Exception):
+    """
+    Any error that log can throw
+    """
+    pass
+
 def set_level(level, logger='twisted'):
     """
     Sets the logging level for a single file. 
@@ -109,7 +118,7 @@ def set_level(level, logger='twisted'):
     if level in levels:
         logger.setLevel(levels[level])
     else:
-        print "%s it's not a valid log level." % (level) #ERR ?
+        raise LogError("%s is not a valid log level." % (level)) #ERR ?
 
 def critical(msg):
     """
@@ -155,6 +164,9 @@ if __name__ == "__main__":
     warning('warning2')
     info('info2')
     debug('debug2')
-    set_level('asd')
+    try:
+        set_level('asd')
+    except LogError, e:
+        print e.message
     stop()
     
