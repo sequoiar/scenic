@@ -887,7 +887,7 @@ class CliView(Observer):
         if key in self.callbacks:
             self.callbacks[key](origin, data)
         else:
-            log.error("update(): Notification not in callbacks: %s" % (key))
+            log.warning("update(): Notification not in callbacks: %s" % (key))
 
     def write(self, msg, prompt=True):
         self.controller.write(msg)
