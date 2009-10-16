@@ -69,7 +69,6 @@ void GtkVideoSink::makeWindowBlack()
 void GtkVideoSink::showWindow()
 {
     makeWindowBlack();
-    gtk_window_set_title(GTK_WINDOW(window_), "Milhouse");
     gtk_widget_show_all(window_);
 }
 
@@ -99,13 +98,19 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 }
 
 
-bool GtkVideoSink::handleMessage(const std::string &path, const std::string &/*arguments*/)
+bool GtkVideoSink::handleMessage(const std::string &path, const std::string &arguments)
 {
     if (path == "fullscreen")
     {
         toggleFullscreen();
         return true;
     }
+    else if (path == "window-title")
+    {
+        gtk_window_set_title(GTK_WINDOW(window_), arguments.c_str());
+        return true;
+    }
+
     return false;
 }
 

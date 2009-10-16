@@ -77,6 +77,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     {
         if(options["fullscreen"].as<bool>())
             MessageDispatcher::sendMessage("fullscreen");
+        MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
     }
 
     LOG_DEBUG("Running main loop");

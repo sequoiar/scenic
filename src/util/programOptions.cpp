@@ -75,6 +75,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("caps-out-of-band,C", po::bool_switch(), "force caps to be communicated out of band")
             ("debug,D", po::value<string>()->default_value("info"), "level of logging verbosity (string/int) "
                     "(critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6)")
+            ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
             ("serverport,y", po::value<int>(), "run as server and listen on this port for ipcp messages")
             ;
 
