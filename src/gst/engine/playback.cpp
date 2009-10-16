@@ -72,3 +72,4 @@ int playback::sampleRate()
 {
     return Pipeline::SAMPLE_RATE;
 }
+

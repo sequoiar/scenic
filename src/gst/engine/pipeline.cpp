@@ -128,7 +128,19 @@ void Pipeline::init()
 {
     if (pipeline_ == 0)
     {
-        gst_init(0, NULL);
+        LOG_DEBUG("Calling gst_init");
+
+        // FIXME: GROSSS, but we need this so that
+        // for example in jack our process shows up as milhouse
+        // and not "unknown"
+        static int argc = 1;
+        static const std::string title("milhouse");
+        gchar *titleStr = new gchar[title.length()];
+        memcpy(titleStr, title.c_str(), title.length());
+        gchar **argv = {&titleStr};
+        gst_init(&argc, &argv);
+        delete [] titleStr;
+
         tassert(pipeline_ = gst_pipeline_new("pipeline"));
 
         // this will be used as a reference for future

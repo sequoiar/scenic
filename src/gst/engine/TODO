@@ -1,9 +1,7 @@
 NTA:
--fix exceptions/error messages, see http://www.parashift.com/c++-faq-lite/exceptions.html#faq-17.10
 -set resolution
 -set framerate
 -set window title
--use boost.program_options
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 
 provide info
 -use osc style path for tcp messages
@@ -14,7 +12,6 @@ HELLO_WORLD:
 -change v4l capture thread's sched policy to RR, as per the examples in gstreamer/tests/examples/streams
 -integrate MIDI
 -get non blocking input from command-line
--rhythmbox uses autoaudiosink, should we? or just look at how autoaudiosink is implemented
 -use more message passing, try mike's approach of path=ClassName, args[0]=handler_method, args[1-n]...
 -use milhouse command line to generate caps
 -Get rid of singletons, rather have an application space all the necessary objects can listen.

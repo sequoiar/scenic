@@ -151,6 +151,8 @@ short Milhouse::run(int argc, char **argv)
 
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
 
+    // FIXME: this is actually where pipeline instance is created because it's the 
+    // first time we call Pipeline::Instance(), this is bad in its implicitness
     if (logger.gstDebug())
         playback::makeVerbose();
 
@@ -239,7 +241,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Main Thread LEAVING with exception: " << e.what() << std::endl;
+        std::cout << "Quitting with exception: " << e.what() << std::endl;
         ret = 1;
     }
     return ret;
