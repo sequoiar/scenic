@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(MILHOUSE, 0.1.3)
+AC_INIT(MILHOUSE, 0.2)
 AC_DEFINE(RELEASE_CANDIDATE,["-c1"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -89,12 +89,6 @@ if test "x${have_jack}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
 fi
 
-#Trying to set LIBV4L2 using pkg-config
-#PKG_CHECK_MODULES(LIBV4L2, [libv4l2], have_libv4l2=true, have_libv4l2=false)
-#if test "x${have_libv4l2}" = "xfalse" ; then
-#AC_MSG_ERROR([missing pkg - libv4l2-dev ])
-#fi
-
 
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
@@ -109,39 +103,10 @@ if test "x${have_libraw1394}" = "xfalse" ; then
 fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
-#AC_SUBST(ALL_GST_LIBS)
 
-#if test "x${enable_sip}" = "xyes" ; then
-
-#Trying to set PJSIP using pkg-config
-#PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
-#if test "x${have_libuuid}" = "xfalse" ; then
-#    AC_MSG_WARN([UUID not found. pkg libuuid1])
-#fi
-
-#Trying to set PJSIP using pkg-config
-#PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
-#if test "x${have_libpj}" = "xfalse" ; then
-#    AC_MSG_WARN([PJSIP not found. http://www.pjsip.org/download.htm])
-#fi
-#fi
-
-#Trying to set LIBLO using pkg-config
-#PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
-#if test "x${have_liblo}" = "xfalse" ; then
-#    AC_MSG_WARN([LIBLO missing. pkg - liblo0,liblo0-dev ])
-#fi
-#AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
-
-#PYTHON_CFLAGS="-I/usr/include/boost/python "
-#PYTHON_CFLAGS+=`python-config --includes` 
-#PYTHON_LIBS="/usr/lib/libboost_python.so "
-#PYTHON_LIBS+=`python-config --ldflags` 
-
-#AC_SUBST(PYTHON_CFLAGS)
-#AC_SUBST(PYTHON_LIBS)
 AX_PYTHON
 
+# BOOST m4 tests
 AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
 AX_BOOST_SYSTEM
@@ -195,13 +160,6 @@ fi
 
 CXXFLAGS+=" -fPIC "
 
-#Trying to set GLIB using pkg-config
-#
-#
-#
-#
-#AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xtrue" )
-#AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
@@ -243,15 +201,6 @@ AC_CONFIG_FILES([Makefile
                  src/main/Makefile
                  src/python/Makefile
                  ])
-#                 src/sip/Makefile
-
-#if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
-
-#                 src/util/test/Makefile
-#                 src/gutil/test/Makefile
-#                 src/tcp/test/Makefile
-#                 src/sip/test/Makefile
-#                 src/gst/engine/test.old/Makefile
 
 AC_CONFIG_FILES([
                  src/util/test/Makefile
@@ -260,7 +209,6 @@ AC_CONFIG_FILES([
                  ])
 
 
-#fi
 AC_OUTPUT
 echo
 
