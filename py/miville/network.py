@@ -65,7 +65,7 @@ from miville.utils import commands
 from miville import connectors
 from miville.errors import CommandNotFoundError
 
-log = log.start('debug', 1, True, 'network') # LOG TO FILE = True
+log = log.start('debug', True, True, 'network') # LOG TO FILE = True
 # CHANGE IT TO debug LEVEL TO GET MORE OUTPUT
 
 # -------------------- constants -----------------------------------

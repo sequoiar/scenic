@@ -175,6 +175,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/network/Makefile
 		 doc/figures/Makefile
 		 doc/figures/test/Makefile
+		 doc/sequences/Makefile
                  src/Makefile
                  py/Makefile
                  py/docs/Makefile

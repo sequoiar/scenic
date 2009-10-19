@@ -27,13 +27,6 @@ class StreamError(Exception):
     """
     pass
 
-# DEPRECATED
-# class SettingsError(Exception):
-#     """
-#     Master Exception Class for the settings.
-#     """
-#     pass
-
 ### Address Book ###
 class AddressBookError(Exception):
     """
@@ -73,7 +66,6 @@ class ConnectorError(ConnectionError):
     Sub Exception Class for the Connector module.
     """
     pass
-
 
 class CommandNotFoundError(Exception):
     """

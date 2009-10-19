@@ -209,7 +209,6 @@ class BasicClient(LineReceiver):
         else:
             log.info('Bad command received from remote')
 
-
 class ConnectionBasic(Connection):
     """
     Connection that uses the "connectors.basic" protocol.
@@ -291,45 +290,9 @@ class ConnectionBasic(Connection):
 #        self.send_settings()
 
     def _com_chan_started_server(self, action="join"):
-        self.com_chan.add(self.settings)
+        pass
+        #self.com_chan.add(self.settings)
     
-    def settings(self, settings):
-        """
-        Receives the settings for the streams.
-
-        :param settings: dict kind => dict "stream" ... whose keys are "name" and "service"
-        """
-#        self.com_chan.delete(self.settings)
-        self.api.select_streams(self, 'receive')
-        for kind, stream in settings.items():
-            name = stream.pop('name') + '.rem'
-            service = stream.pop('service')
-            self.api.add_stream(self, name, kind, service)
-            for attr, value in stream.items():
-                self.api.set_stream(self, name, kind, attr, value)
-        self.api.start_streams(self, None, self.com_chan)
-
-    def send_settings(self):
-        """
-        Sends the settings for the streams. 
-        
-        Sends each stream set in the API. The setting method in this very 
-        same class handles its result on the receiving end.
-        """
-        settings = {}
-        for name, stream in self.api.streams.streams.items():
-            kind = self.api.streams.get_kind(stream)
-            if not kind:
-                continue
-            service = stream.__module__.rpartition('.')[2]
-            params = {'name':name.partition('_')[2], 'service':service}
-            for key, value in stream.__dict__.items():
-                if (key[0] != '_' and value):
-                    params[key] = value
-            settings[kind] = params
-        self.com_chan.callRemote('ConnectionBasic.settings', settings)
-        self.api.start_streams(self, self.contact.address, self.com_chan)
-
     def timeout(self):
         self._close_connection()
         Connection.timeout(self)
@@ -362,9 +325,6 @@ def start(api, port, interfaces=''):
     #interfaces = api.core.config.listen_to_interfaces
     #listen_queue_size = 50
     api.listen_tcp(PORT, server_factory, interfaces)
-
-
-
 
 # TODO:
 # # adapted from Tahoe: finds a single publically-visible address, or None.

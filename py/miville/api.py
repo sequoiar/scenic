@@ -123,6 +123,7 @@ class ControllerApi(object):
             # '' mean all interfaces
             interface = interfaces
             log.debug("listenTCP:%s %s %s %s" % (port, factory, listen_queue_size, interface))
+            log.info("listen TCP on port %s" % (port))
             reactor.listenTCP(port, factory, listen_queue_size, interface)
         else:
             for interface in interfaces:
@@ -473,7 +474,7 @@ class ControllerApi(object):
          * register com_chan callbacks 
         """
         if contact == None:
-            contact = self.adb.get_current()
+            contact = self.adb.get_current() #FIXME : DEPRECATED The CLI should pass a contact argument.
         if contact and contact.name in self.adb.contacts:
             try:
                 connection = connectors.create_connection(contact, self)
@@ -494,9 +495,11 @@ class ControllerApi(object):
                                      'exception':'%s' % err,
                                      'msg':'Connection failed',
                                      'context':'connection'})
+                # TODO return failure
         else:
             self.notify(caller, {'msg':'No contact selected',
                                  'context':'connection'})
+            # TODO return failure
 
     def stop_connection(self, caller, contact=None):
         if contact == None:

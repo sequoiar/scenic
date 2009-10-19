@@ -161,7 +161,7 @@ class TelnetServer(recvline.HistoricRecvLine):
                                  '\x05': self.handle_END, # TODO add control-D for quit
                                  t.TAB: self.completion})
         log.info("%s is connecting in Telnet on port %s" % (self.addr.host, self.addr.port))
-        self.write("Welcome to Sropulpof!")
+        self.write("Welcome to Miville!")
         hostname = socket.gethostname()
         if enable_escape_sequences:
             number = 0 
@@ -518,11 +518,11 @@ class CliController(TelnetServer):
         (options, args) = cp.parse_args(line)
 
         if options.start:
-            self.core.start_connection(self)
+            self.core.start_connection(self) # FIXME: DEPRECATED the CLI should pass an argument here.
         elif options.description:
             cp.print_description()
         elif options.stop:
-            self.core.stop_connection(self)
+            self.core.stop_connection(self) #FIXME: DEPRECATED the CLI should pass an argument here.
         else:
             cp.print_help()
     

@@ -2,6 +2,21 @@
 # -*- coding: utf-8 -*-
 """
 Managers for streams.
+
+For the notifications to the API, we do not care if it is this miville (Alice) 
+or the remote one (Alice) that started the stream, we just want to know 
+we are streaming and with which configuration profile name and entries. 
+Actually, for now, there are 2 different callbacks for when we are 
+Alice or Bob.
+
+Here are the things to verify to make sure a streams has started :
+ * the local sender/receiver process is running
+ * le remote receiver/sender process is running 
+ * the local sender/receiver is streaming
+ * the remote sender/receiver is streaming
+
+Of course, we use the comchan to communicate with the remote peer. We use it
+through the miville.streams.communication.
 """
 import copy
 
@@ -19,13 +34,62 @@ from miville.utils import observer
 from miville.utils import log
 from miville import connectors
 
-log = log.start("info", 1, 0, "streams.manager") 
+log = log.start("info", True, False, "streams.manager") 
 
 _single_manager = None # singleton
+
+class StreamingSession(object):
+    """
+    We need to wrap the informations about the current session in an object.
+    This will be much easier to manager.
+    Contains stuff that is negociated between the peers.
+    """
+    # Not used yet.
+    def __init__(self, contact_infos=None, alice_entries=None, bob_entries=None, role="alice"):
+        """
+        :param contact_infos: ContactInfos object
+        :alice_entries: Dict of configuration entries for initiator peer.
+        :bob_entries: Dict of configuration entries for the othe peer.
+        :param role: str Either "alice" or "bob"
+        """
+        self.contact_infos = contact_infos
+        self.alice_entries = alice_entries
+        self.bob_entries = bob_entries
+        self.role = role
+
+class StreamingNotification(object):
+    """
+    Let's wrap the failure/success notification in a class.
+    """
+    # Not used yet.
+    #TODO: pass StreamingSession object ?
+    def __init__(self, contact=None, message="", details="", success=True, role="alice", stream_state=None):
+        """
+        :param contact: addressbook.Contact object
+        :param message: str
+        :param details: str
+        :param success: bool
+        :param stream_state: str One of the miville.streams.states.STATE*
+        """
+        self.contact=contact, 
+        try:
+            self.contact_name = contact.name
+        except ValueError:
+            self.contact_name = "unknown"
+        self.message = message
+        self.details = details
+        self.success = success
+        self.role = role
+        self.streaming_state = stream_state
 
 class ServicesManager(observer.Observer):
     """
     This is the only class that should be used from the core api.
+    
+    Wasn't it called StreamsManager ? 
+    
+    The service manager is an observer, since it receives notifications from 
+    its services.
     """
     def __init__(self, api=None):
         self.api = api
@@ -58,6 +122,10 @@ class ServicesManager(observer.Observer):
     def _create_contact_infos_from_contact(self, contact):
         """
         Returns a ContactInfos
+        
+        We wrap contact infos in a class, just to be independant from the 
+        miville.addressbook.Contact class.
+        
         :param contact: miville.addressbook.Contact
         We must be connected to that contact in order to get our local port and addr.
         Uses Contact, the streams communication channel and the Api.
@@ -276,9 +344,8 @@ class ServicesManager(observer.Observer):
         :param contact: miville.addressbook.Contact to start streaming with.
         Returns a DeferredList
         """
-        #TODO: return Deferred not DeferredList
         #TODO: if not connected, connect
-        #TODO: manage port numbers.
+        #TODO: manage port numbers using a negociation.
         #TODO: asymetrical config entries (device, etc.)
         #TODO: it is the service that should duplicate the config entries for the initiator and the responder. (A and B) and overide the port numbers accordingly. We should add it a prepare_startup method, or so.
         log.debug("manager.start")
@@ -306,18 +373,10 @@ class ServicesManager(observer.Observer):
         # prepare config entries for alice and bob streams
         for service in self.services.itervalues():
             log.info("preparing service %s to stream with contact %s" % (service.name, contact_infos.get_id()))
-            alice_entries, bob_entries = service.prepare_session(alice_entries, bob_entries, role="alice")
+            alice_entries, bob_entries = service.prepare_session(alice_entries, bob_entries, role="alice", contact_infos=contact_infos)
             log.debug("Alpha ports: %s. Bravo ports: %s" % (
                 conf.path_glob(alice_entries, "port", conf.GLOB_CONTAINS),
                 conf.path_glob(bob_entries, "port", conf.GLOB_CONTAINS)))
-            alice_addr = contact_infos.local_addr
-            bob_addr = contact_infos.remote_addr
-            alice_entries["/send/network/remote_address"] = bob_addr #FIXME: this is milhouse custom field
-            alice_entries["/recv/network/remote_address"] = bob_addr #FIXME: this is milhouse custom field
-            bob_entries["/send/network/remote_address"] = alice_addr #FIXME: this is milhouse custom field
-            bob_entries["/recv/network/remote_address"] = alice_addr #FIXME: this is milhouse custom field
-            log.debug("using addresses %s %s" % (alice_addr, bob_addr))
-            
         # send message to "bob" remote host
         comm.send_start(contact_infos, alice_entries, bob_entries)
         # TODO: add comm_deferred as well.

@@ -111,7 +111,7 @@ from miville.utils.common import find_callbacks
 #from miville.ui.web.pages.gstpage import GstPage
 from miville.ui.web.pages.procspage import ProcsPage
 
-log = log.start('debug', 1, 0, 'web')
+log = log.start('info', 1, 0, 'web')
 
 widgets_mod = []
 

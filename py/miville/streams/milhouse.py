@@ -93,7 +93,7 @@ class MilhouseService(object):
     #     """
     #     return result
     
-    def prepare_session(self, alice_entries, bob_entries, role="alice"):
+    def prepare_session(self, alice_entries, bob_entries, role="alice", contact_infos=None):
         """
         Prepares the config entries for the alice and the bob.
         
@@ -122,6 +122,13 @@ class MilhouseService(object):
             bob_entries["/both/audio/port"] = p3
             bob_entries["/both/video/port"] = p4
             log.info("Allocating ports: %d %d %d %d" % (p1, p2, p3, p4))
+            alice_addr = contact_infos.local_addr
+            bob_addr = contact_infos.remote_addr
+            alice_entries["/send/network/remote_address"] = bob_addr #FIXME: this is milhouse custom field
+            alice_entries["/recv/network/remote_address"] = bob_addr #FIXME: this is milhouse custom field
+            bob_entries["/send/network/remote_address"] = alice_addr #FIXME: this is milhouse custom field
+            bob_entries["/recv/network/remote_address"] = alice_addr #FIXME: this is milhouse custom field
+            log.debug("using addresses %s %s" % (alice_addr, bob_addr))
         # else pass it unchanged TODO: maybe change the ports?
         ret = [alice_entries, bob_entries]
         return ret

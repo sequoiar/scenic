@@ -1,4 +1,4 @@
-SUBDIRS = notes test figures figures/test
+SUBDIRS = notes test figures figures/test sequences
 
 all: 
 	@for i in $(SUBDIRS); do \
