@@ -754,6 +754,8 @@ class ControllerApi(object):
         """
         self.notify(caller, 'Trying to ping... ', 'info')
         try:
+            if isinstance(contact, AddressBookError):
+                raise contact # FIXME: DO NOT RETURN EXCEPTION PLEASE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if contact is None:
                 contact = self.get_contact()
                 self.notify(caller, '...with contact %s.' % (contact.name), 'info')
