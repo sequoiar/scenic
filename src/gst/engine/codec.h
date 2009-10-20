@@ -194,7 +194,7 @@ class H263Encoder : public VideoEncoder
         Payloader* createPayloader() const;
 };
 
-/// Decoder that decodes H.263 into raw video using the ffmpeg hq263 decoder.
+/// Decoder that decodes H.263 into raw video using the ffmpeg h263 decoder.
 class H263Decoder : public VideoDecoder
 {
     private: 
@@ -227,7 +227,7 @@ class Mpeg4Decoder: public VideoDecoder
 };
 
 
-/// Encoder that encodes raw video into mpeg4 using the ffmpeg mpeg4 encoder
+/// Encoder that encodes raw video into theora using the theoraenc encoder
 class TheoraEncoder : public VideoEncoder
 {
     public:
@@ -250,7 +250,7 @@ class TheoraEncoder : public VideoEncoder
 };
 
 
-/// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
+/// Decoder that decodes mpeg4 into raw video using the theoradec decoder.
 class TheoraDecoder: public VideoDecoder
 {
     private: 

@@ -174,9 +174,18 @@ void Mpeg4Payloader::init()
     // 1 packet per buffer. this will allow downstream elements that are bufferlist aware
     // to avoid unneeded memcpys
     // FIXME: Find out why setting buffer-list to true breaks rtp so badly, DON'T SET THIS TO TRUE
-    //g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
-    // The default of true works fine for perfec-rtptime
-    //g_object_set(rtpPay_, "perfect-rtptime", FALSE, NULL);
+    // this bug might have been fixed with (in gst-plugins-base) on oct. 16th
+    // so expected in gst-plugins-base-0.10.26
+    // commit 7bca2a001941798c1a4005ee37802708ed13c225
+    //
+    // rtp: Correct timestamping of buffers when buffer_lists are used
+    //         
+    // The timestamping of buffers when buffer_lists are used failed if
+    // a buffer did not have both a timestamp and an offset.
+    //
+    // g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
+    // The default of true works fine for perfect-rtptime
+    // g_object_set(rtpPay_, "perfect-rtptime", FALSE, NULL);
     Payloader::init();
 }
 
