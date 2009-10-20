@@ -138,7 +138,8 @@ void TheoraDepayloader::init()
 void H264Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph264pay", NULL);
-    g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
+    // FIXME: Find out why setting buffer-list to true breaks rtp so badly, DON'T SET THIS TO TRUE
+    //g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
     Payloader::init();
 }
 
@@ -172,7 +173,10 @@ void Mpeg4Payloader::init()
     // this means that our payloader will output bufferlists instead of
     // 1 packet per buffer. this will allow downstream elements that are bufferlist aware
     // to avoid unneeded memcpys
-    g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
+    // FIXME: Find out why setting buffer-list to true breaks rtp so badly, DON'T SET THIS TO TRUE
+    //g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
+    // The default of true works fine for perfec-rtptime
+    //g_object_set(rtpPay_, "perfect-rtptime", FALSE, NULL);
     Payloader::init();
 }
 

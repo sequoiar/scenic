@@ -1,7 +1,7 @@
 NTA:
+-fix loglevel
 -set resolution
 -set framerate
--set window title
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 
 provide info
 -use osc style path for tcp messages
