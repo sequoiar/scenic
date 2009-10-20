@@ -10,7 +10,7 @@
 #  4. gst-plugin-good 0.10.16
 #  5. gst-plugin-bad 0.10.14
 #  6. gst-plugin-ugly 0.10.12
-#  7. gst-ffmpeg 0.10.10.7
+#  7. gst-ffmpeg 0.10.10.9
 
 DOWNLOAD_DIR=~/src/gstreamer-src
 if [ ! -d $DOWNLOAD_DIR ]
@@ -32,7 +32,7 @@ GST_BASE=gst-plugins-base-0.10.25
 GST_GOOD=gst-plugins-good-0.10.16
 GST_BAD=gst-plugins-bad-0.10.14
 GST_UGLY=gst-plugins-ugly-0.10.12
-GST_FFMPEG=gst-ffmpeg-0.10.7
+GST_FFMPEG=gst-ffmpeg-0.10.9
 GST_PYTHON=gst-python-0.10.16
 GST_GL=gst-plugins-gl-0.10.1
 YASM=yasm-0.8.0
