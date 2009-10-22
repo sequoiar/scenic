@@ -124,6 +124,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     else if (!context->printStats_)
     {
         LOG_DEBUG("Finished printing stats");
+        playback::quit();
         return FALSE;
     }
     else if (sessionCount_ <= 0) // no sessions to print yet
