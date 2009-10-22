@@ -242,7 +242,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception &e)
     {
-        std::cout << "Quitting with exception: " << e.what() << std::endl;
+        std::cout << "milhouse: " << e.what() << std::endl;
         ret = 1;
     }
     return ret;

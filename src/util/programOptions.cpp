@@ -65,7 +65,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("timeout,z", po::value<int>()->default_value(0), "time in ms to wait before quitting, 0=run indefinitely")
             ("audio-buffer-usec,b", po::value<int>()->default_value(11333), "size of receiver's "
                     "audio buffer in microseconds, must be > 10000")
-            ("jitterbuffer,g", po::value<int>(), "size of receiver's rtp jitterbuffers in milliseconds, must be > 1")
+            ("jitterbuffer,g", po::value<int>()->default_value(50), "size of receiver's rtp jitterbuffers in milliseconds, must be > 1")
             ("camera-number,G", po::value<int>()->default_value(-1), "camera id for dc1394src")
             ("multicast-interface,I", po::value<string>()->default_value(""), "interface to use for multicast (eth0,eth1)")
             ("enable-controls,j", po::bool_switch(), "enable gui controls for adjusting the jitterbuffer")

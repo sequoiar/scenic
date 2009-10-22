@@ -1,5 +1,4 @@
 NTA:
--fix loglevel
 -set resolution
 -set framerate
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 
