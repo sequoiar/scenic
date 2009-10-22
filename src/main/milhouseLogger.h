@@ -41,6 +41,7 @@ class MilhouseLogger
         void printMessages();   // this runs in printThread
         LogLevel argToLogLevel(const std::string &logLevel);
         bool gstDebug_;
+        const LogLevel level_;
 };
 
 #endif // _MILHOUSE_LOGGER_H_

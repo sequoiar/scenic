@@ -177,6 +177,7 @@ void XvImageSink::init()
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     tassert(window_);
 
+#ifdef XINE_QUERY
     GdkDisplay* display = gdk_display_get_default();
     tassert(display);
     int n;
@@ -194,6 +195,7 @@ void XvImageSink::init()
         if (j == screen_num_) 
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
+#endif
 
     gtk_window_set_default_size(GTK_WINDOW(window_), videosize::WIDTH, videosize::HEIGHT);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title

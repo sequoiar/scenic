@@ -28,9 +28,8 @@
 
 MilhouseLogger::MilhouseLogger(const std::string &logLevel) : 
     printQueue_(), printThread_(boost::bind<void>(&MilhouseLogger::printMessages, this)), 
-    gstDebug_(false)
+    gstDebug_(false), level_(argToLogLevel(logLevel))
 {
-    setLevel(argToLogLevel(logLevel));
 }
 
 
@@ -63,9 +62,10 @@ MilhouseLogger::~MilhouseLogger()
 }
 
 /// This is called in the main thread
-void MilhouseLogger::operator()(LogLevel& /*level*/, std::string& msg)
+void MilhouseLogger::operator()(LogLevel& level, std::string& msg)
 {
-    printQueue_.push(msg);
+    if (level_ <= level)    // only push to print queue if the loglevel of this msg exceeds 
+        printQueue_.push(msg);  // the logger's loglevel
 //    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 }
 
