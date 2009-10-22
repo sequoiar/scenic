@@ -27,7 +27,7 @@
 
 
 MilhouseLogger::MilhouseLogger(const std::string &logLevel) : 
-    printQueue_(), printThread_(boost::bind<void>(boost::mem_fn(&MilhouseLogger::printMessages), boost::ref(*this))), 
+    printQueue_(), printThread_(boost::bind<void>(&MilhouseLogger::printMessages, this)), 
     gstDebug_(false)
 {
     setLevel(argToLogLevel(logLevel));
