@@ -160,7 +160,7 @@ void VideoEncoder::init()
 }
 
 
-VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0), queue_(0)
+VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0)//, queue_(0)
 {}
 
 
@@ -169,7 +169,7 @@ VideoDecoder::~VideoDecoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
     Pipeline::Instance()->remove(&deinterlace_);
-    Pipeline::Instance()->remove(&queue_);
+    //Pipeline::Instance()->remove(&queue_);
 }
 
 
@@ -181,10 +181,12 @@ void VideoDecoder::init()
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
 
     tassert(decoder_ != 0);
+#if 0
     queue_ = Pipeline::Instance()->makeElement("queue", NULL);
     g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
     g_object_set(queue_, "max-size-bytes", 0, NULL);
     g_object_set(queue_, "max-size-time", 0LL, NULL);
+#endif
     if (doDeinterlace_)
     {
         colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
@@ -193,10 +195,10 @@ void VideoDecoder::init()
         g_object_set(deinterlace_, "fields", TOP, NULL);
         gstlinkable::link(decoder_, colorspc_);
         gstlinkable::link(colorspc_, deinterlace_);
-        gstlinkable::link(deinterlace_, queue_);
+     //   gstlinkable::link(deinterlace_, queue_);
     }
-    else
-        gstlinkable::link(decoder_, queue_);
+    //else
+      //  gstlinkable::link(decoder_, queue_);
 
 }
 

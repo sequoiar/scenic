@@ -142,7 +142,7 @@ class VideoDecoder : public Decoder
         bool doDeinterlace_;
         _GstElement *colorspc_;
         _GstElement *deinterlace_;
-        _GstElement *queue_;
+        //_GstElement *queue_;
         static const unsigned long long LONGER_JITTER_BUFFER_MS = 60;
 
     private:
@@ -150,7 +150,11 @@ class VideoDecoder : public Decoder
         
         _GstElement *srcElement() 
         { 
-            return queue_;
+            // return queue_;
+            if (!doDeinterlace_)
+                return decoder_;
+            else 
+                return deinterlace_;
         }
 };
 
