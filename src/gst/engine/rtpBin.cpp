@@ -28,6 +28,7 @@
 #include "rtpPay.h"
 #include "remoteConfig.h"
 #include "pipeline.h"
+#include "playback.h"
 
 // for posting 
 #include "mapMsg.h"
@@ -54,7 +55,7 @@ void RtpBin::init()
         // uncomment this to print stats
         g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
                 static_cast<GSourceFunc>(printStatsCallback),
-                NULL);
+                this);
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
 }
@@ -112,11 +113,17 @@ void RtpBin::parseSourceStats(GObject * source, RtpBin *context)
 
 
 // callback to print the rtp stats 
-gboolean RtpBin::printStatsCallback(gpointer /*data*/)
+gboolean RtpBin::printStatsCallback(gpointer data)
 {
+    RtpBin *context = static_cast<RtpBin*>(data);
     if (destroyed_)
     {
         LOG_DEBUG("No active rtpsessions, unregistering reporting callback");
+        return FALSE;
+    }
+    else if (!context->printStats_)
+    {
+        LOG_DEBUG("Finished printing stats");
         return FALSE;
     }
     else if (sessionCount_ <= 0) // no sessions to print yet

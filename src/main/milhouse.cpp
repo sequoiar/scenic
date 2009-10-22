@@ -192,7 +192,7 @@ short Milhouse::run(int argc, char **argv)
         LOG_DEBUG("Video disabled.");
         if (!(options.count("audioport") and options.count("audiocodec")))
         {
-            LOG_ERROR("Must specify both audioport and audiocodec");
+            LOG_ERROR("argument error: must specify both audioport and audiocodec");
             return 1;
         }
     }
@@ -201,7 +201,7 @@ short Milhouse::run(int argc, char **argv)
         LOG_DEBUG("Audio disabled.");
         if (!(options.count("videoport") and options.count("videocodec")))
         {
-            LOG_ERROR("Must specify both videoport and videocodec");
+            LOG_ERROR("argument error: must specify both videoport and videocodec");
             return 1;
         }
     }
@@ -242,7 +242,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception &e)
     {
-        std::cout << "milhouse: " << e.what() << std::endl;
+        std::cout << "error: " << e.what() << std::endl;
         ret = 1;
     }
     return ret;

@@ -39,7 +39,7 @@ class RtpBin : boost::noncopyable
         void init();
 
     protected:
-        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0), sessionId_((++sessionCount_) - 1), sessionName_()  // 0 based
+        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0), sessionId_((++sessionCount_) - 1), sessionName_(), printStats_(true)  // 0 based
         {}
         const char *padStr(const char *padName) const;
 
@@ -55,6 +55,7 @@ class RtpBin : boost::noncopyable
         virtual void subParseSourceStats(_GstStructure *stats) = 0;
         void printStatsVal(const std::string &idStr, const char *key, const std::string &type, 
                 const std::string &formatStr, _GstStructure *stats);
+        bool printStats_;
 
     private:
         static const int REPORTING_PERIOD_MS = 8000;

@@ -34,6 +34,7 @@ class RtpPay;
 
 class _GtkAdjustment;
 class _GtkWidget;
+class _GstRtpBin;
 
 class RtpReceiver
     : public RtpBin
@@ -52,10 +53,11 @@ class RtpReceiver
         virtual void subParseSourceStats(_GstStructure *stats);
         static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);
         static std::string getMediaType(_GstPad *pad);
-        static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
+        static void onPadAdded(_GstElement * rtpbin, _GstPad * srcPad, void *data);
+        static void onSenderTimeout(_GstElement * /* rtpbin */, unsigned /* session */, unsigned /* ssrc */, void * /*data*/);
         static void createLatencyControl();
         static const int MIN_LATENCY = 1; // ms
-        static const int INIT_LATENCY = 5;   // ms
+        static const int INIT_LATENCY = 50;   // ms
         static const int MAX_LATENCY = 5000; // ms
 
         _GstElement *rtp_receiver_;

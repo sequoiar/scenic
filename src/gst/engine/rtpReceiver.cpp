@@ -32,6 +32,7 @@
 #include "rtpPay.h"
 #include "rtpReceiver.h"
 #include "remoteConfig.h"
+#include "playback.h"
 
 #include <gtk/gtk.h>
 
@@ -101,7 +102,7 @@ void RtpReceiver::checkSampleRate()
 }
 
 
-void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void * /* data*/)
+void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /* data*/)
 {
     static const std::string expectedPadPrefix = "recv_rtp_src";
     if (gst_pad_is_linked(srcPad))
@@ -132,6 +133,15 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
     gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
 
     gst_object_unref(sinkPad);
+}
+
+
+void RtpReceiver::onSenderTimeout(GstElement *  /*rtpbin*/, guint /* session */, guint /* ssrc */, gpointer data)
+{
+    LOG_INFO("Sender timeout, quitting.");
+    RtpReceiver *context = static_cast<RtpReceiver*>(data);
+    context->printStats_ = false;
+    //playback::quit(); // can't due this without crashing
 }
 
 
@@ -230,8 +240,12 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     depayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", 
-            G_CALLBACK(RtpReceiver::cb_new_src_pad), 
+            G_CALLBACK(RtpReceiver::onPadAdded), 
             NULL);
+    
+    g_signal_connect(rtpbin_, "on-sender-timeout", 
+            G_CALLBACK(RtpReceiver::onSenderTimeout), 
+            this);
 
     if (controlEnabled_)
         createLatencyControl();
