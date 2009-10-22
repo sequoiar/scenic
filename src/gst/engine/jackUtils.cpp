@@ -22,7 +22,6 @@
 
 #include "util.h"
 
-#include <jack/jack.h>
 #include <gst/gst.h>
 
 #include "jackUtils.h"
@@ -95,7 +94,8 @@ bool Jack::is_running()
     return true;
 }
 
-unsigned int Jack::samplerate() 
+
+jack_nframes_t Jack::samplerate() 
 {
     if (!is_running())
         THROW_ERROR("JACK server not running, cannot compare sample rates.");

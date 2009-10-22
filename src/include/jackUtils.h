@@ -22,6 +22,8 @@
 #ifndef _JACK_UTILS_H_
 #define _JACK_UTILS_H_
 
+#include <jack/jack.h>
+
 class _GstElement;
 
 /// Utility functions for jack related issues. 
@@ -29,7 +31,7 @@ namespace Jack {
     void assertReady();
     bool is_running();
     bool autoForcedSupported(_GstElement *jackElement);
-    unsigned int samplerate();
+    jack_nframes_t samplerate();
     unsigned int framesPerPeriod();
     unsigned long long minBufferTime();
     unsigned long long safeBufferTime();
