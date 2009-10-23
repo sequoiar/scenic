@@ -157,7 +157,7 @@ void AudioTestSource::sub_init()
 
     GstCaps *caps = gst_caps_new_simple("audio/x-raw-int", "endianness", G_TYPE_INT, 1234, "signed", 
             G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT, 
-            Pipeline::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
+            Pipeline::Instance()->actualSampleRate(), "channels", G_TYPE_INT, 1, NULL);
 
     for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
     {
@@ -311,7 +311,7 @@ std::string AudioJackSource::getCapsFilterCapsString()
     // force proper number of channels on output
     std::ostringstream capsStr;
     capsStr << "audio/x-raw-float, channels=" << config_.numChannels() 
-        << ", rate=" << Pipeline::SAMPLE_RATE;
+        << ", rate=" << Pipeline::Instance()->actualSampleRate();
     LOG_DEBUG("jackAudiosource caps = " << capsStr.str());
     return capsStr.str();
 }

@@ -147,21 +147,22 @@ if __name__ == '__main__':
         filename = None
 
 
-rate = 48000
-for codec in ('raw', 'mp3'):
-    for channels in xrange(1, 3):
-        profile_name = codec + '_%d_%d' % (channels, rate)
-        profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
+for rate in (16000, 44100, 48000):
+    for codec in ('raw', 'mp3'):
+        for channels in xrange(1, 3):
+            profile_name = codec + '_%d_%d' % (channels, rate)
+            profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
 
 for profile_name, profile in profiles.iteritems():
     profile = generate_caps(profile_name, profile)
 
 # generate caps by hand for raw because its more stable than getting them from a pipeline
 codec = 'raw'
-for channels in xrange(3, 9):
-    profile_name = codec + '_%d_%d' % (channels, rate)
-    profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
-    profiles[profile_name].caps = 'application/x-rtp, media=(string)audio, clock-rate=(int)48000, encoding-name=(string)L16, encoding-params=(string)%d, channels=(int)%d, payload=(int)96' % (channels, channels)
+for rate in (16000, 44100, 48000):
+    for channels in xrange(3, 9):
+        profile_name = codec + '_%d_%d' % (channels, rate)
+        profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
+        profiles[profile_name].caps = 'application/x-rtp, media=(string)audio, clock-rate=(int)%d, encoding-name=(string)L16, encoding-params=(string)%d, channels=(int)%d, payload=(int)96' % (rate, channels, channels)
 
     
 save_caps(profiles, filename)

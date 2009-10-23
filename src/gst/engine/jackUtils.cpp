@@ -140,9 +140,12 @@ void Jack::assertReady()
     if (!Jack::is_running())
         THROW_CRITICAL("Jack is not running");
 
-    if (Pipeline::SAMPLE_RATE != samplerate())
+    if (Pipeline::Instance()->actualSampleRate() != samplerate())
+    {
         LOG_WARNING("Jack's sample rate of " << samplerate()
-                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
+                << " does not match pipeline sample rate " << Pipeline::Instance()->actualSampleRate());
+        Pipeline::Instance()->updateSampleRate(samplerate());
+    }
 }
 
 

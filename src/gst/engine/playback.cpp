@@ -70,6 +70,6 @@ bool playback::quitted()
 
 int playback::sampleRate()
 {
-    return Pipeline::SAMPLE_RATE;
+    return Pipeline::Instance()->actualSampleRate();
 }
 
