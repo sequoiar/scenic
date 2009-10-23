@@ -99,18 +99,22 @@ def save_caps(profiles, filename):
             filename = ''
 
         filestr += '#include "' + filename.split('cpp')[0].strip() + 'h"\n\n'
-        filestr += 'void caps::initCapsMap(std::map<std::string, std::string> &capsMap)\n{\n'
-        filestr += '    if (capsMap.empty())\n    {\n'
-
-        for profileName, profile in profiles.iteritems():
-                filestr += '        capsMap["' + profileName + '"] = '
-                filestr += '"' + profile.caps.replace('\\', '\\\\').replace('"', '\\"') + '";\n\n\n'
-        filestr += '    }\n'
-        filestr += '}\n\n'
+        filestr += '#include <boost/assign.hpp>\n'
+        filestr += '#include <map>\n\n'
 
         filestr += 'std::string caps::getCaps(const std::string &key)\n{\n'
-        filestr += '    static std::map<std::string, std::string> names;\n'
-        filestr += '    initCapsMap(names);\n'
+        filestr += '    using namespace boost::assign;\n'
+        filestr += '    static std::map<std::string, std::string> names = map_list_of \n'
+        
+        delimiter = ''
+        for profileName, profile in profiles.iteritems():
+            filestr += delimiter 
+            filestr += '        ("' + profileName + '" , '
+            filestr += '"' + profile.caps.replace('\\', '\\\\').replace('"', '\\"') + '")'
+            delimiter = '\n\n'
+
+        filestr += ';\n\n'
+
         filestr += '    return names[key];\n}\n\n'
 
         file.write(filestr)

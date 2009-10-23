@@ -26,11 +26,10 @@
 #define __CAPS_H__
 
 #include <string>
-#include <map>
 
+/// FIXME: since this won't change @ runtime this map should be initialized at compile time...somehow.
 namespace caps 
 {
-	void initCapsMap(std::map<std::string, std::string> &capsMap);
 	std::string getCaps(const std::string &key);
 }
 
