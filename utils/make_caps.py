@@ -146,7 +146,7 @@ if __name__ == '__main__':
     else:
         filename = None
 
-SAMPLERATES = (16000, 22050, 32000, 44100, 48000)
+SAMPLERATES = [16000, 22050, 32000, 44100, 48000]
 
 for rate in SAMPLERATES:
     for codec in ('raw', 'mp3'):
@@ -159,6 +159,7 @@ for profile_name, profile in profiles.iteritems():
 
 # generate caps by hand for raw because its more stable than getting them from a pipeline
 codec = 'raw'
+SAMPLERATES.append(96000)
 for rate in SAMPLERATES:
     for channels in xrange(3, 9):
         profile_name = codec + '_%d_%d' % (channels, rate)
