@@ -48,9 +48,11 @@ class Pipeline : boost::noncopyable
         GstClockID add_clock_callback(GstClockCallback callback, void *user_data);
         void remove_clock_callback(GstClockID clockId);
 
+        void updateSampleRate(unsigned newRate);
         void remove(_GstElement ** element);
         void remove(std::vector < _GstElement * >&elementVec);
         bool isPlaying() const;
+        int actualSampleRate() const;
         bool isReady() const;
         bool isPaused() const;
         bool isStopped() const;
@@ -76,7 +78,7 @@ class Pipeline : boost::noncopyable
         static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
         bool checkStateChange(GstStateChangeReturn ret) const;
 
-        Pipeline() : pipeline_(0), startTime_(0), handlers_(), refCount_(0), quitted_(false)
+        Pipeline() : pipeline_(0), startTime_(0), handlers_(), refCount_(0), quitted_(false), sampleRate_(SAMPLE_RATE)
         {}
 
         ~Pipeline();
@@ -88,7 +90,9 @@ class Pipeline : boost::noncopyable
         GstClockTime startTime_;
         std::vector<BusMsgHandler*> handlers_;
         int refCount_;
+        unsigned sampleRate_;
         bool quitted_;
+        char *titleStr_;
 };
 
 #endif // _PIPELINE_H_

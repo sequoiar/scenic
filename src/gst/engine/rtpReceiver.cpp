@@ -141,7 +141,7 @@ void RtpReceiver::onSenderTimeout(GstElement *  /*rtpbin*/, guint /* session */,
     LOG_INFO("Sender timeout, quitting.");
     RtpReceiver *context = static_cast<RtpReceiver*>(data);
     context->printStats_ = false;
-    //playback::quit(); // can't due this without crashing
+    //playback::quit(); // can't do this here without crashing
 }
 
 

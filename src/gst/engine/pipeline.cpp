@@ -52,6 +52,7 @@ Pipeline::~Pipeline()
 {
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
+    delete [] titleStr_;
 }
 
 
@@ -132,14 +133,16 @@ void Pipeline::init()
 
         // FIXME: GROSSS, but we need this so that
         // for example in jack our process shows up as milhouse
-        // and not "unknown"
+        // and not "unknown", and gst_init only takes raw ***argv
         static int argc = 1;
         static const std::string title("milhouse");
-        gchar *titleStr = new gchar[title.length()];
-        memcpy(titleStr, title.c_str(), title.length());
-        gchar **argv = {&titleStr};
+        titleStr_ = new gchar[title.length() + 1];
+        memcpy(titleStr_, title.c_str(), title.length());
+        // argv has to end with 0
+        titleStr_[title.length()] = 0;
+        gchar **argv = {&titleStr_};
+
         gst_init(&argc, &argv);
-        delete [] titleStr;
 
         tassert(pipeline_ = gst_pipeline_new("pipeline"));
 
@@ -473,5 +476,17 @@ void Pipeline::seekTo(gint64 pos)
                 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
         THROW_ERROR("Seek failed!");
     }
+}
+
+
+void Pipeline::updateSampleRate(unsigned newRate)
+{
+    sampleRate_ = newRate;
+}
+
+
+int Pipeline::actualSampleRate() const
+{
+    return sampleRate_;
 }
 
