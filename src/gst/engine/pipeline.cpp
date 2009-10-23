@@ -481,7 +481,7 @@ void Pipeline::seekTo(gint64 pos)
 
 void Pipeline::updateSampleRate(unsigned newRate)
 {
-    LOG_DEBUG("Updating sample rate");
+    LOG_INFO("Updating sample rate to " << newRate);
     sampleRate_ = newRate;
 }
 

@@ -65,8 +65,6 @@ class Pipeline : boost::noncopyable
         bool quitted() { return quitted_; }
         void makeVerbose();
 
-        static const unsigned int SAMPLE_RATE = 48000;
-
     private:
         static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);
         void init();
@@ -93,6 +91,7 @@ class Pipeline : boost::noncopyable
         unsigned sampleRate_;
         bool quitted_;
         char *titleStr_;
+        static const unsigned int SAMPLE_RATE = 48000;
 };
 
 #endif // _PIPELINE_H_
