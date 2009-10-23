@@ -52,7 +52,7 @@ class Pipeline : boost::noncopyable
         void remove(_GstElement ** element);
         void remove(std::vector < _GstElement * >&elementVec);
         bool isPlaying() const;
-        int actualSampleRate() const;
+        unsigned actualSampleRate() const;
         bool isReady() const;
         bool isPaused() const;
         bool isStopped() const;
@@ -88,8 +88,8 @@ class Pipeline : boost::noncopyable
         GstClockTime startTime_;
         std::vector<BusMsgHandler*> handlers_;
         int refCount_;
-        unsigned sampleRate_;
         bool quitted_;
+        unsigned sampleRate_;
         char *titleStr_;
         static const unsigned int SAMPLE_RATE = 48000;
 };

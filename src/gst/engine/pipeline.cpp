@@ -486,7 +486,7 @@ void Pipeline::updateSampleRate(unsigned newRate)
 }
 
 
-int Pipeline::actualSampleRate() const
+unsigned Pipeline::actualSampleRate() const
 {
     return sampleRate_;
 }
