@@ -26,6 +26,7 @@
 #include <cerrno>
 #include <iostream>
 #include <map>
+#include <cstdio>
 
 #include "util.h"
 #include "v4l2util.h"
