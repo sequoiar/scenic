@@ -26,6 +26,7 @@
 
 #include "./gstLinkable.h"
 #include "./pipeline.h"
+#include "./videoSize.h"
 #include <gst/app/gstappbuffer.h>
 #include <gst/app/gstappsink.h>
 
@@ -135,7 +136,10 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
 void SharedVideoSink::prepareSink()
 {
     // FIXME: fixed caps are lame, should be bpp=12 to allow for 4 dc1394 cameras on one firewire port
-    GstCaps *videoCaps = gst_caps_from_string("video/x-raw-rgb, bpp=16, depth=16, width=640, height=480");
+    std::ostringstream capsStr;
+    capsStr << "video/x-raw-rgb, width=" << videosize::WIDTH << ", height=" << videosize::HEIGHT
+        << ", bpp=16, depth=16";
+    GstCaps *videoCaps = gst_caps_from_string(capsStr.str().c_str());
     g_object_set(G_OBJECT(sink_), "emit-signals", TRUE, "caps", videoCaps, NULL);
     //g_object_set(sink_, "max-buffers", MAX_BUFFERS, "drop", TRUE, NULL);
     g_signal_connect(sink_, "new-buffer", G_CALLBACK(onNewBuffer), this);
