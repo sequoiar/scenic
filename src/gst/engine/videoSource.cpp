@@ -216,7 +216,7 @@ std::string VideoDc1394Source::srcCaps() const
 {
     std::ostringstream capsStr;
     capsStr << "video/x-raw-gray, width=" << videosize::WIDTH 
-        << ", height=" << videosize::HEIGHT << ", framerate=30/1, bpp=8, depth=8";
+        << ", height=" << videosize::HEIGHT << ", framerate=15/1, bpp=8, depth=8";
     return capsStr.str();
 }
 
