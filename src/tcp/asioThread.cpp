@@ -267,7 +267,7 @@ class tcp_receiver_session :
         void start()
         {
             // shared_from_this gives shared_ptr to this, this way we cleanly avoid memory leaks
-            socket_.async_read_some(boost::asio::buffer(data_),
+            socket_.async_read_some(boost::asio::buffer(data_, max_length),
                     boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
@@ -307,6 +307,13 @@ class tcp_receiver_session :
                     LOG_DEBUG("Got " << SENTINEL);
                     receiverBuffer_.resize(sentinelPos);    // strip quit from caps
                     socket_.get_io_service().stop();
+                }
+                else
+                {
+                    socket_.async_read_some(boost::asio::buffer(data_, max_length),
+                            boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
+                                boost::asio::placeholders::error,
+                                boost::asio::placeholders::bytes_transferred));
                 }
             }
             else
