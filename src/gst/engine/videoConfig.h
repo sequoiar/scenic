@@ -42,6 +42,7 @@ class VideoSourceConfig
         bool hasDeviceName() const { return !deviceName_.empty(); }
         bool hasCameraNumber() const { return cameraNumber_ != -1; }
         int cameraNumber() const { return cameraNumber_; }
+        int framerate() const { return framerate_; }
         bool locationExists() const;
         bool deviceExists() const;
         const char *location() const;
@@ -54,6 +55,7 @@ class VideoSourceConfig
         const std::string deviceName_;
         const std::string location_;
         const int cameraNumber_;
+        const int framerate_;
 };
 
 

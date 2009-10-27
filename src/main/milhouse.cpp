@@ -169,7 +169,7 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    // FIXME: move these checks up to port comparison into separate function
+ 
     if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
@@ -242,7 +242,7 @@ int main(int argc, char **argv)
     }
     catch (const std::exception &e)
     {
-        std::cout << "error: " << e.what() << std::endl;
+        std::cout << "exitting with error: " << e.what() << std::endl;
         ret = 1;
     }
     return ret;

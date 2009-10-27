@@ -80,7 +80,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                     LOG_DEBUG("Debug details: " << debug);
                     g_free(debug);
                 }
-                THROW_CRITICAL(errStr); 
+                THROW_CRITICAL(gst_object_get_name(msg->src) << ":" << errStr); 
 
                 break;
             }
@@ -91,7 +91,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
                 gst_message_parse_warning(msg, &err, &debug);
 
-                LOG_WARNING(err->message);
+                LOG_WARNING(gst_object_get_name(msg->src) << ":" << err->message);
                 g_error_free(err);
 
                 if (debug) {
