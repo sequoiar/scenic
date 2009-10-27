@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#include <boost/lexical_cast.hpp>
 #include "gstLinkable.h"
 #include "videoSize.h"
 #include "videoSource.h"
@@ -192,7 +193,10 @@ std::string VideoV4lSource::srcCaps() const
     std::ostringstream capsStr;
     /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
       << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
-    capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" << v4l2util::captureHeight(deviceStr()) << ", framerate=30000/1001, interlaced=true";
+    capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" 
+        << v4l2util::captureHeight(deviceStr()) 
+        << ", framerate=" << boost::lexical_cast<std::string>(videosize::FRAMERATE) 
+        << "000/1001, interlaced=true";
     return capsStr.str();
 }
 

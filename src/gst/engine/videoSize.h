@@ -26,6 +26,7 @@ namespace videosize
 {
     const int WIDTH = 640;
     const int HEIGHT = 480;
+    const int FRAMERATE = 30;
 }
 
 #endif // _VIDEO_SIZE_H_
