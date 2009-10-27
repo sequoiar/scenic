@@ -245,6 +245,7 @@ class tcp_server
 };
 
 using boost::asio::ip::tcp;
+static const std::string SENTINEL = "END_BUFFER";
 
 class tcp_receiver_session : 
     public boost::enable_shared_from_this<tcp_receiver_session>
@@ -296,9 +297,17 @@ class tcp_receiver_session :
                 std::ostringstream os;
                 os.write(data_, bytes_transferred);
 
-                // Got the message, now stop the service
-                socket_.get_io_service().stop();
-                receiverBuffer_ = os.str();
+                receiverBuffer_ += os.str();
+
+                LOG_DEBUG("receiver buffer looks like " << receiverBuffer_);
+                // Got the quit message, now stop the service
+                std::string::size_type sentinelPos = receiverBuffer_.find(SENTINEL);
+                if (sentinelPos != std::string::npos)   // end of message
+                {
+                    LOG_DEBUG("Got " << SENTINEL);
+                    receiverBuffer_.resize(sentinelPos);    // strip quit from caps
+                    socket_.get_io_service().stop();
+                }
             }
             else
                 LOG_WARNING("Got error" << boost::system::system_error(error).what());
@@ -386,7 +395,8 @@ bool tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
         tcp::socket s(io_service);
         err = s.connect(*iterator, err);
 
-        boost::asio::write(s, boost::asio::buffer(caps, caps.length()));
+        LOG_DEBUG("Sending " << caps.length() << " characters");
+        boost::asio::write(s, boost::asio::buffer(caps + SENTINEL, caps.length() + SENTINEL.length()));
         success = true;
     }
     catch (std::exception& e)
