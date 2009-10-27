@@ -363,6 +363,7 @@ std::string tcpGetBuffer(int port, int &/*id*/)
 
     io_service.run();
 
+    LOG_DEBUG("Got buffer " << buffer);
     return buffer;
 }
 
