@@ -386,8 +386,7 @@ bool tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
         tcp::socket s(io_service);
         err = s.connect(*iterator, err);
 
-        enum {SIZE = 6000};
-        boost::asio::write(s, boost::asio::buffer(caps));
+        boost::asio::write(s, boost::asio::buffer(caps, caps.length()));
         success = true;
     }
     catch (std::exception& e)
