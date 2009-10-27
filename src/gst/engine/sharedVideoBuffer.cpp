@@ -27,7 +27,7 @@
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/thread.hpp>
 
-const double SharedVideoBuffer::ASPECT_RATIO = SharedVideoBuffer::WIDTH / SharedVideoBuffer::HEIGHT;
+const double SharedVideoBuffer::ASPECT_RATIO = videosize::WIDTH / videosize::HEIGHT;
 
 using namespace boost::interprocess;
 
@@ -93,7 +93,7 @@ void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
     boost::system_time const timeout = boost::get_system_time() +
         boost::posix_time::milliseconds(1);
 
-    if (bufferIn_)
+    while (bufferIn_)   // avoid spurious wakes
     {
         conditionFull_.timed_wait(lock, timeout);
     }
@@ -103,7 +103,7 @@ void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 // wait for buffer to be pushed if it's currently empty
 void SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 {
-    if (!bufferIn_)
+    while (!bufferIn_)
     {
         conditionEmpty_.wait(lock);
     }
