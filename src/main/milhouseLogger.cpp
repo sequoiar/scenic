@@ -78,13 +78,9 @@ void MilhouseLogger::printMessages()
         printQueue_.wait_and_pop(msg);
         
         if (msg != "quit:")
-        {
             std::cout << msg;
-        }
         else  // got a sentinel
-        {
             done = true;
-        }
         boost::this_thread::sleep(boost::posix_time::milliseconds(1));
     }
 }

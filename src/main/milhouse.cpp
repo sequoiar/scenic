@@ -244,7 +244,9 @@ int main(int argc, char **argv)
     }
     catch (const std::exception &e)
     {
-        std::cout << "exitting with error: " << e.what() << std::endl;
+#ifdef CONFIG_DEBUG_LOCAL
+        std::cerr << "exitting with error: " << e.what() << std::endl;
+#endif
         ret = 1;
     }
     return ret;

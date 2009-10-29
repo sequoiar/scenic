@@ -28,7 +28,6 @@
 #include "videoSource.h"
 #include "videoSink.h"
 #include "sharedVideoSink.h"
-#include <boost/lexical_cast.hpp>
 
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
