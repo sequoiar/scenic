@@ -34,6 +34,7 @@
 #endif
 
 #include "dc1394.h"
+#include "v4l2util.h"
 
 VideoSourceConfig::VideoSourceConfig(MapMsg &msg) : 
     source_(msg["source"]), 
@@ -97,6 +98,7 @@ const char* VideoSourceConfig::deviceName() const
 int VideoSourceConfig::listCameras()
 {
     DC1394::listCameras();
+    v4l2util::listCameras();
     return 0;
 }
 

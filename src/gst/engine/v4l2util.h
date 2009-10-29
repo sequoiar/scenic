@@ -23,17 +23,20 @@
 #ifndef _V4L2UTIL_H_
 #define _V4L2UTIL_H_
  	
-namespace v4l2util
+class v4l2util
 {
-    bool checkStandard(const std::string &expected, const std::string &device);
-    void printCaptureFormat(const std::string &device);
-    std::string fcc2s(unsigned int val);
-    std::string field2s(int val);
-    std::string num2s(unsigned num);
-    std::string colorspace2s(int val);
-    unsigned captureWidth(const std::string &device);
-    unsigned captureHeight(const std::string &device);
-}
+    private:
+        static std::string fcc2s(unsigned int val);
+        static std::string field2s(int val);
+        static std::string num2s(unsigned num);
+        static std::string colorspace2s(int val);
+        static void printCaptureFormat(const std::string &device);
+    public:
+        static bool checkStandard(const std::string &expected, const std::string &device);
+        static unsigned captureWidth(const std::string &device);
+        static unsigned captureHeight(const std::string &device);
+        static void listCameras();
+};
 
 #endif // _V4L2UTIL_H_
 

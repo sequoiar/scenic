@@ -54,7 +54,7 @@ int dc1394_caps_get_format_vmode_caps(int mode)
   {
 #define PRINT_CASE(x) \
             case (DC1394_VIDEO_MODE_ ##x): \
-                      LOG_PRINT(# x << std::endl); \
+                      LOG_PRINT("\t" << # x << std::endl); \
             break
 
     PRINT_CASE(160x120_YUV444);
@@ -91,7 +91,7 @@ int dc1394_caps_get_format_vmode_caps(int mode)
 
 void printSupportedFramerates(dc1394framerates_t framerates)
 {
-    LOG_PRINT("Supported framerates: ");
+    LOG_PRINT("\tFramerates: ");
     std::string delimiter;
 
 #define PRINT_CASE_FRACTION(whole, fraction) \
@@ -160,8 +160,8 @@ void DC1394::listCameras()
         camera =
             dc1394_camera_new_unit (dc1394, cameras->ids[srcCamNum].guid,
                     cameras->ids[srcCamNum].unit);
-        LOG_PRINT("\n");
-        LOG_PRINT("Camera " << srcCamNum << "'s guid is " << std::hex << cameras->ids[srcCamNum].guid << std::endl);
+        LOG_PRINT("\nDC1394 Camera " << srcCamNum << std::endl);
+        LOG_PRINT("GUID = " << std::hex << cameras->ids[srcCamNum].guid << std::endl);
 
         camerr = dc1394_video_get_supported_modes(camera, &modes);
         if (camerr != DC1394_SUCCESS) 
@@ -171,7 +171,7 @@ void DC1394::listCameras()
             return;
         }
 
-        LOG_PRINT("Modes supported by camera " << srcCamNum << ":\n");
+        LOG_PRINT("Supported modes :\n");
         for (int i = modes.num - 1; i >= 0; --i)
         {
             int m = modes.modes[i];

@@ -24,9 +24,10 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>  // for O_RDWR
 #include <cerrno>
-#include <iostream>
 #include <map>
 #include <cstdio>
+#include <vector>
+#include <string>
 
 #include "util.h"
 #include "v4l2util.h"
@@ -139,12 +140,13 @@ void v4l2util::printCaptureFormat(const std::string &device)
 {
     v4l2_format vfmt = captureFormat(device);
 
-    printf("\tWidth/Height  : %u/%u\n", vfmt.fmt.pix.width, vfmt.fmt.pix.height);
-    printf("\tPixel Format  : %s\n", fcc2s(vfmt.fmt.pix.pixelformat).c_str());
-    printf("\tField         : %s\n", field2s(vfmt.fmt.pix.field).c_str());
-    printf("\tBytes per Line: %u\n", vfmt.fmt.pix.bytesperline);
-    printf("\tSize Image    : %u\n", vfmt.fmt.pix.sizeimage);
-    printf("\tColorspace    : %s\n", colorspace2s(vfmt.fmt.pix.colorspace).c_str());
+    LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
+    LOG_PRINT("\tWidth/Height  : " << vfmt.fmt.pix.width << "/" << vfmt.fmt.pix.height << "\n");
+    LOG_PRINT("\tPixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
+    LOG_PRINT("\tField         : " << field2s(vfmt.fmt.pix.field) << "\n");
+    LOG_PRINT("\tBytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
+    LOG_PRINT("\tSize Image    : " << vfmt.fmt.pix.sizeimage << "\n");
+    LOG_PRINT("\tColorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
 }
 
 
@@ -183,5 +185,18 @@ std::string v4l2util::colorspace2s(int val)
         default:
             return "Unknown (" + num2s(val) + ")";
     }
+}
+
+void v4l2util::listCameras()
+{
+    typedef std::vector<std::string> DeviceList;
+    DeviceList names;
+    // FIXME: need to figure out how to get names of all v4l devices
+    names.push_back("/dev/video0");
+    names.push_back("/dev/video1");
+
+    for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
+        if (fileExists(*deviceName))
+            printCaptureFormat(*deviceName);
 }
 
