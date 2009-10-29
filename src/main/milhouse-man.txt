@@ -1,0 +1,42 @@
+[DESCRIPTION]
+milhouse is a gstreamer-based application for transmission and reception of your fine audio-visual content.
+
+[SYNOPSIS]
+milhouse [--sender|--receiver] --address address [options]
+.TP
+By default, milhouse uses videotestsrc as a video test source and jackaudiosrc for audio input.
+
+[EXAMPLES]
+
+On local_ip_address:
+.TP
+milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000
+
+On remote_ip_address:
+.TP
+milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030  --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2 --audioport 10000
+
+[AUTHOR]
+Society for Arts and Technology
+
+[REPORTING BUGS]
+http://svn.sat.qc.ca/trac/miville
+
+[COPYRIGHT]
+Miville
+Copyright (C) 2008 Society for Arts and Technology (SAT)
+http://www.sat.qc.ca
+All rights reserved. 
+
+This file is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+Miville is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Miville.  If not, see <http://www.gnu.org/licenses/>.

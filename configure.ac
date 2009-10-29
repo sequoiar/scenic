@@ -96,10 +96,16 @@ if test "x${have_libavc1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing pkg - libavc1394-dev ])
 fi
 
-#Trying to set LIBAVC1394 using pkg-config
+#Trying to set LIBRAW1394 using pkg-config
 PKG_CHECK_MODULES(LIBRAW1394, [libraw1394], have_libraw1394=true, have_libraw1394=false)
 if test "x${have_libraw1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing pkg - libraw1394-dev ])
+fi
+
+#Trying to set LIBDC1394 using pkg-config
+PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394-2=true, have_libdc1394-2=false)
+if test "x${have_libdc1394-2}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libdc1394-2])
 fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")

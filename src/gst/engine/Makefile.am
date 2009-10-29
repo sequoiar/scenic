@@ -22,7 +22,8 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h \
-				   fileSource.h videoSize.h sharedVideoSink.h sharedVideoBuffer.h capsParser.h
+				   fileSource.h videoSize.h sharedVideoSink.h sharedVideoBuffer.h capsParser.h \
+				   dc1394.cpp dc1394.h
 
 BUILT_SOURCES = caps.cpp
 
@@ -32,6 +33,6 @@ caps.cpp: $(top_srcdir)/utils/make_caps.py
 clean-local:
 	rm -f caps.cpp
 		
-libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)
+libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) $(DC1394_CFLAGS)
 
 #CXXFLAGS += -O3

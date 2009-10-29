@@ -38,6 +38,7 @@ bool logLevelIsValid(LogLevel level)
     {
         case DEBUG:
         case INFO:
+        case PRINT:
         case WARNING:
         case ERROR:
         case THROW: 
@@ -155,11 +156,17 @@ bool xlogLevelMatch(LogLevel level)
 
 #include<iomanip>
 #include<boost/date_time/posix_time/posix_time.hpp>
-using namespace boost::posix_time;
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum)
 {
+    using namespace boost::posix_time;
     std::ostringstream logMsg;
+    if (level == PRINT) // for normal printing without log formatting
+    {
+        logMsg << msg;
+        return logMsg.str();
+    }
+
 #ifdef CONFIG_DEBUG_LOCAL
     ptime now = microsec_clock::local_time();
     if(level >= INFO and level < WARNING)
@@ -176,7 +183,7 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 
 //TODO DOCUMENT THIS
 void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, int lineNum,int err)
+        const std::string &functionName, int lineNum,int err)
 {
     std::string strerr = log_(msg, level, fileName, functionName, lineNum);
 
@@ -235,7 +242,7 @@ void backtrace()
 void backtrace(){}
 #endif
 void assert_throw(__const char *__assertion, __const char *__file,
-                           unsigned int __line, __const char *__function)
+        unsigned int __line, __const char *__function)
 {
     backtrace();
     cerr_log_throw(__assertion, ASSERT_FAIL, __file, __function, __line, 0);

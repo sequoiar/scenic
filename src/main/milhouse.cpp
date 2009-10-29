@@ -169,6 +169,8 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
+    if (options["list-cameras"].as<bool>())
+            return VideoSourceConfig::listCameras();
  
     if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))

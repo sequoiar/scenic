@@ -85,7 +85,7 @@ void MilhouseLogger::printMessages()
         {
             done = true;
         }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(MILLISEC_WAIT));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(1));
     }
 }
 

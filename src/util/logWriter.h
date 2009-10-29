@@ -42,6 +42,7 @@
 #define THROW_END_THREAD(msg)  THROW_(msg, THROW,0)
 #define THROW_ERROR(msg)      THROW_(msg, ERROR,0)
 #define THROW_CRITICAL(msg)   THROW_(msg, CRITICAL,0)
+#define LOG_PRINT(msg)          LOG(msg, PRINT)
 #define LOG_INFO(msg)       LOG(msg, INFO)
 #define LOG_ERROR(msg)       LOG(msg, ERROR)
 #define LOG_WARNING(msg)    LOG(msg, WARNING)

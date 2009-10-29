@@ -33,6 +33,8 @@
 #include "glVideoSink.h"
 #endif
 
+#include "dc1394.h"
+
 VideoSourceConfig::VideoSourceConfig(MapMsg &msg) : 
     source_(msg["source"]), 
     bitrate_(msg["bitrate"]), 
@@ -89,6 +91,13 @@ const char* VideoSourceConfig::location() const
 const char* VideoSourceConfig::deviceName() const
 {
     return deviceName_.c_str();
+}
+
+
+int VideoSourceConfig::listCameras()
+{
+    DC1394::listCameras();
+    return 0;
 }
 
 

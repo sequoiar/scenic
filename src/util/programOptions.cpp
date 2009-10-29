@@ -77,6 +77,7 @@ po::options_description ProgramOptions::createDefaultOptions()
                     "(critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6)")
             ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
             ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
+            ("list-cameras,H", po::bool_switch(), "list connected cameras")
             ("serverport,y", po::value<int>(), "run as server and listen on this port for ipcp messages")
             ;
 

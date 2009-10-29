@@ -37,7 +37,7 @@ install-exec-hook:
 			mkdir -p $(DESTDIR)$(docdir)/miville ; \
 			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(docdir)/miville/sphinx ; \
 		fi
-		help2man -N -i MANPAGE.txt -n "The Miville Audio/Video Streaming Software for GNU/Linux" mivilled > mivilled.1
+		help2man -N -i miville-man.txt -n "The Miville Audio/Video Streaming Software for GNU/Linux" ./mivilled > mivilled.1
 		install -D -m 644 mivilled.1 $(DESTDIR)$(mandir)/man1/mivilled.1
 #
 # THIS IS BROKEN !! FIXME

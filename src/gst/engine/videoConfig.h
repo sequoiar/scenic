@@ -35,6 +35,7 @@ class VideoSourceConfig
         VideoSource* createSource() const;  // factory method
 
         const char *source() const { return source_.c_str(); }
+        static int listCameras();
         int bitrate() const { return bitrate_; }
         int quality() const { return quality_; }
 

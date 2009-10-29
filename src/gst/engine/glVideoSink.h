@@ -22,8 +22,8 @@
 #ifndef _GL_VIDEO_SINK_H_
 #define _GL_VIDEO_SINK_H_
 
-#include "gstLinkable.h"
 #include <GL/gl.h>
+#include "gstLinkable.h"
 #include "videoSink.h"
 #include "busMsgHandler.h"
 
