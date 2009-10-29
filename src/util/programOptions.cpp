@@ -67,6 +67,7 @@ po::options_description ProgramOptions::createDefaultOptions()
                     "audio buffer in microseconds, must be > 10000")
             ("jitterbuffer,g", po::value<int>()->default_value(50), "size of receiver's rtp jitterbuffers in milliseconds, must be > 1")
             ("camera-number,G", po::value<int>()->default_value(-1), "camera id for dc1394src")
+            ("guid,U", po::value<std::string>()->default_value("-1"), "camera guid for dc1394src")
             ("multicast-interface,I", po::value<string>()->default_value(""), "interface to use for multicast (eth0,eth1)")
             ("enable-controls,j", po::bool_switch(), "enable gui controls for adjusting the jitterbuffer")
             ("disable-jack-autoconnect,J", po::bool_switch(), "make sure milhouse's "

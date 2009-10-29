@@ -26,6 +26,7 @@ class DC1394
 {
     public:
         static void listCameras();
+        static int GUIDToCameraNumber(unsigned long long GUID);
 };
 
 #endif //_DC1394_H_

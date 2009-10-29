@@ -28,6 +28,7 @@
 #include "videoSource.h"
 #include "videoSink.h"
 #include "sharedVideoSink.h"
+#include <boost/lexical_cast.hpp>
 
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
@@ -36,6 +37,19 @@
 #include "dc1394.h"
 #include "v4l2util.h"
 
+
+template <class T>
+T fromString(const std::string& s, 
+                 std::ios_base& (*f)(std::ios_base&))
+{
+    T t;
+    std::istringstream iss(s);
+    if ((iss >> f >> t).fail())
+        THROW_CRITICAL("Could not convert string " << s);
+    return t;
+}
+
+
 VideoSourceConfig::VideoSourceConfig(MapMsg &msg) : 
     source_(msg["source"]), 
     bitrate_(msg["bitrate"]), 
@@ -43,6 +57,7 @@ VideoSourceConfig::VideoSourceConfig(MapMsg &msg) :
     deviceName_(msg["device"]),
     location_(msg["location"]), 
     cameraNumber_(msg["camera-number"]),
+    GUID_(fromString<unsigned long long>(msg["guid"], std::hex)),
     framerate_(msg["framerate"])
 {}
 

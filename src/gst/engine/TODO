@@ -1,6 +1,5 @@
 NTA:
 -support for raw video (does work with smaller <200 jitter buffer)
--add list-cameras command to milhouse that gives info on all plugged in cameras
 -camera-number should take guid
 -set resolution
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 

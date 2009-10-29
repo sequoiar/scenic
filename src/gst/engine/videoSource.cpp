@@ -29,6 +29,7 @@
 #include "videoConfig.h"
 
 #include "dv1394.h"
+#include "dc1394.h"
 #include "v4l2util.h"
 
 #include "fileSource.h"
@@ -206,8 +207,11 @@ void VideoDc1394Source::init()
 {
     VideoSource::init();
     
-    if (config_.hasCameraNumber())
+    if (config_.hasGUID())
+        g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
+    else if (config_.hasCameraNumber())
         g_object_set(G_OBJECT(source_), "camera-number", config_.cameraNumber(), NULL);
+        
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);

@@ -203,3 +203,57 @@ void DC1394::listCameras()
     cleanup(dc1394, camera, cameras);
 }
 
+
+int DC1394::GUIDToCameraNumber(unsigned long long GUID)
+{
+    int result = -1;
+    dc1394error_t camerr;
+    dc1394video_modes_t modes;
+    dc1394framerates_t framerates;
+
+    dc1394_t * dc1394 = 0;
+    dc1394camera_list_t *cameras = 0;
+    dc1394camera_t *camera = 0;
+
+    dc1394 = dc1394_new();
+
+    camerr = dc1394_camera_enumerate(dc1394, &cameras);
+
+    if (camerr != DC1394_SUCCESS or cameras == 0)
+    {
+        LOG_ERROR("Can't find cameras error : " << camerr);
+        cleanup(dc1394, camera, cameras);
+        return -1;
+    }
+
+    if (cameras->num == 0) 
+    {
+        LOG_INFO("There were no cameras");
+        cleanup(dc1394, camera, cameras);
+        return -1;
+    }
+    
+    bool found = false;
+
+    for (unsigned srcCamNum = 0; !found && srcCamNum < cameras->num; ++srcCamNum)
+    {
+        camera =
+            dc1394_camera_new_unit (dc1394, cameras->ids[srcCamNum].guid,
+                    cameras->ids[srcCamNum].unit);
+        LOG_DEBUG("GUID = " << std::hex << cameras->ids[srcCamNum].guid);
+        if (GUID == cameras->ids[srcCamNum].guid)
+        {
+            result = srcCamNum;
+            found = true;
+        }
+        dc1394_camera_free(camera);
+        camera = 0;
+    }
+
+    cleanup(dc1394, camera, cameras);
+    if (result == -1)
+        LOG_WARNING("Could not find camera with guid " << GUID);
+
+    return result;
+}
+
