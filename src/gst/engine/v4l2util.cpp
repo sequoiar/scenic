@@ -20,6 +20,8 @@
 
 // see v4l2-ctl.cpp for reference
 
+#include "config.h"
+
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>  // for O_RDWR
@@ -30,8 +32,10 @@
 #include <string>
 
 // for filesystem ops
+#ifdef HAVE_BOOST_FILESYSTEM
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+#endif
 
 #include "util.h"
 #include "v4l2util.h"
@@ -191,8 +195,8 @@ std::string v4l2util::colorspace2s(int val)
     }
 }
 
-
 typedef std::vector<std::string> DeviceList;
+#ifdef HAVE_BOOST_FILESYSTEM
 DeviceList getDevices()
 {
     namespace fs = boost::filesystem;
@@ -224,15 +228,20 @@ DeviceList getDevices()
     }
     return deviceList;
 }
+#endif
 
 
 
 void v4l2util::listCameras()
 {
+#ifdef HAVE_BOOST_FILESYSTEM
     DeviceList names(getDevices());
-    // FIXME: need to figure out how to get names of all v4l devices
-    //names.push_back("/dev/video0");
-    //names.push_back("/dev/video1");
+#else
+    LOG_WARNING("Boost filesystem not installed, just guessing what are devices are");
+    DeviceList names;
+    names.push_back("/dev/video0");
+    names.push_back("/dev/video1");
+#endif
 
     for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
         if (fileExists(*deviceName))
