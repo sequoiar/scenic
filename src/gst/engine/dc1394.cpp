@@ -150,7 +150,7 @@ void DC1394::listCameras()
 
     if (cameras->num == 0) 
     {
-        LOG_INFO("There were no cameras");
+        LOG_INFO("There were no dc1394 cameras");
         cleanup(dc1394, camera, cameras);
         return;
     }
@@ -226,7 +226,7 @@ int DC1394::GUIDToCameraNumber(unsigned long long GUID)
 
     if (cameras->num == 0) 
     {
-        LOG_INFO("There were no cameras");
+        LOG_INFO("There were no dc1394 cameras");
         cleanup(dc1394, camera, cameras);
         return -1;
     }

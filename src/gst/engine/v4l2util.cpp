@@ -29,6 +29,10 @@
 #include <vector>
 #include <string>
 
+// for filesystem ops
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/path.hpp"
+
 #include "util.h"
 #include "v4l2util.h"
 
@@ -187,13 +191,48 @@ std::string v4l2util::colorspace2s(int val)
     }
 }
 
+
+typedef std::vector<std::string> DeviceList;
+DeviceList getDevices()
+{
+    namespace fs = boost::filesystem;
+
+    fs::path full_path("/dev/");
+
+
+    if ( !fs::exists(full_path) )
+        THROW_CRITICAL("\nPath " << full_path << " not found");
+
+    DeviceList deviceList;
+
+    fs::directory_iterator end_iter;
+    for (fs::directory_iterator dir_itr(full_path);
+            dir_itr != end_iter;
+            ++dir_itr )
+    {
+        try
+        {
+            std::string pathString(dir_itr->path().string());
+            if (pathString.find("video") != std::string::npos)  // devices matching video
+                if (pathString.find("1394") == std::string::npos)   // that don't contain 1394
+                   deviceList.push_back(pathString);
+        }
+        catch ( const std::exception & ex )
+        {
+            THROW_CRITICAL(dir_itr->path()<< " " << ex.what());
+        }
+    }
+    return deviceList;
+}
+
+
+
 void v4l2util::listCameras()
 {
-    typedef std::vector<std::string> DeviceList;
-    DeviceList names;
+    DeviceList names(getDevices());
     // FIXME: need to figure out how to get names of all v4l devices
-    names.push_back("/dev/video0");
-    names.push_back("/dev/video1");
+    //names.push_back("/dev/video0");
+    //names.push_back("/dev/video1");
 
     for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
         if (fileExists(*deviceName))

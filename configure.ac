@@ -119,6 +119,7 @@ AX_BOOST_SYSTEM
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_ASIO
 AX_BOOST_DATE_TIME
+AX_BOOST_FILESYSTEM
 AX_BOOST_UNIT_TEST_FRAMEWORK
 if test "x$with_boost_python" != "x" ; then 
     AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
