@@ -22,7 +22,7 @@
 Python logging utility.
 
 Wraps the logging module and Twisted's python.log module.
-
+Now with NON-BLOCKING OUTPUT
 """
 # System imports
 import logging
@@ -45,6 +45,8 @@ import miville.utils.common
 from miville.errors import InstallFileError
 
 #TODO: Specified the level by output
+
+ENABLE_NON_BLOCKING_OUTPUT = False
 
 LoggerClass = logging.getLoggerClass()
 
@@ -73,7 +75,8 @@ def start(level='info', to_stdout=True, to_file=False, log_name='twisted'):
     set_level(level, log_name)
     if to_stdout:
         so_handler = logging.StreamHandler(sys.stdout)
-#        fdesc.setNonBlocking(so_handler.stream)
+        if ENABLE_NON_BLOCKING_OUTPUT: 
+            fdesc.setNonBlocking(so_handler.stream) # NON-BLOCKING OUTPUT
         so_handler.setFormatter(formatter)
         logger.addHandler(so_handler)
     if to_file:
@@ -84,7 +87,8 @@ def start(level='info', to_stdout=True, to_file=False, log_name='twisted'):
         else:
     #        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
             file_handler = logging.FileHandler(log_file)
-            #fdesc.setNonBlocking(file_handler.stream)
+            if ENABLE_NON_BLOCKING_OUTPUT: 
+                fdesc.setNonBlocking(file_handler.stream) # NON-BLOCKING OUTPUT
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
     if log_name == 'twisted':

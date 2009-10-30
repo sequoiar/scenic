@@ -325,7 +325,7 @@ class CliController(TelnetServer):
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
         cp.add_option("-a", "--add", type="string", help="Add a contact")
         cp.add_option("-e", "--erase", "--remove", "--delete", action='store_true', help="Erase a contact")
-        cp.add_option("-m", "--modify", action="store_true", help="Modify a contact")
+        cp.add_option("-m", "--modify", action="store_true", help="Modify a contact. You must first select a contact using 'c -s Bob'. This is done using key=value pairs, such as 'c -m auto_answer=True'")
         cp.add_option("-M", "--modify-attr", action="store_true", help="Modify a single contact attribute.")
         cp.add_option("-d", "--duplicate", action="store_true", help="Duplicate a contact")
         cp.add_option("-s", "--select", help="Select a contact")

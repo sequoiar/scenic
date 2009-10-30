@@ -21,7 +21,7 @@ Scripts to run test cases via telnet to satify system tests between two machines
 Prerequisites
 +++++++++++++
 
-Bothe machines must be configured with ssh automatic login
+Both machines must be configured with ssh automatic login (ssh-keyinstall)
 
 
 Files
@@ -34,13 +34,11 @@ dist_telnet_sys_test7b.py
 Instructions
 ------------
 
-
 Run miville.py on each machine
 
 ::
 
 	user@machine:~/src/miville/trunk/py/test/$python miville.py
-
 
 
 Insert remote machine name in the concerned tests 
@@ -50,16 +48,4 @@ Run the scripts on local machine
 ::
 
 	user@machine:~/src/miville/trunk/py/$trial test/telnet_redux_state_machine_test.py
-
-
-
-
-
-
-
-
-
-
-
-
 

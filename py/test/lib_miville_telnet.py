@@ -88,9 +88,9 @@ class MivilleTester(object):
         self.color = 'CYAN'
         self.logfile_prefix = "default"
         #override attributes
-        self.__dict__.update(kwargs)
         self.telnet_logfile = sys.stdout #child.logfile 
         self.miville_logfile = sys.stdout #open("./miville%d.log" % (self.port_offset), 'w') #child.logfile 
+        self.__dict__.update(kwargs) # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX FIXME ARGGGSGGSG
         # non-overridable attributes
         self.miville_process = None
         self.telnet_process = None
@@ -121,6 +121,7 @@ class MivilleTester(object):
                 println('Current working dir: ' + directory)
                 println('Starting \"%s\"' % command)
                 self.miville_process = pexpect.spawn(command, logfile=self.miville_logfile, timeout=0.01) # ProcessOutputLogger(logPrefix, color)
+                self.miville_process.stderr = self.miville_logfile # hack
             else:
                 self.miville_process = pexpect.spawn(command)
             self.miville_process.expect(["Miville is ready"], 2.0) # self.sleep(0.9) # seconds
@@ -138,6 +139,7 @@ class MivilleTester(object):
         command = "telnet %s %s" % ("localhost", self.port_offset + 14444)
         try:
             self.telnet_process = pexpect.spawn(command, logfile=self.telnet_logfile, timeout=0.01) # ProcessOutputLogger(logPrefix, color)
+            self.miville_process.stderr = self.telnet_logfile # hack
             self.sleep(0.5) # seconds
             if self.is_running(self.telnet_process) == False:
                 raise Exception("Telnet could not be started. Not running. %s" % (command))

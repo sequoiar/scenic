@@ -580,4 +580,4 @@ class Test_05_Milhouse(unittest.TestCase):
         deferred.addCallback(_start_callback, service)
         deferred.addErrback(_start_err, service)
         return deferred
-    test_04_start_stop_streams.skip = "gentil sysadmin please fix milhouse. error is : CRITICAL:Jack's sample rate of 44100 does not match default sample rate 48000" 
+    # test_04_start_stop_streams.skip = "gentil sysadmin please fix milhouse. error is : CRITICAL:Jack's sample rate of 44100 does not match default sample rate 48000" 

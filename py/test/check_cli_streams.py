@@ -24,16 +24,32 @@ Tests if miville can stream between two alice mivilles.
 """
 
 import unittest
+import pexpect
 import sys
 from test import lib_miville_telnet as libmi
+import os
 
 libmi.kill_all_running_miville()
 VERBOSE = True
-
-alice = libmi.MivilleTester(port_offset=2, verbose=VERBOSE, use_tmp_home=True)
+logdir = os.path.join(os.getcwd(), "_trial_log")
+try:
+    os.makedirs(logdir) # make sure we have the dir
+except:
+    pass # too bad  
+alice = libmi.MivilleTester(
+    port_offset=2, 
+    verbose=VERBOSE, use_tmp_home=True, 
+    miville_logfile=open(os.path.join(logdir, "log_streams_alice_miville.txt"), 'w'),
+    telnet_logfile=open(os.path.join(logdir, "log_streams_alice_telnet.txt"), 'w'),
+    )
+bob = libmi.MivilleTester(
+    port_offset=3, 
+    verbose=VERBOSE, use_tmp_home=True, 
+    miville_logfile=open(os.path.join(logdir, "log_streams_bob_miville.txt"), 'w'),
+    telnet_logfile=open(os.path.join(logdir, "log_streams_bob_telnet.txt"), 'w'),
+    )
 alice.start_miville_process()
 alice.start_telnet_process()
-bob = libmi.MivilleTester(port_offset=3, verbose=VERBOSE, use_tmp_home=True)
 bob.start_miville_process()
 bob.start_telnet_process()
 
@@ -49,6 +65,11 @@ class Test_Miville_Streams(unittest.TestCase):
         self.bob = bob
 
     def _send_expect_non_blocking(self, which_peer, command, expected, timeout=2.0):
+        """
+        Sends a string to telnet client
+        Expects some output
+        Meanwhile, flushes the output of the other agent's client and server processes.
+        """
         which_peer.telnet_process.sendline(command)
         got_it = False
         start_time = time.time()
@@ -62,6 +83,17 @@ class Test_Miville_Streams(unittest.TestCase):
             if index == 0: #what we expect
                 got_it = True
             #self._flush_both()
+            #flush this agent's miville output
+            child = which_peer.miville_process
+            if child.isalive():
+                try:
+                    child.readline()
+                except pexpect.TIMEOUT, e:
+                    pass
+            # flush the other agent output
+            for agent in [self.alice, self.bob]:
+                if agent is not which_peer:
+                    agent.flush()
             time.sleep(0.1)
         if not got_it:
             self.fail("Expected \"%s\" but did not get it." % (expected))
@@ -93,26 +125,38 @@ class Test_Miville_Streams(unittest.TestCase):
         self.bob.telnet_process.sendline("Y")
         self.alice.expectTest('accepted', 'Connection not successful.')
         self._flush_both()
+
+    def lets_sleep(self, duration):
+        timeout = duration # let's stream for 10 seconds.
+        start_time = time.time()
+        end_time = start_time + timeout
+        while True:
+            now = time.time()
+            if now > end_time:
+                break
+            self.alice.sleep(0.1)
+            self.bob.sleep(0.1)
+        
+    def test_04_start_stop_streams(self):
+        self._send_expect_non_blocking(alice, "z -s Bob", "Successfully started to stream", timeout=15.0)
     
-    #def test_04_start_stop_streams(self):
-    #    self._send_expect_non_blocking(alice, "z -s Bob", "Successfully started to stream", timeout=10.0)
-    #    self._send_expect_non_blocking(alice, "z -i Bob", "Successfully stopped to stream", timeout=10.0)
-    #test_04_start_stop_streams.skip = True
+        self.lets_sleep(15.0) # let's sleep for 15 seconds.
+        self._send_expect_non_blocking(alice, "z -i Bob", "Successfully stopped to stream", timeout=15.0)
 
-    def test_04_start_streams(self):
-        # FIXME: doesnt actually test anything
-        self.alice.telnet_process.sendline("z -s Bob")
-        for t in range(3):
-            duration = float(t + 1)
-            self.alice.sleep(duration)
-            self.bob.sleep(duration)
-
-    def test_05_stop_streams(self):
-        # FIXME: doesnt actually test anything
-        self.alice.telnet_process.sendline("z -i Bob")
-        duration = 1.0
-        self.alice.sleep(duration)
-        self.bob.sleep(duration)
+#    def test_04_start_streams(self):
+#        # FIXME: doesnt actually test anything
+#        self.alice.telnet_process.sendline("z -s Bob")
+#        for t in range(3):
+#            duration = float(t + 1)
+#            self.alice.sleep(duration)
+#            self.bob.sleep(duration)
+#
+#    def test_05_stop_streams(self):
+#        # FIXME: doesnt actually test anything
+#        self.alice.telnet_process.sendline("z -i Bob")
+#        duration = 1.0
+#        self.alice.sleep(duration)
+#        self.bob.sleep(duration)
 
     def test_06_disconnect(self):
         # mandatory prior to delete contacts
@@ -132,4 +176,13 @@ class Test_Miville_Streams(unittest.TestCase):
         self._flush_both()
         self.alice.kill_miville_and_telnet()
         self.bob.kill_miville_and_telnet()
+        # close files
+        try:
+            self.alice.miville_logfile.close()
+            self.alice.telnet_logfile.close()
+            self.bob.miville_logfile.close()
+            self.bob.telnet_logfile.close()
+        except ValueError:
+            pass
+        
 

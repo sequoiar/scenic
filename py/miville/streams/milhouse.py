@@ -43,26 +43,16 @@ class MilhouseProcessManager(tools.ProcessManager):
     We just need to override one method.
     """
     def format_output_when_crashed(self, output):
-        log.debug("format_output_when_crashed")
-        # return output
+        log.debug("MilhouseProcessManager.format_output_when_crashed")
         ret = ""
-        for line in output.splitlines():
-            if line.find("CRITICAL"):
-                ret += line
+        for line in output:
+            for txt in ("CRITICAL", "ERROR", "WARNING", "error while loading shared libraries"):
+                if line.find(txt) != -1:
+                    log.debug("Log : Accepting line : %s" % (line))
+                    ret += line + "\n"
+                else:
+                    log.debug("Log : Discard line : %s" % (line))
         return ret
-        #TODO: debug and use what is below
-        # MILHOUSE_CRITICAL = "CRITICAL" #1
-        # MILHOUSE_ERROR = "ERROR" #2
-        # MILHOUSE_WARNING = "WARNING" #3
-        # MILHOUSE_INFO = "INFO" #4
-        # MILHOUSE_DEBUG = "DEBUG" #5
-        # MILHOUSE_GST_DEBUG = "GST-DEBUG" #6
-        # ret = ""
-        # for line in output.splitlines():
-        #     for text in [MILHOUSE_INFO, MILHOUSE_WARNING, MILHOUSE_ERROR]:
-        #         if line.find(MILHOUSE_ERROR) != -1:
-        #             ret += line + "\n"
-        # return ret
 
 class MilhouseService(object):
     """
@@ -362,6 +352,16 @@ class MilhouseStream(object):
             env_key = "receiver_env"
         log.info("%s$ milhouse %s" % (process_codename, all_args[the_key]))
         args = all_args[the_key].split()
+        try:
+            contact_name = contact_infos.contact.name
+        except AttributeError, e:
+            pass
+        else:
+            args.append("-W") # hard-coded !!!
+            window_title = str(contact_name)
+            for forbidden in "()\"'*!@#$%^&-=+\\|/~`":
+                window_title = window_title.replace(forbidden, "")
+            args.append(window_title) # hard-coded !!!
         environment_variables = all_args[env_key]
         log.debug("Environment variables : %s" % (environment_variables))
         self._process_manager = MilhouseProcessManager(name=process_codename, command=args, check_delay=2.5, env=environment_variables) # very long delay

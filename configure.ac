@@ -179,6 +179,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/notes/Makefile
 		 doc/test/Makefile
 		 doc/network/Makefile
+		 doc/texts/Makefile
 		 doc/figures/Makefile
 		 doc/figures/test/Makefile
 		 doc/sequences/Makefile

@@ -342,6 +342,7 @@ class ControllerApi(object):
         # stream_state 0 = stopped
         # stream_state 1 = starting
         # stream_state 2 = streaming
+        # stream_state 3 = stopping
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         contact = self.get_contact(contact_name)
         if isinstance(contact, AddressBookError):
@@ -427,8 +428,29 @@ class ControllerApi(object):
         """
         log.info('ControllerApi.stop_streams, contact= ' + str(contact_name))
         contact = self.get_contact(contact_name)
-        # TODO: check contact.state
+        # TODO: check contact.state (to send it only once, since javascript sends it twice...)
+        if contact.stream_state == 3: #stopping 
+            log.error("stop_streams called while already is stopping stream state.")
+            return # FIXME: use session instead of contact.stream_state.
+        # if contact.stream_state != 2: # streaming
+        #     state = "stopped" # 0
+        #     if contact.stream_state == 1:
+        #         state = "starting"
+        #     elif contact.stream_state == 2:
+        #         state = "streaming"
+        #     elif contact.stream_state == 3:
+        #         state = "stopping"
+        #     msg = "We are not streaming with contact %s. State is %s." % (contact_name, state)
+        #     notif = {
+        #         "contact_name":contact_name,
+        #         "contact":contact,
+        #         "message":msg,
+        #         "success":False
+        #         }
+        #     self.notify(caller, notif, "stop_streams")
+        #     return defer.fail(failure.Failure(Exception(msg))) # FIXME
         deferred = self.streams_manager.stop(contact)
+        contact.stream_state = 3 # STOPPING
         def _cb_success(result, self, caller, contact_name):
             contact = self.get_contact(contact_name)
             contact.stream_state = 0 # STOPPED

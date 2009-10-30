@@ -2135,11 +2135,7 @@ class AudioVideoTests(object):
             txAudioArg.channels = channel
             proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        prefix = sys.argv[1]
-    else:
-        prefix = 'test_videotestsrc_mpeg4_xvimagesin'
+def main(prefix):
     print 'Welcome to the thrillhouse milhouse tester.'
     print "Running tests which start with '" + prefix + "'\n\n"
     # here we run all the tests thanks to the wonders of reflective programming
@@ -2157,3 +2153,12 @@ if __name__ == '__main__':
         print 'RUNNING TEST: '  + test.__name__
         print '/*----------------------------------------------*/'
         test()
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        prefix = sys.argv[1]
+    else:
+        prefix = 'test_videotestsrc_mpeg4_xvimagesin'
+    main(prefix)
+
+

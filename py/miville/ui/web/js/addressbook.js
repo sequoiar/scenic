@@ -769,8 +769,13 @@ Addressbook.methods(
 	function upd_status(self, event) {
 		// list of events that "status" should react to
 		if (['contact_selected', 'update_status'].contains(event)) {
-			self.status.set('text', self.selected_li.get('status'));
-			self.status.set('title', self.selected_li.get('error'));
+		    if (self.selected_li != null) {
+			    self.status.set('text', self.selected_li.get('status')); // throws a TypeError: self.selected_li is null
+			    self.status.set('title', self.selected_li.get('error'));
+            } else {
+			    self.status.set('text', "Deleted contact."); // FIXME ??
+			    self.status.set('title', "Deleted contact."); // FIXME?? 
+            }
 		} else if (['add_contact',
 					'contact_unselected',
 					'save_contact'].contains(event)) {

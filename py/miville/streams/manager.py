@@ -4,7 +4,7 @@
 Managers for streams.
 
 For the notifications to the API, we do not care if it is this miville (Alice) 
-or the remote one (Alice) that started the stream, we just want to know 
+or the remote one (Bob) that started the stream, we just want to know 
 we are streaming and with which configuration profile name and entries. 
 Actually, for now, there are 2 different callbacks for when we are 
 Alice or Bob.
@@ -38,7 +38,7 @@ log = log.start("info", True, False, "streams.manager")
 
 _single_manager = None # singleton
 
-class StreamingSession(object):
+class SessionDescription(object):
     """
     We need to wrap the informations about the current session in an object.
     This will be much easier to manager.
@@ -292,7 +292,8 @@ class ServicesManager(observer.Observer):
             log.error("Error stopping stream of the %s service. Tried by contact %s." % (service.name, contact_name))
             return reason # we do not catch the error
             #TODO change this objects's state.
-        log.info("r stop from remote  %s " % (contact))
+        log.info("Received STOP from remote  %s " % (contact))
+        contact.stream_state = 3 # stopping !
         contact_infos = self._create_contact_infos_from_contact(contact)
         dl = []
         for service in self.services.itervalues():

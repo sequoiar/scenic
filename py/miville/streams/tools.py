@@ -389,25 +389,32 @@ class ProcessManager(object):
             #print self.subject.observers.values()
             return True #self._startup_check.callback(True) # success !
         else:
+            output_lines = [] # a list of lines
+            #output_lines.append(self.stdout_logger.prefix) # the prefix...
+            output_lines.extend(self.stdout_logger.lines) # the stdout
+            output_lines.extend(self.stderr_logger.lines) # the stderr
+            
             output = "%s\n%s" % (self.stdout_logger.get_text(), self.stderr_logger.get_text())
             #self._startup_check.errback(
-            err_msg = "Could not start process %s. " % (self.name)
-            if self.state is self.STATE_ERROR:
-                err_msg += "It crashed. "
-            else:
-                err_msg += "It state is %s. " % (self.state)
-            err_msg += "\nHere is its output:\n %s" % (self.format_output_when_crashed(output))
+            err_msg = "Process %s crashed at startup. " % (self.name)
+            #if self.state is self.STATE_ERROR:
+            #    err_msg += "It crashed. "
+            #else:
+            #    err_msg += "It state is %s. " % (self.state)
+            err_msg += "Its output: '%s'" % (self.format_output_when_crashed(output_lines))
             self.subject.notify(None, err_msg, "start_error")
             return failure.Failure(ManagedProcessError(err_msg)) # Important to return the failure
 
-    def format_output_when_crashed(self, output):
+    def format_output_when_crashed(self, output_lines):
         """
         Formats the output, prefixing some str to each line, for instane.
         :param output: the output text to format.
         :rettype: str
         """
-        # default does nothing
-        return output
+        ret = ""
+        for line in self.lines:
+            ret += line + "\n"
+        return ret
 
     def _on_out_received(self, data):
         log.debug("Logging(%s): %s" % (self.name, data))
