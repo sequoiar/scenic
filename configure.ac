@@ -103,8 +103,8 @@ if test "x${have_libraw1394}" = "xfalse" ; then
 fi
 
 #Trying to set LIBDC1394 using pkg-config
-PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394-2=true, have_libdc1394-2=false)
-if test "x${have_libdc1394-2}" = "xfalse" ; then
+PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394=true, have_libdc1394=false)
+if test "x${have_libdc1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing pkg - libdc1394-2])
 fi
 

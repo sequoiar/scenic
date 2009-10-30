@@ -211,6 +211,8 @@ void VideoDc1394Source::init()
         g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
         g_object_set(G_OBJECT(source_), "camera-number", config_.cameraNumber(), NULL);
+    else
+        LOG_DEBUG("No valid camera-number or guid specified, using default camera number 0");
         
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);

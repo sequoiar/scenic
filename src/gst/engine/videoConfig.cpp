@@ -56,7 +56,7 @@ VideoSourceConfig::VideoSourceConfig(MapMsg &msg) :
     deviceName_(msg["device"]),
     location_(msg["location"]), 
     cameraNumber_(msg["camera-number"]),
-    GUID_(fromString<unsigned long long>(msg["guid"], std::hex)),
+    GUID_(fromString<unsigned long long>(msg["camera-guid"], std::hex)),
     framerate_(msg["framerate"])
 {}
 

@@ -44,7 +44,7 @@ class VideoSourceConfig
         bool hasCameraNumber() const { return cameraNumber_ != -1; }
         int cameraNumber() const { return cameraNumber_; }
         unsigned long long GUID() const { return GUID_; }
-        bool hasGUID() const { return GUID_ != -1; }
+        bool hasGUID() const { return GUID_ != 0; }
         int framerate() const { return framerate_; }
         bool locationExists() const;
         bool deviceExists() const;

@@ -242,11 +242,16 @@ int main(int argc, char **argv)
         Milhouse milhouse;
         ret = milhouse.run(argc, argv);
     }
-    catch (const std::exception &e)
+    catch (const Except &e)
     {
 #ifdef CONFIG_DEBUG_LOCAL
         std::cerr << "exitting with error: " << e.what() << std::endl;
 #endif
+        ret = 1;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "exitting with error: " << e.what() << std::endl;
         ret = 1;
     }
     return ret;

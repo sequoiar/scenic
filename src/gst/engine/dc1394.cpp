@@ -208,8 +208,6 @@ int DC1394::GUIDToCameraNumber(unsigned long long GUID)
 {
     int result = -1;
     dc1394error_t camerr;
-    dc1394video_modes_t modes;
-    dc1394framerates_t framerates;
 
     dc1394_t * dc1394 = 0;
     dc1394camera_list_t *cameras = 0;
