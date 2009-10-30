@@ -195,10 +195,18 @@ std::string VideoV4lSource::srcCaps() const
     std::ostringstream capsStr;
     /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
       << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
+
+    std::string capsSuffix;
+    if (v4l2util::isInterlaced(deviceStr()))
+        capsSuffix = "000/1001, interlaced=true";
+    else
+        capsSuffix = "/1";
+
     capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" 
         << v4l2util::captureHeight(deviceStr()) 
         << ", framerate=" << config_.framerate() 
-        << "000/1001, interlaced=true";
+        << capsSuffix;
+
     return capsStr.str();
 }
 
@@ -206,14 +214,14 @@ std::string VideoV4lSource::srcCaps() const
 void VideoDc1394Source::init()
 {
     VideoSource::init();
-    
+
     if (config_.hasGUID())
         g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
         g_object_set(G_OBJECT(source_), "camera-number", config_.cameraNumber(), NULL);
     else
         LOG_DEBUG("No valid camera-number or guid specified, using default camera number 0");
-        
+
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);

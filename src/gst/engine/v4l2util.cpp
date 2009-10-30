@@ -38,7 +38,7 @@ static int doioctl(int fd, long request, void *parm, const std::string &name)
 
     retVal = ioctl(fd, request, parm);
     if (retVal < 0)
-        THROW_ERROR("IOCTL " << name << " failed: ");// << strerror(errno) << std::endl);
+        LOG_WARNING("IOCTL " << name << " failed: ");// << strerror(errno) << std::endl);
 
     return retVal;
 }
@@ -200,3 +200,16 @@ void v4l2util::listCameras()
             printCaptureFormat(*deviceName);
 }
 
+bool v4l2util::isInterlaced(const std::string &device)
+{
+    if (fileExists(device))
+    {
+        v4l2_format vfmt = captureFormat(device);
+        if (vfmt.fmt.pix.field == V4L2_FIELD_INTERLACED)
+            return true;
+        else
+            return false;
+    }
+    else
+        LOG_ERROR("No device " << device);
+}
