@@ -211,5 +211,8 @@ bool v4l2util::isInterlaced(const std::string &device)
             return false;
     }
     else
+    {
         LOG_ERROR("No device " << device);
+        return false;
+    }
 }
