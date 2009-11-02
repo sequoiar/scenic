@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <vector>
 #include <string>
+#include <boost/assign.hpp>
 
 // for filesystem ops
 #ifdef HAVE_BOOST_FILESYSTEM
@@ -40,15 +41,13 @@
 #include "util.h"
 #include "v4l2util.h"
 
-static int doioctl(int fd, long request, void *parm, const std::string &name)
+static int doioctl(int fd, long request, void *data, const std::string &name)
 {
-    int retVal;
+    int result = ioctl(fd, request, data);
+    if (result < 0)
+        LOG_DEBUG("IOCTL " << name << " failed: " << strerror(errno) << std::endl);
 
-    retVal = ioctl(fd, request, parm);
-    if (retVal < 0)
-        LOG_WARNING("IOCTL " << name << " failed: ");// << strerror(errno) << std::endl);
-
-    return retVal;
+    return result;
 }
 
 static v4l2_format captureFormat(const std::string &device)
@@ -57,11 +56,10 @@ static v4l2_format captureFormat(const std::string &device)
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     int fd = -1;
 
-    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
         THROW_ERROR("Failed to open " << device);
 
-    if (!(doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0))
-        LOG_WARNING("IOctl VIDIOC_G_FMT failed");
+    doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT");
 
     close(fd);
     return vfmt;
@@ -70,19 +68,20 @@ static v4l2_format captureFormat(const std::string &device)
 /// Check current standard of v4l2 device to make sure it is what we expect
 bool v4l2util::checkStandard(const std::string &expected, const std::string &device)
 {
+    using namespace boost::assign;
     bool result = false;
     v4l2_std_id std;
     int fd = -1;
 
     // map of format codes
-    std::map<std::string, unsigned long long> FORMATS;
-    FORMATS["PAL"] = 0xfff;
-    FORMATS["NTSC"] = 0xf000;
-    FORMATS["SECAM"] = 0xff0000;
-    FORMATS["ATSC/HDTV"] =  0xf000000;
+    static std::map<std::string, unsigned long long> FORMATS = map_list_of
+    ("PAL", 0xfff)
+    ("NTSC", 0xf000)
+    ("SECAM", 0xff0000)
+    ("ATSC/HDTV", 0xf000000);
     
-    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": ");// << strerror(errno));
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
 
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
     {
@@ -151,6 +150,7 @@ void v4l2util::printCaptureFormat(const std::string &device)
     LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
     LOG_PRINT("\tWidth/Height  : " << vfmt.fmt.pix.width << "/" << vfmt.fmt.pix.height << "\n");
     LOG_PRINT("\tPixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
+    LOG_PRINT("\tCapture Type  : " << vfmt.type << "\n");
     LOG_PRINT("\tField         : " << field2s(vfmt.fmt.pix.field) << "\n");
     LOG_PRINT("\tBytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
     LOG_PRINT("\tSize Image    : " << vfmt.fmt.pix.sizeimage << "\n");
@@ -237,7 +237,7 @@ void v4l2util::listCameras()
 #ifdef HAVE_BOOST_FILESYSTEM
     DeviceList names(getDevices());
 #else
-    LOG_WARNING("Boost filesystem not installed, just guessing what are devices are");
+    LOG_WARNING("Boost filesystem not installed, just guessing what video devices are present");
     DeviceList names;
     names.push_back("/dev/video0");
     names.push_back("/dev/video1");
@@ -245,7 +245,10 @@ void v4l2util::listCameras()
 
     for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
         if (fileExists(*deviceName))
+        {
             printCaptureFormat(*deviceName);
+            printSupportedSizes(*deviceName);
+        }
 }
 
 bool v4l2util::isInterlaced(const std::string &device)
@@ -264,3 +267,98 @@ bool v4l2util::isInterlaced(const std::string &device)
         return false;
     }
 }
+
+
+unsigned int pixelFormat(const std::string &device)
+{
+    if (fileExists(device))
+    {
+        v4l2_format vfmt = captureFormat(device);
+        return vfmt.fmt.pix.pixelformat;
+    }
+    else
+    {
+        LOG_ERROR("No device " << device);
+        return 0;
+    }
+}
+
+
+v4l2_buf_type captureType(const std::string &device)
+{
+    if (fileExists(device))
+    {
+        v4l2_format vfmt = captureFormat(device);
+        return vfmt.type;
+    }
+    else
+    {
+        LOG_ERROR("No device " << device);
+        return static_cast<v4l2_buf_type>(0);
+    }
+}
+
+
+void v4l2util::printSupportedSizes(const std::string &device)
+{
+    v4l2_frmsizeenum size;
+    memset(&size, 0, sizeof(v4l2_frmsizeenum));
+    size.index = 0;
+    size.pixel_format = pixelFormat(device);
+    size.type = captureType(device);
+
+    int fd = -1;
+    try 
+    {
+        if ((fd = open(device.c_str(), O_RDWR)) < 0) 
+            THROW_ERROR("Failed to open " << device);
+
+        if (doioctl(fd, VIDIOC_ENUM_FRAMESIZES, &size, "VIDIOC_ENUM_FRAMESIZES") < 0)
+        {
+            LOG_DEBUG("Failed to enumerate frame sizes ");
+            close(fd);
+            return;
+        }
+
+        if (size.type == V4L2_FRMSIZE_TYPE_DISCRETE) 
+        {
+            do 
+            {
+                LOG_DEBUG("got discrete frame size " << size.discrete.width << "x" << size.discrete.height);
+                ++size.index;
+            } while (doioctl(fd, VIDIOC_ENUM_FRAMESIZES, &size, "VIDIOC_ENUM_FRAMESIZES") >= 0);
+            LOG_DEBUG("done iterating discrete frame sizes");
+        } 
+        else if (size.type == V4L2_FRMSIZE_TYPE_STEPWISE) 
+        {
+            LOG_DEBUG("we have stepwise frame sizes:");
+            LOG_DEBUG("min width:   " << size.stepwise.min_width);
+            LOG_DEBUG("min height:  " << size.stepwise.min_height);
+            LOG_DEBUG("max width:   " << size.stepwise.max_width);
+            LOG_DEBUG("min height:  " << size.stepwise.max_height);
+            LOG_DEBUG("step width:  " << size.stepwise.step_width);
+            LOG_DEBUG("step height: " << size.stepwise.step_height);
+
+            LOG_DEBUG("done iterating stepwise frame sizes");
+        } 
+        else if (size.type == V4L2_FRMSIZE_TYPE_CONTINUOUS) 
+        {
+            LOG_DEBUG("we have continuous frame sizes:");
+            LOG_DEBUG("min width:   " << size.stepwise.min_width);
+            LOG_DEBUG("min height:  " << size.stepwise.min_height);
+            LOG_DEBUG("max width:   " << size.stepwise.max_width);
+            LOG_DEBUG("min height:  " << size.stepwise.max_height);
+        } 
+        else
+            LOG_DEBUG("Unknown frame sizeenum type for pixelformat"); 
+    }
+    catch (const std::exception &e)
+    {
+        close(fd);
+        LOG_ERROR("Got error " << e.what() << ", closing fd, rethrowing");
+        throw e;
+    }
+    close(fd);
+}
+
+
