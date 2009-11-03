@@ -50,7 +50,7 @@ static int doioctl(int fd, long request, void *data, const std::string &name)
     return result;
 }
 
-static v4l2_format captureFormat(const std::string &device)
+static v4l2_format getCaptureFormat(const std::string &device)
 {
     v4l2_format vfmt;
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -63,6 +63,20 @@ static v4l2_format captureFormat(const std::string &device)
 
     close(fd);
     return vfmt;
+}
+
+
+static void setCaptureFormat(const std::string &device, v4l2_format format)
+{
+    format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    int fd = -1;
+
+    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
+        THROW_ERROR("Failed to open " << device);
+
+    doioctl(fd, VIDIOC_S_FMT, &format, "VIDIOC_S_FMT");
+
+    close(fd);
 }
 
 /// Check current standard of v4l2 device to make sure it is what we expect
@@ -145,7 +159,7 @@ std::string v4l2util::fcc2s(unsigned int val)
 
 void v4l2util::printCaptureFormat(const std::string &device)
 {
-    v4l2_format vfmt = captureFormat(device);
+    v4l2_format vfmt = getCaptureFormat(device);
 
     LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
     LOG_PRINT("\tWidth/Height  : " << vfmt.fmt.pix.width << "/" << vfmt.fmt.pix.height << "\n");
@@ -155,19 +169,20 @@ void v4l2util::printCaptureFormat(const std::string &device)
     LOG_PRINT("\tBytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
     LOG_PRINT("\tSize Image    : " << vfmt.fmt.pix.sizeimage << "\n");
     LOG_PRINT("\tColorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
+    printSupportedSizes(device);
 }
 
 
 unsigned v4l2util::captureWidth(const std::string &device)
 {
-    v4l2_format vfmt = captureFormat(device);
+    v4l2_format vfmt = getCaptureFormat(device);
     return vfmt.fmt.pix.width;
 }
 
 
 unsigned v4l2util::captureHeight(const std::string &device)
 {
-    v4l2_format vfmt = captureFormat(device);
+    v4l2_format vfmt = getCaptureFormat(device);
     return vfmt.fmt.pix.height;
 }
 
@@ -245,17 +260,14 @@ void v4l2util::listCameras()
 
     for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
         if (fileExists(*deviceName))
-        {
             printCaptureFormat(*deviceName);
-            printSupportedSizes(*deviceName);
-        }
 }
 
 bool v4l2util::isInterlaced(const std::string &device)
 {
     if (fileExists(device))
     {
-        v4l2_format vfmt = captureFormat(device);
+        v4l2_format vfmt = getCaptureFormat(device);
         if (vfmt.fmt.pix.field == V4L2_FIELD_INTERLACED)
             return true;
         else
@@ -269,96 +281,54 @@ bool v4l2util::isInterlaced(const std::string &device)
 }
 
 
-unsigned int pixelFormat(const std::string &device)
+bool formatsMatch(const v4l2_format &lhs, const v4l2_format &rhs)
 {
-    if (fileExists(device))
-    {
-        v4l2_format vfmt = captureFormat(device);
-        return vfmt.fmt.pix.pixelformat;
-    }
-    else
-    {
-        LOG_ERROR("No device " << device);
-        return 0;
-    }
-}
-
-
-v4l2_buf_type captureType(const std::string &device)
-{
-    if (fileExists(device))
-    {
-        v4l2_format vfmt = captureFormat(device);
-        return vfmt.type;
-    }
-    else
-    {
-        LOG_ERROR("No device " << device);
-        return static_cast<v4l2_buf_type>(0);
-    }
+    return lhs.type                 == rhs.type                 and
+        lhs.fmt.pix.width           == rhs.fmt.pix.width        and
+        lhs.fmt.pix.height          == rhs.fmt.pix.height;
 }
 
 
 void v4l2util::printSupportedSizes(const std::string &device)
 {
-    v4l2_frmsizeenum size;
-    memset(&size, 0, sizeof(v4l2_frmsizeenum));
-    size.index = 0;
-    size.pixel_format = pixelFormat(device);
-    size.type = captureType(device);
+    typedef std::pair<int, int> Size;
+    typedef std::vector< Size > SizeList;
+    SizeList sizes;
+    sizes.push_back(Size(720, 480));
+    sizes.push_back(Size(704, 480));    // 4CIF
+    sizes.push_back(Size(704, 240));    // 2CIF
+    sizes.push_back(Size(640, 480));    // SD
+    sizes.push_back(Size(352, 240));    // CIF
+    sizes.push_back(Size(320, 240));    
+    sizes.push_back(Size(176, 120));    // QCIF
 
-    int fd = -1;
-    try 
+    v4l2_format format = getCaptureFormat(device);
+
+    // save values
+    int oldWidth = format.fmt.pix.width;
+    int oldHeight = format.fmt.pix.height;
+
+    for (SizeList::iterator size = sizes.begin(); size != sizes.end(); ++size)
     {
-        if ((fd = open(device.c_str(), O_RDWR)) < 0) 
-            THROW_ERROR("Failed to open " << device);
+        // change some fields
+        format.fmt.pix.width = size->first;
+        format.fmt.pix.height = size->second;
+        setCaptureFormat(device, format);
+        v4l2_format currentFormat = getCaptureFormat(device);
 
-        if (doioctl(fd, VIDIOC_ENUM_FRAMESIZES, &size, "VIDIOC_ENUM_FRAMESIZES") < 0)
-        {
-            LOG_DEBUG("Failed to enumerate frame sizes ");
-            close(fd);
-            return;
-        }
-
-        if (size.type == V4L2_FRMSIZE_TYPE_DISCRETE) 
-        {
-            do 
-            {
-                LOG_DEBUG("got discrete frame size " << size.discrete.width << "x" << size.discrete.height);
-                ++size.index;
-            } while (doioctl(fd, VIDIOC_ENUM_FRAMESIZES, &size, "VIDIOC_ENUM_FRAMESIZES") >= 0);
-            LOG_DEBUG("done iterating discrete frame sizes");
-        } 
-        else if (size.type == V4L2_FRMSIZE_TYPE_STEPWISE) 
-        {
-            LOG_DEBUG("we have stepwise frame sizes:");
-            LOG_DEBUG("min width:   " << size.stepwise.min_width);
-            LOG_DEBUG("min height:  " << size.stepwise.min_height);
-            LOG_DEBUG("max width:   " << size.stepwise.max_width);
-            LOG_DEBUG("min height:  " << size.stepwise.max_height);
-            LOG_DEBUG("step width:  " << size.stepwise.step_width);
-            LOG_DEBUG("step height: " << size.stepwise.step_height);
-
-            LOG_DEBUG("done iterating stepwise frame sizes");
-        } 
-        else if (size.type == V4L2_FRMSIZE_TYPE_CONTINUOUS) 
-        {
-            LOG_DEBUG("we have continuous frame sizes:");
-            LOG_DEBUG("min width:   " << size.stepwise.min_width);
-            LOG_DEBUG("min height:  " << size.stepwise.min_height);
-            LOG_DEBUG("max width:   " << size.stepwise.max_width);
-            LOG_DEBUG("min height:  " << size.stepwise.max_height);
-        } 
+        // FIXME: make sure format has been set?
+        if (!formatsMatch(format, currentFormat))
+            LOG_PRINT("\tFormat " << size->first << "x" << size->second << " not supported\n");
         else
-            LOG_DEBUG("Unknown frame sizeenum type for pixelformat"); 
+            LOG_PRINT("\tFormat " << size->first << "x" << size->second << " supported\n");
+            
     }
-    catch (const std::exception &e)
-    {
-        close(fd);
-        LOG_ERROR("Got error " << e.what() << ", closing fd, rethrowing");
-        throw e;
-    }
-    close(fd);
-}
 
+    format.fmt.pix.width = oldWidth;
+    format.fmt.pix.height = oldHeight;
+    setCaptureFormat(device, format);
+    v4l2_format currentFormat = getCaptureFormat(device);
+    if (!formatsMatch(format, currentFormat))
+        LOG_WARNING("Format " << oldWidth << "x" << oldHeight << "not reverted correctly");
+}
 
