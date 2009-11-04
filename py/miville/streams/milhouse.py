@@ -22,7 +22,7 @@ from miville.streams import tools
 #from miville.streams import StreamError
 from miville.utils import observer
 from miville.errors import * # StreamError
-from miville.utils import common # For ports allocator TODO: rename this and improve it.
+#from miville.utils import common # For ports allocator TODO: rename this and improve it.
 
 from miville.utils import log
 
@@ -34,6 +34,8 @@ VERBOSE = False
 VERY_VERBOSE = False
 VERBOSE_ERROR = True
 TEST_PROFILE = 0 # defined below
+
+PORT_OFFSET = 0
 
 #------------------------------------ MILHOUSE stream --------------
 #TODO
@@ -69,7 +71,8 @@ class MilhouseService(object):
         self.config_db = None # Configuration client.
         self.config_fields = {} 
         self.subject = observer.Subject()
-        self.ports_allocator = common.PortNumberGenerator(10000, 10) 
+        #self.ports_allocator = common.PortNumberGenerator(10000, 10) 
+        self.ports_allocator = tools.PortsAllocator(minimum=10000 + PORT_OFFSET, increment=10) 
         # 10 is the minimum permitted interval between milhouse.cpp ports.
 
     def config_init(self, config_db):
@@ -106,19 +109,28 @@ class MilhouseService(object):
         log.debug("MilhouseService.prepare_session(role=%s)" % (role))
         self.role = role
         if self.role == "alice": 
-            p1, p2, p3, p4 = self.ports_allocator.generate_new_ports(4)
+            #p1, p2, p3, p4 = self.ports_allocator.generate_new_ports(4)
+            p1, p2  = self.ports_allocator.allocate_many(2)
             alice_entries["/both/audio/port"] = p1 #FIXME : alice/bob 
             alice_entries["/both/video/port"] = p2 #FIXME: send/recv
-            bob_entries["/both/audio/port"] = p3
-            bob_entries["/both/video/port"] = p4
-            log.info("Allocating ports: %d %d %d %d" % (p1, p2, p3, p4))
+            log.info("Allocating ports: %d %d" % (p1, p2))
+            p3, p4  = self.ports_allocator.allocate_many(2)
+            bob_entries["/both/audio/port"] = p3 # FIXME: set by bob
+            bob_entries["/both/video/port"] = p4 # FIXME: set by bob
+            log.warning("Allocating ports: %d %d. (BUT BOB SHOULD DO IT)" % (p3, p4))
             alice_addr = contact_infos.local_addr
             bob_addr = contact_infos.remote_addr
-            alice_entries["/send/network/remote_address"] = bob_addr #FIXME: this is milhouse custom field
-            alice_entries["/recv/network/remote_address"] = bob_addr #FIXME: this is milhouse custom field
-            bob_entries["/send/network/remote_address"] = alice_addr #FIXME: this is milhouse custom field
-            bob_entries["/recv/network/remote_address"] = alice_addr #FIXME: this is milhouse custom field
+            alice_entries["/send/network/remote_address"] = bob_addr
+            alice_entries["/recv/network/remote_address"] = bob_addr
+            bob_entries["/send/network/remote_address"] = alice_addr
+            bob_entries["/recv/network/remote_address"] = alice_addr
             log.debug("using addresses %s %s" % (alice_addr, bob_addr))
+        else:
+            log.warning("Bob should allocate its ports, but we don't do it right now.")
+            # log.debug("Allocate ports for bob.")
+            # p3, p4  = self.ports_allocator.allocate_many(2)
+            # bob_entries["/both/audio/port"] = p3
+            # bob_entries["/both/video/port"] = p4
         # else pass it unchanged TODO: maybe change the ports?
         ret = [alice_entries, bob_entries]
         return ret
@@ -138,6 +150,9 @@ class MilhouseService(object):
         
         #TODO: use the communication channel to start local/remote recv/send
         # but it should not be done here !
+        if role == "bob":
+            pass
+            
         for mode in ["send", "recv"]:
             verif_key = self._make_key(contact_infos, mode)
             contact_name = contact_infos.get_contact_name()
@@ -198,15 +213,28 @@ class MilhouseService(object):
         Deletes the streams for a contact.
         Must be called when error occur, of when closing a stream.
         """
-        for mode in ["send", "recv"]:
+        for mode in ["recv", "send"]:
             key = self._make_key(contact_infos, mode)
             if self.streams.has_key(key):
-                state = self.streams[key].state 
+                stream = self.streams[key]
+                state = stream.state 
+                if mode == "recv":
+                    audio_port = stream.config_entries["/both/audio/port"]
+                    video_port = stream.config_entries["/both/video/port"]
+                    self.ports_allocator.free_many((audio_port, video_port))
+                if mode == "send":
+                    log.warning("de-allocating bob's ports but we should not")
+                    audio_port = stream.config_entries["/both/audio/port"]
+                    video_port = stream.config_entries["/both/video/port"]
+                    try:
+                        self.ports_allocator.free_many((audio_port, video_port))
+                    except tools.PortsAllocatorError, e:
+                        log.error("Got error, got to avoid deallocating bob's ports in alice's agent !!! %s" % (e.message))
                 if state in [states.STATE_IDLE, states.STATE_FAILED, states.STATE_STOPPED]:
                     # see miville.streams.states.STATE_*
                     log.debug("deleting milhouse stream %s" % (key))
                     del self.streams[key]
-                else:
+                else: # STREAMING
                     # TODO: d = self.streams[key].stop(); d.addCallback.... 
                     msg = "Cannot delete milhouse stream %s. Its state is %s." % (key, state)
                     log.error("_clear_streams_with_contact: " + msg)
@@ -249,7 +277,6 @@ class MilhouseService(object):
             def _cb(result, self, contact_infos):
                 #TODO: deallocate ports.
                 log.debug("successfully stopped both streams with %s" % (contact_infos.get_id()))
-                
                 self._clear_streams_with_contact(contact_infos)
                 return result
             dl = []

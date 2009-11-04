@@ -134,6 +134,8 @@ class StreamsCommunication(object):
     Allows to send and receive setting information
     via the com_chan protocol, once we are joined to
     a remote contact
+
+    Implements the Streaming Session Protocol...
     """
     CMD_START = "start"
     CMD_STOP = "stop"
@@ -192,6 +194,7 @@ class StreamsCommunication(object):
             try:
                 alice_entries = args[0]
                 bob_entries = args[1]
+                log.debug("Got START %s %s" % (alice_entries, bob_entries))
             except IndexError, e:
                 # TODO: will this crash the whole miville?
                 msg = "Error parsing comchan message %s. No configuration entries." % (self.CMD_START)

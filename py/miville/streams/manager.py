@@ -19,6 +19,7 @@ Of course, we use the comchan to communicate with the remote peer. We use it
 through the miville.streams.communication.
 """
 import copy
+import time
 
 from zope import interface
 from twisted.internet import reactor
@@ -34,28 +35,11 @@ from miville.utils import observer
 from miville.utils import log
 from miville import connectors
 
-log = log.start("info", True, False, "streams.manager") 
+log = log.start("info", True, False, "manager") 
 
 _single_manager = None # singleton
 
-class SessionDescription(object):
-    """
-    We need to wrap the informations about the current session in an object.
-    This will be much easier to manager.
-    Contains stuff that is negociated between the peers.
-    """
-    # Not used yet.
-    def __init__(self, contact_infos=None, alice_entries=None, bob_entries=None, role="alice"):
-        """
-        :param contact_infos: ContactInfos object
-        :alice_entries: Dict of configuration entries for initiator peer.
-        :bob_entries: Dict of configuration entries for the othe peer.
-        :param role: str Either "alice" or "bob"
-        """
-        self.contact_infos = contact_infos
-        self.alice_entries = alice_entries
-        self.bob_entries = bob_entries
-        self.role = role
+        
 
 class StreamingNotification(object):
     """
@@ -156,7 +140,17 @@ class ServicesManager(observer.Observer):
         try:
             profile_id = int(contact.profile_id)
         except TypeError:
-            raise StreamError("Contact %s does not have a profile associated with it." % (contact.name))
+            #raise StreamError(
+            msg = "Contact %s does not have a profile associated with it." % (contact.name)
+            profile_id = -1
+        except AttributeError:
+            #raise StreamError("Contact %s does not have a profile associated with it." % (contact.name))
+            msg = "Contact does not have a profile_id attribute !"
+            log.error(msg)
+            profile_id = -1
+        if contact.profile_id == 0 or profile_id == -1:
+            contact.profile_id = milhouse.TEST_PROFILE
+            log.warning("setting contact %s profile ID to %d" % (contact.name, milhouse.TEST_PROFILE))
         try:
             entries = self.config_db.get_entries_for_profile(profile_id)
         except conf.ConfError, e:
@@ -165,6 +159,13 @@ class ServicesManager(observer.Observer):
         # TODO: order or overriding?
         return entries
         
+#    # TODO:
+#    def _cb_ack(self, channel, contact, alice_entries, bob_entries):
+#        pass
+#    # TODO:
+#    def _start(self, session):
+#        pass
+
     def _cb_start(self, channel, contact, alice_entries, bob_entries):
         """
         Got START message from remote host

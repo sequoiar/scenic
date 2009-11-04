@@ -52,7 +52,10 @@ class Test_01_devices_v4l2(unittest.TestCase):
     
     def test_02_attributes(self):
         app.go()
-        app.api.device_modify_attribute(app.me, 'video', 'v4l2', '/dev/video0', 'norm', 'pal')
+        try:
+            app.api.device_modify_attribute(app.me, 'video', 'v4l2', '/dev/video0', 'norm', 'pal')
+        except AttributeError, e:
+            self.fail("imiville does not have a api attribute !!!")
         app.go()
         
         app.api.device_list_attributes(app.me, 'video', 'v4l2', '/dev/video0')

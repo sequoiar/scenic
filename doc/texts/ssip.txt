@@ -1,0 +1,68 @@
+INVITE (a to b)
+Session-ID: 1257186233
+Protocol-Version: SSIP/0.1
+Started: 1257186233.1231543
+Allow: "INVITE,ACK,OK,BYE,CANCEL,REFUSE,ERROR"
+Comment: "Test session."
+Streams: [{"name":"High-Quality Test", "id":1, "service":"milhouse", "config":{}, "kind":"audio/video","direction":"B2A"}]
+--------------------
+OK (b to a)
+Session-ID: 1257186233
+Method-answered: INVITE
+Protocol-Version: SSIP/0.1
+Streams: [{"name":"High-Quality Test", "id":2, "service":"milhouse", "config":{}, "kind":"audio/video", "direction":"A2B"}]
+Method-answered: INVITE
+----------------------------
+ACK (a to b)
+Session-ID: 1257186233
+Protocol-Version: SSIP/0.1
+----------------------------
+REFUSE (b to a)
+Session-ID: 1257186233
+Protocol-Version: SSIP/0.1
+Error-code: 486 
+Message: "Currently busy"
+Details: ""
+---------------------------
+ERROR (any)
+Session-ID: 1257186233
+Protocol-Version: SSIP/0.1
+Error-code: 500
+Streamers-States: [{"agent":"answerer", "id":1, "direction":"A2B", "error-code":500, "error-message":"Internal Server Error", "error-details":"Jackd is not running.", "kind":"audio/video"}]
+----------------------------
+CANCEL (a to b)
+Session-ID: 1257186233
+Protocol-Version: SSIP/0.1
+----------------------------
+BYE (any)
+Session-ID: 1257186233
+Protocol-Version: SSIP/0.1
+----------------------------
+OK (the other)
+Session-ID: 1257186233
+Method-answered: BYE
+Protocol-Version: SSIP/0.1
+-----------------------------
+Legend
+------
+ALICE = "offerer"
+BOB = "answerer"
+A2B = "offerer to answerer"
+B2A = "answerer to offerer"
+
+Scenarios
+----------
+ 1) Alice propose envoi et réception.
+Bob retranche des streams. Ajoute ses ports de réception. Change ses device settings.
+
+ 2) Alice propose une réception. 
+Bob répond oui (OK) ou non (REFUSE), et envoie sa proposition de réception.
+Alice accepte (ACK)
+Les streams s'en suivent.
+
+NOTE 
+----
+ * Les devices settings sont des custom-overrides. Ils sont globaux.
+
+ * As long as the other agent did not answer OK, a message is sent again. (for CANCEL, BYE, ERROR messages) (TODO LATER)
+

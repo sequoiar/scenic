@@ -8,6 +8,7 @@ import os
 import tempfile
 import pprint
 import warnings
+import copy
 
 from twisted.trial import unittest
 from twisted.internet import defer
@@ -19,6 +20,7 @@ from miville.utils import observer
 from miville.streams import conf
 from miville.streams import manager
 from miville.streams import tools
+from miville.streams import session
 from miville.streams import milhouse 
 from miville.streams import interfaces as streams_interfaces
 # TODO: from miville.streams.engines import milhouse
@@ -181,6 +183,75 @@ class Test_01_Configuration(unittest.TestCase):
 #        self.db = serialize.load(FILE_NAME)
 #        self.db.remove_field("/test/audio/codec") #clean things up
 
+class Test_01_Ports_Allocator(unittest.TestCase):
+    def _tst(self, expected, value):
+        if value != expected:
+            self.fail("Expected value %s but got %s." % (expected, value))
+
+    def test_01_add_remove(self):
+        a = tools.PortsAllocator(minimum=10, increment=2, maximum=20)
+
+        for value in [10, 12, 14, 16, 18, 20]:
+            self._tst(value, a.allocate())
+        try:
+            value = a.allocate()
+        except tools.PortsAllocatorError, e:
+            pass
+        else:
+            self.fail("Ports allocator should have overflown. Got value %d." % (value))
+        for value in [10, 12, 14, 16, 18, 20]:
+            a.free(value)
+        try:
+            a.free(100)
+        except tools.PortsAllocatorError, e:
+            pass
+        else:
+            self.fail("Trying to free value %d should have raised an error." % (100))
+            
+    def test_02_add_many(self):
+        a = tools.PortsAllocator(minimum=10, increment=2, maximum=20)
+        values = a.allocate_many(6)
+        a.free_many(values)
+        values = a.allocate_many(3)
+        values = a.allocate_many(3)
+        try:
+            value = a.allocate()
+        except tools.PortsAllocatorError, e:
+            pass
+        else:
+            self.fail("Ports allocator should have overflown. Got value %d." % (value))
+            pass
+        
+
+class Test_01_Session(unittest.TestCase):
+    def setUp(self):
+        pass
+    def tearDown(self):
+        pass
+    
+    def test_serialize(self):
+        data = {"x":2, "y":[1,2,3], "pi":3.14159}
+        txt = session.serialize(data)
+        data2 = session.unserialize(txt)
+        if data != data2:
+            self.fail("Data has changed during seralization/unserialization.")
+    
+    def test_request(self):
+        req = session.SimpleRequest(session.REQUEST_OK)
+        req.values[session.ATTR_PROTOCOL_VERSION] = "0.1"
+        req.values[session.ATTR_COMMENT] = "Hello"
+        req.values[session.ATTR_CONFIG_ENTRIES] = {"/cheese":"brie", "num":2}
+        txt = session.request_to_text(req)
+        if VERBOSE:
+            print("\n-----------")
+            print(txt)
+            print("-----------")
+        req2 = session.text_to_request(txt)
+        if req.method != req2.method:
+            self.fail("Request name changed during text/obj conversion.")
+        if req.values != req2.values:
+            self.fail("Attributes values changed during text/obj conversion.")
+
 class Test_02_Asynchronous(unittest.TestCase):
     """
     tests the DeferredWrapper and DelayedWrapper
@@ -255,14 +326,14 @@ class Test_03_Streams(unittest.TestCase):
         global _globals_03
         self.globals = _globals_03
     
-    def test_01_manager(self):
+    def test_01_start_manager(self):
         class DummyApi(observer.Subject):
             def update(self, origin, key, value):
                 pass
         manager.start(DummyApi())
         self.globals["manager"] = manager.get_single_manager()
     
-    def test_02_service(self):
+    def test_02_add_dummy_service(self):
         if not isinstance(self.globals["manager"], manager.ServicesManager):
             self.fail("should be a manager.") # XXX
         class DummyStream():
@@ -297,18 +368,22 @@ class Test_03_Streams(unittest.TestCase):
                 return defer.succeed(True)
         api = self.globals["manager"].api
         self.globals["manager"].add_service(DummyService())
-    
-    def XXtest_03_start_dummy_service(self):
+    test_02_add_dummy_service.skip = "This might be useless..."
+        
+
+    def test_03_start_dummy_service(self):
         contact_infos = conf.ContactInfos() # default
         #profile_id = None # dummy
         config_entries = {}
         return self.globals["manager"].start(contact_infos, config_entries) #profile_id)
+    test_03_start_dummy_service.skip = "...since it might change."
 
-    def XXtest_04_stop_dummy_service(self):
+    def test_04_stop_dummy_service(self):
         contact_infos = None # dummy
         return self.globals["manager"].stop(contact_infos)
         # ok, let's no go further... you get the idea. 
         # let's do some tests with the real thing: milhouse
+    test_04_stop_dummy_service.skip = "Let us test the real thing : milhouse."
 
 _globals_04 = {}
 class Test_04_Process_Manager(unittest.TestCase):
@@ -548,7 +623,7 @@ class Test_05_Milhouse(unittest.TestCase):
             return True
         def _stop_err(err, deferred):
             deferred.errback(err)
-            return True #return err
+            return True #return err # ????????????????????????????????????????????????
         def _later(deferred, service):
             global _globals_05
             infos = _globals_05["contact_infos"]
@@ -565,15 +640,22 @@ class Test_05_Milhouse(unittest.TestCase):
             deferred = defer.Deferred()
             reactor.callLater(DURATION, _later, deferred, service)
             return deferred
+        # ----- here we go: --------
         contact_infos = conf.ContactInfos() # TODO: not use default args.
         self.globals["contact_infos"] = contact_infos
         entries = self.globals["entries"]
         self.timeout = 15.0 # timeout attribute on your unit test method. 
         service = milhouse.MilhouseService()
+        entries, dont_care = service.prepare_session(entries, copy.deepcopy(entries), "alice", contact_infos)
+        # prepare_session on alice only (no bob)
+        print("we care about alice : %s" % (entries))
+        print("we dont care about bob: %s" % (dont_care))
         self.globals["service"] = service
         self.globals["milhouse_success"] = False
         service.config_init(self.db)
-        deferred = service.start(contact_infos, entries, entries) # "alpha"
+        # service.start should not send any message to the remote agent
+        # all this work should be done at prepare_session time.
+        deferred = service.start(contact_infos, entries, entries, role="alice") # "alpha"
         obs = DummyObserver(self)
         self.globals["obs"] = obs # XXX Needs to be a global since observer uses a weakref !!!
         obs.append(service.subject) #TODO: check if observer has been triggered.
@@ -581,3 +663,4 @@ class Test_05_Milhouse(unittest.TestCase):
         deferred.addErrback(_start_err, service)
         return deferred
     # test_04_start_stop_streams.skip = "gentil sysadmin please fix milhouse. error is : CRITICAL:Jack's sample rate of 44100 does not match default sample rate 48000" 
+

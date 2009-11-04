@@ -67,6 +67,7 @@ from miville.utils import log
 from miville.utils.common import string_to_number 
 from miville.streams import manager as streams_manager
 from miville.streams import conf
+from miville.streams import tools
 
 log = log.start('debug', 1, 0, 'api') # added by hugo
 
@@ -101,6 +102,7 @@ class ControllerApi(object):
         firewire.start(self)
         streams_manager.start(self) # XXX order matters
         self.streams_manager = streams_manager.get_single_manager()
+        tools.PORT_OFFSET = self.core.config.port_numbers_offset * 100 # FIXME
         self.config_db = conf.get_single_db()
         self.devices_toggle_kill_jackd_enabled(self.get_config("restart_jackd")) # XXX : usually you might not want this. In the config it might be False.
     

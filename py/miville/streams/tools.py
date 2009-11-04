@@ -18,6 +18,65 @@ from miville.utils import log
 
 log = log.start("info", 1, 0, "streams.tools")
 
+class PortsAllocatorError(Exception):
+    """
+    Any error raised by the PortsAllocator
+    """
+    pass
+
+class PortsAllocator(object):
+    """
+    Allocates ports from a pool
+    """
+    # TODO: check if port is available for us to listen to.
+    def __init__(self, minimum=10000, increment=10, maximum=65536):
+        self.minimum = minimum
+        self.increment = increment
+        self.maximum = maximum
+        self.allocated = set()
+        
+    def allocate(self):
+        """
+        Allocates a port number and returns it.
+        """
+        value = self.minimum
+        while value in self.allocated:
+            value += self.increment
+            if value > self.maximum:
+                raise PortsAllocatorError("Maximum value reached. No more ports available.")
+        self.allocated.add(value)
+        return value
+    
+    def free(self, value):
+        """
+        Frees an allocated port number.
+        Raises a PortsAllocatorError if not allocated.
+        """
+        if value not in self.allocated:
+            raise PortsAllocatorError("Value %d not in allocated ports set." % (value))
+        self.allocated.remove(value)
+
+        
+    def allocate_many(self, num=1):
+        """
+        Allocates many ports at once.
+        Returns a list of allocated ports.
+        """
+        ret = []
+        for i in range(num):
+            ret.append(self.allocate())
+        return ret
+    
+    def free_many(self, values):
+        """
+        Frees many allocated ports at a time.
+        :param values: list of integers.
+        """
+        for value in values:
+            self.free(value)
+        
+
+
 class AsynchronousError(Exception):
     """
     Raised by DeferredWrapper or DelayedWrapper

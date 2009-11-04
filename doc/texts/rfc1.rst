@@ -1,10 +1,10 @@
 RFC 1 - The Miville pseudo-SIP Protocol
 ----------------------------------------
-An offer/answer model with session description protocol using python basic types. 
+An offer/answer model with session description protocol using ASCII and JSON. 
 
 Introduction
 ------------
-In this case, we only think about unicast sessions. 
+In this case, we only think about unicast symetrical bidirectional sessions. 
 
 
 Definitions
@@ -19,22 +19,21 @@ Definitions
 
 Protocol Operation
 ------------------
-The offerer (Alice) must create a SessionDescription object. This SessionDescription can be serialized to a Python dict using the PseudoSessionInitialisationProtocol. This dict is then sent to the remote host using the com_chan, an implementation of the Twisted Perspective Broker. 
+The offerer (Alice) must create a SessionDescription object. This SessionDescription can be serialized to an ASCII string using the SimpleSessionInitialisationProtocol. This string is then sent to the remote host using the com_chan, an implementation of the Twisted Perspective Broker. 
 
  1. The offerer sends a offer. (INVITE) 
- 2. The answerer can answer (OK) or reject (REJECT). 
- 3. The offerer send an acknowledgement (ACK) and the streams start.
+ 2. The answerer can answer (OK) or reject (REJECT) and starts its streamers. 
+ 3. The offerer sends an acknowledgement (ACK) and starts its streamers.
  4. When any of the agents want to halt the session, it tells it (BYE).
  5. The other agent(s) confirms the halting. (OK)
 
 At anytime, any agent MAY generate a new offer, but MUST NOT do it if he hasn't answered an already existing offer. 
 
-
 Requirements and Recommendations
 --------------------------------
 The session description MUST include : 
 
- * Session name ("default")
+ * Session name ("")
  * A session ID. (used to share a handle to many infos)
  * Session purpose. An optional comment. ("")
  * The UTC time it started
@@ -65,70 +64,66 @@ Ports Negociation
 -----------------
 If the answerer (Bob) doesn't want to start these streams, he can answer with REJECT.
 
-If the answerer wants 
+The offerer specifies want it want to receive. The answerer answers with what it want to receive. 
 
 Lots of codes
 -------------------
 SIP/2.0:
 Code    Meaning
-1xx Informational -- request received, continuing to process the request
-2xx Success -- the action was successfully received, understood, and accepted
-3xx Redirection -- further action needs to be taken in order to complete the request
-4xx Client Error -- the request contains bad syntax or cannot be fulfilled at this server
-5xx Server Error -- the server failed to fulfill an apparently valid request
-6xx Global Failure -- the request cannot be fulfilled at any server.
-Code    Meaning
-1xx Informational
-100 Trying
-180 Ringing
-181 Call Is Being Forwarded
-182 Queued
-2xx Success
-200 OK
-3xx Redirection
-300 Multiple Choices
-301 Moved Permanently
-302 Moved Temporarily
-303 See Other
-305 Use Proxy
-380 Alternative Service
-4xx Client Error
-400 Bad Request
-401 Unauthorized
-402 Payment Required
-403 Forbidden
-404 Not Found
-405 Method Not Allowed
-406 Not Acceptable
-407 Proxy Authentication Required
-408 Request Timeout
-409 Conflict
-410 Gone
-411 Length Required
-413 Request Entity Too Large
-414 Request-URI Too Large
-415 Unsupported Media Type
-420 Bad Extension
-480 Temporarily not available
-481 Call Leg/Transaction Does Not Exist
-482 Loop Detected
-483 Too Many Hops
-484 Address Incomplete
-485 Ambiguous
-486 Busy Here
-5xx Server Error
-500 Internal Server Error
-501 Not Implemented
-502 Bad Gateway
-503 Service Unavailable
-504 Gateway Time-out
-505 SIP Version not supported
-6xx General Error
-600 Busy Everywhere
-603 Decline (9)
-604 Does not exist anywhere
-606 Does not exist anywhere
+ * 1xx Informational -- request received, continuing to process the request
+ * 2xx Success -- the action was successfully received, understood, and accepted
+ * 3xx Redirection -- further action needs to be taken in order to complete the request
+ * 4xx Client Error -- the request contains bad syntax or cannot be fulfilled at this server
+ * 5xx Server Error -- the server failed to fulfill an apparently valid request
+ * 6xx Global Failure -- the request cannot be fulfilled at any server.
 
-
-
-
+ * 1xx Informational
+ * 100 Trying
+ * 180 Ringing
+ * 181 Call Is Being Forwarded
+ * 182 Queued
+ * 2xx Success
+ * 200 OK
+ * 3xx Redirection
+ * 300 Multiple Choices
+ * 301 Moved Permanently
+ * 302 Moved Temporarily
+ * 303 See Other
+ * 305 Use Proxy
+ * 380 Alternative Service
+ * 4xx Client Error
+ * 400 Bad Request
+ * 401 Unauthorized
+ * 402 Payment Required
+ * 403 Forbidden
+ * 404 Not Found
+ * 405 Method Not Allowed
+ * 406 Not Acceptable
+ * 407 Proxy Authentication Required
+ * 408 Request Timeout
+ * 409 Conflict
+ * 410 Gone
+ * 411 Length Required
+ * 413 Request Entity Too Large
+ * 414 Request-URI Too Large
+ * 415 Unsupported Media Type
+ * 420 Bad Extension
+ * 480 Temporarily not available
+ * 481 Call Leg/Transaction Does Not Exist
+ * 482 Loop Detected
+ * 483 Too Many Hops
+ * 484 Address Incomplete
+ * 485 Ambiguous
+ * 486 Busy Here
+ * 5xx Server Error
+ * 500 Internal Server Error
+ * 501 Not Implemented
+ * 502 Bad Gateway
+ * 503 Service Unavailable
+ * 504 Gateway Time-out
+ * 505 SIP Version not supported
+ * 6xx General Error
+ * 600 Busy Everywhere
+ * 603 Decline (9)
+ * 604 Does not exist anywhere
+ * 606 Does not exist anywhere
