@@ -52,7 +52,7 @@ bool SharedVideoBuffer::isPushing() const
 void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
 {
     // FIXME: dynamically sized buffer, changed by parameter size
-    if (size != BUFFER_SIZE)
+    if (size >= MAX_BUFFER_SIZE)
     {
         LOG_ERROR("Cannot push unexpected video buffer size " << size << " to shared buffer\n");
         return;
@@ -93,7 +93,7 @@ void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
     boost::system_time const timeout = boost::get_system_time() +
         boost::posix_time::milliseconds(1);
 
-    if (bufferIn_)   // WARNING: this should be an if, not a while
+    if (bufferIn_)   // XXX: this must be an if, not a while, otherwise process hangs 
     {
         conditionFull_.timed_wait(lock, timeout);
     }
@@ -103,7 +103,7 @@ void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 // wait for buffer to be pushed if it's currently empty
 void SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 {
-    if (!bufferIn_)  // WARNING: this should be an if, not a while
+    if (!bufferIn_)  // XXX: this must be an if, not a while, otherwise process hangs
     {
         conditionEmpty_.wait(lock);
     }

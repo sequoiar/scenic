@@ -59,10 +59,13 @@ class SharedVideoBuffer
 
     private:
 
-        enum { BUFFER_SIZE = videosize::WIDTH * videosize::HEIGHT * sizeof(short)};
+        enum { 
+            MAX_BUFFER_SIZE = videosize::MAX_WIDTH * videosize::MAX_HEIGHT * sizeof(short),
+            BUFFER_SIZE = videosize::WIDTH * videosize::HEIGHT * sizeof(short)
+        };
 
         // pixels to write to/read from
-        unsigned char pixels[BUFFER_SIZE];
+        unsigned char pixels[MAX_BUFFER_SIZE];
 
         // mutex to protect access to the queue 
         boost::interprocess::interprocess_mutex mutex_;

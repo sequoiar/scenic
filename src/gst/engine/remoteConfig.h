@@ -108,6 +108,7 @@ class ReceiverConfig : public RemoteConfig
         void receiveCaps();
 
     private:
+        static bool isSupportedCodec(const std::string &codec);
         const std::string multicastInterface_;
         std::string caps_;
         bool capsOutOfBand_;

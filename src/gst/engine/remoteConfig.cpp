@@ -23,6 +23,7 @@
 #include "util.h"
 
 #include <algorithm>
+#include <boost/assign.hpp>
 #include <gst/gst.h>
 #include "remoteConfig.h"
 #include "tcp/tcpThread.h"
@@ -179,6 +180,18 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
 }
 
 
+bool ReceiverConfig::isSupportedCodec(const std::string &codec)
+{
+    using namespace boost::assign;
+    using std::string;
+    
+    static const std::vector<string> CODECS = 
+        list_of<string>("mpeg4")("theora")("vorbis")("raw")("h264")("h263")("mp3");
+
+    bool result = std::find(CODECS.begin(), CODECS.end(), codec) != CODECS.end();
+    return result;
+}
+
 
 ReceiverConfig::ReceiverConfig(MapMsg &msg,
         const std::string &caps__,
@@ -189,8 +202,13 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
 {
     if (capsOutOfBand_) // couldn't find caps, need them from other host or we explicitly been told to send caps
     {
-        LOG_INFO("Waiting for " << codec_ << " caps from other host");
-        receiveCaps();  // wait for new caps from sender
+        if (isSupportedCodec(codec_))   // this would fail later but we want to make sure we don't wait with a bogus codec
+        { 
+            LOG_INFO("Waiting for " << codec_ << " caps from other host");
+            receiveCaps();  // wait for new caps from sender
+        }
+        else
+            THROW_ERROR("Codec " << codec_ << " is not supported");
     }
 }
 

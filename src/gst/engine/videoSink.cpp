@@ -44,6 +44,7 @@ void VideoSink::destroySink()
 
 Window GtkVideoSink::getXWindow()
 { 
+    // FIXME: see https://bugzilla.gnome.org/show_bug.cgi?id=599885
     return GDK_WINDOW_XWINDOW(window_->window);
 }
 
@@ -156,7 +157,7 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
         return false;
  
     LOG_DEBUG("Got prepare-xwindow-id msg");
-    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), GDK_WINDOW_XWINDOW(window_->window));
+    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), getXWindow());
   
     return true;
 }
