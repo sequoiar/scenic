@@ -34,20 +34,18 @@ class MapMsg;
 /// container class for variable types used by MapMsg 
 class StrIntFloat
 {
-friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
-friend class MapMsg;
     public:
-        StrIntFloat()
-            : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
+        friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
+        friend class MapMsg;
+        StrIntFloat() : 
+            type_('n'), s_(), i_(0), f_(0.0), e_(), F_(), key_() {}
         char get_type() const; 
-//        bool empty() const;
-        Except except()const { return e_;}
-    
+        Except except() const { return e_;}
+
         std::string str() const { return s_; }
         operator const std::string& () const;
         operator std::vector<double> () const;
         operator int ()const;
-        //operator double ()const;
         operator bool ()const;
 
         bool operator==(const StrIntFloat& sif);
@@ -60,6 +58,7 @@ friend class MapMsg;
 
         StrIntFloat(const StrIntFloat& sif);
         StrIntFloat& operator=(const StrIntFloat& in);
+
     private:
         char type_;
         std::string s_;
@@ -69,7 +68,7 @@ friend class MapMsg;
         std::vector<double> F_;
         std::string key_; //HACK
 };
-//void operator= (std::string& , const StrIntFloat& in);
+
 std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 
 
@@ -77,45 +76,45 @@ std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 class MapMsg
 {
     public:
-    typedef std::map<std::string, StrIntFloat> MapMsg_;
-    typedef const std::pair<const std::string,StrIntFloat>* Item;
-    MapMsg() :
-        map_(), it_(), post_end_(false){}
-    MapMsg(std::string command):map_(),it_(),post_end_(false){ (*this)() = command;}
-    MapMsg(std::string command,bool p):map_(),it_(),post_end_(p){ (*this)() = command;}
-    StrIntFloat &operator()() { return (*this)["command"]; }
-    StrIntFloat &operator[] (const std::string& str);
-    void tokenize(const std::string& str) { tokenize(str, *this); }
-    bool stringify(std::string& str) const { return stringify(*this, str); }
-    void clear() { map_.clear(); }
+        typedef std::map<std::string, StrIntFloat> MapMsg_;
+        typedef const std::pair<const std::string,StrIntFloat>* Item;
+        MapMsg() :
+            map_(), it_(), post_end_(false){}
+        MapMsg(std::string command):map_(),it_(),post_end_(false){ (*this)() = command;}
+        MapMsg(std::string command,bool p):map_(),it_(),post_end_(p){ (*this)() = command;}
+        StrIntFloat &operator()() { return (*this)["command"]; }
+        StrIntFloat &operator[] (const std::string& str);
+        void tokenize(const std::string& str) { tokenize(str, *this); }
+        bool stringify(std::string& str) const { return stringify(*this, str); }
+        void clear() { map_.clear(); }
 
-    ~MapMsg(){ if(post_end_)try{ post();}catch(std::exception e){ LOG_DEBUG(e.what());} }
+        ~MapMsg(){ if(post_end_)try{ post();}catch(std::exception e){ LOG_DEBUG(e.what());} }
 
-    /** Used by code that needs to post messages but does not use 
-     * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
+        /** Used by code that needs to post messages but does not use 
+         * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
 
-    bool post();
+        bool post();
 
-    /// MapMsg will go to most recent registered  
-    class Subscriber
-    {
-        public:
-            Subscriber();
-            virtual void operator()(MapMsg&){}
-            virtual ~Subscriber();
-    };
+        /// MapMsg will go to most recent registered  
+        class Subscriber
+        {
+            public:
+                Subscriber();
+                virtual void operator()(MapMsg&){}
+                virtual ~Subscriber();
+        };
     private:
-    friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
-    friend Item GetBegin(MapMsg& m);
-    friend Item GetNext(MapMsg& m);
+        friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
+        friend Item GetBegin(MapMsg& m);
+        friend Item GetNext(MapMsg& m);
 
-    MapMsg_ map_;
-    MapMsg_::const_iterator it_;
-    bool post_end_;
-    static void tokenize(const std::string& str, MapMsg &cmd_map);
-    static bool stringify(const MapMsg& cmd_map, std::string& rstr);
-    Item begin();
-    Item next();
+        MapMsg_ map_;
+        MapMsg_::const_iterator it_;
+        bool post_end_;
+        static void tokenize(const std::string& str, MapMsg &cmd_map);
+        static bool stringify(const MapMsg& cmd_map, std::string& rstr);
+        Item begin();
+        Item next();
 
 };
 

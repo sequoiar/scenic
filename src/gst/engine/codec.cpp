@@ -135,7 +135,6 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
     Pipeline::Instance()->remove(&aconv_);
 }
 
-
 VideoEncoder::VideoEncoder() :
     colorspc_(0), supportsInterlaced_(false)  // most codecs don't have this property
 {}
