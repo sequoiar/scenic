@@ -46,7 +46,7 @@ from miville.utils import log
 log = log.start('debug', 1, True, 'com_chan') # LOG TO FILE = True
 
 # constants
-PORT = 31054
+DEFAULT_COM_CHAN_PORT = 31054
 
 # module's globals
 # dict of Connection instances.
@@ -244,7 +244,7 @@ class ComChanCheck:
             return failure.Failure(error.UnauthorizedLogin())
 
 # functions 
-def start(api, conns, port=PORT, interfaces=''):
+def start(api, conns, port=DEFAULT_COM_CHAN_PORT, interfaces=''):
     """
     Starts the module for miville's use.
     
@@ -259,7 +259,7 @@ def start(api, conns, port=PORT, interfaces=''):
     p = portal.Portal(realm, [checker])
     api.listen_tcp(port, pb.PBServerFactory(p), interfaces)
 
-def connect(name, address, port=PORT):
+def connect(name, address, port=DEFAULT_COM_CHAN_PORT):
     """
     Use case implementation. 
     Connects to a contact

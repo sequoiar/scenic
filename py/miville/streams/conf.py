@@ -23,6 +23,7 @@ log = log.start("info", 1, 0, "streams.conf")
 # constants
 GLOB_STARTSWITH = "startswith"
 GLOB_CONTAINS = "contains" 
+PORT_OFFSET = 0 # overriden in api
 
 _single_db = None # singleton Database global instance
 
@@ -259,6 +260,7 @@ class Database(object):
         self.settings = {} # dict of id => Setting
         self.profiles = {} # dict of id => Profile
         self.pool = IdPool([]) # IdPool instance
+        # TODO: use a different pool for settings and profiles.
     
     def get_setting(self, setting_id):
         """

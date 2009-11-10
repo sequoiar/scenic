@@ -43,7 +43,7 @@ from miville.utils import log
 from miville.utils import common
 from miville.utils.i18n import to_utf
 from miville.errors import AddressBookError, AddressBookNameError, AddressBookAddressError
-from miville.connectors.states import DISCONNECTED, CONNECTED 
+from miville.connectors.states import DISCONNECTED
 
 log = log.start('info', 1, 0, 'adb')
 
@@ -70,7 +70,7 @@ class AddressBook(object):
         self.selected = None
         self.delayed_write = None
         self.read()
-        Contact.adb = self
+        Contact.addressbook = self
 
     def add(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, profile_id=0):
         """
@@ -315,28 +315,28 @@ class AddressBook(object):
         Reads the Address Book file (.adb) from the disk.
         """
         try:
-            adb_file = open(self.filename, 'r')
+            addressbook_file = open(self.filename, 'r')
             log.info("Opening address book file %s in read mode." % (self.filename))
         except IOError:
             log.warning('Address Book file %s not found.' % self.filename)
         else:
             serialized = False
-            version = re.findall('v(\d+)\.(\d+)', adb_file.readline())
+            version = re.findall('v(\d+)\.(\d+)', addressbook_file.readline())
             if version:
                 self.major = int(version[0][0])
                 self.minor = int(version[0][1])
 
                 if self.major == 1:
                     try:
-                        self.contacts = unjelly(eval(adb_file.read().replace('\n', '').replace('\t', '')))
+                        self.contacts = unjelly(eval(addressbook_file.read().replace('\n', '').replace('\t', '')))
                     except:
                         log.error('Unable to read the Address Book file %s. Bad format.' % self.filename)
                     else:
                         serialized = True
             else:
-                adb_file.seek(0)
+                addressbook_file.seek(0)
                 try:
-                    self.contacts = pickle.load(adb_file)
+                    self.contacts = pickle.load(addressbook_file)
                 except:
                     log.error('Unable to read the Address Book file %s. Bad format.' % self.filename)
                 else:
@@ -360,7 +360,7 @@ class AddressBook(object):
                     contact.stream_state = 0
                     if self.minor == 0:
                         contact.stream_state = 0
-            adb_file.close()
+            addressbook_file.close()
 
     def write(self, state=True):
         """
@@ -371,7 +371,7 @@ class AddressBook(object):
             self.api.get_contacts(self)
 
             try:
-                adb_file = open(self.filename, 'w')
+                addressbook_file = open(self.filename, 'w')
                 log.info("Opening address book file %s in write mode." % (self.filename))
             except:
                 log.error('Could not open the Address Book file %s in write mode.' % self.filename)
@@ -402,16 +402,16 @@ class AddressBook(object):
                         elif char == ']':
                             level -= 1
                         nice_dump.append(char)
-                    adb_file.write(''.join(nice_dump))
+                    addressbook_file.write(''.join(nice_dump))
                 else:
-                    pickle.dump(contacts, adb_file, 1)
-                adb_file.close()
+                    pickle.dump(contacts, addressbook_file, 1)
+                addressbook_file.close()
 
 class Contact(object):
     """
     Class representing a contact in the address book
     """
-    adb = None
+    addressbook = None
 
     def __init__(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, profile_id=0):
         """
@@ -455,7 +455,7 @@ class Contact(object):
                 value = int(value)
                 
         write = False
-        if self.adb and name in ('name',
+        if self.addressbook and name in ('name',
                                     'address',
                                     'port',
                                     'kind',
@@ -472,10 +472,10 @@ class Contact(object):
         object.__setattr__(self, name, value)
         
         if write:
-            if self.adb.delayed_write and self.adb.delayed_write.active():
-                self.adb.delayed_write.reset(0.001)
+            if self.addressbook.delayed_write and self.addressbook.delayed_write.active():
+                self.addressbook.delayed_write.reset(0.001)
             else:
-                self.adb.delayed_write = reactor.callLater(0.001, self.adb.write)
+                self.addressbook.delayed_write = reactor.callLater(0.001, self.addressbook.write)
         
     def set_address(self, address):
         """

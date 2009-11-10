@@ -75,7 +75,7 @@ class Connection(object):
         self.local_port = None
         
         self.contact = contact
-        self.remote_com_chan_port = com_chan.PORT
+        self.remote_com_chan_port = com_chan.DEFAULT_COM_CHAN_PORT
         contact.state = DISCONNECTED
         self.connection = None
         port = self.contact.port
@@ -101,9 +101,7 @@ class Connection(object):
     def _start(self):
         raise NotImplementedError, '_start() method not implemented for this connector: %s.' % self.contact.connector
 
-    def accepted(self, port=com_chan.PORT):
-#        if port is None:
-#            port = com_chan.PORT
+    def accepted(self, port=com_chan.DEFAULT_COM_CHAN_PORT):
         self.remote_com_chan_port = int(port)
         self._accepted()
         self.api.notify(self, {'name':self.contact.name,
@@ -288,8 +286,8 @@ def receive_connection(address, port=None):
         name = address
     if name in contacts:
         contact = contacts[name]
-    else:
-        contact = adb.add(name, address, port,)
+    else: # FIXME where does addresbook come from?
+        contact = addressbook.add(name, address, port,)
 
 
 def load_connectors(api, port, interfaces=''):

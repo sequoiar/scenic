@@ -65,19 +65,19 @@ class Addressbook(Widget):
         http://jtauber.com/2006/02/13/pyuca.py
         http://www.codinghorror.com/blog/archives/001018.html
         """
-        adb = []
+        addressbook = []
         contacts_dict = data[0]
         sorted_keys = sorted(contacts_dict, key=unicode.lower)
         for key in sorted_keys:
             contact = contacts_dict[key]
-            adb.append({'name':contact.name,
+            addressbook.append({'name':contact.name,
                         'state':contact.state,
                         'auto_answer':contact.auto_answer,
                         'setting':contact.profile_id, #TODO: rename to profile
                         'auto_created':contact.auto_created,
                         'stream_state':contact.stream_state})
         log.info('receive update: get_contacts %r %s' % (self, data))
-        self.callRemote('update_list', adb)
+        self.callRemote('update_list', addressbook)
         
     def rc_get_contact(self, name):
         """

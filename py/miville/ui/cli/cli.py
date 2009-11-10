@@ -468,7 +468,7 @@ class CliController(TelnetServer):
             contact_name = options.start
             #try:
             self.core.start_streams(self, unicode(contact_name))
-            #except Exception, e: #TODO: only adb err
+            #except Exception, e: #TODO: only addressbook err
             #    log.error(e.message)
             #    self.write("error " + e.message)
         elif options.stop:
@@ -1109,6 +1109,7 @@ class CliView(Observer):
             self.write('%s with %s...' % (data['msg'], data['name']))
         
     def _info(self, origin, data):
+        log.debug("Got \"info\" notification key from %s. Data = %s " % (origin, data))
         if isinstance(data, dict):
             if data.has_key('context'):
                 if data['context'] == 'auto-answer':

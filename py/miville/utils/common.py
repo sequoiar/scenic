@@ -24,7 +24,6 @@ by any other modules.
 # System imports
 import sys
 import os
-import warnings
 
 # Twisted imports
 from twisted.python.modules import getModule

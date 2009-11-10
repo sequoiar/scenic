@@ -31,15 +31,13 @@ from miville.errors import * # StreamError
 from miville.streams import conf
 from miville.streams import tools
 from miville.streams import milhouse
-from miville.utils import observer
+from miville.streams import session
 from miville.utils import log
 from miville import connectors
 
-log = log.start("info", True, False, "manager") 
+log = log.start("debug", True, False, "streams.manager") 
 
 _single_manager = None # singleton
-
-        
 
 class StreamingNotification(object):
     """
@@ -66,26 +64,18 @@ class StreamingNotification(object):
         self.role = role
         self.streaming_state = stream_state
 
-class ServicesManager(observer.Observer):
+class ServicesManager(object):
     """
     This is the only class that should be used from the core api.
     
     Wasn't it called StreamsManager ? 
-    
-    The service manager is an observer, since it receives notifications from 
-    its services.
     """
     def __init__(self, api=None):
         self.api = api
         self.config_db = conf.get_single_db()
         self.services = {} # key are class names
-        
-    def update(self, origin, key, value):
-        """
-        See miville.utils.observer.Subject.update()
-        """
-        pass
-        # TODO: encapsulate self.api.update(origin, key, value)
+        self.sessions = {} # keys are created using ContactInfos.get_id()
+        self.DEFAULT_PROFILE_ID = 0 # milhouse.TEST_PROFILE # FIXME
     
     def add_service(self, service):
         """
@@ -130,11 +120,60 @@ class ServicesManager(observer.Observer):
         )
         return contact_infos
 
+    def _create_session(self, contact_infos, role=None, session_id=None, time_started=None):
+        """
+        Returns a miville.streams.session.SessionDescription instance.
+        
+        It also add the created session to the sessions dict.
+        If role is "bob", you must provide a request instance.
+        Raises a StreamError if session already exists.
+        """
+        kwargs = {}
+        if role == session.ROLE_OFFERER:
+            pass #role = session.ROLE_OFFERER
+        else: # bob
+            role = session.ROLE_ANSWERER
+            kwargs["session_id"] = session_id # TODO: remove this
+            #TODO: kwargs["time_started"] = time_started
+            kwargs["time_started"] = time.time() #TODO: remove this
+        session_key = contact_infos.get_id()
+        if self.sessions.has_key(session_key):
+            raise StreamError("Streams manager has already a session for contact %s" % (session_key))
+        log.debug("will create session desc. role %s" % (role))
+        session_desc = session.SessionDescription(contact_infos=contact_infos, role=role, **kwargs)
+        self.sessions[session_key] = session_desc
+        log.info("Creating streaming session with %s" % (session_key))
+        # TODO: remove those two guys
+        return session_desc
+    
+    def _get_session(self, contact_infos):
+        """
+        Returns session object for contact.
+        Raises StreamError if no session for contact.
+        """
+        session_key = contact_infos.get_id()
+        if not self.sessions.has_key(session_key):
+            raise StreamError("Streams manager does not have a session for contact %s" % (session_key))
+        return self.sessions[session_key]
+        
+    def _delete_session(self, contact_infos):
+        """
+        Delete a session if in state stopped, idle or error.
+        Otherwise, raise a StreamError
+        Raises StreamError if no session for contact.
+        """
+        session_desc = self._get_session(contact_infos)
+        session_key = contact_infos.get_id()
+        log.debug("deleting session for contact %s" % (contact_infos.get_id()))
+        if session_desc.stream_state in [session.STATE_IDLE, session.STATE_STOPPED, session.STATE_ERROR]:
+            del self.sessions[session_key]
+    
     def _get_config_entries_for_contact(self, contact):
         """
         :param contact: miville.addressbook.Contact to start streaming with.
         Returns a dict of config entries.
         """
+        self.DEFAULT_PROFILE_ID = milhouse.TEST_PROFILE # FIXME
         profile_id = None
         entries = {}
         try:
@@ -149,23 +188,20 @@ class ServicesManager(observer.Observer):
             log.error(msg)
             profile_id = -1
         if contact.profile_id == 0 or profile_id == -1:
-            contact.profile_id = milhouse.TEST_PROFILE
-            log.warning("setting contact %s profile ID to %d" % (contact.name, milhouse.TEST_PROFILE))
+            contact.profile_id = self.DEFAULT_PROFILE_ID
+            log.warning("setting contact %s profile ID to %d" % (contact.name, self.DEFAULT_PROFILE_ID))
         try:
-            entries = self.config_db.get_entries_for_profile(profile_id)
+            entries = self.config_db.get_entries_for_profile(contact.profile_id)
         except conf.ConfError, e:
             log.error(e.message)
-            self.config_db.get_entries_for_profile(milhouse.TEST_PROFILE)
+            entries = self.config_db.get_entries_for_profile(self.DEFAULT_PROFILE_ID)
+            log.debug("entries: %s" % (entries))
         # TODO: order or overriding?
         return entries
         
-#    # TODO:
-#    def _cb_ack(self, channel, contact, alice_entries, bob_entries):
-#        pass
-#    # TODO:
-#    def _start(self, session):
-#        pass
-
+    def _cb_ack(self, channel, contact):
+        log.info("Got ACK from remote contact %s" % (contact.name))
+        
     def _cb_start(self, channel, contact, alice_entries, bob_entries):
         """
         Got START message from remote host
@@ -176,71 +212,45 @@ class ServicesManager(observer.Observer):
         :param contact: miville.addressbook.Contact object
         :param config_entries: dict of entries
         """
-        #TODO manage deferred within local/remote hosts
         log.info("r start from remote  %s %s %s" % (contact, alice_entries, bob_entries))
         contact_infos = self._create_contact_infos_from_contact(contact)
-        
-        def _service_start_success(result, self, contact_infos, alice_entries, bob_entries, service):
-            try:
-                contact_name = contact_infos.contact.name
-            except ValueError:
-                contact_name = contact_infos.get_id()
-            msg = "Contact %s initiated a stream of the %s service." % (contact_name, service.name)
-            log.info(msg)
-            try:
-                notif = {
-                    "contact":contact_infos.contact,
-                    "contact_name":contact_name,
-                    "message":msg,
-                    "success":True,
-                    }
-                self.api.remote_started_streams(None, notif)
-                #self.api.notify(None, notif, "remote_started_streams")
-            except Exception, e:
-                log.error(e.message)
-                raise
-            return result #TODO change this objects's state.
-        def _service_start_failure(reason, self, contact_infos, alice_entries, bob_entries, service):
-            try:
-                contact_name = contact_infos.contact.name
-            except ValueError:
-                contact_name = contact_infos.get_id()
-            msg = "Contact %s failed to initiate a stream of the %s service." % (contact_name, service.name)
-            msg += "Error message:\n" + reason.getErrorMessage()
-            log.info(msg)
-            try:
-                notif = {
-                    "contact":contact_infos.contact,
-                    "contact_name":contact_name,
-                    "message":msg,
-                    "success":False,
-                    }
-                self.api.remote_started_streams(None, notif)
-                #self.api.notify(None, notif, "remote_started_streams") #TODO: pass a dict?
-            except Exception, e:
-                log.error(e.message)
-                raise
-            log.error("Error starting stream of the %s service. Tried by contact %s." % (service.name, contact_name))
-            return reason # we do not catch the error
-            #return True # we catch the error.
-            #TODO change this objects's state.
-        dl = []
+        #TODO: provide time_start and session_id from remote !!!!!!!
+        try:
+            session_desc = self._create_session(session_id=None, time_started=None, contact_infos=contact_infos, role=session.ROLE_ANSWERER)
+        except StreamError, e:
+            log.error("We got start even if a session was already created. We raise an error, but it should not destroy any existing stream or negotiation process.")
+            return failure.Failure(e)
+        session_desc.add_stream_desc(direction=session.DIRECTION_TO_OFFERER, service_name="Milhouse", entries=alice_entries)
+        session_desc.add_stream_desc(direction=session.DIRECTION_TO_ANSWERER, service_name="Milhouse", entries=bob_entries)
         for service in self.services.itervalues():
-            # it does nothing right now if in bob role:
-            alice_entries, bob_entries = service.prepare_session(alice_entries, bob_entries, role="bob")
-            service_deferred = service.start(contact_infos, alice_entries, bob_entries, "bob")
-            service_deferred.addCallback(_service_start_success, self, contact_infos, alice_entries, bob_entries, service)
-            service_deferred.addErrback(_service_start_failure, self, contact_infos, alice_entries, bob_entries, service)
-            dl.append(service_deferred)
-            
-        # TODO: does that report success/failure correctly?
-        deferred = tools.deferred_list_wrapper(dl)
-        def _on_fail(reason):
-            log.debug("We catched the error in _cb_start.")
-            return True
-        deferred.addErrback(_on_fail)
-        return deferred
+            service.prepare_session(session_desc)
+        comm = communication.get_channel_for_contact(contact)
+        comm.send_ok_start(session_desc)
+        return self._start(session_desc)
     
+    def _cb_ok_start(self, channel, contact, alice_entries, bob_entries):
+        """
+        Alice got OK (START) message from bob
+        
+        Called from miville.streams.communication.StreamsCommunication.on_remote_message.
+        :param channel: miville.streams.communication.StreamsCommunication
+        :param contact: miville.addressbook.Contact object
+        :param config_entries: dict of entries
+        """
+        log.info("r OK start from remote  %s %s %s" % (contact, alice_entries, bob_entries))
+        contact_infos = self._create_contact_infos_from_contact(contact)
+        #TODO: provide time_start and session_id from remote !!!!!!!
+        try: # XXX
+            session_desc = self._get_session(contact_infos)
+        except StreamError, e:
+            log.error("No session for remote !!")
+            return failure.Failure(e)
+        session_desc.streams_to_offerer[0].entries = alice_entries # FIXME
+        session_desc.streams_to_answerer[0].entries = bob_entries # FIXME
+        comm = communication.get_channel_for_contact(contact)
+        comm.send_ack(session_desc)
+        return self._start(session_desc)
+
     def _cb_stop(self, channel, contact):
         """
         Got STOP message from remote host
@@ -250,67 +260,78 @@ class ServicesManager(observer.Observer):
         :param channel: miville.streams.communication.StreamsCommunication
         :param contact: miville.addressbook.Contact object
         """
-        def _service_stop_success(result, self, contact_infos):
-            try:
-                contact_name = contact_infos.contact.name
-            except ValueError:
-                contact_name = contact_infos.get_id()
-            msg = "Contact %s stopped a stream of the %s service." % (contact_name, service.name)
-            log.info(msg)
-            try:
-                notif = {
-                    'contact_name':contact_name,
-                    'message':msg,
-                    'contact':contact_infos.contact,
-                    'success':True
-                    }
-                #self.api.notify(None, notif, "remote_stopped_streams")
-                self.api.remote_stopped_streams(None, notif)
-            except Exception, e:
-                log.error(e.message)
-                raise
-            return result #TODO change this objects's state.
-        def _service_stop_failure(reason, self, contact_infos):
-            try:
-                contact_name = contact_infos.contact.name
-            except ValueError:
-                contact_name = contact_infos.get_id()
-            msg = "Contact %s failed to initiate a stream of the %s service." % (contact_name, service.name)
-            msg += "Error message:\n" + reason.getErrorMessage()
-            log.info(msg)
-            try:
-                notif = {
-                    "contact":contact_infos.contact,
-                    "contact_name":contact_name,
-                    "message":msg,
-                    "success":False,
-                    }
-                #self.api.notify(None, notif, "remote_stopped_streams")
-                self.api.remote_stopped_streams(None, notif)
-            except Exception, e:
-                log.error(e.message)
-                raise
-            log.error("Error stopping stream of the %s service. Tried by contact %s." % (service.name, contact_name))
-            return reason # we do not catch the error
-            #TODO change this objects's state.
+        comm = None # TODO : send OK
         log.info("Received STOP from remote  %s " % (contact))
         contact.stream_state = 3 # stopping !
         contact_infos = self._create_contact_infos_from_contact(contact)
+        try:
+            session_desc = self._get_session(contact_infos)
+        except StreamError, e:
+            raise
+        return self._stop(session_desc)
+
+    def _stop(self, session_desc):
+        def _service_stop_success(result, self, service, session_desc):
+            if session_desc.role == session.ROLE_ANSWERER:
+                try:
+                    contact_name = session_desc.contact_infos.contact.name
+                except ValueError:
+                    contact_name = session_desc.contact_infos.get_id()
+                msg = "Contact %s stopped a stream of the %s service." % (contact_name, service.name)
+                log.info(msg)
+                try:
+                    notif = {
+                        'contact_name':contact_name,
+                        'message':msg,
+                        'contact':session_desc.contact_infos.contact,
+                        'success':True
+                        }
+                    #self.api.notify(None, notif, "remote_stopped_streams")
+                    self.api.remote_stopped_streams(None, notif)
+                except Exception, e:
+                    log.error(e.message)
+                    raise
+            
+            self._delete_session(session_desc.contact_infos)
+            return result #TODO change this objects's state.
+        def _service_stop_failure(reason, self, service, session_desc):
+            if session_desc.role == session.ROLE_ANSWERER:
+                try:
+                    contact_name = session_desc.contact_infos.contact.name
+                except ValueError:
+                    contact_name = session_desc.contact_infos.get_id()
+                msg = "Contact %s failed to initiate a stream of the %s service." % (contact_name, service.name)
+                msg += "Error message:\n" + reason.getErrorMessage()
+                log.info(msg)
+                try:
+                    notif = {
+                        "contact":session_desc.contact_infos.contact,
+                        "contact_name":contact_name,
+                        "message":msg,
+                        "success":False,
+                        }
+                    #self.api.notify(None, notif, "remote_stopped_streams")
+                    self.api.remote_stopped_streams(None, notif)
+                except Exception, e:
+                    log.error(e.message)
+                    raise
+                log.error("Error stopping stream of the %s service. Tried by contact %s." % (service.name, contact_name))
+            self._delete_session(session_desc.contact_infos)
+            return reason # we do not catch the error
+            #TODO change this objects's state.
         dl = []
         for service in self.services.itervalues():
-            service_deferred = service.stop(contact_infos)
-            service_deferred.addCallback(_service_stop_success, self, contact_infos)
-            service_deferred.addErrback(_service_stop_failure, self, contact_infos)
+            service_deferred = service.stop(session_desc)
+            service_deferred.addCallback(_service_stop_success, self, service, session_desc)
+            service_deferred.addErrback(_service_stop_failure, self, service, session_desc)
             dl.append(service_deferred)
         deferred = tools.deferred_list_wrapper(dl)
-        # TODO: does that report success/failure correctly?
         return deferred
     
     def list_streams(self):
         """
         Returns the list of all current Stream instances.
         """
-        #TODO: use it.
         streams = []
         for service in self.services.itervalues():
             for stream in service.streams.itervalues():
@@ -342,13 +363,12 @@ class ServicesManager(observer.Observer):
     def start(self, contact):
         """
         Starts all the streams for the provided contact.
-
+        
+        Called from the miville core API.
         :param contact: miville.addressbook.Contact to start streaming with.
         Returns a DeferredList
         """
         #TODO: if not connected, connect
-        #TODO: manage port numbers using a negociation.
-        #TODO: asymetrical config entries (device, etc.)
         #TODO: it is the service that should duplicate the config entries for the initiator and the responder. (A and B) and overide the port numbers accordingly. We should add it a prepare_startup method, or so.
         log.debug("manager.start")
         try:
@@ -356,56 +376,105 @@ class ServicesManager(observer.Observer):
         except StreamError, e: # in case we are not connected to contact.
             log.debug("We are not connected to contact? Maybe bob has errors in the comchan timing of getmyip thing.")
             return defer.fail(failure.Failure(e))
-            # raise
-        # FIXME: this is hard-coded
-        if contact.profile_id == 0:
-            contact.profile_id = milhouse.TEST_PROFILE
-            log.warning("setting contact %s profile ID to %d" % (contact.name, milhouse.TEST_PROFILE))
         config_entries = self._get_config_entries_for_contact(contact)
-        # get communication channel.
         try:
             comm = communication.get_channel_for_contact(contact)
         except StreamError, e:
-            #raise
             return defer.fail(failure.Failure(e))
-        # duplicate the config entries. One dict for each stream
-        alice_entries = copy.deepcopy(config_entries)
-        bob_entries = copy.deepcopy(config_entries)
+        try:
+            contact_name = contact_infos.contact.name
+        except ValueError:
+            contact_name = str(contact_infos.__dict__)
+        try:
+            session_desc = self._create_session(contact_infos=contact_infos, role=session.ROLE_OFFERER) 
+        except StreamError, e:
+            log.error(e.message)
+            raise
+            return defer.fail(failure.Failure(e))
+        offerer_entries = copy.deepcopy(config_entries)
+        answerer_entries = copy.deepcopy(config_entries)
+        session_desc.add_stream_desc(service_name="Milhouse", entries=offerer_entries, direction=session.DIRECTION_TO_OFFERER)
+        session_desc.add_stream_desc(service_name="Milhouse", entries=answerer_entries, direction=session.DIRECTION_TO_ANSWERER)
         dl = []
-        # prepare config entries for alice and bob streams
         for service in self.services.itervalues():
             log.info("preparing service %s to stream with contact %s" % (service.name, contact_infos.get_id()))
-            alice_entries, bob_entries = service.prepare_session(alice_entries, bob_entries, role="alice", contact_infos=contact_infos)
-            log.debug("Alpha ports: %s. Bravo ports: %s" % (
-                conf.path_glob(alice_entries, "port", conf.GLOB_CONTAINS),
-                conf.path_glob(bob_entries, "port", conf.GLOB_CONTAINS)))
-        # send message to "bob" remote host
-        comm.send_start(contact_infos, alice_entries, bob_entries)
-        # TODO: add comm_deferred as well.
-        #comm_deferred = comm.send_start(contact_infos, alice_entries, bob_entries)
-        # dl.append(comm_deferred)
-        def _service_success(result, self, contact_infos, alice_entries, bob_entries, service):
-            log.debug("successfully started stream of the %s service." % (service.name))
-            return result #TODO change this object's state
-        def _service_failure(reason, self, contact_infos, alice_entries, bob_entries, service):
-            #log.error("Error starting services. (as alice) " + str(reason))
-            log.error("Error starting stream of the %s service." % (service.name))
+            service.prepare_session(session_desc)
+            log.debug("alice ports: %s. bob ports: %s" % (conf.path_glob(offerer_entries, "port", conf.GLOB_CONTAINS), conf.path_glob(answerer_entries, "port", conf.GLOB_CONTAINS)))
+            log.debug("config entries : %s %s" % (offerer_entries, answerer_entries))
+        comm.send_start(session_desc)# contact_infos, offerer_entries, answerer_entries)
+        return defer.succeed("Initiating streams with contact %s."  % (contact_name))
+        #return self._start(session_desc) # TODO: do this once bob answered
+
+    def _start(self, session_desc):
+        """
+        Actually start the streamers. 
+        """
+        def _service_success(result, self, session_desc, service):
+            """
+            Success callback
+            """
+            if session_desc.role == session.ROLE_ANSWERER:
+                try:
+                    contact_name = session_desc.contact_infos.contact.name
+                except ValueError:
+                    contact_name = session_desc.contact_infos.get_id()
+                msg = "Contact %s succeeded to initiate a stream of the %s service." % (contact_name, service.name)
+                log.info(msg)
+                try:
+                    notif = {
+                        "contact":session_desc.contact_infos.contact,
+                        "contact_name":contact_name,
+                        "message":msg,
+                        "success":False,
+                        }
+                    self.api.remote_started_streams(None, notif)
+                except Exception, e:
+                    log.error(e.message)
+                    raise
+                log.info("successfully started stream of the %s service. Tried by contact %s." % (service.name, contact_name))
+                return result 
+                #TODO change this objects's state.
+            else:
+                log.debug("successfully started stream of the %s service." % (service.name))
+                return result #TODO change this object's state
+        
+        def _service_failure(reason, self, session_desc, service):
+            try:
+                contact_name = session_desc.contact_infos.contact.name
+            except ValueError:
+                contact_name = session_desc.contact_infos.get_id()
+            if session_desc.role == session.ROLE_ANSWERER:
+                msg = "Contact %s failed to initiate a stream of the %s service." % (contact_name, service.name)
+                msg += "Error message:\n" + reason.getErrorMessage()
+                log.info(msg)
+                try:
+                    notif = {
+                        "contact":session_desc.contact_infos.contact,
+                        "contact_name":contact_name,
+                        "message":msg,
+                        "success":False,
+                        }
+                    self.api.remote_started_streams(None, notif)
+                except ValueError, e:
+                    log.error(e.message)
+            else:
+                #log.error("Error starting services. (as alice) " + str(reason))
+                log.error("Error starting stream of the %s service." % (service.name))
             return reason  #TODO change this objects's state.
+
+        dl = []
         for service in self.services.itervalues():
-            serv_deferred = service.start(contact_infos, alice_entries, bob_entries)
-            serv_deferred.addCallback(_service_success, self, contact_infos, alice_entries, bob_entries, service)
-            serv_deferred.addErrback(_service_failure, self, contact_infos, alice_entries, bob_entries, service)
+            serv_deferred = service.start(session_desc) 
+            serv_deferred.addCallback(_service_success, self, session_desc, service)
+            serv_deferred.addErrback(_service_failure, self, session_desc, service)
             dl.append(serv_deferred)
         deferred = tools.deferred_list_wrapper(dl)
-        #deferred_list = defer.DeferredList(dl, consumeErrors=False) 
-        # TODO: does that report success/failure correctly?
-        return deferred #_list
+        return deferred
     
     def list_all_streams(self):
         """
         Returns a list of all active streams.
         """
-        # TODO: add contact or service arg
         ret = []
         for service in self.services.itervalues():
             for identifier, stream in service.streams.iteritems():
@@ -418,31 +487,19 @@ class ServicesManager(observer.Observer):
         :param contact: miville.addressbook.Contact to start streaming with.
         Returns a DeferredList
         """
-        #TODO: return Deferred not DeferredList
         contact_infos = self._create_contact_infos_from_contact(contact)
-        # communication channel
+        session_desc = self._get_session(contact_infos)
         comm = communication.get_channel_for_contact(contact)
-        # send stop to remote host
-        dl = []
-        comm.send_stop(contact_infos)
-        # TODO: deferred for send stop
-        #comm_deferred = comm.send_stop(contact_infos)
-        #dl.append(comm_deferred)
-        # stop all services
-        for service in self.services.itervalues():
-            serv_deferred = service.stop(contact_infos)
-            dl.append(serv_deferred)
-        deferred = tools.deferred_list_wrapper(dl)
-        # TODO: add call/errbacks to setup this object's state.
-        return deferred
+        comm.send_stop(session_desc)
+        return self._stop(session_desc)
         
     def stop_all(self):
         """
         Stops all streams.
         returns Deferred
         """
+        raise NotImplementedError("Need to work on this.")
         #TODO: send message to each connected host.
-        # TODO; use tools.deferred_list_wrapper
         dl = []
         for service in self.services:
             dl.append(service.stop_all())
@@ -458,11 +515,10 @@ def _start(api):
     Here, we define which streaming services are provided by the application.
     :rtype ServicesManager:
     """
-    # from miville.streams import milhouse
     global _single_manager
     _single_manager = ServicesManager(api)
     to_load = [] 
-    to_load.append(milhouse.MilhouseService)
+    to_load.append(milhouse.MilhouseFactory)
     for class_to_load in to_load:
         _single_manager.add_service(class_to_load())
     return _single_manager

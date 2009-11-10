@@ -25,18 +25,14 @@ See also the api.py for more modules init and servers startup.
 
 Contains the core configuration of miville.
 """
-import os
 import sys
 import traceback
-import socket
 
 # Twisted imports
-from twisted.internet import reactor, task
-from twisted.python.modules import getModule
+from twisted.internet import reactor
 from twisted.internet.error import CannotListenError
 
 # App imports
-from miville import ui
 from miville import api
 #import streams
 from miville.utils import common
@@ -74,8 +70,7 @@ class Core(Subject):
         devices.start(self.api) # passing this api as an argument, 
                                 # so that both share the same notify method.
         self.load_uis()
-        # TODO: rename this addressbook !
-        self.adb = addressbook.AddressBook(self.config.addressbook_filename, self.api)
+        self.addressbook = addressbook.AddressBook(self.config.addressbook_filename, self.api)
         #self.services = self.find_services()
         
         # TODO: causes a couldn't listen error if another miville runs on the same port. 
@@ -148,8 +143,8 @@ def exit(app_return_val=0):
     Cancel delayed calls, stop ports, disconnect connections. 
     """
     try:
-        if core.adb != None:
-            core.adb.write(False)
+        if core.addressbook != None:
+            core.addressbook.write(False)
     except AttributeError:
         pass
     devices.stop()

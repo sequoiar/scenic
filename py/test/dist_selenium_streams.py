@@ -3,6 +3,7 @@ import time
 import unittest
 import re
 import os
+import commands
 
 """
 Expects:
@@ -32,6 +33,19 @@ We assume that :
  - The path to selenium.py in is PYTHONPATH : %s
  - The local miville is neither connected nor streaming to any remote agent.
 """ % (os.getenv("PYTHONPATH")))
+
+
+print("Deleting contact bob using telnet with netcat.")
+actions = [
+    "c -l",
+    "c -s bob",
+    "j =i", 
+    "c -e"
+    ]
+for action in actions:
+    comm = """echo %s | nc localhost 14444 -q 1 """ % (action)
+    ret = commands.getoutput(comm)
+    print(ret)
 
 class test_selenium_streams(unittest.TestCase):
     def setUp(self):

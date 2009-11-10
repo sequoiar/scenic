@@ -47,12 +47,9 @@ self.api.notify(
 """
 
 import sys
-import pprint 
-import repr
 
 from twisted.internet import reactor
 from twisted.python import failure
-from twisted.internet import defer
 
 # App imports
 from miville.errors import *
@@ -64,10 +61,8 @@ from miville import network
 from miville import addressbook # for network_test_*
 from miville.protocols import pinger
 from miville.utils import log
-from miville.utils.common import string_to_number 
 from miville.streams import manager as streams_manager
 from miville.streams import conf
-from miville.streams import tools
 
 log = log.start('debug', 1, 0, 'api') # added by hugo
 
@@ -93,16 +88,16 @@ class ControllerApi(object):
         Some attributes are defined here, but should be defined in __init__ 
         """
         self.core = core
-        self.adb = core.adb
+        self.addressbook = core.addressbook
         self.connectors = core.connectors
         self.connection = None
         
         network.start(self, self.core.config.iperf_port + self.core.config.port_numbers_offset, self.core.config.listen_to_interfaces)
         pinger.start(self)
         firewire.start(self)
+        conf.PORT_OFFSET = self.core.config.port_numbers_offset * 100 # FIXME
         streams_manager.start(self) # XXX order matters
         self.streams_manager = streams_manager.get_single_manager()
-        tools.PORT_OFFSET = self.core.config.port_numbers_offset * 100 # FIXME
         self.config_db = conf.get_single_db()
         self.devices_toggle_kill_jackd_enabled(self.get_config("restart_jackd")) # XXX : usually you might not want this. In the config it might be False.
     
@@ -142,14 +137,14 @@ class ControllerApi(object):
             - a dictionnary of Contact instances
             - the name of the selected Contact
         """
-        self.notify(caller, (self.adb.contacts, self.adb.selected))
+        self.notify(caller, (self.addressbook.contacts, self.addressbook.selected))
 
     def get_contact(self, name=None, caller=None):
         """
         Get the named contact instance.
         """
         try:
-            result = self.adb.get_contact(name)
+            result = self.addressbook.get_contact(name)
         except AddressBookError, err:
             result = err
         if caller:
@@ -158,11 +153,11 @@ class ControllerApi(object):
             return result # self.connectors
 
     def find_contact(self, address, port=None, connector=None):
-#        return self.adb.find_contact(address, port)
+#        return self.addressbook.find_contact(address, port)
         """
         Find a contact by its address and port.
         """
-        for contact in self.adb.contacts.values():
+        for contact in self.addressbook.contacts.values():
             if contact.address == address \
             and (connector == None or connector == contact.connector):
                 if contact.port == None:
@@ -186,7 +181,7 @@ class ControllerApi(object):
         Creates a temporary contact for the caller if he is not already in the
         Address Book. Contact are searched by address and port (optional).
         """
-        return self.adb.client_contact(address, port)
+        return self.addressbook.client_contact(address, port)
 
     def save_client_contact(self, caller, name=None, new_name=None, auto_answer=False):
         """
@@ -195,7 +190,7 @@ class ControllerApi(object):
         contact will be saved under this new name.
         """
         try:
-            result = self.adb.save_client_contact(name, new_name, auto_answer)
+            result = self.addressbook.save_client_contact(name, new_name, auto_answer)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
@@ -212,7 +207,7 @@ class ControllerApi(object):
         on problems.
         """
         try:
-            result = self.adb.add(name, address, port, auto_created, auto_answer)
+            result = self.addressbook.add(name, address, port, auto_created, auto_answer)
         except AddressBookError, err:
             result = err
         self.notify(caller, result) # implicit key: 'add_contact'
@@ -230,7 +225,7 @@ class ControllerApi(object):
                 raise contact
             if contact.state == CONNECTED:
                 raise AddressBookError('Please disconnect from contact prior to delete it.')
-            result = self.adb.delete(contact_name)
+            result = self.addressbook.delete(contact_name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result) # implicit key: 'delete_contact'
@@ -261,7 +256,7 @@ class ControllerApi(object):
         If no name is given, modify the selected contact.
         """
         try:
-            result = self.adb.modify(name, new_name, address, port, auto_answer, profile_id)
+            result = self.addressbook.modify(name, new_name, address, port, auto_answer, profile_id)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
@@ -284,7 +279,7 @@ class ControllerApi(object):
           * auto_answer : bool
         """
         try:
-            self.adb.modify_contact_attr(contact_name, attr_name, attr_value)
+            self.addressbook.modify_contact_attr(contact_name, attr_name, attr_value)
             #TODO: what if contact name is None?
             result = (contact_name, attr_name, attr_value)
         except AddressBookError, e:
@@ -298,7 +293,7 @@ class ControllerApi(object):
         If no name is given, copy the selected contact.
         """
         try:
-            result = self.adb.duplicate(name, new_name)
+            result = self.addressbook.duplicate(name, new_name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
@@ -309,7 +304,7 @@ class ControllerApi(object):
         contact.
         """
         try:
-            result = self.adb.select(name)
+            result = self.addressbook.select(name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
@@ -348,7 +343,7 @@ class ControllerApi(object):
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         contact = self.get_contact(contact_name)
         if isinstance(contact, AddressBookError):
-            #FIXME: for now we crash. The adb should not return exceptions !!!!
+            #FIXME: for now we crash. The addressbook should not return exceptions !!!!
             raise contact
         
         contact.stream_state = 1 # STARTING # FIXME
@@ -498,8 +493,8 @@ class ControllerApi(object):
          * register com_chan callbacks 
         """
         if contact == None:
-            contact = self.adb.get_current() #FIXME : DEPRECATED The CLI should pass a contact argument.
-        if contact and contact.name in self.adb.contacts:
+            contact = self.addressbook.get_current() #FIXME : DEPRECATED The CLI should pass a contact argument.
+        if contact and contact.name in self.addressbook.contacts:
             try:
                 connection = connectors.create_connection(contact, self)
                 deferred = connection.start()
@@ -527,8 +522,8 @@ class ControllerApi(object):
 
     def stop_connection(self, caller, contact=None):
         if contact == None:
-            contact = self.adb.get_current()
-        if contact and contact.name in self.adb.contacts:
+            contact = self.addressbook.get_current()
+        if contact and contact.name in self.addressbook.contacts:
             try:
                 connectors.stop_connection(contact)
                 self.notify(caller, {'msg':'Connection stopped',

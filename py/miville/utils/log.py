@@ -27,8 +27,6 @@ Now with NON-BLOCKING OUTPUT
 # System imports
 import logging
 import sys
-import os
-import types
 
 # Twisted imports
 import twisted.python.log as tw_log

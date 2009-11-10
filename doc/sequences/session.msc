@@ -3,9 +3,9 @@
 #  display streams_services.png
 msc 
 {
-#width = "1200";
+#width = "1900";
     hscale = "1.5";
-    a_api, a_service, a_manager, a_stream_comm, b_stream_comm, b_manager, b_service, b_api;
+    a_api, a_streamer, a_factory, a_manager, a_stream_comm, b_stream_comm, b_manager, b_factory, b_streamer, b_api;
 
 
 # Start streams
@@ -13,32 +13,61 @@ msc
     a_api => a_manager [label = "start(Bob)"];
     a_manager => a_manager [label = "create_session(contact_infos, to_alice_entries, to_bob_entries, role='alice')"];
     # Prepare config... 
-    a_manager => a_service [label = "prepare_session(session)"];
-    a_service => a_manager [label = "return"]; 
+    a_manager => a_factory [label = "prepare_session(session)"];
+    a_factory => a_manager [label = "return"]; 
+    
+    a_manager => a_api [label = "notify(start_streams)"];
+    a_api => a_manager [label = "return"];
+
     # config negociation    
     a_manager => a_stream_comm [label = "send_invite(session, request)"];
     a_stream_comm => b_stream_comm [label = "INVITE"];
     b_stream_comm => b_manager [label = "_cb_invite(session, request)"];
     b_manager  => b_manager [label = "create_session(contact_infos, to_alice_entries, to_bob_entries, role='bob')"];
-    b_manager => b_service [label = "prepare_session(session)"];
-    b_service => b_manager [label = "return"];
-    b_manager => b_service [label = "start(session)"];
+    b_manager => b_factory [label = "prepare_session(session)"];
+    b_factory => b_manager [label = "return"];
+    b_manager => b_factory [label = "start(session)"];
+    b_factory => b_streamer [label = "start(session)"];
+    b_streamer => b_factory [label = "return Deferred"];
+    b_factory => b_manager [label = "return Deferred"];
     b_manager => b_stream_comm [label = "send_ok(session, request)"];
     b_stream_comm => a_stream_comm [label = "OK"];
-    a_stream_comm => a_manager [label = "_cb_ok(session, request)"];
-    # starting B then A streamers
-    a_manager => a_service [label = "start(session)"];
+    a_stream_comm => a_manager [label = "_cb_ok(contact_infos, request)"];
+    a_manager => a_manager [label = "_get_session(contact_infos)"];
+    # starting B streamers then A streamers
+    a_manager => a_factory [label = "start(session)"];
+    a_factory => a_streamer [label = "start(session)"];
+    a_streamer => a_factory [label = "return Deferred"];
+    a_factory => a_manager [label = "return Deferred"];
     a_manager => a_stream_comm [label = "send_ack"];
     a_stream_comm => b_stream_comm [label = "ACK"];
-    b_stream_comm => b_manager [label = "_cb_ack(session, request)"];
+    b_stream_comm => b_manager [label = "_cb_ack(contact_infos, request)"];
+    b_manager => b_manager [label = "_get_session(contact_infos)"];
     ...;
-    b_service => b_manager [label = "StartedStreamNotification"];
+    b_streamer => b_factory [label = "StartedStreamerNotification"];
+    b_factory => b_manager [label = "StartedStreamNotification"];
     b_manager => b_api [label = "remote_started_streams(None, notif)"];
+    b_api => b_manager [label = "return"];
+    b_manager => b_stream_comm [label = "send_info"];
     b_stream_comm => a_stream_comm [label = "INFO"];
-    a_stream_comm => a_manager [label = "_cb_info(session, request)"];
-    a_service => a_manager [label = "StartedStreamNotification"];
+    a_stream_comm => a_manager [label = "_cb_info(contact_infos, request)"];
+    b_manager => b_manager [label = "_get_session(contact_infos)"];
+    # TODO: update state of each B streamers
+    ...;
+    a_streamer => a_factory [label = "StartedStreamerNotification??"];
+    a_factory => a_manager [label = "StartedStreamNotification??"];
     a_stream_comm => b_stream_comm [label = "INFO"];
     b_stream_comm => b_manager [label = "_cb_info(session, request)"];
     a_manager => a_api [label = "started_streams(None, notif)"];
+    ...;
+    a_streamer => a_factory [label = "StreamerProblem"];
+    a_factory => a_manager [label = "StreamProblem"];
+    a_manager => a_factory [label = "stop(session)"];
+    a_factory => a_streamer [label = "stop(session)"];
+    a_streamer => a_factory [label = "return Deferred"];
+    
+    a_stream_comm => b_stream_comm [label = "STOP"];
+    b_stream_comm => b_manager [label = "_cb_error(session, request)"];
+    ...;
 }
 

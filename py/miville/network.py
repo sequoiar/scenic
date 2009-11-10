@@ -34,23 +34,21 @@ See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting
  * bidirectional sequential (KIND_TRADEOFF)
     local: 'iperf -c 10.10.10.66 -t 1 -y c -u -b 1M -r'
 
- * bidirectional simetrical (KIND_DUALTEST)
+ * bidirectional symmetrical (KIND_DUALTEST)
     local:  'iperf -c 10.10.10.66 -t 1 -y c -u -b 1M'
     remote: 'iperf -c 10.10.10.68 -t 1 -y c -u -b 1M'
 """
 # system import
 import os
-import sys
 import time
 import warnings 
 
 # twisted imports
 from twisted.internet import reactor
 from twisted.internet import protocol
-from twisted.internet import defer
-from twisted.internet.error import ProcessExitedAlready, AlreadyCancelled
+from twisted.internet.error import ProcessExitedAlready
 from twisted.python import failure
-from twisted.protocols import basic
+
 try:
     from twisted.internet.error import PotentialZombieWarning
     warnings.simplefilter("ignore", PotentialZombieWarning)
@@ -138,6 +136,7 @@ def _parse_iperf_output(lines):
     #print "TODO: parse, change state and notify"
     line_index = 0
     was_ok = False
+    tmp = None
     for line in lines:
         if line.find("WARNING: did not receive ack of last datagram after 10 tries.") != -1:
             # error !!
@@ -274,7 +273,7 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
         #print "STOP REACTOR"
         #reactor.stop()
         try:
-            if status_object.value.exitCode == 1:
+            if status.value.exitCode == 1: 
                 pass # TODO
         except:
             pass

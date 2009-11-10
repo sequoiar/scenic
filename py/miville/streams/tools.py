@@ -5,6 +5,8 @@ Tools for deferreds, delayed calls and process management.
 """
 #TODO: rename to utils/process.py or so.
 import os
+# for port_is_avaiable
+import socket 
 
 from twisted.internet import defer
 from twisted.internet import error
@@ -14,6 +16,7 @@ from twisted.internet import reactor
 from twisted.python import procutils
 
 from miville.utils import observer
+from miville.utils import sig
 from miville.utils import log
 
 log = log.start("info", 1, 0, "streams.tools")
@@ -29,11 +32,35 @@ class PortsAllocator(object):
     Allocates ports from a pool
     """
     # TODO: check if port is available for us to listen to.
-    def __init__(self, minimum=10000, increment=10, maximum=65536):
+    def __init__(self, minimum=10000, increment=10, maximum=65535):
         self.minimum = minimum
         self.increment = increment
         self.maximum = maximum
         self.allocated = set()
+
+    def check_port(self, port):
+        """
+        Verify that port is available by trying to bind to it. Socket
+        does not persist. Note that some other process could still
+        bind to this port in between when this check happens and when
+        we bind to the port.
+        """
+        # Set the socket parameters
+        host = 'localhost'
+        addr = (host,port)
+        busy = False
+
+        # Create socket and bind to address
+        UDPSock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        try:
+            UDPSock.bind(addr)
+        except socket.error,e:
+            busy = True
+        finally:
+            # Close socket
+            UDPSock.close()
+        if busy:
+            log.warning("Port %d is not available. Reason:%s" % (port, e))
         
     def allocate(self):
         """
@@ -44,6 +71,8 @@ class PortsAllocator(object):
             value += self.increment
             if value > self.maximum:
                 raise PortsAllocatorError("Maximum value reached. No more ports available.")
+
+        self.check_port(value)
         self.allocated.add(value)
         return value
     
@@ -388,6 +417,8 @@ class ProcessManager(object):
         self.stdout_logger = TextLinesLogger(maxsize=log_max_size, prefix=self.name)
         self.stderr_logger = TextLinesLogger(maxsize=log_max_size, prefix=self.name)
         self.subject = observer.Subject() # add observers to this subject !
+        self.signal = sig.Signal() 
+        
         # we dont use the Subject.notify()'s "caller" argument here. (using None)
         self.verbose = verbose
         self.check_delay = check_delay
@@ -423,6 +454,7 @@ class ProcessManager(object):
             # print(str(e))
             self.state = self.STATE_ERROR
             self.subject.notify(None, str(e), "start_error")
+            self.signal("start_error", str(e))
             return defer.fail(failure.Failure(ManagedProcessError(str(e))))
         else:
             self._startup_check = DelayedWrapper()
@@ -445,6 +477,7 @@ class ProcessManager(object):
         # called later.
         if self.state is self.STATE_RUNNING:
             self.subject.notify(None, True, "start_success") 
+            self.signal("start_success")  # no data
             #print self.subject.observers.values()
             return True #self._startup_check.callback(True) # success !
         else:
@@ -462,6 +495,7 @@ class ProcessManager(object):
             #    err_msg += "It state is %s. " % (self.state)
             err_msg += "Its output: '%s'" % (self.format_output_when_crashed(output_lines))
             self.subject.notify(None, err_msg, "start_error")
+            self.signal("start_error", err_msg)
             return failure.Failure(ManagedProcessError(err_msg)) # Important to return the failure
 
     def format_output_when_crashed(self, output_lines):
@@ -511,6 +545,7 @@ class ProcessManager(object):
             self.state = self.STATE_ERROR
             # TODO: notify some observer that it crashed
             self.subject.notify(None, True, "crashed") # what other value could we add here?
+            self.signal("crashed")
         elif self.state == self.STATE_STOPPING:
             self.state = self.STATE_STOPPED
             #self._shutdown_check.cancel() # triggers the callback
@@ -525,11 +560,13 @@ class ProcessManager(object):
         # called later.
         if self.state == self.STATE_STOPPED:
             self.subject.notify(None, True, "stop_success")
+            self.signal("stop_success")
             return True #self._shutdown_check.callback(True) # success !
         else:
             output = "%s\n%s\n" % (self.stdout_logger.get_text().strip(), self.stderr_logger.get_text().strip())
             #self._startup_check.errback(
             err_msg = "Process %s : error while trying to stop it. It is in state %s. Output :\n%s" % (self.name, self.state, output)
             self.subject.notify(None, err_msg, "stop_error")
+            self.signal("stop_error", err_msg)
             return failure.Failure(ManagedProcessError(err_msg))
 

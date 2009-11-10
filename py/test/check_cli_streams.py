@@ -96,7 +96,8 @@ class Test_Miville_Streams(unittest.TestCase):
                     agent.flush()
             time.sleep(0.1)
         if not got_it:
-            self.fail("Expected \"%s\" but did not get it." % (expected))
+            self.fail("Expected \"%s\" but did not get it. Refer to the logfile %s" \
+                    % (expected, which_peer.miville_process.logfile.name))
 
     def _flush_both(self):
         # stdout, not telnet output
@@ -161,7 +162,8 @@ class Test_Miville_Streams(unittest.TestCase):
     def test_06_disconnect(self):
         # mandatory prior to delete contacts
         self.alice.telnet_process.sendline("j -i")
-        self.bob.expectTest("Connection has been closed by")
+        self.alice.expectTest("Connection stopped")
+        #TODO: self.bob.expectTest("Connection has been closed")
         self._flush_both()
     
     def test_98_quit(self):

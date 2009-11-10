@@ -18,6 +18,9 @@ except AttributeError:
     warnings.warn("Use simplejson, not the old json module.")
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
+from miville.utils import log
+
+log = log.start("debug", True, False, "streams.session") 
 # ------------------ Session infos. --------
 # agent roles
 ROLE_OFFERER = "offerer" # alice
@@ -29,12 +32,12 @@ DIRECTION_TO_ANSWERER = "TO_ANSWERER"
 STREAMER_SENDER = "send"
 STREAMER_RECEIVER = "recv"
 # states for session, streams, streamers.
-STATE_IDLE = 0
-STATE_STARTING = 1
-STATE_STREAMING = 2
-STATE_STOPPING = 3
-STATE_STOPPED = 4
-STATE_ERROR = 5
+STATE_IDLE = "idle"
+STATE_STARTING = "starting"
+STATE_STREAMING = "streaming"
+STATE_STOPPING = "stopping"
+STATE_STOPPED = "stopped"
+STATE_ERROR = "error"
 
 # --------------------- SSIP protocol details ---------
 # details
@@ -203,7 +206,8 @@ class SessionDescription(object):
     Contains stuff that is negociated between the peers.
     """
     # Not used yet.
-    def __init__(self, session_id=None, time_started=None, contact_infos=None, offerer_entries=None, answerer_entries=None, role=ROLE_OFFERER):
+    def __init__(self, session_id=None, time_started=None, contact_infos=None, role=ROLE_OFFERER):
+        # offerer_entries=None, answerer_entries=None, 
         """
         :param contact_infos: ContactInfos object
         :alice_entries: Dict of configuration entries for initiator peer.
@@ -212,8 +216,9 @@ class SessionDescription(object):
         """
         #We could classify them as local and remote instead of offerer and answerer
         self.contact_infos = contact_infos
-        self.stream_to_offerer = StreamDescription(direction=DIRECTION_TO_OFFERER, entries=offerer_entries)
-        self.stream_to_answerer = StreamDescription(direction=DIRECTION_TO_ANSWERER, entries=answerer_entries)
+        # TODO: any number of streams to each
+        self.streams_to_offerer = []
+        self.streams_to_answerer = []
         self.role = role # the role if this agent. Is this miville offerer or answerer ?
         self.time_started = None # UTC timestamp
         self.stream_state = STATE_IDLE
@@ -228,17 +233,45 @@ class SessionDescription(object):
             self.session_id = session_id
         else:
             self.session_id = int(self.time_started)
+    
+    def add_stream_desc(self, direction=DIRECTION_TO_OFFERER, service_name=None, entries=None, desc=""):
+        """
+        Adds a stream to the session.
+        """
+        log.debug("add_stream_desc %s %s %s" % (direction, service_name, entries))
+        s = StreamDescription(direction=direction, entries=entries, desc=desc)
+        if direction == DIRECTION_TO_OFFERER:
+            self.streams_to_offerer.append(s)
+        else:
+            self.streams_to_answerer.append(s)
 
+    def get_streams(self, service_name=None, direction=DIRECTION_TO_OFFERER):
+        """
+        Returns a list of streams descriptions.
+        """
+        log.debug("get_streams %s %s %s %s" % (service_name, direction, self.streams_to_offerer, self.streams_to_answerer))
+        if direction == DIRECTION_TO_OFFERER:
+            which = self.streams_to_offerer
+        else:
+            which = self.streams_to_answerer
+        ret = []
+        for s in which:
+            if s.service_name == service_name:
+                ret.append(s)
+        return ret
+        
+        
 class StreamDescription(object):
     """
     Description of a stream as passed using the Streaming Session Protocol.
     """
-    def __init__(self, name="", direction=DIRECTION_TO_ANSWERER, entries=None):
+    def __init__(self, service_name=None, desc="", direction=DIRECTION_TO_ANSWERER, entries=None):
         """
         :param entries: dict
         """
+        self.service_name = service_name
         self.entries = entries # dict or None
-        self.name = name # a profile name ?
+        self.desc = desc
         self.state = STATE_IDLE
         self.direction = direction
         # every stream has a sender and a receiver !
@@ -255,7 +288,7 @@ class StreamerDescription(object):
     """
     def __init__(self, role=STREAMER_SENDER):
         self.role = role
-        self.state = self.STATE_STOPPED
+        self.state = STATE_STOPPED
         self.error = None
         self.details = "" # detailed error message
 

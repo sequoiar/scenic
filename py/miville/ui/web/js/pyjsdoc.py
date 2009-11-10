@@ -25,7 +25,7 @@ Tag reference is similar to JSDoc: http://jsdoc.sourceforge.net/#tagref.  See us
 
 """
 
-import os, re, sys, getopt, cgi
+import os, re, sys, getopt
 
 try:
     import cjson

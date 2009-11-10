@@ -19,9 +19,9 @@ TESTS = test/test_addressbook.py \
         test/test_serialize.py \
         test/check_cli_ui.py \
         test/check_devices.py \
-        test/check_ping.py \
         test/check_miville_starts.py
 
+#        test/check_ping.py \
 #        test/check_milhouse_ipcp.py \
 #        test/check_milhouse_ipcp_sync.py \
 #EXTRA_DIST: $(shell `../utils/list_miville_files`)

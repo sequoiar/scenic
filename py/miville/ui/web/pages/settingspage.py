@@ -45,9 +45,7 @@ except ImportError:
     raise ImportError, 'If you want to use the Web interface, you need to install Nevow.'
 
 #App imports
-from miville.utils import Observer, log
-from miville.utils.i18n import to_utf
-from miville.utils.common import find_callbacks
+from miville.utils import log
 
 from miville.settings import global_settings
 from miville.settings import media_settings

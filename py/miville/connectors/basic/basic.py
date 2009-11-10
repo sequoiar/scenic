@@ -92,6 +92,7 @@ class BasicServer(LineReceiver):
                                  'connection':self},
                                 'ask')
         elif line[0:4] == "STOP":
+            log.debug("got STOP comchan message !")
             #try:    #TODO: to this correctly
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
             self.api.stop_streams(self, contact.name) # ARG MUST BE THE CURRENT CONTACT FOR THAT STREAM
