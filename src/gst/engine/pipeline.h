@@ -38,7 +38,7 @@ class BusMsgHandler;
 class Pipeline : boost::noncopyable
 {
     public:
-        static bool isAlive() { return instance_ != 0; }
+        static bool isAlive() { return Instance()->pipeline_ == 0; }
         /// This is the single point of access to the singleton instance of this pipeline
         static Pipeline * Instance();
         _GstElement *makeElement(const char *factoryName, const char *elementName);
@@ -76,11 +76,9 @@ class Pipeline : boost::noncopyable
         static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
         bool checkStateChange(GstStateChangeReturn ret) const;
 
-        Pipeline() : pipeline_(0), startTime_(0), handlers_(), refCount_(0), quitted_(false), sampleRate_(SAMPLE_RATE)
-        {}
+        Pipeline();
 
         ~Pipeline();
-        static Pipeline *instance_;
 
         void updateListeners(GstMessage *msg);
 

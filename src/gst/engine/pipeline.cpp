@@ -20,38 +20,42 @@
  *
  */
 
+#include "pipeline.h"
+#include <gst/gst.h>
+#include <gtk/gtk.h>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <algorithm>
 #include "util.h"
 
-#include <gst/gst.h>
-#include "pipeline.h"
 #include "dv1394.h"
 #include "busMsgHandler.h"
-#include <cstring>
-#include <algorithm>
 
-#include <gtk/gtk.h>
 
 // NOTES:
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
-// This class uses the Singleton pattern
+// This class uses the Meyer Singleton pattern
 
-Pipeline *Pipeline::instance_ = 0;
+Pipeline::Pipeline() : pipeline_(0), startTime_(0), handlers_(), 
+    refCount_(0), quitted_(false), sampleRate_(SAMPLE_RATE)
+{
+    // thread-safe under gcc
+    init();
+}
 
 Pipeline * Pipeline::Instance()
 {
-    if (instance_ == 0) {
-        instance_ = new Pipeline();
-        instance_->init();
-    }
-    return instance_;
+    static Pipeline instance;
+    return &instance;
 }
 
 
 Pipeline::~Pipeline()
 {
-    stop();
-    gst_object_unref(GST_OBJECT(pipeline_));
+    if (pipeline_)
+        gst_object_unref(GST_OBJECT(pipeline_));
     delete [] titleStr_;
 }
 
@@ -154,24 +158,23 @@ void Pipeline::init()
          *      work like this when a GLib main loop is running) */
         GstBus *bus;
         bus = getBus();
-        gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(this));
+        gst_bus_add_watch(bus, static_cast<GstBusFunc>(bus_call), static_cast<gpointer>(this));
         gst_object_unref(bus);
     }
 }
-
-
 
 // This can be a class method or a member method, it's a class method for the sake of 
 // looking like Instance()
 
 void Pipeline::reset()
 {
-    if (instance_)
+    if (Instance()->pipeline_)
     {
         LOG_DEBUG("Pipeline is being reset.");
-        instance_->stop();
-        delete instance_;
-        instance_ = 0;
+        gst_object_unref(Instance()->getBus());
+        gst_object_unref(GST_OBJECT(Instance()->pipeline_));
+        Instance()->pipeline_ = 0;
+        delete [] Instance()->titleStr_;
     }
 }
 
@@ -186,7 +189,7 @@ void Pipeline::makeVerbose()
 }
 
 
-void Pipeline::deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gchar ** excluded_props)
+void Pipeline::deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gchar **excluded_props)
 {
     GValue value; /* the important thing is that value.type = 0 */
     memset(&value, 0, sizeof(value));
