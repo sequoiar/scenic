@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include "util.h"
 
 #include "dv1394.h"
@@ -60,6 +61,25 @@ Pipeline::~Pipeline()
 }
 
 
+/// Translate error messages into more helpful/detailed info
+std::string translateMessage(GstObject *src, const std::string &errStr)
+{
+    // FIXME: somehow this info could be improved by getting details from elsewhere,
+    // or at least querying the element responsible for more info
+    std::string srcName = gst_object_get_name(src);
+    if (srcName.find("udpsrc") != std::string::npos) // this comes from a udpsrc
+        if (errStr.find("Could not get/set settings from/on resource") != std::string::npos)
+        {
+            int port;
+            g_object_get(src, "port", &port, NULL);
+
+            return srcName + ":" + errStr + " Port " + 
+                boost::lexical_cast<std::string>(port) + " may be in use by another process.";
+        }
+    return srcName + ":" + errStr;
+}
+
+
 gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
 {
     switch(GST_MESSAGE_TYPE(msg))
@@ -84,8 +104,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                     LOG_DEBUG("Debug details: " << debug);
                     g_free(debug);
                 }
-                THROW_CRITICAL(gst_object_get_name(msg->src) << ":" << errStr); 
-
+                THROW_CRITICAL(translateMessage(msg->src, errStr));
                 break;
             }
         case GST_MESSAGE_WARNING:
