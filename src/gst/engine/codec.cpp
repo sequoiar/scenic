@@ -103,13 +103,8 @@ Decoder::~Decoder()
 
 /// Constructor 
 AudioConvertedEncoder::AudioConvertedEncoder() : 
-    aconv_(0) 
+    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL))
 {}
-
-void AudioConvertedEncoder::init()
-{
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-}
 
 /// Destructor 
 AudioConvertedEncoder::~AudioConvertedEncoder()
@@ -135,29 +130,23 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
     Pipeline::Instance()->remove(&aconv_);
 }
 
-VideoEncoder::VideoEncoder() :
-    colorspc_(0), supportsInterlaced_(false)  // most codecs don't have this property
-{}
-
-
-/// Destructor 
-VideoEncoder::~VideoEncoder()
+VideoEncoder::VideoEncoder(GstElement *encoder, bool supportsInterlaced) :
+    colorspc_(Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL)), 
+    supportsInterlaced_(supportsInterlaced)  // most codecs don't have this property
 {
-    Pipeline::Instance()->remove(&colorspc_);
-}
-
-
-void VideoEncoder::init()
-{
-    tassert(encoder_ != 0);
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
-
+    encoder_ = encoder;
+    tassert(encoder_);
     if (supportsInterlaced_)  // not all encoders have this property
         g_object_set(encoder_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
     gstlinkable::link(colorspc_, encoder_);
 }
 
+/// Destructor 
+VideoEncoder::~VideoEncoder()
+{
+    Pipeline::Instance()->remove(&colorspc_);
+}
 
 VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0)//, queue_(0)
 {}
@@ -212,22 +201,14 @@ void VideoDecoder::adjustJitterBuffer()
 
 
 /// Constructor 
-H264Encoder::H264Encoder(MapMsg &settings) : bitrate_(settings["bitrate"]) {}
-
-
-/// Destructor 
-H264Encoder::~H264Encoder()
-{}
-
 // POSIX specific hardware thread info 
 // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
 // int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
 
-void H264Encoder::init()
+H264Encoder::H264Encoder(MapMsg &settings) : 
+    VideoEncoder(Pipeline::Instance()->makeElement("x264enc", NULL), true),
+    bitrate_(settings["bitrate"]) 
 {
-    encoder_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-    supportsInterlaced_ = true;
-
     // hardware threads: 1-n, 0 for automatic 
     int numThreads = boost::thread::hardware_concurrency();
 
@@ -237,17 +218,20 @@ void H264Encoder::init()
     else if (numThreads == 0)
         numThreads = 1;
 
-//    LOG_DEBUG("Using " << numThreads << " threads");
+    LOG_DEBUG("Using " << numThreads << " threads");
     g_object_set(encoder_, "threads", numThreads, NULL);
     // See gst-plugins-good/tests/examples/rtp/*h264*.sh
     g_object_set(encoder_, "byte-stream", TRUE, NULL);  
 
     // subme: subpixel motion estimation 1=fast, 6=best
-    VideoEncoder::init();
 
     setBitrate(bitrate_);
 }
 
+
+/// Destructor 
+H264Encoder::~H264Encoder()
+{}
 
 void Encoder::setBitrateInKbs(int newBitrate)
 {
@@ -292,21 +276,17 @@ void H264Decoder::adjustJitterBuffer()
 
 
 /// Constructor 
-H263Encoder::H263Encoder(MapMsg &settings) : bitrate_(settings["bitrate"])
-{}
+H263Encoder::H263Encoder(MapMsg &settings) : 
+    VideoEncoder(Pipeline::Instance()->makeElement("ffenc_h263p", NULL), false),
+    bitrate_(settings["bitrate"])
+{
+    setBitrate(bitrate_);
+}
 
 
 /// Destructor 
 H263Encoder::~H263Encoder()
 {}
-
-
-void H263Encoder::init()
-{
-    encoder_ = Pipeline::Instance()->makeElement("ffenc_h263p", NULL);    // replaced with newer version
-    VideoEncoder::init();
-    setBitrate(bitrate_);
-}
 
 
 /// Creates an h.263 rtp payloader 
@@ -331,21 +311,17 @@ RtpPay* H263Decoder::createDepayloader() const
 
 
 /// Constructor 
-Mpeg4Encoder::Mpeg4Encoder(MapMsg &settings) : bitrate_(settings["bitrate"])
-{}
+Mpeg4Encoder::Mpeg4Encoder(MapMsg &settings) : 
+    VideoEncoder(Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL), false), // FIXME: interlaced may cause stuttering
+    bitrate_(settings["bitrate"])
+{
+    setBitrate(bitrate_);
+}
 
 
 /// Destructor 
 Mpeg4Encoder::~Mpeg4Encoder()
 {}
-
-void Mpeg4Encoder::init()
-{
-    encoder_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
-    //supportsInterlaced_ = true; this may cause stuttering
-    VideoEncoder::init();
-    setBitrate(bitrate_);
-}
 
 
 /// Creates an h.264 rtp payloader 
@@ -370,23 +346,22 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
-TheoraEncoder::TheoraEncoder(MapMsg &settings) : bitrate_(settings["bitrate"]), quality_(settings["quality"]) {}
-
-
-/// Destructor 
-TheoraEncoder::~TheoraEncoder()
-{}
-
-void TheoraEncoder::init()
+TheoraEncoder::TheoraEncoder(MapMsg &settings) : 
+    VideoEncoder(Pipeline::Instance()->makeElement("theoraenc", NULL), false),
+    bitrate_(settings["bitrate"]), 
+    quality_(settings["quality"]) 
 {
-    encoder_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
     setSpeedLevel(MAX_SPEED_LEVEL);
-    VideoEncoder::init();
     if (bitrate_)
         setBitrate(bitrate_);
     else
         setQuality(quality_);
 }
+
+
+/// Destructor 
+TheoraEncoder::~TheoraEncoder()
+{}
 
 
 /// Overridden to convert from bit/s to kbit/s
@@ -418,7 +393,6 @@ void TheoraEncoder::setSpeedLevel(int speedLevel)
 }
 
 
-
 Payloader* TheoraEncoder::createPayloader() const
 {
     return new TheoraPayloader();
@@ -438,20 +412,14 @@ RtpPay* TheoraDecoder::createDepayloader() const
 
 /// Constructor 
 VorbisEncoder::VorbisEncoder() 
-{}
+{
+    encoder_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
+}
 
 
 /// Destructor 
 VorbisEncoder::~VorbisEncoder() 
 {}
-
-void VorbisEncoder::init()
-{
-    //AudioConvertedEncoder::init();
-    encoder_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
-    //gstlinkable::link(aconv_, encoder_);
-}
-
 
 /// Creates an RtpVorbisPayloader 
 Payloader* VorbisEncoder::createPayloader() const
@@ -477,18 +445,15 @@ RtpPay* VorbisDecoder::createDepayloader() const
 }
 
 /// Constructor
-RawEncoder::RawEncoder()
-{}
-
-
-void RawEncoder::init()
+RawEncoder::RawEncoder() : AudioConvertedEncoder()
 {
     // FIXME: HACK ATTACK: it's simpler to have this placeholder element
     // that pretends to be an aconv, and it has no
     // effect, but this isn't very smart.
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    //aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     //g_object_set(aconv_, "silent", TRUE, NULL);
 }
+
 
 /// Creates an RtpL16Payloader 
 Payloader* RawEncoder::createPayloader() const
@@ -508,23 +473,20 @@ RtpPay* RawDecoder::createDepayloader() const
 }
 
 /// Constructor
-LameEncoder::LameEncoder() : mp3parse_(0)
-{}
+LameEncoder::LameEncoder() : AudioConvertedEncoder(), 
+    mp3parse_(Pipeline::Instance()->makeElement("mp3parse", NULL))
+{
+    /// FIXME: put this in initializer list somehow
+    encoder_ = Pipeline::Instance()->makeElement("lamemp3enc", NULL);
+    gstlinkable::link(aconv_, encoder_);
+    gstlinkable::link(encoder_, mp3parse_);
+}
 
 
 /// Destructor
 LameEncoder::~LameEncoder()
 {
     Pipeline::Instance()->remove(&mp3parse_);
-}
-
-void LameEncoder::init()
-{
-    AudioConvertedEncoder::init();
-    encoder_ = Pipeline::Instance()->makeElement("lamemp3enc", NULL);
-    mp3parse_ = Pipeline::Instance()->makeElement("mp3parse", NULL);
-    gstlinkable::link(aconv_, encoder_);
-    gstlinkable::link(encoder_, mp3parse_);
 }
 
 /// Constructor

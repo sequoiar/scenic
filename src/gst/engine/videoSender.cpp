@@ -70,7 +70,6 @@ void VideoSender::init_codec()
     settings["bitrate"] = videoConfig_->bitrate();
     settings["quality"] = videoConfig_->quality();
     tassert(encoder_ = remoteConfig_->createVideoEncoder(settings));
-    encoder_->init();
 
     gstlinkable::link(*source_, *encoder_);
 }

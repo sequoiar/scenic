@@ -42,7 +42,6 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
     public:
         Encoder();
         virtual ~Encoder();
-        virtual void init () = 0;
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual Payloader* createPayloader() const = 0;
         int getBitrate() const;
@@ -90,7 +89,6 @@ class AudioConvertedEncoder : public Encoder
         AudioConvertedEncoder();
         ~AudioConvertedEncoder();
         _GstElement *aconv_;
-        void init();
 
     private:
         _GstElement *sinkElement() { return aconv_; }
@@ -112,9 +110,8 @@ class AudioConvertedDecoder : public Decoder
 class VideoEncoder : public Encoder 
 {
     public: 
-        VideoEncoder();
+        VideoEncoder(GstElement *encoder, bool supportsInterlaced);
         ~VideoEncoder();
-        virtual void init () = 0;
 
     protected:
         _GstElement *colorspc_;
@@ -167,7 +164,6 @@ class H264Encoder : public VideoEncoder
 
     private:
         ~H264Encoder();
-        void init();
         Payloader* createPayloader() const;
         int bitrate_;
 };
@@ -193,7 +189,6 @@ class H263Encoder : public VideoEncoder
         int bitrate_;
         ~H263Encoder();
 
-        void init();
         
         Payloader* createPayloader() const;
 };
@@ -216,7 +211,6 @@ class Mpeg4Encoder : public VideoEncoder
         ~Mpeg4Encoder();
 
     private:
-        void init();
         int bitrate_;
         Payloader* createPayloader() const;
 };
@@ -247,7 +241,6 @@ class TheoraEncoder : public VideoEncoder
         static const int MIN_QUALITY = 0;
         static const int MAX_QUALITY = 63;  // defined in plugin
         static const int INIT_QUALITY = 20;
-        void init();
         Payloader* createPayloader() const;
         int bitrate_;
         int quality_;
@@ -271,7 +264,6 @@ class VorbisEncoder : public  Encoder
 
     private:
         ~VorbisEncoder();
-        void init();
         Payloader* createPayloader() const;
 };
 
@@ -295,7 +287,6 @@ class RawEncoder : public AudioConvertedEncoder
         _GstElement *srcElement() { return aconv_; }
 
     private:
-        void init();
         Payloader* createPayloader() const;
 };
 
@@ -320,7 +311,6 @@ class LameEncoder : public AudioConvertedEncoder
         ~LameEncoder();
 
     private:
-        void init();
         _GstElement *mp3parse_;
         Payloader* createPayloader() const;
         _GstElement *srcElement() { return mp3parse_; }

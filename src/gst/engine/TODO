@@ -1,5 +1,5 @@
 NTA:
--print supported resolutions with --list-cameras
+-do more initialization in constructors, RAII
 -support for raw video (does work with smaller <200 jitter buffer)
 -set resolution
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 

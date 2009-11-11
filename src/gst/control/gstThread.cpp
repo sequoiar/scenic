@@ -239,10 +239,8 @@ void GstSenderThread::setVideoDefaults(MapMsg &msg)
 
     // If quality is != 0, then we know that we're using theora from the previous check
     if (!msg["bitrate"])
-    {
         if (!msg["quality"])
             msg["bitrate"] = defaults["videobitrate"]; // quality and bitrate are mutually exclusive
-    }
 
     if (!msg["camera-number"])
         msg["camera-number"] = defaults["camera-number"];

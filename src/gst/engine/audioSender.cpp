@@ -87,7 +87,6 @@ void AudioSender::init_level()
 void AudioSender::init_codec()
 {
     tassert(encoder_ = remoteConfig_->createAudioEncoder());
-    encoder_->init();
 
     //gstlinkable::link(level_, *encoder_);
     gstlinkable::link(*source_, *encoder_);
