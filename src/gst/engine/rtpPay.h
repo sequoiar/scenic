@@ -19,8 +19,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _PAYLOADER_H_
-#define _PAYLOADER_H_
+#ifndef _PAY_H_
+#define _PAY_H_
 
 #include "gstLinkable.h"
 #include "messageHandler.h"
@@ -33,7 +33,6 @@ class RtpPay : public GstLinkableFilter, boost::noncopyable
 {
     public:
         RtpPay() : rtpPay_(0) {}
-        virtual void init() = 0;
         virtual ~RtpPay();
         _GstElement *srcElement() { return rtpPay_; }
         _GstElement *sinkElement() { return rtpPay_; }
@@ -42,15 +41,11 @@ class RtpPay : public GstLinkableFilter, boost::noncopyable
         _GstElement *rtpPay_;
 };
 
-class _GtkAdjustment;
-class _GtkWidget;
-
-class Payloader : public RtpPay
+class Pay : public RtpPay
 {
     public:
-        static void enableControl();
-        virtual ~Payloader();
-        void init() = 0;
+        virtual ~Pay();
+
     protected:
         static const long long MAX_PTIME = 2000000LL;
 
@@ -62,115 +57,110 @@ class Payloader : public RtpPay
         static const unsigned long long INIT_MTU = 1400;    
         static const unsigned long long MIN_MTU = 28;    
         static const unsigned long long MAX_MTU = 14000;
-
-        void createMTUControl();
-        static void updateMTUCb(_GtkAdjustment *adj, void *data);
-
-        static bool controlEnabled_;
-        static _GtkWidget *control_;
 };
 
 
-class Depayloader : public RtpPay
+class Depay : public RtpPay
 {
 };
 
 
-class TheoraPayloader : public Payloader
+class TheoraPay : public Pay
 {
-    private: 
-        void init();
+    public:
+        TheoraPay();
 };
 
 
-class TheoraDepayloader : public Depayloader
+class TheoraDepay : public Depay
 {
-    private: 
-        void init();
+    public:
+        TheoraDepay();
 };
 
 
-class H264Payloader : public Payloader
+class H264Pay : public Pay
 {
-    private: 
-        void init();
+    public:
+        H264Pay();
 };
 
 
-class H264Depayloader : public Depayloader
+class H264Depay : public Depay
 {
-    private: 
-        void init();
+    public:
+        H264Depay();
 };
 
 
-class H263Payloader : public Payloader
+class H263Pay : public Pay
 {
-    private: 
-        void init();
+    public:
+        H263Pay();
 };
 
 
-class H263Depayloader : public Depayloader
+class H263Depay : public Depay
 {
-    private: 
-        void init();
+    public:
+        H263Depay();
 };
 
 
-class Mpeg4Payloader : public Payloader, public MessageHandler
+class Mpeg4Pay : public Pay, public MessageHandler
 {
     private: 
-        void init();
         bool handleMessage(const std::string &path, const std::string &arguments); 
+    public:
+        Mpeg4Pay();
 };
 
 
-class Mpeg4Depayloader : public Depayloader
+class Mpeg4Depay : public Depay
 {
-    private: 
-        void init();
+    public:
+        Mpeg4Depay();
 };
 
 
-class VorbisPayloader : public Payloader
+class VorbisPay : public Pay
 {
-    private: 
-        void init();
+    public:
+        VorbisPay();
 };
 
 
-class VorbisDepayloader : public Depayloader 
+class VorbisDepay : public Depay 
 {
-    private: 
-        void init();
+    public:
+        VorbisDepay();
 };
 
 
-class L16Payloader : public Payloader
+class L16Pay : public Pay
 {
-    private: 
-        void init();
+    public:
+        L16Pay();
 };
 
-class L16Depayloader : public Depayloader 
+class L16Depay : public Depay 
 {
-    private: 
-        void init();
+    public:
+        L16Depay();
 };
 
 
-class MpaPayloader : public Payloader
+class MpaPay : public Pay
 {
-    private: 
-        void init();
+    public:
+        MpaPay();
 };
 
-class MpaDepayloader : public Depayloader
+class MpaDepay : public Depay
 {
-    private: 
-        void init();
+    public:
+        MpaDepay();
 };
 
-#endif //_PAYLOADER_H_
+#endif //_PAY_H_
 

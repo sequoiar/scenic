@@ -33,11 +33,6 @@
 #include "remoteConfig.h"
 
 
-void RtpSender::enableControl()
-{
-    Payloader::enableControl();
-}
-
 RtpSender::~RtpSender()
 {
     Pipeline::Instance()->remove(&rtp_sender_);
@@ -63,41 +58,6 @@ void RtpSender::sendCapsChanged(GstPad *pad, GParamSpec * /*pspec*/, RtpSender* 
 
     gst_caps_unref(caps);
 }
-
-
-#if 0
-/** 
- * The new caps message is posted on the bus by the src pad of our udpsink, 
- * received by this rtpsender, and dispatched. */
-// FIXME: maybe someone else should deal with this? or maybe it should be in a separate thread?
-bool RtpSender::handleBusMsg(GstMessage *msg)
-{
-    const GstStructure *s = gst_message_get_structure(msg);
-    const gchar *name = gst_structure_get_name(s);
-
-    if (std::string(name) == "caps-changed") 
-    {   
-        // this is our msg
-        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
-        tassert(newCapsStr);
-
-        const GValue *str = gst_structure_get_value(GST_STRUCTURE(gst_caps_from_string(newCapsStr)), "encoding-name");;
-        std::string encodingName(g_value_get_string(str));
-
-        // FIXME: have this codec list stored somewhere else
-        if (encodingName == "theora" or encodingName == "vorbis")
-        {
-            LOG_DEBUG("Sending caps for codec " << encodingName);
-            config_->sendMessage(std::string(newCapsStr));
-        }
-
-
-        return true;
-    }
-
-    return false;           // this wasn't our msg, someone else should handle it
-}
-#endif
 
 
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)

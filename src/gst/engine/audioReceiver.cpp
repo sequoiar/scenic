@@ -72,7 +72,6 @@ void AudioReceiver::init_codec()
 void AudioReceiver::init_depayloader()
 {
     tassert(depayloader_ = decoder_->createDepayloader());
-    depayloader_->init();
     gstlinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, *remoteConfig_);
 

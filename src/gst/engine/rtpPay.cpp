@@ -23,7 +23,6 @@
 #include "util.h"
 
 #include <gst/gst.h>
-#include <gtk/gtk.h>
 #include "rtpPay.h"
 #include "pipeline.h"
 
@@ -33,34 +32,12 @@ RtpPay::~RtpPay()
     Pipeline::Instance()->remove(&rtpPay_);
 }
 
-bool Payloader::controlEnabled_ = false;
-GtkWidget *Payloader::control_ = 0;
-
-
-Payloader::~Payloader()
+Pay::~Pay()
 {
-    if (control_)
-    {
-        gtk_widget_destroy(control_);
-        LOG_DEBUG("RTP jitterbuffer control window destroyed");
-        control_ = 0;
-    }
-}
-
-void Payloader::enableControl() 
-{ 
-    controlEnabled_ = true; 
 }
 
 
-void Payloader::init()
-{
-    if (controlEnabled_)
-        createMTUControl();
-}
-
-
-void Payloader::setMTU(unsigned long long mtu)
+void Pay::setMTU(unsigned long long mtu)
 {
     if (mtu < MIN_MTU or mtu > MAX_MTU)
         THROW_ERROR("Invalid MTU " << mtu << ", must be in range [" 
@@ -71,100 +48,45 @@ void Payloader::setMTU(unsigned long long mtu)
 }
 
 
-void Payloader::createMTUControl()
-{
-    static bool gtk_initialized = false;
-    if (!gtk_initialized)
-    {
-        gtk_init(0, NULL);
-        gtk_initialized = true;
-    }
-
-    GtkWidget *box1;
-    GtkWidget *hscale;
-    GtkObject *adj;
-    const int WIDTH = 400;
-    const int HEIGHT = 70;
-
-    /* Standard window-creating stuff */
-    control_ = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(control_), WIDTH, HEIGHT);
-    gtk_window_set_title (GTK_WINDOW (control_), "MTU Size");
-
-    box1 = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (control_), box1);
-
-    /* value, lower, upper, step_increment, page_increment, page_size */
-    /* Note that the page_size value only makes a difference for
-     * scrollbar widgets, and the highest value you'll get is actually
-     * (upper - page_size). */
-
-    adj = gtk_adjustment_new (INIT_MTU, MIN_MTU, MAX_MTU + 1, 1.0, 1.0, 1.0);
-
-    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-            GTK_SIGNAL_FUNC(updateMTUCb), static_cast<void*>(this));
-
-
-    hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-    // Signal emitted only when value is done changing
-    gtk_range_set_update_policy (GTK_RANGE (hscale), 
-            GTK_UPDATE_DISCONTINUOUS);
-    gtk_box_pack_start (GTK_BOX (box1), hscale, TRUE, TRUE, 0);
-    gtk_widget_show (hscale);
-    gtk_widget_show (box1);
-    gtk_widget_show (control_);
-}
-
-
-void Payloader::updateMTUCb(GtkAdjustment *adj, gpointer data)
-{
-    Payloader *context = static_cast<Payloader*>(data);
-    unsigned val = static_cast<unsigned>(adj->value);
-    context->setMTU(val);
-}
-
-void TheoraPayloader::init()
+TheoraPay::TheoraPay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtptheorapay", NULL);
-    Payloader::init();
 }
 
 
-void TheoraDepayloader::init()
+TheoraDepay::TheoraDepay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtptheoradepay", NULL);
 }
 
-void H264Payloader::init()
+H264Pay::H264Pay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph264pay", NULL);
     // FIXME: Find out why setting buffer-list to true breaks rtp so badly, DON'T SET THIS TO TRUE
     //g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
-    Payloader::init();
 }
 
 
-void H264Depayloader::init()
+H264Depay::H264Depay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph264depay", NULL);
 }
 
 
 
-void H263Payloader::init()
+H263Pay::H263Pay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph263ppay", NULL);
-    Payloader::init();
 }
 
 
-void H263Depayloader::init()
+H263Depay::H263Depay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph263pdepay", NULL);
 }
 
 
-void Mpeg4Payloader::init()
+Mpeg4Pay::Mpeg4Pay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
     // this will send config header in rtp packets
@@ -186,11 +108,10 @@ void Mpeg4Payloader::init()
     // g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
     // The default of true works fine for perfect-rtptime
     // g_object_set(rtpPay_, "perfect-rtptime", FALSE, NULL);
-    Payloader::init();
 }
 
 
-bool Mpeg4Payloader::handleMessage(const std::string &path, const std::string &/*arguments*/)
+bool Mpeg4Pay::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
     if (path == "disable-send-config")
     {
@@ -203,48 +124,45 @@ bool Mpeg4Payloader::handleMessage(const std::string &path, const std::string &/
 }
 
 
-void Mpeg4Depayloader::init()
+Mpeg4Depay::Mpeg4Depay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vdepay", NULL);
 }
 
 
-void VorbisPayloader::init()
+VorbisPay::VorbisPay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbispay", NULL);
-    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Payloader::MAX_PTIME, NULL);
-    Payloader::init();
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
 
-void VorbisDepayloader::init()
+VorbisDepay::VorbisDepay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbisdepay", NULL);
 }
 
 
-void L16Payloader::init()
+L16Pay::L16Pay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpL16pay", NULL);
-    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Payloader::MAX_PTIME, NULL);
-    Payloader::init();
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
 
-void L16Depayloader::init()
+L16Depay::L16Depay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpL16depay", NULL);
 }
 
 
-void MpaPayloader::init()
+MpaPay::MpaPay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmpapay", NULL);
-    Payloader::init();
 }
 
 
-void MpaDepayloader::init()
+MpaDepay::MpaDepay()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmpadepay", NULL);
 }

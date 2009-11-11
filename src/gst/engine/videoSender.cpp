@@ -78,7 +78,6 @@ void VideoSender::init_codec()
 void VideoSender::init_payloader()       
 {
     tassert(payloader_ = encoder_->createPayloader());
-    payloader_->init();
     // tell rtpmp4vpay not to send config string in header since we're sending caps
     if (remoteConfig_->capsOutOfBand() and remoteConfig_->codec() == "mpeg4") 
         MessageDispatcher::sendMessage("disable-send-config");

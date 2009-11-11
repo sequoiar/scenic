@@ -70,7 +70,6 @@ void VideoReceiver::init_codec()
 void VideoReceiver::init_depayloader()
 {
     tassert(depayloader_ = decoder_->createDepayloader());
-    depayloader_->init();
 
     gstlinkable::link(*depayloader_, *decoder_);
 

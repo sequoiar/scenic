@@ -29,7 +29,7 @@
 // forward declarations
 class _GstElement;
 class RtpPay;
-class Payloader;
+class Pay;
 class MapMsg;
 
 
@@ -43,7 +43,7 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
         Encoder();
         virtual ~Encoder();
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
-        virtual Payloader* createPayloader() const = 0;
+        virtual Pay* createPayloader() const = 0;
         int getBitrate() const;
         void postBitrate();
         virtual void setBitrate(int bitrate);
@@ -164,7 +164,7 @@ class H264Encoder : public VideoEncoder
 
     private:
         ~H264Encoder();
-        Payloader* createPayloader() const;
+        Pay* createPayloader() const;
         int bitrate_;
 };
 
@@ -190,7 +190,7 @@ class H263Encoder : public VideoEncoder
         ~H263Encoder();
 
         
-        Payloader* createPayloader() const;
+        Pay* createPayloader() const;
 };
 
 /// Decoder that decodes H.263 into raw video using the ffmpeg h263 decoder.
@@ -212,7 +212,7 @@ class Mpeg4Encoder : public VideoEncoder
 
     private:
         int bitrate_;
-        Payloader* createPayloader() const;
+        Pay* createPayloader() const;
 };
 
 
@@ -241,7 +241,7 @@ class TheoraEncoder : public VideoEncoder
         static const int MIN_QUALITY = 0;
         static const int MAX_QUALITY = 63;  // defined in plugin
         static const int INIT_QUALITY = 20;
-        Payloader* createPayloader() const;
+        Pay* createPayloader() const;
         int bitrate_;
         int quality_;
 };
@@ -264,7 +264,7 @@ class VorbisEncoder : public  Encoder
 
     private:
         ~VorbisEncoder();
-        Payloader* createPayloader() const;
+        Pay* createPayloader() const;
 };
 
 /// Decoder that decodes vorbis into raw audio using the vorbis decoder.
@@ -287,7 +287,7 @@ class RawEncoder : public AudioConvertedEncoder
         _GstElement *srcElement() { return aconv_; }
 
     private:
-        Payloader* createPayloader() const;
+        Pay* createPayloader() const;
 };
 
 /// Decoder that simply performs datatype conversion on raw audio.
@@ -312,7 +312,7 @@ class LameEncoder : public AudioConvertedEncoder
 
     private:
         _GstElement *mp3parse_;
-        Payloader* createPayloader() const;
+        Pay* createPayloader() const;
         _GstElement *srcElement() { return mp3parse_; }
         
         ///No Copy Constructor

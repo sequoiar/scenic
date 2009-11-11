@@ -96,7 +96,6 @@ void AudioSender::init_codec()
 void AudioSender::init_payloader()   
 {
     tassert(payloader_ = encoder_->createPayloader());
-    payloader_->init();
 
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, *remoteConfig_);   

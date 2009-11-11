@@ -247,9 +247,9 @@ void H264Encoder::setBitrate(int newBitrate)
 
 
 /// Creates an h.264 rtp payloader 
-Payloader* H264Encoder::createPayloader() const
+Pay* H264Encoder::createPayloader() const
 {
-    return new H264Payloader();
+    return new H264Pay();
 }
 
 
@@ -260,10 +260,10 @@ void H264Decoder::init()
 }
 
 
-/// Creates an h.264 RtpDepayloader 
+/// Creates an h.264 RtpDepay 
 RtpPay* H264Decoder::createDepayloader() const
 {
-    return new H264Depayloader();
+    return new H264Depay();
 }
 
 
@@ -290,9 +290,9 @@ H263Encoder::~H263Encoder()
 
 
 /// Creates an h.263 rtp payloader 
-Payloader* H263Encoder::createPayloader() const
+Pay* H263Encoder::createPayloader() const
 {
-    return new H263Payloader();
+    return new H263Pay();
 }
 
 
@@ -303,10 +303,10 @@ void H263Decoder::init()
 }
 
 
-/// Creates an h.263 RtpDepayloader 
+/// Creates an h.263 RtpDepay 
 RtpPay* H263Decoder::createDepayloader() const
 {
-    return new H263Depayloader();
+    return new H263Depay();
 }
 
 
@@ -325,9 +325,9 @@ Mpeg4Encoder::~Mpeg4Encoder()
 
 
 /// Creates an h.264 rtp payloader 
-Payloader* Mpeg4Encoder::createPayloader() const
+Pay* Mpeg4Encoder::createPayloader() const
 {
-    return new Mpeg4Payloader();
+    return new Mpeg4Pay();
 }
 
 
@@ -338,10 +338,10 @@ void Mpeg4Decoder::init()
 }
 
 
-/// Creates an mpeg4 RtpDepayloader 
+/// Creates an mpeg4 RtpDepay 
 RtpPay* Mpeg4Decoder::createDepayloader() const
 {
-    return new Mpeg4Depayloader();
+    return new Mpeg4Depay();
 }
 
 
@@ -393,9 +393,9 @@ void TheoraEncoder::setSpeedLevel(int speedLevel)
 }
 
 
-Payloader* TheoraEncoder::createPayloader() const
+Pay* TheoraEncoder::createPayloader() const
 {
-    return new TheoraPayloader();
+    return new TheoraPay();
 }
 
 
@@ -407,7 +407,7 @@ void TheoraDecoder::init()
 
 RtpPay* TheoraDecoder::createDepayloader() const
 {
-    return new TheoraDepayloader();
+    return new TheoraDepay();
 }
 
 /// Constructor 
@@ -421,10 +421,10 @@ VorbisEncoder::VorbisEncoder()
 VorbisEncoder::~VorbisEncoder() 
 {}
 
-/// Creates an RtpVorbisPayloader 
-Payloader* VorbisEncoder::createPayloader() const
+/// Creates an RtpVorbisPay 
+Pay* VorbisEncoder::createPayloader() const
 {
-    return new VorbisPayloader();
+    return new VorbisPay();
 }
 
 
@@ -438,10 +438,10 @@ void VorbisDecoder::init()
     decoder_ = Pipeline::Instance()->makeElement("vorbisdec", NULL);
 }
 
-/// Creates an RtpVorbisDepayloader 
+/// Creates an RtpVorbisDepay 
 RtpPay* VorbisDecoder::createDepayloader() const
 {
-    return new VorbisDepayloader();
+    return new VorbisDepay();
 }
 
 /// Constructor
@@ -455,10 +455,10 @@ RawEncoder::RawEncoder() : AudioConvertedEncoder()
 }
 
 
-/// Creates an RtpL16Payloader 
-Payloader* RawEncoder::createPayloader() const
+/// Creates an RtpL16Pay 
+Pay* RawEncoder::createPayloader() const
 {
-    return new L16Payloader();
+    return new L16Pay();
 }
 
 /// Constructor
@@ -466,10 +466,10 @@ RawDecoder::RawDecoder()
 {}
 
 
-/// Creates an RtpL16Depayloader 
+/// Creates an RtpL16Depay 
 RtpPay* RawDecoder::createDepayloader() const
 {
-    return new L16Depayloader();
+    return new L16Depay();
 }
 
 /// Constructor
@@ -502,15 +502,15 @@ void MadDecoder::init()
 }
 
 /** 
- * Creates an RtpMpaPayloader */
-Payloader* LameEncoder::createPayloader() const
+ * Creates an RtpMpaPay */
+Pay* LameEncoder::createPayloader() const
 {
-    return new MpaPayloader();
+    return new MpaPay();
 }
 
-/// Creates an RtpMpaDepayloader 
+/// Creates an RtpMpaDepay 
 RtpPay* MadDecoder::createDepayloader() const
 {
-    return new MpaDepayloader();
+    return new MpaDepay();
 }
 

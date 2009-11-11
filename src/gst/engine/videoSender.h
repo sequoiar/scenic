@@ -34,7 +34,7 @@
 
 class VideoSource;
 class VideoEncoder;
-class Payloader;
+class Pay;
 class _GstMessage;
 
 class VideoSender
@@ -55,7 +55,7 @@ class VideoSender
         RtpSender session_;
         VideoSource *source_;
         VideoEncoder *encoder_;
-        Payloader *payloader_; 
+        Pay *payloader_; 
 };
 
 #endif

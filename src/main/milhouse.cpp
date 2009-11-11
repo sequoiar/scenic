@@ -96,9 +96,6 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
     shared_ptr<VideoSender> vTx;
     shared_ptr<AudioSender> aTx;
 
-    if (options["enable-controls"].as<bool>())
-        RtpSender::enableControl();
-
     if (!disableVideo)
     {
         MapMsg ipcp(ProgramOptions::toMapMsg(options));

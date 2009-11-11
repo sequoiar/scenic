@@ -35,7 +35,7 @@
 
 class AudioSource;
 class Encoder;
-class Payloader;
+class Pay;
 class _GstMessage;
 
 
@@ -61,7 +61,7 @@ class AudioSender
         //AudioLevel level_;
 
         Encoder *encoder_;
-        Payloader *payloader_;
+        Pay *payloader_;
 };
 
 #endif // _AUDIO_SENDER_H_
