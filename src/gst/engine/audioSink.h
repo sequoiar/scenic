@@ -41,7 +41,6 @@ class AudioSink : public GstLinkableSink, boost::noncopyable
         ~AudioSink();
        
         virtual void adjustBufferTime(unsigned long long);
-        virtual void init() = 0;
 
     protected:
         _GstElement *sink_;
@@ -64,7 +63,6 @@ class AudioAlsaSink : public AudioSink
     private:
         ~AudioAlsaSink();
         
-        void init();
         /** Returns this AudioAlsaSink's sink, which is an audioconverter, as 
          * raw-audio conversion happens before audio is output to ALSA */
         _GstElement *sinkElement() { return aconv_; }
@@ -80,7 +78,6 @@ class AudioPulseSink : public AudioSink
         AudioPulseSink(const AudioSinkConfig &config);
         ~AudioPulseSink();
     private:
-        void init();
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *aconv_;
         const AudioSinkConfig &config_;
@@ -94,7 +91,6 @@ class AudioJackSink : public AudioSink, public MessageHandler
         ~AudioJackSink();
     private:
         bool handleMessage(const std::string &message, const std::string &arguments);
-        void init();
         const AudioSinkConfig &config_;
 };
           

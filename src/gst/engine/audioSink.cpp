@@ -99,21 +99,10 @@ void AudioSink::adjustBufferTime(unsigned long long bufferTime)
 
 /// Constructor 
 AudioAlsaSink::AudioAlsaSink(const AudioSinkConfig &config) : 
-    aconv_(0), config_(config)
-{}
-
-/// Destructor
-AudioAlsaSink::~AudioAlsaSink()
-{
-    Pipeline::Instance()->remove(&aconv_);
-}
-
-void AudioAlsaSink::init()
+    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL)), config_(config)
 {
     if (Jack::is_running())
         THROW_CRITICAL("Jack is running, you must stop jack server before using alsasink");
-
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
 
@@ -127,10 +116,26 @@ void AudioAlsaSink::init()
     gstlinkable::link(aconv_, sink_);
 }
 
+/// Destructor
+AudioAlsaSink::~AudioAlsaSink()
+{
+    Pipeline::Instance()->remove(&aconv_);
+}
+
 /// Constructor 
 AudioPulseSink::AudioPulseSink(const AudioSinkConfig &config) : 
-    aconv_(0), config_(config) 
-{}
+    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL)), 
+    config_(config) 
+{
+    sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
+    if (config_.hasDeviceName())
+        g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
+    else
+        g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
+
+    gstlinkable::link(aconv_, sink_);
+}
 
 /// Destructor 
 AudioPulseSink::~AudioPulseSink()
@@ -138,33 +143,9 @@ AudioPulseSink::~AudioPulseSink()
     Pipeline::Instance()->remove(&aconv_);
 }
 
-void AudioPulseSink::init()
-{
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-
-    sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
-    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
-    if (config_.hasDeviceName())
-        g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
-//    else
- //       g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
-
-
-    gstlinkable::link(aconv_, sink_);
-}
-
 /// Constructor 
 AudioJackSink::AudioJackSink(const AudioSinkConfig &config) :  
     config_(config)
-{}
-
-/// Destructor 
-AudioJackSink::~AudioJackSink() 
-{}
-
-
-/// Initialization method
-void AudioJackSink::init()
 {
     sink_ = Pipeline::Instance()->makeElement("jackaudiosink", config_.sinkName());
 
@@ -186,6 +167,10 @@ void AudioJackSink::init()
     g_object_get(sink_, "buffer-time", &val, NULL);
     LOG_DEBUG("Buffer time is " << val);
 }
+
+/// Destructor 
+AudioJackSink::~AudioJackSink() 
+{}
 
 
 bool AudioJackSink::handleMessage(const std::string &path, const std::string &/*arguments*/)

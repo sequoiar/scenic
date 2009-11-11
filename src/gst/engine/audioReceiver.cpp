@@ -92,7 +92,6 @@ void AudioReceiver::init_level()
 void AudioReceiver::init_sink()
 {
     tassert(sink_ = audioConfig_->createSink());
-    sink_->init();
     //gstlinkable::link(level_, *sink_);   
     gstlinkable::link(*decoder_, *sink_);   
     setCaps();

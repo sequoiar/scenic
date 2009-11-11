@@ -287,6 +287,10 @@ AudioPulseSource::~AudioPulseSource()
 void AudioPulseSource::sub_init()
 {
     AudioSource::sub_init();
+    if (config_.hasDeviceName())
+        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
+    else
+        g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
 
     initCapsFilter(aconv_, capsFilter_);
 }
