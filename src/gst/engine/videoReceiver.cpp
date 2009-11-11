@@ -81,7 +81,6 @@ void VideoReceiver::init_depayloader()
 void VideoReceiver::init_sink()
 {
     tassert(sink_ = videoConfig_->createSink());
-    sink_->init();
     gstlinkable::link(*decoder_, *sink_);
     setCaps();
     tassert(gotCaps_);

@@ -41,7 +41,6 @@ class VideoSink : public GstLinkableSink, boost::noncopyable
     public:
        VideoSink() : sink_(0) {};
         virtual ~VideoSink(){};
-        virtual void init() = 0;
 
     protected:
         virtual void destroySink();
@@ -81,11 +80,10 @@ class XvImageSink
 : public GtkVideoSink, public BusMsgHandler
 {
     public:
-        XvImageSink(int screenNum) : GtkVideoSink(screenNum) {};
+        XvImageSink(int screenNum);
         bool handleBusMsg(_GstMessage *msg);
 
     private:
-        void init();
         _GstElement *sinkElement() { return sink_; }
         ~XvImageSink();
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
@@ -98,11 +96,10 @@ class XImageSink
 : public VideoSink
 {
     public: 
-        XImageSink() : colorspc_(0) {};
+        XImageSink(); 
 
     private:
         ~XImageSink();
-        void init();
 
         _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;

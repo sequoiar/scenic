@@ -162,8 +162,8 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-
-void XvImageSink::init()
+XvImageSink::XvImageSink(int screenNum) : 
+    GtkVideoSink(screenNum) 
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
@@ -178,6 +178,7 @@ void XvImageSink::init()
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     tassert(window_);
 
+    /// FIXME: this is ifdef'd out to avoid getting that  Xinerama error msg every time
 #ifdef XINE_QUERY
     GdkDisplay* display = gdk_display_get_default();
     tassert(display);
@@ -222,16 +223,15 @@ XvImageSink::~XvImageSink()
 }
 
 
-void XImageSink::init()
+XImageSink::XImageSink() : 
+    colorspc_(Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL)) 
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
     sink_ = Pipeline::Instance()->makeElement("ximagesink", NULL);
     prepareSink();
 
     gstlinkable::link(colorspc_, sink_);
 }
-
 
 XImageSink::~XImageSink()
 {

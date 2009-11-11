@@ -23,6 +23,7 @@
 #include "util.h"
 
 #ifdef CONFIG_GL
+
 #include <gst/interfaces/xoverlay.h>
 #include "gstLinkable.h"
 #include "pipeline.h"
@@ -74,6 +75,55 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
+GLImageSink::GLImageSink(int screen_num) : 
+    GtkVideoSink(screen_num) 
+{
+    static bool gtk_initialized = false;
+    if (!gtk_initialized)
+        gtk_init(0, NULL);
+
+    sink_ = Pipeline::Instance()->makeElement("glimagesink", NULL);
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+
+    window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
+    tassert(window_);
+
+    GdkDisplay* display = gdk_display_get_default();
+    tassert(display);
+    int n;
+    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display), &n);
+    if(!xine)
+        n = 0; // don't query ScreenInfo
+    for(int j = 0; j < n; ++j)
+    {
+        LOG_INFO(   "req:" << screen_num_ << 
+                " screen:" << xine[j].screen_number << 
+                " x:" << xine[j].x_org << 
+                " y:" << xine[j].y_org << 
+                " width:" << xine[j].width << 
+                " height:" << xine[j].height);
+        if (j == screen_num_) 
+            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
+    }
+
+    gtk_window_set_default_size(GTK_WINDOW(window_), videosize::WIDTH, videosize::HEIGHT);
+    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+    gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
+    g_signal_connect(G_OBJECT(window_), "key-press-event",
+            G_CALLBACK(key_press_event_cb), NULL);
+    g_signal_connect(G_OBJECT(window_), "scroll-event",
+            G_CALLBACK(mouse_wheel_cb), NULL);
+    g_signal_connect(G_OBJECT(window_), "destroy",
+            G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
+
+    gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
+    gtk_widget_set_events(window_, GDK_SCROLL_MASK);
+
+    /* configure elements */
+    //g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
+    //g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
+    showWindow();
+}
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
@@ -282,55 +332,6 @@ GLImageSink::~GLImageSink()
         gtk_widget_destroy(window_);
         LOG_DEBUG("Widget destroyed");
     }
-}
-
-void GLImageSink::init()
-{
-    static bool gtk_initialized = false;
-    if (!gtk_initialized)
-        gtk_init(0, NULL);
-
-    sink_ = Pipeline::Instance()->makeElement("glimagesink", NULL);
-    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-
-    window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
-    tassert(window_);
-
-    GdkDisplay* display = gdk_display_get_default();
-    tassert(display);
-    int n;
-    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display), &n);
-    if(!xine)
-        n = 0; // don't query ScreenInfo
-    for(int j = 0; j < n; ++j)
-    {
-        LOG_INFO(   "req:" << screen_num_ << 
-                " screen:" << xine[j].screen_number << 
-                " x:" << xine[j].x_org << 
-                " y:" << xine[j].y_org << 
-                " width:" << xine[j].width << 
-                " height:" << xine[j].height);
-        if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
-    }
-
-    gtk_window_set_default_size(GTK_WINDOW(window_), videosize::WIDTH, videosize::HEIGHT);
-    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
-    g_signal_connect(G_OBJECT(window_), "key-press-event",
-            G_CALLBACK(key_press_event_cb), NULL);
-    g_signal_connect(G_OBJECT(window_), "scroll-event",
-            G_CALLBACK(mouse_wheel_cb), NULL);
-    g_signal_connect(G_OBJECT(window_), "destroy",
-            G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
-
-    gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
-    gtk_widget_set_events(window_, GDK_SCROLL_MASK);
-
-    /* configure elements */
-    //g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
-    //g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
-    showWindow();
 }
 
 #endif //CONFIG_GL

@@ -36,7 +36,7 @@ class GLImageSink
 {
     public:
         /// Constructor 
-        GLImageSink(int screen_num) : GtkVideoSink(screen_num) {}
+        GLImageSink(int screen_num);
         bool handleBusMsg(_GstMessage *msg);
 
     private:
@@ -44,7 +44,6 @@ class GLImageSink
         /** 
          * Destructor */
         ~GLImageSink();
-        void init();
 
         _GstElement *sinkElement() { return sink_; }
 
