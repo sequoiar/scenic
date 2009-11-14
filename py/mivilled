@@ -30,6 +30,7 @@ import sys
 from optparse import OptionParser
 from miville.options import MivilleConfiguration
 from miville.utils import log
+import socket
 
 log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSSAGES
 
