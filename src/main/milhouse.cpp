@@ -176,33 +176,14 @@ short Milhouse::run(int argc, char **argv)
         return 1;
     }
 
-    bool disableVideo = !options.count("videocodec") and !options.count("videoport");
-    bool disableAudio = !options.count("audiocodec") and !options.count("audioport");
+    bool disableVideo = !options.count("videoport");
+    bool disableAudio = !options.count("audioport");
 
 
     if (disableVideo and disableAudio)
     {
-        LOG_ERROR("argument error: must provide video and/or audio parameters. see --help");
+        LOG_ERROR("argument error: must provide videoport and/or audioport. see --help");
         return 1;
-    }
-
-    if (disableVideo)
-    {
-        LOG_DEBUG("Video disabled.");
-        if (!(options.count("audioport") and options.count("audiocodec")))
-        {
-            LOG_ERROR("argument error: must specify both audioport and audiocodec");
-            return 1;
-        }
-    }
-    if (disableAudio) 
-    {
-        LOG_DEBUG("Audio disabled.");
-        if (!(options.count("videoport") and options.count("videocodec")))
-        {
-            LOG_ERROR("argument error: must specify both videoport and videocodec");
-            return 1;
-        }
     }
 
     // Fail early, other port checks do happen later too
@@ -239,14 +220,14 @@ int main(int argc, char **argv)
         Milhouse milhouse;
         ret = milhouse.run(argc, argv);
     }
-    catch (const Except &e)
+    catch (const Except &e) // these are our exceptions, so we can assume they've already been logged
     {
 #ifdef CONFIG_DEBUG_LOCAL
         std::cerr << "exitting with error: " << e.what() << std::endl;
 #endif
         ret = 1;
     }
-    catch (const std::exception &e)
+    catch (const std::exception &e) // these are other exceptions (not one of our exception classes)
     {
         std::cerr << "exitting with error: " << e.what() << std::endl;
         ret = 1;

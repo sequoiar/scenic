@@ -438,7 +438,7 @@ class Test_04_Process_Manager(unittest.TestCase):
             # starts the process
             #manager = tools.ProcessManager(name="xeyes", command=["xeyes"])
             #  "-vo", "gl2",
-            TIMEOUT = 3.0 # seconds at start/stop process
+            TIMEOUT = 5.0 # seconds at start/stop process
             manager = tools.ProcessManager(name="mplayer", command=["mplayer", "-ao", "jack", MOVIEFILENAME], check_delay=TIMEOUT)
             deferred = manager.start()
             deferred.addCallback(_start_callback, manager)
