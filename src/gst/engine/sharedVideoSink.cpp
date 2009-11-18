@@ -82,6 +82,11 @@ SharedVideoSink::SharedVideoSink(const std::string &id) :
 
     // construct the shared structure in memory with placement new
     sharedBuffer_ = new (addr) SharedVideoBuffer;
+
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
+    sink_ = Pipeline::Instance()->makeElement("appsink", NULL);
+    gstlinkable::link(colorspc_, sink_);
+    prepareSink();
 }
 
 
@@ -144,15 +149,6 @@ void SharedVideoSink::prepareSink()
     //g_object_set(sink_, "max-buffers", MAX_BUFFERS, "drop", TRUE, NULL);
     g_signal_connect(sink_, "new-buffer", G_CALLBACK(onNewBuffer), this);
     gst_caps_unref(videoCaps);
-}
-
-
-void SharedVideoSink::init()
-{
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
-    sink_ = Pipeline::Instance()->makeElement("appsink", NULL);
-    gstlinkable::link(colorspc_, sink_);
-    prepareSink();
 }
 
 

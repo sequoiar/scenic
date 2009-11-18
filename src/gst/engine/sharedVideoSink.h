@@ -36,7 +36,6 @@ class SharedVideoSink : public VideoSink
     public:
         SharedVideoSink(const std::string& sharedId_);
         virtual ~SharedVideoSink();
-        virtual void init();
 
     private:
          
