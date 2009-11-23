@@ -7,8 +7,8 @@
 #  1. gstreamer 0.10.25
 #  2. gstreamer-plugin-base 0.10.25
 #  3. gst-python 0.10.16
-#  4. gst-plugin-good 0.10.16
-#  5. gst-plugin-bad 0.10.14
+#  4. gst-plugin-good 0.10.17
+#  5. gst-plugin-bad 0.10.17
 #  6. gst-plugin-ugly 0.10.12
 #  7. gst-ffmpeg 0.10.10.9
 
@@ -29,8 +29,8 @@ fi
 
 GST_CORE=gstreamer-0.10.25
 GST_BASE=gst-plugins-base-0.10.25
-GST_GOOD=gst-plugins-good-0.10.16
-GST_BAD=gst-plugins-bad-0.10.16
+GST_GOOD=gst-plugins-good-0.10.17
+GST_BAD=gst-plugins-bad-0.10.17
 GST_UGLY=gst-plugins-ugly-0.10.13
 GST_FFMPEG=gst-ffmpeg-0.10.9
 GST_PYTHON=gst-python-0.10.16
