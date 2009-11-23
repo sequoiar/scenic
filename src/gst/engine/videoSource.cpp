@@ -221,7 +221,8 @@ void VideoDc1394Source::init()
         g_object_set(G_OBJECT(source_), "camera-number", config_.cameraNumber(), NULL);
     else
         LOG_DEBUG("No valid camera-number or guid specified, using default camera number 0");
-
+    /// TODO: test. this will hopefully help reduce the lag we're seeing with dc1394src
+    g_object_set(G_OBJECT(source_), "buffer-size", DMA_BUFFER_SIZE_IN_FRAMES, NULL);
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
