@@ -78,7 +78,6 @@ void AudioSender::init_source()
 #if 0
 void AudioSender::init_level()
 {
-    level_.init();
     gstlinkable::link(*source_, level_);
 }
 #endif

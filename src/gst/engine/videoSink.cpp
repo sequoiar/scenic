@@ -162,7 +162,7 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-XvImageSink::XvImageSink(int screenNum) : 
+XvImageSink::XvImageSink(int width, int height, int screenNum) : 
     GtkVideoSink(screenNum) 
 {
     static bool gtk_initialized = false;
@@ -199,7 +199,7 @@ XvImageSink::XvImageSink(int screenNum) :
     }
 #endif
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), videosize::WIDTH, videosize::HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);

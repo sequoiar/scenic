@@ -43,7 +43,36 @@ Pipeline::Pipeline() : pipeline_(0), startTime_(0), handlers_(),
     refCount_(0), quitted_(false), sampleRate_(SAMPLE_RATE)
 {
     // thread-safe under gcc
-    init();
+    if (pipeline_ == 0)
+    {
+        LOG_DEBUG("Calling gst_init");
+
+        // FIXME: GROSSS, but we need this so that
+        // for example in jack our process shows up as milhouse
+        // and not "unknown", and gst_init only takes raw ***argv
+        static int argc = 1;
+        static const std::string title("milhouse");
+        titleStr_ = new gchar[title.length() + 1];
+        memcpy(titleStr_, title.c_str(), title.length());
+        // argv has to end with 0
+        titleStr_[title.length()] = 0;
+        gchar **argv = {&titleStr_};
+
+        gst_init(&argc, &argv);
+
+        tassert(pipeline_ = gst_pipeline_new("pipeline"));
+
+        // this will be used as a reference for future
+        // pipeline synchronization
+        startTime_ = gst_clock_get_time(clock());
+
+        /* watch for messages on the pipeline's bus (note that this will only
+         *      work like this when a GLib main loop is running) */
+        GstBus *bus;
+        bus = getBus();
+        gst_bus_add_watch(bus, static_cast<GstBusFunc>(bus_call), static_cast<gpointer>(this));
+        gst_object_unref(bus);
+    }
 }
 
 Pipeline * Pipeline::Instance()
@@ -145,41 +174,6 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
     }
 
     return TRUE;
-}
-
-
-void Pipeline::init()
-{
-    if (pipeline_ == 0)
-    {
-        LOG_DEBUG("Calling gst_init");
-
-        // FIXME: GROSSS, but we need this so that
-        // for example in jack our process shows up as milhouse
-        // and not "unknown", and gst_init only takes raw ***argv
-        static int argc = 1;
-        static const std::string title("milhouse");
-        titleStr_ = new gchar[title.length() + 1];
-        memcpy(titleStr_, title.c_str(), title.length());
-        // argv has to end with 0
-        titleStr_[title.length()] = 0;
-        gchar **argv = {&titleStr_};
-
-        gst_init(&argc, &argv);
-
-        tassert(pipeline_ = gst_pipeline_new("pipeline"));
-
-        // this will be used as a reference for future
-        // pipeline synchronization
-        startTime_ = gst_clock_get_time(clock());
-
-        /* watch for messages on the pipeline's bus (note that this will only
-         *      work like this when a GLib main loop is running) */
-        GstBus *bus;
-        bus = getBus();
-        gst_bus_add_watch(bus, static_cast<GstBusFunc>(bus_call), static_cast<gpointer>(this));
-        gst_object_unref(bus);
-    }
 }
 
 // This can be a class method or a member method, it's a class method for the sake of 

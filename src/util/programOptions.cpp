@@ -21,6 +21,7 @@
  */
 
 #include "programOptions.h"
+#include "videosize.h"
 
 namespace po = boost::program_options;
 
@@ -80,6 +81,10 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
             ("list-cameras,H", po::bool_switch(), "list connected cameras")
             ("serverport,y", po::value<int>(), "run as server and listen on this port for ipcp messages")
+            ("width,P", po::value<int>()->default_value(videosize::WIDTH), "width for video "
+             "(sets capture width if sender, or scales output width if receiver)")
+            ("height,Q", po::value<int>()->default_value(videosize::HEIGHT), "height for video "
+             "(sets capture height if sender, or scales output height if receiver)")
             ;
 
         descriptionInitialized = true;

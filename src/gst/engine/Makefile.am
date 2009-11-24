@@ -22,8 +22,8 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h \
-				   fileSource.h videoSize.h sharedVideoSink.h sharedVideoBuffer.h capsParser.h \
-				   dc1394.cpp dc1394.h
+				   fileSource.h sharedVideoSink.h sharedVideoBuffer.h capsParser.h \
+				   dc1394.cpp dc1394.h videoScale.h videoScale.cpp
 
 BUILT_SOURCES = caps.cpp
 

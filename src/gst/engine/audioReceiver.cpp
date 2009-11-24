@@ -82,7 +82,6 @@ void AudioReceiver::init_depayloader()
 #if 0
 void AudioReceiver::init_level()
 {
-    level_.init();
     gstlinkable::link(*decoder_, level_);
 }
 #endif

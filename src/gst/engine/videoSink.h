@@ -40,7 +40,7 @@ class VideoSink : public GstLinkableSink, boost::noncopyable
 {
     public:
        VideoSink() : sink_(0) {};
-        virtual ~VideoSink(){};
+        virtual ~VideoSink() {};
 
     protected:
         virtual void destroySink();
@@ -80,7 +80,7 @@ class XvImageSink
 : public GtkVideoSink, public BusMsgHandler
 {
     public:
-        XvImageSink(int screenNum);
+        XvImageSink(int width, int height, int screenNum);
         bool handleBusMsg(_GstMessage *msg);
 
     private:

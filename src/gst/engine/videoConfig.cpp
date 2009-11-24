@@ -27,7 +27,9 @@
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include "videoScale.h"
 #include "sharedVideoSink.h"
+#include "videoSize.h"
 
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
@@ -44,7 +46,7 @@ T fromString(const std::string& s,
     T t;
     std::istringstream iss(s);
     if ((iss >> f >> t).fail())
-        THROW_CRITICAL("Could not convert string " << s);
+        THROW_CRITICAL("Could not convert string " << s << " to hex");
     return t;
 }
 
@@ -121,14 +123,16 @@ VideoSinkConfig::VideoSinkConfig(MapMsg &msg) :
     sink_(msg["sink"]), 
     screenNum_(msg["screen"]), 
     doDeinterlace_(msg["deinterlace"]), 
-    sharedVideoId_(msg["shared-video-id"])
+    sharedVideoId_(msg["shared-video-id"]),
+    width_(msg["width"]),
+    height_(msg["height"])
 {}
 
 
-VideoSink * VideoSinkConfig::createSink() const
+VideoSink * VideoSinkConfig::createSink(int width, int height) const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(screenNum_);
+        return new XvImageSink(width, height, screenNum_);
     else if (sink_ == "ximagesink")
         return new XImageSink();
 #ifdef CONFIG_GL
@@ -142,5 +146,11 @@ VideoSink * VideoSinkConfig::createSink() const
 
     LOG_DEBUG("Video sink " << sink_ << " built"); 
     return 0;
+}
+
+
+VideoScale* VideoSinkConfig::createVideoScale() const
+{
+    return new VideoScale(width_, height_);
 }
 

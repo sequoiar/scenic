@@ -27,6 +27,7 @@
 #include "gstLinkable.h"
 #include "videoReceiver.h"
 #include "videoSink.h"
+#include "videoScale.h"
 #include "codec.h"
 #include "rtpPay.h"
 #include "messageDispatcher.h"
@@ -42,6 +43,7 @@ VideoReceiver::VideoReceiver(shared_ptr<VideoSinkConfig> vConfig,
     session_(), 
     depayloader_(0), 
     decoder_(0), 
+    videoscale_(0), 
     sink_(0), 
     gotCaps_(false) 
 {
@@ -79,8 +81,14 @@ void VideoReceiver::init_depayloader()
 
 void VideoReceiver::init_sink()
 {
-    tassert(sink_ = videoConfig_->createSink());
-    gstlinkable::link(*decoder_, *sink_);
+    // XXX: According to the documentation, videoscale can be used without 
+    // impact if no scaling is needed 
+    tassert(videoscale_ = videoConfig_->createVideoScale());
+    tassert(sink_ = videoConfig_->createSink(videoscale_->getWidth(), videoscale_->getHeight()));
+
+    gstlinkable::link(*decoder_, *videoscale_);
+    gstlinkable::link(*videoscale_, *sink_);
+
     setCaps();
     tassert(gotCaps_);
     tassert(remoteConfig_->capsMatchCodec()); 

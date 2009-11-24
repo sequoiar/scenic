@@ -182,6 +182,7 @@ RtpBin::~RtpBin()
     --sessionCount_;
     if (sessionCount_ == 0) // destroy if no streams are present
     {
+        LOG_DEBUG("No rtp sessions left, destroying rtpbin");
         Pipeline::Instance()->remove(&rtpbin_); // one shared by all sessions
         rtpbin_ = 0;
         destroyed_ = true;

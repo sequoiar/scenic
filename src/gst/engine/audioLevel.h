@@ -40,11 +40,7 @@ class AudioLevel : public GstLinkableFilter, public BusMsgHandler
 {
     public:
         AudioLevel();
-
         ~AudioLevel();
-        
-        void init();
-        
         void interval(unsigned long long newInterval);
 
         bool handleBusMsg(_GstMessage *msg);

@@ -26,6 +26,7 @@
 
 class MapMsg;
 class VideoSource;
+class VideoScale;
 class VideoSink;
 
 class VideoSourceConfig
@@ -69,7 +70,8 @@ class VideoSinkConfig
 
         VideoSinkConfig(MapMsg &msg);
 
-        VideoSink* createSink() const;
+        VideoSink* createSink(int width, int height) const;
+        VideoScale* createVideoScale() const;
         bool doDeinterlace() const { return doDeinterlace_; }
 
     private:
@@ -78,6 +80,8 @@ class VideoSinkConfig
         const int screenNum_;
         bool doDeinterlace_;
         const std::string sharedVideoId_;
+        const int width_;
+        const int height_;
 };
 
 #endif // _VIDEO_CONFIG_H_

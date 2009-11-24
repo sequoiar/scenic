@@ -27,7 +27,6 @@
 
 #include "noncopyable.h"
 
-class RemoteConfig;
 class _GstElement;
 class _GstStructure;
 class _GObject;
@@ -58,7 +57,7 @@ class RtpBin : boost::noncopyable
         bool printStats_;
 
     private:
-        static const int REPORTING_PERIOD_MS = 8000;
+        static const int REPORTING_PERIOD_MS = 2000;
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static void parseSourceStats(_GObject * source, RtpBin *context);
