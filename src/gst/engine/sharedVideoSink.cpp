@@ -26,7 +26,6 @@
 
 #include "./gstLinkable.h"
 #include "./pipeline.h"
-#include "videoSize.h"
 #include <gst/app/gstappbuffer.h>
 #include <gst/app/gstappsink.h>
 

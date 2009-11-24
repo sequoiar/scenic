@@ -55,6 +55,7 @@ VideoReceiver::~VideoReceiver()
 {
     remoteConfig_->cleanupPorts();
     delete sink_;
+    delete videoscale_;
     delete depayloader_;
     delete decoder_;
 }
@@ -82,12 +83,21 @@ void VideoReceiver::init_depayloader()
 void VideoReceiver::init_sink()
 {
     // XXX: According to the documentation, videoscale can be used without 
-    // impact if no scaling is needed 
-    tassert(videoscale_ = videoConfig_->createVideoScale());
-    tassert(sink_ = videoConfig_->createSink(videoscale_->getWidth(), videoscale_->getHeight()));
+    // impact if no scaling is needed but I need to verify this and for now not use 
+    // videoscale unless the specified resolution is different than the default
+    if (videoConfig_->hasCustomResolution())
+    {
+        tassert(videoscale_ = videoConfig_->createVideoScale());
+        tassert(sink_ = videoConfig_->createSink(videoscale_->getWidth(), videoscale_->getHeight()));
 
-    gstlinkable::link(*decoder_, *videoscale_);
-    gstlinkable::link(*videoscale_, *sink_);
+        gstlinkable::link(*decoder_, *videoscale_);
+        gstlinkable::link(*videoscale_, *sink_);
+    }
+    else
+    {
+        tassert(sink_ = videoConfig_->createSink(videosize::WIDTH, videosize::HEIGHT));
+        gstlinkable::link(*decoder_, *sink_);
+    }
 
     setCaps();
     tassert(gotCaps_);

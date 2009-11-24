@@ -21,7 +21,7 @@
  */
 
 #include "programOptions.h"
-#include "videosize.h"
+#include "videoSize.h"
 
 namespace po = boost::program_options;
 

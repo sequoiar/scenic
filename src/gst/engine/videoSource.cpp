@@ -23,7 +23,6 @@
 #include "util.h"
 
 #include "gstLinkable.h"
-#include "videoSize.h"
 #include "videoSource.h"
 #include "pipeline.h"
 #include "videoConfig.h"
@@ -33,7 +32,6 @@
 #include "v4l2util.h"
 
 #include "fileSource.h"
-#include "videoSize.h"
 
 /// Constructor
 VideoSource::VideoSource(const VideoSourceConfig &config) : 

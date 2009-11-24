@@ -29,7 +29,6 @@
 #include "videoSink.h"
 #include "videoScale.h"
 #include "sharedVideoSink.h"
-#include "videoSize.h"
 
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
@@ -152,5 +151,11 @@ VideoSink * VideoSinkConfig::createSink(int width, int height) const
 VideoScale* VideoSinkConfig::createVideoScale() const
 {
     return new VideoScale(width_, height_);
+}
+
+
+bool VideoSinkConfig::hasCustomResolution() const
+{
+    return width_ != videosize::WIDTH or height_ != videosize::HEIGHT;
 }
 

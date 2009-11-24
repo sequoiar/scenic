@@ -27,7 +27,7 @@
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 
-#include "videoSize.h"
+#include "util.h"
 
 class SharedVideoBuffer
 {

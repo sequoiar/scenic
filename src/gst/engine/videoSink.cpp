@@ -23,7 +23,6 @@
 
 #include <gst/interfaces/xoverlay.h>
 #include "gstLinkable.h"
-#include "videoSize.h"
 #include "videoSink.h"
 #include "pipeline.h"
 #include "playback.h"

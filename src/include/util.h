@@ -27,6 +27,7 @@
 #include "util/logWriter.h"
 #include "util/fileUtil.h"
 #include "util/sigint.h"
+#include "util/videoSize.h"
 
 
 #endif

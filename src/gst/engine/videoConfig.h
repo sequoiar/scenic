@@ -73,6 +73,7 @@ class VideoSinkConfig
         VideoSink* createSink(int width, int height) const;
         VideoScale* createVideoScale() const;
         bool doDeinterlace() const { return doDeinterlace_; }
+        bool hasCustomResolution() const;
 
     private:
 

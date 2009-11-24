@@ -37,7 +37,6 @@
 
 #include <GL/glu.h>
 
-#include "videoSize.h"
 #include "glVideoSink.h"
 
         
