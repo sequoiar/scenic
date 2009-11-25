@@ -143,6 +143,6 @@ void RtpSender::subParseSourceStats(GstStructure *stats)
         return; // otherwise we don't care about internal sources
     }
     printStatsVal(sessionName_, "rb-jitter", "guint32", ":JITTER: ", stats);
-    printStatsVal(sessionName_, "rb-packetslost", "gint32", ":PACKETS LOST: ", stats);
+    printStatsVal(sessionName_, "rb-packetslost", "gint32", ":PACKETS-LOST: ", stats);
 }
 

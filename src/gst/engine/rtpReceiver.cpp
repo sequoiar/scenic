@@ -104,35 +104,36 @@ void RtpReceiver::checkSampleRate()
 
 void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /* data*/)
 {
+    // don't look at the full name
     static const std::string expectedPadPrefix = "recv_rtp_src";
     if (gst_pad_is_linked(srcPad))
-    {
         LOG_DEBUG("Pad is already linked");
-        return;
-    }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
-    {
         LOG_DEBUG("Pad is not a source");
-        return;
-    } // don't look at the full name
     else if (std::string(gst_pad_get_name(srcPad)).compare(0, expectedPadPrefix.length(), expectedPadPrefix))
-    {
         LOG_DEBUG("Wrong pad");
-        return;
-    }
-    GstPad *sinkPad = getMatchingDepayloaderSinkPad(srcPad);
-
-    if (gst_pad_is_linked(sinkPad)) // only link once
+    else
     {
-        LOG_WARNING("sink pad is already linked, are you trying to connect a new sender to an "
-                "existing receiver that lost its sender?");
+        GstPad *sinkPad = getMatchingDepayloaderSinkPad(srcPad);
+
+        if (gst_pad_is_linked(sinkPad)) // only link once
+        {
+            LOG_WARNING("sink pad is already linked, are you trying to connect a new sender to an "
+                    "existing receiver that lost its sender? You may have specified the wrong port numbers."
+                    "This will likely crash.");
+            gst_object_unref(sinkPad);
+            return;
+        }
+
+        gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
+        gchar *srcPadName;
+        srcPadName = gst_pad_get_name(srcPad);
+        /// FIXME: name by itself isn't so helpful, also sinkPad name is just sink so we ignore it
+        LOG_INFO("Made new RTP connection with source pad " << srcPadName);
+        g_free(srcPadName);
+
         gst_object_unref(sinkPad);
-        return;
     }
-
-    gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
-
-    gst_object_unref(sinkPad);
 }
 
 
@@ -219,7 +220,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "port",
             config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);
 
-  /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
+    /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
     tassert(rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src"));
     tassert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
     tassert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink));
@@ -242,7 +243,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     g_signal_connect(rtpbin_, "pad-added", 
             G_CALLBACK(RtpReceiver::onPadAdded), 
             NULL);
-    
+
     g_signal_connect(rtpbin_, "on-sender-timeout", 
             G_CALLBACK(RtpReceiver::onSenderTimeout), 
             this);
@@ -314,7 +315,7 @@ void RtpReceiver::subParseSourceStats(GstStructure *stats)
     const GValue *val = gst_structure_get_value(stats, "internal");
     if (g_value_get_boolean(val))   // is-internal
         return;
-    
+
     printStatsVal(sessionName_, "octets-received", "guint64", ":OCTETS-RECEIVED:", stats);
     printStatsVal(sessionName_, "packets-received", "guint64", ":PACKETS-RECEIVED:", stats);
 }
