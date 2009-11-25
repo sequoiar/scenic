@@ -31,12 +31,16 @@
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/thread.hpp>
 
-const double SharedVideoBuffer::ASPECT_RATIO = videosize::WIDTH / videosize::HEIGHT;
+/// FIXME: doesn't get updated
+double SharedVideoBuffer::ASPECT_RATIO = videosize::WIDTH / videosize::HEIGHT;
 
 using namespace boost::interprocess;
 
-SharedVideoBuffer::SharedVideoBuffer() : mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), doPush_(true)
-{}
+SharedVideoBuffer::SharedVideoBuffer(int width, int height) : width_(width), height_(height),
+    mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), doPush_(true)
+{
+    ASPECT_RATIO = width_ / height_;
+}
 
 interprocess_mutex & SharedVideoBuffer::getMutex()
 {
@@ -56,7 +60,7 @@ bool SharedVideoBuffer::isPushing() const
 void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
 {
     // FIXME: dynamically sized buffer, changed by parameter size
-    if (size >= MAX_BUFFER_SIZE)
+    if (size > MAX_BUFFER_SIZE)
     {
         /// this is so other applications can include SharedVideoBuffer without using our logging
 #ifdef LOG_ERROR
@@ -116,5 +120,19 @@ void SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
     {
         conditionEmpty_.wait(lock);
     }
+}
+
+
+int SharedVideoBuffer::getWidth()
+{
+    scoped_lock<interprocess_mutex> lock(mutex_);
+    return width_;
+}
+
+
+int SharedVideoBuffer::getHeight()
+{
+    scoped_lock<interprocess_mutex> lock(mutex_);
+    return height_;
 }
 

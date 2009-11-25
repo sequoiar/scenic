@@ -69,7 +69,7 @@ bool SharedVideoSink::removeSharedMemory(const std::string &id)
 }
 
 
-SharedVideoSink::SharedVideoSink(const std::string &id) : 
+SharedVideoSink::SharedVideoSink(int width, int height, const std::string &id) : 
     id_(id),
     colorspc_(0), 
     shm_(createSharedMemory(id_)), 
@@ -80,12 +80,12 @@ SharedVideoSink::SharedVideoSink(const std::string &id) :
     void *addr = region_.get_address();
 
     // construct the shared structure in memory with placement new
-    sharedBuffer_ = new (addr) SharedVideoBuffer;
+    sharedBuffer_ = new (addr) SharedVideoBuffer(width, height);
 
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
     sink_ = Pipeline::Instance()->makeElement("appsink", NULL);
     gstlinkable::link(colorspc_, sink_);
-    prepareSink();
+    prepareSink(width, height);
 }
 
 
@@ -137,13 +137,16 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
 }
 
 
-void SharedVideoSink::prepareSink()
+void SharedVideoSink::prepareSink(int width, int height)
 {
-    // FIXME: fixed caps are lame, should be bpp=12 to allow for 4 dc1394 cameras on one firewire port
+    GstCaps *videoCaps; 
+    
     std::ostringstream capsStr;
-    capsStr << "video/x-raw-rgb, width=" << videosize::WIDTH << ", height=" << videosize::HEIGHT
-        << ", bpp=16, depth=16";
-    GstCaps *videoCaps = gst_caps_from_string(capsStr.str().c_str());
+
+    capsStr << "video/x-raw-rgb, width=" << width 
+        << ", height=" << height << ",bpp=16, depth=16"; 
+    videoCaps = gst_caps_from_string(capsStr.str().c_str());
+
     g_object_set(G_OBJECT(sink_), "emit-signals", TRUE, "caps", videoCaps, NULL);
     //g_object_set(sink_, "max-buffers", MAX_BUFFERS, "drop", TRUE, NULL);
     g_signal_connect(sink_, "new-buffer", G_CALLBACK(onNewBuffer), this);

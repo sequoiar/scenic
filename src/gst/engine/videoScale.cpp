@@ -59,6 +59,8 @@ VideoScale::VideoScale(int width, int height) :
     g_object_set(capsfilter_, "caps", videoCaps, NULL);
     gstlinkable::link(videoscale_, capsfilter_);
 
+    // Don't need to unref tempCaps, this happens every time we append it
+    // to videoCaps
     gst_caps_unref(videoCaps);
 }
 

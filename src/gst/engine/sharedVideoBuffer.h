@@ -32,9 +32,9 @@
 class SharedVideoBuffer
 {
     public:
-        static const double ASPECT_RATIO;
+        static double ASPECT_RATIO;
 
-        SharedVideoBuffer();
+        SharedVideoBuffer(int width, int height);
 
         boost::interprocess::interprocess_mutex & getMutex();
 
@@ -57,6 +57,9 @@ class SharedVideoBuffer
         // wait for buffer to be pushed if it's currently empty
         void waitOnProducer(boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> &lock);
 
+        int getWidth();
+        int getHeight();
+
     private:
 
         enum { 
@@ -66,6 +69,10 @@ class SharedVideoBuffer
 
         // pixels to write to/read from
         unsigned char pixels[MAX_BUFFER_SIZE];
+
+        // resolution
+        const int width_;
+        const int height_;
 
         // mutex to protect access to the queue 
         boost::interprocess::interprocess_mutex mutex_;

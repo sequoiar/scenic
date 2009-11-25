@@ -6,7 +6,7 @@
 # The current needed modules are:
 #  1. gstreamer 0.10.25
 #  2. gstreamer-plugin-base 0.10.25
-#  3. gst-python 0.10.16
+#  3. gst-python 0.10.17
 #  4. gst-plugin-good 0.10.17
 #  5. gst-plugin-bad 0.10.17
 #  6. gst-plugin-ugly 0.10.12
@@ -33,7 +33,7 @@ GST_GOOD=gst-plugins-good-0.10.17
 GST_BAD=gst-plugins-bad-0.10.17
 GST_UGLY=gst-plugins-ugly-0.10.13
 GST_FFMPEG=gst-ffmpeg-0.10.9
-GST_PYTHON=gst-python-0.10.16
+GST_PYTHON=gst-python-0.10.17
 GST_GL=gst-plugins-gl-0.10.1
 YASM=yasm-0.8.0
 X264=x264-snapshot-20090711-2245
