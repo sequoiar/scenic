@@ -23,6 +23,10 @@
 
 #include "./sharedVideoBuffer.h"
 
+#ifndef LOG_ERROR
+#include <iostream> // for cerr
+#endif
+
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/thread.hpp>
@@ -54,8 +58,11 @@ void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
     // FIXME: dynamically sized buffer, changed by parameter size
     if (size >= MAX_BUFFER_SIZE)
     {
-#ifdef LOG_ERROR // FIXME: this won't work
+        /// this is so other applications can include SharedVideoBuffer without using our logging
+#ifdef LOG_ERROR
         LOG_ERROR("Cannot push unexpected video buffer size " << size << " to shared buffer\n");
+#else
+        std::cerr << "Cannot push unexpected video buffer size " << size << " to shared buffer\n";
 #endif
         return;
     }
