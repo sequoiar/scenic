@@ -36,7 +36,7 @@ class GLImageSink
 {
     public:
         /// Constructor 
-        GLImageSink(int screen_num);
+        GLImageSink(int width, int height, int screen_num);
         bool handleBusMsg(_GstMessage *msg);
 
     private:

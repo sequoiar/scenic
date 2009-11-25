@@ -136,7 +136,7 @@ VideoSink * VideoSinkConfig::createSink(int width, int height) const
         return new XImageSink();
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(screenNum_);
+        return new GLImageSink(width, height, screenNum_);
 #endif
     else if (sink_ == "sharedvideosink")
         return new SharedVideoSink(width, height, sharedVideoId_);

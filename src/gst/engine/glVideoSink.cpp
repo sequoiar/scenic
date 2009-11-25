@@ -74,7 +74,7 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-GLImageSink::GLImageSink(int screen_num) : 
+GLImageSink::GLImageSink(int width, int height, int screen_num) : 
     GtkVideoSink(screen_num) 
 {
     static bool gtk_initialized = false;
@@ -105,7 +105,7 @@ GLImageSink::GLImageSink(int screen_num) :
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), videosize::WIDTH, videosize::HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
     g_signal_connect(G_OBJECT(window_), "key-press-event",
