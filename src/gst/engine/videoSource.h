@@ -36,7 +36,6 @@ class VideoSource
 {
     public:
         ~VideoSource();
-        virtual void init();
         virtual std::string srcCaps() const;
         void setCapsFilter(const std::string &srcCaps);
 
@@ -61,7 +60,6 @@ class VideoTestSource
     private:
         ~VideoTestSource();
         _GstElement *srcElement() { return capsFilter_; }
-        void init();
 };
 
 class VideoFileSource
@@ -73,7 +71,6 @@ class VideoFileSource
     private:
         ~VideoFileSource();
         _GstElement *srcElement() { return identity_; }      
-        void init();
 
         // FIXME: maybe just use the queue we acquire?
         _GstElement *identity_;
@@ -89,7 +86,6 @@ class VideoDvSource
         ~VideoDvSource();
         
         _GstElement *srcElement() { return dvdec_; }
-        void init();
 
         _GstElement *queue_, *dvdec_;
 };
@@ -98,10 +94,8 @@ class VideoV4lSource
     : public VideoSource
 {
     public:
-        explicit VideoV4lSource(const VideoSourceConfig &config)
-            : VideoSource(config), expectedStandard_("NTSC") {}
+        explicit VideoV4lSource(const VideoSourceConfig &config);
     private:
-        void init();
         std::string expectedStandard_;
         std::string deviceStr() const;
         std::string srcCaps() const;
@@ -114,11 +108,9 @@ class VideoDc1394Source
     : public VideoSource
 {
     public:
-        explicit VideoDc1394Source(const VideoSourceConfig &config)
-            : VideoSource(config) {}
+        explicit VideoDc1394Source(const VideoSourceConfig &config);
     private:
         enum {DMA_BUFFER_SIZE_IN_FRAMES = 2};
-        void init();
         std::string srcCaps() const;
         _GstElement *srcElement() { return capsFilter_; }
 };

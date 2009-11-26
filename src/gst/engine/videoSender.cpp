@@ -60,7 +60,6 @@ VideoSender::~VideoSender()
 void VideoSender::init_source()
 {
     tassert(source_ = videoConfig_->createSource());
-    source_->init();
 }
 
 

@@ -46,6 +46,7 @@ FileSource::~FileSource()
 
 void FileSource::init(const std::string & location)
 {
+    LOG_DEBUG("Init on filesource for location " << location);
     filesrc_ = Pipeline::Instance()->makeElement("filesrc", NULL); 
     g_object_set(G_OBJECT(filesrc_), "location", location.c_str(), NULL);   // set location
     decodebin_ = Pipeline::Instance()->makeElement("decodebin", NULL);

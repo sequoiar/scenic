@@ -35,15 +35,10 @@
 
 /// Constructor
 VideoSource::VideoSource(const VideoSourceConfig &config) : 
-    config_(config), source_(0), capsFilter_(0)
+    config_(config), 
+    source_(0), 
+    capsFilter_(0)
 {}
-
-
-/// Callable by child classes
-void VideoSource::init()
-{
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
-}
 
 
 /// Destructor
@@ -91,18 +86,14 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
 /// Constructor
 VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
     VideoSource(config)
-{}
-
-void VideoTestSource::init()
 {
-    VideoSource::init();
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
     setCapsFilter(srcCaps());
 }
-
 
 /// Destructor
 VideoTestSource::~VideoTestSource()
@@ -111,13 +102,10 @@ VideoTestSource::~VideoTestSource()
 
 /// Constructor
 VideoFileSource::VideoFileSource(const VideoSourceConfig &config) : 
-    VideoSource(config), identity_(0)
-{}
-
-void VideoFileSource::init()
+    VideoSource(config), 
+    identity_(Pipeline::Instance()->makeElement("identity", NULL))
 {
     tassert(config_.locationExists());
-    identity_ = Pipeline::Instance()->makeElement("identity", NULL);
     g_object_set(identity_, "silent", TRUE, NULL);
 
     GstElement * queue = FileSource::acquireVideo(config_.location());
@@ -134,8 +122,14 @@ VideoFileSource::~VideoFileSource()
 
 /// Constructor
 VideoDvSource::VideoDvSource(const VideoSourceConfig &config) : 
-    VideoSource(config), queue_(0), dvdec_(0)
-{}
+    VideoSource(config), 
+    queue_(Pipeline::Instance()->makeElement("queue", NULL)), 
+    dvdec_(Pipeline::Instance()->makeElement("dvdec", NULL))
+{
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    Dv1394::Instance()->setVideoSink(queue_);
+    gstlinkable::link(queue_, dvdec_);
+}
 
 
 /// Destructor
@@ -147,19 +141,10 @@ VideoDvSource::~VideoDvSource()
 }
 
 
-void VideoDvSource::init()
+VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
+    : VideoSource(config), expectedStandard_("NTSC") 
 {
-    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    dvdec_ = Pipeline::Instance()->makeElement("dvdec", NULL);
-
-    Dv1394::Instance()->setVideoSink(queue_);
-    gstlinkable::link(queue_, dvdec_);
-}
-
-
-void VideoV4lSource::init()
-{
-    VideoSource::init();
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
     // set a v4l2src if given to config as an arg, otherwise use default
     if (config_.hasDeviceName() && config_.deviceExists())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
@@ -209,10 +194,10 @@ std::string VideoV4lSource::srcCaps() const
 }
 
 
-void VideoDc1394Source::init()
+VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) : 
+    VideoSource(config) 
 {
-    VideoSource::init();
-
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
     if (config_.hasGUID())
         g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
@@ -227,7 +212,6 @@ void VideoDc1394Source::init()
 
     setCapsFilter(srcCaps());
 }
-
 
 
 std::string VideoDc1394Source::srcCaps() const
