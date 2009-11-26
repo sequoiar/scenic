@@ -95,10 +95,10 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
     using boost::interprocess::interprocess_mutex;
     using boost::interprocess::interprocess_exception;
 
-    static unsigned long long bufferCount = 0;
     GstBuffer *buffer = 0;
     size_t size;
 
+    /// FIXME: maybe replace with Concurrent queue?
     try
     {
         /* get the buffer from appsink */
@@ -117,7 +117,6 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
             // push the buffer
             size = GST_BUFFER_SIZE (buffer);
             context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
-            ++bufferCount;
         }
 
         context->sharedBuffer_->notifyConsumer();

@@ -17,3 +17,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import sys
+sys.path.append("data-newrtp/miville")
+sys.path.append("data-newrtp/miville/protocols")
+sys.path.append("data-newrtp/miville/protocols/rtp")
+
+sys.path.append("data-newrtp/miville/engines")
+sys.path.append("data-newrtp/miville/engines/midi")
