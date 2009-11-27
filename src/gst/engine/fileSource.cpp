@@ -32,8 +32,23 @@ else create new filesrc and plug into it */
 // class holds a static map of all the existing instances of FileSources 
 std::map<std::string, FileSource*> FileSource::fileSources_;
 
-FileSource::FileSource() : filesrc_(0), decodebin_(0), videoQueue_(0), audioQueue_(0)
-{}
+FileSource::FileSource(const std::string & location) :
+    filesrc_(Pipeline::Instance()->makeElement("filesrc", NULL)), 
+    decodebin_(Pipeline::Instance()->makeElement("decodebin", NULL)), 
+    videoQueue_(0), 
+    audioQueue_(0)
+{
+    LOG_DEBUG("Init on filesource for location " << location);
+    g_object_set(G_OBJECT(filesrc_), "location", location.c_str(), NULL);   // set location
+    // bind callback
+    g_signal_connect(decodebin_, "new-decoded-pad",
+            G_CALLBACK(FileSource::cb_new_src_pad),
+            static_cast<void *>(this));
+
+    // link them
+    gstlinkable::link(filesrc_, decodebin_);
+}
+
 
 FileSource::~FileSource() 
 {
@@ -44,21 +59,6 @@ FileSource::~FileSource()
 }
 
 
-void FileSource::init(const std::string & location)
-{
-    LOG_DEBUG("Init on filesource for location " << location);
-    filesrc_ = Pipeline::Instance()->makeElement("filesrc", NULL); 
-    g_object_set(G_OBJECT(filesrc_), "location", location.c_str(), NULL);   // set location
-    decodebin_ = Pipeline::Instance()->makeElement("decodebin", NULL);
-    // bind callback
-    g_signal_connect(decodebin_, "new-decoded-pad",
-        G_CALLBACK(FileSource::cb_new_src_pad),
-        static_cast<void *>(this));
-
-    // link them
-    gstlinkable::link(filesrc_, decodebin_);
-}
-
 bool FileSource::instanceExists(const std::string &location)
 {
     return fileSources_.find(location) != fileSources_.end();
@@ -68,11 +68,8 @@ bool FileSource::instanceExists(const std::string &location)
 GstElement * FileSource::acquireAudio(const std::string &location)
 {
     if (not instanceExists(location))  // make new FileSource if needed
-    {
-        fileSources_[location] = new FileSource();
-        fileSources_[location]->init(location);
-    }
-    
+        fileSources_[location] = new FileSource(location);
+
     if (fileSources_[location]->audioQueue_ == 0)
         fileSources_[location]->audioQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
@@ -84,17 +81,14 @@ GstElement * FileSource::acquireAudio(const std::string &location)
 GstElement * FileSource::acquireVideo(const std::string &location)
 {
     if (not instanceExists(location))  // make new FileSource if needed
-    {
-        fileSources_[location] = new FileSource();
-        fileSources_[location]->init(location);
-    }
-    
+        fileSources_[location] = new FileSource(location);
+
     if (fileSources_[location]->videoQueue_ == 0)
         fileSources_[location]->videoQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
     return fileSources_[location]->videoQueue_;
 }
- 
+
 
 // called by client
 void FileSource::releaseAudio(const std::string &location)
@@ -104,7 +98,7 @@ void FileSource::releaseAudio(const std::string &location)
         LOG_WARNING("Trying to call release on non existent FileSource object");
         return;
     }
-    
+
     fileSources_[location]->removeAudio();
 
     if (not fileSources_[location]->isLinked()) // no more objects using the filesource
@@ -120,7 +114,7 @@ void FileSource::releaseVideo(const std::string &location)
         LOG_WARNING("Trying to call release on non existent FileSource object");
         return;
     }
-    
+
     fileSources_[location]->removeVideo();
 
     if (not fileSources_[location]->isLinked()) // no more objects using the filesource

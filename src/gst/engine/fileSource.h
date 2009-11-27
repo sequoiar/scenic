@@ -39,10 +39,9 @@ class FileSource : boost::noncopyable
         static void releaseVideo(const std::string &location);
         
     private:
-        FileSource();
+        FileSource(const std::string &location);
         ~FileSource();
         bool isLinked();
-        void init(const std::string &location);
         void removeVideo();
         void removeAudio();
         
