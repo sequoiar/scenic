@@ -12,3 +12,10 @@
 	margin-left: 40px;
 }
 
+#strm_details {
+    display: block;
+    font-size: 10px;
+    overflow: auto;
+    max-height: 100px;
+    width: 300px;
+}

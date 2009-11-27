@@ -44,6 +44,7 @@ from miville.utils import common
 from miville.utils.i18n import to_utf
 from miville.errors import AddressBookError, AddressBookNameError, AddressBookAddressError
 from miville.connectors.states import DISCONNECTED
+from miville.connectors.states import CONNECTED
 
 log = log.start('info', 1, 0, 'adb')
 
@@ -287,7 +288,7 @@ class AddressBook(object):
             raise AddressBookError, 'This contact \'%s\' is already saved.' % contact.name
         contact.auto_created = False
         return_name = name
-        if new_name != None or auto_answer == True:
+        if new_name != None or auto_answer is True:
             return_name = self.modify(contact.name, new_name, auto_answer=auto_answer)
 #        else:
 #            self.write()

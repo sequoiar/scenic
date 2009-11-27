@@ -42,6 +42,7 @@ See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting
 import os
 import time
 import warnings 
+import copy
 
 # twisted imports
 from twisted.internet import reactor
@@ -67,17 +68,17 @@ log = log.start('debug', True, True, 'network') # LOG TO FILE = True
 # CHANGE IT TO debug LEVEL TO GET MORE OUTPUT
 
 # -------------------- constants -----------------------------------
-STATE_IDLE = 0
-KIND_UNIDIRECTIONAL = 1
-KIND_REMOTETOLOCAL = 8
-KIND_REMOTETOLOCAL_SERVER = 9
-KIND_TRADEOFF = 2
-KIND_DUALTEST = 3 # CLIENT
+STATE_IDLE = "idle"
+KIND_UNIDIRECTIONAL = "unidirectional"
+KIND_REMOTETOLOCAL = "remote_to_local"
+KIND_REMOTETOLOCAL_SERVER = "remote_to_local_server"
+KIND_TRADEOFF = "tradeoff"
+KIND_DUALTEST = "dualtest" # CLIENT
 # KIND_DUALTEST_CLIENT = 3
-KIND_DUALTEST_SERVER = 4
-STATE_QUERIED = 5
-STATE_WAITING_REMOTE_ANSWER = 6
-STATE_ANSWERED_OK = 7
+KIND_DUALTEST_SERVER = "dualtest_server"
+STATE_QUERIED = "queried"
+STATE_WAITING_REMOTE_ANSWER = "waiting_answer"
+STATE_ANSWERED_OK = "ok"
 
 MEGABITS = 'M'
 KILOBITS = 'K'
@@ -254,7 +255,8 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
             for line in data.splitlines():
                 print self.prefix, line
 
-    def _warn_network_tester_that_i_died(self, was_intentional=False):
+    #def _warn_network_tester_that_i_died(self, was_intentional=False):
+    def _warn_network_tester_that_i_died(self):
         if not self.network_tester_warned:
             self.network_tester_warned = True
             self.network_tester.on_iperf_server_process_done()
@@ -348,7 +350,8 @@ class NetworkTester(object):
                 self.iperf_server_is_running = False
         #TODO: make sure we do not start again the process !!!!!!!!!!!
 
-    def on_iperf_server_process_done(self, intentional=True):
+    #def on_iperf_server_process_done(self, intentional=True):
+    def on_iperf_server_process_done(self):
         """
         Called when the iperf -s process is done.
         """
@@ -375,6 +378,7 @@ class NetworkTester(object):
             elif key == "error":
                 print "ERROR !", val
         else:
+            log.debug("api.notify %s %s %s" % (caller, val, key))
             self.api.notify(caller, val, key) #key, res)
 
     def _get_remote_addr(self):
@@ -397,9 +401,10 @@ class NetworkTester(object):
         """
         Aborts the current test.
         """
-        self._abort_test(caller, True)
+        self._abort_test(True)
 
-    def _abort_test(self, caller, initiator=False):
+    #def _abort_test(self, caller, initiator=False):
+    def _abort_test(self, initiator=False):
         mess = 'Test has been aborted by '
         if initiator:
             mess += 'local host.'
@@ -415,7 +420,6 @@ class NetworkTester(object):
         reactor.callLater(0.5, self._stop_iperf_server_process)
         self.api.notify(None, mess, 'network_test_error')
         self._when_done() # set state to available
-
 
     def start_test(self, caller, bandwidth_megabits=1, duration=10, kind=KIND_UNIDIRECTIONAL, unit=MEGABITS): # start_client
         """
@@ -508,7 +512,7 @@ class NetworkTester(object):
             "-u" # UDP
         ]
         command.append("-b")
-        log.debug("current unit " + self.current_unit)
+        log.debug("current unit " + str(self.current_unit))
         command.append("%d%s" % (self.current_bandwidth, self.current_unit)) # bandwidth (megabits)
         if self.current_kind == KIND_TRADEOFF:
             command.append("-r") # tradeoff.
@@ -524,8 +528,7 @@ class NetworkTester(object):
         for i in range(len(command)):
             if not isinstance(command[i], str):
                 command[i] = str(command[i])
-        #log.debug("Calling %r." % (command))
-        log.debug("Calling %r." % (" ".join(command)))
+        log.debug("Calling %s." % (" ".join(command)))
         callback = self.on_iperf_command_results
         try:
             self._iperf_client_deferred_list = commands.single_command_start(command, callback, extra_arg, self.current_caller)
@@ -584,7 +587,7 @@ class NetworkTester(object):
             #reactor.cancelCallLater(self.timeout_call_later_id)
         #except AlreadyCancelled, e:
         #    pass
-        except AttributeError, e:
+        except AttributeError:
             pass
 
     def on_remote_message(self, key, args):
@@ -613,7 +616,7 @@ class NetworkTester(object):
         if key == "ping": # from A
             self._start_iperf_server_process()
             if self.state != STATE_IDLE:
-                log.error("Received a ping while being busy doing some network test. (state = %d)" % self.state)
+                log.error("Received a ping while being busy doing some network test. (state = %s)" % self.state)
                 self._send_message("busy")
             if _is_currently_busy:
                 log.error("Received a ping while being busy doing some network test. (_is_currently_busy)")
@@ -633,7 +636,7 @@ class NetworkTester(object):
 
         elif key == "pong": # from B 
             if self.state != STATE_WAITING_REMOTE_ANSWER:
-                log.error("Received pong while not being wainting for an answer. (state = %d)" % self.state)
+                log.error("Received pong while not being wainting for an answer. (state = %s)" % self.state)
             else:
                 self.current_latency = self._get_time_now() - self.current_ping_started_time # seconds
                 params = {
@@ -700,7 +703,7 @@ class NetworkTester(object):
         
         elif key == "abort": # from A _or_ B
             log.debug("Received abort")
-            self._abort_test(None, False)
+            self._abort_test(None)
 
         elif key == "final_results_from_starter": # from A
             log.debug('Notifying our local API as well from \'final_results_from_starter\'')
@@ -720,11 +723,10 @@ class NetworkTester(object):
             # use remote contact, not ourself !
             results['contact'] = self.current_contact.name
             log.debug('contact name:' + str(self.current_contact.name))
-
             self.notify_api(self.current_caller, "network_test_done", results)
         else:
             log.error("Unhandled com_chan message. %s" % key)
-        log.debug("state is %d" % self.state)
+        log.debug("state is %s" % self.state)
     
     def _send_results_if_ready(self):
         """
@@ -737,6 +739,7 @@ class NetworkTester(object):
          * 'contact' : the name of the contact the test has been done with.
         """
         #self.remote_results_timeout = 5 # how many extra seconds over the duration of a test to wait for remote stats before giving up.
+        log.debug("_send_results_if_ready")
         if not self.current_results_sent:
             must_have_local = True
             must_have_remote = False
@@ -752,32 +755,35 @@ class NetworkTester(object):
                 if self.current_stats_remote is None:
                     ok = False
                 else:
-                    results['remote'] = self.current_stats_remote
                     key = 'remote'
+                    results[key] = copy.deepcopy(self.current_stats_remote)
                     results[key]['contact'] = str(self.current_contact)
-                    results[key]['latency'] = self.current_latency / 2.0
+                    results[key]['latency'] = self.current_latency * 0.5
                     results[key]['unit'] = self.current_unit
-                    print str(self.current_contact)
+                    log.debug(str(self.current_contact))
             if must_have_local:
                 if self.current_stats_local is None:
                     ok = False
                 else:
-                    results['local'] = self.current_stats_local
                     key = 'local'
+                    results[key] = copy.deepcopy(self.current_stats_local)
                     results[key]['contact'] = str(self.current_contact) # TODO: remove duplicate code here.
-                    results[key]['latency'] = self.current_latency / 2.0
+                    results[key]['latency'] = self.current_latency * 0.5
                     results[key]['unit'] = self.current_unit
             if ok:
                 results['contact'] = self.current_contact.name
-                self.notify_api(self.current_caller, "network_test_done", results)
+                log.debug("Ready to send results to remote agent.")
                 self._send_message("final_results_from_starter", [results])
+                self.notify_api(self.current_caller, "network_test_done", results)
                 self.current_results_sent = True
-                # XXXX debug._when_done()
+                # XXX debug._when_done()
                 self._when_done()
+            else:
+                log.debug("Not ready yet to send results to remote agent.")
         else:
             log.debug("results were already sent to observers.")
 
-    def on_iperf_command_results(self, results, commands, extra_arg, caller):
+    def on_iperf_command_results(self, results, command, extra_arg, caller):
         """
         Called once the iperf client child process is done.
         
@@ -786,15 +792,12 @@ class NetworkTester(object):
         for i in range(len(results)): # should have a len() of 1
             result = results[i]
             success, results_infos = result
-            command = commands[i]
             
             if isinstance(results_infos, failure.Failure):
                 log.error("FAILURE in on_iperf_command_results: " + str( results_infos.getErrorMessage()))  # if there is an error, the programmer should fix it.
             else:
                 stdout, stderr, signal_or_code = results_infos
                 if success:
-                    # print "stdout:", stdout
-                    ip = extra_arg['ip']
                     try:
                         iperf_stats = _parse_iperf_output(stdout.splitlines())
                         log.debug("iperf results: %s" % stdout)
@@ -804,9 +807,9 @@ class NetworkTester(object):
                     else:    
                         kind = extra_arg['kind']
                         iperf_stats['test_kind'] = kind
-                        log.debug("on_iperf_commands_results : %r" % iperf_stats)
+                        log.debug("on_iperf_commands_results : %s" % iperf_stats)
                         if kind == KIND_DUALTEST_SERVER or kind == KIND_REMOTETOLOCAL_SERVER:
-                            #log.debug("KIND_DUALTEST_SERVER")
+                            log.debug("This agent is the nettest answerer. Sending nettest results to remote: %s" % (iperf_stats))
                             #log.debug('Sending iperf stats %r' % iperf_stats)
                             try:
                                 self._send_message('results', [kind, iperf_stats]) 
@@ -814,6 +817,7 @@ class NetworkTester(object):
                             except Exception, e:
                                 log.error("Error sending results to remote peer : %s" % e.message)
                         else:
+                            log.debug("This agent is the nettest offerer. Here is our results: %s" % (iperf_stats))
                             self.current_stats_local = iperf_stats
                             self._send_results_if_ready()
                             self._send_message("stop")
@@ -857,12 +861,12 @@ def on_com_chan_connected(connection_handle, role="client"):
     We actually do not care if this miville is a com_chan client or server.
     """
     global _testers
+    #FIXME role is unused
 
     # creates a new tester object
     tester = NetworkTester()
     contact = connection_handle.contact
     tester.current_contact = contact
-    name = contact.name
     tester.current_com_chan = connection_handle.com_chan
     tester._register_my_callbacks_to_com_chan(tester.current_com_chan)
     tester.api = _api
@@ -909,9 +913,8 @@ def check_iperf_version():
     caller = None
     try:
         commands.single_command_start(command, callback, extra_arg, caller)
-    except CommandNotFoundError, e: 
+    except CommandNotFoundError: 
         pass
-        # log.error("CommandNotFoundError %s" % e.message)
 
 def _on_iperf_version_results(results, commands, extra_arg, caller):
     """
@@ -923,7 +926,6 @@ def _on_iperf_version_results(results, commands, extra_arg, caller):
     for i in range(len(results)): # should have a len() of 1
         result = results[i]
         success, results_infos = result
-        command = commands[i]
         if isinstance(results_infos, failure.Failure):
             log.error("FAILURE in _on_iperf_version_results: " + str(results_infos.getErrorMessage()))
             log.error("No suitable iperf version.")
@@ -953,7 +955,7 @@ def start(subject, port=None, interfaces=''):
     
     # TODO: use port and interfaces arguments
     try:
-        executable = commands.find_command("iperf", 
+        commands.find_command("iperf", 
             "`iperf` command not found. Please see https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
     except CommandNotFoundError, e:
         if subject is not None:

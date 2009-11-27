@@ -1,5 +1,23 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
+#
+# Miville
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Miville is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 """
 Unit tests for miville.streams.conf and miville.streams.milhouse
 Streams configuration and actual streaming. 
@@ -17,12 +35,12 @@ from twisted.python import failure
 import zope.interface
 
 from miville.utils import observer
+from miville.utils import log 
 from miville.streams import conf
 from miville.streams import manager
 from miville.streams import tools
-from miville.streams import session
 from miville.streams import milhouse 
-from miville.streams import interfaces as streams_interfaces
+from miville.streams import constants 
 # TODO: from miville.streams.engines import milhouse
 from miville.utils import observer 
 
@@ -46,6 +64,7 @@ class DummyObserver(observer.Observer):
 ############################## ACTUAL TESTS #####################
 class Test_01_Configuration(unittest.TestCase):
     def setUp(self):
+        """ Database (and more generally, state) persist between tests """
         self.db = conf.get_single_db()
     def tearDown(self):
         pass
@@ -63,6 +82,7 @@ class Test_01_Configuration(unittest.TestCase):
         self.db.add_field("/test/audio/channels", default=2, desc="Dummy field")
 
     def test_03_add_entries_and_setting(self):
+        """ Fields have already been created previous tests. """
         # to create entries, we must first create a setting
         setting = self.db.add_setting("Test setting")
         self.db.add_entry(setting.id, field_name="/test/audio/bitrate", value=7000)
@@ -175,6 +195,34 @@ class Test_01_Configuration(unittest.TestCase):
             if res.has_key(k):
                 self.fail("GLOB_CONTAINS : Dict should not have key %s" % (k))
     
+    def test_07_save_database(self):
+        """ Save to json """
+        setting = self.db.add_setting("Test setting")
+        setting2 = self.db.add_setting("Test setting2")
+        self.db.add_field("/test/audio/bitrate", default=1000000, desc="Dummy field")
+        self.db.add_field("/test/audio/channels", default=2, desc="Dummy field")
+        self.db.add_entry(setting.id, field_name="/test/audio/bitrate", value=7000)
+        self.db.add_entry(setting.id, field_name="/test/audio/channels", value=1)
+        self.db.add_entry(setting2.id, field_name="/test/audio/bitrate", value=8000)
+        self.db.add_entry(setting2.id, field_name="/test/audio/channels", value=2)
+        self.db.save_as_json('/var/tmp/test_07_save_database.json')
+    
+    def test_08_load_database(self):
+        """ load database from json """
+        # FIXME: this should test more stuff (i.e. the resulting state of self.db 
+        # and not depend on the previous test having been executed
+        self.db.add_field("/test/audio/bitrate", default=1000000, desc="Dummy field")
+        self.db.add_field("/test/audio/channels", default=2, desc="Dummy field")
+        self.db.load_from_json('/var/tmp/test_07_save_database.json')
+        entries = self.db.get_entries_for_setting(4)
+        try: 
+            if entries["/test/audio/channels"] != 1:
+                self.fail("field %s equal to %d instead of %d" % ("/test/audio/channels", entries["/test/audio/channels"], 1))
+            if entries["/test/audio/bitrate"] != 7000:
+                self.fail("field %s equal to %d instead of %d" % ("/test/audio/bitrate", entries["/test/audio/bitrate"], 7000))
+        except Exception,e:
+            self.fail("could not access entries: %s" % (e.message))
+    
 #    def XXtest_06_serialize(self):
 #        self.db.add_field("/test/audio/codec", default="mp3", desc="Dummy field")
 #        serialize.save(FILE_NAME, self.db)
@@ -189,9 +237,10 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             self.fail("Expected value %s but got %s." % (expected, value))
 
     def test_01_add_remove(self):
-        a = tools.PortsAllocator(minimum=10, increment=2, maximum=20)
+        a = tools.PortsAllocator(minimum=2000, increment=2, maximum=2010)
 
-        for value in [10, 12, 14, 16, 18, 20]:
+        # value = 2000; value < 2012; value += 2
+        for value in xrange(2000, 2012, 2):
             self._tst(value, a.allocate())
         try:
             value = a.allocate()
@@ -199,7 +248,8 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             pass
         else:
             self.fail("Ports allocator should have overflown. Got value %d." % (value))
-        for value in [10, 12, 14, 16, 18, 20]:
+        # value = 2000; value < 2012; value += 2
+        for value in xrange(2000, 2012, 2):
             a.free(value)
         try:
             a.free(100)
@@ -209,7 +259,7 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             self.fail("Trying to free value %d should have raised an error." % (100))
             
     def test_02_add_many(self):
-        a = tools.PortsAllocator(minimum=10, increment=2, maximum=20)
+        a = tools.PortsAllocator(minimum=2000, increment=2, maximum=2010)
         values = a.allocate_many(6)
         a.free_many(values)
         values = a.allocate_many(3)
@@ -221,6 +271,17 @@ class Test_01_Ports_Allocator(unittest.TestCase):
         else:
             self.fail("Ports allocator should have overflown. Got value %d." % (value))
             pass
+        
+class Test_01_Streamer_Problem(unittest.TestCase):
+    def test_01_str(self):
+        """ Mostly just to make sure the error handling stays sane """
+        error = constants.STATE_ERROR
+        message = "the pipeline is broken"
+        details = "these would be details"
+
+        errstr = str(tools.StreamerProblem(error, message, details))
+        if errstr != '%s: %s %s' % (error, message, details):
+            self.fail("stringified SteamerProblem does not match expected string %s" % (errstr))
         
 
 class Test_01_Session(unittest.TestCase):
@@ -235,6 +296,7 @@ class Test_01_Session(unittest.TestCase):
         data2 = session.unserialize(txt)
         if data != data2:
             self.fail("Data has changed during seralization/unserialization.")
+    test_serialize.skip = 'Functionality not used yet'
     
     def test_request(self):
         req = session.SimpleRequest(session.REQUEST_OK)
@@ -251,6 +313,7 @@ class Test_01_Session(unittest.TestCase):
             self.fail("Request name changed during text/obj conversion.")
         if req.values != req2.values:
             self.fail("Attributes values changed during text/obj conversion.")
+    test_request.skip = 'Functionality not used yet'
 
 class Test_02_Asynchronous(unittest.TestCase):
     """
@@ -333,242 +396,9 @@ class Test_03_Streams(unittest.TestCase):
         manager.start(DummyApi())
         self.globals["manager"] = manager.get_single_manager()
     
-#    def test_02_add_dummy_service(self):
-#        if not isinstance(self.globals["manager"], manager.ServicesManager):
-#            self.fail("should be a manager.") # XXX
-#        class DummyStream():
-#            zope.interface.implements(streams_interfaces.IStream)
-#            service_name = "dummy"
-#            def __init__(self, service):
-#                pass
-#            def start(self, contact_infos, config_entries, mode):
-#                return defer.succeed(True)
-#            def stop(self):
-#                return defer.succeed(True)
-#        class DummyService():
-#            zope.interface.implements(streams_interfaces.IService)
-#            name = "dummy"
-#            enabled = True
-#            def __init__(self):
-#                self.streams = {}
-#                self.config_fields = {} # or list ?
-#                self.config_db = None
-#            def config_init(self, config_db):
-#                #TODO: add fields.
-#                self.config_db = config_db
-#            def start(self, contact_infos, config_entries):
-#                #TODO: get entries for profile
-#                self.streams[0] = DummyStream(self) 
-#                return self.streams[0].start(contact_infos, config_entries, 'recv')
-#                #return defer.succeed(True)
-#            def stop(self, contact_infos):
-#                return self.streams[0].stop()
-#                #return defer.succeed(True)
-#            def stop_all(self):
-#                return defer.succeed(True)
-#        api = self.globals["manager"].api
-#        self.globals["manager"].add_service(DummyService())
-#    test_02_add_dummy_service.skip = "This might be useless..."
-#
-#    def test_03_start_dummy_service(self):
-#        contact_infos = conf.ContactInfos() # default
-#        #profile_id = None # dummy
-#        config_entries = {}
-#        return self.globals["manager"].start(contact_infos, config_entries) #profile_id)
-#    test_03_start_dummy_service.skip = "...since it might change."
-#
-#    def test_04_stop_dummy_service(self):
-#        contact_infos = None # dummy
-#        return self.globals["manager"].stop(contact_infos)
-#        # ok, let's no go further... you get the idea. 
-#        # let's do some tests with the real thing: milhouse
-#    test_04_stop_dummy_service.skip = "Let us test the real thing : milhouse."
 
-_globals_04 = {}
-class Test_04_Process_Manager(unittest.TestCase):
-    """
-    Tests the ProcessManager
-    """
-    def setUp(self):
-        global _globals_04
-        self.globals = _globals_04
-    
-    def test_04_start_and_stop_mplayer(self):
-        """
-        Mplayer process using twisted and JACK.
-        """
-        def _stop_callback(result, deferred):
-            deferred.callback(True)
-            return True
-
-        def _stop_err(err, deferred):
-            #print("ERROR %s" % (err))
-            #return True
-            deferred.errback(err)
-            return True #return err
-            
-        def _later(deferred, manager):
-            deferred2 = manager.stop()
-            deferred2.addCallback(_stop_callback, deferred)
-            deferred2.addErrback(_stop_err, deferred)
-            #deferred2.callback()
-            #deferred.callback(deferred2)
-            
-        def _start_err(err, manager):
-            # stops reactor in case of error starting process
-            #print("ERROR %s" % (err))
-            #reactor.stop()
-            #return True
-            return err
-
-        def _start_callback(result, manager):
-            DURATION = 2.0
-            deferred = defer.Deferred()
-            reactor.callLater(DURATION, _later, deferred, manager)
-            # stops the process
-            #print(str(result))
-            #deferred.addCallback(_stop)
-            #return True #
-            return deferred
-        
-        MOVIEFILENAME = "/var/tmp/excerpt.ogm"
-        if not os.path.exists(MOVIEFILENAME):
-            warnings.warn("File %s is needed for this test." % (MOVIEFILENAME))
-        else:
-            # starts the process
-            #manager = tools.ProcessManager(name="xeyes", command=["xeyes"])
-            #  "-vo", "gl2",
-            TIMEOUT = 5.0 # seconds at start/stop process
-            manager = tools.ProcessManager(name="mplayer", command=["mplayer", "-ao", "jack", MOVIEFILENAME], check_delay=TIMEOUT)
-            deferred = manager.start()
-            deferred.addCallback(_start_callback, manager)
-            deferred.addErrback(_start_err, manager)
-            return deferred
-
-#    def test_03_start_and_stop_sleep_that_dies(self):
-#        """
-#        Catches when the process dies.
-#        """
-#        def _stop_callback(result, deferred, test_case):
-#            global _globals_04
-#            # XXX: calling stop() when done doesnt give any error anymore
-#            #if result != "NO ERROR DUDE":
-#            #    msg = "The process was still running and has been killed succesfully... Stop() should have created an error."
-#            #    fail = failure.Failure(Exception(msg))
-#            #    deferred.errback(fail)
-#            #    #test_case.fail(msg) # for some reason this doesn;t work, since we returned a deferred ! IMPORTANT
-#            
-#            if not _globals_04["obs"].called:
-#                raise Exception("Observer never called !!")
-#            return True
-#                #return fail
-#
-#        def _stop_err(err, deferred, test_case):
-#            # That's what wer expected
-#            deferred.callback(True)
-#            #deferred.errback(err)
-#            return "NO ERROR DUDE" #return err
-#            #return err
-#            
-#        def _later(deferred, manager, test_case):
-#            deferred2 = manager.stop()
-#            deferred2.addErrback(_stop_err, deferred, test_case) # order matters ! this first.
-#            deferred2.addCallback(_stop_callback, deferred, test_case)
-#            
-#        def _start_err(err, manager, test_case):
-#            return err
-#
-#        def _start_callback(result, manager, test_case):
-#            DURATION = 4.0
-#            deferred = defer.Deferred()
-#            reactor.callLater(DURATION, _later, deferred, manager, test_case)
-#            return deferred
-#        
-#        # starts the process
-#        manager = tools.ProcessManager(name="sleep", command=["sleep", "2"])
-#        deferred = manager.start()
-#        deferred.addCallback(_start_callback, manager, self)
-#        deferred.addErrback(_start_err, manager, self)
-#        return deferred # only possible to fail it by calling deferred.errback() !! 
-#
-#    test_03_start_and_stop_sleep_that_dies.skip = "Heavy changes in process management so this test must be updated."
-    
-    def test_01_executable_not_found(self):
-        try:
-            manager = tools.ProcessManager(name="dummy", command=["you_will_not_find_me"])
-        except tools.ManagedProcessError:
-            pass
-        else:
-            self.fail("Should have thrown error since executable not possible to find.")
-
-    def _02_slot(self, key, value=None):
-        """
-        Callback slot for xeyes process manager signal.
-        """
-        #print("Slot got triggered with %s" % (key))
-        if key == "start_success":
-            pass
-            self.globals["xeyes_start_success"] = True
-        elif key == "start_error":
-            pass
-        elif key == "stop_success":
-            self.globals["xeyes_stop_success"] = True
-            pass
-        elif key == "stop_error":
-            pass
-        elif key == "crashed":
-            pass
-        else:
-            self.fail("Invalid signal key for slot. %s" % (key))
-        
-    def test_02_start_and_stop_xeyes(self):
-        """
-        xeyes process using twisted
-        """
-        def _stop_callback(result, deferred):
-            deferred.callback(True)
-            if not self.globals["xeyes_start_success"]:
-                self.fail("Did not get start_success for process manager.")
-            if not self.globals["xeyes_stop_success"]:
-                self.fail("Did not get stop_success for process manager.")
-            return True
-        def _stop_err(err, deferred):
-            deferred.errback(err)
-            return True #return err
-        def _later(deferred, manager):
-            deferred2 = manager.stop()
-            deferred2.addCallback(_stop_callback, deferred)
-            deferred2.addErrback(_stop_err, deferred)
-        def _start_err(err, manager):
-            return err
-        def _start_callback(result, manager):
-            DURATION = 2.0
-            deferred = defer.Deferred()
-            reactor.callLater(DURATION, _later, deferred, manager)
-            return deferred
-            
-        # starts the process
-        #global _globals_04
-        #obs = DummyObserver(self)
-        #_globals_04["obs"] = obs # XXX Needs to be a global since observer uses a weakref !!!
-        manager = tools.ProcessManager(name="xeyes", command=["xeyes", "-geometry", "640x480"])
-        #obs.append(manager.subject)
-
-        self.globals["xeyes_start_success"] = False
-        self.globals["xeyes_stop_success"] = False
-        manager.signal.connect(self._02_slot)
-        #print(manager.subject.observers.values())
-        #d = manager.subject.observers
-        #for v in d.itervalues():
-        #    print v
-            #print("Subjects:" + str(manager.subject.observers))
-        deferred = manager.start()
-        deferred.addCallback(_start_callback, manager)
-        deferred.addErrback(_start_err, manager)
-        return deferred
 
 _globals_05 = {}
-#_milhouse_test_deferred = defer.Deferred()
 class Test_05_Milhouse(unittest.TestCase):
     # trial test/test_streams_conf.Test_05_Milhouse
     def setUp(self):
@@ -635,6 +465,7 @@ class Test_05_Milhouse(unittest.TestCase):
             milhouse.VERBOSE = True
 
     def test_04_start_stop_streams(self):
+        # XXX : disabled
         def _stop_callback(result, deferred):
             deferred.callback(True)
             return True
@@ -664,10 +495,10 @@ class Test_05_Milhouse(unittest.TestCase):
         entries = self.globals["entries"]
         self.timeout = 15.0 # timeout attribute on your unit test method. 
         service = milhouse.MilhouseFactory()
-        session_desc = session.SessionDescription(contact_infos=contact_infos)
+        session_desc = manager.Session(contact_infos=contact_infos)
         _globals_05["session_desc"] = session_desc
-        session_desc.add_stream_desc(session.DIRECTION_TO_ANSWERER, service_name="Milhouse", entries=copy.deepcopy(entries))
-        session_desc.add_stream_desc(session.DIRECTION_TO_OFFERER, service_name="Milhouse", entries=copy.deepcopy(entries))
+        session_desc.add_stream(constants.DIRECTION_TO_ANSWERER, service_name="milhouse", entries=copy.deepcopy(entries))
+        session_desc.add_stream(constants.DIRECTION_TO_OFFERER, service_name="milhouse", entries=copy.deepcopy(entries))
         service.prepare_session(session_desc)
         # prepare_session on alice only (no bob)
         print("we care about alice : %s" % (session_desc.streams_to_offerer[0].entries))

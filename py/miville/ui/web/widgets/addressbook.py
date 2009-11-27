@@ -367,7 +367,6 @@ class Addressbook(Widget):
         #  START_STREAMS {'started': True, 'msg': 'streaming started'}
         if not data["success"]:
             log.error('Could not start streaming ' + data["message"])
-            #contact = self.api.get_contact() # TODO FIXME XXX WEIRD BUG OCCURS MAYBE
             contact = data["contact"]
             contact_name = data["contact_name"]
             self.callRemote('update_status', 
@@ -380,10 +379,7 @@ class Addressbook(Widget):
             contact = data["contact"]
             self.callRemote('update_selected', contact_name)
             profile_id = contact.profile_id
-            try:
-                setting_name = self.api.config_db.get_profile(profile_id).name # FIXME hack
-            except:
-                raise # FIXME
+            setting_name = self.api.config_db.get_profile(profile_id).name # might raise an error
             self.callRemote('update_status', contact_name, 'Streaming (%s)' % (setting_name), 'Currently streaming. (%s)' % (setting_name))
 
     def cb_stop_streams(self, origin, data):
@@ -399,7 +395,6 @@ class Addressbook(Widget):
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'stop_streams'))
         if isinstance(data, failure.Failure):
             msg = data.getErrorMessage()
-            #log.error(msg)
         else:
             contact = data["contact"]
             contact_name = data["contact_name"]
@@ -417,9 +412,9 @@ class Addressbook(Widget):
             pass
         else:
             if data["success"]: 
-                contact = data["contact"] #:contact_infos.contact,
+                contact = data["contact"]
                 contact_name = data["contact_name"] #:contact_name,
-                message = "Started to stream. " + str(data["message"]) #:msg,
+                message = "Started to stream. " + str(data["message"])
                 self.callRemote('update_selected', contact_name)
                 self.callRemote('update_status', contact_name, message, message)
             else:
@@ -434,12 +429,13 @@ class Addressbook(Widget):
             pass
         else:
             if data["success"]: 
-                contact = data["contact"] #:contact_infos.contact,
-                contact_name = data["contact_name"] #:contact_name,
-                message = "Stream stopped. " + str(data["message"]) #:msg,
+                contact = data["contact"]
+                contact_name = data["contact_name"]
+                message = "Stream stopped. " + str(data["message"])
                 self.callRemote('update_selected', contact_name)
                 self.callRemote('update_status', contact_name, message, message)
             else:
                 log.error("cb_remote_started_streams success is False.")
+    
     # important
     expose(locals())

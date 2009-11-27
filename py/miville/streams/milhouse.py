@@ -1,73 +1,120 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
+#
+# Miville
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Miville is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 """
 Milhouse engine and stream.
 """
-import os
-import copy
 import warnings
 
-from twisted.internet import defer
-from twisted.internet import error
-from twisted.internet import protocol
-from twisted.internet import reactor
-from twisted.python import failure
-from twisted.python import procutils
-import zope.interface
-
-from miville.streams import states
+from miville.streams import constants
 from miville.streams import conf
-from miville.streams import session
 from miville.streams import tools
-#from miville.streams import StreamError
+from miville.streams import proc 
+from miville.streams import base
+from miville import devices
 from miville.errors import * # StreamError
-#from miville.utils import common # For ports allocator TODO: rename this and improve it.
-
 from miville.utils import log
 from miville.utils import sig
 
-log = log.start("debug", 1, 0, "streams.milhouse") 
-#log = log.start("error", 1, 0, "milhouse") 
-#debug for when developing is useful
+log = log.start("debug", True, False, "streams.milhouse") 
 
 VERBOSE = False
 VERY_VERBOSE = False
 VERBOSE_ERROR = True
 TEST_PROFILE = 0 # defined below
 
-
-#------------------------------------ MILHOUSE stream --------------
-#TODO
-
-class MilhouseProcessManager(tools.ProcessManager):
+class MilhouseProcessManager(proc.ProcessManager):
     """
-    We just need to override one method.
+    Override output parsing for Milhouse process manager.
     """
-    def format_output_when_crashed(self, output):
-        """
-        The process has crashed. Let's just keep the interesting lines to print to the uesr.
-        """
-        log.debug("MilhouseProcessManager.format_output_when_crashed")
-        ret = ""
-        for line in output:
-            for txt in ("CRITICAL", "ERROR", "WARNING", "error while loading shared libraries"):
-                if line.find(txt) != -1:
-                    log.debug("Log : Accepting line : %s" % (line))
-                    ret += line + "\n"
-                else:
-                    log.debug("Log : DISCARD line : %s" % (line))
-        return ret
+    def __init__(self, name="default", log_max_size=100, command=None, verbose=False, process_protocol_class=proc.ManagedProcessProtocol, env=None):
+        """ Override from base class so that we can install signals here """
+        # FIXME: might be overkill to override this? would it be ok just to have problem_signal in the base class?
+        proc.ProcessManager.__init__(self, name=name, log_max_size=log_max_size, 
+                command=command, verbose=verbose, process_protocol_class=process_protocol_class, env=env)
+        self.problem_signal = sig.Signal()
+        self.crashed_signal = sig.Signal()
+        # Someone higher up is connecting to these to let the UI know what's up
+        self.rtcp_sender_started_signal = sig.Signal()
+        self.rtcp_sender_connected_signal = sig.Signal()
+        self.rtcp_receiver_connected_signal = sig.Signal()
+        self.milhouse_exitted_signal = sig.Signal()
 
-class MilhouseFactory(object):
+    def _parse_for_errors(self, data):
+        """ Parse for problems in milhouse output. """
+        for txt in ("CRITICAL", "ERROR", "error while loading shared libraries"):
+            if data.find(txt) != -1:
+                problem = tools.StreamerProblem(constants.STATE_ERROR, data)
+                log.error(problem)
+                # LocalMilhouseStreamer handles this signal in method on_process_event
+                self.problem_signal(problem) 
+        if data.find("WARNING") != -1:
+            log.warning(data)
+
+    def _parse_for_rtcp_messages(self, data):
+        """ Parse for rtcp messages in milhouse output """
+        for txt in ("BITRATE", "OCTETS-SENT", "PACKETS-SENT"):
+            if data.find(txt) != -1:
+                # messages split by colons, get last element
+                val = data.split(':')[-1]
+                #log.debug("Got RTCP SENDER-STARTED message %s:%s" % (txt, val))
+                self.rtcp_sender_started_signal(txt + ':' + val) 
+        for txt in ("PACKETS-LOST", "JITTER"):
+            if data.find(txt) != -1:
+                val = data.split(':')[-1]
+                #log.debug("Got RTCP SENDER-CONNECTED message %s:%s" % (txt, val))
+                self.rtcp_sender_connected_signal(txt + ':' + val) 
+        for txt in ("PACKETS-RECEIVED", "OCTETS-RECEIVED"):
+            if data.find(txt) != -1:
+                val = data.split(':')[-1]
+                #log.debug("Got RTCP RECEIVER-CONNECTED message %s:%s" % (txt, val))
+                self.rtcp_receiver_connected_signal(txt + ':' + val) 
+
+    def _parse_for_exit(self, data):
+        """ This looks at milhouse's output to see if it exitted """
+        for txt in ("Leaving Milhouse", "Exitting Milhouse"):
+            if data.find(txt) != -1:
+                log.warning("MILHOUSE HAS LEFT THE BUILDING, DOING NOTHING FOR NOW")
+
+    def _on_out_received(self, data):
+        """
+        Overrides tools.ProcessManager._on_out_received
+        """
+        # TODO: signal when output matches milhouse problem
+        # FIXME: these should be separate methods, i.e. parse_for_error, parse_for_rtcp
+        log.debug("stdout: (%s): %s" % (self.name, data))
+        self._parse_for_errors(data)
+        self._parse_for_rtcp_messages(data)
+        self._parse_for_exit(data)
+        self.stdout_logger.append(data.strip()) # important
+    
+class MilhouseFactory(base.BaseFactory):
     """
     Provides Milhouse streams.
     See miville.streams.interfaces.IService for the documentation.
     """
-    # zope.interface.implements(interfaces.IService)
-    name = "Milhouse" # Name of the service
+    name = "milhouse" # Name of the service
     enabled = True
     
     def __init__(self):
+        # TODO: move streams  to session.
         self.streams = {} # Dict of current streams. 
         #The ID of the contact_info should be their keys.
         self.config_db = None # Configuration client.
@@ -80,26 +127,23 @@ class MilhouseFactory(object):
         self.config_db = config_db
         setup_milhouse_fields(config_db)
         setup_milhouse_settings(config_db)
-    # def _cb_started(self, result):
-    #     """
-    #     Deferred list callback.
-    #     """
-    #     return result
     
-    def prepare_session(self, session_desc):
+    def prepare_session(self, session):
         """
         Prepares the config entries for the alice and the bob.
         
         This is called from the streams manager.
         :param session: SessionDescription
         """
-        role = session_desc.role
+        role = session.role
         log.debug("MilhouseFactory.prepare_session(role=%s)" % (role))
-        alice_entries = session_desc.streams_to_offerer[0].entries # FIXME
-        bob_entries = session_desc.streams_to_answerer[0].entries # FIXME
-        contact_infos = session_desc.contact_infos
         
-        if role == session.ROLE_OFFERER:
+        service = self
+        alice_entries = session.get_stream(service, constants.DIRECTION_TO_OFFERER, 0).entries
+        bob_entries = session.get_stream(service, constants.DIRECTION_TO_ANSWERER, 0).entries
+        contact_infos = session.contact_infos
+        
+        if role == constants.ROLE_OFFERER:
             #"alice": 
             p1, p2  = self.ports_allocator.allocate_many(2)
             alice_entries["/both/audio/port"] = p1 
@@ -122,9 +166,10 @@ class MilhouseFactory(object):
             bob_entries["/both/video/port"] = p4
         
     def _make_key(self, contact_infos, mode):
+        # TODO: move to session.
         return "%s(%s)" % (contact_infos.get_id(), mode)
 
-    def start(self, session_desc):
+    def start(self, session):
         """
         Starts streamers of the milhouse service.
         
@@ -133,114 +178,59 @@ class MilhouseFactory(object):
         
         Return a deferred
         """
+        if len(devices.managers["audio"].drivers["jackd"].devices) == 0:
+            raise StreamError("Cannot start, jackd is not running")
+
         # TODO: check if already in a session with remote
-        role = session_desc.role
-        contact_infos = session_desc.contact_infos
-        alice_entries = session_desc.streams_to_offerer[0].entries # FIXME
-        bob_entries = session_desc.streams_to_answerer[0].entries # FIXME
-        if role == session.ROLE_ANSWERER: # bob
-            pass
-        # first, let's make sure there are no milhouse streamers
-        for mode in ["send", "recv"]:
-            verif_key = self._make_key(contact_infos, mode)
-            contact_name = contact_infos.get_contact_name()
-            if self.streams.has_key(verif_key):
-                stream = self.streams[verif_key]
-                if stream.state in [states.STATE_STREAMING, states.STATE_STARTING]:
-                    log.error("Found milhouse stream %s %s in state %s" % (verif_key, stream, stream.state))
-                    return defer.fail(failure.Failure(states.StreamError("""Could not start Milhouse Service. There is already a Milhouse stream for the contact "%s".""" % (contact_name))))
-                else:
-                    #XXX
-                    self._clear_streams_with_contact(session_desc)
-        # our callback in errback for the deffered list: 
-        def _eb(reason, self, session_desc):
-            contact_infos = session_desc.contact_infos
-            log.error("Could not start streams with contact. %s %s" % (contact_infos.get_id(), reason.getErrorMessage()))
-            # set their state as error so that we can clear them :
-            for mode in ["send", "recv"]:
-                key = self._make_key(contact_infos, mode)
-                stream = self.streams[key]
-                if stream.state != states.STATE_FAILED:
-                    log.debug("Changing stream %s state from %s to %s" % (key, stream.state, states.STATE_FAILED))
-                    stream.state = states.STATE_FAILED
-                    # TODO: change stream description state too...
-                    # TODO: send error message to remote agent
-            self._clear_streams_with_contact(session_desc)
-            #TODO: deallocate ports.
-            #log.error("Failure in MilhouseFactory.start()'s callback. 
-            return reason
-        def _cb(result, self, session_desc):
-            contact_infos = session_desc.contact_infos
-            log.debug("successfully started both streams with %s" % (contact_infos.get_id()))
-            return result
-        dl = []
+        role = session.role
+        contact_infos = session.contact_infos
+        service = self
+        to_alice = session.get_stream(service, constants.DIRECTION_TO_OFFERER, 0)
+        to_bob = session.get_stream(service, constants.DIRECTION_TO_ANSWERER, 0)
+    
         log.debug("Offerer ports: %s. Answerer ports: %s" % (
-            conf.path_glob(alice_entries, "port", conf.GLOB_CONTAINS),
-            conf.path_glob(bob_entries, "port", conf.GLOB_CONTAINS)))
+            conf.path_glob(to_alice.entries, "port", conf.GLOB_CONTAINS),
+            conf.path_glob(to_bob.entries, "port", conf.GLOB_CONTAINS)))
         # checking if bob's ports are valid
-        answerer_ports = conf.path_glob(bob_entries, "port", conf.GLOB_CONTAINS)
+        answerer_ports = conf.path_glob(to_bob.entries, "port", conf.GLOB_CONTAINS)
         for port in answerer_ports.itervalues():
             if port == 0:
-                return defer.fail(failure.Failure(states.StreamError("Answerer has not set his port numbers.")))
+                raise StreamError("Answerer has not set his port numbers.")
         # creating and starting the streamers
-        for mode in ["send", "recv"]:
-            key = self._make_key(contact_infos, mode)
-            self.streams[key] = MilhouseStreamer(self, key)
-            if role == session.ROLE_OFFERER:
-                if mode == "send":
-                    config_entries = alice_entries # no copy.deepcopy
-                else: # receive
-                    config_entries = bob_entries
-            else:
-                if mode == "send":
-                    config_entries = bob_entries
-                else: # receive
-                    config_entries = alice_entries
-            log.debug("STARTING. Mode: %s. Config entries ports: %s" % (mode, conf.path_glob(config_entries, "port", conf.GLOB_CONTAINS)))
-            # connect to streamer's signal
-            self.streams[key].signal.connect(self._on_streamer_signal)
-            try:
-                d = self.streams[key].start(session_desc, config_entries, mode)
-            except tools.ManagedProcessError, e:
-                return defer.fail(failure.Failure(states.StreamError("Milhouse Process error: %s" % (e.message))))
-            #contact_infos, config_entries, mode, role)
-            dl.append(d)
-        deferred = tools.deferred_list_wrapper(dl)  # contains each 
-        deferred.addCallback(_cb, self, session_desc)
-        deferred.addErrback(_eb, self, session_desc)
-        return deferred
+        #log.debug("STARTING. Mode: %s. Config entries ports: %s" % (mode, conf.path_glob(config_entries, "port", conf.GLOB_CONTAINS)))
+        to_alice.start()
+        to_bob.start()
     
-    def _on_streamer_signal(self, key, streamer_identifier):
+    def _on_streamer_crashed(self, streamer_identifier):
+        # TODO: move to session.
         """
         :param key: str
         :param streamer_identifier: str
         """
-        if key == "crashed":
-            log.debug("Milhouse streamer %s crashed !" % (streamer))
-        else:
-            log.error("Unknow signal key %s" % (key))
+        log.debug("Milhouse streamer %s crashed !" % (streamer_identifier))
 
-    def _clear_streams_with_contact(self, session_desc): #contact_infos):
+    def _clear_streams_with_contact(self, session): #contact_infos):
+        # TODO: move to session.
         """
         Deletes the streams for a contact.
         Must be called when error occur, of when closing a stream.
         """
-        contact_infos = session_desc.contact_infos
+        contact_infos = session.contact_infos
         for mode in ["recv", "send"]:
             key = self._make_key(contact_infos, mode)
             if self.streams.has_key(key):
                 stream = self.streams[key]
                 state = stream.state 
                 if mode == "recv":
-                    audio_port = stream.config_entries["/both/audio/port"]
-                    video_port = stream.config_entries["/both/video/port"]
+                    audio_port = stream.entries["/both/audio/port"]
+                    video_port = stream.entries["/both/video/port"]
                     for portnum in (audio_port, video_port):
                         try:
                             self.ports_allocator.free(portnum)
                         except tools.PortsAllocatorError, e:
                             log.error(e.message)
-                if state in [states.STATE_IDLE, states.STATE_FAILED, states.STATE_STOPPED]:
-                    # see miville.streams.states.STATE_*
+                if state in [constants.STATE_IDLE, constants.STATE_FAILED, constants.STATE_STOPPED]:
+                    # see miville.streams.constants.STATE_*
                     log.debug("deleting milhouse stream %s" % (key))
                     del self.streams[key]
                 else: # STREAMING
@@ -249,12 +239,13 @@ class MilhouseFactory(object):
                     log.error("_clear_streams_with_contact: " + msg)
                     raise StreamError(msg) # !!!
 
-    def list_streams_for_contact(self, session_desc):
+    def list_streams_for_contact(self, session):
+        # TODO: move to session.
         """
         Returns a list of stream instances for a contact.
         :param contact_infos: ContactInfos instance.
         """
-        contact_infos = session_desc.contact_infos
+        contact_infos = session.contact_infos
         ret = []
         for mode in ["send", "recv"]:
             key = self._make_key(contact_infos, mode)
@@ -262,117 +253,69 @@ class MilhouseFactory(object):
                 ret.append(self.streams[key])
         return ret
         
-    def stop(self, session_desc):
+    def stop(self, session):
         """
-        Return a deferred
+        stop stream
         """
-        contact_infos = session_desc.contact_infos
+        contact_infos = session.contact_infos
         # at this stage, a message was already sent to remote host.
         contact_id = contact_infos.get_id()
         contact_name = contact_infos.get_contact_name()
-        
-        send_key = self._make_key(contact_infos, "send")
-        recv_key = self._make_key(contact_infos, "recv")
-        #if not self.streams.has_key(send_key): 
-        #    return defer.fail(failure.Failure(states.StreamError("""There is no recv Milhouse stream for the contact "%s".""" % (contact_name))))
-        #elif not self.streams.has_key(recv_key): 
-        #    return defer.fail(failure.Failure(states.StreamError("""There is no send Milhouse stream for the contact "%s".""" % (contact_name))))
-        if not self.streams.has_key(send_key) and not self.streams.has_key(recv_key): 
-            return defer.fail(failure.Failure(states.StreamError("""There is no Milhouse stream for the contact "%s".""" % (contact_name))))
-        else:
-            # our callback and errback
-            def _eb(reason, self, session_desc):
-                contact_infos = session_desc.contact_infos
-                log.error("Error in MilhouseFactory.stop()'s errback. TODO: stop and erase both streams since an error occured. Error msg: %s" % (reason.getErrorMessage()))
-                self._clear_streams_with_contact(session_desc)
-                return reason
-            def _cb(result, self, session_desc):
-                contact_infos = session_desc.contact_infos
-                #TODO: deallocate ports.
-                log.debug("successfully stopped both streams with %s" % (contact_infos.get_id()))
-                self._clear_streams_with_contact(session_desc)
-                return result
-            dl = []
-            for mode in ["send", "recv"]:
-                key = self._make_key(contact_infos, mode)
-                try:
-                    stream = self.streams[key]
-                except KeyError, e:
-                    pass
-                    #deferred = defer.fail(failure.Failure(states.StreamError("""There is no %s Milhouse stream for the contact "%s".""" % (mode, contact_name))))
-                else:
-                    deferred = stream.stop() #TODO: what if it fails immediately?
-                    #deferred.addCallback(_callback, self, contact_id, mode)
-                    dl.append(deferred) 
-            # our callback in errback for the deffered list: 
-            deferred = tools.deferred_list_wrapper(dl) #defer.DeferredList(dl, consumeErrors=False)
-            deferred.addCallback(_cb, self, session_desc)
-            deferred.addErrback(_eb, self, session_desc)
-            return deferred
-    
-    def stop_all(self):
-        raise NotImplementedError("To do.")
-        #def _success(result, self, wrapper, contact_id):
-        #    
-        #wrapper = tools.DeferredWrapper()
-        #deferred = wrapper.make_deferred()
-        #dl = []
-        #for contact_id in self.streams.keys():
-        #    dl.append(self.stop(contact_id))
-        #deferred_list = defer.DeferredList(dl, consumeErrors=True)
-        #deferred_list.addCallback(_success, self, )
 
+        sender = session.get_senders()[0]
+        receiver = session.get_receivers()[0]
+        try:
+            sender.stop()
+        except proc.ManagedProcessError, e:
+            log.warning(e.message)
+        try:
+            receiver.stop()
+        except proc.ManagedProcessError, e:
+            log.warning(e.message)
+        #sender.process.milhouse_exitted_signal()
+        #receiver.process.milhouse_exitted_signal()
 
-class MilhouseStreamer(object):
+class MilhouseStream(base.Stream):
     """
     Milhouse stream
     See miville.streams.interfaces.IStream
     """
-    #zope.interface.implements(interfaces.IStream)
-    name = "Milhouse"
-    def __init__(self, service, identifier):
+    def __init__(self, direction=None, service=None, identifier=None, session=None, mode=None, entries=None):
         """
         :param identifier: unique ID.
         :param service: MilhouseFactory instance.
+        :param session: Session instance.
         """
+        base.Stream.__init__(self, session=session, direction=direction, entries=entries) # call parent constructor
+        self.name = 'milhouse'
         self.service = service
         self.identifier = identifier
-        self.state = states.STATE_IDLE # see miville.streams.states
-        self.config_entries = None
-        self.mode = None
-        self.ports = [] # TODO
-        self._contact_infos = None # TODO: remove the "_"
-        self._process_manager = None # TODO: remove the "_"
-        self.signal = sig.Signal() # 1st arguments is key: "crashed", 2nd is self.identifier
+        self.state = constants.STATE_IDLE # see miville.streams.constants
+        self.process = None
         
-    def _on_process_event(self, key, value=None):
-        log.debug("Milhouse process event: %s %s" % (key, value))
-        if key == "crashed":
-            log.error("Milhouse crashed.")
-            self.state = states.STATE_FAILED 
-            self.signal("crashed", self.identifier)
-            #self.service.stop(self._contact_infos) # sends a message 
-            txt = self._process_manager.stdout_logger.get_text()
-            txt += self._process_manager.stderr_logger.get_text()
-            log.debug(txt) # XXX very verbose !
-        elif key =="stop_success":
-            # TODO: trigger delayed right now instead of waiting.
-            log.debug("%s:%s" % (key, value))
-        # TODO: check milhouse success by looking at it stdout.
-        # TODO: trigger delayed right now instead of waiting.
-    
-    def start(self, session, config_entries, mode):
-        # set up some attributes
-        self._contact_infos = session.contact_infos
-        self.session = session
-        self.config_entries = config_entries
-        self.state = states.STATE_STARTING
-        self.mode = mode
-        # and now start it
-        
-        args = ["milhouse"] # TODO: add args
+    def _on_crashed(self, value=None):
+        """
+        Slot to the MilhouseProcessManager.crashed_signal
+        """
+        log.error("Milhouse crashed.")
+        self.state = constants.STATE_FAILED 
+        self.crashed_signal(self.identifier)
+        #self.service.stop(self.contact_infos) # sends a message 
+        txt = self.process.stdout_logger.get_text()
+        txt += self.process.stderr_logger.get_text()
+        log.debug(txt) # XXX very verbose !
+
+    def start(self):
+        """
+        Starts the streamer.
+        This is where the milhouse command line is created.
+        :param mode: either STREAMER_SENDER or STREAMER_RECEIVER.
+        """
+        self.state = constants.STATE_STARTING
+        args = ["milhouse"]
         process_codename = "%s(%s)" % (self.name, self.mode)
-        all_args = config_fields_to_milhouse_opts(config_entries)
+        all_args = config_fields_to_milhouse_opts(self.entries)
+        # reads what config_fields_to_milhouse_opts returned.
         if self.mode == "send":
             the_key = "sender"
             env_key = "sender_env"
@@ -382,31 +325,49 @@ class MilhouseStreamer(object):
         log.info("%s$ milhouse %s" % (process_codename, all_args[the_key]))
         args = all_args[the_key].split()
         try:
-            contact_name = self._contact_infos.contact.name
+            contact_name = self.session.contact_infos.contact.name
         except AttributeError, e:
             pass
         else:
-            args.append("-W") # hard-coded !!!
+            # set window title
+            args.append("-W")
             window_title = str(contact_name)
             for forbidden in "()\"'*!@#$%^&-=+\\|/~`":
                 window_title = window_title.replace(forbidden, "")
-            args.append(window_title) # hard-coded !!!
+            args.append(window_title)
+        # add env vars
         environment_variables = all_args[env_key]
         log.debug("Environment variables : %s" % (environment_variables))
-        self._process_manager = MilhouseProcessManager(name=process_codename, command=args, check_delay=2.5, env=environment_variables) # very long delay
-        self._process_manager.signal.connect(self._on_process_event)
-        deferred = self._process_manager.start()
-        return deferred
+        self.process = MilhouseProcessManager(name=process_codename, command=args, env=environment_variables)
+
+        # connect process rtcp signals to our session's corresponding handlers
+        self.process.rtcp_sender_started_signal.connect(self.session.on_rtcp_sender_started)
+        self.process.rtcp_sender_connected_signal.connect(self.session.on_rtcp_sender_connected)
+        self.process.rtcp_receiver_connected_signal.connect(self.session.on_rtcp_receiver_connected)
+        self.process.milhouse_exitted_signal.connect(self.session.on_milhouse_exitted)
+        self.process.exitted_itself_signal.connect(self.session.on_milhouse_exitted_itself)
+        self.process.crashed_signal.connect(self._on_crashed)
+        self.process.problem_signal.connect(self.session.on_problem)
+
+        self.process.start()
     
     def stop(self):
+        """
+        Stops the streamer.
+        """
         def _cb(result, self):
-            self.state = states.STATE_STOPPED
+            self.state = constants.STATE_STOPPED
             return result
         process_codename = "%s(%s)" % (self.name, self.mode)
         log.info("%s stop()" % (process_codename))
-        deferred = self._process_manager.stop()
-        deferred.addCallback(_cb, self)
-        return deferred
+        if self.process is not None:
+            self.process.stop()
+            self.process.milhouse_exitted_signal()
+        else:
+            log.warning("No milhouse process to stop")
+
+
+# -------------------- functions -------------
 
 def config_fields_to_milhouse_opts(fields):
     """
@@ -519,7 +480,7 @@ def setup_milhouse_fields(db):
         desc="Audio codec")
     db.add_field("/both/audio/port",
         default=10000,
-        desc="UDP/IP port for audio")
+        desc="RTP port for audio")
     db.add_field("/recv/audio/buffer_usec",
         default=11333,
         desc="length of receiver’s audio buffer in microseconds, must be > 10000")
@@ -528,14 +489,14 @@ def setup_milhouse_fields(db):
         desc="Audio receiver sink", default="jackaudiosink")
     # video fields --------------------------------------
     db.add_field("/send/video/bitrate",
-        default=1000000,
+        default=3000000,
         desc="Video bitrate")
     #db.add_field("/send/audio/bitrate", # TODO: quality
     #    default=1000000,
     #    desc="Audio bitrate")
     db.add_field("/both/video/codec",
         values=["h264", "theora", "mpeg4", "h263"],
-        default="h264",
+        default="mpeg4",
         desc="Video codec")
     db.add_field("/send/video/source",
         values=["dv1394src", "filesrc", "videotestsrc", "v4l2src", "dc1394src"],
@@ -546,7 +507,7 @@ def setup_milhouse_fields(db):
         desc="Receiver's video sink")
     db.add_field("/both/video/port",
         default=11000,
-        desc="UDP/IP port for video")
+        desc="RTP port for video")
     db.add_field("/send/video/file_location",
         default="",
         desc="Sender's videofilesrc Video file source.")
@@ -598,6 +559,7 @@ def setup_milhouse_settings(db):
     #TODO: rename this
     #TODO: change settings for Group/Preset/Setting/Storage
     # TODO: bitrate for MP3
+    # FIXME: put these in text file(s)
     # --------------------
     # we will have in version 0.3 :
     # profiles : 
@@ -635,7 +597,7 @@ def setup_milhouse_settings(db):
         desc="8 channels of OGG Vorbis audio.",
         entries={
             "/both/audio/numchannels":8,
-            "/both/audio/codec":"raw",
+            "/both/audio/codec":"vorbis",
         })
     # --------------------------- video codecs -----------------------------
     # * video: high-bandwidth (MPEG-4), medium-bw (MPEG-4), low-bw (H263)

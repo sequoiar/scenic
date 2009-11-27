@@ -35,6 +35,18 @@ import pprint
 import os
 import stat
 
+import warnings
+try:
+    import json # python 2.6
+except ImportError:
+    import simplejson as json # python 2.4 to 2.5
+try:
+    _tmp = json.loads
+except AttributeError:
+    warnings.warn("Use simplejson, not the old json module.")
+    sys.modules.pop('json') # get rid of the bad json module
+    import simplejson as json
+
 PERMISSIONS = stat.S_IRUSR | stat.S_IWUSR # chmod 600
 
 class SerializeError(Exception):
@@ -96,4 +108,57 @@ def load(filename):
         raise UnserializeError(e.message)
     else:
         return obj
+
+# TODO: get rid of jelly, replace with json
+
+def json_encode(data):
+     """
+     Python dict/list/int/str/float to json.
+     """
+     try:
+        encoded_data = json.dumps(data)
+     except TypeError, e:
+         raise SerializeError("Error trying to encode to JSON:%s" % (e.message))
+     return encoded_data
+
+
+def json_decode(encoded_data):
+     """
+     JSON to Python dict/list/int/str/float.
+     """
+     try:
+        data = json.loads(encoded_data)
+     except ValueError, e:
+         raise UnserializeError("Error trying to decode from JSON:%s" % (e.message))
+     return data
+
+def serialize_json(filename, data):
+    """
+    Python dict/list/int/str/float to file.
+    """
+    try:
+        f = open(filename, "w")
+        json.dump(data, f, indent=4)
+    except IOError, e:
+        raise SerializeError("Error trying to write file %s:%s" % (filename, e.message))
+    except TypeError, e:
+        raise SerializeError("Error trying to encode to a JSON serialized object:%s" % (e.message))
+    finally:
+        f.close()
+
+def unserialize_json(filename):
+    """
+    File to Python dict/list/int/str/float.
+    """
+    try:
+        f = open(filename, 'r')
+        data = json.load(f)
+    except IOError, e:
+        raise UnserializeError("Error trying to read file %s:%s" % (filename, e.message))
+    except ValueError, e:
+        raise UnserializeError("Error trying to decode JSON serialized object.")
+    finally:
+        f.close()
+    
+    return data
 

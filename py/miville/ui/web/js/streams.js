@@ -38,6 +38,7 @@ Streams.methods(
 		
 		// Get DOM elements.
 		self.start_btn = $('strm_start');
+		self.strm_details = $('strm_details');
 		self.global_slct = $('strm_global_setts');
 		
 		// Get string translations.
@@ -150,6 +151,27 @@ Streams.methods(
 	},
 
 	/**
+	 * Update the details for the currently selected profile.
+	 * (called from server)
+	 * 
+	 * @member Streams
+     * @param {array} details An array of dict with keys "name" and "value".
+	 */
+    function update_details(self, details) {
+        // XXX
+        self.strm_details.empty();
+        if (details.length > 0) {
+            var ul = new Element('ul');
+            ul.inject(self.strm_details);
+            details.each(function(detail) 
+            {
+                var li = new Element('li');
+                li.appendText(detail.name + ": " + detail.value);
+                li.inject(ul);
+            });
+        }
+    },
+	/**
 	 * -----------------------------
 	 * Called from javascript Client
 	 * -----------------------------
@@ -259,7 +281,10 @@ Streams.methods(
                 // 0: DISCONNECTED
                 // 3: CONNECTED
 				if (stream_state == 0) {
-					button_state = 'enabled';
+                    if (connection_state == 3) {
+                        // if connected
+                        button_state = 'enabled';
+                    }
 					self.start_btn.addEvent('click', function(){
 						self.start_streams();
 					});
@@ -315,10 +340,10 @@ Streams.methods(
 			self.global_slct.addEvent('change', function(){
 				self.set_setting();
 			});
-			
-			// enable or disable the menu in function the state of the stream,
-			// the contact type (auto_created) or if the menu is empty
-			if (self.empty || self.contact.get('stream_state') != 0 || self.contact.get('auto_created') == 'true') {
+			// Enables or disables the settings drop-down according to : 
+            //  * the state of the stream (stopped or streaming) Has to be stopped to be enabled.
+            //  * if the settings menu is empty
+			if (self.empty || self.contact.get('stream_state') != 0) {
 				self.global_slct.disabled = true;
 			} else {
 				self.global_slct.disabled = false;

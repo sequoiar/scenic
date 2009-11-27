@@ -232,6 +232,7 @@ int main(int argc, char **argv)
         std::cerr << "exitting with error: " << e.what() << std::endl;
         ret = 1;
     }
+    std::cout << "Exitting Milhouse" << std::endl;
     return ret;
 }
 

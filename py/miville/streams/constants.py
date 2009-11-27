@@ -19,14 +19,28 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 """
-Miville Daemon Executable.
-See miville.runner
+States for streams.
 """
-import socket
-import socket
+# states common to all streams
+# states for streamers (and streams?)
+# states for session, streams, streamers.
+STATE_IDLE = "idle"
+STATE_STARTING = "starting"
+STATE_STREAMING = "streaming"
+STATE_STOPPED = "stopped"
+STATE_FAILED = "failed"
+STATE_ERROR = "error"
 
-from miville import runner
+# streamers modes
+STREAMER_SENDER = "send"
+STREAMER_RECEIVER = "recv"
 
-if __name__ == "__main__":
-    runner.run()
-
+# agent roles
+ROLE_OFFERER = "offerer" # alice
+ROLE_ANSWERER = "answerer" # bob
+# directions
+DIRECTION_TO_OFFERER = "TO_OFFERER"
+DIRECTION_TO_ANSWERER = "TO_ANSWERER"
+# locations
+LOCATION_REMOTE = "remote"
+LOCATION_LOCAL = "local"

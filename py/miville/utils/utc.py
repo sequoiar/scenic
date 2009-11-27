@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 #
 # Miville
@@ -19,14 +19,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 """
-Miville Daemon Executable.
-See miville.runner
+UTC timestamps utilities.
 """
-import socket
-import socket
+import time
 
-from miville import runner
+def get_current_utc_time():
+    """
+    Returns a timestamp in UTC time.
+    
+    Important : this relies on the computer internal clock and time zone.
+    """
+    return time.time() - time.timezone
 
-if __name__ == "__main__":
-    runner.run()
+def utc_time_to_local(stamp):
+    """
+    Converts UTC timestamp to local time zone timestamp.
+    You can then compare it the time.time()
 
+    Important : relies on the computer time zone.
+    """
+    return stamp + time.timezone

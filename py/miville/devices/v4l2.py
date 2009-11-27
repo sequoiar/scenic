@@ -176,6 +176,10 @@ class Video4LinuxDriver(devices.VideoDriver):
         # so that we can still access the data while populating.
         # since it is asynchronous
         device_names = glob.glob('/dev/video*')
+        # strip dc1394 device
+        dc1394 = '/dev/video1394'
+        if dc1394 in device_names:
+            device_names.remove(dc1394)
         commands = []
         extra_arg = []
 

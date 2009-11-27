@@ -46,4 +46,3 @@
 	<span n:render="i18n" id="js_devices_duration" class="devices js_str">Duration</span>
 	<span n:render="i18n" id="js_devices_mode" class="devices js_str">Mode</span>
 </div>
-

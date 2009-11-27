@@ -350,11 +350,11 @@ NetworkTesting.methods(
 
         var latency = 0.0;
         var txt = "";
-        if (kind == 1) {
+        if (kind == "unidirectional") {
             txt += "Unidirectional from local to remote";
-        } else if (kind == 2) {
+        } else if (kind == "tradeoff") {
             txt += "Bidirectional Sequential";
-        } else if (kind == 3) {
+        } else if (kind == "dualtest") {
             txt += "Bidirectional Simultaneous";
         } else {
             txt += "Unknown kind of test.";

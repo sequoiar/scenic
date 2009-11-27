@@ -24,20 +24,9 @@ Communication channel for the streaming infos between two miville contacts.
 """
 #FIXME: using contact name as key?! We should use an other key
 
-import sys
-from twisted.internet import reactor
-import pprint
-import warnings 
-
 #XXX: does import miville.streams.manager within a method/function below !
 from miville.utils import log
-from twisted.internet import defer
-from miville.utils.commands import find_command
 from miville.errors import * # StreamError
-
-from miville.streams import session
-#from miville.services import milhouseservice
-#from miville.services.milhouseservice import GstError
 
 log = log.start('debug', 1, 0, 'streams.comm')
 
@@ -85,6 +74,8 @@ def on_com_chan_connected(connection_handle, role="client"):
         )
     callback = subchan.on_remote_message
     key = _make_key_for_contact(subchan.contact) 
+    log.debug('connected: KEY IS %s ' % (key))
+    log.debug('connected: Dict IS %s ' % (_services_channels_dict))
     _services_channels_dict[key] = subchan 
     subchan.com_chan.add(callback, SERVICES_COM_CHANNEL_NAME) # IMPORTANT ! Add this subchan to the com_chan
     log.debug("on_com_chan_connected: streams_subchannels: " + str(_services_channels_dict))
@@ -97,8 +88,12 @@ def on_com_chan_disconnected(connection_handle):
     Called when a connection is stopped
     """
     global _services_channels_dict
+    global _api
     contact = connection_handle.contact
     key = _make_key_for_contact(contact) 
+    log.debug('disconnected: key is %s ' % (key))
+    log.debug('disconnected: dict IS %s ' % (_services_channels_dict))
+
     try:
         del _services_channels_dict[key]
         #log.debug("on_com_chan_disconnected: settings_chans: " + str(_services_channels_dict))
@@ -113,7 +108,8 @@ def get_all_services_channels():
 def _make_key_for_contact(contact):
     log.warning("Using contact name as key for communication subchannels.")
     #TODO: use addr:port as key?
-    return contact.name
+    # FIXME: check that this is ok (should be,the dict stores them as unicode)
+    return unicode(contact.name)
 
 def get_channel_for_contact(contact):
     """
@@ -220,40 +216,28 @@ class StreamsCommunication(object):
                 log.error(msg)
                 raise StreamError(msg)
             else:
-                deferred_list = self.streams_manager._cb_ok_start(self, self.contact, alice_entries, bob_entries)
-                #TODO: use this deferred list...
+                self.streams_manager._cb_ok_start(self, self.contact, alice_entries, bob_entries)
         elif key == self.CMD_STOP:
-            #TODO
             log.debug("received STOP: stopping...")
-            deferred_list = self.streams_manager._cb_stop(self, self.contact)
-            #TODO: use this deferred list...
+            self.streams_manager._cb_stop(self, self.contact)
         elif key == self.CMD_ACK:
-            #TODO
             log.debug("received ACK")
-            deferred_list = self.streams_manager._cb_ack(self, self.contact)
+            self.streams_manager._cb_ack(self, self.contact)
         else:
             log.error("Unknown message in streams channel: " + key +  " args: %s"  % str(args) )
     
     def send_start(self, session_desc): 
-        #contact_infos, alice_entries, bob_entries):
         """
         Called by the alice of a streaming session.
-        
         called from the miville.streams.manager.StreamsManager.start
         :param alice_entries: dict of configuration entries
         :param bob_entries: dict of configuration entries
         """
         log.debug("send_start %s" % (session_desc.__dict__))
-        
-        # FIXME: 
-        alice_entries = session_desc.streams_to_offerer[0].entries # FIXME
-        bob_entries = session_desc.streams_to_answerer[0].entries # FIXME
+        alice_entries = session_desc.streams_to_offerer[0].entries
+        bob_entries = session_desc.streams_to_answerer[0].entries
         log.debug("sending start with entries: %s %s" % (alice_entries, bob_entries))
-        #alice_entries = session_desc.get_streams("Milhouse", session.DIRECTION_TO_OFFERER)[0].entries
-        #bob_entries = session_desc.get_streams("Milhouse", session.DIRECTION_TO_ANSWERER)[0].entries
-        #log.debug("send_start %s %s %s" % (contact_infos, alice_entries, bob_entries))
         self.send_message(self.CMD_START, [alice_entries, bob_entries])
-        #return defer.succeed(True) # TODO
 
     def send_ack(self, session_desc):
         self.send_message(self.CMD_ACK)
@@ -263,8 +247,8 @@ class StreamsCommunication(object):
         called by bob
         """
         log.debug("send_ok_start %s" % (session_desc.__dict__))
-        alice_entries = session_desc.streams_to_offerer[0].entries # FIXME
-        bob_entries = session_desc.streams_to_answerer[0].entries # FIXME
+        alice_entries = session_desc.streams_to_offerer[0].entries
+        bob_entries = session_desc.streams_to_answerer[0].entries
         log.debug("sending ok_start with entries: %s %s" % (alice_entries, bob_entries))
         self.send_message(self.CMD_OK, [self.CMD_START, alice_entries, bob_entries])
 
@@ -273,9 +257,7 @@ class StreamsCommunication(object):
         called from the miville.streams.manager.StreamsManager.stop
         """
         log.debug("send_stop")
-        # log.debug("send_stop %s" % (contact_infos))
         self.send_message(self.CMD_STOP, [])
-        #return defer.succeed(True) # TODO
 
     def send_error(self, session_desc, stream_desc=None, msg=None):
         pass
@@ -283,9 +265,8 @@ class StreamsCommunication(object):
     def send_message(self, key, args_list=[]):
         """
         Sends a message to the current remote contact through the com_chan with key "network_test".
-        :param args: list
+        :param args_list: list of any python basic types.
         """
-        #log.debug("StreamsCommunication._send_message %s. %r" % (key, args_list))
         log.debug("StreamsCommunication._send_message %s. ..." % (key))
         try:
             # list with key as 0th element

@@ -12,11 +12,11 @@ NOTES:
 """
 #TODO: rename to utils.conf.py and delete the old one.
 import sys
-import os
 from pprint import pformat
 # from twisted.spread import jelly # TODO
 #from miville.utils import serialize
 from miville.utils import log
+from miville.utils import serialize
 # TODO: use log more and more.
 log = log.start("info", 1, 0, "streams.conf")
 
@@ -221,6 +221,18 @@ class Setting(object):
         self.desc = desc # TODO unicode
         self.id = id # int
 
+    def serialize(self):
+        """ Returns a dict with all members and values """
+        flattened = {'entries':self.entries, 'name':self.name, 'desc':self.desc, 'id':self.id}
+        return flattened
+
+    def unserialize(self, data):
+        """ Returns a dict with all members and values """
+        self.entries = data['entries']
+        self.name = data['name']
+        self.desc = data['desc']
+        self.id = data['id']
+
     def __str__(self):
         ret = "SETTING:\n" + pformat(self.__dict__)
         return ret
@@ -236,13 +248,26 @@ class Profile(object):
     """
     A Profile contains settings ID.
     """
+    # FIXME: rename settings to setting_ids
     #TODO: Add detailled desc.
     # TODO: preset settings over 10000
     def __init__(self, name="default", id=None, desc=""):
         self.settings = [] # list of settings ID
         self.name = name # TODO unicode
-        self.desc = desc # TODO unicode
         self.id = id # int
+        self.desc = desc # TODO unicode
+    
+    def serialize(self):
+        """ Returns a dict with all members and values """
+        flattened = {'settings':self.settings, 'name':self.name, 'id':self.id, 'desc':self.desc}
+        return flattened
+
+    def unserialize(self, data):
+        """ Returns a dict with all members and values """
+        self.settings = data['settings']
+        self.name = data['name']
+        self.id = data['id']
+        self.desc = data['desc']
 
     def __str__(self):
         return "PROFILE:\n" + pformat(self.__dict__)
@@ -259,7 +284,8 @@ class Database(object):
         self.fields = {} # dict of name => Field 
         self.settings = {} # dict of id => Setting
         self.profiles = {} # dict of id => Profile
-        self.pool = IdPool([]) # IdPool instance
+        self.settings_pool = IdPool([]) # IdPool instance
+        self.profiles_pool = IdPool([]) # IdPool instance
         # TODO: use a different pool for settings and profiles.
     
     def get_setting(self, setting_id):
@@ -325,7 +351,7 @@ class Database(object):
         """
         if name is None:
             name = "" # why not...
-        setting_id = self.pool.allocate()
+        setting_id = self.settings_pool.allocate()
         setting = Setting(name, desc, id=setting_id)
         self.settings[setting_id] = setting
         if entries is not None:
@@ -341,7 +367,7 @@ class Database(object):
         :param settings: list
         :return: Profile instance
         """
-        profile_id = self.pool.allocate()
+        profile_id = self.profiles_pool.allocate()
         profile = Profile(name, id=profile_id, desc=desc)
         self.profiles[profile_id] = profile
         if settings is not None:
@@ -448,17 +474,63 @@ class Database(object):
             ret.update(self.get_entries_for_setting(setting_id))
         return ret
 
-    def __str__(self):
-        ret = "DATABASE DUMP"
-        ret += "Fields:\n"
-        for k, v in self.fields.iteritems():
-            ret += "    %s : %s\n" % (k, v)
+    def save(self):
+        ret = "DATABASE DUMP" 
         ret += "Settings:\n"
         for k, v in self.settings.iteritems():
             ret += "    %s : %s\n" % (k, v)
         ret += "Profiles:\n"
         for k, v in self.profiles.iteritems():
             ret += "    %s : %s\n" % (k, v)
-        ret += "Pool:\n"
-        ret += str(self.pool.__dict__)
-        return ret
+        ret += "Settings Pool:\n"
+        ret += str(self.settings_pool.allocated)
+        ret += "Profiles Pool:\n"
+        ret += str(self.profiles_pool.allocated)
+
+    def save_as_json(self, filename):
+        """ Unused so far """
+        log.debug("DATABASE DUMP")
+
+        flattened = {}
+        flattened['settings'] = {}
+        for k, v in self.settings.iteritems():
+            flattened['settings'][k] = v.serialize()
+        
+        flattened['profiles'] = {}
+        for k, v in self.profiles.iteritems():
+            flattened['profiles'][k] = v.serialize()
+            
+        flattened['settings_pool'] = list(self.settings_pool.allocated)
+        flattened['profiles_pool'] = list(self.profiles_pool.allocated)
+        serialize.serialize_json(filename, flattened)
+
+    def load_from_json(self, filename):
+        """ Get member values from json """
+        log.debug("DATABASE LOAD")
+        # get database data from file
+        data = serialize.unserialize_json(filename)
+        # get rid of any settings/profiles in this db
+        self.settings = {}
+        self.profiles = {}
+        self.settings_pool = None
+        self.profiles_pool = None
+        
+        # json stores keys in unicode, so we need to convert to int
+        for k,v in data['settings'].iteritems():
+            key = int(k)
+            self.settings[key] = Setting()
+            self.settings[key].unserialize(v)
+            for entry in self.settings[key].entries:
+                self.get_field(entry)   # will raise if field does not exist
+        for k,v in data['profiles'].iteritems():
+            key = int(k)
+            self.profiles[key] = Profile()
+            self.profiles[key].unserialize(v)
+            # make sure setting id exists
+            for setting_id in self.profiles[key].settings:
+                if setting_id not in self.settings.keys():
+                    raise serialize.UnserializeError("Invalid setting id %" % (setting_id))
+
+        self.settings_pool = IdPool(data['settings_pool'])
+        self.profiles_pool = IdPool(data['profiles_pool'])
+

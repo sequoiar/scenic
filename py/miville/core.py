@@ -92,7 +92,7 @@ class Core(Subject):
         Loads the user interface modules
         """
         self.uis = common.load_modules(common.find_modules('ui'))
-        count = 0
+        
         for mod in self.uis:
             # interfaces = self.config.listen_to_interfaces
             interfaces = self.config.ui_network_interfaces
@@ -109,7 +109,7 @@ class Core(Subject):
                 log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
                 log.error("Port unavailable. There is probably an other miville running on this machine. Try with -o option.")
                 log.error("Exiting.")
-                exit(1) # ends the program
+                _exit(1) # ends the program
                 raise
             except Exception, e:
                 log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
@@ -136,7 +136,7 @@ def main(config_object):
 #    l = task.LoopingCall(chk_ob, core)
 #    l.start(2.0, False)
 
-def exit(app_return_val=0):
+def _exit(app_return_val=0):
     """
     Called on application exit
     

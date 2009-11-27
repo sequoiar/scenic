@@ -316,12 +316,12 @@ class ControllerApi(object):
         Notifies with a list of all streams.
         """
         # TODO: add contact or service arg
-        all = self.streams_manager.list_all_streams()
-        log.debug("list_streams: %s" % (all))
-        notif = all
+        all_streams = self.streams_manager.list_all_streams()
+        log.debug("list_streams: %s" % (all_streams))
+        notif = all_streams
         self.notify(caller, notif)
     
-    def list_streams_for_contact(contact):
+    def list_streams_for_contact(self, contact):
         """
         Returns the list of streams for a contact.
         :param contact: addressbook.Contact instance.
@@ -351,35 +351,36 @@ class ControllerApi(object):
         #if contact.state == CONNECTED:
         #    contact.stream_state = 2 # STARTED
         #elif contact.state == DISCONNECTED:
-        deferred = self.streams_manager.start(contact)
-        def _cb_success(result, self, caller, contact_name):
-            msg = "Successfully started to stream with %s.\n" % (contact_name)
-            msg += "%s" % (result)
-            contact = self.get_contact(contact_name)
-            contact.stream_state = 2 # STARTED
-            notif = {
-                "contact_name":contact_name,
-                "contact":contact,
-                "message":msg,
-                "success":True
-                }
-            self.notify(caller, notif, "start_streams")
-            return result
-        def _eb_failure(err, self, caller, contact_name):
-            contact = self.get_contact(contact_name)
-            contact.stream_state = 0 # STOPPED
-            msg = "Could not start to stream with %s.\n%s" % (contact_name, str(err.getErrorMessage()))
-            notif = {
-                "contact_name":contact_name,
-                "contact":contact,
-                "message":msg,
-                "success":False
-                }
-            self.notify(caller, notif, "start_streams")
-            return err
-        deferred.addCallback(_cb_success, self, caller, contact_name)
-        deferred.addErrback(_eb_failure, self, caller, contact_name)
-        return deferred
+        #deferred = 
+        self.streams_manager.start(contact)
+        #def _cb_success(result, self, caller, contact_name):
+        #    msg = "Successfully started to stream with %s.\n" % (contact_name)
+        #    msg += "%s" % (result)
+        #    contact = self.get_contact(contact_name)
+        #    contact.stream_state = 2 # STARTED
+        #    notif = {
+        #        "contact_name":contact_name,
+        #        "contact":contact,
+        #        "message":msg,
+        #        "success":True
+        #        }
+        #    self.notify(caller, notif, "start_streams")
+        #    return result
+        #def _eb_failure(err, self, caller, contact_name):
+        #    contact = self.get_contact(contact_name)
+        #    contact.stream_state = 0 # STOPPED
+        #    msg = "Could not start to stream with %s.\n%s" % (contact_name, str(err.getErrorMessage()))
+        #    notif = {
+        #        "contact_name":contact_name,
+        #        "contact":contact,
+        #        "message":msg,
+        #        "success":False
+        #        }
+        #    self.notify(caller, notif, "start_streams")
+        #    return err
+        #deferred.addCallback(_cb_success, self, caller, contact_name)
+        #deferred.addErrback(_eb_failure, self, caller, contact_name)
+        #return deferred
     
     def remote_stopped_streams(self, caller, notif):
         """
@@ -394,6 +395,7 @@ class ControllerApi(object):
             "success":False,
             }
         """
+        log.info("REMOTE_STOPPED_STREAMS")
         self.notify(caller, notif)
         notif["contact"].stream_state = 0 # FIXME remove this
 
@@ -410,6 +412,7 @@ class ControllerApi(object):
             "success":False,
             }
         """
+        log.info("REMOTE_STARTED_STREAMS")
         if notif["success"]:
             notif["contact"].stream_state = 2 # FIXME remove this
         else:
@@ -446,35 +449,36 @@ class ControllerApi(object):
         #         }
         #     self.notify(caller, notif, "stop_streams")
         #     return defer.fail(failure.Failure(Exception(msg))) # FIXME
-        deferred = self.streams_manager.stop(contact)
-        contact.stream_state = 3 # STOPPING
-        def _cb_success(result, self, caller, contact_name):
-            contact = self.get_contact(contact_name)
-            contact.stream_state = 0 # STOPPED
-            msg = "Successfully stopped to stream with %s.\n%s" % (contact_name, str(result))
-            notif = {
-                "contact_name":contact_name,
-                "contact":contact,
-                "message":msg,
-                "success":True
-                }
-            self.notify(caller, notif, "stop_streams")
-            return result
-        def _eb_failure(err, self, caller, contact_name):
-            contact = self.get_contact(contact_name)
-            contact.stream_state = 0 # STOPPED
-            msg = "Error stopping streaming with %s.\n%s\nThere should be no stream left." % (contact_name, str(err.getErrorMessage()))
-            notif = {
-                "contact_name":contact_name,
-                "contact":contact,
-                "message":msg,
-                "success":False
-                }
-            self.notify(caller, notif, "stop_streams")
-            return err
-        deferred.addCallback(_cb_success, self, caller, contact_name)
-        deferred.addErrback(_eb_failure, self, caller, contact_name)
-        return deferred
+        #deferred = 
+        self.streams_manager.stop(contact)
+        #contact.stream_state = 3 # STOPPING
+        #def _cb_success(result, self, caller, contact_name):
+        #    contact = self.get_contact(contact_name)
+        #    contact.stream_state = 0 # STOPPED
+        #    msg = "Successfully stopped to stream with %s.\n%s" % (contact_name, str(result))
+        #    notif = {
+        #        "contact_name":contact_name,
+        #        "contact":contact,
+        #        "message":msg,
+        #        "success":True
+        #        }
+        #    self.notify(caller, notif, "stop_streams")
+        #    return result
+        #def _eb_failure(err, self, caller, contact_name):
+        #    contact = self.get_contact(contact_name)
+        #    contact.stream_state = 0 # STOPPED
+        #    msg = "Error stopping streaming with %s.\n%s\nThere should be no stream left." % (contact_name, str(err.getErrorMessage()))
+        #    notif = {
+        #        "contact_name":contact_name,
+        #        "contact":contact,
+        #        "message":msg,
+        #        "success":False
+        #        }
+        #    self.notify(caller, notif, "stop_streams")
+        #    return err
+        #deferred.addCallback(_cb_success, self, caller, contact_name)
+        #deferred.addErrback(_eb_failure, self, caller, contact_name)
+        #return deferred
 
     ### Connect with com_chan ### ------------------------------------------------------
     def start_connection(self, caller, contact=None):
@@ -525,6 +529,9 @@ class ControllerApi(object):
             contact = self.addressbook.get_current()
         if contact and contact.name in self.addressbook.contacts:
             try:
+                # try stop streams before disconnecting
+                if contact.stream_state != 0:
+                    self.stop_streams(caller, contact.name)
                 connectors.stop_connection(contact)
                 self.notify(caller, {'msg':'Connection stopped',
                                      'name':contact.name})
@@ -695,6 +702,7 @@ class ControllerApi(object):
                 # except Exception, e:
                 #     debug.error("network_test_start(): " + e.message)
                 
+                #remote_addr = contact.address
                 remote_addr = contact.address
                 kinds = {
                     "localtoremote":network.KIND_UNIDIRECTIONAL, 
@@ -704,7 +712,7 @@ class ControllerApi(object):
                 }
                 try:
                     tester = network.get_tester_for_contact(contact.name)
-                except KeyError, e:
+                except KeyError:
                     self.notify(caller, "No network tester for contact", "network_test_error")
                 else:
                     try:
@@ -742,7 +750,7 @@ class ControllerApi(object):
             else:
                 try:
                     tester = network.get_tester_for_contact(contact.name)
-                except KeyError, e:
+                except KeyError:
                     self.notify(caller, "No network tester for contact", "network_test_error")
                 else:
                     tester.abort_test(caller)
@@ -790,21 +798,21 @@ class ControllerApi(object):
             except NameError:
                 self.notify(caller, "Please connect to a contact prior to start a pinger test.", "error")
             if connected:
-                com_chan = None 
+                #com_chan = None 
                 self.notify(caller, '...to which we are connected.', 'info')
                 try:
-                    com_chan = contact.connection.com_chan
+                    #com_chan = contact.connection.com_chan
                     self.notify(caller, 'Using a com_chan.', 'info')
                 except Exception, e:
                     msg = "No com_chan in pinger_start(): " + e.message
-                    debug.error(msg)
+                    log.debug.error(msg)
                     self.notify(caller, msg, "error")
                 else:
                     remote_addr = contact.address
                     self.notify(caller, 'Remote IP is %s' % (remote_addr), 'info')
                     try:
                         ping = pinger.get_pinger_for_contact(contact.name)
-                    except KeyError, e:
+                    except KeyError:
                         self.notify(caller, "No pinger for contact", "error")
                     else:
                         ret = ping.start_ping(caller)

@@ -21,16 +21,16 @@
 
 """
 This modules is the base of the web client (web user interface)
-of the application. Its support internationalisation (i18n).
+of the application. It supports internationalisation (i18n).
 
 More about the i18n process
 ---------------------------
 
-Here we describe all the steps involved in producing translations for this modules.
-Maybe, at the moment you read this, there will be script that simplify the process.
+Here we describe all the steps involved in producing translations for this module.
+Maybe, when you read this, there will be script that simplifies the process.
 But anyway it's good to know how it works.
 
-So here the steps to produce translation from scratch:
+So here the steps to produce a translation from scratch:
 
     We will use the context of creating a new Widget as an example.
     
@@ -109,7 +109,7 @@ from miville.utils.common import find_callbacks
 #from miville.ui.web.pages.gstpage import GstPage
 from miville.ui.web.pages.procspage import ProcsPage
 
-log = log.start('info', 1, 0, 'web')
+log = log.start('debug', 1, 0, 'web')
 
 widgets_mod = []
 
@@ -126,7 +126,6 @@ def import_widgets():
             log.debug('Will load widget %s %s %s' % (widget, widget.name, widget.filePath.path))
             log.debug("%s" % (loaded))
             loaded.append("%s" % (widget.name))
-            
             if widget.isPackage():
                 medias = getModule(widget.name).iterModules()
                 for media in medias:
@@ -134,6 +133,7 @@ def import_widgets():
                         mod = media.load()
                     except:
                         log.error('Unable to load the module %s' % media.name)
+                        raise
                     else:
                         if hasattr(mod, 'render'):
                             widgets_mod.append(mod)
@@ -147,7 +147,6 @@ def import_widgets():
                 else:
                     if hasattr(mod, camel_name(mod.__name__.replace(package, '')[1:])):
                         widgets_mod.append(mod)
-                
     # for each widget add a render_<widget> method to the Index class
     for widget in widgets_mod:
         name = str(widget.__name__.replace(package, '')[1:].replace('.', '_'))
@@ -155,7 +154,7 @@ def import_widgets():
 
 def widget_factory(mod):
     """
-    Factory that produce a render_widget method to be add to the Index class
+    Factory that produces a render_widget method to be added to the Index class
     for each widget.
     """
     # get the module name without the path
@@ -167,7 +166,7 @@ def widget_factory(mod):
     
     def render_widget(self, ctx, data):
         """
-        Generic method use to render all widget from the Index class.
+        Generic method used to render all widgets from the Index class.
         """
         widget = klass(self.api, self.template)
         widget.setFragmentParent(self)
@@ -179,7 +178,7 @@ def camel_name(name):
     """
     Transform a file name (small case with underscore) to a class name style
     (camel case without underscore). Put first character and each character
-    after an underscore in uppper case and remove the underscores.
+    after an underscore in upper case and remove the underscores.
     
     Example::
     
@@ -243,7 +242,7 @@ class Index(LivePage, Observer):
         # load base XML file
         self.docFactory = loaders.xmlfile(path.join(path.dirname(__file__), 'index.xml'))
 
-# not use anymore ?
+# not used anymore ?
 #        if self.template:
 #            self.child_template = static.File(path.join('ui/web/templates', self.template))
 

@@ -153,7 +153,29 @@ Devices.methods(
 	function rc_devices_list_all(self, txt, devs_list) {
         dbug.info("DEVICES: rc_devices_list_all called");
         self.devices_div.empty();
-        var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
+        //var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
+        
+        if (devs_list.length > 0) {
+            devs_list.each(function(dev) 
+            {
+                var title = new Element('h2');
+                title.inject(self.devices_div);
+                // "default" audio device using the "jackd" driver
+                title.appendText('"' + dev.dev_name + '" ' + dev.dr_kind + " device using the \"" + dev.dr_name + 
+"\" driver" );
+                var ul = new Element('ul');
+                ul.inject(self.devices_div);
+                dev.attributes.each(function(attr) 
+                {
+                    var li = new Element('li');
+                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ") " + attr.options).inject(ul);
+                });
+            });
+        } else {
+            var p = new Element('p');
+            p.appendText("No device to list.");
+            p.inject(self.devices_div);
+        }
         
         // var txt = "";
         // txt += devs_list.toString();

@@ -29,7 +29,9 @@ from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
 
-log = log.start('info', 1, 0, 'web_devices')
+log = log.start('debug', 1, 0, 'web_devices')
+
+log.debug("Hello from the devices widget python module.")
 
 class Devices(Widget):
     """
@@ -104,9 +106,10 @@ class Devices(Widget):
         VERY_VERBOSE = False
         lines = []
         devs = []
-        if origin is self:
+        #if origin is self:
+        if True:
             if len(data) == 0:
-                lines.append("No devices to list.")
+                lines.append("No device to list.")
             else:
                 for device in data:
                     dr_kind = device.driver.kind
@@ -114,7 +117,7 @@ class Devices(Widget):
                     dev_name = device.name
                     attributes = device.attributes.values()
                     attr_list = []
-                    lines.append("\"%s\" %s device using the \"%s\" driver" % (dev_name, dr_kind, dr_name))
+                    #lines.append("\"%s\" %s device using the \"%s\" driver" % (dev_name, dr_kind, dr_name))
                     for attr in attributes:
                         a_name = attr.name
                         a_value = attr.get_value()
@@ -124,16 +127,19 @@ class Devices(Widget):
                         else:
                             a_opts = "default=%s" % (attr.default)
                         attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts})
-                        if VERY_VERBOSE:
-                            lines.append("    - %15s = %15s     (%s)" % (a_name, a_value, a_kind))
-                        else:
-                            lines.append("    - %15s = %15s" % (a_name, a_value))
-                    lines.append('')
-                    devs.append({'kind':dr_kind, 'driver_name':dr_name, 'device_name':dev_name, 'attributes':attr_list})
-            try:
-                devs.append('DISPLAY: ' + os.environ['DISPLAY'])
-            except KeyError:
-                log.error('No $DISPLAY environment variable.')
+                        #if VERY_VERBOSE:
+                        #    lines.append("    - %15s = %15s     (%s)" % (a_name, a_value, a_kind))
+                        #else:
+                        #    lines.append("    - %15s = %15s" % (a_name, a_value))
+                    #lines.append('')
+                    d = {"dr_kind":dr_kind, "dr_name":dr_name, "dev_name":dev_name, "attributes":attr_list}
+                    devs.append(d)
+                    log.debug("device : %s" % (d))
+                    #devs.append({'kind':dr_kind, 'driver_name':dr_name, 'device_name':dev_name, 'attributes':attr_list})
+            #try:
+            #    devs.append('DISPLAY: ' + os.environ['DISPLAY'])
+            #except KeyError:
+            #    log.error('No $DISPLAY environment variable.')
             self.callRemote('rc_devices_list_all', "\n".join(lines), devs)
 
 #     def rc_device_list_attributes(self, driver_kind, driver_name, device_name): 
@@ -150,4 +156,3 @@ class Devices(Widget):
 #         self.callRemote('rc_device_list_attributes', attributes)
 
     expose(locals())
-

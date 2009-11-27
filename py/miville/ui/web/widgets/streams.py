@@ -77,7 +77,20 @@ class Streams(Widget):
         :param contact: unicode  contact name
         :param setting: int Profile ID
         """
+        # set the profile_id for contact.
         self.api.modify_contact(self, contact, profile_id=setting)
+        
+        # build details for the newly selected profile.
+        details = [] # array of dict with keys "name" and "value"
+        profile_id = int(setting)
+        entries = self.api.config_db.get_entries_for_profile(profile_id)
+        log.debug("entries for profile : %s" % (entries))
+        for k, v in sorted(entries.items()):
+            field = self.api.config_db.get_field(k)
+            log.debug("    name:%s, value:%s" % (field.name, v))
+            details.append({"name":field.name, "value":v})
+        self.callRemote("update_details", details)
+        
         return False
         
     def cb_list_profiles(self, origin, data): #TODO:rename this ugly method name

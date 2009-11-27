@@ -95,7 +95,9 @@ class BasicServer(LineReceiver):
             log.debug("got STOP comchan message !")
             #try:    #TODO: to this correctly
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
-            self.api.stop_streams(self, contact.name) # ARG MUST BE THE CURRENT CONTACT FOR THAT STREAM
+            if contact.stream_state != 0:
+                log.warning('stream state = %d ' % (contact.stream_state))
+                self.api.stop_streams(self, contact.name) # ARG MUST BE THE CURRENT CONTACT FOR THAT STREAM
             #except Exception, e:
             #    log.error('ERROR : ' + str(type(e)) + ' ' + e.message)
             self.set_port(line)
@@ -275,7 +277,10 @@ class ConnectionBasic(Connection):
                 self._timeout.cancel()
             except (error.AlreadyCalled, error.AlreadyCancelled), err:
                 log.debug(err)
-        self.connection.transport.loseConnection()
+        if self.connection is not None:
+            self.connection.transport.loseConnection()
+        else:
+            log.error("self.connection is none !!")
 
     def _accepted(self):
         global PORT
