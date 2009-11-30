@@ -23,6 +23,7 @@ import time
 import os
 import pprint
 
+from twisted.internet import reactor
 #App imports
 from miville.ui.web.web import Widget, expose
 from miville.utils import log
@@ -61,7 +62,8 @@ class Devices(Widget):
         """
         caller = self
         log.debug("Changing norm to %s" % (norm_value))
-        self.api.set_video_standard(caller, norm_value)
+        self.api.set_video_standard(caller, str(norm_value))
+        reactor.callLater(0.1, self.api.devices_list_all, self)
 
     def cb_devices_removed(self, origin, data):
         """These might cause troubles if attributes change too often."""

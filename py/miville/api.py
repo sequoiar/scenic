@@ -497,6 +497,7 @@ class ControllerApi(object):
         Valid string values are "ntsc", "secam" and "pal".
         If value is None, sets it according to the time zone.
         """
+        log.debug("set_video_standard %s %s" % (caller, value))
         return devices.set_video_standard(caller, value)
         # TODO Return a Deferred !
     

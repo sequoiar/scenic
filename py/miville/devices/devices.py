@@ -625,6 +625,7 @@ def set_video_standard(caller, value=None):
         # for every video driver.
         for driver in manager.drivers.values():
             for device in driver.devices.values():
+                log.debug("changing norm to %s for %s" % (value, device.name))
                 modify_attribute(caller, driver.kind, driver.name, device.name, 'norm', value)
     return value
 
