@@ -138,10 +138,9 @@ class Connection(object):
                                    'context':'connection'})
 
     def stop(self):
-        if self.contact.state > DISCONNECTED and self.contact.state < DISCONNECTING:
+        if self.contact.state == ASKING or self.contact.state == CONNECTING or self.contact.state == CONNECTED:
             self.contact.state = DISCONNECTING
             self._stop()
-#            return 'Connection with %s stopped.' % self.contact.name
         else:
             raise ConnectionError, 'There is no connection'
 
@@ -241,10 +240,8 @@ def create_connection(contact, api):
     """
     if contact.kind == 'group':
         raise NotImplementedError, 'Group contact not implemented for the moment.'
-    if contact.state > DISCONNECTED:
+    if contact.state != DISCONNECTED:
         raise ConnectionError, 'Contact \'%s\' already engaged in a connection. State: %s.' % (contact.name, contact.state)
-#    if contact.name in connections:
-#        raise ConnectionError, 'Can not connect. This contact \'%s\' already have a connection.' % contact.name
     if not contact.connector:
         raise ConnectorError, 'Cannot connect. No connector specified for that contact.'
     if contact.connector not in connectors:
@@ -267,11 +264,11 @@ def stop_connection(contact):
     if contact.state in (ASKING, CONNECTING, CONNECTED):
         if not contact.connection:
             raise ConnectionError, 'There\'s is no connection. State (%s) doesn\'t match' % contact.state
-        if contact.state == ASKING:
+        elif contact.state == ASKING:
             return contact.connection.stop_asking()
-        if contact.state == CONNECTING:
+        elif contact.state == CONNECTING:
             return contact.connection.stop_connecting()
-        if contact.state == CONNECTED:
+        elif contact.state == CONNECTED:
             return contact.connection.stop()
     return 'Cannot stop the connection. Unknown connection state (%s)' % contact.state
 

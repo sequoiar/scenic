@@ -20,10 +20,10 @@
 """
 CONNECTIONS STATE CONSTANTS
 """
-DISCONNECTED = 0
-ASKING = 1
-CONNECTING = 2      
-CONNECTED = 3        # streaming  ! (I guess)
-DISCONNECTING = 4
-HUNGUP = 5
+DISCONNECTED = 'disconnected' # 0
+ASKING = 'asking'
+CONNECTING = 'connecting'      
+CONNECTED = 'connected'        # 3
+DISCONNECTING = 'disconnecting'
+HUNGUP = 'hungup'
 
