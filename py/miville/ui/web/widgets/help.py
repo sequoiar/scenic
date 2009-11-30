@@ -30,8 +30,8 @@ class Help(Widget):
     """
     """
     pass
-#    def rc_manual(self):
-#        print "OPEN MANUAL"
-#        return False
-#    
-#    expose(locals())
+    def rc_manual(self):
+        print "OPEN MANUAL"
+        return False
+    
+    expose(locals())

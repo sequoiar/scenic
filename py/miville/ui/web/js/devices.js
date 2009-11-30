@@ -148,13 +148,14 @@ Devices.methods(
                                 "html": opt,
                                 "value": opt});
                             o.inject(sel);
-                            o.addEvent('change', function() {
-                                dbug.info("on change norm")
-				                self.set_norm(dev_name, o.value);
-			                });
+                        });
+                        dbug.info("adding onChange callback");
+                        sel.addEvent('change', function(dev_name, sel) {
+                            dbug.info("on change norm")
+                            self.set_norm(dev_name, sel.value);
                         });
                         // XXX uncomment this :
-                        //sel.inject(li);
+                        sel.inject(li);
                     }
                 }); // end for each attr
             }); // end for each dev
