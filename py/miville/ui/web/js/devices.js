@@ -131,9 +131,14 @@ Devices.methods(
 	function rc_devices_list_all(self, devs_list) {
         dbug.info("DEVICES: rc_devices_list_all called");
         self.devices_div.empty();
+        var has_jackd = false;
         if (devs_list.length > 0) {
             devs_list.each(function(dev) 
             {
+                if (dev.dr_name == "jackd") 
+                {
+                    has_jackd = true;
+                }    
                 var title = new Element('h2');
                 title.inject(self.devices_div);
                 // Something like : "default" audio device using the "jackd" driver
@@ -144,7 +149,7 @@ Devices.methods(
                 dev.attributes.each(function(attr) 
                 {
                     var li = new Element('li');
-                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ") options:" + attr.options + " ").inject(ul);
+                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ")").inject(ul);
                     // V4L2 NORM:
                     if (dev.dr_name == "v4l2" && attr.name == "norm")
                     {
@@ -200,6 +205,16 @@ Devices.methods(
             var p = new Element('p');
             p.appendText("No device to list.");
             p.inject(self.devices_div);
+        }
+        if (has_jackd == false)
+        {
+            var blinker = new Element("blink", {
+                "html":"The JACK Audio Connection Kit server (jackd) is not running !",
+                "style":"color:#f00;"
+                });
+            blinker.inject(self.devices_div);
+            var msg = new Element("p", {"html":"You should start jackd or qjackctl."});
+            msg.inject(self.devices_div);
         }
 	}
 );
