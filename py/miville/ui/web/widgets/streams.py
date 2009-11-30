@@ -109,27 +109,5 @@ class Streams(Widget):
                 })
         self.callRemote('update_settings', preset_settings, user_settings)
 
-    #def cb_remote_started_streams(self, origin, data):
-    #    """
-    #    The API tells us that the remote Alice has started streams with us. (Bob)
-    #    
-    #    sets the contact stream_state to streaming when started from remote.
-    #    """
-    #    log.debug("cb_remote_started_streams %s %s" % (origin, data))
-    #    if isinstance(data, failure.Failure):
-    #        pass
-    #    else:
-    #        pass
-
-    #def cb_remote_stopped_streams(self, origin, data):
-    #    """
-    #    sets the contact stream_state to stopped when stopped from remote.
-    #    """
-    #    log.debug("cb_remote_stopped_streams %s %s" % (origin, data))
-    #    if isinstance(data, failure.Failure):
-    #        pass
-    #    else:
-    #        pass
-    
     expose(locals())
 

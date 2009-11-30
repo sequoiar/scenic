@@ -325,6 +325,7 @@ Addressbook.methods(
 			var conn_state = li.getChildren()[0];
 			conn_state.removeClass('spinner_small');
 			conn_state.removeClass('conn_connected');
+            // FIXME: change to NAMED_CONSTANTS
 			if (item['state'] > 0 && item['state'] < 3) {
 				conn_state.addClass('spinner_small');
 			} else if (item['state'] == 3) {
@@ -335,9 +336,9 @@ Addressbook.methods(
 			var stream_state = li.getChildren()[1];
 			stream_state.removeClass('spinner_small');
 			stream_state.removeClass('streaming');
-			if (item['stream_state'] == 1) { // starting...
+			if (item['stream_state'] == 'starting') { // starting...
 				stream_state.addClass('spinner_small');
-			} else if (item['stream_state'] == 2) { // streaming
+			} else if (item['stream_state'] == 'streaming') { // streaming
 				stream_state.addClass('streaming');
 			}
 			

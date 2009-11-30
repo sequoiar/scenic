@@ -414,7 +414,7 @@ class StreamsManager(object):
         """
         # TODO : send OK
         log.info("Received STOP from remote  %s " % (contact))
-        contact.stream_state = 3 # stopping !
+        contact.stream_state = STATE_STOPPING # stopping !
         contact_infos = self._create_contact_infos_from_contact(contact)
         try:
             session = self._get_session(contact_infos)

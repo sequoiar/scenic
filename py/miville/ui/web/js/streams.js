@@ -280,7 +280,7 @@ Streams.methods(
                 // "start" if:
                 // 0: DISCONNECTED
                 // 3: CONNECTED
-				if (stream_state == 0) {
+				if (stream_state == 'stopped') {
                     if (connection_state == 3) {
                         // if connected
                         button_state = 'enabled';
@@ -288,7 +288,7 @@ Streams.methods(
 					self.start_btn.addEvent('click', function(){
 						self.start_streams();
 					});
-				} else if (stream_state == 1) {
+				} else if (stream_state == 'starting') {
 					button_name = self.stop_str;
 				} else {
 					button_state = 'enabled';
@@ -343,7 +343,7 @@ Streams.methods(
 			// Enables or disables the settings drop-down according to : 
             //  * the state of the stream (stopped or streaming) Has to be stopped to be enabled.
             //  * if the settings menu is empty
-			if (self.empty || self.contact.get('stream_state') != 0) {
+			if (self.empty || self.contact.get('stream_state') != 'stopped') {
 				self.global_slct.disabled = true;
 			} else {
 				self.global_slct.disabled = false;

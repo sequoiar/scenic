@@ -249,12 +249,12 @@ NetworkTesting.methods(
 			
             self.start_btn.removeEvents('click');
 			if ([0, 3].contains(connection_state)) {
-				if (stream_state == 0) {
+				if (stream_state == 'stopped') {
 					button_state = 'enabled';
 					self.start_btn.addEvent('click', function() {
 						self.start_test();
 					});
-				} else if (stream_state == 1) {
+				} else if (stream_state == 'starting') {
                     dbug.info("Seems like we are streaming. Disabling the nettest button.");
 					button_state = 'disabled';
 					button_name = self.start_str;

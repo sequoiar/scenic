@@ -45,6 +45,7 @@ from miville.utils.i18n import to_utf
 from miville.errors import AddressBookError, AddressBookNameError, AddressBookAddressError
 from miville.connectors.states import DISCONNECTED
 from miville.connectors.states import CONNECTED
+from miville.streams.constants import STATE_STOPPED
 
 log = log.start('info', 1, 0, 'adb')
 
@@ -358,9 +359,9 @@ class AddressBook(object):
                     log.debug('Contact %s has been set to DISCONNECTED'  % (contact.name))
                     contact.connection = None
                     contact.state = DISCONNECTED
-                    contact.stream_state = 0
+                    contact.stream_state = STATE_STOPPED
                     if self.minor == 0:
-                        contact.stream_state = 0
+                        contact.stream_state = STATE_STOPPED
             addressbook_file.close()
 
     def write(self, state=True):
@@ -388,7 +389,7 @@ class AddressBook(object):
                             contacts[name].connection = None
                             del contacts[name].connection
                         if not state:
-                            contacts[name].stream_state = 0
+                            contacts[name].stream_state = STATE_STOPPED
                 # add the selected contact to the dict
                 contacts['_selected'] = self.selected
                 if self.major == 1:
@@ -435,7 +436,7 @@ class Contact(object):
         self.auto_created = auto_created
         self.auto_answer = auto_answer
         self.connection = None
-        self.stream_state = 0
+        self.stream_state = STATE_STOPPED
 
         self.set_address(address)
         self.set_port(port)
