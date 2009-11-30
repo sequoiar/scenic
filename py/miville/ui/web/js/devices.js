@@ -30,35 +30,18 @@ Devices.methods(
      */
     function __init__(self, node) {
         Devices.upcall(self, "__init__", node);
-		
 		// State variables
 		self.contact = null;
-		
 		// Get elements.
-		//self.list_v4l2_btn = $('deviceswidget_list_v4l2');
-		//self.list_jackd_btn = $('deviceswidget_list_jackd');
 		self.devices_div = $('deviceswidget_devices');
-        //self.v4l2_div = $('deviceswidget_v4l2');
-        //self.v4l2_input_popup = $('deviceswidget_unit');
-		
 		// Get string translations.
         // TODO : use only translated strings in the GUI.
 		//self.start_str = $('js_deviceswidget_start').get('text'); // start string
 		//self.stop_str = $('js_deviceswidget_stop').get('text'); // stop string
 		
-		// Set translations.
-		
 		// Register to the widgets communicator.
 		register('deviceswidget', self);
         self.callRemote('rc_devices_list_all');
-
-        //self.list_jackd_btn.addEvent('click', function(){
-        //    self.devices_list('audio');
-        //    self.devices_list_all();
-        //});
-        //self.list_v4l2_btn.addEvent('click', function(){
-        //    self.devices_list('video');
-        //});
 	},
 	
 	/**
@@ -66,9 +49,8 @@ Devices.methods(
 	 * Utility functions
 	 * -----------------
 	 */
-	
 	/**
-	 * Notify all the controllers (buttons/fields/etc) state when an event call
+	 * Notifies all the controllers (buttons/fields/etc) state when an event call
 	 * this method.
 	 * 
 	 * For every controller you want to be notify you have to call the method
@@ -84,7 +66,7 @@ Devices.methods(
      * @param {string} event The event that fire the notification.
 	 */
 	function notify_controllers(self, event){
-		// self.upd_start_btn(event);
+        // pass
 	},
     
 	/**
@@ -92,10 +74,9 @@ Devices.methods(
 	 * Called from Client
 	 * ------------------
 	 */
-	
 	/**
 	 * Get info from others widgets.
-	 * (call from the client)
+	 * (called from the client)
 	 * 
 	 * Called when a contact is selected.
 	 * 
@@ -116,13 +97,6 @@ Devices.methods(
 	 * @member Devices
 	 */
 	function devices_list(self, driver_kind) {
-        /* 
-         * if (driver_name == 'jackd') {
-            kind = 'audio';
-        } else if (driver_name == 'v4l2') {
-            kind = 'video';
-        }
-        */
         self.callRemote('rc_devices_list', driver_kind);
     },
 
@@ -143,24 +117,19 @@ Devices.methods(
     // nothing here for now.
 
 	/**
-     * 
-     *
 	 * (called from Python)
-     *
 	 * @member Devices
-     * @param {list} lines List of text lines to display.
+     * @param {devs_list} list of dict ...
 	 */
-	function rc_devices_list_all(self, txt, devs_list) {
+	function rc_devices_list_all(self, devs_list) {
         dbug.info("DEVICES: rc_devices_list_all called");
         self.devices_div.empty();
-        //var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
-        
         if (devs_list.length > 0) {
             devs_list.each(function(dev) 
             {
                 var title = new Element('h2');
                 title.inject(self.devices_div);
-                // "default" audio device using the "jackd" driver
+                // Something like : "default" audio device using the "jackd" driver
                 title.appendText('"' + dev.dev_name + '" ' + dev.dr_kind + " device using the \"" + dev.dr_name + 
 "\" driver" );
                 var ul = new Element('ul');
@@ -176,35 +145,8 @@ Devices.methods(
             p.appendText("No device to list.");
             p.inject(self.devices_div);
         }
-        
-        // var txt = "";
-        // txt += devs_list.toString();
-        // if (devs_list.length == 0) {
-        //     var p = new Element('p').appendText('No devices to list').inject(self.devices_div); 
-        // } else {
-        //     for (var dev in devs_list) {
-        //         txt += dev.kind + '/';
-        //         txt += dev.driver_name + '/';
-        //         txt += dev.device_name + ' \n';
-        //         for (var attr in dev.attributes) {
-        //             txt += "    " + attr.name + "=";
-        //             if (attr.kind == 'int' || attr.kind == 'float') {
-        //                 txt += (attr.value).toString();
-        //                 // int, string, boolean, options
-        //             } else {
-        //                 txt += attr.value;
-        //             }
-        //             if (attr.kind == 'options') {
-        //                 txt += attr.options.toString();
-        //             }
-        //         }
-        //     }
-        // }
-        // var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
 	},
 	/**
-     * 
-     *
 	 * (called from server)
 	 * 
      * See miville/network.py for the list of fields received from Python.
@@ -215,6 +157,7 @@ Devices.methods(
      * @param {string} remote_data Dict/object with iperf stats.
 	 */
 	function rc_devices_list(self, driver_name, devices_list) {
+        /*
         dbug.info("DEVICES: rc_devices_list called");
         if (driver_name == 'jackd') {
             self.jackd_div.empty();
@@ -223,5 +166,6 @@ Devices.methods(
             self.v4l2_div.empty();
             var p = new Element('pre').appendText('List of V4L2 devices: ' + devices_list).inject(self.v4l2_div); 
         }
+        */
 	}
 );
