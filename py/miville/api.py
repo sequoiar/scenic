@@ -347,43 +347,6 @@ class ControllerApi(object):
         
         contact.stream_state = STATE_STARTING
         self.streams_manager.start(contact)
-    
-    def remote_stopped_streams(self, caller, notif):
-        """
-        Called from the StreamsManager when remote host has stopped to stream.
-        
-        :param caller: Always None
-        :param notif: dict with keys  
-            {
-            "contact":contact_infos.contact,
-            "contact_name":contact_name,
-            "message":msg,
-            "success":False,
-            }
-        """
-        log.info("REMOTE_STOPPED_STREAMS")
-        self.notify(caller, notif)
-        notif["contact"].stream_state = STATE_STOPPED
-
-    def remote_started_streams(self, caller, notif):
-        """
-        Called from the StreamsManager when remote host has started to stream.
-        
-        :param caller: Always None
-        :param notif: dict with keys  
-            {
-            "contact":contact_infos.contact,
-            "contact_name":contact_name,
-            "message":msg,
-            "success":False,
-            }
-        """
-        log.info("REMOTE_STARTED_STREAMS")
-        if notif["success"]:
-            notif["contact"].stream_state = STATE_STREAMING
-        else:
-            notif["contact"].stream_state = STATE_STOPPED
-        self.notify(caller, notif)
                             
     def stop_streams(self, caller, contact_name):
         """

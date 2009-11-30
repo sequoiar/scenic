@@ -93,7 +93,7 @@ class Session(object):
             "message":'',
             "success":True,
             }
-        self.manager.api.remote_started_streams(None, notif)
+        self.manager.remote_started_streams(notif)
     
     def on_milhouse_exitted(self):
         """ Should be called when a Milhouse process has exitted """
@@ -114,7 +114,7 @@ class Session(object):
                 "success":False,
                 }
             # FIXME: call something else...
-            self.manager.api.remote_started_streams(None, notif)
+            self.manager.remote_started_streams(notif)
     
     def on_milhouse_exitted_itself(self):
         """ Should be called when a Milhouse process has exitted itself, i.e. the window was closed. This
@@ -134,7 +134,7 @@ class Session(object):
             "message":'Stopped',
             "success":True,
             }
-        self.manager.api.remote_stopped_streams(None, notif)
+        self.manager.remote_stopped_streams(notif)
 
     def on_problem(self, problem):
         """ Should be called when a Milhouse process has a problem """
@@ -147,10 +147,9 @@ class Session(object):
             "message":str(problem),
             "success":True,
             }
-        self.manager.api.remote_stopped_streams(None, notif)
+        self.manager.remote_stopped_streams(notif)
         self.manager.stop(self.contact_infos.contact)
 
-    
     def on_rtcp_sender_connected(self, value):
         """ Called when rtcp messages indicate that the Milhouse sending process is currently sending
             packets to a Milhouse receiving process """
@@ -544,6 +543,44 @@ class StreamsManager(object):
         comm = communication.get_channel_for_contact(contact)
         comm.send_stop(session)
         self._stop(session)
+
+    def remote_stopped_streams(self, notif):
+        """
+        Called from the StreamsManager when remote host has stopped to stream.
+        
+        :param caller: Always None
+        :param notif: dict with keys  
+            {
+            "contact":contact_infos.contact,
+            "contact_name":contact_name,
+            "message":msg,
+            "success":False,
+            }
+        """
+        log.info("REMOTE_STOPPED_STREAMS")
+        self.api.notify(None, notif)
+        notif["contact"].stream_state = STATE_STOPPED
+    
+    def remote_started_streams(self, notif):
+        """
+        Called from the StreamsManager when remote host has started to stream.
+        
+        :param caller: Always None
+        :param notif: dict with keys  
+            {
+            "contact":contact_infos.contact,
+            "contact_name":contact_name,
+            "message":msg,
+            "success":False,
+            }
+        """
+        log.info("REMOTE_STARTED_STREAMS")
+        if notif["success"]:
+            notif["contact"].stream_state = STATE_STREAMING
+        else:
+            notif["contact"].stream_state = STATE_STOPPED
+        self.api.notify(None, notif)
+
 
 def _start(api):
     """
