@@ -103,12 +103,18 @@ Devices.methods(
 	 * (called from the js client)
 	 * @member Devices
 	 */
-	function set_norm(self, target) {
-        dev_name = target.getProperty("dev_name");
-        norm_value = target.value;
+	function set_norm(self, dev_name, norm_value) {
         dbug.info("set_norm" + dev_name + " " + norm_value)
         self.callRemote('rc_set_norm', dev_name, norm_value);
-        target.blur(); // lose focus on form element
+    },
+	/**
+     * Changes the input number of a V4L2 video device.
+	 * (called from the js client)
+	 * @member Devices
+	 */
+	function set_input(self, dev_name, input_value) {
+        dbug.info("set_input" + dev_name + " " + input_value)
+        self.callRemote('rc_set_input', dev_name, input_value);
     },
 	/**
 	 * ------------------
@@ -158,9 +164,34 @@ Devices.methods(
                         dbug.info("adding onChange callback");
                         sel.addEvent('change', function(event) {
                             dbug.info("on change norm");
-                            self.set_norm(event.target); //dev_name, sel.value);
+                            var dev_name = event.target.getProperty("dev_name");
+                            var norm_value = event.target.value;
+                            self.set_norm(dev_name, norm_value); 
+                            event.target.blur(); // lose focus on form element
                         });
-                        // XXX uncomment this :
+                        sel.inject(li);
+                    }
+                    // V4L2 INPUT:
+                    else if (dev.dr_name == "v4l2" && attr.name == "input")
+                    {
+                        var sel = new Element("select", {
+                            "dev_name": dev.dev_name
+                            });
+                        attr.options.each(function(opt) {
+                            var o = new Element("option", {
+                                "html": opt,
+                                "selected":opt == attr.value,
+                                "value": opt});
+                            o.inject(sel);
+                        });
+                        dbug.info("adding onChange callback");
+                        sel.addEvent('change', function(event) {
+                            dbug.info("on change input");
+                            var dev_name = event.target.getProperty("dev_name");
+                            var input_value = event.target.value;
+                            self.set_input(dev_name, input_value); 
+                            event.target.blur(); // lose focus on form element
+                        });
                         sel.inject(li);
                     }
                 }); // end for each attr
