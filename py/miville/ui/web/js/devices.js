@@ -35,9 +35,7 @@ Devices.methods(
 		// Get elements.
 		self.devices_div = $('deviceswidget_devices');
 		// Get string translations.
-        // TODO : use only translated strings in the GUI.
-		//self.start_str = $('js_deviceswidget_start').get('text'); // start string
-		//self.stop_str = $('js_deviceswidget_stop').get('text'); // stop string
+        // TODO : use translated strings in the GUI.
 		
 		// Register to the widgets communicator.
 		register('deviceswidget', self);
@@ -91,16 +89,6 @@ Devices.methods(
 	},
 
 	/**
-     * Refreshes the list of devices.
-	 * (called from the js client)
-	 * 
-	 * @member Devices
-	 */
-	function devices_list(self, driver_kind) {
-        self.callRemote('rc_devices_list', driver_kind);
-    },
-
-	/**
      * Refreshes the list of all devices attributes.
 	 * (called from the js client)
 	 * 
@@ -108,6 +96,16 @@ Devices.methods(
 	 */
 	function devices_list_all(self) {
         self.callRemote('rc_devices_list_all');
+    },
+
+	/**
+     * Changes the norm of a V4L2 video device.
+	 * (called from the js client)
+	 * @member Devices
+	 */
+	function set_norm(self, dev_name, norm_value) {
+        dbug.info("set_norm" + dev_name + " " + norm_value)
+        self.callRemote('rc_set_norm', dev_name, norm_value);
     },
 	/**
 	 * ------------------
@@ -137,35 +135,33 @@ Devices.methods(
                 dev.attributes.each(function(attr) 
                 {
                     var li = new Element('li');
-                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ") " + attr.options).inject(ul);
-                });
-            });
+                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ") options:" + attr.options + " ").inject(ul);
+                    // V4L2 NORM:
+                    if (dev.dr_name == "v4l2" && attr.name == "norm")
+                    {
+                        var sel = new Element("select");
+                        //dbug.info("attr.options:");
+                        //dbug.info(attr.options);
+                        //dbug.info(typeof attr.options);
+                        attr.options.each(function(opt) {
+                            var o = new Element("option", {
+                                "html": opt,
+                                "value": opt});
+                            o.inject(sel);
+                            o.addEvent('change', function() {
+                                dbug.info("on change norm")
+				                self.set_norm(dev_name, o.value);
+			                });
+                        });
+                        // XXX uncomment this :
+                        //sel.inject(li);
+                    }
+                }); // end for each attr
+            }); // end for each dev
         } else {
             var p = new Element('p');
             p.appendText("No device to list.");
             p.inject(self.devices_div);
         }
-	},
-	/**
-	 * (called from server)
-	 * 
-     * See miville/network.py for the list of fields received from Python.
-     *
-	 * @member NetworkTesting
-     * @param {string} contact_name The name of the contact . 
-     * @param {string} local_data Dict/object with iperf stats.
-     * @param {string} remote_data Dict/object with iperf stats.
-	 */
-	function rc_devices_list(self, driver_name, devices_list) {
-        /*
-        dbug.info("DEVICES: rc_devices_list called");
-        if (driver_name == 'jackd') {
-            self.jackd_div.empty();
-            var p = new Element('pre').appendText('List of JACK devices: ' + devices_list).inject(self.jackd_div); 
-        } else if (driver_name == 'v4l2') {
-            self.v4l2_div.empty();
-            var p = new Element('pre').appendText('List of V4L2 devices: ' + devices_list).inject(self.v4l2_div); 
-        }
-        */
 	}
 );

@@ -6,32 +6,8 @@
 	<h3 n:render="i18n">Devices</h3>
     <div id="devices" class="section">
         <div id="deviceswidget_devices">
-            No device to list.
+            Devices have not been polled yet.
         </div>
-        <!--
-        <table>
-            <tr>
-                <td>
-                    <input type="button" id="deviceswidget_list_jackd" value="Refresh JACK Devices" class="js_help button"></input>
-                </td>
-                <td>
-                    <input type="button" id="deviceswidget_list_v4l2" value="Refresh V4L2 Devices" class="js_help button"></input>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div id="deviceswidget_jackd">
-                        No JACK devices to list.
-                    </div>
-                </td>
-                <td>
-                    <div id="deviceswidget_v4l2">
-                        No V4L2 devices to list.
-                    </div>
-                </td>
-            </tr>
-        </table>
-        -->
 	</div>
 
     <!-- ####################### -->

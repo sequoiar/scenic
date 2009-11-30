@@ -55,6 +55,14 @@ class Devices(Widget):
         devs = self.api.devices_list_all(self)
         return False
     
+    def rc_set_norm(self, v4l2_dev_name, norm_value):
+        """
+        Changes the norm of a video device.
+        """
+        caller = self
+        log.debug("Changing norm to %s" % (norm_value))
+        self.api.set_video_standard(caller, norm_value)
+
     def cb_devices_removed(self, origin, data):
         """These might cause troubles if attributes change too often."""
         log.debug('cb_devices_removed')
@@ -92,10 +100,14 @@ class Devices(Widget):
                         a_value = attr.get_value()
                         a_kind = attr.kind # int, string, boolean, options
                         if a_kind == 'options':
-                            a_opts = "options=%s" % (attr.options)
+                            #a_opts = "options=%s" % (attr.options)
+                            a_opts = attr.options
+                            a_default = ""
                         else:
-                            a_opts = "default=%s" % (attr.default)
-                        attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts})
+                            a_opts = None
+                            a_default = attr.default
+                            #a_opts = "default=%s" % (attr.default)
+                        attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts, "default":a_default})
                     d = {"dr_kind":dr_kind, "dr_name":dr_name, "dev_name":dev_name, "attributes":attr_list}
                     devs.append(d)
                     log.debug("device : %s" % (d))
