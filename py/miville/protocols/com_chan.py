@@ -30,12 +30,16 @@ ComChannel class is used.
 
 # System imports
 #from types import FunctionType
-from inspect import ismethod, isfunction
+from inspect import ismethod
 
 # Twisted imports
 from zope.interface import implements
-from twisted.internet import reactor, defer
-from twisted.cred import portal, checkers, credentials, error
+from twisted.internet import reactor
+from twisted.internet import defer
+from twisted.cred import portal
+from twisted.cred import checkers
+from twisted.cred import credentials
+from twisted.cred import error
 from twisted.spread import pb
 from twisted.spread.pb import DeadReferenceError
 from twisted.python import failure
