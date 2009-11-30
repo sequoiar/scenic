@@ -81,12 +81,11 @@ class Session(object):
     def on_rtcp_sender_started(self, value):
         """ Called when rtcp messages indicate that the Milhouse sending process has started """
         #log.debug('RTCP SENDER STARTED: %s' % (value))
-        #FIXME: probably should only do this once per session instead of every 2 seconds
         if not self.notified_api_of_start:
-            self.notify_api_of_start()
+            self._notify_api_about_start()
             self.notified_api_of_start = True 
 
-    def notify_api_of_start(self):
+    def _notify_api_about_start(self):
         self.stream_state = STATE_STREAMING
         notif = {
             "contact":self.contact_infos.contact,
@@ -101,14 +100,7 @@ class Session(object):
         #log.debug('RTCP SENDER STARTED: %s' % (value))
         if self.stream_state != STATE_ERROR:
             log.info('MILHOUSE EXITTED')
-            self.stream_state = STATE_STOPPED
-            notif = {
-                "contact":self.contact_infos.contact,
-                "contact_name":self.contact_infos.contact.name,
-                "message":'Stopped',
-                "success":True,
-                }
-            self.manager.api.remote_stopped_streams(None, notif)
+            self._notify_api_about_stop()
     
     def on_could_not_start(self, message):
         """ Should be called when could not start milhouse"""
@@ -130,6 +122,11 @@ class Session(object):
             scrap the first one. """
         #log.debug('RTCP SENDER STARTED: %s' % (value))
         log.info('MILHOUSE EXITTED ITSELF')
+        self._notify_api_about_stop()
+        self.manager.stop(self.contact_infos.contact)
+
+    def _notify_api_about_stop(self):
+        """ Notify api of stop """
         self.stream_state = STATE_STOPPED
         notif = {
             "contact":self.contact_infos.contact,
@@ -138,7 +135,6 @@ class Session(object):
             "success":True,
             }
         self.manager.api.remote_stopped_streams(None, notif)
-        self.manager.stop(self.contact_infos.contact)
 
     def on_problem(self, problem):
         """ Should be called when a Milhouse process has a problem """
