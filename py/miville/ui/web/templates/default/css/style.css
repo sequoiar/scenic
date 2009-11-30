@@ -1,6 +1,6 @@
 body {
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-	font-size: 12px;
+	font-size: 10px;
 }
 
 h1 {
@@ -12,11 +12,11 @@ input.notify {
 }
 
 .color_one {
-	background-color: #c3ccd3;	
+	background-color: #bbb;	
 }
 
 .color_two {
-	background-color: #839eb3;	
+	background-color: #aaa;	
 }
 
 .color_text_fade {
@@ -24,11 +24,11 @@ input.notify {
 }
 
 .color_zebra {
-	background-color: #e9f2f9;	
+	background-color:  #eee;
 }
 
 .color_help {
-	background-color: #fffcd9;
+	background-color: #eee;
 }
 
 .color_selectable:hover {
@@ -95,4 +95,12 @@ input.notify {
 	margin-left: 4px;
 }
 
+select {
+    margin: 1px;
+    padding: 0px;
+}
+select option {
+    margin: 0;
+    padding: 0;
+}
 

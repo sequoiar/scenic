@@ -7,6 +7,7 @@
 
 #deviceswidget_devices {
     font-size:10px;
+    overflow:auto;
 }
 #deviceswidget_devices h2 {
     font-size:11px;
