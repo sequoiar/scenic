@@ -53,10 +53,13 @@ sudo $MAKEINSTALL
 popd
 
 
-#get x264, note that as of 09/23/2009 upstream x264 is incompatible gstreamer
+# get x264, note that as of 09/23/2009 upstream x264 is incompatible with gstreamer
+# and that there are unfortunately no real releases of x264, only daily tarballs
 wget -c ftp://ftp.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
 tar xjf $X264.tar.bz2
 pushd $X264
+# added enable-shared flag to make sure that we can build the gstreamer x264enc
+# plugin on 64 bit platforms
 ./configure --enable-shared
 make 
 sudo $MAKEINSTALL
@@ -64,7 +67,7 @@ sudo ldconfig
 popd
 
 
-#get libdc1394
+# get libdc1394
 wget -c http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/2.1.2/$DC1394.tar.gz
 tar xzf $DC1394.tar.gz
 pushd $DC1394
