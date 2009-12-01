@@ -57,7 +57,7 @@ popd
 wget -c ftp://ftp.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
 tar xjf $X264.tar.bz2
 pushd $X264
-./configure 
+./configure --enable-shared
 make 
 sudo $MAKEINSTALL
 sudo ldconfig
