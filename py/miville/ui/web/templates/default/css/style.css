@@ -1,10 +1,24 @@
 body {
-	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-	font-size: 10px;
+	font-family: Arial, Helvetica, FreeSans, Verdana, sans-serif;
+    background: #999 url("../img/patt_grey_16px.png");
+}
+body, select, input, td, th, li, p {
+    font-size: 11px;
 }
 
 h1 {
 	margin: 0; 
+}
+h3 { /* section header */
+    background-color:#eee;
+    padding:0; 
+    margin:0;
+    width: 100%;
+    color: #33f;
+}
+.section h3 {
+    color: #000;
+    font-size: 13pt;
 }
 
 input.notify {
@@ -12,11 +26,11 @@ input.notify {
 }
 
 .color_one {
-	background-color: #bbb;	
+	/* background-color: #999;	*/
 }
 
 .color_two {
-	background-color: #aaa;	
+	/* background-color: #999;	*/
 }
 
 .color_text_fade {
@@ -28,7 +42,7 @@ input.notify {
 }
 
 .color_help {
-	background-color: #eee;
+	/* background-color: #eee; */
 }
 
 .color_selectable:hover {
@@ -48,8 +62,12 @@ input.notify {
 }
 
 .section {
-	border: dotted 1px #999;
-	padding: 10px;
+	/* border: dotted 1px #999; */
+	/* border: outset 1px #999;*/
+	padding: 0px;
+    margin: 0px;
+    background-color:#eee;
+    border: solid 1px #999;
 }
 
 .spinner_small {
@@ -73,17 +91,17 @@ input.notify {
 	overflow: auto;
 	background-color: #FFF;
 	border: solid 1px #999;
-	font-size: 11px;
 	position: relative;
 	list-style: none;
 	padding: 0;
-	margin: 0;
+	margin: 4px;
 }
 
 .basic_list li {
 	height: 16px;
-	padding: 2px 4px;
+	padding: 1px 2px;
 	position: relative;
+    /* background-color:#fff; */
 }
 
 .basic_icon {
@@ -92,15 +110,20 @@ input.notify {
 	width: 16px;
 	height: 16px;
 	float: right;
-	margin-left: 4px;
+	margin-left: 2px;
 }
 
 select {
-    margin: 1px;
+    margin: 0px 1px 0px 1px; /* top right bottom left */
     padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 select option {
     margin: 0;
     padding: 0;
 }
-
+th {
+    text-align:left;
+    font-weight: bold;
+}

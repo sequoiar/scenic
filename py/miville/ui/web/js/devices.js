@@ -131,6 +131,8 @@ Devices.methods(
 	function rc_devices_list_all(self, devs_list) {
         dbug.info("DEVICES: rc_devices_list_all called");
         self.devices_div.empty();
+        var table = new Element("table");
+        table.inject(self.devices_div);
         var has_jackd = false;
         if (devs_list.length > 0) {
             devs_list.each(function(dev) 
@@ -139,17 +141,18 @@ Devices.methods(
                 {
                     has_jackd = true;
                 }    
-                var title = new Element('h2');
-                title.inject(self.devices_div);
+                var _tr = new Element("tr");
+                var title = new Element('th', {"colspan": 3, "class": "dev_name"}).inject(_tr);
+                _tr.inject(table);
                 // Something like : "default" audio device using the "jackd" driver
                 title.appendText('"' + dev.dev_name + '" ' + dev.dr_kind + " device using the \"" + dev.dr_name + 
 "\" driver" );
-                var ul = new Element('ul');
-                ul.inject(self.devices_div);
                 dev.attributes.each(function(attr) 
                 {
-                    var li = new Element('li');
-                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ")").inject(ul);
+                    var tr2 = new Element('tr').inject(table);
+                    var td1 = new Element("td", {"class": "dev_attr_name"}).inject(tr2).appendText(attr.name + " :");
+                    var td2 = new Element("td", {"class": "dev_attr_value"}).inject(tr2).appendText(attr.value);
+                    var td3 = new Element("td", {"class": "dev_attr_change"}).inject(tr2);
                     // V4L2 NORM:
                     if (dev.dr_name == "v4l2" && attr.name == "norm")
                     {
@@ -174,7 +177,7 @@ Devices.methods(
                             self.set_norm(dev_name, norm_value); 
                             event.target.blur(); // lose focus on form element
                         });
-                        sel.inject(li);
+                        sel.inject(td3);
                     }
                     // V4L2 INPUT:
                     else if (dev.dr_name == "v4l2" && attr.name == "input")
@@ -197,7 +200,7 @@ Devices.methods(
                             self.set_input(dev_name, input_value); 
                             event.target.blur(); // lose focus on form element
                         });
-                        sel.inject(li);
+                        sel.inject(td3);
                     }
                 }); // end for each attr
             }); // end for each dev

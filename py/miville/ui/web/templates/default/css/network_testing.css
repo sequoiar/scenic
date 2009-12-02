@@ -1,10 +1,11 @@
 #nettest {
     /* border:1px dotted #999; */
+    padding-top: 4px; /* FIXME HACK ! */
 }
 #nettest table {
     width:100%; 
-    padding:10px; 
-    font-size:11px;
+    /* padding:2px; */
+    /* font-size:11px; */
 }
 .nettest_progress { /* test in progress icon */
 	background-image: url(/img/spinner16.png); /* macthrob-small.png); */
@@ -42,19 +43,19 @@
 #nettest_bandwidth {
      width: 50px;
      text-align: right;
-     font-size:11px;
+     /* font-size:11px; */
 }
 #nettest_duration {
     width: 40px;
     text-align: right;
-    font-size:11px;
+    /* font-size:11px; */
 }
 #nettest_unit {
-    font-size:11px; 
+    /* font-size:11px; */
     width: 80px;
 }
 #nettest_kind {
-    font-size:11px;
-    width: 140px;
+    /* font-size:11px; */
+    width: 150px;
 }
 

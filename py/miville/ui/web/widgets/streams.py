@@ -43,11 +43,8 @@ class Streams(Widget):
         Called from the javascript widget.
         :param contact: unicode name of the contact
         """
-        # self.api.select_contact(self, contact)
         self.api.notify(self, contact, 'will_start_streams_with_contact') # XXX FIXME HACK sending this for addressbook web widget.
         deferred = self.api.start_streams(self, contact)
-        #def _cb(result, self):
-        #deferred.addCallback(_cb, self)
         return False
         
     def rc_stop_streams(self, contact):
@@ -79,7 +76,6 @@ class Streams(Widget):
         """
         # set the profile_id for contact.
         self.api.modify_contact(self, contact, profile_id=setting)
-        
         # build details for the newly selected profile.
         details = [] # array of dict with keys "name" and "value"
         profile_id = int(setting)
@@ -90,7 +86,6 @@ class Streams(Widget):
             log.debug("    name:%s, value:%s" % (field.name, v))
             details.append({"name":field.name, "value":v})
         self.callRemote("update_details", details)
-        
         return False
         
     def cb_list_profiles(self, origin, data): #TODO:rename this ugly method name

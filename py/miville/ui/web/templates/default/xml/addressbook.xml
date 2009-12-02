@@ -1,8 +1,8 @@
 <div xmlns:n="http://nevow.com/ns/nevow/0.1"
     xmlns:athena="http://divmod.org/ns/athena/0.7"
     n:render="liveFragment">
-	<h3 n:render="i18n">Connections</h3>
 	<div class="section">
+	    <h3 n:render="i18n">Connections</h3>
 		<ul class="js_help basic_list" id="adb_list">
 		</ul>
 		<div id="adb_status" class="color_text_fade">

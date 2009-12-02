@@ -5,10 +5,7 @@
 }
 */
 
-#deviceswidget_devices {
-    font-size:10px;
-    overflow:auto;
-}
+
 #deviceswidget_devices h2 {
     font-size:11px;
     font-weight: bold;
@@ -20,4 +17,20 @@
     padding-top: 0;
     margin-top: 0;
 }
+th.dev_name {
+    padding-top:5px;
+    color:#333;
+}
+td.dev_attr_name {
+    color:#666;
+    padding-left:30px;
+    font-weight: bold;
+}
 
+td.dev_attr_value {
+    text-align: right;
+}
+td.dev_attr_change {
+    padding-left: 20px;
+    text-align: right;
+}

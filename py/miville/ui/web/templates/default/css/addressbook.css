@@ -3,18 +3,18 @@
 }
 
 .conn_connected {
-	background-image: url(/img/network-transmit-receive.png);
+	background-image: url("/img/network-transmit-receive.png");
 }
 
 .streaming {
-	background-image: url(/img/mail-send-receive.png);
+	background-image: url("/img/mail-send-receive.png");
 }
 
 #adb_add {
 	float: left;
 	width: 22px;
 	height: 22px;
-	background-image: url(/img/list-add.png);
+	background-image: url("/img/list-add.png");
 	background-repeat: no-repeat;
 }
 
@@ -22,19 +22,18 @@
 	float: left;
 	width: 22px;
 	height: 22px;
-	background-image: url(/img/list-remove.png);
+	background-image: url("/img/list-remove.png");
 	background-repeat: no-repeat;
 }
 
 #adb_join {
 	position: absolute;
 	right: 0px;
-	margin-right: 32px;
+	margin-right: 5px;
 }
 
 #adb_fields {
 	clear: both;
-	font-size: 11px;
 	text-align: right;
 }
 
@@ -58,7 +57,6 @@ div.button_disabled:hover {
 #adb_status {
 	min-height: 22px;
 	line-height: 22px;
-	font-size: 10px;
 }
 
 #adb_status_icon {
@@ -91,7 +89,6 @@ li.auto_created {
 	background-color: #b2b2b2;
 	padding: 0 5px;
 	line-height: 30px;
-	font-size: 10px;
 	font-weight: bold;
 	margin: 0px 0px 0px 10px;
 }

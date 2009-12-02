@@ -100,7 +100,7 @@ class Devices(Widget):
         :data: list of devices
         they all belong to the same driver.
         """
-        log.debug('Got answer from api.devices_list_all')
+        log.debug('Got answer from api.devices_list_all()')
         VERY_VERBOSE = False
         devs = []
         #if origin is self:
@@ -127,7 +127,7 @@ class Devices(Widget):
                         attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts, "default":a_default})
                     d = {"dr_kind":dr_kind, "dr_name":dr_name, "dev_name":dev_name, "attributes":attr_list}
                     devs.append(d)
-                    log.debug("device : %s" % (d))
+                    #log.debug("device : %s" % (d))
             self.callRemote('rc_devices_list_all', devs)
 
     expose(locals())
