@@ -2,6 +2,9 @@ body {
 	font-family: Arial, Helvetica, FreeSans, Verdana, sans-serif;
     background: #999 url("../img/patt_grey_16px.png");
 }
+table {
+    border-collapse:collapse;
+}
 body, select, input, td, th, li, p {
     font-size: 11px;
 }
@@ -16,6 +19,16 @@ h3 { /* section header */
     width: 100%;
     color: #33f;
 }
+/*
+.tight_table tr {
+    margin: 0;
+    padding: 0;
+}
+.tight_table td {
+    margin: 0 2px;;
+    padding: 0;
+}
+*/
 .section h3 {
     color: #000;
     font-size: 13pt;
@@ -46,15 +59,15 @@ input.notify {
 }
 
 .color_selectable:hover {
-	background-color: #ffeaab;
+	background-color: #d3e0ef;
 }
 
 .color_selectable:active {
-	background-color: #ffd75a;
+	background-color: #8db1d9;
 }
 
 .color_selected, .color_selected:hover {
-	background-color: #ffd75a;
+	background-color: #b7cee6;
 }
 
 .color_optional {

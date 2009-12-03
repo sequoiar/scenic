@@ -5,6 +5,9 @@
     <title>miville : mockup short-term</title>
     <!-- voir http://www.w3schools.com/css/ -->
     <style type="text/css">
+    #foo td {
+        vertical-align:top;
+    }
     body {
         font-family: sans-serif;
     }
@@ -138,4 +141,40 @@
         <td>b</td>
         <td>c</td>
     </tr>
-</body></html>
+</table>
+
+<table id="foo">
+    <tr>
+        <td>
+            a <br />
+            a <br />
+            a <br />
+            a <br />
+            a <br />
+            a <br />
+        </td>
+        <td rowspan="2">
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+        </td>
+    <tr>
+        <td>
+            c <br />
+            c <br />
+            c <br />
+            c <br />
+            c <br />
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

@@ -4,17 +4,24 @@
     <div id="strm_section" class="section">
 	<h3 n:render="i18n">Streams</h3>
     <table id="strm_table">
-    <tr><td>
-        <input type="button" id="strm_start" value="Start" class="js_help button" disabled="true"></input>
-        <span id="strm_presets" n:render="i18n">Presets:</span>
-        <span>
-        <select id="strm_global_setts" disabled="disabled">
-            <option n:render="i18n">No settings loaded</option>
-        </select>
-        </span>
-    </td><td>
-        <span id="strm_details"></span>
-	</td></tr>
+        <tr>
+            <td style="overflow:auto;">
+                <span id="strm_presets" n:render="i18n">Profile :</span>
+                <span>
+                    <select id="strm_global_setts" disabled="disabled">
+                        <option n:render="i18n">No settings loaded</option>
+                    </select>
+                </span>
+                <br />
+                <br />
+                <input type="button" id="strm_start" value="Start" class="js_help button" disabled="true">
+                </input>
+            </td>
+            <td>
+                <span id="strm_details">
+                </span>
+            </td>
+        </tr>
     </table>
     </div>
 	<!-- Help strings -->
@@ -24,5 +31,5 @@
 	<span n:render="i18n" id="js_strm_start" class="strm js_str">Start</span>
 	<span n:render="i18n" id="js_strm_stop" class="strm js_str">Stop</span>
 	<span n:render="i18n" id="js_strm_user" class="strm js_str">User settings</span>
-	<span n:render="i18n" id="js_strm_preset" class="strm js_str">Preset settings</span>
+	<span n:render="i18n" id="js_strm_preset" class="strm js_str">Profiles</span>
 </div>

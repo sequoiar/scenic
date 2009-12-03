@@ -54,7 +54,7 @@ Streams.methods(
 		register('strm', self);
 		
 		// Request the settings list
-		self.callRemote('rc_update_settings');
+		self.callRemote('rc_update_profiles');
 	},
 
 	/**
@@ -93,47 +93,26 @@ Streams.methods(
 	 * Called from the python Server
 	 * -----------------------------
 	 */
-
 	/**
 	 * Update the settings menu to reflect the state of the server.
-	 * (call from server)
+	 * (called from server)
 	 * 
 	 * @member Streams
-     * @param {array} presets An array of preset setting object. 
-     * @param {array} users An array of user setting object. 
+     * @param {array} profiles An array of preset setting object. 
 	 */
-    function update_settings(self, presets, users) {
-		if (users.length > 0 || presets.length > 0) {
+    function update_profiles(self, profiles) {
+		if (profiles.length > 0) {
 			self.empty = false;
 			self.global_slct.empty();
 			self.global_slct.disabled = false;
-			
-			// // populate the user settings
-			// if (users.length > 0) {
-			// 	// add the user section title
-			// 	var optgroup = new Element('optgroup', {
-			// 		'label': self.user_str
-			// 	});
-			// 	optgroup.inject(self.global_slct);
-			// 	
-			// 	users.each(function(setting){
-			// 		var opt = new Element('option', {
-			// 			'html': setting.name,
-			// 			'value': setting.id
-			// 		});
-			// 		opt.inject(optgroup);
-			// 	});
-			// }
-			
-			// populate the user settings
-			if (presets.length > 0) {
+			// populate with profiles name and ID: 
+			if (profiles.length > 0) {
 				// add the preset section title
 				var optgroup = new Element('optgroup', {
 					'label': self.preset_str
 				});
 				optgroup.inject(self.global_slct);
-				
-				presets.each(function(setting){
+				profiles.each(function(setting){
 					var opt = new Element('option', {
 						'html': setting.name,
 						'value': setting.id
@@ -141,13 +120,11 @@ Streams.methods(
 					opt.inject(optgroup);
 				});
 			}
-			
 		} else {
-			// if there's no setting, disabled the menu
+			// if there's no profile to list, disable the menu
 			self.empty = false;
 			self.global_slct.disabled = true;
 		}
-		
 	},
 
 	/**
@@ -160,14 +137,25 @@ Streams.methods(
     function update_details(self, details) {
         // XXX
         self.strm_details.empty();
+        var is_odd = true;
+        var style_name = "";
         if (details.length > 0) {
-            var ul = new Element('ul');
-            ul.inject(self.strm_details);
+            var table = new Element('table', {"class": "tight_table"});
+            table.inject(self.strm_details);
             details.each(function(detail) 
             {
-                var li = new Element('li');
-                li.appendText(detail.name + ": " + detail.value);
-                li.inject(ul);
+                if (is_odd) {
+                    style_name = "color_zebra";
+                } else {
+                    style_name = "";
+                }
+                var tr = new Element('tr', {"class": style_name});
+                var td1 = new Element("td").inject(tr);
+                var td2 = new Element("td").inject(tr);
+                td1.appendText(detail.name + " :");
+                td2.appendText(detail.value);
+                tr.inject(table);
+                is_odd = ! is_odd;
             });
         }
     },
@@ -234,9 +222,9 @@ Streams.methods(
 	 * 
 	 * @member Streams
 	 */
-	function set_setting(self) {
-		var setting = self.global_slct.get('inputValue');
-		self.callRemote('rc_set_setting', self.contact.get('name'), setting);
+	function set_profile(self) {
+		var profile_id = self.global_slct.get('inputValue');
+		self.callRemote('rc_set_profile', self.contact.get('name'), profile_id);
 	},
 
 	/**
@@ -264,16 +252,14 @@ Streams.methods(
      */
 	function upd_start_btn(self, event) {
 		// list of events that "list" should react to
-		if ('contact_selected' == event) {
-			
+		if (event == 'contact_selected') 
+        {
 			// set the default state
 			var button_state = 'disabled';
 			var button_name = self.start_str;
-			
 			// get the state of other controls necessary to find the state
 			var stream_state = self.contact.get('stream_state');
 			var connection_state = self.contact.get('state');
-
 			// add event to the button
 			self.start_btn.removeEvents('click');
 			if (connection_state == 'disconnected' || connection_state == 'connected') {
@@ -294,10 +280,8 @@ Streams.methods(
 					});
 				}
 			}
-			
 			// set the name
 			self.start_btn.value = button_name;
-			
 			// set the state
 			if (button_state == 'enabled') {
 				self.start_btn.disabled = false;
@@ -309,7 +293,6 @@ Streams.methods(
 			self.start_btn.disabled = true;
 			self.start_btn.value = self.start_str;
 		}
-
 	},
 	
     /**
@@ -324,18 +307,19 @@ Streams.methods(
      *  - 'add_contact'
      */
 	function upd_global_slct(self, event) {
-		self.global_slct.removeEvents('change');
 		if ('contact_selected' == event) {
+		    self.global_slct.removeEvents('change');
 			// get the setting id of the selected contact
 			var setting = self.contact.get('setting')
 			if (setting) {
 				self.global_slct.set('inputValue', setting);
 			} else {
-				dbug.info('We have a problem Roger: setting = null');
+				dbug.info('Error : setting is null');
 			}
 			self.global_slct.addEvent('change', function(){
-				self.set_setting();
+				self.set_profile();
 			});
+		    self.callRemote('rc_profile_details_for_contact', self.contact.get('name'));
 			// Enables or disables the settings drop-down according to : 
             //  * the state of the stream (stopped or streaming) Has to be stopped to be enabled.
             //  * if the settings menu is empty
@@ -344,12 +328,10 @@ Streams.methods(
 			} else {
 				self.global_slct.disabled = false;
 			}
-
 		} else if (['contact_unselected',
 					'add_contact'].contains(event)) {
+		    self.global_slct.removeEvents('change');
 			self.global_slct.disabled = true;
 		}
 	}
-	
 );
-
