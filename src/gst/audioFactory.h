@@ -69,7 +69,7 @@ namespace audiofactory
 
             shared_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
 
-            rConfig->capsOutOfBand(msg["caps-out-of-band"] 
+            rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
 
             tx->init();

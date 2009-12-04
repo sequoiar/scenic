@@ -22,11 +22,20 @@
 #ifndef _DC1394_H_
 #define _DC1394_H_
 
+#include <gst/gst.h>
+#include <string>
+
 class DC1394 
 {
     public:
         static void listCameras();
+        static int capsToMode(int cameraNumber, int width, 
+                int height, 
+                const std::string &colourspace,
+                int framerate);
         static int GUIDToCameraNumber(unsigned long long GUID);
+        static bool requiresMoreISOSpeed(int mode);
+        static const int MAX_ISO_SPEED = 800;
 };
 
 #endif //_DC1394_H_

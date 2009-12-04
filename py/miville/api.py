@@ -490,14 +490,13 @@ class ControllerApi(object):
             log.error(e.message)
         # TODO Return a Deferred !
     
-    def set_video_standard(self, caller, value=None, device_name=None):
+    def set_video_standard(self, caller, value=None):
         """
         Easily sets the video standard. (norm)
         
         Valid string values are "ntsc", "secam" and "pal".
         If value is None, sets it according to the time zone.
         """
-        # TODO: use device_name arg
         log.debug("set_video_standard %s %s" % (caller, value))
         return devices.set_video_standard(caller, value)
         # TODO Return a Deferred !

@@ -1,4 +1,5 @@
 NTA:
+-if we do get a crappy resolution, try to set it to something reasonable instead of crashing
 -do more initialization in constructors, RAII
 -support for raw video (does work with smaller <200 jitter buffer)
 -set resolution

@@ -74,17 +74,22 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("disable-jack-autoconnect,J", po::bool_switch(), "make sure milhouse's "
                     "jack audio ports don't connect on startup")
             ("jack-client-name,O", po::value<string>()->default_value(""), "name of jack-client")
-            ("caps-out-of-band,C", po::bool_switch(), "force caps to be communicated out of band")
+            ("negotiate-caps,C", po::bool_switch(), "force media capabilities (caps) to be communicated over tcp")
             ("debug,D", po::value<string>()->default_value("info"), "level of logging verbosity (string/int) "
                     "(critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6)")
             ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
             ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
             ("list-cameras,H", po::bool_switch(), "list connected cameras")
             ("serverport,y", po::value<int>(), "run as server and listen on this port for ipcp messages")
-            ("width,P", po::value<int>()->default_value(videosize::WIDTH), "width for video "
-             "(sets capture width if sender, or scales output width if receiver)")
-            ("height,Q", po::value<int>()->default_value(videosize::HEIGHT), "height for video "
-             "(sets capture height if sender, or scales output height if receiver)")
+            ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture"
+             "(sets video capture width)")
+            ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture"
+             "(sets video capture height)")
+            ("display-width,P", po::value<int>()->default_value(videosize::WIDTH), "width for video on display"
+             "(scales output video width)")
+            ("display-height,Q", po::value<int>()->default_value(videosize::HEIGHT), "height for video "
+             "(scales output video height)")
+            ("grayscale,M", po::bool_switch(), "force dc1394 capture to grayscale")
             ;
 
         descriptionInitialized = true;

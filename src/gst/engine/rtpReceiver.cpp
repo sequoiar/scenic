@@ -93,15 +93,6 @@ void RtpReceiver::setCaps(const char *capsStr)
 }
 
 
-void RtpReceiver::checkSampleRate()
-{
-    GstPad *srcPad = gst_element_get_pad(rtp_receiver_, "src");
-    GstCaps *srcCaps = gst_pad_get_negotiated_caps(srcPad);
-    gst_caps_unref(srcCaps);
-    gst_object_unref(srcPad);
-}
-
-
 void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /* data*/)
 {
     // don't look at the full name

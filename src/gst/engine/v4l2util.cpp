@@ -294,6 +294,7 @@ void v4l2util::printSupportedSizes(const std::string &device)
     typedef std::pair<int, int> Size;
     typedef std::vector< Size > SizeList;
     SizeList sizes;
+    sizes.push_back(Size(768, 480));
     sizes.push_back(Size(720, 480));
     sizes.push_back(Size(704, 480));    // 4CIF
     sizes.push_back(Size(704, 240));    // 2CIF
@@ -316,7 +317,6 @@ void v4l2util::printSupportedSizes(const std::string &device)
         setCaptureFormat(device, format);
         v4l2_format currentFormat = getCaptureFormat(device);
 
-        // FIXME: make sure format has been set?
         if (!formatsMatch(format, currentFormat))
             LOG_PRINT("\tFormat " << size->first << "x" << size->second << " not supported\n");
         else
@@ -324,6 +324,7 @@ void v4l2util::printSupportedSizes(const std::string &device)
             
     }
 
+    // restore old format
     format.fmt.pix.width = oldWidth;
     format.fmt.pix.height = oldHeight;
     setCaptureFormat(device, format);

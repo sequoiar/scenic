@@ -355,9 +355,14 @@ void Pipeline::stop()
 {
     if (isStopped())        // only needs to be stopped once
         return;
-    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-    tassert(checkStateChange(ret)); // set it to paused
-    LOG_DEBUG("Now stopped/null");
+    if (pipeline_)
+    {
+        GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
+        tassert(checkStateChange(ret)); // set it to paused
+        LOG_DEBUG("Now stopped/null");
+    }
+    else
+        LOG_DEBUG("Pipeline == 0, can't be stopped");
 }
 
 

@@ -5,6 +5,9 @@
 }
 */
 
+#deviceswidget_devices {
+    font-size:10px;
+}
 #deviceswidget_devices h2 {
     font-size:11px;
     font-weight: bold;
@@ -16,29 +19,4 @@
     padding-top: 0;
     margin-top: 0;
 }
-table.devs_table {
-    background-color: #fff;
-    border: solid 1px #666;
-    margin-left: 10px;
-}
-th.dev_name {
-    border-top: solid 1px #666;
-    padding-top:5px;
-    color:#333;
-    background: #999 url("../img/patt_grey_16px.png");
-}
-td.dev_attr_name {
-    color:#666;
-    padding-left:30px;
-    font-weight: bold;
-}
-td.dev_attr_value {
-    text-align: right;
-    padding-right: 4px;
-}
-/*
-td.dev_attr_change {
-    padding-left: 20px;
-    text-align: right;
-}
-*/
+

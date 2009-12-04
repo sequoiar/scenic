@@ -67,8 +67,8 @@ namespace videofactory
         {
             shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
 
-            // get caps here
-            std::string caps(CapsParser::getVideoCaps(msg["codec"]));
+            // get caps here, based on codec, capture width and capture height
+            std::string caps(CapsParser::getVideoCaps(msg["codec"], msg["width"], msg["height"]));
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
 
@@ -87,7 +87,7 @@ namespace videofactory
             shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID)); 
             shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
 
-            rConfig->capsOutOfBand(msg["caps-out-of-band"] 
+            rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
 
             tx->init(); 

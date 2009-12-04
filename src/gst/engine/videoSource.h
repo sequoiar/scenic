@@ -99,6 +99,7 @@ class VideoV4lSource
         std::string expectedStandard_;
         std::string deviceStr() const;
         std::string srcCaps() const;
+        bool willModifyCaptureResolution() const;
         _GstElement *srcElement() { return capsFilter_; }
 };
 
