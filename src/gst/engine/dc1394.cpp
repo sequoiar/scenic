@@ -82,6 +82,7 @@ int dc1394_caps_print_format_vmode_caps(int mode)
     PRINT_CASE(1600x1200_MONO16);
 
     default:
+        LOG_WARNING("Unknown vmode " << mode);
         retval = -1;
   }
   return retval;
