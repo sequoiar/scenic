@@ -90,6 +90,19 @@ do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
 
+DC1394PATCH=$(dirname $0)/dc1394-iso-speed.diff
+if [ -r $DC1394PATCH ]; then
+    echo "Patching gst-plugins-bad to add iso-speed property to dc1394src"
+    pushd $GST_BAD
+    patch -p1 < $DC1394PATCH
+    popd
+    echo "Done patching $GST_BAD"
+else
+    echo "No dc1394-iso-speed.patch found"
+    echo "Patch available on http://svn.sat.qc.ca/trunk/utils/dc1394-iso-speed.patch"
+    echo "Warning, iso-speed will be always 400Mbps."
+fi
+
 # Build!
 for module in $MODULES
 do
@@ -112,3 +125,4 @@ do
 echo "Installation completed, but who knows"
 echo "Life is full of surprises"
 echo "Downloaded files are in " $DOWNLOAD_DIR
+
