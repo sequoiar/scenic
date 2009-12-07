@@ -20,12 +20,12 @@
  *
  */
 
-#include "./sharedVideoSink.h"
-#include "./sharedVideoBuffer.h"
 #include "util.h"
+#include "sharedVideoSink.h"
+#include "sharedVideoBuffer.h"
 
-#include "./gstLinkable.h"
-#include "./pipeline.h"
+#include "gstLinkable.h"
+#include "pipeline.h"
 #include <gst/app/gstappbuffer.h>
 #include <gst/app/gstappsink.h>
 

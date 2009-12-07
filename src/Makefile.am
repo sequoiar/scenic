@@ -5,7 +5,7 @@ include $(top_srcdir)/globals.mak
 if BOOST_PYTHON
 PYTHONDIR = python
 endif
-SUBDIRS = include boost util gutil tcp gst main devices $(PYTHONDIR) $(SIPDIR)
+SUBDIRS = include boost util gutil shared_video tcp gst main devices $(PYTHONDIR) $(SIPDIR)
 
 
 BUILT_SOURCES = Makefile

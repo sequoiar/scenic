@@ -24,10 +24,9 @@
 #ifndef _SHARED_VIDEO_BUFFER_H_
 #define _SHARED_VIDEO_BUFFER_H_
 
+#include "videoSize.h"
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
-
-#include "util.h"
 
 class SharedVideoBuffer
 {

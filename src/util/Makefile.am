@@ -3,6 +3,8 @@ SUBDIRS= . test
 
 	
 lib_LTLIBRARIES= libutil.la
+# needed by libshared_video
+include_HEADERS = videoSize.h
 
 libutil_la_SOURCES = logWriter.cpp fileUtil.cpp mapMsg.cpp parser.cpp sigint.cpp baseThread.cpp \
 					 programOptions.cpp $(inc)/programOptions.h \

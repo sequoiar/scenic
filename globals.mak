@@ -16,8 +16,3 @@ done
 
 %_pylint.txt: %.py
 		pylint $^ > $@ 
-
-#	for pfile in *.py; do \
-    if [ $$pfile != "*.py" ]; then \
-        pylint *.py; break; fi; \
-done 

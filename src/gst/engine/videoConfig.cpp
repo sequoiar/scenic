@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include "videoSize.h"
 #include "mapMsg.h"
 
 #include <fstream>
