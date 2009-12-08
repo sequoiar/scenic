@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#include "videoSize.h"
 #include "gstLinkable.h"
 #include "videoSource.h"
 #include "pipeline.h"
