@@ -36,6 +36,10 @@ videoSink_(0)
 {
     if (!Raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
+
+    // setting this to false leads to lower latency and less 
+    // speeding-up/slowing-down. also v4l does it
+    g_object_set(dv1394src_, "do-timestamp", FALSE, NULL);
     gstlinkable::link(dv1394src_, dvdemux_);
 
     // register connection callback for demux
