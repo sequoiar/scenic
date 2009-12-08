@@ -1,5 +1,5 @@
 include $(top_srcdir)/globals.mak
-SUBDIRS= . test
+SUBDIRS= .
 
 	
 lib_LTLIBRARIES= libutil.la

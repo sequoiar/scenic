@@ -26,7 +26,7 @@
 #include "../engine/mediaBase.h"
 #include "gstThread.h"
 #include "gstSenderThread.h"
-#include "../engine/playback.h"
+#include "playback.h"
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>

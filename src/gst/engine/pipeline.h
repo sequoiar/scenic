@@ -64,6 +64,7 @@ class Pipeline : boost::noncopyable
         void notifyQuitted() { quitted_ = true; }
         bool quitted() { return quitted_; }
         void makeVerbose();
+        void postInterrupt();
 
     private:
         static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);

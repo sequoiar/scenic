@@ -152,12 +152,31 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                 }
                 break;
             }
+            // using fallthrough
         case GST_MESSAGE_ELEMENT:
+            Instance()->updateListeners(msg);
+            break;
         case GST_MESSAGE_APPLICATION:
+            /// handle interrupt
+            const GstStructure *s;
+
+            s = gst_message_get_structure(msg);
+
+            if (gst_structure_has_name (s, "MilhouseInterrupt")) 
             {
-                Instance()->updateListeners(msg);
-                break;
+                /* this application message is posted when we caught an interrupt and
+                 * we need to stop the pipeline. */
+                LOG_INFO("Interrupt: Stopping pipeline ...\n");
+                if (msg)
+                {
+                   // gst_message_unref(msg);
+                  //  gst_object_unref(bus);
+                }
+                return FALSE;
             }
+            else
+                Instance()->updateListeners(msg);
+            break;
 
         case GST_MESSAGE_LATENCY:
             {
@@ -510,5 +529,18 @@ void Pipeline::updateSampleRate(unsigned newRate)
 unsigned Pipeline::actualSampleRate() const
 {
     return sampleRate_;
+}
+
+
+void Pipeline::postInterrupt()
+{
+    /* post an application specific message */
+    if (pipeline_)
+    {
+        gst_element_post_message (GST_ELEMENT (pipeline_),
+                gst_message_new_application (GST_OBJECT (pipeline_),
+                    gst_structure_new ("MilhouseInterrupt",
+                        "message", G_TYPE_STRING, "Pipeline interrupted", NULL)));
+    }
 }
 

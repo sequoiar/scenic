@@ -1,5 +1,5 @@
 include $(top_srcdir)/globals.mak
-SUBDIRS = . test
+SUBDIRS = .
 lib_LTLIBRARIES = libtcp.la
 
 libtcp_la_SOURCES = tcpServer.cpp tcpThread.cpp asioThread.cpp tcpServer.h tcpThread.h asioThread.h

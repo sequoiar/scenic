@@ -20,9 +20,9 @@
  *
  */
 
+#include "playback.h"
 #include "util.h"
 
-#include "playback.h"
 #include "pipeline.h"
 #include "gutil.h"
 #include "mapMsg.h"
@@ -73,3 +73,7 @@ int playback::sampleRate()
     return Pipeline::Instance()->actualSampleRate();
 }
 
+void playback::postInterrupt()
+{
+//    Pipeline::Instance()->postInterrupt();
+}

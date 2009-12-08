@@ -32,6 +32,7 @@ namespace playback {
         void quit();
         bool quitted();
         int sampleRate();
+        void postInterrupt();
 }
 
 #endif // _PLAYBACK_H_

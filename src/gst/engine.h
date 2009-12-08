@@ -32,7 +32,7 @@
 #include "gst/engine/audioConfig.h"
 #include "gst/engine/videoConfig.h"
 #include "gst/engine/remoteConfig.h"
-#include "gst/engine/playback.h"
+#include "playback.h"
 #include "gst/engine/videoSink.h"
 #include "gst/engine/capsParser.h"
 #include "gst/engine/messageDispatcher.h"

@@ -30,8 +30,6 @@ AC_PROG_GCC_TRADITIONAL
 AC_CHECK_FUNCS([inet_ntoa memset socket])
 
 AC_MSG_CHECKING(whether to enable debugging)
-#AC_ARG_ENABLE([sip], [ **************** 
-#  --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
@@ -213,7 +211,6 @@ AC_CONFIG_FILES([Makefile
                  ])
 
 AC_CONFIG_FILES([
-                 src/util/test/Makefile
                  src/tcp/test/Makefile
                  src/gst/engine/test/Makefile
                  ])
