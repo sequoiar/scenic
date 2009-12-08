@@ -28,6 +28,22 @@
 
 Dv1394 *Dv1394::instance_ = 0;
 
+Dv1394::Dv1394() : 
+dv1394src_(Pipeline::Instance()->makeElement("dv1394src", NULL)), 
+dvdemux_(Pipeline::Instance()->makeElement("dvdemux", "demux")), 
+audioSink_(0), 
+videoSink_(0) 
+{
+    if (!Raw1394::cameraIsReady())
+        THROW_ERROR("Camera is not ready");
+    gstlinkable::link(dv1394src_, dvdemux_);
+
+    // register connection callback for demux
+    g_signal_connect(dvdemux_, "pad-added",
+            G_CALLBACK(Dv1394::cb_new_src_pad),
+            NULL);
+}
+
 Dv1394::~Dv1394()
 {
     Pipeline::Instance()->remove(&dvdemux_);
@@ -37,27 +53,9 @@ Dv1394::~Dv1394()
 
 Dv1394 * Dv1394::Instance()
 {
-    if (instance_ == 0) {
+    if (instance_ == 0)
         instance_ = new Dv1394();
-        instance_->init();
-    }
     return instance_;
-}
-
-
-void Dv1394::init()
-{
-    if (!Raw1394::cameraIsReady())
-        THROW_ERROR("Camera is not ready");
-
-    dv1394src_ = Pipeline::Instance()->makeElement("dv1394src", NULL);
-    dvdemux_ = Pipeline::Instance()->makeElement("dvdemux", "demux");
-    gstlinkable::link(dv1394src_, dvdemux_);
-
-    // register connection callback for demux
-    g_signal_connect(dvdemux_, "pad-added",
-            G_CALLBACK(Dv1394::cb_new_src_pad),
-            NULL);
 }
 
 

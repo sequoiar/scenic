@@ -64,7 +64,7 @@ class BaseThread
         QueuePair flippedQueue_;
 
         static std::set< BaseThread *> allThreads_;
-        static bool Quitted;
+        static bool quitted_;
     private:
         /** No Copy Constructor */
         BaseThread(const BaseThread&); 

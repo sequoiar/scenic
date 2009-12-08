@@ -19,12 +19,12 @@
 
 #include "baseThread.h"
 
-bool BaseThread::Quitted = false;
+bool BaseThread::quitted_ = false;
 
 
 bool BaseThread::isQuitted()
 {
-    return Quitted;
+    return quitted_;
 }
 
 
@@ -42,7 +42,7 @@ void BaseThread::postQuit(BaseThread* bt)
 void BaseThread::broadcastQuit()
 {
     for_each(allThreads_.begin(), allThreads_.end(), BaseThread::postQuit);
-    Quitted = true;
+    quitted_ = true;
 }
 
 /// client access to async QueuePair 
