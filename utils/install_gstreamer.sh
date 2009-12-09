@@ -12,6 +12,8 @@
 #  6. gst-plugin-ugly 0.10.12
 #  7. gst-ffmpeg 0.10.10.9
 
+SCRIPT_PATH=$(pwd)
+
 DOWNLOAD_DIR=~/src/gstreamer-src
 if [ ! -d $DOWNLOAD_DIR ]
 then
@@ -58,8 +60,8 @@ popd
 wget -c ftp://ftp.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
 tar xjf $X264.tar.bz2
 pushd $X264
-# added enable-shared flag to make sure that we can build the gstreamer x264enc
-# plugin on 64 bit platforms
+## added enable-shared flag to make sure that we can build the gstreamer x264enc
+## plugin on 64 bit platforms
 ./configure --enable-shared
 make 
 sudo $MAKEINSTALL
@@ -90,7 +92,7 @@ do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
 
-DC1394PATCH=$(dirname $0)/dc1394-iso-speed.diff
+DC1394PATCH=$SCRIPT_PATH/dc1394-iso-speed.diff
 if [ -r $DC1394PATCH ]; then
     echo "Patching gst-plugins-bad to add iso-speed property to dc1394src"
     pushd $GST_BAD
@@ -98,8 +100,8 @@ if [ -r $DC1394PATCH ]; then
     popd
     echo "Done patching $GST_BAD"
 else
-    echo "No dc1394-iso-speed.patch found"
-    echo "Patch available on http://svn.sat.qc.ca/trunk/utils/dc1394-iso-speed.patch"
+    echo "No dc1394-iso-speed.diff found"
+    echo "Patch available on http://svn.sat.qc.ca/trunk/utils/dc1394-iso-speed.diff"
     echo "Warning, iso-speed will be always 400Mbps."
 fi
 
