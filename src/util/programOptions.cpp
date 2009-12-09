@@ -85,9 +85,9 @@ po::options_description ProgramOptions::createDefaultOptions()
              "(sets video capture width)")
             ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture"
              "(sets video capture height)")
-            ("display-width,P", po::value<int>()->default_value(videosize::WIDTH), "width for video on display"
+            ("display-width,P", po::value<int>(), "width for video on display"
              "(scales output video width)")
-            ("display-height,Q", po::value<int>()->default_value(videosize::HEIGHT), "height for video "
+            ("display-height,Q", po::value<int>(), "height for video "
              "(scales output video height)")
             ("grayscale,M", po::bool_switch(), "force dc1394 capture to grayscale")
             ;

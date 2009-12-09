@@ -145,8 +145,9 @@ VideoSinkConfig::VideoSinkConfig(MapMsg &msg) :
     screenNum_(msg["screen"]), 
     doDeinterlace_(msg["deinterlace"]), 
     sharedVideoId_(msg["shared-video-id"]),
-    displayWidth_(msg["display-width"]),
-    displayHeight_(msg["display-height"])
+    /// if display-resolution is not specified, default to capture-resolution
+    displayWidth_(msg["display-width"] ? msg["display-width"] : msg["width"]),
+    displayHeight_(msg["display-height"] ? msg["display-height"] : msg["height"])
 {}
 
 
