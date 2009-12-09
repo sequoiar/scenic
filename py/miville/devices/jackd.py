@@ -40,17 +40,18 @@ from exceptions import DeprecationWarning
 import warnings
 
 # Twisted imports
-from twisted.internet import reactor, protocol
+from twisted.internet import protocol
+from twisted.internet import reactor
 from twisted.python import procutils
 from twisted.python import failure
 
 # App imports
-import devices #from devices import *
+from miville.devices import devices
 from miville.utils.commands import *
 from miville.errors import DeviceError
 from miville.utils import log as logger
 
-log = logger.start('debug', 1, 0, 'devices_jackd')
+log = logger.start('debug', True, True, 'devices_jackd')
 
 _state_printed_jackd_is_frozen = False
 _enable_kill_jackd = True

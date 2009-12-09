@@ -16,6 +16,7 @@ TESTS = test/test_addressbook.py \
         test/check_cli_streams.py \
         test/test_log.py \
         test/test_proc.py \
+        test/test_x11.py \
         test/test_observer.py \
         test/test_serialize.py \
         test/check_cli_ui.py \

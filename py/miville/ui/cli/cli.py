@@ -1230,10 +1230,14 @@ class CliView(Observer):
         if origin is self.controller:
             if len(data) == 0:
                 msg.append("No devices to list.")
-            else:    
-                msg.append("Devices for driver %s :" % (bold(data[0].driver.name)))
+            else:
+                msg.append("Listing devices:")
                 for device in data:
-                    msg.append("\t%s" % (device.name))
+                    driver_kind = device.driver.kind
+                    driver_name = device.driver.name
+                    device_name = device.name
+                    #msg.append("Devices for driver %s :" % (bold(data[0].)))
+                    msg.append("\t\"%s\" %s device using the \"%s\" driver." % (bold(device_name), driver_kind, bold(driver_name)))
         self.write("\n".join(msg), True)
     
     def _devices_list_all(self, origin, data):
@@ -1247,6 +1251,7 @@ class CliView(Observer):
                 lines.append("No devices to list.")
             else:
                 for device in data:
+                    dev_name = device.name
                     dr_kind = device.driver.kind
                     dr_name = device.driver.name
                     attributes = device.attributes.values()
@@ -1258,7 +1263,7 @@ class CliView(Observer):
                             a_opts = "options=%s" % (attr.options)
                         else:
                             a_opts = "default=%s" % (attr.default)
-                        lines.append("/%s/%s/%s (%s) = %s %s" % (dr_kind, dr_name, a_name, a_kind, a_value, a_opts))
+                        lines.append("%s: \"%s\": \"%s\" %s (%s) = %s (%s)" % (dr_kind, dr_name, dev_name, a_name, a_kind, a_value, a_opts))
         self.write("\n".join(lines), True)
 
     def _network_test_error(self, origin, data):
