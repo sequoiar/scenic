@@ -152,7 +152,9 @@ if __name__ == '__main__':
     else:
         filename = None
 
-RESOLUTIONS = ( (176, 120), 
+RESOLUTIONS = ( 
+                (160, 120),
+                (176, 120), 
                 (320, 240), 
                 (352, 240), 
                 (640, 480), 
