@@ -13,7 +13,7 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   codec.cpp rtpPay.cpp audioConfig.cpp remoteConfig.cpp messageDispatcher.cpp messageHandler.cpp \
 				   videoReceiver.cpp videoSender.cpp videoSource.cpp raw1394Util.cpp \
 				   audioLevel.cpp glVideoSink.cpp playback.cpp dv1394.cpp v4l2util.cpp fileSource.cpp \
-				   sharedVideoSink.cpp sharedVideoBuffer.cpp capsParser.cpp busMsgHandler.cpp \
+				   sharedVideoSink.cpp capsParser.cpp busMsgHandler.cpp \
                    mediaBase.h messageDispatcher.h messageHandler.h busMsgHandler.h ../ports.h \
 				   audioSender.h audioReceiver.h $(inc)/alsa.h caps.h \
 				   videoConfig.h rtpBin.h pipeline.h \
@@ -21,9 +21,9 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   gstLinkable.h videoSink.h audioSink.h $(inc)/jackUtils.h \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
-				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h \
-				   fileSource.h sharedVideoSink.h sharedVideoBuffer.h capsParser.h \
-				   dc1394.cpp dc1394.h videoScale.h videoScale.cpp
+				   audioLevel.h glVideoSink.h $(inc)/playback.h dv1394.h v4l2util.h \
+				   fileSource.h sharedVideoSink.h capsParser.h \
+				   dc1394.cpp dc1394.h videoScale.h videoScale.cpp noncopyable.h
 
 BUILT_SOURCES = caps.cpp
 

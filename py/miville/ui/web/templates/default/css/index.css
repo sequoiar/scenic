@@ -8,6 +8,9 @@ html, body {
 
 h3 {
 	margin-bottom: 5px;
+    color: #333;
+	/* background: #eee url("../img/ccc_eee_16px.png") repeat-x; */
+	background: #eee url("../img/grad_eee.png") repeat-x;
 }
 
 #index_left_pan {
@@ -15,8 +18,10 @@ h3 {
 	top: 0px;
 /*	bottom: 22px; for chat*/
 	bottom: 0px;
-	width: 260px;
-	padding: 20px;
+	width: 300px;
+	padding: 0px;
+    margin:0;
+    overflow:auto;
 }
 
 #index_right_pan {
@@ -26,40 +31,54 @@ h3 {
 	left: 300px;
 	right: 0px;
 	padding: 0px;
+    margin:0;
 }
 
-#strm {
+#strm_section {
 	position: absolute;
 	top: 0px;
 /*	height: 0px;*/
-	left: 300px;
+	left: 305px; /* not 300 */
 	right: 0px;
-	padding: 6px 20px;
+	padding: 0; /* 2px 10px; */
+    height: 95px; /* see devs.top */
+    overflow: auto;
+    margin:0;
 }
-
-#devs { /* devices div */
+/*
+#strm_section {
+    height: 100px;
+}
+*/
+/* devices div */
+#devices_section { 
 	position: absolute;
-	top: 150px;
+	top: 100px;
+	bottom: 100px;
 /*	height: 0px;*/
-	left: 300px;
+	left: 305px; /* not 300 */
 	right: 0px;
-	padding: 6px 20px;
+	padding: 0px;
+/*    max-height: 300px; */
+    overflow:auto;
+    margin:0;
 }
 .help_str, .js_str {
 	display: none;
 }
 
-#help {
+#help_section {
 	position: absolute;
 	bottom: 0px;
-	left: 300px;
+	left: 305px; /* not 300 */
 	right: 0px;
+    margin:0;
+    height: 95px;
+    overflow: auto;
 }
 
-
-
 /*************************************/
-/* LINE BETWEEN THE GOOD AND THE BAD */
+/* Below are custom declarations that should not be there, maybe. */
 /*************************************/
 
 #media_but {
@@ -77,7 +96,6 @@ h3 {
 	width: 160px;
 	background-color: #adaec4;
 }
-
 
 #right_pan {
 	background-color: #F8f8f9;
@@ -104,19 +122,18 @@ h3 {
 	padding: 5px 10px 0;
 	background-color: #F6F6F6;
 }
-
+/*
 #help_cont {
 	position: relative;
 	height: 50px;
 	overflow: hidden;
-	background: #ffe;
 }
 
 #help_cont p {
-	padding: 0 20px;
+	padding: 0;
 	font-size: 11px;
 }
-
+*/
 #contacts {
 	border: dotted 1px #999;
 	padding: 10px;
@@ -126,7 +143,7 @@ h3 {
 	height: 100px;
 	overflow: auto;
 	background-color: #FFF;
-	border: solid 1px #999;
+	border: solid 1px #666;
 	font-size: 11px;
 }
 

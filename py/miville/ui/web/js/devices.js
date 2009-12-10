@@ -30,35 +30,16 @@ Devices.methods(
      */
     function __init__(self, node) {
         Devices.upcall(self, "__init__", node);
-		
 		// State variables
 		self.contact = null;
-		
 		// Get elements.
-		//self.list_v4l2_btn = $('deviceswidget_list_v4l2');
-		//self.list_jackd_btn = $('deviceswidget_list_jackd');
 		self.devices_div = $('deviceswidget_devices');
-        //self.v4l2_div = $('deviceswidget_v4l2');
-        //self.v4l2_input_popup = $('deviceswidget_unit');
-		
 		// Get string translations.
-        // TODO : use only translated strings in the GUI.
-		//self.start_str = $('js_deviceswidget_start').get('text'); // start string
-		//self.stop_str = $('js_deviceswidget_stop').get('text'); // stop string
-		
-		// Set translations.
+        // TODO : use translated strings in the GUI.
 		
 		// Register to the widgets communicator.
 		register('deviceswidget', self);
         self.callRemote('rc_devices_list_all');
-
-        //self.list_jackd_btn.addEvent('click', function(){
-        //    self.devices_list('audio');
-        //    self.devices_list_all();
-        //});
-        //self.list_v4l2_btn.addEvent('click', function(){
-        //    self.devices_list('video');
-        //});
 	},
 	
 	/**
@@ -66,9 +47,8 @@ Devices.methods(
 	 * Utility functions
 	 * -----------------
 	 */
-	
 	/**
-	 * Notify all the controllers (buttons/fields/etc) state when an event call
+	 * Notifies all the controllers (buttons/fields/etc) state when an event call
 	 * this method.
 	 * 
 	 * For every controller you want to be notify you have to call the method
@@ -84,7 +64,7 @@ Devices.methods(
      * @param {string} event The event that fire the notification.
 	 */
 	function notify_controllers(self, event){
-		// self.upd_start_btn(event);
+        // pass
 	},
     
 	/**
@@ -92,10 +72,9 @@ Devices.methods(
 	 * Called from Client
 	 * ------------------
 	 */
-	
 	/**
 	 * Get info from others widgets.
-	 * (call from the client)
+	 * (called from the client)
 	 * 
 	 * Called when a contact is selected.
 	 * 
@@ -110,23 +89,6 @@ Devices.methods(
 	},
 
 	/**
-     * Refreshes the list of devices.
-	 * (called from the js client)
-	 * 
-	 * @member Devices
-	 */
-	function devices_list(self, driver_kind) {
-        /* 
-         * if (driver_name == 'jackd') {
-            kind = 'audio';
-        } else if (driver_name == 'v4l2') {
-            kind = 'video';
-        }
-        */
-        self.callRemote('rc_devices_list', driver_kind);
-    },
-
-	/**
      * Refreshes the list of all devices attributes.
 	 * (called from the js client)
 	 * 
@@ -134,6 +96,25 @@ Devices.methods(
 	 */
 	function devices_list_all(self) {
         self.callRemote('rc_devices_list_all');
+    },
+
+	/**
+     * Changes the norm of a V4L2 video device.
+	 * (called from the js client)
+	 * @member Devices
+	 */
+	function set_norm(self, dev_name, norm_value) {
+        dbug.info("set_norm" + dev_name + " " + norm_value)
+        self.callRemote('rc_set_norm', dev_name, norm_value);
+    },
+	/**
+     * Changes the input number of a V4L2 video device.
+	 * (called from the js client)
+	 * @member Devices
+	 */
+	function set_input(self, dev_name, input_value) {
+        dbug.info("set_input" + dev_name + " " + input_value)
+        self.callRemote('rc_set_input', dev_name, input_value);
     },
 	/**
 	 * ------------------
@@ -143,85 +124,112 @@ Devices.methods(
     // nothing here for now.
 
 	/**
-     * 
-     *
 	 * (called from Python)
-     *
 	 * @member Devices
-     * @param {list} lines List of text lines to display.
+     * @param {devs_list} list of dict ...
 	 */
-	function rc_devices_list_all(self, txt, devs_list) {
+	function rc_devices_list_all(self, devs_list) {
         dbug.info("DEVICES: rc_devices_list_all called");
         self.devices_div.empty();
-        //var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
-        
+        var table = new Element("table", {"class": "devs_table"});
+        table.inject(self.devices_div);
+        var has_jackd = false;
+        var is_odd = true;
+        var style_name = "";
         if (devs_list.length > 0) {
             devs_list.each(function(dev) 
             {
-                var title = new Element('h2');
-                title.inject(self.devices_div);
-                // "default" audio device using the "jackd" driver
+                if (dev.dr_name == "jackd") 
+                {
+                    has_jackd = true;
+                }    
+                var _tr = new Element("tr");
+                var title = new Element('th', {"colspan": 3, "class": "dev_name"}).inject(_tr);
+                _tr.inject(table);
+                // Something like : "default" audio device using the "jackd" driver
                 title.appendText('"' + dev.dev_name + '" ' + dev.dr_kind + " device using the \"" + dev.dr_name + 
 "\" driver" );
-                var ul = new Element('ul');
-                ul.inject(self.devices_div);
+                is_odd = true;
                 dev.attributes.each(function(attr) 
                 {
-                    var li = new Element('li');
-                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ") " + attr.options).inject(ul);
-                });
-            });
+                    if (is_odd) {
+                        style_name = "color_zebra";
+                    } else {
+                        style_name = "";
+                    }
+                    is_odd = ! is_odd;
+                    var tr2 = new Element('tr', {"class": style_name}).inject(table);
+                    var td1 = new Element("td", {"class": "dev_attr_name"}).inject(tr2).appendText(attr.name + " :");
+                    var td2 = new Element("td", {"class": "dev_attr_value"}).inject(tr2);
+                    // V4L2 NORM:
+                    if (dev.dr_name == "v4l2" && attr.name == "norm")
+                    {
+                        var sel = new Element("select", {
+                            "dev_name": dev.dev_name
+                            });
+                        //dbug.info("attr.options:");
+                        //dbug.info(attr.options);
+                        //dbug.info(typeof attr.options);
+                        attr.options.each(function(opt) {
+                            var o = new Element("option", {
+                                "html": opt,
+                                "selected":opt == attr.value,
+                                "value": opt});
+                            o.inject(sel);
+                        });
+                        dbug.info("adding onChange callback");
+                        sel.addEvent('change', function(event) {
+                            dbug.info("on change norm");
+                            var dev_name = event.target.getProperty("dev_name");
+                            var norm_value = event.target.value;
+                            self.set_norm(dev_name, norm_value); 
+                            event.target.blur(); // lose focus on form element
+                        });
+                        sel.inject(td2);
+                    }
+                    // V4L2 INPUT:
+                    else if (dev.dr_name == "v4l2" && attr.name == "input")
+                    {
+                        var sel = new Element("select", {
+                            "dev_name": dev.dev_name
+                            });
+                        attr.options.each(function(opt) {
+                            var o = new Element("option", {
+                                "html": opt,
+                                "selected":opt == attr.value,
+                                "value": opt});
+                            o.inject(sel);
+                        });
+                        dbug.info("adding onChange callback");
+                        sel.addEvent('change', function(event) {
+                            dbug.info("on change input");
+                            var dev_name = event.target.getProperty("dev_name");
+                            var input_value = event.target.value;
+                            self.set_input(dev_name, input_value); 
+                            event.target.blur(); // lose focus on form element
+                        });
+                        sel.inject(td2);
+                    }
+                    else 
+                    {
+                        td2.appendText(attr.value);
+                    }
+                }); // end for each attr
+            }); // end for each dev
         } else {
             var p = new Element('p');
             p.appendText("No device to list.");
             p.inject(self.devices_div);
         }
-        
-        // var txt = "";
-        // txt += devs_list.toString();
-        // if (devs_list.length == 0) {
-        //     var p = new Element('p').appendText('No devices to list').inject(self.devices_div); 
-        // } else {
-        //     for (var dev in devs_list) {
-        //         txt += dev.kind + '/';
-        //         txt += dev.driver_name + '/';
-        //         txt += dev.device_name + ' \n';
-        //         for (var attr in dev.attributes) {
-        //             txt += "    " + attr.name + "=";
-        //             if (attr.kind == 'int' || attr.kind == 'float') {
-        //                 txt += (attr.value).toString();
-        //                 // int, string, boolean, options
-        //             } else {
-        //                 txt += attr.value;
-        //             }
-        //             if (attr.kind == 'options') {
-        //                 txt += attr.options.toString();
-        //             }
-        //         }
-        //     }
-        // }
-        // var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
-	},
-	/**
-     * 
-     *
-	 * (called from server)
-	 * 
-     * See miville/network.py for the list of fields received from Python.
-     *
-	 * @member NetworkTesting
-     * @param {string} contact_name The name of the contact . 
-     * @param {string} local_data Dict/object with iperf stats.
-     * @param {string} remote_data Dict/object with iperf stats.
-	 */
-	function rc_devices_list(self, driver_name, devices_list) {
-        dbug.info("DEVICES: rc_devices_list called");
-        if (driver_name == 'jackd') {
-            self.jackd_div.empty();
-            var p = new Element('pre').appendText('List of JACK devices: ' + devices_list).inject(self.jackd_div); 
-        } else if (driver_name == 'v4l2') {
-            self.v4l2_div.empty();
-            var p = new Element('pre').appendText('List of V4L2 devices: ' + devices_list).inject(self.v4l2_div); 
+        if (has_jackd == false)
+        {
+            var blinker = new Element("blink", {
+                "html":"The JACK Audio Connection Kit server (jackd) is not running !",
+                "style":"color:#f00;"
+                });
+            blinker.inject(self.devices_div);
+            var msg = new Element("p", {"html":"You should start jackd or qjackctl."});
+            msg.inject(self.devices_div);
         }
 	}
 );

@@ -20,12 +20,12 @@
  *
  */
 
-#include "./sharedVideoSink.h"
-#include "./sharedVideoBuffer.h"
 #include "util.h"
+#include "sharedVideoSink.h"
+#include "sharedVideoBuffer.h"
 
-#include "./gstLinkable.h"
-#include "./pipeline.h"
+#include "gstLinkable.h"
+#include "pipeline.h"
 #include <gst/app/gstappbuffer.h>
 #include <gst/app/gstappsink.h>
 
@@ -142,6 +142,7 @@ void SharedVideoSink::prepareSink(int width, int height)
     
     std::ostringstream capsStr;
 
+    /// FIXME: should detect caps from preceding element in pipeline if possible
     capsStr << "video/x-raw-rgb, width=" << width 
         << ", height=" << height << ",bpp=16, depth=16"; 
     videoCaps = gst_caps_from_string(capsStr.str().c_str());

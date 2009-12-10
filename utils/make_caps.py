@@ -127,18 +127,20 @@ def save_caps(profiles, filename):
             file.close()
 
 
-profiles = {
-    'mpeg4'  : VideoProfile('ffenc_mpeg4','rtpmp4vpay'),
-    'h264'   : VideoProfile('x264enc', 'rtph264pay'),
-    'h263'   : VideoProfile('ffenc_h263p', 'rtph263ppay'),
-}
+profiles = {}
 
 encoders = {
+    'mpeg4' : 'ffenc_mpeg4',
+    'h264' : 'x264enc',
+    'h263' : 'ffenc_h263p',
     'mp3' : 'lame',
     'raw' : 'identity silent=true'
 }
 
 payloaders = {
+    'mpeg4' : 'rtpmp4vpay',
+    'h264' : 'rtph264pay',
+    'h263' : 'rtph263ppay',
     'mp3' : 'rtpmpapay',
     'raw' : 'rtpL16pay'
 }
@@ -149,6 +151,25 @@ if __name__ == '__main__':
         filename = sys.argv[1]
     else:
         filename = None
+
+RESOLUTIONS = ( 
+                (160, 120),
+                (176, 120), 
+                (320, 240), 
+                (352, 240), 
+                (640, 480), 
+                (704, 240),
+                (704, 480),
+                (720, 480),
+                (768, 480),
+                (800, 600), 
+                (1024, 768), 
+                (1280, 960))
+
+for resolution in RESOLUTIONS:
+    for codec in ('mpeg4', 'h264', 'h263'):
+        profile_name = codec + '_%d_%d' % (resolution[0], resolution[1])
+        profiles[profile_name] = VideoProfile(encoders[codec], payloaders[codec], resolution[0], resolution[1])
 
 SAMPLERATES = [16000, 22050, 32000, 44100, 48000]
 

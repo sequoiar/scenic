@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Miville
@@ -18,20 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
-#App imports
-from miville.ui.web.web import Widget, expose
-from miville.utils import log
-from miville.utils.i18n import to_utf
+"""
+Unit tests for the Miville X11 driver.
+""" 
+import unittest
+from miville.devices import x11
 
-log = log.start('debug', 1, 0, 'web_hlp')
-
-
-class Help(Widget):
-    """
-    """
-    pass
-    def rc_manual(self):
-        print "OPEN MANUAL"
-        return False
-    
-    expose(locals())
+class Test_X11(unittest.TestCase):
+    def test_list_displays(self):
+        displays = x11._list_x11_displays()
+        if len(displays) < 1:
+            self.fail("There should be at least one X11 display listed.")

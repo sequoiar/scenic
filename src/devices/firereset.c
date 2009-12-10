@@ -43,6 +43,17 @@ static int bus_reset_handler(struct raw1394_handle *handle, unsigned int gen)
     return 0;
 }
 
+void print_help(char *program_name)
+{
+    printf("Usage: firereset\n\n");
+    printf("Usage: %s\n", program_name);
+    printf("Options:\n");
+    printf("  -h, --help            Shows program's help message and exits.\n");
+    printf("\n");
+    printf("Resets the Firewire (ieee1394) bus under GNU/Linux.\n");
+    printf("Use at your own risks.\n");
+}
+
 int main(int argc, char **argv)
 {
     raw1394handle_t handle;
@@ -53,8 +64,7 @@ int main(int argc, char **argv)
     
     if (argc >= 2)
     {
-        printf("Usage: %s\n", argv[0]);
-        printf("Resets the Firewire (ieee1394) bus.\n");
+        print_help(argv[0]);
         return 0;
     }
 

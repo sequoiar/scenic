@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include "videoSize.h"
 #include "mapMsg.h"
 
 #include <fstream>
@@ -58,7 +59,10 @@ VideoSourceConfig::VideoSourceConfig(MapMsg &msg) :
     location_(msg["location"]), 
     cameraNumber_(msg["camera-number"]),
     GUID_(fromString<unsigned long long>(msg["camera-guid"], std::hex)),
-    framerate_(msg["framerate"])
+    framerate_(msg["framerate"]),
+    captureWidth_(msg["width"]),
+    captureHeight_(msg["height"]),
+    grayscale_(msg["grayscale"])
 {}
 
 
@@ -83,6 +87,24 @@ VideoSource * VideoSourceConfig::createSource() const
     LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", location: " 
             << location_ << ", device: " << deviceName_);
     return 0;
+}
+
+
+unsigned VideoSourceConfig::captureWidth() const
+{
+    return captureWidth_;
+}
+
+
+unsigned VideoSourceConfig::captureHeight() const
+{
+    return captureHeight_;
+}
+
+
+bool VideoSourceConfig::forceGrayscale() const
+{
+    return grayscale_;
 }
 
 
@@ -123,23 +145,24 @@ VideoSinkConfig::VideoSinkConfig(MapMsg &msg) :
     screenNum_(msg["screen"]), 
     doDeinterlace_(msg["deinterlace"]), 
     sharedVideoId_(msg["shared-video-id"]),
-    width_(msg["width"]),
-    height_(msg["height"])
+    /// if display-resolution is not specified, default to capture-resolution
+    displayWidth_(msg["display-width"] ? msg["display-width"] : msg["width"]),
+    displayHeight_(msg["display-height"] ? msg["display-height"] : msg["height"])
 {}
 
 
-VideoSink * VideoSinkConfig::createSink(int width, int height) const
+VideoSink * VideoSinkConfig::createSink() const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(width, height, screenNum_);
+        return new XvImageSink(displayWidth_, displayHeight_, screenNum_);
     else if (sink_ == "ximagesink")
         return new XImageSink();
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(width, height, screenNum_);
+        return new GLImageSink(displayWidth_, displayHeight_, screenNum_);
 #endif
     else if (sink_ == "sharedvideosink")
-        return new SharedVideoSink(width, height, sharedVideoId_);
+        return new SharedVideoSink(displayWidth_, displayHeight_, sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid sink");
 
@@ -150,12 +173,12 @@ VideoSink * VideoSinkConfig::createSink(int width, int height) const
 
 VideoScale* VideoSinkConfig::createVideoScale() const
 {
-    return new VideoScale(width_, height_);
+    return new VideoScale(displayWidth_, displayHeight_);
 }
 
 
 bool VideoSinkConfig::hasCustomResolution() const
 {
-    return width_ != videosize::WIDTH or height_ != videosize::HEIGHT;
+    return displayWidth_ != videosize::WIDTH or displayHeight_ != videosize::HEIGHT;
 }
 

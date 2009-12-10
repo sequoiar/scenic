@@ -63,6 +63,10 @@ from miville.protocols import pinger
 from miville.utils import log
 from miville.streams import manager as streams_manager
 from miville.streams import conf
+from miville.streams.constants import STATE_STOPPED
+from miville.streams.constants import STATE_STARTING
+from miville.streams.constants import STATE_STREAMING
+from miville.streams.constants import STATE_STOPPING
 
 log = log.start('debug', 1, 0, 'api') # added by hugo
 
@@ -335,89 +339,14 @@ class ControllerApi(object):
         IMPORTANT: there are also remote_start_streams and remote_stopped_streams notification 
         that are called directly from the StreamsManager.
         """
-        #TODO: use constants for these !
-        # stream_state 0 = stopped
-        # stream_state 1 = starting
-        # stream_state 2 = streaming
-        # stream_state 3 = stopping
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         contact = self.get_contact(contact_name)
         if isinstance(contact, AddressBookError):
             #FIXME: for now we crash. The addressbook should not return exceptions !!!!
             raise contact
         
-        contact.stream_state = 1 # STARTING # FIXME
-        # TODO: check contact.stream_state
-        #if contact.state == CONNECTED:
-        #    contact.stream_state = 2 # STARTED
-        #elif contact.state == DISCONNECTED:
-        #deferred = 
+        contact.stream_state = STATE_STARTING
         self.streams_manager.start(contact)
-        #def _cb_success(result, self, caller, contact_name):
-        #    msg = "Successfully started to stream with %s.\n" % (contact_name)
-        #    msg += "%s" % (result)
-        #    contact = self.get_contact(contact_name)
-        #    contact.stream_state = 2 # STARTED
-        #    notif = {
-        #        "contact_name":contact_name,
-        #        "contact":contact,
-        #        "message":msg,
-        #        "success":True
-        #        }
-        #    self.notify(caller, notif, "start_streams")
-        #    return result
-        #def _eb_failure(err, self, caller, contact_name):
-        #    contact = self.get_contact(contact_name)
-        #    contact.stream_state = 0 # STOPPED
-        #    msg = "Could not start to stream with %s.\n%s" % (contact_name, str(err.getErrorMessage()))
-        #    notif = {
-        #        "contact_name":contact_name,
-        #        "contact":contact,
-        #        "message":msg,
-        #        "success":False
-        #        }
-        #    self.notify(caller, notif, "start_streams")
-        #    return err
-        #deferred.addCallback(_cb_success, self, caller, contact_name)
-        #deferred.addErrback(_eb_failure, self, caller, contact_name)
-        #return deferred
-    
-    def remote_stopped_streams(self, caller, notif):
-        """
-        Called from the StreamsManager when remote host has stopped to stream.
-        
-        :param caller: Always None
-        :param notif: dict with keys  
-            {
-            "contact":contact_infos.contact,
-            "contact_name":contact_name,
-            "message":msg,
-            "success":False,
-            }
-        """
-        log.info("REMOTE_STOPPED_STREAMS")
-        self.notify(caller, notif)
-        notif["contact"].stream_state = 0 # FIXME remove this
-
-    def remote_started_streams(self, caller, notif):
-        """
-        Called from the StreamsManager when remote host has started to stream.
-        
-        :param caller: Always None
-        :param notif: dict with keys  
-            {
-            "contact":contact_infos.contact,
-            "contact_name":contact_name,
-            "message":msg,
-            "success":False,
-            }
-        """
-        log.info("REMOTE_STARTED_STREAMS")
-        if notif["success"]:
-            notif["contact"].stream_state = 2 # FIXME remove this
-        else:
-            notif["contact"].stream_state = 0 # FIXME remove this
-        self.notify(caller, notif)
                             
     def stop_streams(self, caller, contact_name):
         """
@@ -429,56 +358,11 @@ class ControllerApi(object):
         log.info('ControllerApi.stop_streams, contact= ' + str(contact_name))
         contact = self.get_contact(contact_name)
         # TODO: check contact.state (to send it only once, since javascript sends it twice...)
-        if contact.stream_state == 3: #stopping 
+        if contact.stream_state == STATE_STOPPING:
             log.error("stop_streams called while already is stopping stream state.")
             return # FIXME: use session instead of contact.stream_state.
-        # if contact.stream_state != 2: # streaming
-        #     state = "stopped" # 0
-        #     if contact.stream_state == 1:
-        #         state = "starting"
-        #     elif contact.stream_state == 2:
-        #         state = "streaming"
-        #     elif contact.stream_state == 3:
-        #         state = "stopping"
-        #     msg = "We are not streaming with contact %s. State is %s." % (contact_name, state)
-        #     notif = {
-        #         "contact_name":contact_name,
-        #         "contact":contact,
-        #         "message":msg,
-        #         "success":False
-        #         }
-        #     self.notify(caller, notif, "stop_streams")
-        #     return defer.fail(failure.Failure(Exception(msg))) # FIXME
-        #deferred = 
+        
         self.streams_manager.stop(contact)
-        #contact.stream_state = 3 # STOPPING
-        #def _cb_success(result, self, caller, contact_name):
-        #    contact = self.get_contact(contact_name)
-        #    contact.stream_state = 0 # STOPPED
-        #    msg = "Successfully stopped to stream with %s.\n%s" % (contact_name, str(result))
-        #    notif = {
-        #        "contact_name":contact_name,
-        #        "contact":contact,
-        #        "message":msg,
-        #        "success":True
-        #        }
-        #    self.notify(caller, notif, "stop_streams")
-        #    return result
-        #def _eb_failure(err, self, caller, contact_name):
-        #    contact = self.get_contact(contact_name)
-        #    contact.stream_state = 0 # STOPPED
-        #    msg = "Error stopping streaming with %s.\n%s\nThere should be no stream left." % (contact_name, str(err.getErrorMessage()))
-        #    notif = {
-        #        "contact_name":contact_name,
-        #        "contact":contact,
-        #        "message":msg,
-        #        "success":False
-        #        }
-        #    self.notify(caller, notif, "stop_streams")
-        #    return err
-        #deferred.addCallback(_cb_success, self, caller, contact_name)
-        #deferred.addErrback(_eb_failure, self, caller, contact_name)
-        #return deferred
 
     ### Connect with com_chan ### ------------------------------------------------------
     def start_connection(self, caller, contact=None):
@@ -530,7 +414,7 @@ class ControllerApi(object):
         if contact and contact.name in self.addressbook.contacts:
             try:
                 # try stop streams before disconnecting
-                if contact.stream_state != 0:
+                if contact.stream_state != STATE_STOPPED:
                     self.stop_streams(caller, contact.name)
                 connectors.stop_connection(contact)
                 self.notify(caller, {'msg':'Connection stopped',
@@ -606,13 +490,15 @@ class ControllerApi(object):
             log.error(e.message)
         # TODO Return a Deferred !
     
-    def set_video_standard(self, caller, value=None):
+    def set_video_standard(self, caller, value=None, device_name=None):
         """
         Easily sets the video standard. (norm)
         
         Valid string values are "ntsc", "secam" and "pal".
         If value is None, sets it according to the time zone.
         """
+        # TODO: use device_name arg
+        log.debug("set_video_standard %s %s" % (caller, value))
         return devices.set_video_standard(caller, value)
         # TODO Return a Deferred !
     

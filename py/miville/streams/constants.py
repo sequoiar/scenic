@@ -25,9 +25,10 @@ States for streams.
 # states for streamers (and streams?)
 # states for session, streams, streamers.
 STATE_IDLE = "idle"
-STATE_STARTING = "starting"
-STATE_STREAMING = "streaming"
-STATE_STOPPED = "stopped"
+STATE_STARTING = "starting"     # map to 1
+STATE_STREAMING = "streaming"   # map to 2
+STATE_STOPPING = "stopping"     # map to 3
+STATE_STOPPED = "stopped"       # map to 0
 STATE_FAILED = "failed"
 STATE_ERROR = "error"
 

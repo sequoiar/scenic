@@ -51,10 +51,8 @@ VideoSource::~VideoSource()
 std::string VideoSource::defaultSrcCaps() const
 {
     std::ostringstream capsStr;
-    /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
-        << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
-    capsStr << "video/x-raw-yuv, width=" << videosize::WIDTH 
-        << ", height=" << videosize::HEIGHT << ", framerate="
+    capsStr << "video/x-raw-yuv, width=" << config_.captureWidth()
+        << ", height=" << config_.captureHeight() << ", framerate="
         << config_.framerate() << "000/1001";
     return capsStr.str();
 }
@@ -126,7 +124,6 @@ VideoDvSource::VideoDvSource(const VideoSourceConfig &config) :
     queue_(Pipeline::Instance()->makeElement("queue", NULL)), 
     dvdec_(Pipeline::Instance()->makeElement("dvdec", NULL))
 {
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
     Dv1394::Instance()->setVideoSink(queue_);
     gstlinkable::link(queue_, dvdec_);
 }
@@ -139,6 +136,13 @@ VideoDvSource::~VideoDvSource()
     Pipeline::Instance()->remove(&dvdec_);
     Dv1394::Instance()->unsetVideoSink();
 }
+
+
+bool VideoV4lSource::willModifyCaptureResolution() const 
+{ 
+    return v4l2util::captureWidth(deviceStr()) != config_.captureWidth() or  
+        v4l2util::captureHeight(deviceStr()) != config_.captureHeight(); 
+} 
 
 
 VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
@@ -154,6 +158,10 @@ VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
 
     LOG_DEBUG("v4l width is " << v4l2util::captureWidth(deviceStr()));
     LOG_DEBUG("v4l height is " << v4l2util::captureHeight(deviceStr()));
+
+    if (willModifyCaptureResolution())  
+        LOG_INFO("Changing v4l resolution to " << 
+                config_.captureWidth() << "x" << config_.captureHeight());
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
@@ -214,12 +222,46 @@ VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) :
 }
 
 
-std::string VideoDc1394Source::srcCaps() const
-{
-    std::ostringstream capsStr;
-    capsStr << "video/x-raw-gray, width=" << videosize::WIDTH 
-        << ", height=" << videosize::HEIGHT << ", framerate=" 
-        << config_.framerate() <<"/1, bpp=8, depth=8";
-    return capsStr.str();
+std::string VideoDc1394Source::srcCaps() const 
+{ 
+    typedef std::vector<std::string> SpaceList; 
+    std::ostringstream capsStr; 
+    int cameraNumber; 
+    int mode = 0; 
+    g_object_get(source_, "camera-number", &cameraNumber, NULL); 
+
+    std::string colourSpace; 
+    SpaceList spaces; 
+    // if we support other colourspaces besides grayscale 
+    if (!config_.forceGrayscale()) 
+    { 
+        /// favour rgb because we need to be have that colourspace for shared video buffer 
+        spaces.push_back("rgb"); 
+        spaces.push_back("yuv"); 
+    } 
+    spaces.push_back("gray"); 
+
+    for (SpaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space) 
+    { 
+        colourSpace = *space; 
+        mode = DC1394::capsToMode(cameraNumber, config_.captureWidth(),  
+                config_.captureHeight(), colourSpace, config_.framerate()); 
+    } 
+
+    // vmode takes into account resolution, bpp, depth 
+    if (mode != 0) 
+        capsStr << "video/x-raw-" << colourSpace << ", vmode=" << mode << ",framerate="<< config_.framerate() << "/1"; 
+    else 
+        THROW_CRITICAL("Could not find appropriate video mode for colourspace " 
+                << colourSpace  << " and resolution " 
+                << config_.captureWidth() << "x" << config_.captureHeight()); 
+
+    if (DC1394::requiresMoreISOSpeed(mode)) 
+    { 
+        // FIXME: should set to b-mode too 
+        LOG_DEBUG("Setting iso speed to 800"); 
+        g_object_set(source_, "iso-speed", DC1394::MAX_ISO_SPEED, NULL); 
+    } 
+    return capsStr.str(); 
 }
 

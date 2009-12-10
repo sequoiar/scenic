@@ -43,7 +43,6 @@ class RtpReceiver
         RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}
         ~RtpReceiver();
         void setCaps(const char* capsStr);
-        void checkSampleRate();
 
         void add(RtpPay * depayloader, const ReceiverConfig & config);
         static void setLatency(int latency);

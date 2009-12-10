@@ -88,14 +88,14 @@ void VideoReceiver::init_sink()
     if (videoConfig_->hasCustomResolution())
     {
         tassert(videoscale_ = videoConfig_->createVideoScale());
-        tassert(sink_ = videoConfig_->createSink(videoscale_->getWidth(), videoscale_->getHeight()));
+        tassert(sink_ = videoConfig_->createSink());
 
         gstlinkable::link(*decoder_, *videoscale_);
         gstlinkable::link(*videoscale_, *sink_);
     }
     else
     {
-        tassert(sink_ = videoConfig_->createSink(videosize::WIDTH, videosize::HEIGHT));
+        tassert(sink_ = videoConfig_->createSink());
         gstlinkable::link(*decoder_, *sink_);
     }
 

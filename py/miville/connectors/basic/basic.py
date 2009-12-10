@@ -45,6 +45,7 @@ from miville.utils import log
 from miville.connectors import Connection
 from miville.connectors.states import *
 from miville import errors
+from miville.streams.constants import STATE_STOPPED
 
 log = log.start('debug', 1, 0, 'basic')
 
@@ -95,7 +96,7 @@ class BasicServer(LineReceiver):
             log.debug("got STOP comchan message !")
             #try:    #TODO: to this correctly
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
-            if contact.stream_state != 0:
+            if contact.stream_state != STATE_STOPPED:
                 log.warning('stream state = %d ' % (contact.stream_state))
                 self.api.stop_streams(self, contact.name) # ARG MUST BE THE CURRENT CONTACT FOR THAT STREAM
             #except Exception, e:

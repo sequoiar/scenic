@@ -17,7 +17,7 @@ For distribution packages::
 """
 from setuptools import find_packages
 from setuptools import setup
-__version__ = "0.3" # see miville.runner.__version__ as well
+__version__ = "0.3.1" # see miville.runner.__version__ as well
 
 # how I generated that list : 
 #packages = find_packages(exclude=["test", "miville.py"]),

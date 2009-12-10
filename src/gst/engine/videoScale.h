@@ -38,8 +38,6 @@ class VideoScale : public GstLinkableFilter
     public:
         VideoScale(int width, int height);
         ~VideoScale();
-        int getWidth() const;
-        int getHeight() const;
 
     private:
         _GstElement *sinkElement() { return videoscale_; }

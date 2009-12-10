@@ -37,8 +37,6 @@ class RtpSender
 {
     public:
         RtpSender() : rtp_sender_(0) {}
-        void checkSampleRate();
-
         ~RtpSender();
 
         void add(RtpPay * payloader, const SenderConfig & config);

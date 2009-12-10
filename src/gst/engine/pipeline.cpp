@@ -82,10 +82,14 @@ Pipeline * Pipeline::Instance()
 }
 
 
+/// FIXME: this is never called
 Pipeline::~Pipeline()
 {
     if (pipeline_)
+    {
+        LOG_DEBUG("Unreffing pipeline");
         gst_object_unref(GST_OBJECT(pipeline_));
+    }
     delete [] titleStr_;
 }
 
@@ -152,12 +156,31 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                 }
                 break;
             }
+            // using fallthrough
         case GST_MESSAGE_ELEMENT:
+            Instance()->updateListeners(msg);
+            break;
         case GST_MESSAGE_APPLICATION:
+            /// handle interrupt
+            const GstStructure *s;
+
+            s = gst_message_get_structure(msg);
+
+            if (gst_structure_has_name (s, "MilhouseInterrupt")) 
             {
-                Instance()->updateListeners(msg);
-                break;
+                /* this application message is posted when we caught an interrupt and
+                 * we need to stop the pipeline. */
+                LOG_INFO("Interrupt: Stopping pipeline ...\n");
+                if (msg)
+                {
+                   // gst_message_unref(msg);
+                  //  gst_object_unref(bus);
+                }
+                return FALSE;
             }
+            else
+                Instance()->updateListeners(msg);
+            break;
 
         case GST_MESSAGE_LATENCY:
             {
@@ -184,7 +207,9 @@ void Pipeline::reset()
     if (Instance()->pipeline_)
     {
         LOG_DEBUG("Pipeline is being reset.");
+        LOG_DEBUG("Unreffing bus");
         gst_object_unref(Instance()->getBus());
+        LOG_DEBUG("Unreffing pipeline");
         gst_object_unref(GST_OBJECT(Instance()->pipeline_));
         Instance()->pipeline_ = 0;
         delete [] Instance()->titleStr_;
@@ -355,9 +380,14 @@ void Pipeline::stop()
 {
     if (isStopped())        // only needs to be stopped once
         return;
-    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-    tassert(checkStateChange(ret)); // set it to paused
-    LOG_DEBUG("Now stopped/null");
+    if (pipeline_)
+    {
+        GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
+        tassert(checkStateChange(ret)); // set it to paused
+        LOG_DEBUG("Now stopped/null");
+    }
+    else
+        LOG_DEBUG("Pipeline == 0, can't be stopped");
 }
 
 
@@ -378,6 +408,7 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
         *element = NULL;
         --refCount_;
 
+        /// No elements left in pipeline
         if (refCount_ <= 0)
         {
             if (refCount_ != 0)
@@ -505,5 +536,18 @@ void Pipeline::updateSampleRate(unsigned newRate)
 unsigned Pipeline::actualSampleRate() const
 {
     return sampleRate_;
+}
+
+
+void Pipeline::postInterrupt()
+{
+    /* post an application specific message */
+    if (pipeline_)
+    {
+        gst_element_post_message (GST_ELEMENT (pipeline_),
+                gst_message_new_application (GST_OBJECT (pipeline_),
+                    gst_structure_new ("MilhouseInterrupt",
+                        "message", G_TYPE_STRING, "Pipeline interrupted", NULL)));
+    }
 }
 

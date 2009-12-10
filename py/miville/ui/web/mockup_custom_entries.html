@@ -5,6 +5,9 @@
     <title>miville : mockup short-term</title>
     <!-- voir http://www.w3schools.com/css/ -->
     <style type="text/css">
+    #foo td {
+        vertical-align:top;
+    }
     body {
         font-family: sans-serif;
     }
@@ -123,4 +126,55 @@
     <blink>CRITICAL : Jackd is not running ! Exiting</blink>
 </div>
 </div>
-</body></html>
+
+<table>
+    <tr>
+        <th colspan="3">title</th>
+    </tr>
+    <tr>
+        <td>a</td>
+        <td>b</td>
+        <td>c</td>
+    </tr>
+    <tr>
+        <td>a</td>
+        <td>b</td>
+        <td>c</td>
+    </tr>
+</table>
+
+<table id="foo">
+    <tr>
+        <td>
+            a <br />
+            a <br />
+            a <br />
+            a <br />
+            a <br />
+            a <br />
+        </td>
+        <td rowspan="2">
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+            b <br />
+        </td>
+    <tr>
+        <td>
+            c <br />
+            c <br />
+            c <br />
+            c <br />
+            c <br />
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

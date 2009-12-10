@@ -134,7 +134,7 @@ int discoverAVC(int* port, octlet_t* guid)
 				if (rom1394_get_directory(handle, i, &rom_dir) < 0)
 				{
 					rom1394_free_directory(&rom_dir);
-					THROW_ERROR("error reading config rom directory for node " << i);
+					LOG_WARNING("error reading config rom directory for node " << i);
 				}
 				if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) and 
 				         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or 
@@ -172,7 +172,7 @@ bool Raw1394::cameraIsReady()
     raw1394_destroy_handle(handle);
 
     if (discoverAVC(&port, &guid) == -1)
-        THROW_ERROR("Dv source is not ready");
+        LOG_WARNING("Dv source is not ready");
 
     return true;
 }

@@ -12,6 +12,8 @@
 #  6. gst-plugin-ugly 0.10.12
 #  7. gst-ffmpeg 0.10.10.9
 
+SCRIPT_PATH=$(pwd)
+
 DOWNLOAD_DIR=~/src/gstreamer-src
 if [ ! -d $DOWNLOAD_DIR ]
 then
@@ -53,18 +55,21 @@ sudo $MAKEINSTALL
 popd
 
 
-#get x264, note that as of 09/23/2009 upstream x264 is incompatible gstreamer
+# get x264, note that as of 09/23/2009 upstream x264 is incompatible with gstreamer
+# and that there are unfortunately no real releases of x264, only daily tarballs
 wget -c ftp://ftp.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
 tar xjf $X264.tar.bz2
 pushd $X264
-./configure 
+## added enable-shared flag to make sure that we can build the gstreamer x264enc
+## plugin on 64 bit platforms
+./configure --enable-shared
 make 
 sudo $MAKEINSTALL
 sudo ldconfig
 popd
 
 
-#get libdc1394
+# get libdc1394
 wget -c http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/2.1.2/$DC1394.tar.gz
 tar xzf $DC1394.tar.gz
 pushd $DC1394
@@ -86,6 +91,19 @@ for uri_path in gstreamer/$GST_CORE.tar.bz2 \
 do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
+
+DC1394PATCH=$SCRIPT_PATH/dc1394-iso-speed.diff
+if [ -r $DC1394PATCH ]; then
+    echo "Patching gst-plugins-bad to add iso-speed property to dc1394src"
+    pushd $GST_BAD
+    patch -p1 < $DC1394PATCH
+    popd
+    echo "Done patching $GST_BAD"
+else
+    echo "No dc1394-iso-speed.diff found"
+    echo "Patch available on http://svn.sat.qc.ca/trunk/utils/dc1394-iso-speed.diff"
+    echo "Warning, iso-speed will be always 400Mbps."
+fi
 
 # Build!
 for module in $MODULES
@@ -109,3 +127,4 @@ do
 echo "Installation completed, but who knows"
 echo "Life is full of surprises"
 echo "Downloaded files are in " $DOWNLOAD_DIR
+

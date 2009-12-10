@@ -1,4 +1,5 @@
-// videoSize.h
+
+// playback.h
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
@@ -19,16 +20,20 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _VIDEO_SIZE_H_
-#define _VIDEO_SIZE_H_
+#ifndef _PLAYBACK_H_
+#define _PLAYBACK_H_
 
-namespace videosize 
-{
-    const int WIDTH = 640;
-    const int HEIGHT = 480;
-    const int MAX_WIDTH = 1200;
-    const int MAX_HEIGHT = 900;
-    const int FRAMERATE = 30;
+namespace playback {
+        void start();
+        void pause();
+        void stop();
+        bool isPlaying();
+        void makeVerbose();
+        void quit();
+        bool quitted();
+        int sampleRate();
+        void postInterrupt();
 }
 
-#endif // _VIDEO_SIZE_H_
+#endif // _PLAYBACK_H_
+

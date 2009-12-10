@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include "videoSize.h"
 
 #ifdef CONFIG_GL
 

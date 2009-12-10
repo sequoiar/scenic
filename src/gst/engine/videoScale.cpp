@@ -71,36 +71,3 @@ VideoScale::~VideoScale()
     Pipeline::Instance()->remove(&videoscale_);
 }
 
-/// FIXME: merge some of this?
-int VideoScale::getWidth() const
-{
-    int width;
-
-    // Get caps directly from capsfilter so we're sure they're accurate
-    GstCaps *caps;
-    g_object_get(capsfilter_, "caps", &caps, NULL);
-
-    // get fixed caps structure, then get width out of it 
-    if (not gst_structure_get_int(gst_caps_get_structure(caps, 0), "width", &width))
-        THROW_ERROR("Could not get width from caps");
-
-    LOG_DEBUG("Got width " << width);
-    return width;  
-}
-
-
-int VideoScale::getHeight() const
-{
-    int height;
-
-    // Get caps directly from capsfilter so we're sure they're accurate
-    GstCaps *caps;
-    g_object_get(capsfilter_, "caps", &caps, NULL);
-
-    // get fixed caps structure, then get width out of it 
-    if (not gst_structure_get_int(gst_caps_get_structure(caps, 0), "height", &height))
-        THROW_ERROR("Could not get height from caps");
-    LOG_DEBUG("Got height " << height);
-    return height;  
-}
-

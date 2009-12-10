@@ -19,11 +19,12 @@
 
 #include "baseThread.h"
 
-bool BaseThread::Quitted = false;
+bool BaseThread::quitted_ = false;
 
 
-bool BaseThread::isQuitted(){
-    return Quitted;
+bool BaseThread::isQuitted()
+{
+    return quitted_;
 }
 
 
@@ -41,7 +42,7 @@ void BaseThread::postQuit(BaseThread* bt)
 void BaseThread::broadcastQuit()
 {
     for_each(allThreads_.begin(), allThreads_.end(), BaseThread::postQuit);
-    Quitted = true;
+    quitted_ = true;
 }
 
 /// client access to async QueuePair 
@@ -63,7 +64,8 @@ BaseThread::BaseThread()
 
 BaseThread::~BaseThread()
 {
-    if (th_){
+    if (th_)
+    {
         MapMsg t("quit"); //TODO: this is forcing the 
         flippedQueue_.push(t);
         LOG_DEBUG("Thread Stopping " << this);
@@ -97,7 +99,7 @@ bool BaseThread::run()
         return true;
     }
     //No thread yet
-    if(!ready())
+    if (!ready())
         return false;
 
     th_ = new boost::thread(thread_create(this));

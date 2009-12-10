@@ -243,18 +243,18 @@ NetworkTesting.methods(
 			var button_name = self.start_str; // "start" string that is i18nized
 			// get the state of other controls necessary to find the state
 			var stream_state = self.contact.get('stream_state');
-			var connection_state = self.contact.get('state').toInt();
+			var connection_state = self.contact.get('state');
             dbug.info("connection_state: " + connection_state);
             dbug.info("stream_state: " + stream_state);
 			
             self.start_btn.removeEvents('click');
-			if ([0, 3].contains(connection_state)) {
-				if (stream_state == 0) {
+			if (connection_state == 'disconnected' || connection_state == 'connected') {
+				if (stream_state == 'stopped') {
 					button_state = 'enabled';
 					self.start_btn.addEvent('click', function() {
 						self.start_test();
 					});
-				} else if (stream_state == 1) {
+				} else if (stream_state == 'starting') {
                     dbug.info("Seems like we are streaming. Disabling the nettest button.");
 					button_state = 'disabled';
 					button_name = self.start_str;

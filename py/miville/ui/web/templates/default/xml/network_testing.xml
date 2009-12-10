@@ -2,9 +2,8 @@
     xmlns:athena="http://divmod.org/ns/athena/0.7"
     n:render="liveFragment">
     <!-- The actual HTML template -->
-    <br />
-	<h3 n:render="i18n">Network Testing</h3>
-    <div id="nettest" class="section">
+    <div class="section">
+	    <h3 n:render="i18n">Network Testing</h3>
         <table>
             <tr>
                 <td align="right">Bandwidth: </td>
@@ -15,7 +14,7 @@
             </tr>
             <tr>
                 <td align="right">Test duration: </td>
-                <td><input type="text" id="nettest_duration" value="10"   /> seconds</td>
+                <td><input type="text" id="nettest_duration" value="10" /> seconds</td>
             </tr>
             <tr>
                 <td align="right">Mode:</td>

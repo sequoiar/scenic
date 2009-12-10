@@ -51,6 +51,9 @@ class VideoSourceConfig
         bool deviceExists() const;
         const char *location() const;
         const char *deviceName() const;
+        unsigned captureWidth() const;
+        unsigned captureHeight() const;
+        bool forceGrayscale() const;
 
     private:
         const std::string source_;
@@ -61,6 +64,9 @@ class VideoSourceConfig
         const int cameraNumber_;
         const unsigned long long GUID_;
         const int framerate_;
+        const int captureWidth_;
+        const int captureHeight_;
+        const bool grayscale_;
 };
 
 
@@ -69,8 +75,7 @@ class VideoSinkConfig
     public:
 
         VideoSinkConfig(MapMsg &msg);
-
-        VideoSink* createSink(int width, int height) const;
+        VideoSink* createSink() const;
         VideoScale* createVideoScale() const;
         bool doDeinterlace() const { return doDeinterlace_; }
         bool hasCustomResolution() const;
@@ -81,8 +86,8 @@ class VideoSinkConfig
         const int screenNum_;
         bool doDeinterlace_;
         const std::string sharedVideoId_;
-        const int width_;
-        const int height_;
+        const int displayWidth_;
+        const int displayHeight_;
 };
 
 #endif // _VIDEO_CONFIG_H_

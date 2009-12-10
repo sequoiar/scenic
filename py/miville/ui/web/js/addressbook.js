@@ -325,9 +325,10 @@ Addressbook.methods(
 			var conn_state = li.getChildren()[0];
 			conn_state.removeClass('spinner_small');
 			conn_state.removeClass('conn_connected');
-			if (item['state'] > 0 && item['state'] < 3) {
+            // FIXME: change to NAMED_CONSTANTS
+			if (item['state'] == 'asking' || item['state'] == 'connecting') {
 				conn_state.addClass('spinner_small');
-			} else if (item['state'] == 3) {
+			} else if (item['state'] == 'connected') {
 				conn_state.addClass('conn_connected');
 			}
 			
@@ -335,9 +336,9 @@ Addressbook.methods(
 			var stream_state = li.getChildren()[1];
 			stream_state.removeClass('spinner_small');
 			stream_state.removeClass('streaming');
-			if (item['stream_state'] == 1) { // starting...
+			if (item['stream_state'] == 'starting') { // starting...
 				stream_state.addClass('spinner_small');
-			} else if (item['stream_state'] == 2) { // streaming
+			} else if (item['stream_state'] == 'streaming') { // streaming
 				stream_state.addClass('streaming');
 			}
 			
@@ -575,7 +576,7 @@ Addressbook.methods(
      * @member Addressbook
      */
 	function edit_contact(self) {
-		if (self.get_selected_attr('state') == 0) {
+		if (self.get_selected_attr('state') == 'disconnected') {
 			self.edit_type = 'modify';
 			self.notify_controllers('edit_contact');
 
@@ -921,7 +922,7 @@ Addressbook.methods(
 			// get the state of other controls necessary to find the state
 			var contact_state = self.get_selected_attr('state');	// state of selected contact
 			
-			if (contact_state == 0 && self.edit_btn.value == self.edit_str) {
+			if (contact_state == 'disconnected' && self.edit_btn.value == self.edit_str) {
 				button_state = 'enabled';	
 			}
 			
@@ -957,7 +958,7 @@ Addressbook.methods(
 			    auto_created = true;
 			}
 
-			if (contact_state != 0 && !auto_created) {
+			if (contact_state != 'disconnected' && !auto_created) {
 				button_state = 'disabled';	
 			}
 			
@@ -1012,11 +1013,12 @@ Addressbook.methods(
 
 			// get the state of other controls necessary to find the state
 			var contact_state = self.get_selected_attr('state');	// state of selected contact
-			if (contact_state >= 0 && (self.edit_btn.value == self.edit_str || self.edit_btn.value == self.keep_str)) {
+            // contact_state could only be false if it's null, FIXME: this might be unnecessary
+			if ((contact_state != null) && (self.edit_btn.value == self.edit_str || self.edit_btn.value == self.keep_str)) {
 				button_state = 'enabled';
 			}
 			
-			if (contact_state > 0) {
+			if (contact_state != 'disconnected') {
 				button_name = self.disconnect_str;
 			}
 
@@ -1025,7 +1027,7 @@ Addressbook.methods(
 			if (button_state == 'enabled') {
 				self.connect_btn.disabled = false;
 				
-				if (contact_state > 0) {
+				if (contact_state != 'disconnected') {
 					button_name = self.disconnect_str;
 					self.connect_btn.addEvent('click', function(){
 						self.disconnect();

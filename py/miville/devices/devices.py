@@ -1,3 +1,4 @@
+#!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 # 
 # Miville
@@ -21,7 +22,6 @@
 """
 Devices handling and Driver base classes.
 """
-
 # 
 # ------------
 # 
@@ -49,7 +49,7 @@ from miville.utils import commands
 from miville.errors import DeviceError
 from miville.errors import CommandNotFoundError
 
-log = log.start('debug', 1, 0, 'devices')
+log = log.start('debug', True, True, 'devices')
 
 class Driver(object): #shell.ShellCommander):
     """
@@ -61,9 +61,7 @@ class Driver(object): #shell.ShellCommander):
     Methods and attributes that must be overriden in child classes are:
         - name : A class attribute string for the name of the driver (example: 'v4l2')
         - on_attribute_change(...) : method called when the programmer changes the value of a device attribute
-        - on_devices_polling(...) : method called when the Driver wants to poll its devices.
-        - on_commands_results(...) : method called once commands started from on_devices_polling or on_attribute_change are done.
-        - on_commands_error(...) : method similar to the method above.
+        - _on_devices_polling(...) : method called when the Driver wants to poll its devices.
     
     The programmer can also override:
         - prepare(...) : method called once at startup
@@ -86,6 +84,8 @@ class Driver(object): #shell.ShellCommander):
     If a getter/setter is necessary, the corresponding attribute should be private.
     i.e. begin with an underscore.
     """
+    # - on_commands_results(...) : method called once commands started from on_devices_polling or on_attribute_change are done.
+    # - on_commands_error(...) : method similar to the method above.
     name = 'default_name'
     
     def __init__(self, polling_interval=15.0, polling_enabled=True):
@@ -275,6 +275,7 @@ class Driver(object): #shell.ShellCommander):
         Devices polling routine.
         """
         if self.state_poll_enabled:
+            # FIXME: this could be replaced by a looping call
             self._cancel_delayed_polling()
             self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices) # no caller, no event_key
         self._new_devices = {}
@@ -298,20 +299,22 @@ class Driver(object): #shell.ShellCommander):
     
 # Drivers should extend one of these classes: 
 class VideoDriver(Driver):
-    """
+    """ 
+    Video driver base class
     """
     pass
 
 class AudioDriver(Driver):
     """
+    Audio driver base class
     """
     pass
 
 class DataDriver(Driver):
     """
+    Data driver base class
     """
     pass
-    
 
 class Attribute(object):
     """
@@ -625,6 +628,7 @@ def set_video_standard(caller, value=None):
         # for every video driver.
         for driver in manager.drivers.values():
             for device in driver.devices.values():
+                log.debug("changing norm to %s for %s" % (value, device.name))
                 modify_attribute(caller, driver.kind, driver.name, device.name, 'norm', value)
     return value
 

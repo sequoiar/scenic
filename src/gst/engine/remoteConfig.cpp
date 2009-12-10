@@ -133,10 +133,11 @@ gboolean SenderConfig::sendMessage(gpointer data)
             << context->remoteHost_ << " on port " << context->capsPort() 
             << " with id " << context->msgId_);
 
+    /// FIXME: everytime a receiver starts, it should ask sender for caps, then the sender can
+    /// send them.
     if (tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
-        return FALSE;    // message got through, don't need to send it again
-    else
-        return TRUE;    // no connection made, try again later
+        LOG_INFO("Caps sent successfully");
+    return TRUE;    // try again later, in case we have a new receiver
 }
 
 
@@ -198,7 +199,7 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
         int msgId__) : 
     RemoteConfig(msg, msgId__), 
     multicastInterface_(msg["multicast-interface"]), caps_(caps__), 
-    capsOutOfBand_(msg["caps-out-of-band"] or caps_ == "")
+    capsOutOfBand_(msg["negotiate-caps"] or caps_ == "")
 {
     if (capsOutOfBand_) // couldn't find caps, need them from other host or we explicitly been told to send caps
     {

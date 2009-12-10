@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(MILHOUSE, 0.2)
+AC_INIT(MILHOUSE, 0.3.1)
 AC_DEFINE(RELEASE_CANDIDATE,["-c1"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -30,8 +30,6 @@ AC_PROG_GCC_TRADITIONAL
 AC_CHECK_FUNCS([inet_ntoa memset socket])
 
 AC_MSG_CHECKING(whether to enable debugging)
-#AC_ARG_ENABLE([sip], [ **************** 
-#  --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
@@ -201,6 +199,7 @@ AC_CONFIG_FILES([Makefile
                  src/include/Makefile
                  src/util/Makefile
                  src/gutil/Makefile
+                 src/shared_video/Makefile
                  src/boost/Makefile
                  src/tcp/Makefile
                  src/gst/Makefile
@@ -212,7 +211,6 @@ AC_CONFIG_FILES([Makefile
                  ])
 
 AC_CONFIG_FILES([
-                 src/util/test/Makefile
                  src/tcp/test/Makefile
                  src/gst/engine/test/Makefile
                  ])

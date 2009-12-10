@@ -40,9 +40,8 @@ class Dv1394 : boost::noncopyable
         static void cb_new_src_pad(_GstElement *  /*srcElement*/, _GstPad * srcPad, void *data);
 
     private:
-        explicit Dv1394() : dv1394src_(0), dvdemux_(0), audioSink_(0), videoSink_(0) {}
+        Dv1394();
         ~Dv1394();
-        void init();
 
         _GstElement *dv1394src_;
         _GstElement *dvdemux_;

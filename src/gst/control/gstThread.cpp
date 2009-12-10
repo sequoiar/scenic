@@ -26,7 +26,7 @@
 #include "../engine/mediaBase.h"
 #include "gstThread.h"
 #include "gstSenderThread.h"
-#include "../engine/playback.h"
+#include "playback.h"
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
@@ -134,9 +134,9 @@ void GstThread::handleMsg(MapMsg &msg)
 void GstThread::main()
 {
     bool done = false;
-    while(!done)
+    while (!done)
     {
-        if(g_main_context_iteration(NULL, FALSE))
+        if (g_main_context_iteration(NULL, FALSE))
             continue;
 
         if(queue_.ready())
@@ -171,12 +171,11 @@ void GstThread::main()
                     
                     if(!subHandleMsg(f))
                         handleMsg(f);
-
                 }
                 f = queue_.timed_pop(1);
-            }while(f());
+            } while(f());
         }
-        usleep(MILLISEC_WAIT*1000);
+        usleep(MILLISEC_WAIT * 1000);
     }
 
 }
@@ -307,10 +306,10 @@ void GstReceiverThread::video_init(MapMsg& msg)
         setVideoDefaults(msg);
         video_ = videofactory::buildVideoReceiver(msg);
     }
-    catch(ErrorExcept e)
+    catch (ErrorExcept e)
     {
         LOG_WARNING(e.what());
-        throw(e);
+        throw e;
     }
 }
 
@@ -324,9 +323,9 @@ void GstReceiverThread::audio_init(MapMsg& msg)
         setAudioDefaults(msg);
         audio_ = audiofactory::buildAudioReceiver(msg);
     }
-    catch(ErrorExcept e)
+    catch (ErrorExcept e)
     {
-        throw(e);
+        throw e;
     }
 }
 
@@ -345,10 +344,10 @@ void GstSenderThread::video_init(MapMsg& msg)
         setVideoDefaults(msg);
         video_ = videofactory::buildVideoSender(msg);
     }
-    catch(ErrorExcept e)
+    catch (ErrorExcept e)
     {
         LOG_ERROR(e.what());
-        throw(e);
+        throw e;
     }
 }
 
@@ -362,10 +361,10 @@ void GstSenderThread::audio_init(MapMsg& msg)
         setAudioDefaults(msg);
         audio_ = audiofactory::buildAudioSender(msg);
     }
-    catch(ErrorExcept e)
+    catch (ErrorExcept e)
     {
         LOG_ERROR(e.what());
-        throw(e);
+        throw e;
     }
 }
 

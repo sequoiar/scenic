@@ -112,6 +112,7 @@ jack_nframes_t Jack::samplerate()
 
 bool Jack::autoForcedSupported(GstElement *jackElement)
 {
+    const std::string PROPERTY_NAME("auto-forced");
     GParamSpecEnum *enum_property; 
     enum_property = G_PARAM_SPEC_ENUM(g_object_class_find_property(G_OBJECT_GET_CLASS(jackElement), "connect"));
     GEnumClass *enum_class = enum_property->enum_class;
@@ -123,7 +124,7 @@ bool Jack::autoForcedSupported(GstElement *jackElement)
     {
         if ((enum_value = g_enum_get_value(enum_class, value))) 
         {
-            if (std::string("auto-forced") == enum_value->value_nick)
+            if (PROPERTY_NAME == enum_value->value_nick)
                 found = true;
         }
     }
