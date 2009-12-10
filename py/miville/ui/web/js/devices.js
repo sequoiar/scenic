@@ -103,12 +103,18 @@ Devices.methods(
 	 * (called from the js client)
 	 * @member Devices
 	 */
-	function set_norm(self, target) {
-        dev_name = target.getProperty("dev_name");
-        norm_value = target.value;
+	function set_norm(self, dev_name, norm_value) {
         dbug.info("set_norm" + dev_name + " " + norm_value)
         self.callRemote('rc_set_norm', dev_name, norm_value);
-        target.blur(); // lose focus on form element
+    },
+	/**
+     * Changes the input number of a V4L2 video device.
+	 * (called from the js client)
+	 * @member Devices
+	 */
+	function set_input(self, dev_name, input_value) {
+        dbug.info("set_input" + dev_name + " " + input_value)
+        self.callRemote('rc_set_input', dev_name, input_value);
     },
 	/**
 	 * ------------------
@@ -125,20 +131,36 @@ Devices.methods(
 	function rc_devices_list_all(self, devs_list) {
         dbug.info("DEVICES: rc_devices_list_all called");
         self.devices_div.empty();
+        var table = new Element("table", {"class": "devs_table"});
+        table.inject(self.devices_div);
+        var has_jackd = false;
+        var is_odd = true;
+        var style_name = "";
         if (devs_list.length > 0) {
             devs_list.each(function(dev) 
             {
-                var title = new Element('h2');
-                title.inject(self.devices_div);
+                if (dev.dr_name == "jackd") 
+                {
+                    has_jackd = true;
+                }    
+                var _tr = new Element("tr");
+                var title = new Element('th', {"colspan": 3, "class": "dev_name"}).inject(_tr);
+                _tr.inject(table);
                 // Something like : "default" audio device using the "jackd" driver
                 title.appendText('"' + dev.dev_name + '" ' + dev.dr_kind + " device using the \"" + dev.dr_name + 
 "\" driver" );
-                var ul = new Element('ul');
-                ul.inject(self.devices_div);
+                is_odd = true;
                 dev.attributes.each(function(attr) 
                 {
-                    var li = new Element('li');
-                    li.appendText(attr.name + ": " + attr.value + " (" + attr.kind + ") options:" + attr.options + " ").inject(ul);
+                    if (is_odd) {
+                        style_name = "color_zebra";
+                    } else {
+                        style_name = "";
+                    }
+                    is_odd = ! is_odd;
+                    var tr2 = new Element('tr', {"class": style_name}).inject(table);
+                    var td1 = new Element("td", {"class": "dev_attr_name"}).inject(tr2).appendText(attr.name + " :");
+                    var td2 = new Element("td", {"class": "dev_attr_value"}).inject(tr2);
                     // V4L2 NORM:
                     if (dev.dr_name == "v4l2" && attr.name == "norm")
                     {
@@ -158,10 +180,39 @@ Devices.methods(
                         dbug.info("adding onChange callback");
                         sel.addEvent('change', function(event) {
                             dbug.info("on change norm");
-                            self.set_norm(event.target); //dev_name, sel.value);
+                            var dev_name = event.target.getProperty("dev_name");
+                            var norm_value = event.target.value;
+                            self.set_norm(dev_name, norm_value); 
+                            event.target.blur(); // lose focus on form element
                         });
-                        // XXX uncomment this :
-                        sel.inject(li);
+                        sel.inject(td2);
+                    }
+                    // V4L2 INPUT:
+                    else if (dev.dr_name == "v4l2" && attr.name == "input")
+                    {
+                        var sel = new Element("select", {
+                            "dev_name": dev.dev_name
+                            });
+                        attr.options.each(function(opt) {
+                            var o = new Element("option", {
+                                "html": opt,
+                                "selected":opt == attr.value,
+                                "value": opt});
+                            o.inject(sel);
+                        });
+                        dbug.info("adding onChange callback");
+                        sel.addEvent('change', function(event) {
+                            dbug.info("on change input");
+                            var dev_name = event.target.getProperty("dev_name");
+                            var input_value = event.target.value;
+                            self.set_input(dev_name, input_value); 
+                            event.target.blur(); // lose focus on form element
+                        });
+                        sel.inject(td2);
+                    }
+                    else 
+                    {
+                        td2.appendText(attr.value);
                     }
                 }); // end for each attr
             }); // end for each dev
@@ -169,6 +220,16 @@ Devices.methods(
             var p = new Element('p');
             p.appendText("No device to list.");
             p.inject(self.devices_div);
+        }
+        if (has_jackd == false)
+        {
+            var blinker = new Element("blink", {
+                "html":"The JACK Audio Connection Kit server (jackd) is not running !",
+                "style":"color:#f00;"
+                });
+            blinker.inject(self.devices_div);
+            var msg = new Element("p", {"html":"You should start jackd or qjackctl."});
+            msg.inject(self.devices_div);
         }
 	}
 );

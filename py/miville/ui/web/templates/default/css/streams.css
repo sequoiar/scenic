@@ -1,21 +1,55 @@
-#strm h3 {
-	margin: 0px 0px 10px;
-	color: #FFFFFF;
-}
-
+/* drop-down menu to choose profile ID for current contact */
 #strm_global_setts {
-	width: 150px;
-	margin-left: 10px;
+	width: 250px;
+    /* width: 100%;
+    */
+    position: absolute;
+    left: 50px;
+    top: 22px;
+    /*
+	margin-left: 5px;
+    */
 }
-
+/* text label for the drop-down menu */
 #strm_presets {
-	margin-left: 40px;
+    /*
+	margin-left: 10px;
+    */
+    position: absolute;
+    left: 0px;
+    top: 26px;
 }
-
+/* start/stop button */
+#strm_start {
+    position: absolute;
+    left: 50px;
+    top: 45px;
+}
+/* list/table of field name : entries */
 #strm_details {
-    display: block;
-    font-size: 10px;
+    position: absolute;
+/*    left: 305px;
+*/
+    right: 0;
+    top: 15px;
+    height: 75px;
     overflow: auto;
-    max-height: 100px;
-    width: 300px;
+    background-color: #fff;
+    border: solid 1px #666;
+    width: 250px;
+    /*
+    display: block;
+    position:relative;
+    right:0;
+    margin:0;
+    padding:0;
+    width: 200px;
+    */
+}
+/* the whole table */
+#strm_table {
+    
+}
+#strm_table td {
+    vertical-align: top;
 }

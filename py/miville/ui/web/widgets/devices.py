@@ -62,9 +62,24 @@ class Devices(Widget):
         """
         caller = self
         log.debug("Changing norm to %s" % (norm_value))
+        # TODO: use device_name arg
         self.api.set_video_standard(caller, str(norm_value))
         reactor.callLater(0.1, self.api.devices_list_all, self)
 
+    def rc_set_input(self, v4l2_dev_name, input_value):
+        """
+        Changes the input number of a video device.
+        """
+        caller = self
+        driver_kind = "video"
+        driver_name = "v4l2"
+        device_name = v4l2_dev_name
+        attribute_name = "input"
+        value = input_value
+        self.api.device_modify_attribute(caller, driver_kind, driver_name, device_name, attribute_name, value)
+        log.debug("Changing input to %s" % (input_value))
+        reactor.callLater(0.1, self.api.devices_list_all, self)
+    
     def cb_devices_removed(self, origin, data):
         """These might cause troubles if attributes change too often."""
         log.debug('cb_devices_removed')
