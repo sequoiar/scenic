@@ -498,8 +498,8 @@ class ControllerApi(object):
         If value is None, sets it according to the time zone.
         """
         # TODO: use device_name arg
-        log.debug("set_video_standard %s %s" % (caller, value))
-        return devices.set_video_standard(caller, value)
+        log.debug("set_video_standard %s %s %s" % (caller, value, device_name))
+        return devices.set_video_standard(caller, value, device_name)
         # TODO Return a Deferred !
     
     def reset_firewire_bus(self, caller):

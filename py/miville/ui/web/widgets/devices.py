@@ -61,9 +61,9 @@ class Devices(Widget):
         Changes the norm of a video device.
         """
         caller = self
-        log.debug("Changing norm to %s" % (norm_value))
+        log.debug("Changing norm to %s for device %s" % (norm_value, v4l2_dev_name))
         # TODO: use device_name arg
-        self.api.set_video_standard(caller, str(norm_value))
+        self.api.set_video_standard(caller, str(norm_value), v4l2_dev_name)
         reactor.callLater(0.1, self.api.devices_list_all, self)
 
     def rc_set_input(self, v4l2_dev_name, input_value):
