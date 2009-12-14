@@ -1,5 +1,5 @@
-from struct import pack, unpack
-
+from struct import unpack
+from struct import pack
 
 class  Singleton (object):
     instances = {}

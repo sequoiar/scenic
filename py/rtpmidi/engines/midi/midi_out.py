@@ -1,9 +1,11 @@
 #Twisted
-from twisted.internet import reactor, defer
+from twisted.internet import defer
+from twisted.internet import reactor
 
 #Midi Streams
-from ringBuffer import myFIFO, myRingBuffer
-from midi_object import SafeKeyboard
+from rtpmidi.engines.midi.ringBuffer import myRingBuffer
+from rtpmidi.engines.midi.ringBuffer import myFIFO
+from rtpmidi.engines.midi.midi_object import SafeKeyboard
 
 import Queue
 

@@ -4,8 +4,8 @@ from struct import unpack
 import time
 
 #data
-from midi_object import OldPacket
-from list_circ import  PacketCirc
+from rtpmidi.engines.midi.midi_object import OldPacket
+from rtpmidi.engines.midi.list_circ import  PacketCirc
 
 def timestamp_compare(x, y):
     if x[1]>y[1]:

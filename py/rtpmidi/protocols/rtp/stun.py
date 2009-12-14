@@ -3,14 +3,14 @@
 # Copyright (C) 2004 Anthony Baxter
 # $Id: stun.py,v 1.15 2004/03/02 14:22:31 anthony Exp $
 
-import struct, socket
-from twisted.internet import reactor, defer
+import socket
+import struct
+from twisted.internet import defer
+from twisted.internet import reactor
 from twisted.internet.protocol import DatagramProtocol
 from twisted.python import log
 
 import sets
-
-
 
 from defcache import DeferredCache
 from nat import BaseMapper

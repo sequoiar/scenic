@@ -3,23 +3,29 @@
 # Completed by Antoine Collet
 
 #utils
-import random, os, md5, socket
-from time import time, sleep
+import random
+import os
+import md5
+import socket
+from time import sleep
+from time import time
 
 #twisted
-from twisted.internet import task, reactor, defer
+from twisted.internet import reactor
+from twisted.internet import defer
+from twisted.internet import task
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet.task import LoopingCall
 from twisted.internet.error import MessageLengthError
 
 #rtp 
-from sdp import SDP
-from formats import SDPGenerator, PT_CN, PT_xCN, PT_NTE, PT_PCMU, PT_AVP
-from packets import RTPPacket, parse_rtppacket
-from packets import NTE
+from rtpmidi.protocols.rtp.sdp import SDP
+from rtpmidi.protocols.rtp.formats import SDPGenerator, PT_CN, PT_xCN, PT_NTE, PT_PCMU, PT_AVP
+from rtpmidi.protocols.rtp.packets import RTPPacket, parse_rtppacket
+from rtpmidi.protocols.rtp.packets import NTE
 
 #data
-from jitter_buffer import JitterBuffer
+from rtpmidi.protocols.rtp.jitter_buffer import JitterBuffer
 from struct import unpack
 
 #Constants

@@ -1,17 +1,19 @@
 #utils import
 import sys
 import os
-from struct import pack, unpack
+from struct import unpack
+from struct import pack
 import time
 
 #twisted import
-from twisted.internet import reactor, task
+from twisted.internet import task
+from twisted.internet import reactor
 
 #data import
-from utils import Singleton
+from rtpmidi.protocols.rtp.utils import Singleton
 
 #rtp import
-from protocol import RTPProtocol
+from rtpmidi.protocols.rtp.protocol import RTPProtocol
 
 #RTP Timeout is 60
 RTP_TIME_OUT = 40
