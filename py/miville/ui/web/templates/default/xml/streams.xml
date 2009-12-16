@@ -18,6 +18,8 @@
                 </input>
             </td>
             <td>
+                <span id="strm_sets">
+                </span>
                 <span id="strm_details">
                 </span>
             </td>

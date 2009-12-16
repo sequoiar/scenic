@@ -28,7 +28,7 @@ from twisted.python import procutils
 from miville.utils import sig
 from miville.utils import log
 
-log = log.start("debug", 1, 0, "streams.proc")
+log = log.start("debug", True, True, "streams.proc")
 
 STATE_IDLE = "IDLE" 
 STATE_STARTING = "STARTING"

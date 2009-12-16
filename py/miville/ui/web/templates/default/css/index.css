@@ -41,7 +41,7 @@ h3 {
 	left: 305px; /* not 300 */
 	right: 0px;
 	padding: 0; /* 2px 10px; */
-    height: 95px; /* see devs.top */
+    height: 150px; /* see devices_section.top */
     overflow: auto;
     margin:0;
 }
@@ -53,7 +53,7 @@ h3 {
 /* devices div */
 #devices_section { 
 	position: absolute;
-	top: 100px;
+	top: 155px;
 	bottom: 100px;
 /*	height: 0px;*/
 	left: 305px; /* not 300 */

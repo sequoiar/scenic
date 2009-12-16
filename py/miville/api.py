@@ -99,7 +99,7 @@ class ControllerApi(object):
         network.start(self, self.core.config.iperf_port + self.core.config.port_numbers_offset, self.core.config.listen_to_interfaces)
         pinger.start(self)
         firewire.start(self)
-        conf.PORT_OFFSET = self.core.config.port_numbers_offset * 100 # FIXME
+        streams_manager.PORT_OFFSET = self.core.config.port_numbers_offset * 100 # FIXME
         streams_manager.start(self) # XXX order matters
         self.streams_manager = streams_manager.get_single_manager()
         self.config_db = conf.get_single_db()
