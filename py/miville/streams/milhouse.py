@@ -638,7 +638,7 @@ def setup_milhouse_settings(db):
     # ------------------------------- video inputs ---------------------------
     setting_v4l2_0 = db.add_setting(
         name="V4L2 video device 0", 
-        desc="V4L2 video driver with default device. Input 0. NTSC.",
+        desc="V4L2 video device 0",
         entries={
             "/send/video/source":"v4l2src",
             "/send/video/v4l2/device":"/dev/video0",
@@ -647,7 +647,7 @@ def setup_milhouse_settings(db):
         })
     setting_v4l2_1 = db.add_setting(
         name="V4L2 video device 1", 
-        desc="V4L2 video driver with default device. Input 1. NTSC.",
+        desc="V4L2 video device 1.",
         entries={
             "/send/video/source":"v4l2src",
             "/send/video/v4l2/device":"/dev/video1",
@@ -694,6 +694,7 @@ def setup_milhouse_settings(db):
         setting_jack_out.id,
         ])
     # ------------------------------- video outputs ---------------------------
+    #TODO: add more DISPLAY values !!
     setting_x11 = db.add_setting(
         name="XVideo video output", 
         desc="XVideo X11 video output.",
