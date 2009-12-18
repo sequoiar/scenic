@@ -1,0 +1,67 @@
+#!/usr/bin/env lunch
+#
+# This lunch script launches 8 milhouse processes sending/receiving a/v not sync
+#
+LOCAL_HOST = "10.10.10.80" # aalex's
+REMOTE_HOST = "10.10.10.65" # brrr
+REMOTE_USER = "miville"
+R_AUDIO_PORT = 10000
+S_AUDIO_PORT = 10010
+R_VIDEO_PORT = 10020
+S_VIDEO_PORT = 10030
+AUDIO_CODEC = "raw"
+VIDEO_CODEC = "mpeg4"
+NUMCHANNELS = 2
+VIDEO_SOURCE = "v4l2src"
+VIDEO_DEVICE = "/dev/video0"
+DISPLAY = ":0.0"
+#VIDEO_BITRATE = 
+
+# audio commands
+# audio local ----------------------------------
+add_command(
+    command="milhouse -r --audioport %s --audiocodec %s --address %s --audiosink jackaudiosink" % (R_AUDIO_PORT, AUDIO_CODEC, REMOTE_HOST),
+    title="local_audio_receiver"
+    )
+add_command(
+    command="milhouse -s --audioport %s --audiocodec %s --audiosource jackaudiosrc -c %s --address %s" % (S_AUDIO_PORT, AUDIO_CODEC, NUMCHANNELS, REMOTE_HOST),
+    title="local_audio_sender"
+    )
+# ports numbers are reversed in remote host:
+# audio remote -------------------------
+add_command(
+    host=REMOTE_HOST,
+    user=REMOTE_USER,
+    command="milhouse -r --audioport %s --audiocodec %s --address %s" % (S_AUDIO_PORT, AUDIO_CODEC, LOCAL_HOST),
+    title="remote_audio_receiver"
+    )
+add_command(
+    host=REMOTE_HOST,
+    user=REMOTE_USER,
+    command="milhouse -s --audioport %s --audiocodec %s --audiosource jackaudiosrc -c %s --address %s --videocodec %s" % (R_AUDIO_PORT, AUDIO_CODEC, NUMCHANNELS, LOCAL_HOST, VIDEO_CODEC),
+    title="remote_audio_sender"
+    )
+# video local -----------------------------------
+add_command(
+    command="milhouse -r --videoport %s --address %s --videosink xvimagesink --videocodec %s" % (R_VIDEO_PORT, REMOTE_HOST, VIDEO_CODEC),
+    env={"DISPLAY":DISPLAY},
+    title="local_video_receiver"
+    )
+add_command(
+    command="milhouse -s --videoport %s --address %s --videosource %s --videocodec %s --videodevice %s" % (R_VIDEO_PORT, REMOTE_HOST, VIDEO_SOURCE, VIDEO_CODEC, VIDEO_DEVICE),
+    title="local_video_receiver"
+    )
+# video remote -----------------------------------
+add_command(
+    host=REMOTE_HOST,
+    user=REMOTE_USER,
+    command="milhouse -r --videoport %s --address %s --videosink xvimagesink --videocodec %s" % (R_VIDEO_PORT, LOCAL_HOST, VIDEO_CODEC),
+    env={"DISPLAY":DISPLAY},
+    title="remote_video_receiver"
+    )
+add_command(
+    host=REMOTE_HOST,
+    user=REMOTE_USER,
+    command="milhouse -s --videoport %s --address %s --videosource %s --videocodec %s --videodevice %s" % (R_VIDEO_PORT, LOCAL_HOST, VIDEO_SOURCE, VIDEO_CODEC, VIDEO_DEVICE),
+    title="remote_video_receiver"
+    )
