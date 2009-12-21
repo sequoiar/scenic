@@ -21,7 +21,8 @@ DISPLAY = ":0.0"
 # audio local ----------------------------------
 add_command(
     command="milhouse -r --audioport %s --audiocodec %s --address %s --audiosink jackaudiosink" % (R_AUDIO_PORT, AUDIO_CODEC, REMOTE_HOST),
-    title="local_audio_receiver"
+    title="local_audio_receiver", 
+    log_file="/var/tmp/XXX"
     )
 add_command(
     command="milhouse -s --audioport %s --audiocodec %s --audiosource jackaudiosrc -c %s --address %s" % (S_AUDIO_PORT, AUDIO_CODEC, NUMCHANNELS, REMOTE_HOST),
