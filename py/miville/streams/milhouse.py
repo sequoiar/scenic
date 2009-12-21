@@ -651,8 +651,20 @@ def setup_milhouse_settings(db):
         entries={
             "/send/video/source":"v4l2src",
             "/send/video/v4l2/device":"/dev/video1",
-            #"/send/video/v4l2/input":1,
-            #"/send/video/v4l2/norm":"ntsc",
+        })
+    setting_v4l2_2 = db.add_setting(
+        name="V4L2 video device 2", 
+        desc="V4L2 video device 2.",
+        entries={
+            "/send/video/source":"v4l2src",
+            "/send/video/v4l2/device":"/dev/video2",
+        })
+    setting_v4l2_3 = db.add_setting(
+        name="V4L2 video device 3", 
+        desc="V4L2 video device 3.",
+        entries={
+            "/send/video/source":"v4l2src",
+            "/send/video/v4l2/device":"/dev/video3",
         })
     setting_videotestsrc = db.add_setting(
         name="Video test inputs", 
@@ -661,6 +673,8 @@ def setup_milhouse_settings(db):
             "/send/video/source":"videotestsrc",
         })
     db.add_set("video_source", desc="Video input", settings_ids=[
+        setting_v4l2_3.id,
+        setting_v4l2_2.id,
         setting_v4l2_1.id,
         setting_v4l2_0.id,
         setting_videotestsrc.id,
