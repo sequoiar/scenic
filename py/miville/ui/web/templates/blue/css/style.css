@@ -1,0 +1,19 @@
+body {
+    
+}
+
+
+.basic_list {
+    border: 0;
+}
+.section {
+    border: 0; 
+}
+h3 { /* section header */
+    background-color:#eee;
+    padding:0; 
+    margin:0;
+    width: 100%;
+    color: #33f;
+}
+

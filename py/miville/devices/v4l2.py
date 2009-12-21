@@ -371,7 +371,3 @@ def start(api):
     driver.api = api
     devices.managers['video'].add_driver(driver)
     reactor.callLater(0, driver.prepare)
-
-
-    
-    

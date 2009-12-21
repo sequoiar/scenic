@@ -26,13 +26,16 @@ corresponding miville configuration variables.
 
 See the MivilleConfiguration class in miville/core.py
 """
+from twisted.internet.error import CannotListenError
+from twisted.internet import reactor
 import sys
 import socket
 from optparse import OptionParser
 from miville.options import MivilleConfiguration
 from miville.utils import log
+from miville.core import main
 
-log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSSAGES
+log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSAGES
 
 __version__ = "0.3.1"
 VERSION = __version__
@@ -81,6 +84,8 @@ def run():
         help="""Communication channel listen only to those network interfaces IP. Use this flag many times if needed. Default is all. Example: -i 127.0.0.1 -i 10.10.10.55""")
     parser.add_option("-m", "--miville-home", type="string", \
         help="Path to miville configuration files. (dot files)")
+    parser.add_option("-w", "--web-template", type="string", default="default", \
+        help="Name of the template for the Web interface.")
     parser.add_option("-M", "--moo", action="store_true", \
         help="There is no easter egg in this program.")
     parser.add_option("-C", "--disable-escape-sequences", action="store_true", \
@@ -97,7 +102,7 @@ def run():
     if options.moo:
         moo()
         sys.exit(0)
-    from miville.core import *
+    
     # configure miville
     config = MivilleConfiguration()
     # network interfaces for the communication channel
@@ -114,12 +119,15 @@ def run():
             config.ui_network_interfaces = options.ui_interfaces
     if options.all_interfaces:
         config.ui_network_interfaces = ''
+    if options.web_template:
+        config.web_template = options.web_template
     if options.miville_home:
         config.miville_home = options.miville_home
     if options.verbose:
         config.verbose = options.verbose
     if options.restart_jackd:
         config.restart_jackd = True
+    # TODO: add options like in toonloop
     if options.disable_escape_sequences: # in both telnet CLI and this shell
         config.enable_escape_sequences = False
     # set the port offset        

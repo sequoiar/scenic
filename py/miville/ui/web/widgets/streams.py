@@ -30,8 +30,11 @@ from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
 from miville.streams.conf import ConfError
+from miville.devices import devices
 
-log = log.start('info', 1, 0, 'web_strm')
+LOG_LEVEL = "info"
+# LOG_LEVEL = "debug"
+log = log.start(LOG_LEVEL, True, True, 'web_strm')
 
 CUSTOM_PROFILE_NAME = "Custom"
 
@@ -120,6 +123,10 @@ class Streams(Widget):
             field = self.api.config_db.get_field(k)
             #log.debug("    name:%s, value:%s" % (field.desc, v))
             entries_details.append({"name":field.desc, "value":v})
+        # --------------
+        # get list of video devices available on this computer.
+        video_devices = devices.managers["video"].drivers["v4l2"].devices.keys()
+        log.debug("V4l2 devices: %s" % (video_devices))
         # ------------ all sets (a profile contains one setting chosen for each set) --------
         settings_ids = self.api.config_db.get_profile(profile_id).settings
         sets_details = [] # array of dict with keys "set_name", "settings", "chosen_setting" and "desc". "setting" is a list of dict with keys setting_id and setting_desc.
@@ -129,12 +136,29 @@ class Streams(Widget):
             the_set = self.api.config_db.sets[set_name]
             _set_infos = {"set_name":set_name, "settings":[], "chosen_setting":0, "desc":the_set.desc}
             for setting_id in the_set.get_all():
+                add_it = True
                 is_selected = False
-                setting_desc = self.api.config_db.get_setting(setting_id).desc
+                setting = self.api.config_db.get_setting(setting_id)
+                setting_desc = setting.desc
                 if setting_id in settings_ids: # this it the chosen one in set!
                     _set_infos["chosen_setting"] = setting_id
                     is_selected = True
-                _set_infos["settings"].append({"setting_id": setting_id, "setting_desc": setting_desc, "is_selected":is_selected})
+                # if set is about choosing a video device, we must make sure the device is present on this computer.
+                if set_name == "video_source": # FIXME: hard-coded
+                    video_source = setting.entries["/send/video/source"]
+                    log.debug("Found set video_source with /send/video/source %s" % (video_source))
+                    if setting.entries["/send/video/source"] == "v4l2src":
+                        v4l2_dev = setting.entries["/send/video/v4l2/device"]
+                        log.debug("Found v4l2 setting with dev %s" % (v4l2_dev))
+                        if v4l2_dev not in video_devices:
+                            add_it = False
+                            log.debug("Discarding setting %s since we have no v4l2 device %s." % (setting_desc, v4l2_dev))
+                        else:
+                            log.debug("Found dev %s, so we keep that setting." % (v4l2_dev))
+                if add_it:
+                    _set_infos["settings"].append({"setting_id": setting_id, "setting_desc": setting_desc, "is_selected":is_selected})
+                else:
+                    log.debug("Not adding setting %s to set." % (setting_desc))
             sets_details.append(_set_infos)
         #log.debug("Sets details: %s" % (sets_details))
         self.callRemote("update_details", entries_details, sets_details, profile_id)

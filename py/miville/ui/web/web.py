@@ -82,41 +82,35 @@ So here the steps to produce a translation from scratch:
     the evolution of the code and template.
            
 """
-
-
-#System imports
 import os.path as path
 import os
 from xml.etree import ElementTree
-
-#Twisted imports
 from twisted.python.modules import getModule
-
 try:
     from nevow import loaders, appserver, static, tags, inevow
     from nevow.athena import LivePage, LiveFragment, expose as nevow_expose
     from nevow.i18n import render as i18nrender
     from nevow.i18n import I18NConfig
 except ImportError:
-    raise ImportError, 'If you want to use the Web interface, you need to install Nevow.'
-
-#App imports
+    raise ImportError('If you want to use the Web interface, you need to install Nevow.')
 from miville.utils import Observer, log
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
-
-#from miville.ui.web.pages.settingspage import SettingsPage
-#from miville.ui.web.pages.gstpage import GstPage
 from miville.ui.web.pages.procspage import ProcsPage
 
-log = log.start('debug', 1, 0, 'web')
+log = log.start('debug', True, True, 'web')
 
+# globals
 widgets_mod = []
+BASE_PATH = os.path.dirname(__file__)
+#XXX template name must be specified as global
+TEMPLATE_NAME = None
+TEMPLATE_NAME = "blue" 
 
 def import_widgets():
     """
-    Import all the widget modules found in the widgets directory
-    and add render_<widget> method to the Index class for each.
+    Imports all the widget modules found in the miville/ui/web/widgets 
+    directory and add render_<widget> method to the Index class for each.
     """
     package = 'miville.ui.web.widgets'
     loaded = []
@@ -159,24 +153,23 @@ def widget_factory(mod):
     """
     # get the module name without the path
     mod_name = mod.__name__.split('.')[ - 1]
-    # convert the module to the class name by removing the underscore and camelcasing it
+    # convert the module to the class name by removing the 
+    # underscore and camelcasing it
     klass_name = camel_name(mod_name)
     # get the class from the widget module
     klass = getattr(mod, klass_name)
-    
     def render_widget(self, ctx, data):
         """
         Generic method used to render all widgets from the Index class.
         """
-        widget = klass(self.api, self.template)
+        widget = klass(self.api, TEMPLATE_NAME)
         widget.setFragmentParent(self)
         return widget
-    
     return render_widget
 
 def camel_name(name):
     """
-    Transform a file name (small case with underscore) to a class name style
+    Transforms a file name (small case with underscore) to a class name style
     (camel case without underscore). Put first character and each character
     after an underscore in upper case and remove the underscores.
     
@@ -188,7 +181,7 @@ def camel_name(name):
 
 def small_name(name):
     """
-    Transform a class name to a file name (all lower case with underscore)
+    Transforms a class name to a file name (all lower case with underscore)
     
     Example::
     
@@ -213,41 +206,37 @@ def create_js(src):
     """ 
     return tags.script(src=src, type="text/javascript")
 
-
-
 class Index(LivePage, Observer):
     """
     Class representing the base of the root page (/index.xml).
+    
+    Its child paths are :
+     * js/ => templates/default/js AND js/
+     * css/ => templates/default/css
+     * img/ => templates/default/img
     """
-    
     addSlash = True
-    
-    # base_path = os.getcwdu()
-    base_path = unicode(os.path.dirname(__file__))
     # serve some static files
-    child_jslib = static.File(path.join(base_path, 'js/'))
-    child_css = static.File(path.join(base_path, 'templates/default/css/'))
-    child_js = static.File(path.join(base_path, 'templates/default/js/'))
-    child_img = static.File(path.join(base_path, 'templates/default/img/'))
-
-#    render_i18n = i18nrender()
-
-    def __init__(self, subject, template=None):
+    child_jslib = static.File(path.join(BASE_PATH, 'js/'))
+    # XXX: deprecated:
+    #child_css = static.File(path.join(BASE_PATH, 'templates/default/css/'))
+    #child_js = static.File(path.join(BASE_PATH, 'templates/default/js/'))
+    #child_img = static.File(path.join(BASE_PATH, 'templates/default/img/'))
+    # let's add all the templates as static files. This is much simpler.
+    child_templates = static.File(path.join(BASE_PATH, 'templates/'))
+    # render_i18n = i18nrender()
+    def __init__(self, subject):
         Observer.__init__(self, subject)
         self.subject = subject
         self.api = subject.api
-        self.template = template
+        log.info("Using template %s" % (TEMPLATE_NAME))
         self.lang = 'en'
-
         # load base XML file
-        self.docFactory = loaders.xmlfile(path.join(path.dirname(__file__), 'index.xml'))
-
-# not used anymore ?
-#        if self.template:
-#            self.child_template = static.File(path.join('ui/web/templates', self.template))
-
+        self.docFactory = loaders.xmlfile(path.join(BASE_PATH, 'index.xml'))
+        # not used anymore ?
+        #        if TEMPLATE_NAME:
+        #            self.child_template = static.File(path.join('ui/web/templates', TEMPLATE_NAME))
         LivePage.__init__(self)
-
 
     def childFactory(self, ctx, name):
         log.info("childFactory %s %s" % (ctx, name) )
@@ -263,27 +252,24 @@ class Index(LivePage, Observer):
         Overwrite renderHTTP to get GET arguments, cookies values
         and client IP address.
         """
-        
         # We're only overriding renderHTTP to look for a 'lang' query parameter
         # without cluttering up the messages renderer, below.
-        
+        #
         # If 'lang' is present then we "force" the translation language. This
         # simulates how user preferences from the session might be used to
         # override the browser's language settings.
         lang = ctx.arg('lang')
         if lang is not None:
             ctx.remember([lang], inevow.ILanguages)
-#        request = inevow.IRequest(ctx)
-#        request.addCookie('temp', 'allo', expires=None, domain=None, path=None, max_age=None, comment=None, secure=None)
-#        cookie = request.getCookie('temp')
-#        print cookie
-
+        #        request = inevow.IRequest(ctx)
+        #        request.addCookie('temp', 'allo', expires=None, domain=None, path=None, max_age=None, comment=None, secure=None)
+        #        cookie = request.getCookie('temp')
+        #        print cookie
         # add the locale file for the index
         ctx.remember(I18NConfig(domain='index', localeDir='locale'), inevow.II18NConfig)                
-
         # get the client IP address to look if he is in the LAN
-#        client_ip = request.getClientIP())
-
+        # client_ip = request.getClientIP())
+        #
         # Let the base class handle it, really.
         return LivePage.renderHTTP(self, ctx)
 
@@ -291,19 +277,20 @@ class Index(LivePage, Observer):
         """
         This method return a list of all the Widgets that are present
         in the index template.
+
+        Loads templates/XXX/xml/index.xml or templates/default/xml/index.xml
+        where XXX is the name of the template if its index.xml file is present.
         """
-        base_path = path.dirname(__file__)
-        template_path = path.join(base_path, 'templates/default/xml/index.xml')
+        index_file = path.join(BASE_PATH, 'templates/default/xml/index.xml')
         # if we don't use default template check if there's a valid index.xml
         # in the choose template directory and set the path accordinally
-        if self.template:
-            tmp_path = path.join(base_path, 'templates', self.template, 'xml/index.xml')
+        if TEMPLATE_NAME is not None:
+            tmp_path = path.join(BASE_PATH, 'templates', TEMPLATE_NAME, 'xml/index.xml')
             if path.isfile(tmp_path):
-                template_path = tmp_path
-        
+                index_file = tmp_path
         # parse the XML, find the widget element and return the list
         # of widget's name
-        tree = ElementTree.parse(template_path)
+        tree = ElementTree.parse(index_file)
         divs = tree.getiterator('div')
         attribute = '{http://nevow.com/ns/nevow/0.1}render'
         widgets = [div.attrib[attribute]
@@ -315,51 +302,58 @@ class Index(LivePage, Observer):
     
     def render_header(self, ctx, data):
         """
-        Add javascript and css import to the page header.
+        Add javascript and css imports to the page header.
+       
+        Files linked to in header: 
+         * templates/default/css/style.css
+         * templates/default/css/XXX.css where XXX is the name of each widget.
+         * templates/default/js/XXX.js where XXX is the name of each widget.
+
+        If the template name is set to "blue", it loads :
+         * templates/blue/css/XXX.css where XXX is the name of each widget.
+         * templates/blue/js/XXX.js where XXX is the name of each widget.
+        ...if they are found, instead of the "default" one.
         """
-
-        base_path = path.dirname(__file__).replace(self.base_path + '/', '') # ????
-        templates_path = path.join(base_path, 'templates')
-
+        # FIXME: I think we should show the full tree of files instead
+        # of hacking paths one by one.
+        log.info("Template: %s" % (TEMPLATE_NAME))
+        templates_path = path.join(BASE_PATH, 'templates')
         widgets = self.list_widgets()
         widgets.insert(0, 'index')
         log.debug(widgets)
-        
         links = []
-        
         # add style.css files
         style_file = 'css/style.css'
         if path.isfile(path.join(templates_path, 'default', style_file)):
-            links.append(create_css(style_file))
-        if self.template and \
-        path.isfile(path.join(templates_path, self.template, style_file)):
-            links.append(create_css(path.join('template', style_file)))
-                
+            links.append(create_css(path.join('templates', 'default', style_file)))
+        if TEMPLATE_NAME is not None and \
+            path.isfile(path.join(templates_path, TEMPLATE_NAME, style_file)):
+            links.append(create_css(path.join('templates', TEMPLATE_NAME, style_file)))
         kinds = {'css':create_css, 'js':create_js}
-        
         # add nevow js, display js and css for every widget
         for widget in widgets:
             widget_file = '%s.js' % widget
             # add the nevow js code for this widget
-            widget_path = path.join(self.base_path, base_path, 'js', widget_file)
+            widget_path = path.join(BASE_PATH, 'js', widget_file)
             if path.isfile(widget_path):
-#                links.append(self.create_js(path.join('jslib', widget_file)))
+                # links.append(self.create_js(path.join('jslib', widget_file)))
                 self.jsModules.mapping[camel_name(widget)] = widget_path
             else:
                 log.debug("'%s' is not a valid file." % widget_path)
-            for kind in kinds:
+            for kind in kinds.keys():
                 # kind directory plus name of the file. Ex.: css/index.css
-                end_path = path.join(kind, '%s.%s' % (widget, kind))
-                if self.template and \
-                path.isfile(path.join(templates_path, self.template, end_path)):
-                    links.append(kinds[kind](path.join('template', end_path)))
-                elif path.isfile(path.join(templates_path, 'default', end_path)):
-                    links.append(kinds[kind](path.join(end_path)))
-
+                file_name = path.join(kind, '%s.%s' % (widget, kind))
+                if TEMPLATE_NAME is not None and \
+                path.isfile(path.join(templates_path, TEMPLATE_NAME, file_name)):
+                    links.append(kinds[kind](path.join('templates', TEMPLATE_NAME, file_name)))
+                    #FIXME: Not quite legible. 
+                    # This appends to a list what calling either create_css() 
+                    # or create_js() returns. The path looks like "template/XXX.css or template/XXX.js where XXX is the name of the widget.
+                elif path.isfile(path.join(templates_path, 'default', file_name)):
+                    links.append(kinds[kind](path.join('templates', 'default', file_name)))
         # prettier xml output
         for i in range(1, len(links) * 2, 2):
             links.insert(i, ['\n\t\t'])
-            
         return links
 
     def render_body(self, ctx, data):
@@ -367,18 +361,18 @@ class Index(LivePage, Observer):
         Load and render the body of the page from the selected template.
         """
         body_file = 'xml/index.xml'
-        templates_path = path.join(path.dirname(__file__), 'templates')
-        if self.template and path.isfile(path.join(templates_path, self.template, body_file)):
-            template = self.template
+        templates_path = path.join(BASE_PATH, 'templates')
+        if TEMPLATE_NAME is not None and path.isfile(path.join(templates_path, TEMPLATE_NAME, body_file)):
+            template = TEMPLATE_NAME
         else:
             template = 'default'
-
         body = loaders.xmlfile(path.join(templates_path, template, body_file))
         return body
 
     def child_ (self, ctx):
         """
-        This create a new Index instance on browser refresh and multiple connections.
+        This create a new Index instance on browser refresh and multiple 
+        connections.
         """
         return Index(self.subject)
 
@@ -391,25 +385,21 @@ class Index(LivePage, Observer):
             if hasattr(children, 'callbacks') and key in children.callbacks:
                 children.callbacks[key](origin, data)
 
-
 # Remove the rewrite of the XML element id
 # (now we need to avoid clash of id ourself)
 for key, preprocessors in enumerate(LiveFragment.preprocessors):
     if preprocessors.__name__ == "rewriteAthenaIds":
         del LiveFragment.preprocessors[key]
- 
         
 class Widget(LiveFragment):
     """
     Base class for all the widget classes.
-    
     *Note: we use the deprecated LiveFragment instead of LiveElement because
     i18n need the context, so it doesn't work with LiveElement.* 
-
-    Every method of a Widget that starts with "cb_" catches a callback for Miville API 
+    Every method of a Widget that starts with "cb_" catches a callback 
+    for Miville API 
     Subject notification.
     """
-
     # add the translation renderer
     render_i18n = i18nrender()
 
@@ -418,18 +408,16 @@ class Widget(LiveFragment):
         Get the name of the widget and find the template file (in template and,
         if not, in 'default'.)
         """
-
         self.docFactory = ['']  # not sure if it's a good idea ?
-        base_path = path.dirname(__file__)
         class_name = self.__class__.__name__
         tmpl_name = 'xml/%s.xml' % small_name(class_name)
-        tmpl_path = path.join(base_path, 'templates')
+        tmpl_path = path.join(BASE_PATH, 'templates')
         if template and path.isfile(path.join(tmpl_path, template, tmpl_name)):
             self.docFactory = loaders.xmlfile(path.join(tmpl_path, template, tmpl_name))
         elif path.isfile(path.join(tmpl_path, 'default', tmpl_name)):
             self.docFactory = loaders.xmlfile(path.join(tmpl_path, 'default', tmpl_name))
         else:
-            log.error("Didn't found any valid %s.xml template." % small_name(class_name))
+            log.error("Didn't find any valid %s.xml template." % small_name(class_name))
         # add the JS class for this widget
         # (should be the same name has the python class) 
         self.jsClass = to_utf(class_name)
@@ -447,7 +435,6 @@ class Widget(LiveFragment):
         domain = self.__module__.split('.')[ - 1]
         ctx.remember(I18NConfig(domain=domain, localeDir='locale'),
                      inevow.II18NConfig)                
-
         # Let the base class handle it.
         return LiveFragment.rend(self, ctx, data)
 
@@ -456,10 +443,8 @@ class Widget(LiveFragment):
         Overwrite callRemote to tranform all object of type string to utf.
         """
         args = tree_to_utf(*args)
-        
         # call the base class callRemote
         LiveFragment.callRemote(self, methodName, *args)
-
         
 def tree_to_utf(*args):
     """
@@ -479,13 +464,12 @@ def tree_to_utf(*args):
             clean_args.append(clean_dict)
         else:
             clean_args.append(arg)
-            
     return clean_args
-        
 
 def expose(loc):
     """
-    Function that automatically expose (that mean become accessible from javascript)
+    Function that automatically exposes 
+    (that means become accessible from javascript)
     all methods beginning by "rc\_" (for "remote call") in the local scope
     of a Class.
     
@@ -498,23 +482,19 @@ def expose(loc):
             def rc_method(self):
                 pass
             expose(locals())
-    
     """
     for key, value in loc.iteritems():
         if key.startswith('rc_'):
             nevow_expose(value)
-    
 
-
-def start(subject, port=8080, interfaces=''):
+def start(subject, port=8080, interfaces='', template_name="blue"):
     """
     This function is call when the core find and load all the UI packages.
     """
+    global TEMPLATE_NAME
+    TEMPLATE_NAME = template_name
     site = appserver.NevowSite(Index(subject))
     # reactor.listenTCP(port, site, 5, '127.0.0.1')
     # subject is the api...
     subject.api.listen_tcp(port, site, interfaces) #  subject.config.ui_network_interfaces)
     import_widgets()
-    
-    
-    
