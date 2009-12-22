@@ -29,8 +29,8 @@
 /* text label for the drop-down menu */
 #strm_sets {
     position: absolute;
-    right: 0;
-    top: 0; /* 15px;*/
+    right: 5px;
+    top: 5px; /* 15px;*/
     /* height: 75px;
     overflow: auto;
     */

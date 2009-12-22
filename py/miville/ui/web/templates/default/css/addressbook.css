@@ -3,18 +3,18 @@
 }
 
 .conn_connected {
-	background-image: url("/img/network-transmit-receive.png");
+	background-image: url("../img/network-transmit-receive.png");
 }
 
 .streaming {
-	background-image: url("/img/mail-send-receive.png");
+	background-image: url("../img/mail-send-receive.png");
 }
 
 #adb_add {
 	float: left;
 	width: 22px;
 	height: 22px;
-	background-image: url("/img/list-add.png");
+	background-image: url("../img/list-add.png");
 	background-repeat: no-repeat;
 }
 
@@ -22,7 +22,7 @@
 	float: left;
 	width: 22px;
 	height: 22px;
-	background-image: url("/img/list-remove.png");
+	background-image: url("../img/list-remove.png");
 	background-repeat: no-repeat;
 }
 
@@ -82,8 +82,18 @@ li.auto_created {
 	position: relative;
 	top: -3px;
 }
+/* this is a custom hack to try to fix the message having lost its frame. */
+/* though we should simply update to a newer version of clientcide, since 
+ * it hard-links to assets to its old googlecode repository !!! 
+ */
+.StickyWinInstance {
+	border: 1px #cdcdcd solid;
+	background-color: #b2b2b2;
+    opacity:0.8;
+    filter:alpha(opacity=80);
+}
 
-.closeSticky.button {
+.closeSticky .button {
 	border: 1px #cdcdcd solid;
 	height: 18px;
 	background-color: #b2b2b2;
@@ -92,7 +102,6 @@ li.auto_created {
 	font-weight: bold;
 	margin: 0px 0px 0px 10px;
 }
-
 #adb_error_msg {
     color: #900;
 }

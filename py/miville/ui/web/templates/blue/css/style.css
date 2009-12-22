@@ -1,19 +1,29 @@
 body {
-    
+    background: #778c99;
 }
-
-
 .basic_list {
-    border: 0;
+    border: solid 1px #574238;
 }
 .section {
-    border: 0; 
+    background-color:#618CB8;
+    border: solid 1px #574238;
 }
-h3 { /* section header */
-    background-color:#eee;
-    padding:0; 
-    margin:0;
-    width: 100%;
-    color: #33f;
+.section h3 { /* section header */
+    background: none;
+    color: #1D2654;
 }
-
+.color_zebra {
+	background-color: #eee;
+}
+/* columns */
+#index_left_pan, #index_right_pan {
+    background: none
+}
+#index_left_pan .section {
+    background: #778c99; /* blue-grey */
+}
+#index_left_pan .section {
+    background: #a2bf7c; /* green-grey */
+}
+/* streams *:q
+ * /
