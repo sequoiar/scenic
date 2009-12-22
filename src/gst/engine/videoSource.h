@@ -97,6 +97,7 @@ class VideoV4lSource
         explicit VideoV4lSource(const VideoSourceConfig &config);
     private:
         std::string expectedStandard_;
+        std::string actualStandard_;
         std::string deviceStr() const;
         std::string srcCaps() const;
         bool willModifyCaptureResolution() const;

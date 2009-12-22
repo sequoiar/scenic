@@ -33,7 +33,8 @@ class v4l2util
         static void printCaptureFormat(const std::string &device);
         static void printSupportedSizes(const std::string &device);
     public:
-        static bool checkStandard(const std::string &expected, const std::string &device);
+        static bool checkStandard(const std::string &expected, 
+                std::string &actual, const std::string &device);
         static unsigned captureWidth(const std::string &device);
         static unsigned captureHeight(const std::string &device);
         static void listCameras();
