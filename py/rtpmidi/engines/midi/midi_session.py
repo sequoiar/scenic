@@ -10,8 +10,8 @@ from rtpmidi.protocols.rtp.rtp_session import RTPSession
 from rtpmidi.protocols.rtp.rtp_session import RTPControl
 
 #midi import
-from midi_in import MidiIn
-from midi_out import MidiOut
+from rtpmidi.engines.midi.midi_in import MidiIn
+from rtpmidi.engines.midi.midi_out import MidiOut
 import pypm
 from time import time
 

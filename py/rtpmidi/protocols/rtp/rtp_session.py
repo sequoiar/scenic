@@ -3,11 +3,13 @@ import sys
 import os
 import re
 
-from struct import pack, unpack
+from struct import unpack
+from struct import pack
 import time
 
 #twisted import
-from twisted.internet import reactor, task
+from twisted.internet import task
+from twisted.internet import reactor
 
 #rtp import
 from rtpmidi.protocols.rtp.rtp_control import RTPControl

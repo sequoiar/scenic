@@ -28,7 +28,7 @@ Communication channel for the streaming infos between two miville contacts.
 from miville.utils import log
 from miville.errors import * # StreamError
 
-log = log.start('debug', 1, 0, 'streams.comm')
+log = log.start('debug', True, True, 'streams.comm')
 
 # module variables
 _services_channels_dict = {}

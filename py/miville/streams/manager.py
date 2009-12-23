@@ -35,7 +35,7 @@ from miville.streams.constants import * # STATE_*, ROLE_*, DIRECTION_*, etc.
 from miville.utils import log
 from miville import connectors
 
-log = log.start("debug", True, False, "streams.manager") 
+log = log.start("debug", True, True, "streams.manager") 
 
 _single_manager = None # singleton
 
@@ -44,6 +44,51 @@ class SessionError(Exception):
     Any error the SimpleSessionInitiationProtocol can raise.
     """
     pass
+
+class ContactInfos(object):
+    """
+    Informations regarding the remote and local IP, etc. 
+    """
+    #TODO: Move this to somewhere else.
+    #TODO: use comchan to get local IP.
+    #TODO: set ou local port
+    DEFAULT_PORT = 2222 # com_chan port (TODO: or use api.get_config()....
+    def __init__(self, **kwargs):
+        # default value to be overriden
+        self.remote_addr = "127.0.0.1"
+        self.local_addr = "127.0.0.1"
+        self.remote_port = self.DEFAULT_PORT
+        self.local_port = self.DEFAULT_PORT 
+        self.contact = None # miville.addressbook.Contact object.
+        self.__dict__.update(kwargs)
+
+    def set_remote_contact(self, contact):
+        """
+        Configure these contact infos to match the infos 
+        of the addressbook.Contact object.
+        """
+        self.contact = contact
+        self.remote_addr = contact.address
+        self.remote_port = contact.port
+        if self.remote_port is None:
+            self.remote_port = self.DEFAULT_PORT
+
+    def get_id(self):
+        """
+        Returns a unique identified that streams can use as a key to store
+        their contact.
+        For now, since the contact name changes, and this class is meant to be 
+        created and deleted a lot, let's use adde:port as a key.
+        """
+        if self.remote_port is None:
+            self.remote_port = self.DEFAULT_PORT
+        return "%s:%s" % (self.remote_addr, self.remote_port)
+
+    def get_contact_name(self):
+        if self.contact is not None:
+            return self.contact.name
+        else:
+            return "Unknown"
 
 class Session(object):
     """
@@ -252,7 +297,7 @@ class StreamsManager(object):
             raise
         comm.remote_addr
         comm.my_addr
-        contact_infos = conf.ContactInfos(
+        contact_infos = ContactInfos(
             remote_addr = comm.remote_addr, #"127.0.0.1",
             local_addr = comm.my_addr, #"127.0.0.1",
             remote_port = contact.port, # 2222, # com_chan port

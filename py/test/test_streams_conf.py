@@ -52,22 +52,22 @@ base.DelayedCall.debug = True
 import tempfile
 FILE_NAME = tempfile.mktemp()
 
-class DummyObserver(observer.Observer):
-    def __init__(self, test_case):
-        observer.Observer.__init__(self)
-        self.test_case = test_case
-        self.called = False
-    def update(self, origin, key, value):
-        self.called = True
-        # print("update: %s:%s:%s" % (origin, key, value))
-
 ############################## ACTUAL TESTS #####################
+_globals_test_01_configuration = {}
+
 class Test_01_Configuration(unittest.TestCase):
+    """
+    tests for miville.streams.conf
+    """
     def setUp(self):
         """ Database (and more generally, state) persist between tests """
+        global _globals_test_01_configuration
         self.db = conf.get_single_db()
+        self.globals = _globals_test_01_configuration
+    
     def tearDown(self):
         pass
+    
     def test_01_field(self):
         self.db.add_field("/dummy", default=2, desc="Dummy field")
         if "/dummy" not in self.db.fields.keys():
@@ -195,8 +195,32 @@ class Test_01_Configuration(unittest.TestCase):
             if res.has_key(k):
                 self.fail("GLOB_CONTAINS : Dict should not have key %s" % (k))
     
-    def test_07_save_database(self):
-        """ Save to json """
+    def test_06_pool_is_freed(self):
+        """
+        Are id in pool freed when we delete a setting?
+        """
+        self.db.clear_all()
+        setting = self.db.add_setting("Test setting")
+        setting_id = setting.id
+        self.db.delete_setting(setting.id)
+        if setting_id in self.db.settings_pool.get_all():
+            self.fail("Setting %d is still in the pool !" % (setting_id))
+        profile = self.db.add_profile("Test profile")
+        profile_id = profile.id
+        self.db.delete_profile(profile.id)
+        if profile_id in self.db.profiles_pool.get_all():
+            self.fail("Profile %d is still in the pool !" % (profile_id))
+        
+    def test_07_save_load_database(self):
+        """ 
+        Save and load to json """
+        FILE_NAME = "/var/tmp/test_streams_conf_test_save_database.json"
+        try:
+            os.remove(FILE_NAME)
+        except OSError, e:
+            pass
+        self.db.clear_all()
+        # --------------------- fill with data and save ------------------
         setting = self.db.add_setting("Test setting")
         setting2 = self.db.add_setting("Test setting2")
         self.db.add_field("/test/audio/bitrate", default=1000000, desc="Dummy field")
@@ -205,16 +229,14 @@ class Test_01_Configuration(unittest.TestCase):
         self.db.add_entry(setting.id, field_name="/test/audio/channels", value=1)
         self.db.add_entry(setting2.id, field_name="/test/audio/bitrate", value=8000)
         self.db.add_entry(setting2.id, field_name="/test/audio/channels", value=2)
-        self.db.save_as_json('/var/tmp/test_07_save_database.json')
-    
-    def test_08_load_database(self):
-        """ load database from json """
-        # FIXME: this should test more stuff (i.e. the resulting state of self.db 
-        # and not depend on the previous test having been executed
+        self.db.save_as_json(FILE_NAME)
+        # ---------------------- fill with other data and load -----------
+        # mess up previous data
         self.db.add_field("/test/audio/bitrate", default=1000000, desc="Dummy field")
         self.db.add_field("/test/audio/channels", default=2, desc="Dummy field")
-        self.db.load_from_json('/var/tmp/test_07_save_database.json')
-        entries = self.db.get_entries_for_setting(4)
+        # reload previous data
+        self.db.load_from_json(FILE_NAME)
+        entries = self.db.get_entries_for_setting(setting.id)
         try: 
             if entries["/test/audio/channels"] != 1:
                 self.fail("field %s equal to %d instead of %d" % ("/test/audio/channels", entries["/test/audio/channels"], 1))
@@ -222,14 +244,31 @@ class Test_01_Configuration(unittest.TestCase):
                 self.fail("field %s equal to %d instead of %d" % ("/test/audio/bitrate", entries["/test/audio/bitrate"], 7000))
         except Exception,e:
             self.fail("could not access entries: %s" % (e.message))
-    
-#    def XXtest_06_serialize(self):
-#        self.db.add_field("/test/audio/codec", default="mp3", desc="Dummy field")
-#        serialize.save(FILE_NAME, self.db)
-#    
-#    def XXtest_07_unserialize(self):
-#        self.db = serialize.load(FILE_NAME)
-#        self.db.remove_field("/test/audio/codec") #clean things up
+
+    def test_settings_of_a_set(self):
+        self.db.clear_all()
+        setting_a = self.db.add_setting("Test setting A")
+        setting_b = self.db.add_setting("Test setting B")
+        the_set = self.db.add_set(self, "Test Set", settings_ids=[setting_a.id, setting_b.id])
+        profile = self.db.add_profile("Test profile")
+        self.db.add_setting_to_profile(profile.id, setting_a.id)
+        self.db.add_setting_to_profile(profile.id, setting_a.id)
+        if setting_a in profile.settings:
+            self.fail("Setting A still in profile even if in a set whose setting B is also member, while setting B has been added after setting_a to profile.")
+
+    def test_duplicate_profile(self):
+        self.db.clear_all()
+        setting_a = self.db.add_setting("Test setting A")
+        profile = self.db.add_profile("Test profile")
+        profile_copy = self.db.duplicate_profile(profile.id)
+        if profile_copy.settings != profile.settings:
+            self.fail("All the settings ID in the new profiles are not there.")
+        if profile_copy.name != "%s (copy)" % profile.name:
+            self.fail("New profile name is malformed.")
+        for p in [profile, profile_copy]:
+            if p.id not in self.db.profiles.keys():
+                self.fail("Profile %s is not in the database." % (p.name))
+        
 
 class Test_01_Ports_Allocator(unittest.TestCase):
     def _tst(self, expected, value):
@@ -282,7 +321,6 @@ class Test_01_Streamer_Problem(unittest.TestCase):
         errstr = str(tools.StreamerProblem(error, message, details))
         if errstr != '%s: %s %s' % (error, message, details):
             self.fail("stringified SteamerProblem does not match expected string %s" % (errstr))
-        
 
 class Test_01_Session(unittest.TestCase):
     def setUp(self):
@@ -396,8 +434,6 @@ class Test_03_Streams(unittest.TestCase):
         manager.start(DummyApi())
         self.globals["manager"] = manager.get_single_manager()
     
-
-
 _globals_05 = {}
 class Test_05_Milhouse(unittest.TestCase):
     # trial test/test_streams_conf.Test_05_Milhouse
@@ -490,7 +526,7 @@ class Test_05_Milhouse(unittest.TestCase):
             reactor.callLater(DURATION, _later, deferred, service)
             return deferred
         # ----- here we go: --------
-        contact_infos = conf.ContactInfos() # TODO: not use default args.
+        contact_infos = manager.ContactInfos() # TODO: not use default args.
         self.globals["contact_infos"] = contact_infos
         entries = self.globals["entries"]
         self.timeout = 15.0 # timeout attribute on your unit test method. 
@@ -507,12 +543,75 @@ class Test_05_Milhouse(unittest.TestCase):
         service.config_init(self.db)
         # service.start should not send any message to the remote agent
         # all this work should be done at prepare_session time.
-        deferred = service.start(session_desc) #contact_infos, entries, entries, role="alice") # "alpha"
-        obs = DummyObserver(self)
-        self.globals["obs"] = obs # XXX Needs to be a global since observer uses a weakref !!!
-        obs.append(service.subject) #TODO: check if observer has been triggered.
+        deferred = service.start(session_desc)
         deferred.addCallback(_cb_start, service)
         deferred.addErrback(_eb_start, service)
         return deferred
     test_04_start_stop_streams.skip = "Too much heavy changes."
+
+
+_globals_06 = {}
+class Test_06_Sets(unittest.TestCase):
+    def setUp(self):
+        global _globals_06
+        self.globals = _globals_06
+        self.db = conf.get_single_db()
+    
+    def test_01_clear_db(self):
+        self.db.clear_all()
+        if len(self.db.fields) != 0:
+            self.fail("There should be no field left.")
+        if len(self.db.settings) != 0:
+            self.fail("There should be no setting left.")
+        if len(self.db.sets) != 0:
+            self.fail("There should be no set left.")
+        if len(self.db.settings_pool.get_all()) != 0:
+            self.fail("Settings pool should be cleared.")
+        if len(self.db.profiles_pool.get_all()) != 0:
+            self.fail("Profiles pool should be cleared.")
+    
+    def test_02_create_data(self):
+        self.db.add_field("/audio/codec", default="vorbis", desc="Audio codec")
+        self.db.add_field("/audio/numchannels", default=2, desc="Number of audio channels")
+        a_setting = self.db.add_setting("Setting A", desc="Low-fi")
+        self.db.add_entry(a_setting.id, field_name="/audio/codec", value="lame")
+        self.db.add_entry(a_setting.id, field_name="/audio/numchannels", value=2)
+        self.globals["a_setting"] = a_setting
+        b_setting = self.db.add_setting("Setting B", desc="Hi fi extra pro")
+        self.db.add_entry(b_setting.id, field_name="/audio/codec", value="raw")
+        self.db.add_entry(b_setting.id, field_name="/audio/numchannels", value=24)
+        self.globals["b_setting"] = b_setting
+
+    def test_03_create_sets(self):
+        set_name = "Choice"
+        self.globals["set_name"] = set_name
+        a_setting = self.globals["a_setting"]
+        b_setting = self.globals["b_setting"]
+        self.db.add_set(set_name)
+        self.db.add_setting_to_set(set_name, a_setting.id)
+        self.db.add_setting_to_set(set_name, b_setting.id)
+        s = self.db.get_set(set_name)
+        
+        ids = s.get_all()
+        if len(ids) != 2:
+            self.fail("There should be 2 ids in set.")
+        for i in [a_setting.id, b_setting.id]:
+            if i not in ids:
+                self.fail("Id %d should be in set." % (i))
+            
+    def test_04_profile_contains_setting_in_set(self):
+        # checks if a set contains a setting.
+        a_setting = self.globals["a_setting"]
+        b_setting = self.globals["b_setting"]
+        profile_a = self.db.add_profile(name="Cheap", desc="Using low-fi audio")
+        self.db.add_setting_to_profile(profile_a.id, a_setting.id)
+
+        the_set = self.db.get_set(self.globals["set_name"])
+        found = False
+        for setting_id in the_set.get_all():
+            if setting_id in profile_a.settings:
+                found = True
+        if not found:
+            self.fail("Did not find setting for the set in the profile.")
+
 

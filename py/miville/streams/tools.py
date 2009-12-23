@@ -36,7 +36,7 @@ from twisted.python import procutils
 from miville.utils import sig
 from miville.utils import log
 
-log = log.start("info", 1, 0, "streams.tools")
+log = log.start("info", True, True, "streams.tools")
 
 class StreamerProblem(object):
     """

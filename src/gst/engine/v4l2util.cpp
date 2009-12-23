@@ -80,7 +80,11 @@ static void setCaptureFormat(const std::string &device, v4l2_format format)
 }
 
 /// Check current standard of v4l2 device to make sure it is what we expect
-bool v4l2util::checkStandard(const std::string &expected, const std::string &device)
+// FIXME: replace with a function that just returns the actual standard
+// and then the client can compare against the expected standard
+bool v4l2util::checkStandard(const std::string &expected, 
+        std::string &actual,
+        const std::string &device)
 {
     using namespace boost::assign;
     bool result = false;
@@ -102,7 +106,10 @@ bool v4l2util::checkStandard(const std::string &expected, const std::string &dev
         std::map<std::string, unsigned long long>::const_iterator iter;
         for (iter = FORMATS.begin(); iter != FORMATS.end(); ++iter)
             if (std & (*iter).second)    // true if current format matches this iter's key
+            {
                 result = (result or (expected == (*iter).first)); // can have multiple positives, hence the or
+                actual = (*iter).first; // save the actual standard
+            }
     }
 
     close(fd);
@@ -294,6 +301,7 @@ void v4l2util::printSupportedSizes(const std::string &device)
     typedef std::pair<int, int> Size;
     typedef std::vector< Size > SizeList;
     SizeList sizes;
+    sizes.push_back(Size(924, 576));
     sizes.push_back(Size(768, 480));
     sizes.push_back(Size(720, 480));
     sizes.push_back(Size(704, 480));    // 4CIF

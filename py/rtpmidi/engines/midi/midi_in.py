@@ -1,7 +1,10 @@
-from twisted.internet import protocol, reactor, task, defer
+from twisted.internet import reactor
+from twisted.internet import protocol
+from twisted.internet import task
+from twisted.internet import defer
 
 import time
-from midi_object import MidiNote
+from rtpmidi.engines.midi.midi_object import MidiNote
 from twisted.internet import threads
 
 import sys

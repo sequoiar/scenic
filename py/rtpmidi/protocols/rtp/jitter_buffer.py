@@ -1,4 +1,4 @@
-from packets import RTPPacket
+from rtpmidi.protocols.rtp.packets import RTPPacket
 from threading import Lock
 
 def packet_seq_compare(x, y):

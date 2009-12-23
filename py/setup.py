@@ -47,8 +47,12 @@ miville_packages = [
     'miville.ui.web.templates.default.xml',
     'miville.ui.web.templates.default.img',
     'miville.ui.web.templates.default.css',
+    'rtpmidi',
+    'rtpmidi.protocols',
+    'rtpmidi.protocols.rtp',
+    'rtpmidi.engines',
+    'rtpmidi.engines.midi',
     ]
-
 
 setup(
     name = "miville",
@@ -64,7 +68,7 @@ setup(
     # in nevow, which installs it using easy_install even when the nevow ubuntu package is already installed. 
     # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
     # we removed twisted as well, since we prefer the user to install it himself.
-    scripts = ["restart_jackd.py", "mivilled"], #, "miville.py"
+    scripts = ["restart_jackd.py", "mivilled", "midistream"], #, "miville.py"
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,
@@ -74,6 +78,3 @@ setup(
         "":["*.rst", "*.png", "*.jpg", "*.css", "*.js", "*.xml", '*.txt', 'off']
     }
     )
-
-#test_suite='nose.collector',
-    

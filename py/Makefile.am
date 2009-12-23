@@ -39,8 +39,10 @@ install-exec-hook:
 			mkdir -p $(DESTDIR)$(docdir)/miville ; \
 			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(docdir)/miville/sphinx ; \
 		fi
-		help2man -N -i miville-man.txt -n "The Miville Audio/Video Streaming Software for GNU/Linux" ./mivilled > mivilled.1
+		help2man --no-info --include=miville-man.txt --name="The Miville Audio/Video Streaming Software for GNU/Linux" ./mivilled > mivilled.1
 		install -D -m 644 mivilled.1 $(DESTDIR)$(mandir)/man1/mivilled.1
+#		help2man --no-info --name="The midistream MIDI RTP Streaming Software for GNU/Linux" ./midistream > midistream.1
+#		install -D -m 644 midistream.1 $(DESTDIR)$(mandir)/man1/midistream.1
 #
 # THIS IS BROKEN !! FIXME
 
@@ -52,6 +54,7 @@ uninstall-hook:
 		rm -f $(DESTDIR)$(bindir)/miville
 		rm -f $(DESTDIR)$(bindir)/restart_jackd.py
 		rm -f $(DESTDIR)$(mandir)/man1/mivilled.1
+		rm -f $(DESTDIR)$(mandir)/man1/midistream.1
 		rm -f $(DESTDIR)$(datarootdir)/applications/miville.desktop
 		rm -f $(DESTDIR)$(datarootdir)/pixmaps/miville.png
 

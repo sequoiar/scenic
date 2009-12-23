@@ -340,18 +340,32 @@ class CliController(TelnetServer):
         elif options.add:
             if len(args) == 2:
                 self.core.add_contact(self, options.add, args[1])
-            elif len(args) > 2:
-                if args[2].isdigit():
+            elif len(args) == 3:
+                # FIXME: this is really bad.
+                if args[2].isdigit(): # port number
                     self.core.add_contact(self, options.add, args[1], args[2])
                 else:
                     self.write('The port is not valid.', True)
+                # FIXME: this is really bad.
+            elif len(args) == 4: # auto_answer
+                auto_answer = False
+                if args[3] in ["True", "true", "yes", "1"]:
+                    auto_answer = True
+                    log.info("auto_answer set to True")
+                elif args[3] in ["False", "false", "no", "0"]:
+                    log.info("auto_answer set to False")
+                    auto_answer = False
+                else:
+                    self.write("Invalid value for anto_answer : %s" % (args[3]))
+                self.core.add_contact(self, options.add, args[1], args[2], auto_answer=auto_answer)
             else:
-                self.write('You need to give at least a name and an address.', True)
+                self.write('You need to give at least a name and an address. Max 4 args.', True)
         elif options.erase:
             if len(args) > 1:
                 self.core.delete_contact(self, args[1])
             else:
                 self.core.delete_contact(self)
+        # FIXME: this is really bad
         elif options.modify:
             # parses key=val arguments:
             if len(args) > 1:

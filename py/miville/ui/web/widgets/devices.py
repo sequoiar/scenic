@@ -25,12 +25,13 @@ import pprint
 
 from twisted.internet import reactor
 #App imports
-from miville.ui.web.web import Widget, expose
+from miville.ui.web.web import expose
+from miville.ui.web.web import Widget
 from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
 
-log = log.start('debug', 1, 0, 'web_devices')
+log = log.start('info', 1, 0, 'web_devices')
 
 log.debug("Hello from the devices widget python module.")
 
@@ -61,9 +62,9 @@ class Devices(Widget):
         Changes the norm of a video device.
         """
         caller = self
-        log.debug("Changing norm to %s" % (norm_value))
+        log.debug("Changing norm to %s for device %s" % (norm_value, v4l2_dev_name))
         # TODO: use device_name arg
-        self.api.set_video_standard(caller, str(norm_value))
+        self.api.set_video_standard(caller, str(norm_value), v4l2_dev_name)
         reactor.callLater(0.1, self.api.devices_list_all, self)
 
     def rc_set_input(self, v4l2_dev_name, input_value):
@@ -102,6 +103,11 @@ class Devices(Widget):
         """
         log.debug('Got answer from api.devices_list_all()')
         VERY_VERBOSE = False
+        DISPLAY_ATTR = [
+            "backend", "rate", "period", "nperiods",
+            "dimensions",
+            "driver", "height", "width", "input", "pixel format", "norm"
+            ] # which to show
         devs = []
         #if origin is self:
         if origin is self:
@@ -116,15 +122,18 @@ class Devices(Widget):
                         a_name = attr.name
                         a_value = attr.get_value()
                         a_kind = attr.kind # int, string, boolean, options
-                        if a_kind == 'options':
-                            #a_opts = "options=%s" % (attr.options)
-                            a_opts = attr.options
-                            a_default = ""
+                        if a_name in DISPLAY_ATTR:
+                            if a_kind == 'options':
+                                #a_opts = "options=%s" % (attr.options)
+                                a_opts = attr.options
+                                a_default = ""
+                            else:
+                                a_opts = None
+                                a_default = attr.default
+                                #a_opts = "default=%s" % (attr.default)
+                            attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts, "default":a_default})
                         else:
-                            a_opts = None
-                            a_default = attr.default
-                            #a_opts = "default=%s" % (attr.default)
-                        attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts, "default":a_default})
+                            log.debug("Discarding attribute %s %s %s %s" % (dr_name, dev_name, a_name, a_value))
                     d = {"dr_kind":dr_kind, "dr_name":dr_name, "dev_name":dev_name, "attributes":attr_list}
                     devs.append(d)
                     #log.debug("device : %s" % (d))

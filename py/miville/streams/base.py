@@ -24,7 +24,7 @@ Base class for streamers
 from miville.utils import log
 from miville.streams import constants
 
-log = log.start("info", 1, 0, "streams.base")
+log = log.start("info", True, True, "streams.base")
 
 class Stream(object):
     """

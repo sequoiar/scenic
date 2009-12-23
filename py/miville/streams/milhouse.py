@@ -33,12 +33,13 @@ from miville.errors import * # StreamError
 from miville.utils import log
 from miville.utils import sig
 
-log = log.start("debug", True, False, "streams.milhouse") 
+log = log.start("debug", True, True, "streams.milhouse") 
 
 VERBOSE = False
 VERY_VERBOSE = False
 VERBOSE_ERROR = True
 TEST_PROFILE = 0 # defined below
+PORT_OFFSET = 0 # overriden in api. 
 
 class MilhouseProcessManager(proc.ProcessManager):
     """
@@ -119,7 +120,7 @@ class MilhouseFactory(base.BaseFactory):
         #The ID of the contact_info should be their keys.
         self.config_db = None # Configuration client.
         self.config_fields = {} 
-        self.ports_allocator = tools.PortsAllocator(minimum=10000 + conf.PORT_OFFSET, increment=10) 
+        self.ports_allocator = tools.PortsAllocator(minimum=10000 + PORT_OFFSET, increment=10) 
         # 10 is the minimum permitted interval between milhouse.cpp ports.
 
     def config_init(self, config_db):
@@ -243,7 +244,7 @@ class MilhouseFactory(base.BaseFactory):
         # TODO: move to session.
         """
         Returns a list of stream instances for a contact.
-        :param contact_infos: ContactInfos instance.
+        :param session: Session instance.
         """
         contact_infos = session.contact_infos
         ret = []
@@ -521,9 +522,9 @@ def setup_milhouse_fields(db):
         values=["/dev/video0", "/dev/video1"],
         default="/dev/video0",
         desc="Sender's V4L2 video capture device")
-    db.add_field("/send/video/v4l2/input", 
-        default=0,
-        desc="Sender's V4L2 video capture input number")
+    #db.add_field("/send/video/v4l2/input", 
+    #    default=0,
+    #    desc="Sender's V4L2 video capture input number")
     db.add_field("/send/video/v4l2/norm", 
         default="ntsc",
         values=["ntsc", "pal"],
@@ -599,6 +600,13 @@ def setup_milhouse_settings(db):
             "/both/audio/numchannels":8,
             "/both/audio/codec":"vorbis",
         })
+    db.add_set("audio_codec", desc="Audio codec", settings_ids=[
+        setting_raw_2.id,
+        setting_mp3_2.id,
+        setting_vorbis_2.id,
+        setting_raw_8.id,
+        setting_vorbis_8.id,
+        ])
     # --------------------------- video codecs -----------------------------
     # * video: high-bandwidth (MPEG-4), medium-bw (MPEG-4), low-bw (H263)
     setting_video_high = db.add_setting(
@@ -622,31 +630,62 @@ def setup_milhouse_settings(db):
             "/both/video/codec":"h263",
             "/send/video/bitrate":500000, # 500 kbps
         })
-    # ------------------------------- inputs ---------------------------
+    db.add_set("video_codec", desc="Video codec", settings_ids=[
+        setting_video_high.id,
+        setting_video_medium.id,
+        setting_video_low.id,
+        ])
+    # ------------------------------- video inputs ---------------------------
     setting_v4l2_0 = db.add_setting(
-        name="V4L2 video input 0 NTSC", 
-        desc="V4L2 video driver with default device. Input 0. NTSC.",
+        name="V4L2 video device 0", 
+        desc="V4L2 video device 0",
         entries={
             "/send/video/source":"v4l2src",
             "/send/video/v4l2/device":"/dev/video0",
-            "/send/video/v4l2/input":0,
-            "/send/video/v4l2/norm":"ntsc",
+            #"/send/video/v4l2/input":0,
+            #"/send/video/v4l2/norm":"ntsc",
         })
     setting_v4l2_1 = db.add_setting(
-        name="V4L2 video input 1 NTSC", 
-        desc="V4L2 video driver with default device. Input 1. NTSC.",
+        name="V4L2 video device 1", 
+        desc="V4L2 video device 1.",
         entries={
             "/send/video/source":"v4l2src",
-            "/send/video/v4l2/device":"/dev/video0",
-            "/send/video/v4l2/input":1,
-            "/send/video/v4l2/norm":"ntsc",
+            "/send/video/v4l2/device":"/dev/video1",
         })
-    setting_testsrc = db.add_setting(
-        name="Audio/video test sources", 
-        desc="Test sources for both audio and video.",
+    setting_v4l2_2 = db.add_setting(
+        name="V4L2 video device 2", 
+        desc="V4L2 video device 2.",
+        entries={
+            "/send/video/source":"v4l2src",
+            "/send/video/v4l2/device":"/dev/video2",
+        })
+    setting_v4l2_3 = db.add_setting(
+        name="V4L2 video device 3", 
+        desc="V4L2 video device 3.",
+        entries={
+            "/send/video/source":"v4l2src",
+            "/send/video/v4l2/device":"/dev/video3",
+        })
+    setting_videotestsrc = db.add_setting(
+        name="Video test inputs", 
+        desc="Test sources for video.",
+        entries = {
+            "/send/video/source":"videotestsrc",
+        })
+    db.add_set("video_source", desc="Video input", settings_ids=[
+        setting_v4l2_3.id,
+        setting_v4l2_2.id,
+        setting_v4l2_1.id,
+        setting_v4l2_0.id,
+        setting_videotestsrc.id,
+        ])
+    # ------------------------------- audio inputs ---------------------------
+    # FIXME: separate audiotestsrc and videotestsrc
+    setting_audiotestsrc = db.add_setting(
+        name="Audio test inputs", 
+        desc="Test sources for audio.",
         entries = {
             "/send/audio/source":"audiotestsrc",
-            "/send/video/source":"videotestsrc",
         })
     setting_jack_in = db.add_setting(
         name="Jack audio input", 
@@ -654,16 +693,25 @@ def setup_milhouse_settings(db):
         entries={
             "/send/audio/source": "jackaudiosrc",
         })
-    # ------------------------------- outputs ---------------------------
+    db.add_set("audio_source", desc="Audio input", settings_ids=[
+        setting_jack_in.id,
+        setting_audiotestsrc.id,
+        ])
+    # ------------------------------- audio outputs ---------------------------
     setting_jack_out = db.add_setting(
         name="Jack audio output", 
         desc="Jack audio output.", 
         entries={
             "/recv/audio/sink": "jackaudiosink",
         })
+    db.add_set("audio_sink", desc="Audio output", settings_ids=[
+        setting_jack_out.id,
+        ])
+    # ------------------------------- video outputs ---------------------------
+    #TODO: add more DISPLAY values !!
     setting_x11 = db.add_setting(
-        name="X11 video output", 
-        desc="X11 Window video output.",
+        name="XVideo video output", 
+        desc="XVideo X11 video output.",
         entries={
             "/recv/video/sink": "xvimagesink",
             "/recv/video/display":":0.0",
@@ -674,6 +722,10 @@ def setup_milhouse_settings(db):
         entries={
             "/recv/video/sink":"glimagesink",
         })
+    db.add_set("video_sink", desc="Video output", settings_ids=[
+        setting_x11.id,
+        setting_gl.id,
+        ])
     # ----------------------------------- some profiles
     profile_test = db.add_profile(
         name="Test Sources Low-Quality 2-Channel raw", 
@@ -681,7 +733,8 @@ def setup_milhouse_settings(db):
         settings=[
             setting_video_low.id, 
             setting_x11.id,
-            setting_testsrc.id, 
+            setting_videotestsrc.id, 
+            setting_audiotestsrc.id, 
             setting_raw_2.id, 
             setting_jack_out.id, 
         ])
@@ -741,4 +794,8 @@ def setup_milhouse_settings(db):
             setting_jack_out.id, 
             setting_jack_in.id, 
         ])
+    #for set_name, s in db.sets.iteritems():
+    #    print("Set %s is choice between either:" % (set_name))
+    #    for setting_id in s.get_all():
+    #        print("    - %s" % (db.get_setting(setting_id).name))
 

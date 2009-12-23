@@ -146,15 +146,16 @@ bool VideoV4lSource::willModifyCaptureResolution() const
 
 
 VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
-    : VideoSource(config), expectedStandard_("NTSC") 
+    : VideoSource(config), expectedStandard_("NTSC"), actualStandard_("")
 {
     source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
     // set a v4l2src if given to config as an arg, otherwise use default
     if (config_.hasDeviceName() && config_.deviceExists())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
-    if (!v4l2util::checkStandard(expectedStandard_, deviceStr()))
-        LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard " << expectedStandard_);
+    if (!v4l2util::checkStandard(expectedStandard_, actualStandard_, deviceStr()))
+        LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard " 
+                << expectedStandard_ << ", it is " << actualStandard_);
 
     LOG_DEBUG("v4l width is " << v4l2util::captureWidth(deviceStr()));
     LOG_DEBUG("v4l height is " << v4l2util::captureHeight(deviceStr()));
@@ -189,14 +190,22 @@ std::string VideoV4lSource::srcCaps() const
 
     std::string capsSuffix;
     if (v4l2util::isInterlaced(deviceStr()))
-        capsSuffix = "000/1001, interlaced=true";
+    {
+        if (actualStandard_ == "NTSC")
+            capsSuffix = "30000/1001, interlaced=true";
+        else if (actualStandard_ == "PAL")
+            capsSuffix = "25000/1000, interlaced=true"; // PAL is not drop frame
+        else 
+            THROW_CRITICAL("Unsupported standard " << actualStandard_);
+    }
     else
         capsSuffix = "/1";
 
     capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" 
         << v4l2util::captureHeight(deviceStr()) 
-        << ", framerate=" << config_.framerate() 
+        << ", framerate="
         << capsSuffix;
+    LOG_DEBUG("V4l2src caps are " << capsStr.str());
 
     return capsStr.str();
 }
