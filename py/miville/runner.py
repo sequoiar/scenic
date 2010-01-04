@@ -29,13 +29,14 @@ See the MivilleConfiguration class in miville/core.py
 from twisted.internet.error import CannotListenError
 from twisted.internet import reactor
 import sys
+import os
 import socket
 from optparse import OptionParser
 from miville.options import MivilleConfiguration
 from miville.utils import log
-from miville.core import main
+from miville.utils import common
 
-log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSAGES
+log_file_name = log.LOG_FILE_NAME
 
 __version__ = "0.3.3"
 VERSION = __version__
@@ -127,12 +128,29 @@ def run():
         config.verbose = options.verbose
     if options.restart_jackd:
         config.restart_jackd = True
-    # TODO: add options like in toonloop
     if options.disable_escape_sequences: # in both telnet CLI and this shell
         config.enable_escape_sequences = False
     # set the port offset        
     config.port_numbers_offset = options.offset
+    # checks if files we need to write to are writable
+    for f in [common.install_dir(log_file_name), common.install_dir(config.addressbook_filename)]:
+        try:
+            fp = open(f, 'w')
+        except IOError, e:
+            if os.path.exists(f):
+                print("File %s is not writable by this user. Check its permission and try again.", f)
+            else:
+                d = os.path.dirname(f)
+                if os.path.exists(d):
+                    print("Directory %s is not writable by this user. Check its permissions and try again." % (d))
+                else:
+                    print("Directory %s does not exist. The application should be able to write in this directory." % (d))
+            exit(1)
+        else:
+            fp.close()
+    log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSAGES
     log.info('Starting Miville...')
+    from miville.core import main
     # changes terminal title
     for terminal in ['xterm', 'rxvt']:
         if terminal.find and config.enable_escape_sequences:
