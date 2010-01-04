@@ -37,7 +37,7 @@ from miville.core import main
 
 log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSAGES
 
-__version__ = "0.3.1"
+__version__ = "0.3.3"
 VERSION = __version__
 
 def moo():
