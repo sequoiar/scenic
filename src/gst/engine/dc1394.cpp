@@ -414,5 +414,3 @@ int DC1394::GUIDToCameraNumber(unsigned long long GUID)
 
     return result;
 }
-
-

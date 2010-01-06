@@ -56,7 +56,7 @@ class RtpBin : boost::noncopyable
         void printStatsVal(const std::string &idStr, const char *key, const std::string &type, 
                 const std::string &formatStr, _GstStructure *stats);
         bool printStats_;
-
+    
     private:
         static const int REPORTING_PERIOD_MS = 2000;
         static int printStatsCallback(void * rtpbin);

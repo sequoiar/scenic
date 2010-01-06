@@ -205,3 +205,4 @@ void RtpBin::unregisterSession()
     // does NOT call this->destructor (and that's a good thing)
     sessions_.erase(sessionId_); // remove session name by id
 }
+

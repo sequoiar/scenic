@@ -9,7 +9,7 @@
 #  3. gst-python 0.10.17
 #  4. gst-plugin-good 0.10.17
 #  5. gst-plugin-bad 0.10.17
-#  6. gst-plugin-ugly 0.10.12
+#  6. gst-plugin-ugly 0.10.13
 #  7. gst-ffmpeg 0.10.10.9
 
 SCRIPT_PATH=$(pwd)
