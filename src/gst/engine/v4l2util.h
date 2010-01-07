@@ -35,6 +35,7 @@ class v4l2util
     public:
         static bool checkStandard(const std::string &expected, 
                 std::string &actual, const std::string &device);
+        static void setFormatVideo(const std::string &device, int width, int height);
         static unsigned captureWidth(const std::string &device);
         static unsigned captureHeight(const std::string &device);
         static void listCameras();
