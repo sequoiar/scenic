@@ -341,6 +341,7 @@ TheoraEncoder::TheoraEncoder(MapMsg &settings) :
     quality_(settings["quality"]) 
 {
     setSpeedLevel(MAX_SPEED_LEVEL);
+    //g_object_set(encoder_, "keyframe-force", 1, NULL);
     if (bitrate_)
         setBitrate(bitrate_);
     else
