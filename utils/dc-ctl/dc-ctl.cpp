@@ -129,8 +129,6 @@ int run(int argc, char *argv[])
             raw1394_destroy_handle(tmp_handle);
 
         // get camera information first to have valid ranges
-        int mode = 0;
-        dc1394video_modes_t modes;
         dc1394error_t camerr;
         dc1394 = dc1394_new();
         camerr = dc1394_camera_enumerate(dc1394, &cameras);

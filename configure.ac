@@ -182,6 +182,8 @@ AC_CONFIG_FILES([Makefile
 		 doc/figures/Makefile
 		 doc/figures/test/Makefile
 		 doc/sequences/Makefile
+                 utils/Makefile
+                 utils/dc-ctl/Makefile
                  src/Makefile
                  py/Makefile
                  py/docs/Makefile
