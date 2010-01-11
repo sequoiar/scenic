@@ -161,8 +161,11 @@ VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
     LOG_DEBUG("v4l height is " << v4l2util::captureHeight(deviceStr()));
 
     if (willModifyCaptureResolution())  
+    {
         LOG_INFO("Changing v4l resolution to " << 
                 config_.captureWidth() << "x" << config_.captureHeight());
+        v4l2util::setFormatVideo(deviceStr(), config_.captureWidth(), config_.captureHeight());
+    }
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);

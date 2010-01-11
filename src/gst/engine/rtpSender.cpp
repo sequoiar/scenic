@@ -74,15 +74,20 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     GstPad *rtcpSenderSink;
     GstPad *rtcpReceiverSrc;
 
+    /// FIXME: need to update config.ports() accordingly if they can change (which for now they can't)
     rtp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
-    g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), NULL);
+    int rtpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.port());
+    g_object_set(rtp_sender_, "sockfd", rtpsink_socket, "host", 
+            config.remoteHost(), "port", config.port(), NULL);
 
     rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.rtcpFirstPort(),
-            "sync", FALSE, "async", FALSE, NULL);
+    int rtcpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.rtcpFirstPort());
+    g_object_set(rtcp_sender_, "sockfd", rtcpsink_socket, "host", config.remoteHost(), 
+            "port", config.rtcpFirstPort(), "sync", FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtcp_receiver_, "port", config.rtcpSecondPort(), NULL);
+    int rtcpsrc_socket = RtpBin::createSourceSocket(config.rtcpSecondPort());
+    g_object_set(rtcp_receiver_, "sockfd", rtcpsrc_socket, "port", config.rtcpSecondPort(), NULL);
 
     // padStr adds a session id to the pad name, so we get the pad for this session
     /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */

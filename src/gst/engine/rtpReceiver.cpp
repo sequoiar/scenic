@@ -53,12 +53,15 @@ RtpReceiver::~RtpReceiver()
     Pipeline::Instance()->remove(&rtp_receiver_);
 
     // find this->depayloader in the static list of depayloaders
-    std::list<GstElement *>::iterator iter;
-    iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
+    if (depayloader_) // in case destructor was called before depayloader was created
+    {
+        std::list<GstElement *>::iterator iter;
+        iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
 
-    // make sure we found it and remove it
-    tassert(iter != depayloaders_.end());
-    depayloaders_.erase(iter);
+        // make sure we found it and remove it
+        tassert(iter != depayloaders_.end());
+        depayloaders_.erase(iter);
+    }
 
     if (control_)
     {
@@ -192,9 +195,12 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 
     // store copy so that destructor knows which depayloader to remove from its list
     depayloader_ = depayloader->sinkElement();
+    // add to our list of active depayloaders
+    depayloaders_.push_back(depayloader_);
 
     rtp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtp_receiver_, "port", config.port(), NULL);
+    int rtpsrc_socket = RtpBin::createSourceSocket(config.port());
+    g_object_set(rtp_receiver_, "sockfd", rtpsrc_socket, "port", config.port(), NULL);
 
     // this is a multicast session
     if (config.hasMulticastInterface())
@@ -205,10 +211,12 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     }
 
     rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtcp_receiver_, "port", config.rtcpFirstPort(), NULL);
+    int rtcpsrc_socket = RtpBin::createSourceSocket(config.rtcpFirstPort());
+    g_object_set(rtcp_receiver_, "sockfd", rtcpsrc_socket, "port", config.rtcpFirstPort(), NULL);
 
     rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port",
+    int rtcpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.rtcpSecondPort());
+    g_object_set(rtcp_sender_, "host", config.remoteHost(), "sockfd", rtcpsink_socket, "port",
             config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);
 
     /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
@@ -229,7 +237,6 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     tassert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
     gst_object_unref(rtcpSenderSink);
 
-    depayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", 
             G_CALLBACK(RtpReceiver::onPadAdded), 

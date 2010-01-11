@@ -24,6 +24,7 @@
 
 #include <gst/gst.h>
 #include <cstring>
+#include <netdb.h>
 #include "rtpBin.h"
 #include "rtpPay.h"
 #include "remoteConfig.h"
@@ -205,3 +206,120 @@ void RtpBin::unregisterSession()
     // does NOT call this->destructor (and that's a good thing)
     sessions_.erase(sessionId_); // remove session name by id
 }
+
+int RtpBin::createSinkSocket(const char *hostname, int port)
+{
+    using boost::lexical_cast;
+    using std::string;
+    int sockfd;
+    struct addrinfo hints, *servinfo, *p;
+    int rv;
+    std::string portStr(lexical_cast<string>(port));
+    LOG_DEBUG("Trying socket for host " << hostname << ", port " << portStr);
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    if ((rv = getaddrinfo(hostname, portStr.c_str(), &hints, &servinfo)) != 0) 
+        THROW_ERROR("getaddrinfo: " << gai_strerror(rv));
+
+    // loop through all the results and make a socket
+    for(p = servinfo; p != NULL; p = p->ai_next) 
+    {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                p->ai_protocol)) == -1) 
+        {
+            perror("socket error");
+            continue;
+        }
+        else if (p->ai_family == AF_INET)
+            LOG_DEBUG("IPV4 socket");
+        else if (p->ai_family == AF_INET6)
+            LOG_DEBUG("IPV4 socket");
+        else 
+            LOG_DEBUG("Unknown address family");
+
+        break;
+    }
+
+    if (p == NULL) 
+    {
+        close(sockfd);
+        THROW_ERROR("failed to create socket");
+    }
+
+    freeaddrinfo(servinfo);
+    LOG_DEBUG("socket created successfully\n");
+    return sockfd;
+}
+
+
+int RtpBin::createSourceSocket(int port)
+{
+    using std::string;
+    using boost::lexical_cast;
+
+    int sockfd;
+    struct addrinfo hints, *servinfo, *p;
+    int rv;
+    //int reuse = 1;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE; // use my IP
+    
+    string portStr(lexical_cast<string>(port));
+    LOG_DEBUG("Trying socket for port " << portStr);
+
+    if ((rv = getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo)) != 0) 
+        THROW_ERROR("getaddrinfo: " << gai_strerror(rv));
+
+    // loop through all the results and make a socket
+    for (p = servinfo; p != NULL; p = p->ai_next) 
+    {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                p->ai_protocol)) == -1) 
+        {
+            LOG_WARNING("socket error");
+            continue;
+        }
+        else if (p->ai_family == AF_INET)
+            LOG_DEBUG("IPV4 Socket");
+        else if (p->ai_family == AF_INET6)
+            LOG_DEBUG("IPV6 Socket");
+        else 
+            LOG_DEBUG("Unknown address family");
+#if 0
+        /// GST uses this, we don't necessarily want to enable reuse
+        if ((setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse,
+                        sizeof (reuse))) < 0)
+        {
+            close(sockfd);
+            LOG_WARNING("setsockopt failed");
+            continue;
+        }
+#endif
+
+        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
+        {
+            close(sockfd);
+            LOG_WARNING("bind error");
+            continue;
+        }
+
+        break;
+    }
+
+    if (p == NULL) 
+    {
+        close(sockfd);
+        THROW_ERROR("Failed to bind socket");
+    }
+
+    freeaddrinfo(servinfo);
+    LOG_DEBUG("socket created successfully");
+    return sockfd;
+}
+

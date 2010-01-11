@@ -148,7 +148,7 @@ VideoEncoder::~VideoEncoder()
     Pipeline::Instance()->remove(&colorspc_);
 }
 
-VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0)//, queue_(0)
+VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0)
 {}
 
 
@@ -157,7 +157,6 @@ VideoDecoder::~VideoDecoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
     Pipeline::Instance()->remove(&deinterlace_);
-    //Pipeline::Instance()->remove(&queue_);
 }
 
 
@@ -165,16 +164,10 @@ VideoDecoder::~VideoDecoder()
 /// or just decoder->queue
 void VideoDecoder::init()
 {
-    // FIXME: should be settable
+    // FIXME: should maybe be settable
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
 
     tassert(decoder_ != 0);
-#if 0
-    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
-    g_object_set(queue_, "max-size-bytes", 0, NULL);
-    g_object_set(queue_, "max-size-time", 0LL, NULL);
-#endif
     if (doDeinterlace_)
     {
         colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
@@ -183,11 +176,7 @@ void VideoDecoder::init()
         g_object_set(deinterlace_, "fields", TOP, NULL);
         gstlinkable::link(decoder_, colorspc_);
         gstlinkable::link(colorspc_, deinterlace_);
-     //   gstlinkable::link(deinterlace_, queue_);
     }
-    //else
-      //  gstlinkable::link(decoder_, queue_);
-
 }
 
 
@@ -352,6 +341,7 @@ TheoraEncoder::TheoraEncoder(MapMsg &settings) :
     quality_(settings["quality"]) 
 {
     setSpeedLevel(MAX_SPEED_LEVEL);
+    //g_object_set(encoder_, "keyframe-force", 1, NULL);
     if (bitrate_)
         setBitrate(bitrate_);
     else

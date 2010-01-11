@@ -34,12 +34,10 @@ from twisted.internet.error import CannotListenError
 
 # App imports
 from miville import api
-#import streams
 from miville.utils import common
 from miville.utils import log
 from miville.utils.observer import Subject
 from miville import addressbook
-#from miville import settings
 from miville.protocols import com_chan
 from miville import connectors
 from miville import devices
@@ -47,7 +45,7 @@ from miville import devices
 # module variables
 core = None
 
-log = log.start('debug', True, True, 'core') # LOG TO FILE = True
+log = log.start('debug', name='core')
 
 class Core(Subject):
     """
