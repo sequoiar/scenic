@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(MILHOUSE, 0.3.3)
+AC_INIT(MILHOUSE, 0.3.4)
 AC_DEFINE(RELEASE_CANDIDATE,["-c1"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
