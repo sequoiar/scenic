@@ -32,6 +32,7 @@ import sys
 import twisted.python.log as tw_log
 import twisted
 from twisted.internet import fdesc
+
 # deal with older version of twisted (in Ubuntu and other)
 version = int(twisted.__version__.split('.')[0])
 if version < 8:
@@ -43,9 +44,9 @@ import miville.utils.common
 from miville.errors import InstallFileError
 
 #TODO: Specified the level by output
-
 ENABLE_NON_BLOCKING_OUTPUT = False
-
+# ~/.miville/miville.log
+LOG_FILE_NAME = "miville.log"
 LoggerClass = logging.getLoggerClass()
 
 class CoreLogger(LoggerClass):
@@ -60,7 +61,7 @@ class CoreLogger(LoggerClass):
 
 logging.setLoggerClass(CoreLogger)
 
-def start(level='info', to_stdout=True, to_file=False, log_name='twisted'):
+def start(level='info', to_stdout=True, to_file=True, name='twisted'):
     """
     Starts the logging for a single module.
 
@@ -68,9 +69,9 @@ def start(level='info', to_stdout=True, to_file=False, log_name='twisted'):
     Example : is level is INFO, the DEBUG messages (lower level) will not be displayed
     but the CRITICAL ones will.
     """
-    logger = logging.getLogger(log_name)
+    logger = logging.getLogger(name)
     formatter = logging.Formatter('%(asctime)s %(name)-8s %(levelname)-8s %(message)s')
-    set_level(level, log_name)
+    set_level(level, name)
     if to_stdout:
         so_handler = logging.StreamHandler(sys.stdout)
         if ENABLE_NON_BLOCKING_OUTPUT: 
@@ -79,21 +80,21 @@ def start(level='info', to_stdout=True, to_file=False, log_name='twisted'):
         logger.addHandler(so_handler)
     if to_file:
         try:
-            log_file = miville.utils.common.install_dir('miville.log')
+            log_file = miville.utils.common.install_dir(LOG_FILE_NAME)
         except InstallFileError, err:
             print "Logging module ERROR\t%s" % err
         else:
-    #        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
-            file_handler = logging.FileHandler(log_file)
+            # file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
+            file_handler = logging.FileHandler(log_file) # not catching IOError that could occur.
             if ENABLE_NON_BLOCKING_OUTPUT: 
                 fdesc.setNonBlocking(file_handler.stream) # NON-BLOCKING OUTPUT
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
-    if log_name == 'twisted':
-        observer = tw_log.PythonLoggingObserver(log_name)
+    if name == 'twisted':
+        observer = tw_log.PythonLoggingObserver(name)
         observer.start()
     else:
-        return logging.getLogger(log_name)
+        return logging.getLogger(name)
 
 def stop():
     """
@@ -154,6 +155,7 @@ def debug(msg):
     tw_log.msg(msg, logLevel=logging.DEBUG)
        
 if __name__ == "__main__":
+    # test:
     start('warning', 1, 1)
     critical('critical1é')
     error('error1')

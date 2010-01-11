@@ -1,6 +1,6 @@
 include $(top_srcdir)/globals.mak
-SUBDIRS = src py doc
-DIST_SUBDIRS = src py doc
+SUBDIRS = src py doc utils
+DIST_SUBDIRS = src py doc utils
 ACLOCAL_AMFLAGS = -I m4
 
 #EXTRA_DIST = doc/Makefile py/docs/Makefile 

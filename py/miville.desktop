@@ -1,13 +1,13 @@
 [Desktop Entry]
-Version=0.3.3
+Version=0.3.4
 Encoding=UTF-8
 Name=Miville
-GenericName=Telesceno Web Interface
+GenericName=Scenic Web Interface
 Comment=Start a miville server and a Firefox client
 Exec=miville
 Icon=miville.png
 Terminal=true
 Type=Application
 Categories=Application;Network;
-GenericName=Telesceno Web Interface
-GenericName[en_CA]=Telesceno Web Interface
+GenericName=Scenic Web Interface
+GenericName[en_CA]=Scenic Web Interface
