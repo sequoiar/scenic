@@ -101,6 +101,17 @@ std::string featureHelp(const dc1394featureset_t &features, dc1394feature_t feat
 }
 
 
+void cleanup(dc1394_t * dc1394, dc1394camera_t *camera, dc1394camera_list_t *cameras)
+{
+    if (camera != 0)
+        free(camera);
+    if (cameras != 0)
+        dc1394_camera_free_list(cameras);
+    if (dc1394 != 0)
+        dc1394_free(dc1394);
+}
+
+
 int run(int argc, char *argv[])
 {
     dc1394_t * dc1394 = 0; 
@@ -138,7 +149,7 @@ int run(int argc, char *argv[])
             throw std::runtime_error("libdc1394 error: no camera found on bus");
 
         camera = dc1394_camera_new_unit(dc1394, cameras->ids[0].guid,
-                    cameras->ids[0].unit);
+                cameras->ids[0].unit);
 
         dc1394featureset_t features;
         camerr = dc1394_feature_get_all(camera, &features);
@@ -171,13 +182,7 @@ int run(int argc, char *argv[])
         if (vm.count("help") or argc == 1)  // no args
         {
             std::cout << desc << "\n";
-            if (camera)
-                free(camera);
-            if (cameras)
-                dc1394_camera_free_list(cameras);
-            if (dc1394)
-                dc1394_free(dc1394);
-
+            cleanup(dc1394, camera, cameras);
             return 0;
         }
 
@@ -192,7 +197,7 @@ int run(int argc, char *argv[])
             if (vm["camera"].as<unsigned>() < cameras->num)
             {
                 camera = dc1394_camera_new_unit(dc1394, cameras->ids[vm["camera"].as<unsigned>()].guid,
-                            cameras->ids[vm["camera"].as<unsigned>()].unit);
+                        cameras->ids[vm["camera"].as<unsigned>()].unit);
 
                 camerr = dc1394_feature_get_all(camera, &features);
                 if (camerr != DC1394_SUCCESS)
@@ -208,36 +213,39 @@ int run(int argc, char *argv[])
         if (vm["list-features"].as<bool>())
         {
             camerr = dc1394_feature_print_all(&features, stdout);
+            // FIXME: actually look at the error value
             if (camerr != DC1394_SUCCESS)
-                throw std::runtime_error("libdc1394 error: this should be more verbose");
+                throw std::runtime_error("libdc1394 error: could not print features");
             std::cout << std::endl;
-
-            if (camera)
-                free(camera);
-            if (cameras)
-                dc1394_camera_free_list(cameras);
-            if (dc1394)
-                dc1394_free(dc1394);
-
+            cleanup(dc1394, camera, cameras);
             return 0;
         }
 
-        std::cout << "Setting brightness: " << vm["brightness"].as<string>() << std::endl;
-        setFeature(camera, features, DC1394_FEATURE_BRIGHTNESS, vm["brightness"].as<string>());
+        if(vm.count("brightness"))
+        {
+            std::cout << "Setting brightness: " << vm["brightness"].as<string>() << std::endl;
+            setFeature(camera, features, DC1394_FEATURE_BRIGHTNESS, vm["brightness"].as<string>());
+        }
 
-        std::cout << "Setting auto-exposure: " << vm["auto-exposure"].as<string>() << std::endl;
-        setFeature(camera, features, DC1394_FEATURE_EXPOSURE, vm["auto-exposure"].as<string>());
+        if(vm.count("auto-exposure"))
+        {
+            std::cout << "Setting auto-exposure: " << vm["auto-exposure"].as<string>() << std::endl;
+            setFeature(camera, features, DC1394_FEATURE_EXPOSURE, vm["auto-exposure"].as<string>());
+        }
 
-        std::cout << "Setting sharpness: " << vm["sharpness"].as<string>() << std::endl;
-        setFeature(camera, features, DC1394_FEATURE_SHARPNESS, vm["sharpness"].as<string>());
-
-        // FIXME: Hack because i don't know how to have defaults for vector program options
-        string u_b_string("49");
-        string v_r_string("149");
-        bool autoWhiteBalance = false;
+        if(vm.count("sharpness"))
+        {
+            std::cout << "Setting sharpness: " << vm["sharpness"].as<string>() << std::endl;
+            setFeature(camera, features, DC1394_FEATURE_SHARPNESS, vm["sharpness"].as<string>());
+        }
 
         if (vm.count("whitebalance"))
         {
+            // FIXME: Hack because i don't know how to have defaults for vector program options
+            string u_b_string;
+            string v_r_string;
+            bool autoWhiteBalance = false;
+
             // either auto or values
             if (vm["whitebalance"].as<string>() == "auto")
             {
@@ -264,94 +272,80 @@ int run(int argc, char *argv[])
                             break;
                         default:
                             std::cerr << "error: white balance takes two arguments, Blue/U and Red/V [int int]\n";
-                            if (camera)
-                                free(camera);
-                            if (cameras)
-                                dc1394_camera_free_list(cameras);
-                            if (dc1394)
-                                dc1394_free(dc1394);
+                            cleanup(dc1394, camera, cameras);
                             return 1;
                     }
                     ++count;
                 }
             }
+
+            if (not autoWhiteBalance)
+            {
+                const int MIN_WHITE_BALANCE = featureMin(features, DC1394_FEATURE_WHITE_BALANCE);
+                const int MAX_WHITE_BALANCE = featureMax(features, DC1394_FEATURE_WHITE_BALANCE);
+                const int u_b = lexical_cast<int>(u_b_string); // convert to ints
+                const int v_r = lexical_cast<int>(v_r_string); // convert to ints
+
+                if (u_b >= MIN_WHITE_BALANCE and 
+                        u_b <= MAX_WHITE_BALANCE and 
+                        v_r >= MIN_WHITE_BALANCE and 
+                        v_r <= MAX_WHITE_BALANCE)
+                {
+                    std::cout << "Setting white balance: Blue/U=" << u_b << ", Red/V=" << v_r << "\n";
+                    camerr = dc1394_feature_set_mode(camera, DC1394_FEATURE_WHITE_BALANCE, DC1394_FEATURE_MODE_MANUAL);
+                    camerr = dc1394_feature_whitebalance_set_value(camera, u_b, v_r);
+                    if (camerr != DC1394_SUCCESS)
+                        throw std::runtime_error("libdc1394 error: this should be more verbose");
+                }
+                else
+                {
+                    std::cerr << "error: whitebalance values must be in range [" 
+                        << MIN_WHITE_BALANCE << "," << MAX_WHITE_BALANCE << "]" << std::endl;
+                    cleanup(dc1394, camera, cameras);
+                    return 1;
+                }
+            }
         }
 
-        if (not autoWhiteBalance)
+        if (vm.count("saturation"))
         {
-            const int MIN_WHITE_BALANCE = featureMin(features, DC1394_FEATURE_WHITE_BALANCE);
-            const int MAX_WHITE_BALANCE = featureMax(features, DC1394_FEATURE_WHITE_BALANCE);
-            const int u_b = lexical_cast<int>(u_b_string); // convert to ints
-            const int v_r = lexical_cast<int>(v_r_string); // convert to ints
-
-            if (u_b >= MIN_WHITE_BALANCE and 
-                    u_b <= MAX_WHITE_BALANCE and 
-                    v_r >= MIN_WHITE_BALANCE and 
-                    v_r <= MAX_WHITE_BALANCE)
-            {
-                std::cout << "Setting white balance: Blue/U=" << u_b << ", Red/V=" << v_r << "\n";
-                camerr = dc1394_feature_set_mode(camera, DC1394_FEATURE_WHITE_BALANCE, DC1394_FEATURE_MODE_MANUAL);
-                camerr = dc1394_feature_whitebalance_set_value(camera, u_b, v_r);
-                if (camerr != DC1394_SUCCESS)
-                    throw std::runtime_error("libdc1394 error: this should be more verbose");
-            }
-            else
-            {
-                std::cerr << "error: whitebalance values must be in range [" 
-                    << MIN_WHITE_BALANCE << "," << MAX_WHITE_BALANCE << "]" << std::endl;
-                if (camera)
-                    free(camera);
-                if (cameras)
-                    dc1394_camera_free_list(cameras);
-                if (dc1394)
-                    dc1394_free(dc1394);
-                return 1;
-            }
+            std::cout << "Setting saturation : " << vm["saturation"].as<string>() << std::endl;
+            setFeature(camera, features, DC1394_FEATURE_SATURATION, vm["saturation"].as<string>());
         }
 
-        std::cout << "Setting saturation : " << vm["saturation"].as<string>() << std::endl;
-        setFeature(camera, features, DC1394_FEATURE_SATURATION, vm["saturation"].as<string>());
+        if (vm.count("gamma"))
+        {
+            std::cout << "Setting gamma: " << vm["gamma"].as<string>() << std::endl;
+            setFeature(camera, features, DC1394_FEATURE_GAMMA, vm["gamma"].as<string>());
+        }
 
-        std::cout << "Setting gamma: " << vm["gamma"].as<string>() << std::endl;
-        setFeature(camera, features, DC1394_FEATURE_GAMMA, vm["gamma"].as<string>());
+        if (vm.count("shutter-time"))
+        {
+            std::cout << "Setting shutter-time: " << vm["shutter-time"].as<string>() << std::endl;
+            setFeature(camera, features, DC1394_FEATURE_SHUTTER, vm["shutter-time"].as<string>());
+        }
 
-        std::cout << "Setting shutter-time: " << vm["shutter-time"].as<string>() << std::endl;
-        setFeature(camera, features, DC1394_FEATURE_SHUTTER, vm["shutter-time"].as<string>());
-
-        std::cout << "Setting gain : " << vm["gain"].as<string>() << std::endl;
-        setFeature(camera, features, DC1394_FEATURE_GAIN, vm["gain"].as<string>());
+        if (vm.count("gain"))
+        {
+            std::cout << "Setting gain : " << vm["gain"].as<string>() << std::endl;
+            setFeature(camera, features, DC1394_FEATURE_GAIN, vm["gain"].as<string>());
+        }
     }
     catch (const std::exception& e) 
     {
         std::cerr << "error: " << e.what() << "\n";
-        if (camera)
-            free(camera);
-        if (cameras)
-            dc1394_camera_free_list(cameras);
-        if (dc1394)
-            dc1394_free(dc1394);
+        cleanup(dc1394, camera, cameras);
         return 1;
     }
     catch (...) 
     {
         // FIXME: is this possible?
         std::cerr << "Exception of unknown type!\n";
-        if (camera)
-            free(camera);
-        if (cameras)
-            dc1394_camera_free_list(cameras);
-        if (dc1394)
-            dc1394_free(dc1394);
+        cleanup(dc1394, camera, cameras);
         return 1;
     }
 
-    if (camera)
-        free(camera);
-    if (cameras)
-        dc1394_camera_free_list(cameras);
-    if (dc1394)
-        dc1394_free(dc1394);
-
+    cleanup(dc1394, camera, cameras);
     return 0;
 }
 
