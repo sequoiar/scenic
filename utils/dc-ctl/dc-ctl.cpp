@@ -51,10 +51,53 @@ void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features,
     }
 }
             
+unsigned int getFeatureValue(dc1394feature_t feature, dc1394camera_t * camera)
+{
+    unsigned int value;
+    dc1394error_t error = dc1394_feature_get_value(camera, feature, &value);
+    if (error != DC1394_SUCCESS)
+        throw std::runtime_error("libdc1394 error: could not get value");
+    return value;
+}
 
-void saveSettings(const std::string &filename, dc1394camera_t * /*camera*/)
+
+/// pass by reference because we're expecting multiple values, alternately could return a vector
+std::string getWhiteBalance(dc1394camera_t * camera)
+{
+    unsigned int valueBU, valueRV;
+    dc1394error_t error = dc1394_feature_whitebalance_get_value(camera, &valueBU, &valueRV);
+    if (error != DC1394_SUCCESS)
+        throw std::runtime_error("libdc1394 error: could not get value");
+    std::ostringstream result;
+    result << valueBU << "," << valueRV;
+    return result.str();
+}
+
+
+void saveSettings(const std::string &filename, dc1394camera_t * camera)
 {
     std::cout << "Saving settings to " << filename << std::endl;
+    /// FIXME: find reference on how to safely, idiomatically open and write to a file
+    std::ofstream fout;
+    try 
+    {
+        fout.open(filename.c_str());
+        fout << "camera=" << std::hex << camera->guid << "\n" << std::dec;
+        fout << "brightness=" << getFeatureValue(DC1394_FEATURE_BRIGHTNESS, camera) << "\n";
+        fout << "auto-exposure=" << getFeatureValue(DC1394_FEATURE_EXPOSURE, camera) << "\n";
+        fout << "sharpness=" << getFeatureValue(DC1394_FEATURE_SHARPNESS, camera) << "\n";
+        fout << "whitebalance=" << getWhiteBalance(camera) << "\n";
+        fout << "saturation=" << getFeatureValue(DC1394_FEATURE_SATURATION, camera) << "\n";
+        fout << "gamma=" << getFeatureValue(DC1394_FEATURE_GAMMA, camera) << "\n";
+        fout << "shutter-time=" << getFeatureValue(DC1394_FEATURE_SHUTTER, camera) << "\n";
+        fout << "gain=" << getFeatureValue(DC1394_FEATURE_GAIN, camera) << "\n";
+        fout.close();
+    }
+    catch (const std::exception& e)  // catch it here so that we close file
+    {
+        std::cerr << "error: " << e.what() << "\n";
+    }
+    fout.close();
 }
 
 std::string featureHelp(const dc1394featureset_t &features, dc1394feature_t feature)
@@ -168,7 +211,7 @@ int run(int argc, char *argv[])
         // using strings so that value can be "auto"
         desc.add_options()
             ("help,h", "produce help message")
-            ("camera,c", po::value<unsigned>()->default_value(0), "camera number to use")
+            ("camera,c", po::value<string>()->default_value("0"), "guid of camera number to use (0 is first camera on bus)")
             ("brightness,b", po::value<string>(), featureHelp(features, DC1394_FEATURE_BRIGHTNESS).c_str())
             ("auto-exposure,e", po::value<string>(), featureHelp(features, DC1394_FEATURE_EXPOSURE).c_str())
             ("sharpness,s", po::value<string>(), featureHelp(features, DC1394_FEATURE_SHARPNESS).c_str())
@@ -192,7 +235,7 @@ int run(int argc, char *argv[])
             cleanup(dc1394, camera, cameras);
             return 0;
         }
-        
+
         if(vm.count("save"))
         {
             saveSettings(vm["save"].as<string>(), camera);
@@ -206,22 +249,29 @@ int run(int argc, char *argv[])
             store(parse_config_file(configFile, desc), vm);
         }
 
-        if (vm["camera"].as<unsigned>() != 0) // using non-default camera id
+        if (vm["camera"].as<string>() != "0") // using non-default camera id
         {
-            if (vm["camera"].as<unsigned>() < cameras->num)
+            // find right guid
+            bool matchedGUID = false;
+            for (unsigned i = 0; i < cameras->num and not matchedGUID; ++i)
             {
-                camera = dc1394_camera_new_unit(dc1394, cameras->ids[vm["camera"].as<unsigned>()].guid,
-                        cameras->ids[vm["camera"].as<unsigned>()].unit);
+                std::stringstream GUIDInHex;
+                GUIDInHex << std::hex << cameras->ids[i].guid;
+                if (GUIDInHex.str() == vm["camera"].as<string>())
+                {
+                    camera = dc1394_camera_new_unit(dc1394, cameras->ids[i].guid,
+                            cameras->ids[i].unit);
+                    matchedGUID = true;
+                }
+            }
+            if (not matchedGUID)
+                throw std::runtime_error("could not find camera with guid " + 
+                        lexical_cast<string>(vm["camera"].as<string>()));
 
-                camerr = dc1394_feature_get_all(camera, &features);
-                if (camerr != DC1394_SUCCESS)
-                    throw std::runtime_error("libdc1394 error: this should be more verbose");
-            }
-            else
-            {
-                std::cerr << "Invalid camera-number " << vm["camera"].as<unsigned>() << std::endl;
-                return 1;
-            }
+
+            camerr = dc1394_feature_get_all(camera, &features);
+            if (camerr != DC1394_SUCCESS)
+                throw std::runtime_error("libdc1394 error: this should be more verbose");
         }
 
         if (vm["list-features"].as<bool>())
