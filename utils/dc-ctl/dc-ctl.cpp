@@ -51,31 +51,49 @@ void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features,
     }
 }
             
-unsigned int getFeatureValue(dc1394feature_t feature, dc1394camera_t * camera)
+std::string getFeatureValue(const dc1394featureset_t &features, dc1394feature_t feature, dc1394camera_t * camera)
 {
-    unsigned int value;
-    dc1394error_t error = dc1394_feature_get_value(camera, feature, &value);
-    if (error != DC1394_SUCCESS)
-        throw std::runtime_error("libdc1394 error: could not get value");
-    return value;
+    // if it's auto, we don't care about the value
+    if (features.feature[feature - DC1394_FEATURE_MIN].current_mode == DC1394_FEATURE_MODE_AUTO)
+        return std::string("auto");
+    else
+    {
+        unsigned int value;
+        std::ostringstream result;
+        dc1394error_t error = dc1394_feature_get_value(camera, feature, &value);
+        if (error != DC1394_SUCCESS)
+            throw std::runtime_error("libdc1394 error: could not get value");
+        result << value;
+        return result.str();
+    }
 }
 
 
 /// pass by reference because we're expecting multiple values, alternately could return a vector
-std::string getWhiteBalance(dc1394camera_t * camera)
+std::string getWhiteBalance(const dc1394featureset_t &features, dc1394camera_t * camera)
 {
-    unsigned int valueBU, valueRV;
-    dc1394error_t error = dc1394_feature_whitebalance_get_value(camera, &valueBU, &valueRV);
-    if (error != DC1394_SUCCESS)
-        throw std::runtime_error("libdc1394 error: could not get value");
-    std::ostringstream result;
-    result << valueBU << "," << valueRV;
-    return result.str();
+    if (features.feature[DC1394_FEATURE_WHITE_BALANCE - DC1394_FEATURE_MIN].current_mode == DC1394_FEATURE_MODE_AUTO)
+        return std::string("auto");
+    else
+    {
+        unsigned int valueBU, valueRV;
+        dc1394error_t error = dc1394_feature_whitebalance_get_value(camera, &valueBU, &valueRV);
+        if (error != DC1394_SUCCESS)
+            throw std::runtime_error("libdc1394 error: could not get value");
+        std::ostringstream result;
+        result << valueBU << "," << valueRV;
+        return result.str();
+    }
 }
 
 
 void saveSettings(const std::string &filename, dc1394camera_t * camera)
 {
+    dc1394featureset_t features;
+    dc1394error_t camerr = dc1394_feature_get_all(camera, &features);
+    if (camerr != DC1394_SUCCESS)
+        throw std::runtime_error("libdc1394 error: this should be more verbose");
+
     std::cout << "Saving settings to " << filename << std::endl;
     /// FIXME: find reference on how to safely, idiomatically open and write to a file
     std::ofstream fout;
@@ -83,14 +101,14 @@ void saveSettings(const std::string &filename, dc1394camera_t * camera)
     {
         fout.open(filename.c_str());
         fout << "camera=" << std::hex << camera->guid << "\n" << std::dec;
-        fout << "brightness=" << getFeatureValue(DC1394_FEATURE_BRIGHTNESS, camera) << "\n";
-        fout << "auto-exposure=" << getFeatureValue(DC1394_FEATURE_EXPOSURE, camera) << "\n";
-        fout << "sharpness=" << getFeatureValue(DC1394_FEATURE_SHARPNESS, camera) << "\n";
-        fout << "whitebalance=" << getWhiteBalance(camera) << "\n";
-        fout << "saturation=" << getFeatureValue(DC1394_FEATURE_SATURATION, camera) << "\n";
-        fout << "gamma=" << getFeatureValue(DC1394_FEATURE_GAMMA, camera) << "\n";
-        fout << "shutter-time=" << getFeatureValue(DC1394_FEATURE_SHUTTER, camera) << "\n";
-        fout << "gain=" << getFeatureValue(DC1394_FEATURE_GAIN, camera) << "\n";
+        fout << "brightness=" << getFeatureValue(features, DC1394_FEATURE_BRIGHTNESS, camera) << "\n";
+        fout << "auto-exposure=" << getFeatureValue(features, DC1394_FEATURE_EXPOSURE, camera) << "\n";
+        fout << "sharpness=" << getFeatureValue(features, DC1394_FEATURE_SHARPNESS, camera) << "\n";
+        fout << "whitebalance=" << getWhiteBalance(features, camera) << "\n";
+        fout << "saturation=" << getFeatureValue(features, DC1394_FEATURE_SATURATION, camera) << "\n";
+        fout << "gamma=" << getFeatureValue(features, DC1394_FEATURE_GAMMA, camera) << "\n";
+        fout << "shutter-time=" << getFeatureValue(features, DC1394_FEATURE_SHUTTER, camera) << "\n";
+        fout << "gain=" << getFeatureValue(features, DC1394_FEATURE_GAIN, camera) << "\n";
         fout.close();
     }
     catch (const std::exception& e)  // catch it here so that we close file
@@ -246,7 +264,7 @@ int run(int argc, char *argv[])
         if(vm.count("config"))
         {
             std::ifstream configFile(vm["config"].as<string>().c_str());
-            if (!configFile.good())
+            if (not configFile.good())
             {
                 configFile.close();
                 throw std::runtime_error("Could not open file " + vm["config"].as<string>()); 
