@@ -152,14 +152,14 @@ int run(int argc, char *argv[])
         desc.add_options()
             ("help,h", "produce help message")
             ("camera,c", po::value<unsigned>()->default_value(0), "camera number to use")
-            ("brightness,b", po::value<string>()->default_value("300"), featureHelp(features, DC1394_FEATURE_BRIGHTNESS).c_str())
-            ("auto-exposure,e", po::value<string>()->default_value("300"), featureHelp(features, DC1394_FEATURE_EXPOSURE).c_str())
-            ("sharpness,s", po::value<string>()->default_value("0"), featureHelp(features, DC1394_FEATURE_SHARPNESS).c_str())
-            ("whitebalance,w", po::value<string>()->default_value("49,149"), featureHelp(features, DC1394_FEATURE_WHITE_BALANCE).c_str())
-            ("saturation,S", po::value<string>()->default_value("0"), featureHelp(features, DC1394_FEATURE_SATURATION).c_str())
-            ("gamma,g", po::value<string>()->default_value("0"), featureHelp(features, DC1394_FEATURE_GAMMA).c_str())
-            ("shutter-time,t", po::value<string>()->default_value("7"), featureHelp(features, DC1394_FEATURE_SHUTTER).c_str())
-            ("gain,G", po::value<string>()->default_value("0"), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
+            ("brightness,b", po::value<string>(), featureHelp(features, DC1394_FEATURE_BRIGHTNESS).c_str())
+            ("auto-exposure,e", po::value<string>(), featureHelp(features, DC1394_FEATURE_EXPOSURE).c_str())
+            ("sharpness,s", po::value<string>(), featureHelp(features, DC1394_FEATURE_SHARPNESS).c_str())
+            ("whitebalance,w", po::value<string>(), featureHelp(features, DC1394_FEATURE_WHITE_BALANCE).c_str())
+            ("saturation,S", po::value<string>(), featureHelp(features, DC1394_FEATURE_SATURATION).c_str())
+            ("gamma,g", po::value<string>(), featureHelp(features, DC1394_FEATURE_GAMMA).c_str())
+            ("shutter-time,t", po::value<string>(), featureHelp(features, DC1394_FEATURE_SHUTTER).c_str())
+            ("gain,G", po::value<string>(), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
             ("config,C", po::value<string>(), "path of file with configuration presets")
             ("list-features,l", po::bool_switch(), "print available features for this camera")
             ;
@@ -168,7 +168,7 @@ int run(int argc, char *argv[])
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
 
-        if (vm.count("help")) 
+        if (vm.count("help") or argc == 1)  // no args
         {
             std::cout << desc << "\n";
             if (camera)
