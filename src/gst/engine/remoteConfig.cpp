@@ -144,13 +144,10 @@ gboolean SenderConfig::sendMessage(gpointer data)
 /** 
  * The new caps message is posted on the bus by the src pad of our udpsink, 
  * received by this audiosender, and sent to our other host if needed. */
-// FIXME: move this all in to SenderConfig
 bool SenderConfig::handleBusMsg(GstMessage *msg)
 {
     const GstStructure *s = gst_message_get_structure(msg);
-    const gchar *name = gst_structure_get_name(s);
-
-    if (std::string(name) == "caps-changed") 
+    if (s != NULL and gst_structure_has_name(s, "caps-changed"))
     {   
         // this is our msg
         const gchar *newCapsStr = gst_structure_get_string(s, "caps");
