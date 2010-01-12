@@ -50,6 +50,12 @@ void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features,
         }
     }
 }
+            
+
+void saveSettings(const std::string &filename, dc1394camera_t * /*camera*/)
+{
+    std::cout << "Saving settings to " << filename << std::endl;
+}
 
 std::string featureHelp(const dc1394featureset_t &features, dc1394feature_t feature)
 {
@@ -173,6 +179,7 @@ int run(int argc, char *argv[])
             ("gain,G", po::value<string>(), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
             ("config,C", po::value<string>(), "path of file with configuration presets")
             ("list-features,l", po::bool_switch(), "print available features for this camera")
+            ("save,x", po::value<string>(), "save current camera settings to the specified filename")
             ;
 
         po::variables_map vm;
@@ -182,6 +189,13 @@ int run(int argc, char *argv[])
         if (vm.count("help") or argc == 1)  // no args
         {
             std::cout << desc << "\n";
+            cleanup(dc1394, camera, cameras);
+            return 0;
+        }
+        
+        if(vm.count("save"))
+        {
+            saveSettings(vm["save"].as<string>(), camera);
             cleanup(dc1394, camera, cameras);
             return 0;
         }
