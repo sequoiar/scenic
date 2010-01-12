@@ -246,6 +246,11 @@ int run(int argc, char *argv[])
         if(vm.count("config"))
         {
             std::ifstream configFile(vm["config"].as<string>().c_str());
+            if (!configFile.good())
+            {
+                configFile.close();
+                throw std::runtime_error("Could not open file " + vm["config"].as<string>()); 
+            }
             store(parse_config_file(configFile, desc), vm);
         }
 
