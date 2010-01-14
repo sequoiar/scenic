@@ -342,7 +342,7 @@ void DC1394::listCameras()
         else if (boost::filesystem::exists("/dev/video1394"))
             LOG_WARNING("Module raw1394 is not loaded.");
         else
-            ;// do nothing, neither module is loaded, we can assume no firewire utilization
+            LOG_DEBUG("Neither raw1394 nor video1394 modules are loaded");// do nothing, neither module is loaded, we can assume no firewire utilization
 
         return;
     }
