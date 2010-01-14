@@ -102,6 +102,13 @@ unsigned VideoSourceConfig::captureHeight() const
 }
 
 
+std::string VideoSourceConfig::pictureAspectRatio() const
+{
+    /// FIXME: have this be settable
+    return "4:3";
+}
+
+
 bool VideoSourceConfig::forceGrayscale() const
 {
     return grayscale_;
@@ -137,6 +144,45 @@ int VideoSourceConfig::listCameras()
     DC1394::listCameras();
     v4l2util::listCameras();
     return 0;
+}
+
+
+std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, const std::string &pictureAspectRatio)
+{
+// Reference:
+// http://en.wikipedia.org/wiki/Pixel_aspect_ratio#Pixel_aspect_ratios_of_common_video_formats
+
+    using std::map;
+    using std::string;
+    typedef map < string, map < string, string > > Table;
+
+    static Table PIXEL_ASPECT_RATIO_TABLE;
+    // only does this once
+    if (PIXEL_ASPECT_RATIO_TABLE.empty())
+    {
+        // PAL
+        PIXEL_ASPECT_RATIO_TABLE["720x576"]["4:3"] = 
+            PIXEL_ASPECT_RATIO_TABLE["704x576"]["4:3"] = "59/54";
+
+        PIXEL_ASPECT_RATIO_TABLE["704x576"]["16:9"] = 
+            PIXEL_ASPECT_RATIO_TABLE["352x288"]["16:9"] = "118/81";
+
+        // NTSC
+        PIXEL_ASPECT_RATIO_TABLE["720x480"]["4:3"] = 
+            PIXEL_ASPECT_RATIO_TABLE["704x480"]["4:3"] = "10/11";
+
+        PIXEL_ASPECT_RATIO_TABLE["704x480"]["16:9"] = 
+            PIXEL_ASPECT_RATIO_TABLE["352x240"]["16:9"] = "40/33";
+
+        /// Misc. Used by us
+        PIXEL_ASPECT_RATIO_TABLE["768x480"]["4:3"] = "6/7";
+        PIXEL_ASPECT_RATIO_TABLE["640x480"]["4:3"] = "1/1"; // square pixels
+    }
+    std::stringstream resolution;
+    resolution << width << "x" << height;
+
+    LOG_DEBUG("Pixel-aspect-ratio is " << PIXEL_ASPECT_RATIO_TABLE[resolution.str()][pictureAspectRatio]);
+    return PIXEL_ASPECT_RATIO_TABLE[resolution.str()][pictureAspectRatio];
 }
 
 

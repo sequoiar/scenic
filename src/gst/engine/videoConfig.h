@@ -53,7 +53,10 @@ class VideoSourceConfig
         const char *deviceName() const;
         unsigned captureWidth() const;
         unsigned captureHeight() const;
+        std::string pictureAspectRatio() const;
         bool forceGrayscale() const;
+        static std::string calculatePixelAspectRatio(int width, int height, 
+                const std::string &pictureAspectRatio);
 
     private:
         const std::string source_;

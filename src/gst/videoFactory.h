@@ -68,7 +68,7 @@ namespace videofactory
             shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
 
             // get caps here, based on codec, capture width and capture height
-            std::string caps(CapsParser::getVideoCaps(msg["codec"], msg["width"], msg["height"]));
+            std::string caps(CapsParser::getVideoCaps(msg["codec"], msg["width"], msg["height"], msg["aspect-ratio"]));
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
 

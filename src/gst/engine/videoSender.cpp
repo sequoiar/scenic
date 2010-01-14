@@ -47,7 +47,8 @@ VideoSender::VideoSender(shared_ptr<VideoSourceConfig> vConfig,
 bool VideoSender::checkCaps() const
 {
     return CapsParser::getVideoCaps(remoteConfig_->codec(), 
-            videoConfig_->captureWidth(), videoConfig_->captureHeight()) != ""; 
+            videoConfig_->captureWidth(), videoConfig_->captureHeight(),
+            videoConfig_->pictureAspectRatio()) != ""; 
 }
 
 VideoSender::~VideoSender()

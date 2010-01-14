@@ -215,7 +215,8 @@ int main(int argc, char **argv)
     int ret = 0;
     atexit(onExit);
 
-    try {
+    try 
+    {
         signal_handlers::setHandlers();
         Milhouse milhouse;
         ret = milhouse.run(argc, argv);
