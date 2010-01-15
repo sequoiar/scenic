@@ -77,18 +77,6 @@ void Encoder::setBitrate(int bitrate)
     }
 }
 
-/// Posts bitrate using MapMsg
-void Encoder::postBitrate()
-{
-    tassert(encoder_);
-    MapMsg mapMsg("bitrate");
-    mapMsg["value"] = 
-        std::string(gst_element_factory_get_longname(gst_element_get_factory(encoder_))) 
-        + ": " +  boost::lexical_cast<std::string>(getBitrate());
-    mapMsg.post();
-}
-
-
 /// Constructor 
 Decoder::Decoder() : decoder_(0)
 {}

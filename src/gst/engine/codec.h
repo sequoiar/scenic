@@ -45,7 +45,6 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual Pay* createPayloader() const = 0;
         int getBitrate() const;
-        void postBitrate();
         virtual void setBitrate(int bitrate);
 
     protected:

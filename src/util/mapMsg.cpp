@@ -22,7 +22,6 @@
 
 #include "mapMsg.h"
 
-static MapMsg::Subscriber* pf = 0;
 std::ostream& operator<< (std::ostream& os, const MapMsg& msg)
 {
     std::string str;
@@ -49,30 +48,6 @@ std::ostream& operator<< (std::ostream& os, const StrIntFloat& var)
     }
     return os;
 }
-
-
-MapMsg::Subscriber::Subscriber()
-{
-    LOG_DEBUG("Registered a subscriber");
-    pf = this;
-}
-
-MapMsg::Subscriber::~Subscriber()
-{
-    LOG_DEBUG("Un Registered a subscriber");
-    pf = 0;
-}
-
-bool MapMsg::post()
-{
-    if(pf)
-    {
-        (*pf)(*this);
-        return true;
-    }
-    return false;
-}
-
 
 #define T_EXPAND(x) (x == 'f'?"double":x == 's'?"string":x == 'i'?"integer":x == 'F'?"vector<double>":"unknown")
 

@@ -1,5 +1,5 @@
-/* msgThread.h
- * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+/* asioThread.h
+ * Copyright (C) 2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
  *
@@ -20,35 +20,14 @@
  *
  */
 
-#ifndef __MSG_THREAD_H__
-#define __MSG_THREAD_H__
+#ifndef _ASIO_H_
+#define _ASIO_H_
+#include <cstdlib>
+#include <iostream>
 
-#include "baseThread.h"
-#include "mapMsg.h"
+namespace asio {
+    std::string tcpGetBuffer(int port, int &id);
+    bool tcpSendBuffer(std::string ip, int port, int id, std::string caps);
+}
 
-
-/** template specialization of BaseThread with MapMsg */
-class MsgThread
-    : public BaseThread
-{
-
-};
-
-///Instance will register a particular MsgThread as a MapMsg handler
-class MainSubscriber
-    : public MapMsg::Subscriber
-{
-    MsgThread &t_;
-    public:
-        MainSubscriber(MsgThread* pt)
-            : t_(*pt)
-        {}
-
-        void operator()(MapMsg& msg)
-        {
-            t_.getQueue().push(msg);
-        }
-};
-
-#endif
-
+#endif //_ASIO_H_

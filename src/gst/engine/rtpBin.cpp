@@ -90,7 +90,6 @@ void RtpBin::printStatsVal(const std::string &idStr,
 
     mapMsg["stats"] = idStr + paramStr;
     LOG_INFO(mapMsg["stats"]);
-    mapMsg.post();
 }
 
 

@@ -202,14 +202,11 @@ AC_CONFIG_FILES([Makefile
                  src/util/Makefile
                  src/gutil/Makefile
                  src/shared_video/Makefile
-                 src/boost/Makefile
                  src/tcp/Makefile
                  src/gst/Makefile
                  src/gst/engine/Makefile
-                 src/gst/control/Makefile
                  src/devices/Makefile
                  src/main/Makefile
-                 src/python/Makefile
                  ])
 
 AC_CONFIG_FILES([

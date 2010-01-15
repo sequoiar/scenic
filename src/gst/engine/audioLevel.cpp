@@ -88,7 +88,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
             rmsDb = g_value_get_double(value);
             rmsValues.push_back(dbToLinear(rmsDb));    // new channel
         }
-        post(rmsValues);
+        /// FIXME: write these somewhere
 
         return true;
     }
@@ -105,17 +105,6 @@ void AudioLevel::print(const std::vector<double> &rmsValues) const
 
     LOG_DEBUG("rms values: " << os.str());
 }
-
-
-/// Posts the rms values to be handled at a higher level by the MapMsg system. 
-void AudioLevel::post(const std::vector<double> &rmsValues) const
-{
-    MapMsg mapMsg("levels");
-
-    mapMsg["values"] = rmsValues;
-    mapMsg.post();
-}
-
 
 /// Sets the reporting interval in nanoseconds. 
 void AudioLevel::interval(unsigned long long newInterval)

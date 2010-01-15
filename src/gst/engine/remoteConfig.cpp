@@ -26,7 +26,8 @@
 #include <boost/assign.hpp>
 #include <gst/gst.h>
 #include "remoteConfig.h"
-#include "tcp/tcpThread.h"
+#include "tcp/asio.h"
+#include "mapMsg.h"
 #include "codec.h"
 
 const int RemoteConfig::PORT_MIN = 1024;
@@ -135,7 +136,7 @@ gboolean SenderConfig::sendMessage(gpointer data)
 
     /// FIXME: everytime a receiver starts, it should ask sender for caps, then the sender can
     /// send them.
-    if (tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
+    if (asio::tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
         LOG_INFO("Caps sent successfully");
     return TRUE;    // try again later, in case we have a new receiver
 }
@@ -291,7 +292,7 @@ void ReceiverConfig::receiveCaps()
 {
     int id;
     // this blocks
-    std::string msg(tcpGetBuffer(capsPort(), id));
+    std::string msg(asio::tcpGetBuffer(capsPort(), id));
     //tassert(id == msgId_);
     caps_ = msg;
 }

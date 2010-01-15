@@ -88,21 +88,8 @@ class MapMsg
         bool stringify(std::string& str) const { return stringify(*this, str); }
         void clear() { map_.clear(); }
 
-        ~MapMsg(){ if(post_end_)try{ post();}catch(std::exception e){ LOG_DEBUG(e.what());} }
+        ~MapMsg(){}
 
-        /** Used by code that needs to post messages but does not use 
-         * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
-
-        bool post();
-
-        /// MapMsg will go to most recent registered  
-        class Subscriber
-        {
-            public:
-                Subscriber();
-                virtual void operator()(MapMsg&){}
-                virtual ~Subscriber();
-        };
     private:
         friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
         friend Item GetBegin(MapMsg& m);

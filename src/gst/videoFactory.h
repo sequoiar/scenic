@@ -25,7 +25,7 @@
 #define _VIDEO_FACTORY_H_
 
 #include "util.h"
-#include "gutil.h"
+#include "mapMsg.h"
 
 #include "gst/engine.h"
 
@@ -36,7 +36,6 @@ namespace videofactory
     using boost::shared_ptr;
     static const int MSG_ID = 2;
 
-#ifdef __COMMAND_LINE__
     /// Convert command line options to ipcp
     static void rxOptionsToIPCP(MapMsg &options)
     {
@@ -74,8 +73,6 @@ namespace videofactory
         options["port"] = options["videoport"];
         options["codec"] = options["videocodec"];
     }
-#endif // __COMMAND_LINE__
-
 
     static shared_ptr<VideoReceiver> 
         buildVideoReceiver(MapMsg &msg)

@@ -24,19 +24,14 @@
 #include "util.h"
 
 #include "gutil.h"
-#include "msgThreadFactory.h"
 
-#define __COMMAND_LINE__
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
-#undef __COMMAND_LINE__
 
 #include "milhouse.h"
 #include "milhouseLogger.h"
 #include "programOptions.h"
 
-
-int telnetServer(int, int);
 
 namespace po = boost::program_options;
 
@@ -163,9 +158,6 @@ short Milhouse::run(int argc, char **argv)
 
     if (options.count("help") or argc == 1) 
         return usage(desc);
-
-    if (options.count("serverport"))
-        return telnetServer(options["sender"].as<bool>(), options["serverport"].as<int>());
 
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
 

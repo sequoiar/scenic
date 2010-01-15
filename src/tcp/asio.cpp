@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "util.h"
-#include "asioThread.h"
+#include "asio.h"
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -43,206 +43,10 @@
 using boost::asio::ip::tcp;
 using boost::asio::io_service;
 using boost::system::error_code;
-using boost::asio::async_write;
 using boost::asio::buffer;
 using boost::asio::placeholders::error;
 using boost::asio::placeholders::bytes_transferred;
-using boost::asio::ip::address_v4;
 using namespace boost::posix_time;
-
-
-///pull first line from msg  -returns first line 
-static std::string get_line(std::string& msg)
-{
-    std::string ret=msg;
-    std::string::size_type pos = msg.find_first_of("\r\n");
-    if(pos != std::string::npos)
-    {
-        int count = 1;
-        if(msg[pos+1] == '\r' or msg[pos+1] == '\n')
-            count++;
-        ret = msg.substr(0, pos+count);
-        msg = msg.substr(pos+count);
-        if(ret.find_first_not_of(" \r\n\t") == std::string::npos)
-            ret.clear();
-    }
-    else
-    {
-        msg.clear();
-        ret.clear();
-    }
-
-    return ret;
-}
-
-///The session once connected -- session must send READY
-class tcp_session
-{
-    public:
-        tcp_session(io_service& io_service, QueuePair& queue)
-            : io_service_(io_service),
-            socket_(io_service),
-            queue_(queue), 
-            welcome_(),
-            t_(io_service, millisec(1))
-    {
-        std::cout << "READY\n";
-    }
-        ~tcp_session()
-        {
-            io_service_.stop();
-        }
-        tcp::socket& socket()
-        {
-            return socket_;
-        }
-
-        void start()
-        {
-            socket_.async_read_some(buffer(data_, max_length),
-                    boost::bind(&tcp_session::read_cb, this, 
-                        error, bytes_transferred));
-            t_.expires_at(t_.expires_at() + millisec(1));
-            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
-        }
-
-        void read_cb(const error_code& err,
-                size_t bytes_transferred)
-        {
-            if (!err)
-            {
-                std::string msgs(data_);
-                std::string line = get_line(msgs);
-                do
-                {
-                    try
-                    {
-                        MapMsg mapMsg;
-                        mapMsg.tokenize(line);
-                        queue_.push(mapMsg);
-                    }
-                    catch(ErrorExcept)
-                    {
-                       LOG_DEBUG("Could not tokenize string --- continuing"); 
-                    }
-                    line = get_line(msgs);
-                }
-                while(!line.empty());
-
-                memset(data_, 0, max_length);
-                socket_.async_read_some(buffer(data_, max_length),
-                        boost::bind(&tcp_session::read_cb, this, error, bytes_transferred));
-            }
-            else
-            {
-                queue_.push(MapMsg("quit"));
-                std::cout << "here" << std::endl;
-                delete this;
-            }
-        }
-
-        void write_cb(const error_code& err)
-        {
-            if (!err)
-            {
-                t_.expires_at(t_.expires_at() + millisec(1));
-                t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
-            }
-            else
-            {
-                std::cout << "here2" << std::endl;
-                delete this;
-            }
-        }
-
-        void handle_timer(const error_code& err)
-        {
-            if (!err)
-            {
-                if(queue_.ready())
-                {
-                    MapMsg msg = queue_.timed_pop(1);
-                    if(msg())
-                    {
-                        if(!(msg() == "quit"))
-                        {
-                            std::string msg_str;
-                            msg.stringify(msg_str);
-                            msg_str+="\x0D\x0A";
-                            async_write(socket_, buffer(msg_str), 
-                                    boost::bind(&tcp_session::write_cb, this, error));
-                        }
-                    }
-                    else
-                        THROW_ERROR("queue.ready() but msg empty!");
-                }
-                else
-                {
-                    t_.expires_at(t_.expires_at() + millisec(MILLISEC_WAIT));
-                    t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
-                }
-            }
-            else
-            {
-                std::cout << "here3" << std::endl;
-            }
-        }
-
-    private:
-        io_service& io_service_;
-        tcp::socket socket_;
-        enum { max_length = 1024 };
-        char data_[max_length];
-        QueuePair& queue_;
-        std::string welcome_;
-        boost::asio::deadline_timer t_;
-};
-
-class tcp_server
-{
-    public:
-        tcp_server(io_service& io_service, short port, QueuePair& queue)
-            : io_service_(io_service), 
-            acceptor_ ( io_service, 
-                    tcp::endpoint(address_v4::loopback(), //Note: loopback only endpoint 
-                        port)), 
-            queue_(queue), 
-            t_(io_service, seconds(1))
-    {
-        tcp_session* new_tcp_session = new tcp_session(io_service_,queue_); 
-        acceptor_.async_accept(new_tcp_session->socket(),
-                boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
-                    error));
-        t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
-    }
-
-
-        void handle_accept(tcp_session* new_tcp_session,
-                const error_code& err)
-        {
-            if (!err)
-                new_tcp_session->start();
-            else
-                delete new_tcp_session;
-        }
-
-        void handle_timer(const error_code& err)
-        {
-            if (!err)
-            {
-                t_.expires_at(t_.expires_at() + seconds(1));
-                t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
-                if(MsgThread::isQuitted())
-                    io_service_.stop();
-            }
-        }
-
-    private:
-        io_service& io_service_;
-        tcp::acceptor acceptor_;
-        QueuePair& queue_;
-        boost::asio::deadline_timer t_;
-};
 
 using boost::asio::ip::tcp;
 static const std::string SENTINEL = "END_BUFFER";
@@ -279,7 +83,7 @@ class tcp_receiver_session :
             {
                 timer_.expires_at(timer_.expires_at() + seconds(1));
                 timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error)); // schedule this check for later
-                if (MsgThread::isQuitted())
+                if (signal_handlers::signalFlag())
                 {
                     socket_.get_io_service().stop();
                     LOG_ERROR("Interrupted while waiting to receive caps");
@@ -369,7 +173,7 @@ class tcp_receiver
 };
 
 
-std::string tcpGetBuffer(int port, int &/*id*/)
+std::string asio::tcpGetBuffer(int port, int &/*id*/)
 {
     std::string buffer("");
     boost::asio::io_service io_service;
@@ -384,7 +188,7 @@ std::string tcpGetBuffer(int port, int &/*id*/)
 }
 
 
-bool tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
+bool asio::tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
 {
     using boost::lexical_cast;
 
@@ -418,25 +222,5 @@ bool tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
         }
     }
     return success;
-}
-
-
-
-void asio_thread::main()
-{
-
-    try
-    {
-        io_service io_service;
-        tcp_server s(io_service, port_, queue_);
-
-        io_service.run();
-    }
-    catch (std::exception e)
-    {
-        LOG_ERROR("caught exception:" << e.what());
-        queue_.push(MapMsg("quit"));
-    }
-
 }
 
