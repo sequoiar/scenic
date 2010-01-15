@@ -59,6 +59,21 @@ namespace videofactory
         options["bitrate"] = options["videobitrate"];
         options["quality"] = options["videoquality"];
     }
+
+    /// Convert command line options to ipcp
+    static void localOptionsToIPCP(MapMsg &options)
+    {
+        options["source"] = options["videosource"];
+        options["sink"] = options["videosink"];
+        options["device"] = options["videodevice"];
+        options["location"] = options["videolocation"];
+
+        // FIXME: unused
+        options["bitrate"] = options["videobitrate"];
+        options["quality"] = options["videoquality"];
+        options["port"] = options["videoport"];
+        options["codec"] = options["videocodec"];
+    }
 #endif // __COMMAND_LINE__
 
 
@@ -95,6 +110,16 @@ namespace videofactory
             return tx;
         }
 
+    static shared_ptr<LocalVideo> 
+        buildLocalVideo(MapMsg &msg)
+        {
+            shared_ptr<VideoSourceConfig> sourceConfig(new VideoSourceConfig(msg));
+            shared_ptr<VideoSinkConfig> sinkConfig(new VideoSinkConfig(msg));
+
+            shared_ptr<LocalVideo> localVideo(new LocalVideo(sourceConfig, sinkConfig));
+
+            return localVideo;
+        }
 }
 
 #endif // _VIDEO_FACTORY_H_

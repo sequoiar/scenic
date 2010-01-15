@@ -56,7 +56,8 @@ std::string VideoSource::defaultSrcCaps() const
     std::ostringstream capsStr;
     capsStr << "video/x-raw-yuv, width=" << config_.captureWidth()
         << ", height=" << config_.captureHeight() << ", framerate="
-        << config_.framerate() << "000/1001";
+        << config_.framerate() << "000/1001, pixel-aspect-ratio=" 
+        << config_.pixelAspectRatio();
     return capsStr.str();
 }
 
@@ -204,8 +205,7 @@ std::string VideoV4lSource::srcCaps() const
         capsSuffix +=", interlaced=true";
 
     capsSuffix += ", pixel-aspect-ratio=";
-    capsSuffix += VideoSourceConfig::calculatePixelAspectRatio(config_.captureWidth(), 
-            config_.captureHeight(), config_.pictureAspectRatio());
+    capsSuffix += config_.pixelAspectRatio();
 
     capsStr << "video/x-raw-yuv, width=" << config_.captureWidth() << ", height=" 
         << config_.captureHeight() 

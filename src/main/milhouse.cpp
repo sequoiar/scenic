@@ -121,6 +121,26 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
 }
 
 
+void Milhouse::runAsLocal(const po::variables_map &options)
+{
+    using boost::shared_ptr;
+
+    LOG_DEBUG("Running local");
+    shared_ptr<LocalVideo> localVideo;
+    //shared_ptr<LocalAudio> localAudio; // doesn't exist (yet)
+
+    MapMsg ipcp(ProgramOptions::toMapMsg(options));
+    videofactory::localOptionsToIPCP(ipcp);
+    localVideo = videofactory::buildLocalVideo(ipcp);
+
+    playback::start();
+
+    gutil::runMainLoop(options["timeout"].as<int>());
+
+    playback::stop();
+}
+
+
 short Milhouse::usage(const po::options_description &desc)
 {
     std::cout << desc << "\n";
@@ -168,11 +188,17 @@ short Milhouse::run(int argc, char **argv)
 
     if (options["list-cameras"].as<bool>())
             return VideoSourceConfig::listCameras();
+    
+    if (options["localvideo"].as<bool>()) 
+    {
+        runAsLocal(options);
+        return 0;
+    }
  
     if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
-        LOG_ERROR("argument error: must be sender OR receiver."); 
+        LOG_ERROR("argument error: must be sender OR receiver OR localvideo."); 
         return 1;
     }
 

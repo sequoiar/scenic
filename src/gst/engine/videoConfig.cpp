@@ -62,7 +62,8 @@ VideoSourceConfig::VideoSourceConfig(MapMsg &msg) :
     framerate_(msg["framerate"]),
     captureWidth_(msg["width"]),
     captureHeight_(msg["height"]),
-    grayscale_(msg["grayscale"])
+    grayscale_(msg["grayscale"]),
+    pictureAspectRatio_(msg["aspect-ratio"])
 {}
 
 
@@ -105,7 +106,7 @@ unsigned VideoSourceConfig::captureHeight() const
 std::string VideoSourceConfig::pictureAspectRatio() const
 {
     /// FIXME: have this be settable
-    return "4:3";
+    return pictureAspectRatio_;
 }
 
 
@@ -147,6 +148,12 @@ int VideoSourceConfig::listCameras()
 }
 
 
+
+std::string VideoSourceConfig::pixelAspectRatio() const
+{
+    return calculatePixelAspectRatio(captureWidth_, captureHeight_, pictureAspectRatio_);
+}
+
 std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, const std::string &pictureAspectRatio)
 {
 // Reference:
@@ -180,9 +187,12 @@ std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, 
     }
     std::stringstream resolution;
     resolution << width << "x" << height;
+    std::string result = PIXEL_ASPECT_RATIO_TABLE[resolution.str()][pictureAspectRatio];
+    if (result == "")
+        result = "1/1"; // default to square pixels
 
-    LOG_DEBUG("Pixel-aspect-ratio is " << PIXEL_ASPECT_RATIO_TABLE[resolution.str()][pictureAspectRatio]);
-    return PIXEL_ASPECT_RATIO_TABLE[resolution.str()][pictureAspectRatio];
+    LOG_DEBUG("Pixel-aspect-ratio is " << result);
+    return result;
 }
 
 
@@ -227,4 +237,3 @@ bool VideoSinkConfig::hasCustomResolution() const
 {
     return displayWidth_ != videosize::WIDTH or displayHeight_ != videosize::HEIGHT;
 }
-

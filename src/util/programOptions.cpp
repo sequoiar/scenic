@@ -91,6 +91,7 @@ po::options_description ProgramOptions::createDefaultOptions()
              "(scales output video height)")
             ("grayscale,M", po::bool_switch(), "force dc1394 capture to grayscale")
             ("aspect-ratio,A", po::value<string>()->default_value("4:3"), "picture aspect ratio (4:3,16:9)")
+            ("localvideo", po::bool_switch(), "display local video only")
             ;
 
         descriptionInitialized = true;
