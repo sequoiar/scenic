@@ -57,13 +57,18 @@ RtpBin::RtpBin() :
     if (rtpbin_ == 0) 
     {
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
-
-        // uncomment this to print stats
-        g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
-                static_cast<GSourceFunc>(printStatsCallback),
-                this);
+        startPrintStatsCallback();
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
+}
+
+
+void RtpBin::startPrintStatsCallback()
+{
+    // comment this to not print stats
+    g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
+            static_cast<GSourceFunc>(printStatsCallback),
+            this);
 }
 
 

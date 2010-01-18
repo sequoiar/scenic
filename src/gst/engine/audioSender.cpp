@@ -45,8 +45,16 @@ AudioSender::AudioSender(shared_ptr<AudioSourceConfig> aConfig,
     payloader_(0)
 {
     if (remoteConfig_->codec() == "mp3")
+    {
         if (audioConfig_->numChannels() < 1 or audioConfig_->numChannels() > 2)
             THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_->numChannels());
+    }
+    else if (remoteConfig_->codec() == "raw")
+    {
+        if (audioConfig_->numChannels() > 8) 
+            THROW_CRITICAL("Raw currently only accepts 8 channels or less, not " << audioConfig_->numChannels());
+    }
+    LOG_DEBUG("Creating audio sender pipeline");
     createPipeline();
 }
 

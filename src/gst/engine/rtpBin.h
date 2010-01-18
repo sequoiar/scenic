@@ -56,6 +56,7 @@ class RtpBin : boost::noncopyable
         bool printStats_;
         static int createSinkSocket(const char *hostname, int port);
         static int createSourceSocket(int port);
+        void startPrintStatsCallback();
     
     private:
         static const int REPORTING_PERIOD_MS = 2000;
