@@ -41,7 +41,6 @@ AudioSender::AudioSender(shared_ptr<AudioSourceConfig> aConfig,
     audioConfig_(aConfig), 
     session_(), 
     source_(0), 
-    //level_(), 
     encoder_(0), 
     payloader_(0)
 {
@@ -68,32 +67,19 @@ AudioSender::~AudioSender()
     delete source_;
 }
 
-void AudioSender::init_source()
+void AudioSender::createSource()
 {
     tassert(source_ = audioConfig_->createSource());
-    source_->init();
-    //init_level();
 }
 
-
-#if 0
-void AudioSender::init_level()
-{
-    gstlinkable::link(*source_, level_);
-}
-#endif
-
-
-void AudioSender::init_codec()
+void AudioSender::createCodec()
 {
     tassert(encoder_ = remoteConfig_->createAudioEncoder());
-
-    //gstlinkable::link(level_, *encoder_);
     gstlinkable::link(*source_, *encoder_);
 }
 
 
-void AudioSender::init_payloader()   
+void AudioSender::createPayloader()   
 {
     tassert(payloader_ = encoder_->createPayloader());
 

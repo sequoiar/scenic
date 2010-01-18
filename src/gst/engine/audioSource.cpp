@@ -39,18 +39,6 @@ AudioSource::AudioSource(const AudioSourceConfig &config) :
     source_(0)
 {}
 
-void AudioSource::init()
-{
-    sub_init();
-}
-
-/// Initialize source_
-void AudioSource::sub_init()
-{
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
-}
-
-
 /// Destructor 
 AudioSource::~AudioSource()
 {
@@ -89,18 +77,6 @@ void AudioSource::initCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
 /// Constructor 
 InterleavedAudioSource::InterleavedAudioSource(const AudioSourceConfig &config) : 
     AudioSource(config), interleave_(config_), sources_(), aconvs_()
-{}
-
-/// Destructor 
-InterleavedAudioSource::~InterleavedAudioSource() 
-{
-    Pipeline::Instance()->remove(aconvs_);
-    Pipeline::Instance()->remove(sources_);
-}
-
-
-/// Overridden source initializer, which must initialize this object's Interleave object 
-void InterleavedAudioSource::sub_init()
 {
     interleave_.init();
 
@@ -113,6 +89,13 @@ void InterleavedAudioSource::sub_init()
     gstlinkable::link(aconvs_, interleave_);
 }
 
+/// Destructor 
+InterleavedAudioSource::~InterleavedAudioSource() 
+{
+    Pipeline::Instance()->remove(aconvs_);
+    Pipeline::Instance()->remove(sources_);
+}
+
 
 const double AudioTestSource::FREQUENCY[2][8] = 
 {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
@@ -123,33 +106,7 @@ AudioTestSource::AudioTestSource(const AudioSourceConfig &config) :
     InterleavedAudioSource(config), 
     clockId_(0), 
     offset_(0) 
-{}
-
-
-/// Asynchronous timed callback which will periodically toggle the frequency output by each channel 
-gboolean AudioTestSource::timedCallback(GstClock *, GstClockTime, GstClockID, gpointer user_data)
 {
-    AudioTestSource * context = static_cast<AudioTestSource*>(user_data);
-    context->toggle_frequency();
-    return TRUE;
-}
-
-
-void AudioTestSource::toggle_frequency()
-{
-    int i = 0;
-
-    for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
-        g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
-
-    offset_ = (offset_ == 0) ? 1 : 0;
-}
-
-
-void AudioTestSource::sub_init()
-{
-    InterleavedAudioSource::sub_init();
-
     GstIter src;
 
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
@@ -174,6 +131,27 @@ void AudioTestSource::sub_init()
     clockId_ = Pipeline::Instance()->add_clock_callback(timedCallback, this);
 }
 
+
+/// Asynchronous timed callback which will periodically toggle the frequency output by each channel 
+gboolean AudioTestSource::timedCallback(GstClock *, GstClockTime, GstClockID, gpointer user_data)
+{
+    AudioTestSource * context = static_cast<AudioTestSource*>(user_data);
+    context->toggle_frequency();
+    return TRUE;
+}
+
+
+void AudioTestSource::toggle_frequency()
+{
+    int i = 0;
+
+    for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
+        g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
+
+    offset_ = (offset_ == 0) ? 1 : 0;
+}
+
+
 /// Destructor 
 AudioTestSource::~AudioTestSource()
 {
@@ -185,17 +163,6 @@ const int AudioFileSource::LOOP_INFINITE = -1;
 
 /// Constructor 
 AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(config), aconv_(0), loopCount_(0) 
-{}
-
-void AudioFileSource::loop(int nTimes)
-{
-    if (nTimes < -1)
-        THROW_ERROR("Loop setting must be either >= 0 , or -1 for infinite looping");
-
-    loopCount_ = nTimes;
-}
-
-void AudioFileSource::sub_init()
 {
     tassert(config_.locationExists());
 
@@ -205,6 +172,13 @@ void AudioFileSource::sub_init()
     gstlinkable::link(queue, aconv_);
 }
 
+void AudioFileSource::loop(int nTimes)
+{
+    if (nTimes < -1)
+        THROW_ERROR("Loop setting must be either >= 0 , or -1 for infinite looping");
+
+    loopCount_ = nTimes;
+}
 
 /// Handles EOS signal from bus, which may mean repeating playback of the file 
 bool AudioFileSource::handleBusMsg(_GstMessage *msg)
@@ -246,18 +220,8 @@ AudioFileSource::~AudioFileSource()
 /// Constructor 
 AudioAlsaSource::AudioAlsaSource(const AudioSourceConfig &config) : 
     AudioSource(config), capsFilter_(0), aconv_(0)
-{}
-
-/// Destructor 
-AudioAlsaSource::~AudioAlsaSource()
 {
-    Pipeline::Instance()->remove(&aconv_);
-    Pipeline::Instance()->remove(&capsFilter_);
-}
-
-void AudioAlsaSource::sub_init()
-{
-    AudioSource::sub_init();
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
 
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
@@ -267,13 +231,27 @@ void AudioAlsaSource::sub_init()
     initCapsFilter(aconv_, capsFilter_);
 }
 
+/// Destructor 
+AudioAlsaSource::~AudioAlsaSource()
+{
+    Pipeline::Instance()->remove(&aconv_);
+    Pipeline::Instance()->remove(&capsFilter_);
+}
 
 /// Constructor 
 AudioPulseSource::AudioPulseSource(const AudioSourceConfig &config) : 
     AudioSource(config), 
     capsFilter_(0),
     aconv_(0)
-{}
+{
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    if (config_.hasDeviceName())
+        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
+    else
+        g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
+
+    initCapsFilter(aconv_, capsFilter_);
+}
 
 
 /// Destructor 
@@ -284,43 +262,9 @@ AudioPulseSource::~AudioPulseSource()
 }
 
 
-void AudioPulseSource::sub_init()
-{
-    AudioSource::sub_init();
-    if (config_.hasDeviceName())
-        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
-    else
-        g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
-
-    initCapsFilter(aconv_, capsFilter_);
-}
-
-
-
 /// Constructor 
 AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
     AudioSource(config), capsFilter_(0)
-{
-}
-
-
-/// Destructor 
-AudioJackSource::~AudioJackSource()
-{
-    Pipeline::Instance()->remove(&capsFilter_);
-}
-
-std::string AudioJackSource::getCapsFilterCapsString()
-{
-    // force proper number of channels on output
-    std::ostringstream capsStr;
-    capsStr << "audio/x-raw-float, channels=" << config_.numChannels() 
-        << ", rate=" << Pipeline::Instance()->actualSampleRate();
-    LOG_DEBUG("jackAudiosource caps = " << capsStr.str());
-    return capsStr.str();
-}
-
-void AudioJackSource::sub_init()
 {
     source_ = Pipeline::Instance()->makeElement(config_.source(), config_.sourceName());
 
@@ -341,6 +285,23 @@ void AudioJackSource::sub_init()
 }
 
 
+/// Destructor 
+AudioJackSource::~AudioJackSource()
+{
+    Pipeline::Instance()->remove(&capsFilter_);
+}
+
+std::string AudioJackSource::getCapsFilterCapsString()
+{
+    // force proper number of channels on output
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-float, channels=" << config_.numChannels() 
+        << ", rate=" << Pipeline::Instance()->actualSampleRate();
+    LOG_DEBUG("jackAudiosource caps = " << capsStr.str());
+    return capsStr.str();
+}
+
+
 bool AudioJackSource::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
     assert(source_);
@@ -358,7 +319,14 @@ AudioDvSource::AudioDvSource(const AudioSourceConfig &config) :
     AudioSource(config), 
     queue_(0),
     aconv_(0)
-{}
+{
+    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+
+    // Now the Dv1394 will be able to link this queue to the dvdemux when the audio pad is created
+    Dv1394::Instance()->setAudioSink(queue_);
+    gstlinkable::link(queue_, aconv_);
+}
 
 
 /// Destructor 
@@ -368,14 +336,4 @@ AudioDvSource::~AudioDvSource()
     Dv1394::Instance()->unsetAudioSink();
 }
 
-
-void AudioDvSource::sub_init()
-{
-    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-
-    // Now the Dv1394 will be able to link this queue to the dvdemux when the audio pad is created
-    Dv1394::Instance()->setAudioSink(queue_);
-    gstlinkable::link(queue_, aconv_);
-}
 

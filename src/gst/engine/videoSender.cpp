@@ -61,13 +61,13 @@ VideoSender::~VideoSender()
 }
 
 
-void VideoSender::init_source()
+void VideoSender::createSource()
 {
     tassert(source_ = videoConfig_->createSource());
 }
 
 
-void VideoSender::init_codec()
+void VideoSender::createCodec()
 {
     MapMsg settings;
     settings["bitrate"] = videoConfig_->bitrate();
@@ -78,7 +78,7 @@ void VideoSender::init_codec()
 }
 
 
-void VideoSender::init_payloader()       
+void VideoSender::createPayloader()       
 {
     tassert(payloader_ = encoder_->createPayloader());
     // tell rtpmp4vpay not to send config string in header since we're sending caps

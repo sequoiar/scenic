@@ -179,7 +179,6 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
 
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
-    RtpBin::init();
     registerSession(config.codec());
 
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES

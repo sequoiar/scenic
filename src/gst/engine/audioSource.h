@@ -44,18 +44,13 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
 {
     public:
         ~AudioSource();
-        virtual void init();
 
     protected:
         explicit AudioSource(const AudioSourceConfig &config);
         
-        /// Implemented by subclasses to perform other specific initialization 
-        virtual void sub_init() = 0;
-
         /// Audio parameter object 
         const AudioSourceConfig &config_;
         
-        /// GstElements representing each source and audioconvert 
         GstElement *source_;
 
         /// Caps used by any source with a capsfilter
@@ -101,9 +96,6 @@ class InterleavedAudioSource : public AudioSource
         GstElement *srcElement() { return interleave_.srcElement(); }
 
     protected:
-        /// Object initializer 
-        void sub_init();
-
         explicit InterleavedAudioSource(const AudioSourceConfig &config);
 
         ~InterleavedAudioSource();
@@ -126,8 +118,6 @@ class AudioTestSource : public InterleavedAudioSource
         explicit AudioTestSource(const AudioSourceConfig &config);
 
     private:
-        void sub_init();
-
         ~AudioTestSource();
 
         static int timedCallback(GstClock *clock, 
@@ -165,7 +155,6 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
 
         void loop(int nTimes);
         GstElement *srcElement() { return aconv_; }
-        void sub_init();
 
         void restartPlayback();
         GstElement *aconv_;
@@ -186,7 +175,6 @@ class AudioAlsaSource : public AudioSource
     private:
         ~AudioAlsaSource();
 
-        void sub_init();
         GstElement *srcElement() { return capsFilter_; }
 
         GstElement *capsFilter_;
@@ -205,7 +193,6 @@ class AudioPulseSource : public AudioSource
     private:
         ~AudioPulseSource();
 
-        void sub_init();
         GstElement *srcElement() { return capsFilter_; }
 
         GstElement *capsFilter_;
@@ -227,7 +214,6 @@ class AudioJackSource : public AudioSource, public MessageHandler
 
         bool handleMessage(const std::string &path, const std::string &arguments);
         GstElement *srcElement() { return capsFilter_; }
-        void sub_init();
         /// Caps used by any source with a capsfilter
         std::string getCapsFilterCapsString();
 
@@ -251,7 +237,6 @@ class AudioDvSource : public AudioSource
 
     private:
         ~AudioDvSource();
-        void sub_init();
 
         GstElement *queue_;
         GstElement *aconv_;

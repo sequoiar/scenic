@@ -62,13 +62,13 @@ AudioReceiver::~AudioReceiver()
 }
 
 
-void AudioReceiver::init_codec()
+void AudioReceiver::createCodec()
 {
     tassert(decoder_ = remoteConfig_->createAudioDecoder());
 }
 
 
-void AudioReceiver::init_depayloader()
+void AudioReceiver::createDepayloader()
 {
     tassert(depayloader_ = decoder_->createDepayloader());
     gstlinkable::link(*depayloader_, *decoder_);
@@ -76,7 +76,7 @@ void AudioReceiver::init_depayloader()
 }
 
 
-void AudioReceiver::init_sink()
+void AudioReceiver::createSink()
 {
     tassert(sink_ = audioConfig_->createSink());
     gstlinkable::link(*decoder_, *sink_);   

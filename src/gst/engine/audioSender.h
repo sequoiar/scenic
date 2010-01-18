@@ -49,16 +49,14 @@ class AudioSender
         ~AudioSender();
 
     private:
-        void init_source();
-// void init_level();
-        void init_codec();
-        void init_payloader();
+        void createSource();
+        void createCodec();
+        void createPayloader();
         virtual bool checkCaps() const;
 
         boost::shared_ptr<AudioSourceConfig> audioConfig_;
         RtpSender session_;
         AudioSource *source_;
-        //AudioLevel level_;
 
         Encoder *encoder_;
         Pay *payloader_;

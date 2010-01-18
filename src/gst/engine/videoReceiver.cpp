@@ -62,13 +62,13 @@ VideoReceiver::~VideoReceiver()
 }
 
 
-void VideoReceiver::init_codec()
+void VideoReceiver::createCodec()
 {
     tassert(decoder_ = remoteConfig_->createVideoDecoder(videoConfig_->doDeinterlace()));
 }
 
 
-void VideoReceiver::init_depayloader()
+void VideoReceiver::createDepayloader()
 {
     tassert(depayloader_ = decoder_->createDepayloader());
 
@@ -78,7 +78,7 @@ void VideoReceiver::init_depayloader()
 }
 
 
-void VideoReceiver::init_sink()
+void VideoReceiver::createSink()
 {
     // XXX: According to the documentation, videoscale can be used without 
     // impact if no scaling is needed but I need to verify this and for now not use 

@@ -62,7 +62,6 @@ void RtpSender::sendCapsChanged(GstPad *pad, GParamSpec * /*pspec*/, RtpSender* 
 
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
-    RtpBin::init();
     registerSession(config.codec());
 
     GstPad *send_rtp_sink;

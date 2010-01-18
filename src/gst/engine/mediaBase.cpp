@@ -36,9 +36,9 @@ SenderBase::SenderBase(shared_ptr<SenderConfig> rConfig) :
 void SenderBase::createPipeline()
 {
     // template method pattern : these methods are defined in subclasses
-    init_source();
-    init_codec();
-    init_payloader();
+    createSource();
+    createCodec();
+    createPayloader();
 }
 
 SenderBase::~SenderBase()
@@ -49,7 +49,7 @@ SenderBase::~SenderBase()
 void ReceiverBase::createPipeline()
 {
     // these methods are defined in subclasses
-    init_codec();
-    init_depayloader();
-    init_sink();
+    createCodec();
+    createDepayloader();
+    createSink();
 }

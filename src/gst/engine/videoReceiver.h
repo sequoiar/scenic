@@ -47,9 +47,9 @@ class VideoReceiver
 
     private:
 
-        void init_codec();
-        void init_depayloader();
-        void init_sink();
+        void createCodec();
+        void createDepayloader();
+        void createSink();
         void setCaps();
 
         boost::shared_ptr<VideoSinkConfig> videoConfig_;
