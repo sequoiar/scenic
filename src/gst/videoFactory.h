@@ -84,9 +84,7 @@ namespace videofactory
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
 
-            shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-
-            return rx;
+            return shared_ptr<VideoReceiver>(new VideoReceiver(vConfig, rConfig));
         }
 
 
@@ -110,9 +108,7 @@ namespace videofactory
             shared_ptr<VideoSourceConfig> sourceConfig(new VideoSourceConfig(msg));
             shared_ptr<VideoSinkConfig> sinkConfig(new VideoSinkConfig(msg));
 
-            shared_ptr<LocalVideo> localVideo(new LocalVideo(sourceConfig, sinkConfig));
-
-            return localVideo;
+            return shared_ptr<LocalVideo>(new LocalVideo(sourceConfig, sinkConfig));
         }
 }
 
