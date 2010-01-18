@@ -1,5 +1,10 @@
 include $(top_srcdir)/globals.mak
 
+
+TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/milhouse:$(PATH) trial
+
+TESTS = test/test_milhouse.py
+
 bin_PROGRAMS = milhouse
 
 milhouse_SOURCES = milhouse.cpp milhouseLogger.cpp milhouseLogger.h ConcurrentQueue.h milhouse.h
