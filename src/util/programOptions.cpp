@@ -115,15 +115,3 @@ MapMsg ProgramOptions::toMapMsg(const po::variables_map &options)
     return msg;
 }
 
-
-/// Only used by telnet interface
-MapMsg ProgramOptions::defaultMapMsg()
-{
-    po::options_description desc(createDefaultOptions());
-    po::variables_map options;
-    char **argv = 0;
-    po::store(po::parse_command_line(1, argv, desc), options);
-    po::notify(options);
-    return toMapMsg(options);
-}
-
