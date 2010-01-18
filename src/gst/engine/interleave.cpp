@@ -46,12 +46,21 @@ void InterleavedAudioSource::Interleave::set_channel_layout()
 
     g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
 
-    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-    {
-        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() -1][channelIdx]);
-        g_value_array_append(arr, &val);
-        g_value_reset(&val);
-    }
+    /// VORBIS_CHANNEL_POSITIONS only goes up to 8 channels
+    if (config_.numChannels() > 8)
+        for (int channelIdx = 0; channelIdx < 8; channelIdx++)
+        {
+            g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_NONE);
+            g_value_array_append(arr, &val);
+            g_value_reset(&val);
+        }
+    else
+        for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
+        {
+            g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);
+            g_value_array_append(arr, &val);
+            g_value_reset(&val);
+        }
 
     g_value_unset(&val);
 
@@ -60,9 +69,10 @@ void InterleavedAudioSource::Interleave::set_channel_layout()
 }
 
 
-void InterleavedAudioSource::Interleave::init()
+InterleavedAudioSource::Interleave::Interleave(const AudioSourceConfig &config)
+    : interleave_(Pipeline::Instance()->makeElement("interleave", NULL)), 
+    config_(config)
 {
-    interleave_ = Pipeline::Instance()->makeElement("interleave", NULL);
     set_channel_layout();
 }
 
@@ -93,7 +103,7 @@ const GstAudioChannelPosition InterleavedAudioSource::Interleave::VORBIS_CHANNEL
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
         GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
         GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT
-        ,
+            ,
     },
     {                          /* Full 5.1 Surround */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,

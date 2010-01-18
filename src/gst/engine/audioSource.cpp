@@ -78,8 +78,6 @@ void AudioSource::initCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
 InterleavedAudioSource::InterleavedAudioSource(const AudioSourceConfig &config) : 
     AudioSource(config), interleave_(config_), sources_(), aconvs_()
 {
-    interleave_.init();
-
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
         sources_.push_back(Pipeline::Instance()->makeElement(config_.source(), NULL));
@@ -97,16 +95,21 @@ InterleavedAudioSource::~InterleavedAudioSource()
 }
 
 
-const double AudioTestSource::FREQUENCY[2][8] = 
-{{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
-    {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
-
 /// Constructor 
 AudioTestSource::AudioTestSource(const AudioSourceConfig &config) : 
     InterleavedAudioSource(config), 
+    frequencies_(),
     clockId_(0), 
     offset_(0) 
 {
+    frequencies_.push_back(std::vector<double>()); // two rows
+    frequencies_.push_back(std::vector<double>());
+    for (int channel = 0; channel < config_.numChannels(); ++channel)
+    {
+        frequencies_[0].push_back((100 * channel) + 200);
+        frequencies_[1].push_back(frequencies_[0].back() + 100);
+    }
+
     GstIter src;
 
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
@@ -119,7 +122,7 @@ AudioTestSource::AudioTestSource(const AudioSourceConfig &config) :
     for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
     {
         GstPad *pad;
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], "is-live", TRUE, NULL);
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequencies_[0][channelIdx], "is-live", TRUE, NULL);
         tassert(pad = gst_element_get_static_pad(*src, "src"));
         tassert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);
@@ -146,7 +149,7 @@ void AudioTestSource::toggle_frequency()
     int i = 0;
 
     for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
-        g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
+        g_object_set(G_OBJECT(*iter), "freq", frequencies_[offset_][i++], NULL);
 
     offset_ = (offset_ == 0) ? 1 : 0;
 }
@@ -167,7 +170,7 @@ AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(
     tassert(config_.locationExists());
 
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-    
+
     GstElement * queue = FileSource::acquireAudio(config_.location());
     gstlinkable::link(queue, aconv_);
 }
@@ -271,7 +274,7 @@ AudioJackSource::AudioJackSource(const AudioSourceConfig &config) :
     // use auto-forced connect mode if available
     if (Jack::autoForcedSupported(source_))
         g_object_set(G_OBJECT(source_), "connect", 2, NULL);
-    
+
     // setup capsfilter
     GstCaps *caps = 0;
     caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
@@ -280,7 +283,7 @@ AudioJackSource::AudioJackSource(const AudioSourceConfig &config) :
     g_object_set(G_OBJECT(capsFilter_), "caps", caps, NULL);
 
     gst_caps_unref(caps);
-    
+
     gstlinkable::link(source_, capsFilter_);
 }
 

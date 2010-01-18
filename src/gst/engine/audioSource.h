@@ -24,6 +24,7 @@
 
 #pragma GCC diagnostic ignored "-pedantic"
 #include <gst/audio/multichannel.h>
+#include <vector>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
 #include "messageHandler.h"
@@ -78,10 +79,8 @@ class InterleavedAudioSource : public AudioSource
                  * separate classes, it make sense for them to be friends. Also
                  * InterleavedAudioSource's internals are safe
                  * as InterleavedAudioSource's children will not have access here. */
-                explicit Interleave(const AudioSourceConfig &config)
-                    : interleave_(0), config_(config) {}
+                explicit Interleave(const AudioSourceConfig &config);
                 ~Interleave();
-                void init();
 
                 GstElement *srcElement() { return interleave_; }
                 GstElement *sinkElement() { return interleave_; }
@@ -126,10 +125,9 @@ class AudioTestSource : public InterleavedAudioSource
                 void *user_data);
         void toggle_frequency();
 
+        std::vector< std::vector <double> > frequencies_;
         GstClockID clockId_;
         int offset_;
-
-        static const double FREQUENCY[2][8];
 };
 
 /** 
