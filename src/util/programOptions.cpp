@@ -42,7 +42,8 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("address,i", po::value<string>()->default_value("127.0.0.1"), "provide ip address of remote host")
             ("videocodec,v", po::value<string>()->default_value("mpeg4"), "videocodec (mpeg4,h263,h264,theora)")
             ("audiocodec,a", po::value<string>()->default_value("raw"), "audiocodec (raw,vorbis,mp3)")
-            ("videosink,k", po::value<string>()->default_value("xvimagesink"), "video output (xvimagesink,ximagesink,glimagesink)")
+            ("videosink,k", po::value<string>()->default_value("xvimagesink"), "video output "
+             "(xvimagesink,ximagesink,glimagesink,sharedvideosink)")
             ("audiosink,l", po::value<string>()->default_value("jackaudiosink"), "audio output (jackaudiosink,alsasink,pulsesink)")
             ("audioport,t", po::value<int>(), "audioport number (1024-65535")
             ("videoport,p", po::value<int>(), "videoport number (1024-65535)")
@@ -80,10 +81,8 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
             ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
             ("list-cameras,H", po::bool_switch(), "list connected cameras")
-            ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture"
-             "(sets video capture width)")
-            ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture"
-             "(sets video capture height)")
+            ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture")
+            ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture")
             ("display-width,P", po::value<int>(), "width for video on display"
              "(scales output video width)")
             ("display-height,Q", po::value<int>(), "height for video "
