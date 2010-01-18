@@ -45,7 +45,6 @@ AudioReceiver::AudioReceiver(shared_ptr<AudioSinkConfig> aConfig,
     gotCaps_(false),
     depayloader_(0), 
     decoder_(0), 
-    level_(), 
     sink_(0)
 { 
     tassert(remoteConfig_->hasCodec()); 
@@ -65,7 +64,6 @@ AudioReceiver::~AudioReceiver()
 void AudioReceiver::init_codec()
 {
     tassert(decoder_ = remoteConfig_->createAudioDecoder());
-    decoder_->init();
 }
 
 
@@ -74,23 +72,12 @@ void AudioReceiver::init_depayloader()
     tassert(depayloader_ = decoder_->createDepayloader());
     gstlinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, *remoteConfig_);
-
-    //init_level();
 }
-
-
-#if 0
-void AudioReceiver::init_level()
-{
-    gstlinkable::link(*decoder_, level_);
-}
-#endif
 
 
 void AudioReceiver::init_sink()
 {
     tassert(sink_ = audioConfig_->createSink());
-    //gstlinkable::link(level_, *sink_);   
     gstlinkable::link(*decoder_, *sink_);   
     setCaps();
     tassert(gotCaps_);

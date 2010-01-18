@@ -41,7 +41,6 @@
 #pragma GCC diagnostic ignored "-Weffc++"
 
 using boost::asio::ip::tcp;
-using boost::asio::io_service;
 using boost::system::error_code;
 using boost::asio::buffer;
 using boost::asio::placeholders::error;
@@ -51,17 +50,16 @@ using namespace boost::posix_time;
 using boost::asio::ip::tcp;
 static const std::string SENTINEL = "END_BUFFER";
 
-class tcp_receiver_session : 
-    public boost::enable_shared_from_this<tcp_receiver_session>
-{
+class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_session> {
     public:
-        tcp_receiver_session(boost::asio::io_service& io_service, std::string &receiverBuffer)
-            : socket_(io_service), receiverBuffer_(receiverBuffer),
+        tcp_receiver_session(boost::asio::io_service& io_service, std::string &receiverBuffer) : 
+            socket_(io_service), 
+            receiverBuffer_(receiverBuffer),
             timer_(io_service, millisec(1))
-        {
-            // periodically check if we've been quit/interrupted
-            timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error));
-        }
+    {
+        // periodically check if we've been quit/interrupted, every millisecond
+        timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error));
+    }
 
         tcp::socket& socket()
         {
@@ -76,7 +74,7 @@ class tcp_receiver_session :
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
         }
-        
+
         void handle_timer(const error_code& err)
         {
             if (!err)
@@ -86,7 +84,7 @@ class tcp_receiver_session :
                 if (signal_handlers::signalFlag())
                 {
                     socket_.get_io_service().stop();
-                    LOG_ERROR("Interrupted while waiting to receive caps");
+                    LOG_WARNING("Interrupted while waiting to receive caps");
                 }
             }
         }
@@ -134,9 +132,7 @@ class tcp_receiver_session :
 };
 
 
-
-class tcp_receiver
-{
+class tcp_receiver {
     typedef boost::shared_ptr<tcp_receiver_session> session_ptr;
 
     public:
@@ -210,7 +206,7 @@ bool asio::tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
         boost::asio::write(s, boost::asio::buffer(caps + SENTINEL, caps.length() + SENTINEL.length()));
         success = true;
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         if (err != boost::asio::error::connection_refused)  // don't throw exception if connection isn't there
         {

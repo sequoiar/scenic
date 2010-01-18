@@ -65,7 +65,6 @@ class Decoder : public GstLinkableFilter, boost::noncopyable
     public:
         Decoder();
         virtual ~Decoder();
-        virtual void init () = 0;
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
         virtual void adjustJitterBuffer() {}; // buy default, do nothing
@@ -80,31 +79,6 @@ class Decoder : public GstLinkableFilter, boost::noncopyable
         _GstElement *sinkElement() { return decoder_; }
 };
 
-/// Abstract child of encoder that wraps audioconvert functionality
-
-class AudioConvertedEncoder : public Encoder
-{
-    protected:
-        AudioConvertedEncoder();
-        ~AudioConvertedEncoder();
-        _GstElement *aconv_;
-
-    private:
-        _GstElement *sinkElement() { return aconv_; }
-};
-
-
-class AudioConvertedDecoder : public Decoder
-{
-    protected: 
-        AudioConvertedDecoder();
-        ~AudioConvertedDecoder();
-        _GstElement *aconv_;
-        void init();
-
-    private:
-        _GstElement *srcElement() { return aconv_; }
-};
 
 class VideoEncoder : public Encoder 
 {
@@ -270,48 +244,56 @@ class VorbisEncoder : public  Encoder
 class VorbisDecoder : public Decoder
 {
     public: 
+        VorbisDecoder();
         bool adjustsBufferTime() { return true; }
         unsigned long long minimumBufferTime();
     private: 
-        void init();
         RtpPay* createDepayloader() const;
         static const unsigned long long MIN_BUFFER_USEC = 100000;
 };
 
 /// Encoder that simply performs datatype conversion on raw audio.
-class RawEncoder : public AudioConvertedEncoder 
+class RawEncoder : public Encoder
 {
     public:
         RawEncoder();
+        ~RawEncoder();
+        _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return aconv_; }
 
     private:
+        _GstElement *aconv_;
         Pay* createPayloader() const;
 };
 
 /// Decoder that simply performs datatype conversion on raw audio.
-class RawDecoder : public AudioConvertedDecoder
+class RawDecoder : public Decoder
 {
     public:
         RawDecoder();
+        ~RawDecoder();
 
     private:
         RtpPay* createDepayloader() const;
+        _GstElement *aconv_;
 
         _GstElement *sinkElement() { return aconv_; }
+        _GstElement *srcElement() { return aconv_; }
 };
 
 
 /// Encoder that encodes raw audio to mpeg.
-class LameEncoder : public AudioConvertedEncoder 
+class LameEncoder : public Encoder
 {
     public:
         LameEncoder();
         ~LameEncoder();
 
     private:
+        _GstElement *aconv_;
         _GstElement *mp3parse_;
         Pay* createPayloader() const;
+        _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return mp3parse_; }
         
         ///No Copy Constructor
@@ -322,11 +304,14 @@ class LameEncoder : public AudioConvertedEncoder
 
 /// Decoder that decodes mpeg to raw audio.
 
-class MadDecoder : public AudioConvertedDecoder
+class MadDecoder : public Decoder
 {
     public:
         MadDecoder();
+        ~MadDecoder();
     private:
+        _GstElement *srcElement() { return aconv_; }
+        _GstElement *aconv_;
         void init();
         RtpPay* createDepayloader() const;
 };

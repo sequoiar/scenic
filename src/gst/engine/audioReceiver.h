@@ -26,7 +26,6 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
-#include "audioLevel.h"
 
 #include "noncopyable.h"
 
@@ -52,7 +51,6 @@ class AudioReceiver
     private:
         void init_codec();
         void init_depayloader();
-        void init_level();
         void init_sink();
         
         void setCaps(); 
@@ -64,7 +62,6 @@ class AudioReceiver
         bool gotCaps_;
         RtpPay *depayloader_;
         Decoder *decoder_;
-        AudioLevel level_;
         AudioSink *sink_;
 };
 
