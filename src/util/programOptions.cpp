@@ -80,7 +80,6 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
             ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
             ("list-cameras,H", po::bool_switch(), "list connected cameras")
-            ("serverport,y", po::value<int>(), "run as server and listen on this port for ipcp messages")
             ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture"
              "(sets video capture width)")
             ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture"
