@@ -69,7 +69,6 @@ namespace audiofactory
             rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
 
-            tx->init();
             return tx;
         }
 
@@ -84,7 +83,6 @@ namespace audiofactory
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID));
 
             shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-            rx->init();
             return rx;
         }
 }

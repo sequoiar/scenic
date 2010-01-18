@@ -49,6 +49,7 @@ VideoReceiver::VideoReceiver(shared_ptr<VideoSinkConfig> vConfig,
 {
     tassert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
+    createPipeline();
 }
 
 VideoReceiver::~VideoReceiver()
@@ -63,10 +64,7 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::init_codec()
 {
-    tassert(decoder_ = remoteConfig_->createVideoDecoder());
-    if (videoConfig_->doDeinterlace())
-        decoder_->doDeinterlace();
-    decoder_->init();
+    tassert(decoder_ = remoteConfig_->createVideoDecoder(videoConfig_->doDeinterlace()));
 }
 
 

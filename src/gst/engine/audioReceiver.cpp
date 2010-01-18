@@ -49,6 +49,7 @@ AudioReceiver::AudioReceiver(shared_ptr<AudioSinkConfig> aConfig,
 { 
     tassert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
+    createPipeline();
 }
 
 /// Destructor 

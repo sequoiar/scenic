@@ -211,19 +211,19 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
     }
 }
 
-VideoDecoder * ReceiverConfig::createVideoDecoder() const
+VideoDecoder * ReceiverConfig::createVideoDecoder(bool doDeinterlace) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
 
     if (codec_ == "h264")
-        return new H264Decoder();
+        return new H264Decoder(doDeinterlace);
     else if (codec_ == "h263")
-        return new H263Decoder();
+        return new H263Decoder(doDeinterlace);
     else if (codec_ == "mpeg4")
-        return new Mpeg4Decoder();
+        return new Mpeg4Decoder(doDeinterlace);
     else if (codec_ == "theora")
-        return new TheoraDecoder();
+        return new TheoraDecoder(doDeinterlace);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");

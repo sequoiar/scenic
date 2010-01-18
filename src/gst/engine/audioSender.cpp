@@ -48,6 +48,7 @@ AudioSender::AudioSender(shared_ptr<AudioSourceConfig> aConfig,
     if (remoteConfig_->codec() == "mp3")
         if (audioConfig_->numChannels() < 1 or audioConfig_->numChannels() > 2)
             THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_->numChannels());
+    createPipeline();
 }
 
 

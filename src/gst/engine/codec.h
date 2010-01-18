@@ -102,13 +102,12 @@ class VideoEncoder : public Encoder
 class VideoDecoder : public Decoder 
 {
     public: 
-        VideoDecoder();
+        VideoDecoder(bool doDeinterlace);
         ~VideoDecoder();
-        void doDeinterlace() { doDeinterlace_ = true; }
-        virtual void init() = 0;
         virtual void adjustJitterBuffer();
     
     protected:
+        void addDeinterlace();
         bool doDeinterlace_;
         _GstElement *colorspc_;
         _GstElement *deinterlace_;
@@ -142,10 +141,10 @@ class H264Encoder : public VideoEncoder
 };
 
 /// Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
-class H264Decoder : public VideoDecoder
-{
+class H264Decoder : public VideoDecoder {
+    public:
+        H264Decoder(bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
         void adjustJitterBuffer(); 
 };
@@ -162,15 +161,15 @@ class H263Encoder : public VideoEncoder
         int bitrate_;
         ~H263Encoder();
 
-        
         Pay* createPayloader() const;
 };
 
 /// Decoder that decodes H.263 into raw video using the ffmpeg h263 decoder.
 class H263Decoder : public VideoDecoder
 {
+    public:
+        H263Decoder(bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
 };
 
@@ -192,8 +191,9 @@ class Mpeg4Encoder : public VideoEncoder
 /// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
 class Mpeg4Decoder: public VideoDecoder
 {
+    public:
+        Mpeg4Decoder(bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
 };
 
@@ -223,8 +223,9 @@ class TheoraEncoder : public VideoEncoder
 /// Decoder that decodes mpeg4 into raw video using the theoradec decoder.
 class TheoraDecoder: public VideoDecoder
 {
+    public:
+        TheoraDecoder(bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
 };
 
@@ -312,7 +313,6 @@ class MadDecoder : public Decoder
     private:
         _GstElement *srcElement() { return aconv_; }
         _GstElement *aconv_;
-        void init();
         RtpPay* createDepayloader() const;
 };
 

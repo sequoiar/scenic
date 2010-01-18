@@ -98,7 +98,7 @@ class ReceiverConfig : public RemoteConfig
         ReceiverConfig(MapMsg &msg, const std::string &caps__,
                 int msgId__); 
 
-        VideoDecoder* createVideoDecoder() const;
+        VideoDecoder* createVideoDecoder(bool doDeinterlace) const;
         Decoder* createAudioDecoder() const;
 
         const char *multicastInterface() const { return multicastInterface_.c_str(); }

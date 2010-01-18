@@ -42,7 +42,9 @@ VideoSender::VideoSender(shared_ptr<VideoSourceConfig> vConfig,
         shared_ptr<SenderConfig> rConfig) : 
     SenderBase(rConfig), videoConfig_(vConfig), session_(), source_(0), 
     encoder_(0), payloader_(0) 
-{}
+{
+    createPipeline();
+}
 
 bool VideoSender::checkCaps() const
 {

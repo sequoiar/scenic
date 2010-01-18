@@ -107,7 +107,7 @@ VideoEncoder::~VideoEncoder()
     Pipeline::Instance()->remove(&colorspc_);
 }
 
-VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0)
+VideoDecoder::VideoDecoder(bool doDeinterlace) : doDeinterlace_(doDeinterlace), colorspc_(0), deinterlace_(0)
 {}
 
 
@@ -120,8 +120,7 @@ VideoDecoder::~VideoDecoder()
 
 
 /// Sets up either decoder->queue->colorspace->deinterlace
-/// or just decoder->queue
-void VideoDecoder::init()
+void VideoDecoder::addDeinterlace()
 {
     // FIXME: should maybe be settable
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
@@ -201,10 +200,10 @@ Pay* H264Encoder::createPayloader() const
 }
 
 
-void H264Decoder::init()
+H264Decoder::H264Decoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("ffdec_h264", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 
@@ -244,10 +243,10 @@ Pay* H263Encoder::createPayloader() const
 }
 
 
-void H263Decoder::init()
+H263Decoder::H263Decoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("ffdec_h263", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 
@@ -279,10 +278,10 @@ Pay* Mpeg4Encoder::createPayloader() const
 }
 
 
-void Mpeg4Decoder::init()
+Mpeg4Decoder::Mpeg4Decoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("ffdec_mpeg4", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 
@@ -348,10 +347,10 @@ Pay* TheoraEncoder::createPayloader() const
 }
 
 
-void TheoraDecoder::init()
+TheoraDecoder::TheoraDecoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("theoradec", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 RtpPay* TheoraDecoder::createDepayloader() const

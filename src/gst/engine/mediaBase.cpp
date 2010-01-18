@@ -28,35 +28,28 @@
 using boost::shared_ptr;
 
 SenderBase::SenderBase(shared_ptr<SenderConfig> rConfig) : 
-    remoteConfig_(rConfig), initialized_(false)
+    remoteConfig_(rConfig)
 {
     remoteConfig_->checkPorts();
 }
 
-void SenderBase::init()  // template method
+void SenderBase::createPipeline()
 {
-    // these methods are defined in subclasses
-    tassert(!initialized_);
+    // template method pattern : these methods are defined in subclasses
     init_source();
     init_codec();
     init_payloader();
-    initialized_ = true;
 }
-
 
 SenderBase::~SenderBase()
 {
     remoteConfig_->cleanupPorts();
 }
 
-
-void ReceiverBase::init()  // template method
+void ReceiverBase::createPipeline()
 {
     // these methods are defined in subclasses
-    tassert(!initialized_);
     init_codec();
     init_depayloader();
     init_sink();
-    initialized_ = true;
 }
-

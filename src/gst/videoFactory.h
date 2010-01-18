@@ -85,7 +85,6 @@ namespace videofactory
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
 
             shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-            rx->init();
 
             return rx;
         }
@@ -101,8 +100,6 @@ namespace videofactory
 
             rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
-
-            tx->init(); 
 
             return tx;
         }
