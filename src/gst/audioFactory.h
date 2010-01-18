@@ -82,8 +82,7 @@ namespace audiofactory
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID));
 
-            shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-            return rx;
+            return shared_ptr<AudioReceiver>(new AudioReceiver(aConfig, rConfig));
         }
 }
 
