@@ -250,9 +250,9 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 }
 
 
-void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
+void RtpReceiver::updateLatencyCb(GtkWidget *scale)
 {
-    unsigned val = static_cast<unsigned>(adj->value);
+    unsigned val = static_cast<unsigned>(gtk_range_get_value(GTK_RANGE(scale)));
     LOG_DEBUG("Setting latency to " << val);
     setLatency(val);
 }
@@ -272,7 +272,6 @@ void RtpReceiver::createLatencyControl()
 
     GtkWidget *box1;
     GtkWidget *hscale;
-    GtkObject *adj;
     const int WIDTH = 400;
     const int HEIGHT = 70;
 
@@ -289,13 +288,11 @@ void RtpReceiver::createLatencyControl()
      * scrollbar widgets, and the highest value you'll get is actually
      * (upper - page_size). */
 
-    adj = gtk_adjustment_new (INIT_LATENCY, MIN_LATENCY, MAX_LATENCY + 1, 1.0, 1.0, 1.0);
-
-    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+    hscale = gtk_hscale_new_with_range(MIN_LATENCY, MAX_LATENCY, 1.0);
+    gtk_range_set_value(GTK_RANGE(hscale), INIT_LATENCY);
+    gtk_signal_connect (GTK_OBJECT(hscale), "value_changed",
             GTK_SIGNAL_FUNC(updateLatencyCb), NULL);
 
-
-    hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
     // Signal emitted only when value is done changing
     gtk_range_set_update_policy (GTK_RANGE (hscale), 
             GTK_UPDATE_DISCONTINUOUS);

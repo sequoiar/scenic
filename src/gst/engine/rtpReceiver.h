@@ -63,7 +63,7 @@ class RtpReceiver
         _GstElement *depayloader_;
         static std::list<_GstElement *> depayloaders_;
 
-        static void updateLatencyCb(_GtkAdjustment *adj);
+        static void updateLatencyCb(_GtkWidget *scale);
         static bool madeControl_;
         static _GtkWidget *control_;
         static bool controlEnabled_;
