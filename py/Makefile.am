@@ -29,34 +29,34 @@ TESTS = test/test_addressbook.py \
 #EXTRA_DIST: $(shell `../utils/list_miville_files`)
 
 install-exec-hook: 
-		[ -d $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages ] || mkdir -p $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages
-		PYTHONPATH=$(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages python setup.py build
-		PYTHONPATH=$(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages python setup.py install --prefix=$(DESTDIR)$(prefix)
-		install -m 755 -D miville-wrapper $(DESTDIR)$(bindir)/miville
-		install -m 644 -D miville.desktop $(DESTDIR)$(datarootdir)/applications/miville.desktop
-		install -m 644 -D miville.png $(DESTDIR)$(datarootdir)/pixmaps/miville.png
-		if [ -d docs/_build/html ]; then \
-			mkdir -p $(DESTDIR)$(docdir)/miville ; \
-			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(docdir)/miville/sphinx ; \
-		fi
-		help2man --no-info --include=miville-man.txt --name="The Miville Audio/Video Streaming Software for GNU/Linux" ./mivilled > mivilled.1
-		install -D -m 644 mivilled.1 $(DESTDIR)$(mandir)/man1/mivilled.1
-#		help2man --no-info --name="The midistream MIDI RTP Streaming Software for GNU/Linux" ./midistream > midistream.1
-#		install -D -m 644 midistream.1 $(DESTDIR)$(mandir)/man1/midistream.1
+	[ -d $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages ] || mkdir -p $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages
+	PYTHONPATH=$(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages python setup.py build
+	PYTHONPATH=$(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages python setup.py install --prefix=$(DESTDIR)$(prefix)
+	install -m 755 -D miville-wrapper $(DESTDIR)$(bindir)/miville
+	install -m 644 -D miville.desktop $(DESTDIR)$(datarootdir)/applications/miville.desktop
+	install -m 644 -D miville.png $(DESTDIR)$(datarootdir)/pixmaps/miville.png
+	if [ -d docs/_build/html ]; then \
+		mkdir -p $(DESTDIR)$(docdir)/miville ; \
+		install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(docdir)/miville/sphinx ; \
+	fi
+	help2man --no-info --include=miville-man.txt --name="The Miville Audio/Video Streaming Software for GNU/Linux" ./mivilled > mivilled.1
+	install -D -m 644 mivilled.1 $(DESTDIR)$(mandir)/man1/mivilled.1
+#	help2man --no-info --name="The midistream MIDI RTP Streaming Software for GNU/Linux" ./midistream > midistream.1
+#	install -D -m 644 midistream.1 $(DESTDIR)$(mandir)/man1/midistream.1
 #
 # THIS IS BROKEN !! FIXME
 
 uninstall-hook:
-		awk '/miville/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
-		sed -i '/miville-.*egg/d' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
-		rm -rf $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/miville-*.egg
-		rm -f $(DESTDIR)$(bindir)/mivilled
-		rm -f $(DESTDIR)$(bindir)/miville
-		rm -f $(DESTDIR)$(bindir)/restart_jackd.py
-		rm -f $(DESTDIR)$(mandir)/man1/mivilled.1
-		rm -f $(DESTDIR)$(mandir)/man1/midistream.1
-		rm -f $(DESTDIR)$(datarootdir)/applications/miville.desktop
-		rm -f $(DESTDIR)$(datarootdir)/pixmaps/miville.png
+	awk '/miville/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
+	sed -i '/miville-.*egg/d' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
+	rm -rf $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/miville-*.egg
+	rm -f $(DESTDIR)$(bindir)/mivilled
+	rm -f $(DESTDIR)$(bindir)/miville
+	rm -f $(DESTDIR)$(bindir)/restart_jackd.py
+	rm -f $(DESTDIR)$(mandir)/man1/mivilled.1
+	rm -f $(DESTDIR)$(mandir)/man1/midistream.1
+	rm -f $(DESTDIR)$(datarootdir)/applications/miville.desktop
+	rm -f $(DESTDIR)$(datarootdir)/pixmaps/miville.png
 
 # temporarily removed: check_ping.py
 # not much useful:
