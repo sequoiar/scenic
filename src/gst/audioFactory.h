@@ -37,8 +37,6 @@ namespace audiofactory
 
     static const int MSG_ID = 1;
 
-
-#ifdef __COMMAND_LINE__
     /// Convert command line options to ipcp
     static void rxOptionsToIPCP(MapMsg &options)
     {
@@ -58,7 +56,6 @@ namespace audiofactory
         options["device"] = options["audiodevice"];
         options["location"] = options["audiolocation"];
     }
-#endif // __COMMAND_LINE__
 
     static shared_ptr<AudioSender> 
         buildAudioSender(MapMsg &msg)
@@ -72,7 +69,6 @@ namespace audiofactory
             rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
 
-            tx->init();
             return tx;
         }
 
@@ -86,9 +82,7 @@ namespace audiofactory
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID));
 
-            shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-            rx->init();
-            return rx;
+            return shared_ptr<AudioReceiver>(new AudioReceiver(aConfig, rConfig));
         }
 }
 

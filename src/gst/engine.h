@@ -27,6 +27,7 @@
 
 #include "gst/engine/audioSender.h"
 #include "gst/engine/audioReceiver.h"
+#include "gst/engine/localVideo.h"
 #include "gst/engine/videoSender.h"
 #include "gst/engine/videoReceiver.h"
 #include "gst/engine/audioConfig.h"

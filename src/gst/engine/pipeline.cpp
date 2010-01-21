@@ -87,10 +87,11 @@ Pipeline::~Pipeline()
 {
     if (pipeline_)
     {
-        LOG_DEBUG("Unreffing pipeline");
+        LOG_INFO("Unreffing pipeline");
         gst_object_unref(GST_OBJECT(pipeline_));
     }
     delete [] titleStr_;
+    titleStr_ = 0;
 }
 
 
@@ -207,12 +208,11 @@ void Pipeline::reset()
     if (Instance()->pipeline_)
     {
         LOG_DEBUG("Pipeline is being reset.");
-        LOG_DEBUG("Unreffing bus");
-        gst_object_unref(Instance()->getBus());
         LOG_DEBUG("Unreffing pipeline");
         gst_object_unref(GST_OBJECT(Instance()->pipeline_));
         Instance()->pipeline_ = 0;
         delete [] Instance()->titleStr_;
+        Instance()->titleStr_ = 0;
     }
 }
 

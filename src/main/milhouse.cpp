@@ -24,19 +24,14 @@
 #include "util.h"
 
 #include "gutil.h"
-#include "msgThreadFactory.h"
 
-#define __COMMAND_LINE__
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
-#undef __COMMAND_LINE__
 
 #include "milhouse.h"
 #include "milhouseLogger.h"
 #include "programOptions.h"
 
-
-int telnetServer(int, int);
 
 namespace po = boost::program_options;
 
@@ -121,6 +116,26 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
 }
 
 
+void Milhouse::runAsLocal(const po::variables_map &options)
+{
+    using boost::shared_ptr;
+
+    LOG_DEBUG("Running local");
+    shared_ptr<LocalVideo> localVideo;
+    //shared_ptr<LocalAudio> localAudio; // doesn't exist (yet)
+
+    MapMsg ipcp(ProgramOptions::toMapMsg(options));
+    videofactory::localOptionsToIPCP(ipcp);
+    localVideo = videofactory::buildLocalVideo(ipcp);
+
+    playback::start();
+
+    gutil::runMainLoop(options["timeout"].as<int>());
+
+    playback::stop();
+}
+
+
 short Milhouse::usage(const po::options_description &desc)
 {
     std::cout << desc << "\n";
@@ -144,9 +159,6 @@ short Milhouse::run(int argc, char **argv)
     if (options.count("help") or argc == 1) 
         return usage(desc);
 
-    if (options.count("serverport"))
-        return telnetServer(options["sender"].as<bool>(), options["serverport"].as<int>());
-
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
 
     // FIXME: this is actually where pipeline instance is created because it's the 
@@ -168,11 +180,17 @@ short Milhouse::run(int argc, char **argv)
 
     if (options["list-cameras"].as<bool>())
             return VideoSourceConfig::listCameras();
+    
+    if (options["localvideo"].as<bool>()) 
+    {
+        runAsLocal(options);
+        return 0;
+    }
  
     if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
-        LOG_ERROR("argument error: must be sender OR receiver."); 
+        LOG_ERROR("argument error: must be sender OR receiver OR localvideo."); 
         return 1;
     }
 
@@ -215,7 +233,8 @@ int main(int argc, char **argv)
     int ret = 0;
     atexit(onExit);
 
-    try {
+    try 
+    {
         signal_handlers::setHandlers();
         Milhouse milhouse;
         ret = milhouse.run(argc, argv);

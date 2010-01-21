@@ -7,14 +7,15 @@
 
 #include "caps.h"
 
-/// Video profile is in format <codec>
-std::string CapsParser::getVideoCaps(const std::string &codec, int width, int height)
+/// Video profile is in format <codec>_<width>_<height>_<pictureAspectRatio>
+std::string CapsParser::getVideoCaps(const std::string &codec, int width, int height, const std::string &pictureAspectRatio)
 {
     using boost::lexical_cast;
 
     const std::string profile = codec + "_" + 
         lexical_cast<std::string>(width) + "_" + 
-        lexical_cast<std::string>(height);
+        lexical_cast<std::string>(height) + "_" +
+        pictureAspectRatio;
     return caps::getCaps(profile);
 }
 

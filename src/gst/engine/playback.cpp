@@ -54,8 +54,6 @@ void playback::quit()
     stop();
     Pipeline::Instance()->notifyQuitted();
     gutil::killMainLoop();
-    MapMsg quitMsg("quit");
-    quitMsg.post();
 }
 
 void playback::makeVerbose()
@@ -73,7 +71,3 @@ int playback::sampleRate()
     return Pipeline::Instance()->actualSampleRate();
 }
 
-void playback::postInterrupt()
-{
-//    Pipeline::Instance()->postInterrupt();
-}

@@ -22,6 +22,8 @@
 
 #include "util.h"
 
+#include <sstream>
+
 #include "gstLinkable.h"
 #include "videoSource.h"
 #include "pipeline.h"
@@ -32,6 +34,7 @@
 #include "v4l2util.h"
 
 #include "fileSource.h"
+
 
 /// Constructor
 VideoSource::VideoSource(const VideoSourceConfig &config) : 
@@ -53,7 +56,8 @@ std::string VideoSource::defaultSrcCaps() const
     std::ostringstream capsStr;
     capsStr << "video/x-raw-yuv, width=" << config_.captureWidth()
         << ", height=" << config_.captureHeight() << ", framerate="
-        << config_.framerate() << "000/1001";
+        << config_.framerate() << "000/1001, pixel-aspect-ratio=" 
+        << config_.pixelAspectRatio();
     return capsStr.str();
 }
 
@@ -188,24 +192,23 @@ std::string VideoV4lSource::deviceStr() const
 std::string VideoV4lSource::srcCaps() const
 {
     std::ostringstream capsStr;
-    /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
-      << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
 
     std::string capsSuffix;
-    if (v4l2util::isInterlaced(deviceStr()))
-    {
-        if (actualStandard_ == "NTSC")
-            capsSuffix = "30000/1001, interlaced=true";
-        else if (actualStandard_ == "PAL")
-            capsSuffix = "25000/1000, interlaced=true"; // PAL is not drop frame
-        else 
-            THROW_CRITICAL("Unsupported standard " << actualStandard_);
-    }
-    else
-        capsSuffix = "/1";
+    if (actualStandard_ == "NTSC")
+        capsSuffix = "30000/1001"; // NTSC is drop frame
+    else if (actualStandard_ == "PAL")
+        capsSuffix = "25/1"; // PAL is not drop frame
+    else 
+        THROW_CRITICAL("Unsupported standard " << actualStandard_);
 
-    capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" 
-        << v4l2util::captureHeight(deviceStr()) 
+    if (v4l2util::isInterlaced(deviceStr()))
+        capsSuffix +=", interlaced=true";
+
+    capsSuffix += ", pixel-aspect-ratio=";
+    capsSuffix += config_.pixelAspectRatio();
+
+    capsStr << "video/x-raw-yuv, width=" << config_.captureWidth() << ", height=" 
+        << config_.captureHeight() 
         << ", framerate="
         << capsSuffix;
     LOG_DEBUG("V4l2src caps are " << capsStr.str());
@@ -236,14 +239,14 @@ VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) :
 
 std::string VideoDc1394Source::srcCaps() const 
 { 
-    typedef std::vector<std::string> SpaceList; 
+    typedef std::vector<std::string> ColourspaceList; 
     std::ostringstream capsStr; 
     int cameraNumber; 
     int mode = 0; 
     g_object_get(source_, "camera-number", &cameraNumber, NULL); 
 
     std::string colourSpace; 
-    SpaceList spaces; 
+    ColourspaceList spaces; 
     // if we support other colourspaces besides grayscale 
     if (!config_.forceGrayscale()) 
     { 
@@ -253,7 +256,7 @@ std::string VideoDc1394Source::srcCaps() const
     } 
     spaces.push_back("gray"); 
 
-    for (SpaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space) 
+    for (ColourspaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space) 
     { 
         colourSpace = *space; 
         mode = DC1394::capsToMode(cameraNumber, config_.captureWidth(),  

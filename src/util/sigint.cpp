@@ -24,8 +24,6 @@
 #include <signal.h>
 #include "sigint.h"
 #include "logWriter.h"
-#include "msgThread.h"
-#include "playback.h"
 
 static bool signal_flag = false;
 
@@ -59,8 +57,6 @@ static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
 {
     LOG_INFO("Got signal " << sigToString(sig) << ", going down!");
     signal_flag = true;
-    MsgThread::broadcastQuit();
-    playback::postInterrupt();
 }
 
 void signal_handlers::setHandlers()

@@ -46,19 +46,29 @@ bool RtpBin::destroyed_ = false;
 
 std::map<int, RtpBin*> RtpBin::sessions_;
 
-void RtpBin::init()
+RtpBin::RtpBin() : 
+    rtcp_sender_(0), 
+    rtcp_receiver_(0), 
+    sessionId_((++sessionCount_) - 1), 
+    sessionName_(), 
+    printStats_(true)  // 0 based
 {
-    // only initialize rtpbin once per process
+    // only initialize rtpbin element once per process
     if (rtpbin_ == 0) 
     {
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
-
-        // uncomment this to print stats
-        g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
-                static_cast<GSourceFunc>(printStatsCallback),
-                this);
+        startPrintStatsCallback();
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
+}
+
+
+void RtpBin::startPrintStatsCallback()
+{
+    // comment this to not print stats
+    g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
+            static_cast<GSourceFunc>(printStatsCallback),
+            this);
 }
 
 
@@ -90,7 +100,6 @@ void RtpBin::printStatsVal(const std::string &idStr,
 
     mapMsg["stats"] = idStr + paramStr;
     LOG_INFO(mapMsg["stats"]);
-    mapMsg.post();
 }
 
 
@@ -100,7 +109,7 @@ void RtpBin::parseSourceStats(GObject * source, RtpBin *context)
 
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
-    
+
     /* simply dump the stats structure */
     // gchar *str = gst_structure_to_string (stats);
     // LOG_DEBUG("source stats: " << str);
@@ -228,7 +237,7 @@ int RtpBin::createSinkSocket(const char *hostname, int port)
     for(p = servinfo; p != NULL; p = p->ai_next) 
     {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                p->ai_protocol)) == -1) 
+                        p->ai_protocol)) == -1) 
         {
             perror("socket error");
             continue;
@@ -269,7 +278,7 @@ int RtpBin::createSourceSocket(int port)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE; // use my IP
-    
+
     string portStr(lexical_cast<string>(port));
     LOG_DEBUG("Trying socket for port " << portStr);
 
@@ -280,7 +289,7 @@ int RtpBin::createSourceSocket(int port)
     for (p = servinfo; p != NULL; p = p->ai_next) 
     {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                p->ai_protocol)) == -1) 
+                        p->ai_protocol)) == -1) 
         {
             LOG_WARNING("socket error");
             continue;

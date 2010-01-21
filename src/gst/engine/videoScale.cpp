@@ -61,7 +61,8 @@ VideoScale::VideoScale(int width, int height) :
 
     // Don't need to unref tempCaps, this happens every time we append it
     // to videoCaps
-    gst_caps_unref(videoCaps);
+    if (videoCaps)
+        gst_caps_unref(videoCaps);
 }
 
 /// Destructor 

@@ -1,5 +1,5 @@
 
-// audioLocal.h
+// localVideo.h
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
@@ -20,47 +20,35 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _AUDIO_SENDER_H_
-#define _AUDIO_SENDER_H_
+#ifndef _LOCAL_VIDEO_H_
+#define _LOCAL_VIDEO_H_
 
-#include "mediaBase.h"
-#include "audioConfig.h"
-#include "remoteConfig.h"
-#include "rtpSender.h"
-#include "busMsgHandler.h"
-//#include "audioLevel.h"
+#include "videoConfig.h"
+
 #include "noncopyable.h"
 
 #include <boost/shared_ptr.hpp>
 
-class AudioSource;
-class Encoder;
-class Pay;
-class _GstMessage;
+class VideoSource;
+class VideoScale;
+class VideoSink;
+class _GstElement;
 
-
-class AudioSender
-    : public SenderBase, boost::noncopyable
+class LocalVideo : public boost::noncopyable
 {
     public:
-        AudioSender(boost::shared_ptr<AudioSourceConfig> aConfig, 
-                boost::shared_ptr<SenderConfig> rConfig);
-
-        ~AudioSender();
+        LocalVideo(boost::shared_ptr<VideoSourceConfig> sourceConfig,
+                boost::shared_ptr<VideoSinkConfig> sinkConfig);
+        ~LocalVideo();
 
     private:
-        void createSource();
-        void createCodec();
-        void createPayloader();
-        virtual bool checkCaps() const;
-
-        boost::shared_ptr<AudioSourceConfig> audioConfig_;
-        RtpSender session_;
-        AudioSource *source_;
-
-        Encoder *encoder_;
-        Pay *payloader_;
+        boost::shared_ptr<VideoSourceConfig> sourceConfig_;
+        boost::shared_ptr<VideoSinkConfig> sinkConfig_;
+        VideoSource *source_;
+        _GstElement *colourspace_;
+        VideoScale *videoscale_;
+        VideoSink *sink_;
 };
 
-#endif // _AUDIO_SENDER_H_
+#endif // _LOCAL_VIDEO_H_
 

@@ -25,7 +25,7 @@
 #define _VIDEO_FACTORY_H_
 
 #include "util.h"
-#include "gutil.h"
+#include "mapMsg.h"
 
 #include "gst/engine.h"
 
@@ -36,7 +36,6 @@ namespace videofactory
     using boost::shared_ptr;
     static const int MSG_ID = 2;
 
-#ifdef __COMMAND_LINE__
     /// Convert command line options to ipcp
     static void rxOptionsToIPCP(MapMsg &options)
     {
@@ -59,8 +58,21 @@ namespace videofactory
         options["bitrate"] = options["videobitrate"];
         options["quality"] = options["videoquality"];
     }
-#endif // __COMMAND_LINE__
 
+    /// Convert command line options to ipcp
+    static void localOptionsToIPCP(MapMsg &options)
+    {
+        options["source"] = options["videosource"];
+        options["sink"] = options["videosink"];
+        options["device"] = options["videodevice"];
+        options["location"] = options["videolocation"];
+
+        // FIXME: unused
+        options["bitrate"] = options["videobitrate"];
+        options["quality"] = options["videoquality"];
+        options["port"] = options["videoport"];
+        options["codec"] = options["videocodec"];
+    }
 
     static shared_ptr<VideoReceiver> 
         buildVideoReceiver(MapMsg &msg)
@@ -68,14 +80,11 @@ namespace videofactory
             shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
 
             // get caps here, based on codec, capture width and capture height
-            std::string caps(CapsParser::getVideoCaps(msg["codec"], msg["width"], msg["height"]));
+            std::string caps(CapsParser::getVideoCaps(msg["codec"], msg["width"], msg["height"], msg["aspect-ratio"]));
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
 
-            shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-            rx->init();
-
-            return rx;
+            return shared_ptr<VideoReceiver>(new VideoReceiver(vConfig, rConfig));
         }
 
 
@@ -90,11 +99,17 @@ namespace videofactory
             rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
 
-            tx->init(); 
-
             return tx;
         }
 
+    static shared_ptr<LocalVideo> 
+        buildLocalVideo(MapMsg &msg)
+        {
+            shared_ptr<VideoSourceConfig> sourceConfig(new VideoSourceConfig(msg));
+            shared_ptr<VideoSinkConfig> sinkConfig(new VideoSinkConfig(msg));
+
+            return shared_ptr<LocalVideo>(new LocalVideo(sourceConfig, sinkConfig));
+        }
 }
 
 #endif // _VIDEO_FACTORY_H_

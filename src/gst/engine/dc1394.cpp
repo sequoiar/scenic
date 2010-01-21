@@ -22,7 +22,10 @@
 #include "util.h"
 #include "./dc1394.h"
 
+#include <boost/filesystem/operations.hpp>
+#include <fstream>
 #include <dc1394/control.h>
+#include <libraw1394/raw1394.h>
 #include <iomanip>
 
 int cleanup(dc1394_t *& dc1394, dc1394camera_t *& camera, dc1394camera_list_t *& cameras)
@@ -284,6 +287,26 @@ void printSupportedFramerates(dc1394framerates_t framerates)
 #undef PRINT_CASE_FRACTION
 }
 
+bool isModuleReadable(const std::string &module)
+{
+    std::string path("/dev/" + module);
+    std::ifstream input(path.c_str());
+    bool readable = input.good();
+    input.close();
+    return readable;
+}
+
+
+bool isModuleWriteable(const std::string &module)
+{
+    std::string path("/dev/" + module);
+    std::ofstream output(path.c_str());
+    bool writeable = output.good();
+    output.close();
+    return writeable;
+}
+
+
 void DC1394::listCameras()
 {
     LOG_DEBUG("listing cameras");
@@ -295,6 +318,36 @@ void DC1394::listCameras()
     dc1394_t * dc1394 = 0;
     dc1394camera_list_t *cameras = 0;
     dc1394camera_t *camera = 0;
+
+    // make sure raw1394 is loaded and read/writeable
+    raw1394handle_t tmpHandle = raw1394_new_handle();
+    if (tmpHandle == NULL) 
+    {
+        // if module is present but permissions aren't good, print a warning
+        // otherwise don't do anything
+        if (boost::filesystem::exists("/dev/raw1394"))
+        {
+            if (boost::filesystem::exists("/dev/video1394"))
+            {
+                if (not isModuleReadable("raw1394"))
+                    LOG_WARNING("Module raw1394 is not readable");
+                if (not isModuleWriteable("raw1394"))
+                    LOG_WARNING("Module raw1394 is not writeable");
+                if (not isModuleReadable("video1394"))
+                    LOG_WARNING("Module video1394 is not readable");
+            }
+            else
+                LOG_WARNING("Module video1394 is not loaded.");
+        }
+        else if (boost::filesystem::exists("/dev/video1394"))
+            LOG_WARNING("Module raw1394 is not loaded.");
+        else
+            LOG_DEBUG("Neither raw1394 nor video1394 modules are loaded");// do nothing, neither module is loaded, we can assume no firewire utilization
+
+        return;
+    }
+    else
+        raw1394_destroy_handle(tmpHandle);
 
     dc1394 = dc1394_new();
 

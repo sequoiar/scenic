@@ -36,13 +36,14 @@ po::options_description ProgramOptions::createDefaultOptions()
     {
         // TODO: maybe add groupings (audioreceiver, audiosender, videoreceiver, videosender)
         desc.add_options()
-            ("help", "produce help")
+            ("help,?", "produce help")
             ("receiver,r", po::bool_switch(), "this process is a receiver")
             ("sender,s", po::bool_switch(), "this process is a sender")
             ("address,i", po::value<string>()->default_value("127.0.0.1"), "provide ip address of remote host")
             ("videocodec,v", po::value<string>()->default_value("mpeg4"), "videocodec (mpeg4,h263,h264,theora)")
             ("audiocodec,a", po::value<string>()->default_value("raw"), "audiocodec (raw,vorbis,mp3)")
-            ("videosink,k", po::value<string>()->default_value("xvimagesink"), "video output (xvimagesink,ximagesink,glimagesink)")
+            ("videosink,k", po::value<string>()->default_value("xvimagesink"), "video output "
+             "(xvimagesink,ximagesink,glimagesink,sharedvideosink)")
             ("audiosink,l", po::value<string>()->default_value("jackaudiosink"), "audio output (jackaudiosink,alsasink,pulsesink)")
             ("audioport,t", po::value<int>(), "audioport number (1024-65535")
             ("videoport,p", po::value<int>(), "videoport number (1024-65535)")
@@ -80,16 +81,15 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
             ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
             ("list-cameras,H", po::bool_switch(), "list connected cameras")
-            ("serverport,y", po::value<int>(), "run as server and listen on this port for ipcp messages")
-            ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture"
-             "(sets video capture width)")
-            ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture"
-             "(sets video capture height)")
+            ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture")
+            ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture")
             ("display-width,P", po::value<int>(), "width for video on display"
              "(scales output video width)")
             ("display-height,Q", po::value<int>(), "height for video "
              "(scales output video height)")
             ("grayscale,M", po::bool_switch(), "force dc1394 capture to grayscale")
+            ("aspect-ratio,A", po::value<string>()->default_value("4:3"), "picture aspect ratio (4:3,16:9)")
+            ("localvideo", po::bool_switch(), "display local video only")
             ;
 
         descriptionInitialized = true;
@@ -111,17 +111,5 @@ MapMsg ProgramOptions::toMapMsg(const po::variables_map &options)
             msg[iter->first] =  iter->second.as<bool>();
 
     return msg;
-}
-
-
-/// Only used by telnet interface
-MapMsg ProgramOptions::defaultMapMsg()
-{
-    po::options_description desc(createDefaultOptions());
-    po::variables_map options;
-    char **argv = 0;
-    po::store(po::parse_command_line(1, argv, desc), options);
-    po::notify(options);
-    return toMapMsg(options);
 }
 
