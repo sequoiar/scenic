@@ -35,12 +35,10 @@ class RtpBin : boost::noncopyable
 {
     public:
         virtual ~RtpBin();
-        void init();
 
     protected:
         /// FIXME: this sessionId is all kinds of gross
-        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0), sessionId_((++sessionCount_) - 1), sessionName_(), printStats_(true)  // 0 based
-        {}
+        RtpBin();
         const char *padStr(const char *padName) const;
 
         void registerSession(const std::string &codec);
@@ -58,6 +56,7 @@ class RtpBin : boost::noncopyable
         bool printStats_;
         static int createSinkSocket(const char *hostname, int port);
         static int createSourceSocket(int port);
+        void startPrintStatsCallback();
     
     private:
         static const int REPORTING_PERIOD_MS = 2000;

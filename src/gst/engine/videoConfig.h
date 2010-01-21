@@ -36,6 +36,7 @@ class VideoSourceConfig
         VideoSource* createSource() const;  // factory method
 
         const char *source() const { return source_.c_str(); }
+        std::string sourceString() const { return source_; }
         static int listCameras();
         int bitrate() const { return bitrate_; }
         int quality() const { return quality_; }
@@ -53,7 +54,12 @@ class VideoSourceConfig
         const char *deviceName() const;
         unsigned captureWidth() const;
         unsigned captureHeight() const;
+        std::string pictureAspectRatio() const;
         bool forceGrayscale() const;
+        std::string pixelAspectRatio() const;
+        /// used by other classes, that's why it's not a member function
+        static std::string calculatePixelAspectRatio(int width, int height, 
+                const std::string &pictureAspectRatio);
 
     private:
         const std::string source_;
@@ -67,6 +73,7 @@ class VideoSourceConfig
         const int captureWidth_;
         const int captureHeight_;
         const bool grayscale_;
+        const std::string pictureAspectRatio_;
 };
 
 

@@ -31,34 +31,33 @@ class _GstMessage;
 class SenderBase 
 {
     public: 
-        void init();
         SenderBase(boost::shared_ptr<SenderConfig> rConfig);
         virtual ~SenderBase();
         bool capsAreCached() { return checkCaps(); }
 
     protected:
         boost::shared_ptr<SenderConfig> remoteConfig_;
+        void createPipeline();
 
     private:
         virtual bool checkCaps() const = 0;
-        virtual void init_source() = 0;
-        virtual void init_codec() = 0;
-        virtual void init_payloader() = 0;
-        bool initialized_;
+        virtual void createSource() = 0;
+        virtual void createCodec() = 0;
+        virtual void createPayloader() = 0;
 };
 
 class ReceiverBase 
 {
     public: 
-        void init();
-        ReceiverBase() : initialized_(false) {};
+        ReceiverBase(){};
         virtual ~ReceiverBase(){};
+    protected:
+        void createPipeline();
 
     private:
-        virtual void init_codec() = 0;
-        virtual void init_depayloader() = 0;
-        virtual void init_sink() = 0;
-        bool initialized_;
+        virtual void createCodec() = 0;
+        virtual void createDepayloader() = 0;
+        virtual void createSink() = 0;
 };
 
 #endif // _MEDIA_BASE_H_

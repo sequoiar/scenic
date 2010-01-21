@@ -42,12 +42,15 @@ VideoSender::VideoSender(shared_ptr<VideoSourceConfig> vConfig,
         shared_ptr<SenderConfig> rConfig) : 
     SenderBase(rConfig), videoConfig_(vConfig), session_(), source_(0), 
     encoder_(0), payloader_(0) 
-{}
+{
+    createPipeline();
+}
 
 bool VideoSender::checkCaps() const
 {
     return CapsParser::getVideoCaps(remoteConfig_->codec(), 
-            videoConfig_->captureWidth(), videoConfig_->captureHeight()) != ""; 
+            videoConfig_->captureWidth(), videoConfig_->captureHeight(),
+            videoConfig_->pictureAspectRatio()) != ""; 
 }
 
 VideoSender::~VideoSender()
@@ -58,13 +61,13 @@ VideoSender::~VideoSender()
 }
 
 
-void VideoSender::init_source()
+void VideoSender::createSource()
 {
     tassert(source_ = videoConfig_->createSource());
 }
 
 
-void VideoSender::init_codec()
+void VideoSender::createCodec()
 {
     MapMsg settings;
     settings["bitrate"] = videoConfig_->bitrate();
@@ -75,7 +78,7 @@ void VideoSender::init_codec()
 }
 
 
-void VideoSender::init_payloader()       
+void VideoSender::createPayloader()       
 {
     tassert(payloader_ = encoder_->createPayloader());
     // tell rtpmp4vpay not to send config string in header since we're sending caps

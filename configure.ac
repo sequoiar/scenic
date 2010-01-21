@@ -2,8 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(MILHOUSE, 0.3.4)
-AC_DEFINE(RELEASE_CANDIDATE,["-c1"],[rc version num])
+AC_INIT(MILHOUSE, 0.3.5)
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -202,14 +201,11 @@ AC_CONFIG_FILES([Makefile
                  src/util/Makefile
                  src/gutil/Makefile
                  src/shared_video/Makefile
-                 src/boost/Makefile
                  src/tcp/Makefile
                  src/gst/Makefile
                  src/gst/engine/Makefile
-                 src/gst/control/Makefile
                  src/devices/Makefile
                  src/main/Makefile
-                 src/python/Makefile
                  ])
 
 AC_CONFIG_FILES([

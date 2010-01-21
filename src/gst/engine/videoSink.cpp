@@ -216,6 +216,7 @@ XvImageSink::XvImageSink(int width, int height, int screenNum) :
     }
 #endif
 
+    LOG_DEBUG("Setting default window size to " << width << "x" << height);
     gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 

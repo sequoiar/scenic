@@ -26,7 +26,8 @@
 #include <boost/assign.hpp>
 #include <gst/gst.h>
 #include "remoteConfig.h"
-#include "tcp/tcpThread.h"
+#include "tcp/asio.h"
+#include "mapMsg.h"
 #include "codec.h"
 
 const int RemoteConfig::PORT_MIN = 1024;
@@ -135,7 +136,7 @@ gboolean SenderConfig::sendMessage(gpointer data)
 
     /// FIXME: everytime a receiver starts, it should ask sender for caps, then the sender can
     /// send them.
-    if (tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
+    if (asio::tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
         LOG_INFO("Caps sent successfully");
     return TRUE;    // try again later, in case we have a new receiver
 }
@@ -144,13 +145,10 @@ gboolean SenderConfig::sendMessage(gpointer data)
 /** 
  * The new caps message is posted on the bus by the src pad of our udpsink, 
  * received by this audiosender, and sent to our other host if needed. */
-// FIXME: move this all in to SenderConfig
 bool SenderConfig::handleBusMsg(GstMessage *msg)
 {
     const GstStructure *s = gst_message_get_structure(msg);
-    const gchar *name = gst_structure_get_name(s);
-
-    if (std::string(name) == "caps-changed") 
+    if (s != NULL and gst_structure_has_name(s, "caps-changed"))
     {   
         // this is our msg
         const gchar *newCapsStr = gst_structure_get_string(s, "caps");
@@ -213,19 +211,19 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
     }
 }
 
-VideoDecoder * ReceiverConfig::createVideoDecoder() const
+VideoDecoder * ReceiverConfig::createVideoDecoder(bool doDeinterlace) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
 
     if (codec_ == "h264")
-        return new H264Decoder();
+        return new H264Decoder(doDeinterlace);
     else if (codec_ == "h263")
-        return new H263Decoder();
+        return new H263Decoder(doDeinterlace);
     else if (codec_ == "mpeg4")
-        return new Mpeg4Decoder();
+        return new Mpeg4Decoder(doDeinterlace);
     else if (codec_ == "theora")
-        return new TheoraDecoder();
+        return new TheoraDecoder(doDeinterlace);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -294,7 +292,7 @@ void ReceiverConfig::receiveCaps()
 {
     int id;
     // this blocks
-    std::string msg(tcpGetBuffer(capsPort(), id));
+    std::string msg(asio::tcpGetBuffer(capsPort(), id));
     //tassert(id == msgId_);
     caps_ = msg;
 }

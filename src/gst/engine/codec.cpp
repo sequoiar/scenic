@@ -77,18 +77,6 @@ void Encoder::setBitrate(int bitrate)
     }
 }
 
-/// Posts bitrate using MapMsg
-void Encoder::postBitrate()
-{
-    tassert(encoder_);
-    MapMsg mapMsg("bitrate");
-    mapMsg["value"] = 
-        std::string(gst_element_factory_get_longname(gst_element_get_factory(encoder_))) 
-        + ": " +  boost::lexical_cast<std::string>(getBitrate());
-    mapMsg.post();
-}
-
-
 /// Constructor 
 Decoder::Decoder() : decoder_(0)
 {}
@@ -100,35 +88,6 @@ Decoder::~Decoder()
     Pipeline::Instance()->remove(&decoder_);
 }
 
-
-/// Constructor 
-AudioConvertedEncoder::AudioConvertedEncoder() : 
-    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL))
-{}
-
-/// Destructor 
-AudioConvertedEncoder::~AudioConvertedEncoder()
-{
-    Pipeline::Instance()->remove(&aconv_);
-}
-
-
-/// Constructor 
-AudioConvertedDecoder::AudioConvertedDecoder() : 
-    aconv_(0) 
-{}
-
-
-void AudioConvertedDecoder::init()
-{
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-}
-
-/// Destructor 
-AudioConvertedDecoder::~AudioConvertedDecoder()
-{
-    Pipeline::Instance()->remove(&aconv_);
-}
 
 VideoEncoder::VideoEncoder(GstElement *encoder, bool supportsInterlaced) :
     colorspc_(Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL)), 
@@ -148,7 +107,7 @@ VideoEncoder::~VideoEncoder()
     Pipeline::Instance()->remove(&colorspc_);
 }
 
-VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0)
+VideoDecoder::VideoDecoder(bool doDeinterlace) : doDeinterlace_(doDeinterlace), colorspc_(0), deinterlace_(0)
 {}
 
 
@@ -161,8 +120,7 @@ VideoDecoder::~VideoDecoder()
 
 
 /// Sets up either decoder->queue->colorspace->deinterlace
-/// or just decoder->queue
-void VideoDecoder::init()
+void VideoDecoder::addDeinterlace()
 {
     // FIXME: should maybe be settable
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
@@ -242,10 +200,10 @@ Pay* H264Encoder::createPayloader() const
 }
 
 
-void H264Decoder::init()
+H264Decoder::H264Decoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("ffdec_h264", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 
@@ -285,10 +243,10 @@ Pay* H263Encoder::createPayloader() const
 }
 
 
-void H263Decoder::init()
+H263Decoder::H263Decoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("ffdec_h263", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 
@@ -320,10 +278,10 @@ Pay* Mpeg4Encoder::createPayloader() const
 }
 
 
-void Mpeg4Decoder::init()
+Mpeg4Decoder::Mpeg4Decoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("ffdec_mpeg4", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 
@@ -389,10 +347,10 @@ Pay* TheoraEncoder::createPayloader() const
 }
 
 
-void TheoraDecoder::init()
+TheoraDecoder::TheoraDecoder(bool doDeinterlace) : VideoDecoder(doDeinterlace)
 {
     decoder_ = Pipeline::Instance()->makeElement("theoradec", NULL);
-    VideoDecoder::init();
+    addDeinterlace();
 }
 
 RtpPay* TheoraDecoder::createDepayloader() const
@@ -423,10 +381,12 @@ unsigned long long VorbisDecoder::minimumBufferTime()
     return MIN_BUFFER_USEC;
 }
 
-void VorbisDecoder::init()
+
+VorbisDecoder::VorbisDecoder()
 {
     decoder_ = Pipeline::Instance()->makeElement("vorbisdec", NULL);
 }
+
 
 /// Creates an RtpVorbisDepay 
 RtpPay* VorbisDecoder::createDepayloader() const
@@ -435,15 +395,15 @@ RtpPay* VorbisDecoder::createDepayloader() const
 }
 
 /// Constructor
-RawEncoder::RawEncoder() : AudioConvertedEncoder()
-{
-    // FIXME: HACK ATTACK: it's simpler to have this placeholder element
-    // that pretends to be an aconv, and it has no
-    // effect, but this isn't very smart.
-    //aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-    //g_object_set(aconv_, "silent", TRUE, NULL);
-}
+RawEncoder::RawEncoder() : 
+    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL))
+{}
 
+/// Destructor
+RawEncoder::~RawEncoder()
+{
+    Pipeline::Instance()->remove(&aconv_);
+}
 
 /// Creates an RtpL16Pay 
 Pay* RawEncoder::createPayloader() const
@@ -452,9 +412,16 @@ Pay* RawEncoder::createPayloader() const
 }
 
 /// Constructor
-RawDecoder::RawDecoder()
+RawDecoder::RawDecoder() :
+    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL))
 {}
 
+
+/// Destructor
+RawDecoder::~RawDecoder()
+{
+    Pipeline::Instance()->remove(&aconv_);
+}
 
 /// Creates an RtpL16Depay 
 RtpPay* RawDecoder::createDepayloader() const
@@ -463,7 +430,8 @@ RtpPay* RawDecoder::createDepayloader() const
 }
 
 /// Constructor
-LameEncoder::LameEncoder() : AudioConvertedEncoder(), 
+LameEncoder::LameEncoder() : 
+    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL)),
     mp3parse_(Pipeline::Instance()->makeElement("mp3parse", NULL))
 {
     /// FIXME: put this in initializer list somehow
@@ -477,19 +445,22 @@ LameEncoder::LameEncoder() : AudioConvertedEncoder(),
 LameEncoder::~LameEncoder()
 {
     Pipeline::Instance()->remove(&mp3parse_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 /// Constructor
-MadDecoder::MadDecoder()
-{}
-
-
-void MadDecoder::init()
+MadDecoder::MadDecoder() :
+    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL))
 {
-    AudioConvertedDecoder::init();
     decoder_ = Pipeline::Instance()->makeElement("mad", NULL);
     gstlinkable::link(decoder_, aconv_);
 }
+
+MadDecoder::~MadDecoder()
+{
+    Pipeline::Instance()->remove(&aconv_);
+}
+
 
 /** 
  * Creates an RtpMpaPay */

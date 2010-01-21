@@ -58,8 +58,6 @@ class AudioLevel : public GstLinkableFilter, public BusMsgHandler
 
         void print(const std::vector<double> &rmsValues) const;
 
-        void post(const std::vector<double> &rmsValues) const;
-
         _GstElement *level_;
         bool emitMessages_;
 

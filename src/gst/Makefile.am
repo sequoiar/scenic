@@ -1,1 +1,1 @@
-SUBDIRS = engine control
+SUBDIRS = engine

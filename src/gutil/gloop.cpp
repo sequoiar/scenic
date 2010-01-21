@@ -45,7 +45,6 @@ int gutil::checkSignal(gpointer /*data*/)
     if (signal_handlers::signalFlag())
     {
         killMainLoop(NULL);
-        //THROW_END_THREAD("Got signal flag in gloop");
         return FALSE; // won't be called again
     }
 
@@ -60,7 +59,7 @@ void gutil::runMainLoop(int ms)
         g_timeout_add(ms, static_cast<GSourceFunc>(gutil::killMainLoop),
                 NULL);
 
-    g_timeout_add(1000 /*ms*/,  // poll signal status every second
+    g_timeout_add(500 /*ms*/,  // poll signal status every half second
             static_cast<GSourceFunc>(gutil::checkSignal),
             NULL);
 

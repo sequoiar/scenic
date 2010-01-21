@@ -46,9 +46,9 @@ class VideoSender
         ~VideoSender();
 
     private:
-        void init_source();
-        void init_codec();
-        void init_payloader();
+        void createSource();
+        void createCodec();
+        void createPayloader();
         virtual bool checkCaps() const;
 
         boost::shared_ptr<VideoSourceConfig> videoConfig_;
