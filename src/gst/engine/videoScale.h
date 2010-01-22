@@ -27,6 +27,7 @@
 #include "gstLinkable.h"
 
 // forward declarations
+class Pipeline;
 class _GstElement;
 
 /** 
@@ -36,13 +37,14 @@ class _GstElement;
 class VideoScale : public GstLinkableFilter
 {
     public:
-        VideoScale(int width, int height);
+        VideoScale(Pipeline &pipeline, int width, int height);
         ~VideoScale();
 
     private:
         _GstElement *sinkElement() { return videoscale_; }
         _GstElement *srcElement() { return capsfilter_; }
 
+        Pipeline &pipeline_;
         _GstElement *videoscale_;
         _GstElement *capsfilter_;
 

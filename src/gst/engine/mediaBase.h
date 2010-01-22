@@ -26,6 +26,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+class Pipeline;
 class _GstMessage;
 
 class SenderBase 
@@ -37,12 +38,12 @@ class SenderBase
 
     protected:
         boost::shared_ptr<SenderConfig> remoteConfig_;
-        void createPipeline();
+        void createPipeline(Pipeline &pipeline);
 
     private:
         virtual bool checkCaps() const = 0;
-        virtual void createSource() = 0;
-        virtual void createCodec() = 0;
+        virtual void createSource(Pipeline &pipeline) = 0;
+        virtual void createCodec(Pipeline &pipeline) = 0;
         virtual void createPayloader() = 0;
 };
 
@@ -52,12 +53,12 @@ class ReceiverBase
         ReceiverBase(){};
         virtual ~ReceiverBase(){};
     protected:
-        void createPipeline();
+        void createPipeline(Pipeline &pipeline);
 
     private:
-        virtual void createCodec() = 0;
+        virtual void createCodec(Pipeline &pipeline) = 0;
         virtual void createDepayloader() = 0;
-        virtual void createSink() = 0;
+        virtual void createSink(Pipeline &pipeline) = 0;
 };
 
 #endif // _MEDIA_BASE_H_

@@ -27,6 +27,7 @@
 
 #include <gst/gstclock.h>
 
+class Pipeline;
 class VideoSourceConfig;
 class _GstElement;
 class _GstPad;
@@ -40,7 +41,8 @@ class VideoSource
         void setCapsFilter(const std::string &srcCaps);
 
     protected:
-        explicit VideoSource(const VideoSourceConfig &config);
+        VideoSource(Pipeline &pipeline, const VideoSourceConfig &config);
+        Pipeline &pipeline_;
         const VideoSourceConfig &config_;
         _GstElement *source_;
         _GstElement *capsFilter_;
@@ -54,7 +56,7 @@ class VideoTestSource
     : public VideoSource
 {
     public:
-        explicit VideoTestSource(const VideoSourceConfig &config);
+        VideoTestSource(Pipeline &pipeline, const VideoSourceConfig &config);
         void filterCaps();
 
     private:
@@ -66,7 +68,7 @@ class VideoFileSource
     : public VideoSource
 {
     public:
-        explicit VideoFileSource(const VideoSourceConfig &config);
+        VideoFileSource(Pipeline &pipeline, const VideoSourceConfig &config);
 
     private:
         ~VideoFileSource();
@@ -80,7 +82,7 @@ class VideoDvSource
     : public VideoSource
 {
     public:
-        explicit VideoDvSource(const VideoSourceConfig &config);
+        VideoDvSource(Pipeline &pipeline, const VideoSourceConfig &config);
 
     private:
         ~VideoDvSource();
@@ -94,7 +96,7 @@ class VideoV4lSource
     : public VideoSource
 {
     public:
-        explicit VideoV4lSource(const VideoSourceConfig &config);
+        VideoV4lSource(Pipeline &pipeline, const VideoSourceConfig &config);
     private:
         std::string expectedStandard_;
         std::string actualStandard_;
@@ -110,7 +112,7 @@ class VideoDc1394Source
     : public VideoSource
 {
     public:
-        explicit VideoDc1394Source(const VideoSourceConfig &config);
+        explicit VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig &config);
     private:
         enum {DMA_BUFFER_SIZE_IN_FRAMES = 2};
         std::string srcCaps() const;

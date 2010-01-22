@@ -37,7 +37,8 @@
 
 
 /// Constructor
-VideoSource::VideoSource(const VideoSourceConfig &config) : 
+VideoSource::VideoSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    pipeline_(pipeline),
     config_(config), 
     source_(0), 
     capsFilter_(0)
@@ -47,8 +48,8 @@ VideoSource::VideoSource(const VideoSourceConfig &config) :
 /// Destructor
 VideoSource::~VideoSource()
 {
-    Pipeline::Instance()->remove(&capsFilter_);
-    Pipeline::Instance()->remove(&source_);
+    pipeline_.remove(&capsFilter_);
+    pipeline_.remove(&source_);
 }
 
 std::string VideoSource::defaultSrcCaps() const
@@ -86,13 +87,13 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
 
 
 /// Constructor
-VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
-    VideoSource(config)
+VideoTestSource::VideoTestSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config)
 {
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    source_ = pipeline_.makeElement(config_.source(), NULL);
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
     setCapsFilter(srcCaps());
 }
@@ -103,32 +104,32 @@ VideoTestSource::~VideoTestSource()
 
 
 /// Constructor
-VideoFileSource::VideoFileSource(const VideoSourceConfig &config) : 
-    VideoSource(config), 
-    identity_(Pipeline::Instance()->makeElement("identity", NULL))
+VideoFileSource::VideoFileSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config), 
+    identity_(pipeline_.makeElement("identity", NULL))
 {
     tassert(config_.locationExists());
     g_object_set(identity_, "silent", TRUE, NULL);
 
-    GstElement * queue = FileSource::acquireVideo(config_.location());
+    GstElement * queue = FileSource::acquireVideo(pipeline, config_.location());
     gstlinkable::link(queue, identity_);
 }
 
 /// Destructor
 VideoFileSource::~VideoFileSource()
 {
-    Pipeline::Instance()->remove(&identity_);
+    pipeline_.remove(&identity_);
     FileSource::releaseVideo(config_.location());
 }
 
 
 /// Constructor
-VideoDvSource::VideoDvSource(const VideoSourceConfig &config) : 
-    VideoSource(config), 
-    queue_(Pipeline::Instance()->makeElement("queue", NULL)), 
-    dvdec_(Pipeline::Instance()->makeElement("dvdec", NULL))
+VideoDvSource::VideoDvSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config), 
+    queue_(pipeline_.makeElement("queue", NULL)), 
+    dvdec_(pipeline_.makeElement("dvdec", NULL))
 {
-    Dv1394::Instance()->setVideoSink(queue_);
+    Dv1394::Instance(pipeline_)->setVideoSink(queue_);
     gstlinkable::link(queue_, dvdec_);
 }
 
@@ -136,9 +137,9 @@ VideoDvSource::VideoDvSource(const VideoSourceConfig &config) :
 /// Destructor
 VideoDvSource::~VideoDvSource()
 {
-    Pipeline::Instance()->remove(&queue_);
-    Pipeline::Instance()->remove(&dvdec_);
-    Dv1394::Instance()->unsetVideoSink();
+    pipeline_.remove(&queue_);
+    pipeline_.remove(&dvdec_);
+    Dv1394::Instance(pipeline_)->unsetVideoSink();
 }
 
 
@@ -149,10 +150,10 @@ bool VideoV4lSource::willModifyCaptureResolution() const
 } 
 
 
-VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
-    : VideoSource(config), expectedStandard_("NTSC"), actualStandard_("")
+VideoV4lSource::VideoV4lSource(Pipeline &pipeline, const VideoSourceConfig &config)
+    : VideoSource(pipeline, config), expectedStandard_("NTSC"), actualStandard_("")
 {
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    source_ = pipeline_.makeElement(config_.source(), NULL);
     // set a v4l2src if given to config as an arg, otherwise use default
     if (config_.hasDeviceName() && config_.deviceExists())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
@@ -171,7 +172,7 @@ VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
         v4l2util::setFormatVideo(deviceStr(), config_.captureWidth(), config_.captureHeight());
     }
 
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
     setCapsFilter(srcCaps());
@@ -217,10 +218,10 @@ std::string VideoV4lSource::srcCaps() const
 }
 
 
-VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) : 
-    VideoSource(config) 
+VideoDc1394Source::VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config) 
 {
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    source_ = pipeline_.makeElement(config_.source(), NULL);
     if (config_.hasGUID())
         g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
@@ -230,7 +231,7 @@ VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) :
     /// TODO: test. this will hopefully help reduce the lag we're seeing with dc1394src
     g_object_set(G_OBJECT(source_), "buffer-size", DMA_BUFFER_SIZE_IN_FRAMES, NULL);
 
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
     setCapsFilter(srcCaps());

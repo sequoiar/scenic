@@ -33,7 +33,8 @@
 bool AudioSink::signalHandlerAttached_ = false;
         
 /// Constructor 
-AudioSink::AudioSink() : 
+AudioSink::AudioSink(Pipeline &pipeline) : 
+    pipeline_(pipeline),
     sink_(0)
 {
     // attach floating point exception signal handler
@@ -47,7 +48,7 @@ AudioSink::AudioSink() :
 /// Destructor 
 AudioSink::~AudioSink()
 {
-    Pipeline::Instance()->remove(&sink_);
+    pipeline_.remove(&sink_);
 }
 
 
@@ -98,13 +99,15 @@ void AudioSink::adjustBufferTime(unsigned long long bufferTime)
 
 
 /// Constructor 
-AudioAlsaSink::AudioAlsaSink(const AudioSinkConfig &config) : 
-    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL)), config_(config)
+AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) : 
+    AudioSink(pipeline),
+    aconv_(pipeline_.makeElement("audioconvert", NULL)), 
+    config_(config)
 {
     if (Jack::is_running())
         THROW_CRITICAL("Jack is running, you must stop jack server before using alsasink");
 
-    sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
+    sink_ = pipeline_.makeElement("alsasink", NULL);
 
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
@@ -119,15 +122,16 @@ AudioAlsaSink::AudioAlsaSink(const AudioSinkConfig &config) :
 /// Destructor
 AudioAlsaSink::~AudioAlsaSink()
 {
-    Pipeline::Instance()->remove(&aconv_);
+    pipeline_.remove(&aconv_);
 }
 
 /// Constructor 
-AudioPulseSink::AudioPulseSink(const AudioSinkConfig &config) : 
-    aconv_(Pipeline::Instance()->makeElement("audioconvert", NULL)), 
+AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config) : 
+    AudioSink(pipeline),
+    aconv_(pipeline_.makeElement("audioconvert", NULL)), 
     config_(config) 
 {
-    sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
+    sink_ = pipeline_.makeElement("pulsesink", NULL);
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
@@ -140,14 +144,15 @@ AudioPulseSink::AudioPulseSink(const AudioSinkConfig &config) :
 /// Destructor 
 AudioPulseSink::~AudioPulseSink()
 {
-    Pipeline::Instance()->remove(&aconv_);
+    pipeline_.remove(&aconv_);
 }
 
 /// Constructor 
-AudioJackSink::AudioJackSink(const AudioSinkConfig &config) :  
+AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) :  
+    AudioSink(pipeline),
     config_(config)
 {
-    sink_ = Pipeline::Instance()->makeElement("jackaudiosink", config_.sinkName());
+    sink_ = pipeline_.makeElement("jackaudiosink", config_.sinkName());
 
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);

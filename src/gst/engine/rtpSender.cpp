@@ -35,7 +35,8 @@
 
 RtpSender::~RtpSender()
 {
-    Pipeline::Instance()->remove(&rtp_sender_);
+    /// rtcp_sender and rtcp_receiver are removed in RtpBin base class
+    pipeline_.remove(&rtp_sender_);
 }
 
 
@@ -74,17 +75,17 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     GstPad *rtcpReceiverSrc;
 
     /// FIXME: need to update config.ports() accordingly if they can change (which for now they can't)
-    rtp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
+    rtp_sender_ = pipeline_.makeElement("udpsink", NULL);
     int rtpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.port());
     g_object_set(rtp_sender_, "sockfd", rtpsink_socket, "host", 
             config.remoteHost(), "port", config.port(), NULL);
 
-    rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
+    rtcp_sender_ = pipeline_.makeElement("udpsink", NULL);
     int rtcpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.rtcpFirstPort());
     g_object_set(rtcp_sender_, "sockfd", rtcpsink_socket, "host", config.remoteHost(), 
             "port", config.rtcpFirstPort(), "sync", FALSE, "async", FALSE, NULL);
 
-    rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
+    rtcp_receiver_ = pipeline_.makeElement("udpsrc", NULL);
     int rtcpsrc_socket = RtpBin::createSourceSocket(config.rtcpSecondPort());
     g_object_set(rtcp_receiver_, "sockfd", rtcpsrc_socket, "port", config.rtcpSecondPort(), NULL);
 

@@ -25,7 +25,6 @@
 #include "gstLinkable.h"
 #include "videoSink.h"
 #include "pipeline.h"
-#include "playback.h"
 #include "gutil.h"
 
 
@@ -38,7 +37,7 @@
 
 void VideoSink::destroySink()
 {
-    Pipeline::Instance()->remove(&sink_);
+    pipeline_.remove(&sink_);
 }
 
 Window GtkVideoSink::getXWindow()
@@ -50,9 +49,10 @@ Window GtkVideoSink::getXWindow()
 
 void GtkVideoSink::destroy_cb(GtkWidget * /*widget*/, gpointer data)
 {
+
     LOG_DEBUG("Window closed, quitting.");
-    playback::quit();
     GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
+    //context->pipeline_.quit();
     context->window_ = 0;
 }
 
@@ -140,8 +140,9 @@ void VideoSink::prepareSink()
 }
 
 
-gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
+gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
+    XvImageSink *context = static_cast<XvImageSink*>(data);
     switch (event->keyval)
     {
         case GDK_f:
@@ -153,7 +154,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             // Quit application, this quits the main loop
             // (if there is one)
             LOG_INFO("Q key pressed, quitting.");
-            playback::quit();
+            context->VideoSink::pipeline_.quit();
             break;
 
         default:
@@ -179,8 +180,9 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-XvImageSink::XvImageSink(int width, int height, int screenNum) : 
-    GtkVideoSink(screenNum) 
+XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNum) : 
+    GtkVideoSink(pipeline, screenNum),
+    BusMsgHandler(pipeline)
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
@@ -189,7 +191,7 @@ XvImageSink::XvImageSink(int width, int height, int screenNum) :
         gtk_initialized = true;
     }
 
-    sink_ = Pipeline::Instance()->makeElement("xvimagesink", NULL);
+    sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
     prepareSink();
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -222,7 +224,7 @@ XvImageSink::XvImageSink(int width, int height, int screenNum) :
 
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
-            G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
+            G_CALLBACK(XvImageSink::key_press_event_cb), this);
     g_signal_connect(G_OBJECT(window_), "destroy",
             G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
@@ -242,11 +244,12 @@ XvImageSink::~XvImageSink()
 }
 
 
-XImageSink::XImageSink() : 
-    colorspc_(Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL)) 
+XImageSink::XImageSink(Pipeline &pipeline) : 
+    VideoSink(pipeline),
+    colorspc_(pipeline_.makeElement("ffmpegcolorspace", NULL)) 
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
-    sink_ = Pipeline::Instance()->makeElement("ximagesink", NULL);
+    sink_ = pipeline_.makeElement("ximagesink", NULL);
     prepareSink();
 
     gstlinkable::link(colorspc_, sink_);
@@ -255,6 +258,6 @@ XImageSink::XImageSink() :
 XImageSink::~XImageSink()
 {
     VideoSink::destroySink();
-    Pipeline::Instance()->remove(&colorspc_);
+    pipeline_.remove(&colorspc_);
 }
 

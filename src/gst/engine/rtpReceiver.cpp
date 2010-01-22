@@ -32,7 +32,6 @@
 #include "rtpPay.h"
 #include "rtpReceiver.h"
 #include "remoteConfig.h"
-#include "playback.h"
 
 #include <gtk/gtk.h>
 
@@ -50,7 +49,7 @@ void RtpReceiver::enableControl()
 
 RtpReceiver::~RtpReceiver()
 {
-    Pipeline::Instance()->remove(&rtp_receiver_);
+    pipeline_.remove(&rtp_receiver_);
 
     // find this->depayloader in the static list of depayloaders
     if (depayloader_) // in case destructor was called before depayloader was created
@@ -197,7 +196,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     // add to our list of active depayloaders
     depayloaders_.push_back(depayloader_);
 
-    rtp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
+    rtp_receiver_ = pipeline_.makeElement("udpsrc", NULL);
     int rtpsrc_socket = RtpBin::createSourceSocket(config.port());
     g_object_set(rtp_receiver_, "sockfd", rtpsrc_socket, "port", config.port(), NULL);
 
@@ -209,11 +208,11 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
         LOG_DEBUG("Using IFACE for multicast" << config.multicastInterface());
     }
 
-    rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
+    rtcp_receiver_ = pipeline_.makeElement("udpsrc", NULL);
     int rtcpsrc_socket = RtpBin::createSourceSocket(config.rtcpFirstPort());
     g_object_set(rtcp_receiver_, "sockfd", rtcpsrc_socket, "port", config.rtcpFirstPort(), NULL);
 
-    rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
+    rtcp_sender_ = pipeline_.makeElement("udpsink", NULL);
     int rtcpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.rtcpSecondPort());
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "sockfd", rtcpsink_socket, "port",
             config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);

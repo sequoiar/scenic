@@ -25,6 +25,7 @@
 #include <string>
 
 class MapMsg;
+class Pipeline;
 class VideoSource;
 class VideoScale;
 class VideoSink;
@@ -33,7 +34,7 @@ class VideoSourceConfig
 {
     public:
         VideoSourceConfig(MapMsg &msg);
-        VideoSource* createSource() const;  // factory method
+        VideoSource* createSource(Pipeline &pipeline) const;  // factory method
 
         const char *source() const { return source_.c_str(); }
         std::string sourceString() const { return source_; }
@@ -82,8 +83,8 @@ class VideoSinkConfig
     public:
 
         VideoSinkConfig(MapMsg &msg);
-        VideoSink* createSink() const;
-        VideoScale* createVideoScale() const;
+        VideoSink* createSink(Pipeline &pipeline) const;
+        VideoScale* createVideoScale(Pipeline &pipeline) const;
         bool doDeinterlace() const { return doDeinterlace_; }
         bool hasCustomResolution() const;
 

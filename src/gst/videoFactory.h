@@ -75,7 +75,7 @@ namespace videofactory
     }
 
     static shared_ptr<VideoReceiver> 
-        buildVideoReceiver(MapMsg &msg)
+        buildVideoReceiver(Pipeline &pipeline, MapMsg &msg)
         {
             shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
 
@@ -84,17 +84,17 @@ namespace videofactory
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
 
-            return shared_ptr<VideoReceiver>(new VideoReceiver(vConfig, rConfig));
+            return shared_ptr<VideoReceiver>(new VideoReceiver(pipeline, vConfig, rConfig));
         }
 
 
     static shared_ptr<VideoSender> 
-        buildVideoSender(MapMsg &msg)
+        buildVideoSender(Pipeline &pipeline, MapMsg &msg)
         {
             shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(msg));
 
-            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID)); 
-            shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, msg, MSG_ID)); 
+            shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, rConfig));
 
             rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
@@ -103,12 +103,12 @@ namespace videofactory
         }
 
     static shared_ptr<LocalVideo> 
-        buildLocalVideo(MapMsg &msg)
+        buildLocalVideo(Pipeline &pipeline, MapMsg &msg)
         {
             shared_ptr<VideoSourceConfig> sourceConfig(new VideoSourceConfig(msg));
             shared_ptr<VideoSinkConfig> sinkConfig(new VideoSinkConfig(msg));
 
-            return shared_ptr<LocalVideo>(new LocalVideo(sourceConfig, sinkConfig));
+            return shared_ptr<LocalVideo>(new LocalVideo(pipeline, sourceConfig, sinkConfig));
         }
 }
 

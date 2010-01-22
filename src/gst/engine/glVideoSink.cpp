@@ -75,14 +75,15 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-GLImageSink::GLImageSink(int width, int height, int screen_num) : 
-    GtkVideoSink(screen_num) 
+GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_num) : 
+    GtkVideoSink(pipeline, screen_num), 
+    BusMsgHandler(pipeline)
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
         gtk_init(0, NULL);
 
-    sink_ = Pipeline::Instance()->makeElement("glimagesink", NULL);
+    sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
@@ -210,8 +211,9 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 }
 
 
-gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
+gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
+    GLImageSink *context = static_cast<GLImageSink*>(data);
     switch (event->keyval) {
         case GDK_f:
         case GDK_F:
@@ -271,7 +273,7 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
         case GDK_Q:
             // Quit application, this quits the main loop
             // (if there is one)
-            playback::quit();
+            context->VideoSink::pipeline_.quit();
             break;
         default:
             LOG_DEBUG("unknown keypress " << event->keyval);

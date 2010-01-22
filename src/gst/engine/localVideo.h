@@ -37,11 +37,12 @@ class _GstElement;
 class LocalVideo : public boost::noncopyable
 {
     public:
-        LocalVideo(boost::shared_ptr<VideoSourceConfig> sourceConfig,
+        LocalVideo(Pipeline &pipeline, boost::shared_ptr<VideoSourceConfig> sourceConfig,
                 boost::shared_ptr<VideoSinkConfig> sinkConfig);
         ~LocalVideo();
 
     private:
+        Pipeline &pipeline_;
         boost::shared_ptr<VideoSourceConfig> sourceConfig_;
         boost::shared_ptr<VideoSinkConfig> sinkConfig_;
         VideoSource *source_;

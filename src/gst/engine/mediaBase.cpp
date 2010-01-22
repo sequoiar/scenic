@@ -33,11 +33,11 @@ SenderBase::SenderBase(shared_ptr<SenderConfig> rConfig) :
     remoteConfig_->checkPorts();
 }
 
-void SenderBase::createPipeline()
+void SenderBase::createPipeline(Pipeline &pipeline)
 {
     // template method pattern : these methods are defined in subclasses
-    createSource();
-    createCodec();
+    createSource(pipeline);
+    createCodec(pipeline);
     createPayloader();
 }
 
@@ -46,10 +46,10 @@ SenderBase::~SenderBase()
     remoteConfig_->cleanupPorts();
 }
 
-void ReceiverBase::createPipeline()
+void ReceiverBase::createPipeline(Pipeline &pipeline)
 {
     // these methods are defined in subclasses
-    createCodec();
+    createCodec(pipeline);
     createDepayloader();
-    createSink();
+    createSink(pipeline);
 }

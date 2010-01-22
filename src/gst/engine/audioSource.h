@@ -33,6 +33,7 @@
 
 // forward declarations
 class AudioSourceConfig;
+class Pipeline;
 
 /** 
  *  Abstract base class from which our audio sources are derived.
@@ -47,8 +48,9 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
         ~AudioSource();
 
     protected:
-        explicit AudioSource(const AudioSourceConfig &config);
+        AudioSource(Pipeline &pipeline, const AudioSourceConfig &config);
         
+        Pipeline &pipeline_;
         /// Audio parameter object 
         const AudioSourceConfig &config_;
         
@@ -79,13 +81,14 @@ class InterleavedAudioSource : public AudioSource
                  * separate classes, it make sense for them to be friends. Also
                  * InterleavedAudioSource's internals are safe
                  * as InterleavedAudioSource's children will not have access here. */
-                explicit Interleave(const AudioSourceConfig &config);
+                Interleave(Pipeline &pipeline, const AudioSourceConfig &config);
                 ~Interleave();
 
                 GstElement *srcElement() { return interleave_; }
                 GstElement *sinkElement() { return interleave_; }
 
             private:
+                Pipeline &pipeline_;
                 GstElement *interleave_;
                 const AudioSourceConfig &config_;
                 static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
@@ -95,7 +98,7 @@ class InterleavedAudioSource : public AudioSource
         GstElement *srcElement() { return interleave_.srcElement(); }
 
     protected:
-        explicit InterleavedAudioSource(const AudioSourceConfig &config);
+        InterleavedAudioSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
         ~InterleavedAudioSource();
 
@@ -114,7 +117,7 @@ class InterleavedAudioSource : public AudioSource
 class AudioTestSource : public InterleavedAudioSource
 {
     public:
-        explicit AudioTestSource(const AudioSourceConfig &config);
+        AudioTestSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioTestSource();
@@ -144,7 +147,7 @@ class AudioTestSource : public InterleavedAudioSource
 class AudioFileSource : public AudioSource, public BusMsgHandler
 {
     public:
-        explicit AudioFileSource(const AudioSourceConfig &config);
+        AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioFileSource();
@@ -168,7 +171,7 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
 class AudioAlsaSource : public AudioSource
 {
     public:
-        AudioAlsaSource(const AudioSourceConfig &config);
+        AudioAlsaSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioAlsaSource();
@@ -187,7 +190,7 @@ class AudioAlsaSource : public AudioSource
 class AudioPulseSource : public AudioSource
 {
     public:
-        AudioPulseSource(const AudioSourceConfig &config);
+        AudioPulseSource(Pipeline &pipeline, const AudioSourceConfig &config);
     private:
         ~AudioPulseSource();
 
@@ -205,7 +208,7 @@ class AudioPulseSource : public AudioSource
 class AudioJackSource : public AudioSource, public MessageHandler
 {
     public:
-        AudioJackSource(const AudioSourceConfig &config);
+        AudioJackSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioJackSource();
@@ -231,7 +234,7 @@ class AudioJackSource : public AudioSource, public MessageHandler
 class AudioDvSource : public AudioSource
 {
     public:
-        explicit AudioDvSource(const AudioSourceConfig &config);
+        AudioDvSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioDvSource();

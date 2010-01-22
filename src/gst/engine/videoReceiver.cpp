@@ -36,11 +36,12 @@
 
 using boost::shared_ptr;
     
-VideoReceiver::VideoReceiver(shared_ptr<VideoSinkConfig> vConfig, 
+VideoReceiver::VideoReceiver(Pipeline &pipeline,
+        shared_ptr<VideoSinkConfig> vConfig, 
         shared_ptr<ReceiverConfig> rConfig) : 
     videoConfig_(vConfig), 
     remoteConfig_(rConfig), 
-    session_(), 
+    session_(pipeline), 
     depayloader_(0), 
     decoder_(0), 
     videoscale_(0), 
@@ -49,7 +50,7 @@ VideoReceiver::VideoReceiver(shared_ptr<VideoSinkConfig> vConfig,
 {
     tassert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
-    createPipeline();
+    createPipeline(pipeline);
 }
 
 VideoReceiver::~VideoReceiver()
@@ -62,9 +63,9 @@ VideoReceiver::~VideoReceiver()
 }
 
 
-void VideoReceiver::createCodec()
+void VideoReceiver::createCodec(Pipeline &pipeline)
 {
-    tassert(decoder_ = remoteConfig_->createVideoDecoder(videoConfig_->doDeinterlace()));
+    tassert(decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace()));
 }
 
 
@@ -78,22 +79,22 @@ void VideoReceiver::createDepayloader()
 }
 
 
-void VideoReceiver::createSink()
+void VideoReceiver::createSink(Pipeline &pipeline)
 {
     // XXX: According to the documentation, videoscale can be used without 
     // impact if no scaling is needed but I need to verify this and for now not use 
     // videoscale unless the specified resolution is different than the default
     if (videoConfig_->hasCustomResolution())
     {
-        tassert(videoscale_ = videoConfig_->createVideoScale());
-        tassert(sink_ = videoConfig_->createSink());
+        tassert(videoscale_ = videoConfig_->createVideoScale(pipeline));
+        tassert(sink_ = videoConfig_->createSink(pipeline));
 
         gstlinkable::link(*decoder_, *videoscale_);
         gstlinkable::link(*videoscale_, *sink_);
     }
     else
     {
-        tassert(sink_ = videoConfig_->createSink());
+        tassert(sink_ = videoConfig_->createSink(pipeline));
         gstlinkable::link(*decoder_, *sink_);
     }
 

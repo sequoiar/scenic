@@ -67,21 +67,21 @@ VideoSourceConfig::VideoSourceConfig(MapMsg &msg) :
 {}
 
 
-VideoSource * VideoSourceConfig::createSource() const
+VideoSource * VideoSourceConfig::createSource(Pipeline &pipeline) const
 {
     // FIXME: should derived class specific arguments just be passed in here to their constructors?
     if (source_ == "videotestsrc")
-        return new VideoTestSource(*this);
+        return new VideoTestSource(pipeline, *this);
     else if (source_ == "v4l2src")
-        return new VideoV4lSource(*this);
+        return new VideoV4lSource(pipeline, *this);
     else if (source_ == "v4lsrc")
-        return new VideoV4lSource(*this);
+        return new VideoV4lSource(pipeline, *this);
     else if (source_ == "dv1394src")
-        return new VideoDvSource(*this);
+        return new VideoDvSource(pipeline, *this);
     else if (source_ == "filesrc")
-        return new VideoFileSource(*this);
+        return new VideoFileSource(pipeline, *this);
     else if (source_ == "dc1394src")
-        return new VideoDc1394Source(*this);
+        return new VideoDc1394Source(pipeline, *this);
     else 
         THROW_ERROR(source_ << " is an invalid source!");
 
@@ -207,18 +207,18 @@ VideoSinkConfig::VideoSinkConfig(MapMsg &msg) :
 {}
 
 
-VideoSink * VideoSinkConfig::createSink() const
+VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(displayWidth_, displayHeight_, screenNum_);
+        return new XvImageSink(pipeline, displayWidth_, displayHeight_, screenNum_);
     else if (sink_ == "ximagesink")
-        return new XImageSink();
+        return new XImageSink(pipeline);
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(displayWidth_, displayHeight_, screenNum_);
+        return new GLImageSink(pipeline, displayWidth_, displayHeight_, screenNum_);
 #endif
     else if (sink_ == "sharedvideosink")
-        return new SharedVideoSink(displayWidth_, displayHeight_, sharedVideoId_);
+        return new SharedVideoSink(pipeline, displayWidth_, displayHeight_, sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid sink");
 
@@ -227,9 +227,9 @@ VideoSink * VideoSinkConfig::createSink() const
 }
 
 
-VideoScale* VideoSinkConfig::createVideoScale() const
+VideoScale* VideoSinkConfig::createVideoScale(Pipeline &pipeline) const
 {
-    return new VideoScale(displayWidth_, displayHeight_);
+    return new VideoScale(pipeline, displayWidth_, displayHeight_);
 }
 
 

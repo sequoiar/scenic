@@ -30,6 +30,7 @@
 
 #include "noncopyable.h"
 
+class Pipeline;
 class _GtkWidget;
 class _GdkEventExpose;
 class _GdkEventKey;
@@ -39,12 +40,13 @@ class _GstElement;
 class VideoSink : public GstLinkableSink, boost::noncopyable
 {
     public:
-       VideoSink() : sink_(0) {};
+        explicit VideoSink(Pipeline &pipeline) : pipeline_(pipeline), sink_(0) {};
         virtual ~VideoSink() {};
 
     protected:
         virtual void destroySink();
         void prepareSink();
+        Pipeline &pipeline_;
         _GstElement *sink_;
 };
 
@@ -52,8 +54,8 @@ class GtkVideoSink
 : public VideoSink, public MessageHandler
 {
     public:
-        GtkVideoSink(int screen_num)
-            : window_(0), screen_num_(screen_num) {};
+        GtkVideoSink(Pipeline &pipeline, int screen_num)
+            : VideoSink(pipeline), window_(0), screen_num_(screen_num) {};
         virtual ~GtkVideoSink(){};
         void showWindow();
 
@@ -81,7 +83,7 @@ class XvImageSink
 : public GtkVideoSink, public BusMsgHandler
 {
     public:
-        XvImageSink(int width, int height, int screenNum);
+        XvImageSink(Pipeline &pipeline, int width, int height, int screenNum);
         bool handleBusMsg(_GstMessage *msg);
 
     private:
@@ -97,7 +99,7 @@ class XImageSink
 : public VideoSink
 {
     public: 
-        XImageSink(); 
+        XImageSink(Pipeline &pipeline); 
 
     private:
         ~XImageSink();

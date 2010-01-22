@@ -39,17 +39,17 @@ class VideoReceiver
     : public ReceiverBase
 {
     public:
-        VideoReceiver(boost::shared_ptr<VideoSinkConfig> vConfig, 
+        VideoReceiver(Pipeline &pipeline,
+                boost::shared_ptr<VideoSinkConfig> vConfig, 
                 boost::shared_ptr<ReceiverConfig> rConfig);
 
         ~VideoReceiver();
         void toggleFullscreen();
 
     private:
-
-        void createCodec();
+        void createCodec(Pipeline &pipeline);
         void createDepayloader();
-        void createSink();
+        void createSink(Pipeline &pipeline);
         void setCaps();
 
         boost::shared_ptr<VideoSinkConfig> videoConfig_;

@@ -32,9 +32,10 @@ else create new filesrc and plug into it */
 // class holds a static map of all the existing instances of FileSources 
 std::map<std::string, FileSource*> FileSource::fileSources_;
 
-FileSource::FileSource(const std::string & location) :
-    filesrc_(Pipeline::Instance()->makeElement("filesrc", NULL)), 
-    decodebin_(Pipeline::Instance()->makeElement("decodebin", NULL)), 
+FileSource::FileSource(Pipeline &pipeline, const std::string & location) :
+    pipeline_(pipeline),
+    filesrc_(pipeline_.makeElement("filesrc", NULL)), 
+    decodebin_(pipeline_.makeElement("decodebin", NULL)), 
     videoQueue_(0), 
     audioQueue_(0)
 {
@@ -54,8 +55,8 @@ FileSource::~FileSource()
 {
     if (isLinked())
         LOG_WARNING("Deleting FileSource that is still linked");
-    Pipeline::Instance()->remove(&decodebin_);
-    Pipeline::Instance()->remove(&filesrc_);
+    pipeline_.remove(&decodebin_);
+    pipeline_.remove(&filesrc_);
 }
 
 
@@ -65,26 +66,26 @@ bool FileSource::instanceExists(const std::string &location)
 }   
 
 /// checks to see if an instance is already available, or creates a new one if needed.
-GstElement * FileSource::acquireAudio(const std::string &location)
+GstElement * FileSource::acquireAudio(Pipeline &pipeline, const std::string &location)
 {
     if (not instanceExists(location))  // make new FileSource if needed
-        fileSources_[location] = new FileSource(location);
+        fileSources_[location] = new FileSource(pipeline, location);
 
     if (fileSources_[location]->audioQueue_ == 0)
-        fileSources_[location]->audioQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+        fileSources_[location]->audioQueue_ = pipeline.makeElement("queue", NULL);
 
     return fileSources_[location]->audioQueue_;
 }
 
 
 /// checks to see if an instance is already available, or creates a new one if needed.
-GstElement * FileSource::acquireVideo(const std::string &location)
+GstElement * FileSource::acquireVideo(Pipeline &pipeline, const std::string &location)
 {
     if (not instanceExists(location))  // make new FileSource if needed
-        fileSources_[location] = new FileSource(location);
+        fileSources_[location] = new FileSource(pipeline, location);
 
     if (fileSources_[location]->videoQueue_ == 0)
-        fileSources_[location]->videoQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+        fileSources_[location]->videoQueue_ = pipeline.makeElement("queue", NULL);
 
     return fileSources_[location]->videoQueue_;
 }
@@ -123,13 +124,13 @@ void FileSource::releaseVideo(const std::string &location)
 
 void FileSource::removeVideo()
 {
-    Pipeline::Instance()->remove(&videoQueue_);
+    pipeline_.remove(&videoQueue_);
 }
 
 
 void FileSource::removeAudio()
 {
-    Pipeline::Instance()->remove(&audioQueue_);
+    pipeline_.remove(&audioQueue_);
 }
 
 

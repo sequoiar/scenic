@@ -31,6 +31,7 @@
 
 class MapMsg;
 class Encoder;
+class Pipeline;
 class VideoEncoder;
 class VideoDecoder;
 class Decoder;
@@ -75,11 +76,11 @@ class RemoteConfig
 class SenderConfig : public RemoteConfig, public BusMsgHandler
 {
     public:
-        SenderConfig(MapMsg &msg,
+        SenderConfig(Pipeline &pipeline, MapMsg &msg,
                 int msgId__);
 
-        VideoEncoder* createVideoEncoder(MapMsg &settings) const;
-        Encoder* createAudioEncoder() const;
+        VideoEncoder* createVideoEncoder(Pipeline &pipeline, MapMsg &settings) const;
+        Encoder* createAudioEncoder(Pipeline &pipeline) const;
         bool capsOutOfBand() { return capsOutOfBand_; }
         void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
 
@@ -98,8 +99,8 @@ class ReceiverConfig : public RemoteConfig
         ReceiverConfig(MapMsg &msg, const std::string &caps__,
                 int msgId__); 
 
-        VideoDecoder* createVideoDecoder(bool doDeinterlace) const;
-        Decoder* createAudioDecoder() const;
+        VideoDecoder* createVideoDecoder(Pipeline &pipeline, bool doDeinterlace) const;
+        Decoder* createAudioDecoder(Pipeline &pipeline) const;
 
         const char *multicastInterface() const { return multicastInterface_.c_str(); }
         const char *caps() const { return caps_.c_str(); }

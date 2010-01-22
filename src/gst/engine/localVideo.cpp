@@ -33,13 +33,16 @@
 using boost::shared_ptr;
 
 /// Constructor
-LocalVideo::LocalVideo(shared_ptr<VideoSourceConfig> sourceConfig, shared_ptr<VideoSinkConfig> sinkConfig) : 
+LocalVideo::LocalVideo(Pipeline &pipeline, 
+        shared_ptr<VideoSourceConfig> sourceConfig, 
+        shared_ptr<VideoSinkConfig> sinkConfig) : 
+    pipeline_(pipeline),
     sourceConfig_(sourceConfig),
     sinkConfig_(sinkConfig),
-    source_(sourceConfig_->createSource()), 
-    colourspace_(Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL)),
-    videoscale_(sinkConfig_->createVideoScale()),
-    sink_(sinkConfig_->createSink())
+    source_(sourceConfig_->createSource(pipeline_)), 
+    colourspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
+    videoscale_(sinkConfig_->createVideoScale(pipeline_)),
+    sink_(sinkConfig_->createSink(pipeline_))
 {
     if (sourceConfig_->sourceString() != "dc1394src")
     {
@@ -58,6 +61,7 @@ LocalVideo::LocalVideo(shared_ptr<VideoSourceConfig> sourceConfig, shared_ptr<Vi
 LocalVideo::~LocalVideo()
 {
     delete sink_;
-    Pipeline::Instance()->remove(&colourspace_);
+    pipeline_.remove(&colourspace_);
     delete source_;
 }
+

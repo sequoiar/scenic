@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <boost/assign.hpp>
 #include <gst/gst.h>
+#include "pipeline.h"
 #include "remoteConfig.h"
 #include "tcp/asio.h"
 #include "mapMsg.h"
@@ -79,25 +80,27 @@ void RemoteConfig::checkPorts() const
 }
         
 
-SenderConfig::SenderConfig(MapMsg &msg, int msgId__) : 
-    RemoteConfig(msg, msgId__), message_(""), 
+SenderConfig::SenderConfig(Pipeline &pipeline, MapMsg &msg, int msgId__) : 
+    RemoteConfig(msg, msgId__), 
+    BusMsgHandler(pipeline),
+    message_(""), 
     capsOutOfBand_(false)    // this will be determined later
 {}
 
 
-VideoEncoder * SenderConfig::createVideoEncoder(MapMsg &settings) const
+VideoEncoder * SenderConfig::createVideoEncoder(Pipeline &pipeline, MapMsg &settings) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "h264")
-        return new H264Encoder(settings);
+        return new H264Encoder(pipeline, settings);
     else if (codec_ == "h263")
-        return new H263Encoder(settings);       // set caps from here?
+        return new H263Encoder(pipeline, settings);       // set caps from here?
     else if (codec_ == "mpeg4")
-        return new Mpeg4Encoder(settings);
+        return new Mpeg4Encoder(pipeline, settings);
     else if (codec_ == "theora")
-        return new TheoraEncoder(settings);
+        return new TheoraEncoder(pipeline, settings);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -107,17 +110,17 @@ VideoEncoder * SenderConfig::createVideoEncoder(MapMsg &settings) const
 }
 
 
-Encoder * SenderConfig::createAudioEncoder() const
+Encoder * SenderConfig::createAudioEncoder(Pipeline &pipeline) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "vorbis")
-        return new VorbisEncoder();
+        return new VorbisEncoder(pipeline);
     else if (codec_ == "raw")
-        return new RawEncoder();
+        return new RawEncoder(pipeline);
     else if (codec_ == "mp3")
-        return new LameEncoder();
+        return new LameEncoder(pipeline);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -211,19 +214,19 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
     }
 }
 
-VideoDecoder * ReceiverConfig::createVideoDecoder(bool doDeinterlace) const
+VideoDecoder * ReceiverConfig::createVideoDecoder(Pipeline &pipeline, bool doDeinterlace) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
 
     if (codec_ == "h264")
-        return new H264Decoder(doDeinterlace);
+        return new H264Decoder(pipeline, doDeinterlace);
     else if (codec_ == "h263")
-        return new H263Decoder(doDeinterlace);
+        return new H263Decoder(pipeline, doDeinterlace);
     else if (codec_ == "mpeg4")
-        return new Mpeg4Decoder(doDeinterlace);
+        return new Mpeg4Decoder(pipeline, doDeinterlace);
     else if (codec_ == "theora")
-        return new TheoraDecoder(doDeinterlace);
+        return new TheoraDecoder(pipeline, doDeinterlace);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -233,17 +236,17 @@ VideoDecoder * ReceiverConfig::createVideoDecoder(bool doDeinterlace) const
 }
 
 
-Decoder * ReceiverConfig::createAudioDecoder() const
+Decoder * ReceiverConfig::createAudioDecoder(Pipeline &pipeline) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
 
     if (codec_ == "vorbis")
-        return new VorbisDecoder();
+        return new VorbisDecoder(pipeline);
     else if (codec_ == "raw")
-        return new RawDecoder();
+        return new RawDecoder(pipeline);
     else if (codec_ == "mp3")
-        return new MadDecoder();
+        return new MadDecoder(pipeline);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
