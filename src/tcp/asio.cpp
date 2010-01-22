@@ -71,8 +71,8 @@ class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_
             // shared_from_this gives shared_ptr to this, this way we cleanly avoid memory leaks
             socket_.async_read_some(boost::asio::buffer(data_, max_length),
                     boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+                        error,
+                        bytes_transferred));
         }
 
         void handle_timer(const error_code& err)
@@ -114,8 +114,8 @@ class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_
                 {
                     socket_.async_read_some(boost::asio::buffer(data_, max_length),
                             boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
-                                boost::asio::placeholders::error,
-                                boost::asio::placeholders::bytes_transferred));
+                                error,
+                                bytes_transferred));
                 }
             }
             else
@@ -144,7 +144,7 @@ class tcp_receiver {
         session_ptr new_session(new tcp_receiver_session(io_service_, buffer_));
         acceptor_.async_accept(new_session->socket(),
                 boost::bind(&tcp_receiver::handle_accept, this, new_session,
-                    boost::asio::placeholders::error));
+                    error));
     }
 
     void handle_accept(session_ptr new_session,
@@ -156,7 +156,7 @@ class tcp_receiver {
             new_session.reset(new tcp_receiver_session(io_service_, buffer_));
             acceptor_.async_accept(new_session->socket(),
                     boost::bind(&tcp_receiver::handle_accept, this, new_session,
-                        boost::asio::placeholders::error));
+                        error));
         }
         else
             LOG_WARNING("Got error" << boost::system::system_error(error).what());
