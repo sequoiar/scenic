@@ -34,7 +34,6 @@ miville_packages = [
     'miville.protocols',
     'miville.streams',
     'miville.connectors.basic',
-    'miville.connectors.sip',
     'miville.ui.cli',
     'miville.ui.web',
     'miville.ui.web.pages',
