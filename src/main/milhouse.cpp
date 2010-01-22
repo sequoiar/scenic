@@ -177,12 +177,6 @@ short Milhouse::run(int argc, char **argv)
 
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
 
-    // FIXME: this is actually where pipeline instance is created because it's the 
-    // first time we call Pipeline::Instance(), this is bad in its implicitness
-    // FIXME: gst-debug broken for now
-    //if (logger.gstDebug())
-     //   playback::makeVerbose();
-
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
 
     if (options["version"].as<bool>())
@@ -195,15 +189,22 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
+    if (options.count("display"))
+    {
+        setenv("DISPLAY", 
+                options["display"].as<std::string>().c_str(), 
+                1 /* override current value if present */);
+    }
+
     if (options["list-cameras"].as<bool>())
-            return VideoSourceConfig::listCameras();
-    
+        return VideoSourceConfig::listCameras();
+
     if (options["localvideo"].as<bool>()) 
     {
         runAsLocal(options);
         return 0;
     }
- 
+
     if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {

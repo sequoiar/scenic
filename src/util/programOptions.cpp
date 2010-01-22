@@ -92,6 +92,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("localvideo", po::bool_switch(), "display local video only")
             ("flip-video", po::value<string>()->default_value("none"), "flip video (none, clockwise, rotate-180, "
              "counterclockwise, horizontal-flip, vertical-flip, upper-left-diagonal, upper-right-diagonal")
+            ("display", po::value<string>(), "set DISPLAY environment variable")
             ;
 
         descriptionInitialized = true;
