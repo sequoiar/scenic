@@ -91,7 +91,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("aspect-ratio,A", po::value<string>()->default_value("4:3"), "picture aspect ratio (4:3,16:9)")
             ("localvideo", po::bool_switch(), "display local video only")
             ("flip-video", po::value<string>()->default_value("none"), "flip video (none, clockwise, rotate-180, "
-             "counterclockwise, horizontal-flip, vertical-flip, upper-left-diagonal, upper-right-diagonal")
+             "counterclockwise, horizontal-flip, vertical-flip, upper-left-diagonal, upper-right-diagonal)")
             ("display", po::value<string>(), "set DISPLAY environment variable")
             ;
 
