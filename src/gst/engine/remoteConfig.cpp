@@ -202,7 +202,7 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
     multicastInterface_(msg["multicast-interface"]), caps_(caps__), 
     capsOutOfBand_(msg["negotiate-caps"] or caps_ == "")
 {
-    if (capsOutOfBand_) // couldn't find caps, need them from other host or we explicitly been told to send caps
+    if (capsOutOfBand_) // couldn't find caps, need them from other host or we've explicitly been told to send caps
     {
         if (isSupportedCodec(codec_))   // this would fail later but we want to make sure we don't wait with a bogus codec
         { 

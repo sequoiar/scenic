@@ -81,6 +81,7 @@ class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_
             {
                 timer_.expires_at(timer_.expires_at() + seconds(1));
                 timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error)); // schedule this check for later
+
                 if (signal_handlers::signalFlag())
                 {
                     socket_.get_io_service().stop();
@@ -184,7 +185,7 @@ std::string asio::tcpGetBuffer(int port, int &/*id*/)
 }
 
 
-bool asio::tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
+bool asio::tcpSendBuffer(const std::string &ip, int port, int /*id*/, const std::string &caps)
 {
     using boost::lexical_cast;
 
