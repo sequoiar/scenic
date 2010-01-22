@@ -2,6 +2,9 @@ include $(top_srcdir)/globals.mak
 SUBDIRS = docs prism
 DIST_SUBDIRS = miville maugis docs prism
 
+# Install my_script in $(bindir) and distribute it.
+dist_bin_SCRIPTS = mivilled midistream miville-wrapper
+
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/src/main:$(PATH) trial
         
 all: 

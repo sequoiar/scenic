@@ -191,7 +191,6 @@ AC_CONFIG_FILES([Makefile
                  py/miville/Makefile
                  py/miville/connectors/Makefile
                  py/miville/connectors/basic/Makefile
-                 py/miville/connectors/sip/Makefile
                  py/miville/devices/Makefile
                  py/miville/protocols/Makefile
                  py/miville/streams/Makefile
