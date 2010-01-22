@@ -28,6 +28,7 @@ class MapMsg;
 class Pipeline;
 class VideoSource;
 class VideoScale;
+class VideoFlip;
 class VideoSink;
 
 class VideoSourceConfig
@@ -85,17 +86,21 @@ class VideoSinkConfig
         VideoSinkConfig(MapMsg &msg);
         VideoSink* createSink(Pipeline &pipeline) const;
         VideoScale* createVideoScale(Pipeline &pipeline) const;
+        VideoFlip* createVideoFlip(Pipeline &pipeline) const;
         bool doDeinterlace() const { return doDeinterlace_; }
         bool hasCustomResolution() const;
 
     private:
-
+        bool resolutionIsInverted() const;
+        int effectiveDisplayWidth() const;
+        int effectiveDisplayHeight() const;
         const std::string sink_;
         const int screenNum_;
         bool doDeinterlace_;
         const std::string sharedVideoId_;
         const int displayWidth_;
         const int displayHeight_;
+        const std::string flipMethod_;
 };
 
 #endif // _VIDEO_CONFIG_H_

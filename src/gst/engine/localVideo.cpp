@@ -28,6 +28,7 @@
 
 #include "videoSource.h"
 #include "videoScale.h"
+#include "videoFlip.h"
 #include "videoSink.h"
 
 using boost::shared_ptr;
@@ -42,18 +43,21 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     source_(sourceConfig_->createSource(pipeline_)), 
     colourspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
     videoscale_(sinkConfig_->createVideoScale(pipeline_)),
+    videoflip_(sinkConfig_->createVideoFlip(pipeline_)),
     sink_(sinkConfig_->createSink(pipeline_))
 {
     if (sourceConfig_->sourceString() != "dc1394src")
     {
         gstlinkable::link(*source_, *videoscale_);
-        gstlinkable::link(*videoscale_, *sink_);
+        gstlinkable::link(*videoscale_, *videoflip_);
+        gstlinkable::link(*videoflip_, *sink_);
     }
     else
     {
         gstlinkable::link(*source_, colourspace_);
         gstlinkable::link(colourspace_, *videoscale_);
-        gstlinkable::link(*videoscale_, *sink_);
+        gstlinkable::link(*videoscale_, *videoflip_);
+        gstlinkable::link(*videoflip_, *sink_);
     }
 }
 
@@ -62,6 +66,8 @@ LocalVideo::~LocalVideo()
 {
     delete sink_;
     pipeline_.remove(&colourspace_);
+    delete videoflip_;
+    delete videoscale_;
     delete source_;
 }
 

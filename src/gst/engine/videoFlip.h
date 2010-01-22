@@ -1,5 +1,5 @@
 
-/* videoScale.h
+/* videoFlip.h
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef _VIDEO_SCALE_H_
-#define _VIDEO_SCALE_H_
+#ifndef _VIDEO_FLIP_H_
+#define _VIDEO_FLIP_H_
 
 #include "gstLinkable.h"
 #include "noncopyable.h"
@@ -35,20 +35,19 @@ class _GstElement;
  *  A filter that scales video to a specified resolution.
  */
 
-class VideoScale : public GstLinkableFilter, public boost::noncopyable
+class VideoFlip : public GstLinkableFilter, public boost::noncopyable
 {
     public:
-        VideoScale(Pipeline &pipeline, int width, int height);
-        ~VideoScale();
+        VideoFlip(Pipeline &pipeline, const std::string &flipMethod);
+        ~VideoFlip();
 
     private:
-        _GstElement *sinkElement() { return videoscale_; }
-        _GstElement *srcElement() { return capsfilter_; }
+        _GstElement *sinkElement() { return videoflip_; }
+        _GstElement *srcElement() { return videoflip_; }
 
         Pipeline &pipeline_;
-        _GstElement *videoscale_;
-        _GstElement *capsfilter_;
+        _GstElement *videoflip_;
 };
 
-#endif //_VIDEO_SCALE_H_
+#endif //_VIDEO_FLIP_H_
 

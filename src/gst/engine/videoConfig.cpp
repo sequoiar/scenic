@@ -28,6 +28,7 @@
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include "videoFlip.h"
 #include "videoScale.h"
 #include "sharedVideoSink.h"
 
@@ -203,22 +204,47 @@ VideoSinkConfig::VideoSinkConfig(MapMsg &msg) :
     sharedVideoId_(msg["shared-video-id"]),
     /// if display-resolution is not specified, default to capture-resolution
     displayWidth_(msg["display-width"] ? msg["display-width"] : msg["width"]),
-    displayHeight_(msg["display-height"] ? msg["display-height"] : msg["height"])
+    displayHeight_(msg["display-height"] ? msg["display-height"] : msg["height"]),
+    flipMethod_(msg["flip-video"])
 {}
+
+
+bool VideoSinkConfig::resolutionIsInverted() const
+{
+    return flipMethod_ == "clockwise" or flipMethod_ == "counterclockwise"
+        or flipMethod_ == "upper-left-diagonal" or flipMethod_ == "upper-right-diagonal";
+}
+
+int VideoSinkConfig::effectiveDisplayWidth() const
+{
+    if (resolutionIsInverted())
+        return displayHeight_;
+    else
+        return displayWidth_;
+}
+
+
+int VideoSinkConfig::effectiveDisplayHeight() const
+{
+    if (resolutionIsInverted())
+        return displayWidth_;
+    else
+        return displayHeight_;
+}
 
 
 VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(pipeline, displayWidth_, displayHeight_, screenNum_);
+        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
     else if (sink_ == "ximagesink")
         return new XImageSink(pipeline);
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(pipeline, displayWidth_, displayHeight_, screenNum_);
+        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
 #endif
     else if (sink_ == "sharedvideosink")
-        return new SharedVideoSink(pipeline, displayWidth_, displayHeight_, sharedVideoId_);
+        return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid sink");
 
@@ -230,6 +256,12 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 VideoScale* VideoSinkConfig::createVideoScale(Pipeline &pipeline) const
 {
     return new VideoScale(pipeline, displayWidth_, displayHeight_);
+}
+
+
+VideoFlip* VideoSinkConfig::createVideoFlip(Pipeline &pipeline) const
+{
+    return new VideoFlip(pipeline, flipMethod_);
 }
 
 

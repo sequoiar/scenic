@@ -31,6 +31,7 @@
 
 class VideoSource;
 class VideoScale;
+class VideoFlip;
 class VideoSink;
 class _GstElement;
 
@@ -48,6 +49,7 @@ class LocalVideo : public boost::noncopyable
         VideoSource *source_;
         _GstElement *colourspace_;
         VideoScale *videoscale_;
+        VideoFlip *videoflip_;
         VideoSink *sink_;
 };
 

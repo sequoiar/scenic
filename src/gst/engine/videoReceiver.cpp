@@ -26,8 +26,9 @@
 #include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
-#include "videoSink.h"
 #include "videoScale.h"
+#include "videoFlip.h"
+#include "videoSink.h"
 #include "codec.h"
 #include "rtpPay.h"
 #include "messageDispatcher.h"
@@ -45,6 +46,7 @@ VideoReceiver::VideoReceiver(Pipeline &pipeline,
     depayloader_(0), 
     decoder_(0), 
     videoscale_(0), 
+    videoflip_(0), 
     sink_(0), 
     gotCaps_(false) 
 {
@@ -57,6 +59,7 @@ VideoReceiver::~VideoReceiver()
 {
     remoteConfig_->cleanupPorts();
     delete sink_;
+    delete videoflip_;
     delete videoscale_;
     delete depayloader_;
     delete decoder_;
@@ -84,19 +87,20 @@ void VideoReceiver::createSink(Pipeline &pipeline)
     // XXX: According to the documentation, videoscale can be used without 
     // impact if no scaling is needed but I need to verify this and for now not use 
     // videoscale unless the specified resolution is different than the default
+    tassert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
+    tassert(sink_ = videoConfig_->createSink(pipeline));
+
     if (videoConfig_->hasCustomResolution())
     {
         tassert(videoscale_ = videoConfig_->createVideoScale(pipeline));
-        tassert(sink_ = videoConfig_->createSink(pipeline));
 
         gstlinkable::link(*decoder_, *videoscale_);
-        gstlinkable::link(*videoscale_, *sink_);
+        gstlinkable::link(*videoscale_, *videoflip_);
     }
     else
-    {
-        tassert(sink_ = videoConfig_->createSink(pipeline));
-        gstlinkable::link(*decoder_, *sink_);
-    }
+        gstlinkable::link(*decoder_, *videoflip_);
+
+        gstlinkable::link(*videoflip_, *sink_);
 
     setCaps();
     tassert(gotCaps_);

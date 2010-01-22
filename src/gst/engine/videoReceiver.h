@@ -33,6 +33,7 @@
 class RtpPay;
 class VideoDecoder;
 class VideoScale;
+class VideoFlip;
 class VideoSink;
 
 class VideoReceiver
@@ -59,6 +60,7 @@ class VideoReceiver
         RtpPay *depayloader_; 
         VideoDecoder *decoder_;
         VideoScale *videoscale_;
+        VideoFlip *videoflip_;
         VideoSink *sink_;
         bool gotCaps_;
 };
