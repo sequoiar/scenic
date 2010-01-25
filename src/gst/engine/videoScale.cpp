@@ -26,6 +26,7 @@
 #include <sstream>
 #include "pipeline.h"
 
+const int VideoScale::MAX_SCALE;
 
 /** Constructor sets width and height */
 VideoScale::VideoScale(Pipeline &pipeline, int width, int height) : 
