@@ -208,7 +208,6 @@ AC_CONFIG_FILES([Makefile
                  ])
 
 AC_CONFIG_FILES([
-                 src/tcp/test/Makefile
                  src/gst/engine/test/Makefile
                  ])
 
