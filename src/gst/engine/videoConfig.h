@@ -88,7 +88,6 @@ class VideoSinkConfig
         VideoScale* createVideoScale(Pipeline &pipeline) const;
         VideoFlip* createVideoFlip(Pipeline &pipeline) const;
         bool doDeinterlace() const { return doDeinterlace_; }
-        bool hasCustomResolution() const;
 
     private:
         bool resolutionIsInverted() const;

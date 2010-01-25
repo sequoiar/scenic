@@ -84,26 +84,17 @@ void VideoReceiver::createDepayloader()
 
 void VideoReceiver::createSink(Pipeline &pipeline)
 {
-    // XXX: According to the documentation, videoscale can be used without 
-    // impact if no scaling is needed but I need to verify this and for now not use 
-    // videoscale unless the specified resolution is different than the default
+    tassert(videoscale_ = videoConfig_->createVideoScale(pipeline));
     tassert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
     tassert(sink_ = videoConfig_->createSink(pipeline));
+
     if (remoteConfig_->jitterbufferControlEnabled())
         MessageDispatcher::sendMessage("create-control");
-        
 
-    if (videoConfig_->hasCustomResolution())
-    {
-        tassert(videoscale_ = videoConfig_->createVideoScale(pipeline));
 
-        gstlinkable::link(*decoder_, *videoscale_);
-        gstlinkable::link(*videoscale_, *videoflip_);
-    }
-    else
-        gstlinkable::link(*decoder_, *videoflip_);
-
-        gstlinkable::link(*videoflip_, *sink_);
+    gstlinkable::link(*decoder_, *videoscale_);
+    gstlinkable::link(*videoscale_, *videoflip_);
+    gstlinkable::link(*videoflip_, *sink_);
 
     setCaps();
     tassert(gotCaps_);

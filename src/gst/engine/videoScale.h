@@ -40,6 +40,8 @@ class VideoScale : public GstLinkableFilter, public boost::noncopyable
     public:
         VideoScale(Pipeline &pipeline, int width, int height);
         ~VideoScale();
+        /// Found by trial and error, neither width nor height may exceed this value
+        static const int MAX_SCALE = 2046;
 
     private:
         _GstElement *sinkElement() { return videoscale_; }

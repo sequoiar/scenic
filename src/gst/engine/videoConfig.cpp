@@ -203,8 +203,8 @@ VideoSinkConfig::VideoSinkConfig(MapMsg &msg) :
     doDeinterlace_(msg["deinterlace"]), 
     sharedVideoId_(msg["shared-video-id"]),
     /// if display-resolution is not specified, default to capture-resolution
-    displayWidth_(msg["display-width"] ? msg["display-width"] : msg["width"]),
-    displayHeight_(msg["display-height"] ? msg["display-height"] : msg["height"]),
+    displayWidth_(std::min(static_cast<int>(msg["display-width"] ? msg["display-width"] : msg["width"]), VideoScale::MAX_SCALE)),
+    displayHeight_(std::min(static_cast<int>(msg["display-height"] ? msg["display-height"] : msg["height"]), VideoScale::MAX_SCALE)),
     flipMethod_(msg["flip-video"])
 {}
 
@@ -264,8 +264,3 @@ VideoFlip* VideoSinkConfig::createVideoFlip(Pipeline &pipeline) const
     return new VideoFlip(pipeline, flipMethod_);
 }
 
-
-bool VideoSinkConfig::hasCustomResolution() const
-{
-    return displayWidth_ != videosize::WIDTH or displayHeight_ != videosize::HEIGHT;
-}
