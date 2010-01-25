@@ -56,8 +56,6 @@ log = logger.start('debug', True, True, 'devices_jackd')
 _state_printed_jackd_is_frozen = False
 _enable_kill_jackd = True
 
-RESTART_JACKD_SCRIPT = "restart_jackd.py" # TODO: move to some other location at install time !
-
 def double_fork(args):
     """
     Starts a process and double fork so init (PID 1) becomes
@@ -429,10 +427,9 @@ class JackDriver(devices.AudioDriver):
         else:
             if caller is not None:
                 self.api.notify(caller, "Killed -9 jackd", "info")
-        #reactor.callLater(1.0, self._resurrect_jackd, caller, args, pid)
-        reactor.callLater(1.0, self._resurrect2_jackd, args)
+        reactor.callLater(1.0, self._resurrect_jackd, args)
 
-    def _resurrect2_jackd(self, str_args):
+    def _resurrect_jackd(self, str_args):
         """
         New version using the double fork.
         """
@@ -443,23 +440,6 @@ class JackDriver(devices.AudioDriver):
         log.info("We did restart jackd.")
         
         
-    def _resurrect_jackd(self, caller, args, pid):
-        """
-        Starts jackd again
-        """
-        log.info("resurrecting jackd")
-        commands_to_start = [["/usr/bin/python", RESTART_JACKD_SCRIPT]] # TODO : maybe specify the absolute path?
-        #print "starting /usr/bin/python ./devices/start_jackd.py" + str(args.split())
-        for arg in args.strip().split():
-            commands_to_start[0].append(arg) 
-        extra_args = None
-        try:
-            deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
-        except CommandNotFoundError, e:
-            log.error("ERROR, could not find command " + e.message)
-        if caller is not None:
-            self.api.notify(caller, "Starting jackd again.", "info")
-        #print "jackd resurrected"
 
 def start(api):
     """

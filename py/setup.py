@@ -21,10 +21,6 @@ from setuptools import setup
 #FIXME: get this from configure.ac
 __version__ = "0.3.5" # see miville.runner.__version__ as well
 
-# how I generated that list : 
-#packages = find_packages(exclude=["test", "miville.py"]),
-#print 'PACKAGES:', packages
-
 miville_packages = [
     'miville',
     'miville.connectors',
