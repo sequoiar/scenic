@@ -49,9 +49,6 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     shared_ptr<VideoReceiver> vRx;
     shared_ptr<AudioReceiver> aRx;
 
-    if (options["enable-controls"].as<bool>())
-        RtpReceiver::enableControl();
-
     if (!disableVideo)       
     {
         MapMsg ipcp(ProgramOptions::toMapMsg(options));

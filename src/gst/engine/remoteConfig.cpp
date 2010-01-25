@@ -200,7 +200,8 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
         int msgId__) : 
     RemoteConfig(msg, msgId__), 
     multicastInterface_(msg["multicast-interface"]), caps_(caps__), 
-    capsOutOfBand_(msg["negotiate-caps"] or caps_ == "")
+    capsOutOfBand_(msg["negotiate-caps"] or caps_ == ""),
+    jitterbufferControlEnabled_(msg["enable-controls"])
 {
     if (capsOutOfBand_) // couldn't find caps, need them from other host or we've explicitly been told to send caps
     {

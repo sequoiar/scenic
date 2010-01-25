@@ -89,6 +89,9 @@ void VideoReceiver::createSink(Pipeline &pipeline)
     // videoscale unless the specified resolution is different than the default
     tassert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
     tassert(sink_ = videoConfig_->createSink(pipeline));
+    if (remoteConfig_->jitterbufferControlEnabled())
+        MessageDispatcher::sendMessage("create-control");
+        
 
     if (videoConfig_->hasCustomResolution())
     {

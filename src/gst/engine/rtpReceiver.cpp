@@ -35,17 +35,8 @@
 
 #include <gtk/gtk.h>
 
-bool RtpReceiver::controlEnabled_ = false;
-bool RtpReceiver::madeControl_ = false;
-GtkWidget *RtpReceiver::control_ = 0;
-
 
 std::list<GstElement *> RtpReceiver::depayloaders_;
-
-void RtpReceiver::enableControl() 
-{ 
-    controlEnabled_ = true; 
-}
 
 RtpReceiver::~RtpReceiver()
 {
@@ -60,14 +51,6 @@ RtpReceiver::~RtpReceiver()
         // make sure we found it and remove it
         tassert(iter != depayloaders_.end());
         depayloaders_.erase(iter);
-    }
-
-    if (control_)
-    {
-        madeControl_ = false;
-        gtk_widget_destroy(control_);
-        LOG_DEBUG("RTP jitterbuffer control window destroyed");
-        control_ = 0;
     }
 }
 
@@ -243,9 +226,6 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     g_signal_connect(rtpbin_, "on-sender-timeout", 
             G_CALLBACK(RtpReceiver::onSenderTimeout), 
             this);
-
-    if (controlEnabled_)
-        createLatencyControl();
 }
 
 
@@ -254,52 +234,6 @@ void RtpReceiver::updateLatencyCb(GtkWidget *scale)
     unsigned val = static_cast<unsigned>(gtk_range_get_value(GTK_RANGE(scale)));
     LOG_DEBUG("Setting latency to " << val);
     setLatency(val);
-}
-
-/* makes the latency window */
-void RtpReceiver::createLatencyControl()
-{
-    if (madeControl_)   // one control sets all jitterbuffers
-        return;
-
-    static bool gtk_initialized = false;
-    if (!gtk_initialized)
-    {
-        gtk_init(0, NULL);
-        gtk_initialized = true;
-    }
-
-    GtkWidget *box1;
-    GtkWidget *hscale;
-    const int WIDTH = 400;
-    const int HEIGHT = 70;
-
-    /* Standard window-creating stuff */
-    control_ = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(control_), WIDTH, HEIGHT);
-    gtk_window_set_title (GTK_WINDOW (control_), "Rtpjitterbuffer Latency (ms)");
-
-    box1 = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (control_), box1);
-
-    /* value, lower, upper, step_increment, page_increment, page_size */
-    /* Note that the page_size value only makes a difference for
-     * scrollbar widgets, and the highest value you'll get is actually
-     * (upper - page_size). */
-
-    hscale = gtk_hscale_new_with_range(MIN_LATENCY, MAX_LATENCY, 1.0);
-    gtk_range_set_value(GTK_RANGE(hscale), INIT_LATENCY);
-    gtk_signal_connect (GTK_OBJECT(hscale), "value_changed",
-            GTK_SIGNAL_FUNC(updateLatencyCb), NULL);
-
-    // Signal emitted only when value is done changing
-    gtk_range_set_update_policy (GTK_RANGE (hscale), 
-            GTK_UPDATE_DISCONTINUOUS);
-    gtk_box_pack_start (GTK_BOX (box1), hscale, TRUE, TRUE, 0);
-    gtk_widget_show (hscale);
-    gtk_widget_show (box1);
-    gtk_widget_show (control_);
-    madeControl_ = true;
 }
 
 

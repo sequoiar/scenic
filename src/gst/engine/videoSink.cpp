@@ -25,6 +25,7 @@
 #include "gstLinkable.h"
 #include "videoSink.h"
 #include "pipeline.h"
+#include "rtpReceiver.h"
 #include "gutil.h"
 
 
@@ -40,10 +41,45 @@ void VideoSink::destroySink()
     pipeline_.remove(&sink_);
 }
 
+bool initializeGtk()
+{
+    gtk_init(0, NULL);
+    return true;
+}
+        
+GtkVideoSink::GtkVideoSink(Pipeline &pipeline, int screen_num) : 
+    VideoSink(pipeline), 
+    gtkInitialized_(initializeGtk()),
+    window_(gtk_window_new(GTK_WINDOW_TOPLEVEL)), 
+    screen_num_(screen_num), drawingArea_(gtk_drawing_area_new()),
+	vbox_(gtk_vbox_new(FALSE, 0)),
+	hbox_(gtk_hbox_new(FALSE, 0)),
+	horizontalSlider_(0),
+	sliderFrame_(0),
+    isFullscreen_(false)
+{
+    gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
+
+    gtk_container_add(GTK_CONTAINER(window_), hbox_);
+    
+    // add listener for window-state-event to detect fullscreenness
+    g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);
+}
+
+
+gboolean GtkVideoSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindowState *event, gpointer data)
+{
+    GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
+    context->isFullscreen_ = (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN);
+    return TRUE;
+}
+
+
 Window GtkVideoSink::getXWindow()
 { 
     // FIXME: see https://bugzilla.gnome.org/show_bug.cgi?id=599885
-    return GDK_WINDOW_XWINDOW(window_->window);
+    return GDK_WINDOW_XWINDOW(drawingArea_->window);
 }
 
 
@@ -57,18 +93,17 @@ void GtkVideoSink::destroy_cb(GtkWidget * /*widget*/, gpointer data)
 }
 
 
-
-void GtkVideoSink::makeWindowBlack()
+void GtkVideoSink::makeDrawingAreaBlack()
 {
     GdkColor color;
     gdk_color_parse ("black", &color);
-    gtk_widget_modify_bg(window_, GTK_STATE_NORMAL, &color);    // needed to ensure black background
+    gtk_widget_modify_bg(drawingArea_, GTK_STATE_NORMAL, &color);    // needed to ensure black background
 }
 
 
 void GtkVideoSink::showWindow()
 {
-    makeWindowBlack();
+    makeDrawingAreaBlack();
     gtk_widget_show_all(window_);
 }
 
@@ -79,26 +114,22 @@ void GtkVideoSink::hideCursor()
     char invisible_cursor_bits[] = { 0x0 };
     GdkCursor* cursor;
     GdkBitmap *empty_bitmap;
-    GdkColor color = { 0, 0, 0, 0 };
-    empty_bitmap = gdk_bitmap_create_from_data (GDK_WINDOW(window_->window),
+    GdkColor color = {0, 0, 0, 0};
+    empty_bitmap = gdk_bitmap_create_from_data(GDK_WINDOW(drawingArea_->window),
             invisible_cursor_bits,
             1, 1);
 
     cursor = gdk_cursor_new_from_pixmap(empty_bitmap, empty_bitmap, &color,
             &color, 0, 0);
 
-    gdk_window_set_cursor(GDK_WINDOW(window_->window), cursor);
+    gdk_window_set_cursor(GDK_WINDOW(drawingArea_->window), cursor);
 }
 
 
 void GtkVideoSink::toggleFullscreen(GtkWidget *widget)
 {
-    // FIXME: this could be flipped if the window manager changes the fullscreen state
-    static gboolean isFullscreen = FALSE;
-
     // toggle fullscreen state
-    isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
-    isFullscreen = !isFullscreen;
+    isFullscreen_ ? makeUnfullscreen(widget) : makeFullscreen(widget);
 }
 
 
@@ -106,6 +137,10 @@ void GtkVideoSink::makeFullscreen(GtkWidget *widget)
 {
     gtk_window_stick(GTK_WINDOW(widget));           // window is visible on all workspaces
     gtk_window_fullscreen(GTK_WINDOW(widget));
+    if (horizontalSlider_)
+        gtk_widget_hide(horizontalSlider_);
+    if (sliderFrame_)
+        gtk_widget_hide(sliderFrame_);
 }
 
 
@@ -113,6 +148,11 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 {
     gtk_window_unstick(GTK_WINDOW(widget));           // window is not visible on all workspaces
     gtk_window_unfullscreen(GTK_WINDOW(widget));
+    /// show controls
+    if (horizontalSlider_)
+        gtk_widget_show(horizontalSlider_);
+    if (sliderFrame_)
+        gtk_widget_show(sliderFrame_);
 }
 
 
@@ -128,10 +168,33 @@ bool GtkVideoSink::handleMessage(const std::string &path, const std::string &arg
         gtk_window_set_title(GTK_WINDOW(window_), arguments.c_str());
         return true;
     }
+    else if (path == "create-control")
+    {
+        createControl();
+        return true;
+    }
 
     return false;
 }
 
+
+/* makes the latency window */
+void GtkVideoSink::createControl()
+{
+    LOG_INFO("Creating controls");
+    sliderFrame_ = gtk_frame_new("Jitterbuffer Latency (ms)");
+    // min, max, step-size
+	horizontalSlider_ = gtk_hscale_new_with_range(RtpReceiver::MIN_LATENCY, RtpReceiver::MAX_LATENCY, 1.0);
+
+    // set initial value
+    gtk_range_set_value(GTK_RANGE(horizontalSlider_), RtpReceiver::INIT_LATENCY);
+
+    gtk_container_add(GTK_CONTAINER(sliderFrame_), horizontalSlider_);
+	gtk_box_pack_start(GTK_BOX(vbox_), sliderFrame_, FALSE, FALSE, 0);
+    g_signal_connect(G_OBJECT(horizontalSlider_), "value-changed",
+			 G_CALLBACK(RtpReceiver::updateLatencyCb), NULL);
+    showWindow();
+}
 
 void VideoSink::prepareSink()
 {
@@ -147,7 +210,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
     {
         case GDK_f:
         case GDK_F:
-            toggleFullscreen(widget);
+            context->toggleFullscreen(widget);
             break;
 
         case GDK_Q:
@@ -184,39 +247,10 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNu
     GtkVideoSink(pipeline, screenNum),
     BusMsgHandler(pipeline)
 {
-    static bool gtk_initialized = false;
-    if (!gtk_initialized)
-    {
-        gtk_init(0, NULL);
-        gtk_initialized = true;
-    }
-
     sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
     prepareSink();
 
-    window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    tassert(window_);
-
     /// FIXME: this is ifdef'd out to avoid getting that  Xinerama error msg every time
-#ifdef XINE_QUERY
-    GdkDisplay* display = gdk_display_get_default();
-    tassert(display);
-    int n;
-    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display), &n);
-    if (!xine)
-        n = 0; // don't query ScreenInfo
-    for (int j = 0; j < n; ++j)
-    {
-        LOG_INFO(" req:"    << screen_num_ << 
-                 " screen:" << xine[j].screen_number << 
-                 " x:"      << xine[j].x_org << 
-                 " y:"      << xine[j].y_org << 
-                 " width:"  << xine[j].width << 
-                 " height:" << xine[j].height);
-        if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
-    }
-#endif
 
     LOG_DEBUG("Setting default window size to " << width << "x" << height);
     gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
@@ -230,6 +264,8 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNu
 
     showWindow();
     hideCursor();
+
+    gtk_widget_set_size_request(drawingArea_, width, height);
 }
 
 

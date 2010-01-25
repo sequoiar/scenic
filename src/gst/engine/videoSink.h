@@ -32,10 +32,10 @@
 
 class Pipeline;
 class _GtkWidget;
-class _GdkEventExpose;
 class _GdkEventKey;
 class _GdkEventScroll;
 class _GstElement;
+class _GdkEventWindowState;
 
 class VideoSink : public GstLinkableSink, boost::noncopyable
 {
@@ -54,28 +54,34 @@ class GtkVideoSink
 : public VideoSink, public MessageHandler
 {
     public:
-        GtkVideoSink(Pipeline &pipeline, int screen_num)
-            : VideoSink(pipeline), window_(0), screen_num_(screen_num) {};
+        GtkVideoSink(Pipeline &pipeline, int screen_num);
+        void createControl();
         virtual ~GtkVideoSink(){};
         void showWindow();
 
-
     protected:
         void toggleFullscreen() { toggleFullscreen(window_); }
+        bool gtkInitialized_;
         _GtkWidget *window_;
         int screen_num_;
+        _GtkWidget *drawingArea_;
+        _GtkWidget *vbox_;
+        _GtkWidget *hbox_;
+        _GtkWidget *horizontalSlider_;
+        _GtkWidget *sliderFrame_;
 
+        static int onWindowStateEvent(_GtkWidget *widget, _GdkEventWindowState *event, void *data);
         static void destroy_cb(_GtkWidget * /*widget*/, void *data);
         Window getXWindow();
-        static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
-        void makeWindowBlack();
-        static void makeFullscreen(_GtkWidget *widget);
-        static void makeUnfullscreen(_GtkWidget *widget);
-        static void toggleFullscreen(_GtkWidget *widget);
+        void makeDrawingAreaBlack();
+        void makeFullscreen(_GtkWidget *widget);
+        void makeUnfullscreen(_GtkWidget *widget);
+        void toggleFullscreen(_GtkWidget *widget);
         void hideCursor();
 
     private:
         virtual bool handleMessage(const std::string &path, const std::string &arguments);
+        bool isFullscreen_;
 };
 
 

@@ -70,7 +70,7 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
         return false;
  
     LOG_DEBUG("Got prepare-xwindow-id msg");
-    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY(GST_MESSAGE_SRC(message)), GDK_WINDOW_XWINDOW(window_->window));
+    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), getXWindow());
   
     return true;
 }
@@ -79,39 +79,13 @@ GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_n
     GtkVideoSink(pipeline, screen_num), 
     BusMsgHandler(pipeline)
 {
-    static bool gtk_initialized = false;
-    if (!gtk_initialized)
-        gtk_init(0, NULL);
-
     sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-    window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
-    tassert(window_);
-
-    GdkDisplay* display = gdk_display_get_default();
-    tassert(display);
-    int n;
-    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display), &n);
-    if(!xine)
-        n = 0; // don't query ScreenInfo
-    for(int j = 0; j < n; ++j)
-    {
-        LOG_INFO(   "req:" << screen_num_ << 
-                " screen:" << xine[j].screen_number << 
-                " x:" << xine[j].x_org << 
-                " y:" << xine[j].y_org << 
-                " width:" << xine[j].width << 
-                " height:" << xine[j].height);
-        if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
-    }
-
     gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
     g_signal_connect(G_OBJECT(window_), "key-press-event",
-            G_CALLBACK(key_press_event_cb), NULL);
+            G_CALLBACK(key_press_event_cb), this);
     g_signal_connect(G_OBJECT(window_), "scroll-event",
             G_CALLBACK(mouse_wheel_cb), NULL);
     g_signal_connect(G_OBJECT(window_), "destroy",
@@ -124,6 +98,8 @@ GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_n
     //g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
     //g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
     showWindow();
+    hideCursor();
+    gtk_widget_set_size_request(drawingArea_, width, height);
 }
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
@@ -217,7 +193,7 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
     switch (event->keyval) {
         case GDK_f:
         case GDK_F:
-            toggleFullscreen(widget);
+            context->toggleFullscreen(widget);
             break;
         case GDK_x:
         case GDK_Right:

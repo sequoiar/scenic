@@ -107,12 +107,14 @@ class ReceiverConfig : public RemoteConfig
         bool capsMatchCodec() const;
         bool hasMulticastInterface() const { return multicastInterface_ != ""; }
         void receiveCaps();
+        bool jitterbufferControlEnabled() const { return jitterbufferControlEnabled_; }
 
     private:
         static bool isSupportedCodec(const std::string &codec);
         const std::string multicastInterface_;
         std::string caps_;
         bool capsOutOfBand_;
+        bool jitterbufferControlEnabled_;
 };
 
 #endif // _REMOTE_CONFIG_H_
