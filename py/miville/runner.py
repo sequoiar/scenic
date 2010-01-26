@@ -136,7 +136,7 @@ def run():
     # checks if files we need to write to are writable
     for f in [common.install_dir(log_file_name), common.install_dir(config.addressbook_filename)]:
         try:
-            fp = open(f, 'w')
+            fp = open(f, 'a')
         except IOError, e:
             if os.path.exists(f):
                 print("File %s is not writable by this user. Check its permission and try again.", f)
