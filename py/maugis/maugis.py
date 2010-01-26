@@ -29,8 +29,7 @@ import smtplib
 import re
 import subprocess
 import time
-from string import join
-
+from optparse import OptionParser
 
 try:
     import pygtk
@@ -64,17 +63,21 @@ gtk.glade.textdomain(APP)
 
 ### MAIN MEDIATOR(CONTROLLER)/COLLEAGUE CLASSES ###
 
-class Mediator:
+class Mediator(object):
     def __init__(self):
         self.config = Config()
 
         self.ad_book = AddressBook()
         
         self.gstsend_proc = Processes(self)
-        
-        kiosk = len(sys.argv) > 1 and (sys.argv[1] == "-k" or sys.argv[1] == "--kiosk")
 
-        self.gui = GuiClass(self, kiosk)
+        # command line parsing
+        parser = OptionParser(usage="%prog", version=str(__version__))
+        parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
+                help="Run maugis in kiosk mode")
+        (options, args) = parser.parse_args()
+        
+        self.gui = GuiClass(self, options.kiosk)
 
         self.server = Server(self)
         self.server.start_listening()
