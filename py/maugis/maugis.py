@@ -78,10 +78,7 @@ class Mediator(object):
         gui.contact_problem_label.set_label(text)
         answ = gui.contact_dialog.run()
         gui.contact_dialog.hide()
-        if answ == gtk.RESPONSE_OK:
-            return 1
-        else:
-            return 0
+        return answ == gtk.RESPONSE_OK
 
     def set_confirm_dialog(self, text, gui=None):
         if not gui:
@@ -89,10 +86,7 @@ class Mediator(object):
         gui.confirm_label.set_label(text)
         answ = gui.dialog.run()
         gui.dialog.hide()
-        if answ == gtk.RESPONSE_OK:
-            return 1
-        else:
-            return 0
+        return answ == gtk.RESPONSE_OK
 
     def hide_contacting_window(self, msg="", err=""):
         self.gui.contacting_window.hide()
@@ -142,13 +136,6 @@ class Mediator(object):
         try:
             w, r, err = os.popen3(self.config.milhouse_recv + ' -v')
             err_str = err.read()
-            ### a remettre quand milhouse_recv ne retournera plus d'erreur par defaut ###
-            #~ if err_str:
-                #~ text = (_("<b><big>Could not start milhouse_recv?</big></b>\n\nError: %(err_str). Quitting."), err_str)
-                #~ if self.set_contact_dialog(text, gui):
-                    #~ pass
-                #~ sys.exit()
-            #~ else:
             match = re.search(r'version ([^ \n]+)', r.readline(), re.I)
             if match:
                 self.milhouse_recv_version = match.group(1)
