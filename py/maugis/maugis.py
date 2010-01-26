@@ -13,11 +13,8 @@
 
 
 ### CONSTANTS ###
-
-_TEST = 0
 __version__ = 1.0
-_DEBUG = 0
-
+APP_NAME = "maugis" # changed in __main__
 
 ### MODULES IMPORTS  ###
 
@@ -29,7 +26,6 @@ import smtplib
 import re
 import subprocess
 from optparse import OptionParser
-
 try:
     import pygtk
     pygtk.require("2.0")
@@ -40,17 +36,14 @@ try:
     import gtk.glade
     import gobject
 except ImportError, e:
-    print str(e)
+    print "Could not load GTK or glade. Install python-gtk2 and python-glade2.", str(e)
     sys.exit(1)
 
 ### MULTILINGUAL SUPPORT ###
 APP = "maugis"
 DIR = "locale"
-
 import gettext
-
 _ = gettext.gettext
-
 gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 gtk.glade.bindtextdomain(APP, DIR)
@@ -59,24 +52,16 @@ gtk.glade.textdomain(APP)
 ### MAIN MEDIATOR(CONTROLLER)/COLLEAGUE CLASSES ###
 
 class Mediator(object):
-    def __init__(self):
+    def __init__(self, kiosk=False):
         """
         Starts the main loop of the application
         """
         self.config = Config()
         self.ad_book = AddressBook()
-        self.gstsend_proc = Processes(self)
-
-        # command line parsing
-        parser = OptionParser(usage="%prog", version=str(__version__))
-        parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
-                help="Run maugis in kiosk mode")
-        (options, args) = parser.parse_args()
-        
-        self.gui = GuiClass(self, options.kiosk)
+        self.milhouse_send_proc = Processes(self)
+        self.gui = GuiClass(self, kiosk)
         self.server = Server(self)
         self.server.start_listening()
-        gtk.main()
 
     def colleague_changed(self, colleague, event, event_args):
         if hasattr(self, event):
@@ -131,84 +116,65 @@ class Mediator(object):
     ### Callbacks ###
 
     def check_ext_program(self, gui):
-        global __version__, _TEST
-        if not _TEST:
-            # verify propulseart version
-            try:
-                w, r, err = os.popen3(self.config.gstsend + ' -v')
-                err_str = err.read()
-                if err_str:
-                    text = _("<b><big>Could not start gstsend?</big></b>\n\nError: %s. Quitting.") % err_str
-                    if self.set_contact_dialog(text, gui):
-                        pass
-                    sys.exit()
-                else:
-                    match = re.search(r'version ([^ \n]+)', r.readline(), re.I)
-                    if match:
-                        self.gstsend_version = match.group(1)
-                    else:
-                        self.gstsend_version = "?"
-                w.close()
-                r.close()
-                err.close()
-            except:
-                text = _("<b><big>Could not start gstsend?</big></b>\n\nCould not start gstsend. Quitting.")
+        # verify milhouse version
+        try:
+            w, r, err = os.popen3(self.config.milhouse_send + ' -v')
+            err_str = err.read()
+            if err_str:
+                text = _("<b><big>Could not start milhouse_send?</big></b>\n\nError: %s. Quitting.") % err_str
                 if self.set_contact_dialog(text, gui):
                     pass
                 sys.exit()
-
-            try:
-                w, r, err = os.popen3(self.config.gstrecv + ' -v')
-                err_str = err.read()
-
-                ### a remettre quand gstrecv ne retournera plus d'erreur par defaut ###
-                #~ if err_str:
-                    #~ text = (_("<b><big>Could not start gstrecv?</big></b>\n\nError: %(err_str). Quitting."), err_str)
-                    #~ if self.set_contact_dialog(text, gui):
-                        #~ pass
-                    #~ sys.exit()
-                #~ else:
+            else:
                 match = re.search(r'version ([^ \n]+)', r.readline(), re.I)
                 if match:
-                    self.gstrecv_version = match.group(1)
+                    self.milhouse_send_version = match.group(1)
                 else:
-                    self.gstrecv_version = "?"
-
-                w.close()
-                r.close()
-                err.close()
-            except:
-                text = _("<b><big>Could not start gstrecv?</big></b>\n\nCould not start gstrecv. Quitting.")
-                if self.set_contact_dialog(text, gui):
-                    pass
-                sys.exit()
-
+                    self.milhouse_send_version = "?"
+            w.close()
+            r.close()
+            err.close()
+        except:
+            text = _("<b><big>Could not start milhouse_send?</big></b>\n\nCould not start milhouse_send. Quitting.")
+            if self.set_contact_dialog(text, gui):
+                pass
+            sys.exit()
+        try:
+            w, r, err = os.popen3(self.config.milhouse_recv + ' -v')
+            err_str = err.read()
+            ### a remettre quand milhouse_recv ne retournera plus d'erreur par defaut ###
+            #~ if err_str:
+                #~ text = (_("<b><big>Could not start milhouse_recv?</big></b>\n\nError: %(err_str). Quitting."), err_str)
+                #~ if self.set_contact_dialog(text, gui):
+                    #~ pass
+                #~ sys.exit()
+            #~ else:
+            match = re.search(r'version ([^ \n]+)', r.readline(), re.I)
+            if match:
+                self.milhouse_recv_version = match.group(1)
             else:
-                text = _("<b><big>maugis</big></b>\nVersion: ")
-                text += str(__version__)
-                text += _("\ngstsend: ") + self.gstsend_version
-                text += _("\ngstrecv: ") + self.gstrecv_version
-                text += _("\nCopyright: SAT")
-                text += _("\nAuthors: Etienne Desautels")
-
-        if _TEST:
-            self.gstsend_version = '1.23'
-            self.gstrecv_version = '1.21'
-
+                self.milhouse_recv_version = "?"
+            w.close()
+            r.close()
+            err.close()
+        except:
+            text = _("<b><big>Could not start milhouse_recv?</big></b>\n\nCould not start milhouse_recv. Quitting.")
+            if self.set_contact_dialog(text, gui):
+                pass
+            sys.exit()
+        else:
             text = _("<b><big>maugis</big></b>\nVersion: ")
             text += str(__version__)
-            text += _("\ngstsend: ") + self.gstsend_version
-            text += _("\ngstrecv: ") + self.gstrecv_version
+            text += _("\nmilhouse_send: ") + self.milhouse_send_version
+            text += _("\nmilhouse_recv: ") + self.milhouse_recv_version
             text += _("\nCopyright: SAT")
             text += _("\nAuthors: Etienne Desautels")
-                        
         gui.info_label.set_label(text)
-
 
     def on_main_window_destroy(self, colleague, (widget)):
         self.server.close()
         self.ad_book.write()
-        self.gstsend_proc.stop()
+        self.milhouse_send_proc.stop()
         gtk.main_quit()
 
     def on_main_tabs_switch_page(self, gui, (widget, page, page_num)):
@@ -325,7 +291,7 @@ class Mediator(object):
         #Validate the port number
         port = gui.contact_port_entry.get_text()
         if port == "":
-            port = str(self.config.gstsendport) #set port to default
+            port = str(self.config.milhouse_sendport) #set port to default
         elif (not port.isdigit()) or (int(port) not in range(1,10000)):
             text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1000-99999")
             if self.set_contact_dialog(text):
@@ -354,7 +320,6 @@ class Mediator(object):
         ad_book.write()
         gui.edit_contact_window.hide()
 
-
     def on_net_conf_set_but_clicked(self, gui, (widget)):
         os.system('gksudo "network-admin"')
 
@@ -374,8 +339,8 @@ class Mediator(object):
     def on_maint_send_but_clicked(self, gui, (widget)):
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
         if self.set_confirm_dialog(text):
-            msg = "--- gstsend ---\n" + self.gstsend_version + "\n\n"
-            msg += "--- gstrecv ---\n" + self.gstrecv_version + "\n\n"
+            msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n\n"
+            msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n\n"
             msg += "--- uname -a ---\n"
             try:
                 w, r, err = os.popen3('uname -a')
@@ -417,9 +382,8 @@ class Mediator(object):
     def on_client_join_but_clicked(self, gui, (widget)):
         gui.contacting_window.show()
         msg = repr({"command":"ask", "port":self.ad_book.contact["port"], "bandwidth":self.config.bandwidth})
-        client = Client(self)   ###############
+        client = Client(self)
         gobject.idle_add(client.connect, self.ad_book.contact["address"], msg)
-    
 
     def on_server_rcv_command(self, server, (msg, addr, conn)):
         if msg and "command" in msg:
@@ -437,12 +401,12 @@ class Mediator(object):
                         bandwidth = self.config.bandwidth
                     conn.sendall(repr({"answer":"accept", "bandwidth": bandwidth}))
                     conn.close()
-                    self.gstsend_proc.start(addr[0], bandwidth)
+                    self.milhouse_send_proc.start(addr[0], bandwidth)
                 else:
                     conn.sendall(repr({"answer":"refuse"}))
                     conn.close()
             elif cmd == "stop":
-                self.gstsend_proc.stop()
+                self.milhouse_send_proc.stop()
                 conn.sendall(repr({"answer":"stopped"}))
                 conn.close()
             else:
@@ -458,13 +422,10 @@ class Mediator(object):
             pass
         return False
 
-
     def on_client_socket_timeout(self, client):
-        #~ if self.widgets: ############
         self.hide_contacting_window("timeout")
     
     def on_client_socket_error(self, client, (err, msg)):
-        #~ if self.widgets: ############
         self.hide_contacting_window(msg)
         print err
 
@@ -484,11 +445,11 @@ class Mediator(object):
                     bandwidth = msg["bandwidth"]
                 else:
                     bandwidth = self.config.bandwidth
-                self.gstsend_proc.start(client.host, bandwidth)
+                self.milhouse_send_proc.start(client.host, bandwidth)
             elif answ == "refuse":
                 self.hide_contacting_window("refuse")
             elif answ == "stopped":
-                self.gstsend_proc.stop()
+                self.milhouse_send_proc.stop()
             else:
                 self.hide_contacting_window("badAnsw")
 
@@ -499,13 +460,13 @@ class Mediator(object):
             self.hide_contacting_window("answTimeout")
         return False
     
-    def on_start_gstsend(self, colleague):
+    def on_start_milhouse_send(self, colleague):
         self.gui.contact_join_but.set_sensitive(False)
 
-    def on_stop_gstsend(self, colleague):
+    def on_stop_milhouse_send(self, colleague):
         self.gui.contact_join_but.set_sensitive(True)
 
-    def watch_gstrecv(self, colleague, (child, condition)):
+    def watch_milhouse_recv(self, colleague, (child, condition)):
         msg = repr({"command":"stop"})
         client = Client(self)
         client.connect(self.ad_book.contact["address"], msg)
@@ -520,14 +481,13 @@ class Colleague(object):
             event = sys._getframe(1).f_code.co_name
         self.med.colleague_changed(colleague, event, event_args)
 
-### READING AND WRITING CONFIGURATION FILE ###
-
 class Config(object):
-    # Default values
-    gstsendport = 8000
+    """
+    READING AND WRITING CONFIGURATION FILE
+    """# Default values
+    milhouse_sendport = 8000
     negotiationport = 17446
-    gstsend = "milhouse"
-    gstrecv = gstsend
+    streamer_command = "milhouse"
     smtpserver = "smtp.sat.qc.ca"
     emailinfo = "maugis@sat.qc.ca"
     audio_input = "jackaudiosrc"
@@ -539,7 +499,7 @@ class Config(object):
     video_output = "xvimagesink"
     video_codec = "mpeg4"
     video_bitrate = "3000000"
-    video_port = gstsendport
+    video_port = milhouse_sendport
     audio_port = video_port + 10
     bandwidth = 30
 
@@ -550,7 +510,6 @@ class Config(object):
         else:
             config_path = os.environ['HOME'] + '/.maugis/'
         self.config_path = config_path + config_file
-
         if os.path.isfile(self.config_path):
             self._read()
         else:
@@ -560,7 +519,7 @@ class Config(object):
 
     def _write(self):
         global __version__
-        config_str = _("# Configuration written by %(app)s %(version)s\n") % {'app': sys.argv[0], 'version': __version__}
+        config_str = _("# Configuration written by %(app)s %(version)s\n") % {'app': APP_NAME, 'version': __version__}
         for c in dir(self.__class__):
             if c[0] != '_' and hasattr(self, c):
                 inst_attr = getattr(self, c)
@@ -630,7 +589,6 @@ class GuiClass(Colleague):
     GTK GUI
     """
     def __init__(self, med, kiosk):
-        global _TEST, __version__
         Colleague.__init__(self, med)
         # Set the Glade file
         glade_file = 'maugis.glade'
@@ -649,7 +607,6 @@ class GuiClass(Colleague):
         for n in dir(self.__class__):
             if n[0] != '_' and hasattr(self, n):
                 cb[n] = getattr(self, n)
-
         self.widgets.signal_autoconnect(cb)
 
         # get all the widgets that we use
@@ -678,7 +635,7 @@ class GuiClass(Colleague):
         self.negotiation_port_entry = self.widgets.get_widget("netConfPortEntry")
         self.net_conf_bw_combo = self.widgets.get_widget("netConfBWCombo")
         
-        # verify gstrecv and gstsend
+        # verify milhouse_recv and milhouse_send
         #self._changed(self, event="check_ext_program")
         
         # adjust the bandwidth combobox iniline with the config
@@ -768,110 +725,96 @@ class Processes(Colleague):
     """
     PROCESS manager.
     """
-    global _DEBUG
     def __init__(self, med):
         Colleague.__init__(self, med)
         self.config = med.config
-        self.video_port = self.config.gstsendport
+        self.video_port = self.config.milhouse_sendport
         self.audio_port = self.video_port + 10
         
     def start(self, host, bandwidth):
-        self._changed(self, event="on_start_gstsend")
+        self._changed(self, event="on_start_milhouse_send")
         base = 30
         divider = base / bandwidth
-        # First, start the gst_recv process, gstsend needs a remote running propulseart --receive to work
-        self.gstrecv_cmd = [self.config.gstrecv,
-                                        '--receiver', 
-                                        '--address', host,
-                                        '--videosink', self.config.video_output,
-                                        '--audiosink', self.config.audio_output,
-                                        '--videocodec', self.config.video_codec,
-                                        '--audiocodec', self.config.audio_codec,
-                                        '--videoport', str(self.video_port),
-                                        '--audioport', str(self.audio_port) ]
-        print "gstrecv_cmd: ", self.gstrecv_cmd
-        def env_sequence():
+        # First, start the milhouse_recv process, milhouse_send needs a remote running propulseart --receive to work
+        self.milhouse_recv_cmd = [
+            self.config.streamer_command,
+            '--receiver', 
+            '--address', host,
+            '--videosink', self.config.video_output,
+            '--audiosink', self.config.audio_output,
+            '--videocodec', self.config.video_codec,
+            '--audiocodec', self.config.audio_codec,
+            '--videoport', str(self.video_port),
+            '--audioport', str(self.audio_port) 
+            ]
+        print "milhouse_recv_cmd: ", self.milhouse_recv_cmd
+        
+        # local function declaration:
+        def _env_sequence():
             return [key + '=' + value for key, value in os.environ.items()]
-        self.gstrecv_pid, self.gstrecv_input, self.gstrecv_output, self.gstrecv_error = gobject.spawn_async(self.gstrecv_cmd,
-                                            envp = env_sequence(),
-                                            working_directory = os.environ['PWD'],
-                                            flags = gobject.SPAWN_SEARCH_PATH,
-                                            standard_input = False,
-                                            standard_output = True,
-                                            standard_error = True)
+        
+        self.milhouse_recv_pid, self.milhouse_recv_input, self.milhouse_recv_output, self.milhouse_recv_error = gobject.spawn_async(
+            self.milhouse_recv_cmd,
+            envp = _env_sequence(),
+            working_directory = os.environ['PWD'],
+            flags = gobject.SPAWN_SEARCH_PATH,
+            standard_input = False,
+            standard_output = True,
+            standard_error = True)
+        self.watched_milhouse_recv = gobject.io_add_watch(
+            self.milhouse_recv_output,
+            gobject.IO_HUP,
+            self.watch_milhouse_recv)
+        self.milhouse_send_cmd = [self.config.streamer_command, '--sender', 
+            '--address', host,
+            '--videosource', self.config.video_input,
+            '--videocodec', self.config.video_codec,
+            '--videobitrate', self.config.video_bitrate,
+            '--audiosource', self.config.audio_input,
+            '--audiocodec', self.config.audio_codec,
+            '--videoport', str(self.video_port),
+            '--audioport', str(self.audio_port)]
+        print "milhouse_send_cmd: ", self.milhouse_send_cmd
+        self.milhouse_send_subproc = subprocess.Popen(self.milhouse_send_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        print "milhouse_send_cmd launched "
+        self.milhouse_send_pid = self.milhouse_send_subproc.pid
 
-        self.watched_gstrecv = gobject.io_add_watch(  self.gstrecv_output,
-                                            gobject.IO_HUP,
-                                            self.watch_gstrecv  )
-        # Now we launch the sender
-        # Do we need a little sleep?
-        #self.gstrecv_child = subprocess.Popen( '/usr/local/bin/propulseart --receiver --address %s --videocodec h264 --audiocodec vorbis --videoport 8000 --audioport 8010' %host )
-
-        time.sleep(1)
-
-        if _DEBUG:
-            self.gstsend_cmd = [self.config.gstsend, '--sender', 
-                                            '--address', host,
-                                            '--videosource', self.config.video_input,
-                                            '--videocodec', self.config.video_codec,
-                                            '--videobitrate', self.config.video_bitrate,
-                                            '--audiosource', self.config.audio_input,
-                                            '--audiocodec', self.config.audio_codec,
-                                            '--videoport', str(self.video_port),
-                                            '--audioport', str(self.audio_port)]
-            self.gstsend_cmd = ['xlogo']
-        else:
-            self.gstsend_cmd = [self.config.gstsend, '--sender', 
-                                            '--address', host,
-                                            '--videosource', self.config.video_input,
-                                            '--videocodec', self.config.video_codec,
-                                            '--videobitrate', self.config.video_bitrate,
-                                            '--audiosource', self.config.audio_input,
-                                            '--audiocodec', self.config.audio_codec,
-                                            '--videoport', str(self.video_port),
-                                            '--audioport', str(self.audio_port)]
-
-        print "gstsend_cmd: ", self.gstsend_cmd
-        self.gstsend_subproc = subprocess.Popen(self.gstsend_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        print "gstsend_cmd launched "
-        self.gstsend_pid = self.gstsend_subproc.pid
-
-    def watch_gstrecv(self, *args):
-        print "watch_gstrecv"
+    def watch_milhouse_recv(self, *args):
+        print "watch_milhouse_recv"
         self._changed(self, args)
-        self.gstrecv_timeout = gobject.timeout_add(5000, self.stop)
+        self.milhouse_recv_timeout = gobject.timeout_add(5000, self.stop)
         return False
 
-    def watch_gstsend(self, *args):
-        print "watch_gstsend"
+    def watch_milhouse_send(self, *args):
+        print "watch_milhouse_send"
         self._changed(self, args)
-        self.gstsend_timeout = gobject.timeout_add(5000, self.stop)
+        self.milhouse_send_timeout = gobject.timeout_add(5000, self.stop)
         return False
 
     def stop(self):
         print "stop: ", 
-        if hasattr(self, "watched_gstrecv"):
+        if hasattr(self, "watched_milhouse_recv"):
             print "watch"
-            gobject.source_remove(self.watched_gstrecv)
+            gobject.source_remove(self.watched_milhouse_recv)
         if hasattr(self, "timeout"):
             print "timeout"
             gobject.source_remove(self.timeout)
         try:
-            print "killing gstrecv: ", self.gstrecv_pid
-            os.kill(self.gstrecv_pid, signal.SIGTERM)
+            print "killing milhouse_recv: ", self.milhouse_recv_pid
+            os.kill(self.milhouse_recv_pid, signal.SIGTERM)
             print "recv: before os.wait()"
             print "recv: after os.wait()"
         except:
             pass
         try:
-            print "killing gstsend_pid: ", self.gstsend_pid
-            os.kill(self.gstsend_pid, signal.SIGTERM)
+            print "killing milhouse_send_pid: ", self.milhouse_send_pid
+            os.kill(self.milhouse_send_pid, signal.SIGTERM)
             print "send: before os.wait()"
             os.wait()
             print "send: after os.wait()"
         except:
             pass
-        self._changed(self, event="on_stop_gstsend")
+        self._changed(self, event="on_stop_milhouse_send")
 
 ### NETWORK ###
 
@@ -908,12 +851,8 @@ class Network(Colleague):
 
 class Server(Network):
     def __init__(self, med):
-        global _TEST
         Network.__init__(self, med)
         self.host = ''
-        if _TEST:
-            self.port = int(sys.argv[1])
-            self.host = socket.gethostname()
 
     def start_listening(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -933,12 +872,9 @@ class Server(Network):
 
 class Client(Network):
     def __init__(self, med):
-        global _TEST
         Network.__init__(self, med)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(10)
-        if _TEST:
-            self.port = int(sys.argv[2])
 
     def connect(self, host, msg):
         self.host = host
@@ -974,4 +910,12 @@ class Client(Network):
         return False
 
 if __name__ == '__main__':
-    main = Mediator()
+    # command line parsing
+    parser = OptionParser(usage="%prog", version=str(__version__))
+    parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
+            help="Run maugis in kiosk mode")
+    (options, args) = parser.parse_args()
+    main = Mediator(kiosk=options.kiosk)
+    APP_NAME = sys.argv[0]
+    gtk.main()
+    
