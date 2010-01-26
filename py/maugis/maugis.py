@@ -40,10 +40,9 @@ try:
     import gtk
     import gtk.glade
     import gobject
-except:
+except ImportError, e:
+    print str(e)
     sys.exit(1)
-
-
 
 ### MULTILINGUAL SUPPORT ###
 APP = "maugis"
@@ -58,17 +57,15 @@ gettext.textdomain(APP)
 gtk.glade.bindtextdomain(APP, DIR)
 gtk.glade.textdomain(APP)
 
-
-
-
 ### MAIN MEDIATOR(CONTROLLER)/COLLEAGUE CLASSES ###
 
 class Mediator(object):
     def __init__(self):
+        """
+        Starts the main loop of the application
+        """
         self.config = Config()
-
         self.ad_book = AddressBook()
-        
         self.gstsend_proc = Processes(self)
 
         # command line parsing
@@ -78,10 +75,8 @@ class Mediator(object):
         (options, args) = parser.parse_args()
         
         self.gui = GuiClass(self, options.kiosk)
-
         self.server = Server(self)
         self.server.start_listening()
-        
         gtk.main()
 
     def colleague_changed(self, colleague, event, event_args):
@@ -90,7 +85,6 @@ class Mediator(object):
                 eval("self." + event)(colleague, event_args)
             else:
                 eval("self." + event)(colleague)
-
 
     ### General Methods ###
 
@@ -134,7 +128,6 @@ class Mediator(object):
         if text:
             if self.set_contact_dialog(text):
                 pass
-
 
     ### Callbacks ###
 
@@ -218,7 +211,6 @@ class Mediator(object):
         self.ad_book.write()
         self.gstsend_proc.stop()
         gtk.main_quit()
-
 
     def on_main_tabs_switch_page(self, gui, (widget, page, page_num)):
         tab = widget.get_nth_page(page_num).name
@@ -508,7 +500,6 @@ class Mediator(object):
             self.hide_contacting_window("answTimeout")
         return False
     
-    
     def on_start_gstsend(self, colleague):
         self.gui.contact_join_but.set_sensitive(False)
 
@@ -520,10 +511,8 @@ class Mediator(object):
         client = Client(self)
         client.connect(self.ad_book.contact["address"], msg)
         #~ client.close()
-        
 
-
-class Colleague:
+class Colleague(object):
     def __init__(self, med):
         self.med = med
 
@@ -532,11 +521,9 @@ class Colleague:
             event = sys._getframe(1).f_code.co_name
         self.med.colleague_changed(colleague, event, event_args)
 
-
-
 ### READING AND WRITING CONFIGURATION FILE ###
 
-class Config:
+class Config(object):
     # Default values
     gstsendport = 8000
     negotiationport = 17446
@@ -544,7 +531,6 @@ class Config:
     gstrecv = gstsend
     smtpserver = "smtp.sat.qc.ca"
     emailinfo = "maugis@sat.qc.ca"
-    audiolib = "oss"
     audio_input = "jackaudiosrc"
     audio_output = "jackaudiosink"
     audio_codec = "raw"
@@ -556,9 +542,7 @@ class Config:
     video_bitrate = "3000000"
     video_port = gstsendport
     audio_port = video_port + 10
-
     bandwidth = 30
-
 
     def __init__(self):
         config_file = 'maugis.cfg'
@@ -606,10 +590,10 @@ class Config:
                     pass
         config_file.close()
 
-
-### READING & WRITING ADDRESS BOOK FILE ###
-
-class AddressBook:
+class AddressBook(object):
+    """
+    READING & WRITING ADDRESS BOOK FILE 
+    """
     def __init__(self):
         self.list = []
         self.selected = 0
@@ -642,18 +626,13 @@ class AddressBook:
             except:
                 print _("Cannot write Address Book file")
 
-
-
-
-
-### GTK GUI ###
-
 class GuiClass(Colleague):
+    """
+    GTK GUI
+    """
     def __init__(self, med, kiosk):
         global _TEST, __version__
-        
         Colleague.__init__(self, med)
-
         # Set the Glade file
         glade_file = 'maugis.glade'
         if os.path.isfile(glade_file):
@@ -664,8 +643,6 @@ class GuiClass(Colleague):
             text = _("<b><big>Could not find the Glade file?</big></b>\n\nBe sure the file %s is in /usr/share/maugis/. Quitting.") % glade_file
             print text
             sys.exit()
-
-
         self.widgets = gtk.glade.XML(glade_path, domain=APP)
         
         # connects callbacks to widgets automatically
@@ -700,10 +677,8 @@ class GuiClass(Colleague):
         self.info_label = self.widgets.get_widget("infoLabel")
         self.contact_list = self.widgets.get_widget("contactList")
         self.negotiation_port_entry = self.widgets.get_widget("netConfPortEntry")
-
         self.net_conf_bw_combo = self.widgets.get_widget("netConfBWCombo")
-
-
+        
         # verify gstrecv and gstsend
         #self._changed(self, event="check_ext_program")
         
@@ -714,32 +689,28 @@ class GuiClass(Colleague):
         if kiosk:
             self.main_window.set_decorated(False)
             self.widgets.get_widget("sysBox").show()
-
+        
         # Build the contact list view
         self.selection = self.contact_list.get_selection()
         self.selection.connect("changed", self.on_contact_list_changed, None)
-
+        
         self.contact_tree = gtk.ListStore(str)
         self.contact_list.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list.append_column(column)
         
         self._changed(self, event="init_ad_book_list")
-        
         self._changed(self, event="init_negotiation_port")
         
         self.main_window.show()
-        
         
     ### GUI Callbacks ###
     
     def on_main_window_destroy(self, *args):
         self._changed(self, args)
 
-
     def on_main_tabs_switch_page(self, *args):
         self._changed(self, args)
-
 
     def on_contact_list_changed(self, *args):
         self._changed(self, args)
@@ -766,7 +737,6 @@ class GuiClass(Colleague):
     def on_edit_contact_save_but_clicked(self, *args):
         self._changed(self, args)
 
-
     def on_net_conf_set_but_clicked(self, *args):
         self._changed(self, args)
 
@@ -782,10 +752,8 @@ class GuiClass(Colleague):
     def on_maint_send_but_clicked(self, *args):
         self._changed(self, args)
 
-
     def on_client_join_but_clicked(self, *args):
         self._changed(self, args)
-
 
     def on_net_conf_bw_combo_changed(self, *args):
         self._changed(self, args)
@@ -797,9 +765,10 @@ class GuiClass(Colleague):
     def on_net_conf_port_entry_changed2(self, *args):
         self._changed(self, args)
 
-### DV... PROCESS ###
-
 class Processes(Colleague):
+    """
+    PROCESS manager.
+    """
     global _DEBUG
     def __init__(self, med):
         Colleague.__init__(self, med)
@@ -808,14 +777,10 @@ class Processes(Colleague):
         self.audio_port = self.video_port + 10
         
     def start(self, host, bandwidth):
-    
         self._changed(self, event="on_start_gstsend")
-        
         base = 30
         divider = base / bandwidth
-        
-
-        # First start the gst_recv process, gstsend needs a remote running propulseart --receive to work
+        # First, start the gst_recv process, gstsend needs a remote running propulseart --receive to work
         self.gstrecv_cmd = [self.config.gstrecv,
                                         '--receiver', 
                                         '--address', host,
@@ -872,7 +837,6 @@ class Processes(Colleague):
         print "gstsend_cmd launched "
         self.gstsend_pid = self.gstsend_subproc.pid
 
-
     def watch_gstrecv(self, *args):
         print "watch_gstrecv"
         self._changed(self, args)
@@ -893,7 +857,6 @@ class Processes(Colleague):
         if hasattr(self, "timeout"):
             print "timeout"
             gobject.source_remove(self.timeout)
-            
         try:
             print "killing gstrecv: ", self.gstrecv_pid
             os.kill(self.gstrecv_pid, signal.SIGTERM)
@@ -909,12 +872,7 @@ class Processes(Colleague):
             print "send: after os.wait()"
         except:
             pass
-            
         self._changed(self, event="on_stop_gstsend")
-
-
-
-
 
 ### NETWORK ###
 
@@ -924,8 +882,7 @@ class Network(Colleague):
         self.config = med.config
         self.buf_size = 1024
         self.port = self.config.negotiationport
-
-
+    
     def validate(self, msg):
         tmp_msg = msg.strip()
         msg = None
@@ -955,7 +912,6 @@ class Server(Network):
         global _TEST
         Network.__init__(self, med)
         self.host = ''
-
         if _TEST:
             self.port = int(sys.argv[1])
             self.host = socket.gethostname()
@@ -972,10 +928,8 @@ class Server(Network):
         conn, addr = source.accept()
         buffer = self.recv(conn)
         msg = self.validate(buffer)
-
         self._changed(self, (msg, addr, conn), event="on_server_rcv_command")
         return True
-        
 
 
 class Client(Network):
@@ -984,7 +938,6 @@ class Client(Network):
         Network.__init__(self, med)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(10)
-
         if _TEST:
             self.port = int(sys.argv[2])
 
@@ -1020,8 +973,6 @@ class Client(Network):
         msg = self.validate(buffer)
         self._changed(self, msg, event="on_client_rcv_command")
         return False
-
-
 
 if __name__ == '__main__':
     main = Mediator()
