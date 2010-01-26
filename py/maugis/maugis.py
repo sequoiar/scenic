@@ -28,7 +28,6 @@ import socket
 import smtplib
 import re
 import subprocess
-import time
 from optparse import OptionParser
 
 try:
