@@ -22,7 +22,6 @@ _DEBUG = 0
 ### MODULES IMPORTS  ###
 
 import sys
-import random
 import os, signal
 import time
 import socket
@@ -73,10 +72,7 @@ class Mediator:
         
         self.gstsend_proc = Processes(self)
         
-        if len(sys.argv) > 1 and (sys.argv[1] == "-k" or sys.argv[1] == "--kiosk"):
-            kiosk = 1
-        else:
-            kiosk = 0
+        kiosk = len(sys.argv) > 1 and (sys.argv[1] == "-k" or sys.argv[1] == "--kiosk")
 
         self.gui = GuiClass(self, kiosk)
 
