@@ -102,7 +102,6 @@ class Config(object):
     bandwidth = 30
     
     def __init__(self):
-
         config_file = 'maugis.cfg'
         if os.path.isfile('/etc/' + config_file):
             config_dir = '/etc'
@@ -139,14 +138,17 @@ class Config(object):
             line = line.strip()
             if line and line[0] != "#" and len(line) > 2:
                 try:
-                    item = line.split("=")
-                    item[0] = item[0].strip()
-                    item[1] = item[1].strip()
-                    if item[1].isdigit():
-                        item[1] = int(item[1])
-                    setattr(self, item[0], item[1])
-                except:
-                    pass
+                    tokens = line.split("=")
+                    k = tokens[0].strip()
+                    v = tokens[1].strip()
+                    if v.isdigit():
+                        v = int(v)
+                    else:
+                        v = str(v)
+                    setattr(self, k, v)
+                    print("Setting config %s = %s" % (k, v))
+                except Excepion, e:
+                    print str(e)
         config_file.close()
 
 class AddressBook(object):
@@ -156,22 +158,27 @@ class AddressBook(object):
     def __init__(self):
         self.contact_list = []
         self.selected = 0
-        self.ad_book_name = os.environ['HOME'] + '/.maugis/contacts.json'
+        #FIXME: do not hard code
+        self.ad_book_name = os.path.join(os.environ['HOME'], '.maugis/contacts.json')
+        self.SELECTED_KEYNAME = "selected:"
         self.read()
 
     def read(self):
+        print("Loading addressbook.")
         if os.path.isfile(self.ad_book_name):
             self.contact_list = []
             ad_book_file = file(self.ad_book_name, "r")
+            kw_len = len(self.SELECTED_KEYNAME)
             for line in ad_book_file:
-                if line[:4] == "sel:":
-                    self.selected = int(line[4:].strip())
+                if line[:kw_len] == self.SELECTED_KEYNAME:
+                    self.selected = int(line[kw_len:].strip())
+                    print("Loading selected contact: %s" % (self.selected))
                 else:
                     try:
+                        print("Loading contact %s" % (line))
                         self.contact_list.append(json.loads(line))
                     except Exception, e:
                         print str(e)
-                        pass
             ad_book_file.close()
 
     def write(self):
@@ -181,7 +188,7 @@ class AddressBook(object):
                 for contact in self.contact_list:
                     ad_book_file.write(json.dumps(contact) + "\n")
                 if self.selected:
-                    ad_book_file.write("sel:" + str(self.selected) + "\n")
+                    ad_book_file.write(self.SELECTED_KEYNAME + str(self.selected) + "\n")
                 ad_book_file.close()
             except:
                 print _("Cannot write Address Book file")
