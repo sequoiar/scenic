@@ -54,6 +54,18 @@ try:
 except ImportError, e:
     print "Could not load GTK or glade. Install python-gtk2 and python-glade2.", str(e)
     sys.exit(1)
+# JSON import:
+try:
+    import json # python 2.6
+except ImportError:
+    import simplejson as json # python 2.4 to 2.5
+try:
+    _tmp = json.loads
+except AttributeError:
+    import warnings
+    warnings.warn("Use simplejson, not the old json module.")
+    sys.modules.pop('json') # get rid of the bad json module
+    import simplejson as json
 
 ### MULTILINGUAL SUPPORT ###
 APP = "maugis"
@@ -82,9 +94,9 @@ class Mediator(object):
     def colleague_changed(self, colleague, event, event_args):
         if hasattr(self, event):
             if event_args:
-                eval("self." + event)(colleague, event_args)
+                eval("self." + event)(colleague, event_args) # FIXME !!!!!!!!!!!!!!!!!!!
             else:
-                eval("self." + event)(colleague)
+                eval("self." + event)(colleague) # FIXME!!!!!!!!!!!!!!
 
     ### General Methods ###
 
@@ -335,7 +347,7 @@ class Mediator(object):
 
     def on_client_join_but_clicked(self, gui, (widget)):
         gui.contacting_window.show()
-        msg = repr({"command":"ask", "port":self.ad_book.contact["port"], "bandwidth":self.config.bandwidth})
+        msg = json.dumps({"command":"ask", "port":self.ad_book.contact["port"], "bandwidth":self.config.bandwidth})
         client = Client(self)
         gobject.idle_add(client.connect, self.ad_book.contact["address"], msg)
 
@@ -353,15 +365,15 @@ class Mediator(object):
                         bandwidth = msg["bandwidth"]
                     else:
                         bandwidth = self.config.bandwidth
-                    conn.sendall(repr({"answer":"accept", "bandwidth": bandwidth}))
+                    conn.sendall(json.dumps({"answer":"accept", "bandwidth": bandwidth}))
                     conn.close()
                     self.process_manager.start(addr[0], bandwidth)
                 else:
-                    conn.sendall(repr({"answer":"refuse"}))
+                    conn.sendall(json.dumps({"answer":"refuse"}))
                     conn.close()
             elif cmd == "stop":
                 self.process_manager.stop()
-                conn.sendall(repr({"answer":"stopped"}))
+                conn.sendall(json.dumps({"answer":"stopped"}))
                 conn.close()
             else:
                 conn.close()
@@ -421,7 +433,7 @@ class Mediator(object):
         self.gui.contact_join_but.set_sensitive(True)
 
     def watch_milhouse_recv(self, colleague, (child, condition)):
-        msg = repr({"command":"stop"})
+        msg = json.dumps({"command":"stop"})
         client = Client(self)
         client.connect(self.ad_book.contact["address"], msg)
         #~ client.close()
@@ -521,7 +533,7 @@ class AddressBook(object):
                     self.selected = int(line[4:].strip())
                 else:
                     try:
-                        self.list.append(eval(line))
+                        self.list.append(json.loads(line))
                     except:
                         pass
             ad_book_file.close()
@@ -531,7 +543,7 @@ class AddressBook(object):
             try:
                 ad_book_file = file(self.ad_book_name, "w")
                 for contact in self.list:
-                    ad_book_file.write(repr(contact) + "\n")
+                    ad_book_file.write(json.dumps(contact) + "\n")
                 if self.selected:
                     ad_book_file.write("sel:" + str(self.selected) + "\n")
                 ad_book_file.close()
@@ -761,7 +773,10 @@ class ProcessManager(Colleague):
         print "stop: ", 
         if hasattr(self, "watched_milhouse_recv_id"):
             print "watch"
-            gobject.source_remove(self.watched_milhouse_recv_id)
+            try:
+                gobject.source_remove(self.watched_milhouse_recv_id)
+            except TypeError:
+                pass
         if hasattr(self, "timeout"):
             print "timeout"
             gobject.source_remove(self.timeout)
@@ -795,7 +810,7 @@ class Network(Colleague):
         msg = None
         if tmp_msg[0] == "{" and tmp_msg[-1] == "}" and tmp_msg.find("{", 1, -2) == -1 and tmp_msg.find("}", 1, -2) == -1:
             try:
-                tmp_msg = eval(tmp_msg)
+                tmp_msg = json.loads(tmp_msg)
                 if type(tmp_msg) is dict:
                     msg = tmp_msg
             except:
@@ -855,7 +870,7 @@ class Client(Network):
         return False
 
     def send(self, msg):
-        if not len(msg)%self.buf_size:
+        if not len(msg) % self.buf_size:
             msg += " "
         try:
             self.sock.sendall(msg)
