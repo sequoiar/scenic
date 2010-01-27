@@ -292,7 +292,7 @@ class Application(object):
         self.on_contact_edit_but_clicked(args)
 
     def on_add_contact_clicked(self, *args):
-        self.ad_book.new_contact = 1
+        self.ad_book.new_contact = True
         self.contact_name_entry.set_text("")
         self.contact_ip_entry.set_text("")
         self.contact_port_entry.set_text("")
@@ -348,7 +348,7 @@ class Application(object):
             ad_book.contact_list.append({})
             self.selection.select_path(len(ad_book.contact_list) - 1)
             ad_book.contact = ad_book.contact_list[len(ad_book.contact_list) - 1]
-            ad_book.new_contact = 0
+            ad_book.new_contact = False
         else:
             self.contact_tree.set_value(self.row, 0, "<b>" + self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
         ad_book.contact["name"] = self.contact_name_entry.get_text()
@@ -498,7 +498,7 @@ class Application(object):
     def init_ad_book_contact_list(self):
         ad_book = self.ad_book
         ad_book.contact = None
-        ad_book.new_contact = 0
+        ad_book.new_contact = False
         if len(ad_book.contact_list) > 0:
             for contact in ad_book.contact_list:
                 self.contact_tree.append(    ["<b>" + contact["name"]
