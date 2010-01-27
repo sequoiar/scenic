@@ -34,7 +34,7 @@ try:
 except ImportError, e:
     print "Could not load GTK or glade. Install python-gtk2 and python-glade2.", str(e)
     sys.exit(1)
-from propulseart import gui
+from scenic import gui
 
 def run():
     # command line parsing

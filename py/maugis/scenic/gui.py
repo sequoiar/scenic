@@ -42,8 +42,8 @@ import socket
 import smtplib
 import re
 import subprocess
-import propulseart
-PACKAGE_DATA = os.path.dirname(propulseart.__file__)
+import scenic
+PACKAGE_DATA = os.path.dirname(scenic.__file__)
 try:
     import gtk
     import gtk.glade

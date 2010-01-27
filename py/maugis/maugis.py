@@ -19,7 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 """
-Executable script which calls propulseart.runner.run()
+Executable script which calls scenic.runner.run()
 """
-from propulseart import runner
-runner.run()
+from scenic import runner
+if __name__ == "__main__":
+    runner.run()
