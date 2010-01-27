@@ -58,7 +58,7 @@ class Mediator(object):
         """
         self.config = Config()
         self.ad_book = AddressBook()
-        self.milhouse_send_proc = Processes(self)
+        self.milhouse_send_proc = ProcessManager(self)
         self.gui = GuiClass(self, kiosk)
         self.server = Server(self)
         self.server.start_listening()
@@ -656,7 +656,7 @@ class GuiClass(Colleague):
     def on_net_conf_port_entry_changed2(self, *args):
         self._changed(self, args)
 
-class Processes(Colleague):
+class ProcessManager(Colleague):
     """
     PROCESS manager.
     """
