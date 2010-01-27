@@ -35,8 +35,7 @@ APP_NAME = "maugis" # changed in __main__
 ### MODULES IMPORTS  ###
 
 import sys
-import signal
-import os
+import os, signal
 import time
 import socket
 import smtplib
@@ -71,408 +70,34 @@ except AttributeError:
     import simplejson as json
 
 ### MULTILINGUAL SUPPORT ###
-APP = "maugis"
 DIR = os.path.join(PACKAGE_DATA, "locale")
 import gettext
 _ = gettext.gettext
-gettext.bindtextdomain(APP, DIR)
-gettext.textdomain(APP)
-gtk.glade.bindtextdomain(APP, DIR)
-gtk.glade.textdomain(APP)
-
-### MAIN MEDIATOR(CONTROLLER)/COLLEAGUE CLASSES ###
-
-class Mediator(object):
-    def __init__(self, kiosk=False):
-        """
-        Starts the main loop of the application
-        """
-        self.config = Config()
-        self.ad_book = AddressBook()
-        self.process_manager = ProcessManager(self)
-        self.gui = GuiClass(self, kiosk)
-        self.server = Server(self)
-        self.server.start_listening()
-
-    def colleague_changed(self, colleague, event, event_args):
-        if hasattr(self, event):
-            if event_args:
-                eval("self." + event)(colleague, event_args) # FIXME !!!!!!!!!!!!!!!!!!!
-            else:
-                eval("self." + event)(colleague) # FIXME!!!!!!!!!!!!!!
-
-    ### General Methods ###
-
-    def set_contact_dialog(self, text, gui=None):
-        if not gui:
-            gui = self.gui
-        gui.contact_problem_label.set_label(text)
-        answ = gui.contact_dialog.run()
-        gui.contact_dialog.hide()
-        return answ == gtk.RESPONSE_OK
-
-    def set_confirm_dialog(self, text, gui=None):
-        if not gui:
-            gui = self.gui
-        gui.confirm_label.set_label(text)
-        answ = gui.dialog.run()
-        gui.dialog.hide()
-        return answ == gtk.RESPONSE_OK
-
-    def hide_contacting_window(self, msg="", err=""):
-        self.gui.contacting_window.hide()
-        text = None
-        if msg == "err":
-            text = _("<b><big>Contact unreacheable.</big></b>\n\nCould not connect to the IP address of this contact.")
-        elif msg == "timeout":
-            text = _("<b><big>Connection timeout.</big></b>\n\nCould not connect to the port of this contact.")
-        elif msg == "answTimeout":
-            text = _("<b><big>Contact answer timeout.</big></b>\n\nThe contact did not answer in an reasonable delay.")
-        elif msg == "send":
-            text = _("<b><big>Problem sending command.</big></b>\n\nError: %s") % err
-        elif msg == "refuse":
-            text = _("<b><big>Connection refuse.</big></b>\n\nThe contact refuse the connection.")
-        elif msg == "badAnsw":
-            text = _("<b><big>Invalid answer.</big></b>\n\nThe answer was not valid.")
-        if text:
-            if self.set_contact_dialog(text):
-                pass
-
-    ### Callbacks ###
-
-    def on_main_window_destroy(self, colleague, (widget)):
-        self.server.close()
-        self.ad_book.write()
-        self.process_manager.stop()
-        gtk.main_quit()
-
-    def on_main_tabs_switch_page(self, gui, (widget, page, page_num)):
-        tab = widget.get_nth_page(page_num).name
-        if tab == "localPan":
-            gui.widgets.get_widget("netConfSetBut").grab_default()
-        if tab == "contactPan":
-            gui.widgets.get_widget("contactJoinBut").grab_default()
-
-    def init_bandwidth(self, gui):
-        base = 30
-        num = 2 # number of choice
-        selection = int(round((self.config.bandwidth - 1) * num / base))
-        if selection < 0:
-            selection = 0
-        elif selection > base:
-            selection = base
-        gui.net_conf_bw_combo.set_active(selection)
-
-    def on_net_conf_bw_combo_changed(self, gui, (widget)):
-        base = 30
-        num = 2 # number of choice
-        step = base / num
-        selection = gui.net_conf_bw_combo.get_active()
-        self.config.bandwidth = (selection + 1) * step
-        self.config._write()
-
-    def init_negotiation_port(self, gui):
-        gui.negotiation_port_entry.set_text(str(self.config.negotiationport))
-
-    def on_net_conf_port_entry_changed2(self, gui, (widget)):
-        port = gui.negotiation_port_entry.get_text()
-        if not port.isdigit():
-            gui.widgets.get_widget("mainTabs").set_current_page(1)
-            self.init_negotiation_port(gui)
-            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1-999999")
-            if self.set_contact_dialog(text):
-                gui.negotiation_port_entry.grab_focus()
-                return False
-        else:
-            self.config.negotiationport = int(port)
-            self.config._write()
-            self.server.close()
-            self.server = Server(self)
-            self.server.start_listening()
-        
-
-    def init_ad_book_list(self, gui):
-        ad_book = self.ad_book
-        ad_book.contact = None
-        ad_book.new_contact = 0
-        
-        if len(ad_book.list) > 0:
-            for contact in ad_book.list:
-                gui.contact_tree.append(    ["<b>" + contact["name"]
-                                            + "</b>\n  IP: "
-                                            + contact["address"] + "\n  Port: "
-                                            + str(contact["port"])] )
-            gui.selection.select_path(ad_book.selected)
-        else:
-            gui.contact_edit_but.set_sensitive(False)
-            gui.remove_contact.set_sensitive(False)
-            gui.contact_join_but.set_sensitive(False)
-
-    def on_contact_list_changed(self, gui, (widget, data)):
-        list, gui.row = widget.get_selected()
-        if gui.row:
-            gui.contact_edit_but.set_sensitive(True)
-            gui.remove_contact.set_sensitive(True)
-            gui.contact_join_but.set_sensitive(True)
-
-            self.num = list.get_path(gui.row)[0]
-            self.ad_book.contact = self.ad_book.list[self.num]
-            self.ad_book.selected = self.num
-        else:
-            gui.contact_edit_but.set_sensitive(False)
-            gui.remove_contact.set_sensitive(False)
-            gui.contact_join_but.set_sensitive(False)
-
-            self.ad_book.contact = None
-
-    def on_add_contact_clicked(self, gui, (widget)):
-        self.ad_book.new_contact = 1
-        gui.contact_name_entry.set_text("")
-        gui.contact_ip_entry.set_text("")
-        gui.contact_port_entry.set_text("")
-        gui.edit_contact_window.show()
-
-    def on_remove_contact_clicked(self, gui, (widget)):
-        text = _("<b><big>Delete this contact from the list?</big></b>\n\nAre you sure you want to delete this contact from the list?")
-        if self.set_confirm_dialog(text):
-            del self.ad_book.list[self.num]
-            gui.contact_tree.remove(gui.row)
-            self.ad_book.write()
-            num = self.num - 1
-            if num < 0:
-                num = 0
-            gui.selection.select_path(num)
-
-    def on_contact_edit_but_clicked(self, gui, (widget)):
-        gui.contact_name_entry.set_text(self.ad_book.contact["name"])
-        gui.contact_ip_entry.set_text(self.ad_book.contact["address"])
-        gui.contact_port_entry.set_text(str(self.ad_book.contact["port"]))
-        gui.edit_contact_window.show()
-
-    def on_edit_contact_window_delete_event(self, gui, (widget, event)):
-        widget.hide()
-
-    def on_edit_contact_cancel_but_clicked(self, gui, (widget)):
-        gui.edit_contact_window.hide()
-
-    def on_edit_contact_save_but_clicked(self, gui, (widget)):
-        ad_book = self.ad_book
-        #Validate the port number
-        port = gui.contact_port_entry.get_text()
-        if port == "":
-            port = str(self.config.milhouse_sendport) #set port to default
-        elif (not port.isdigit()) or (int(port) not in range(1,10000)):
-            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1000-99999")
-            if self.set_contact_dialog(text):
-                return
-
-        #Validate the address
-        addr = gui.contact_ip_entry.get_text()
-        if len(addr) < 7:
-            text = _("<b><big>The address is not valid</big></b>\n\nEnter a valid address\nExample: 168.123.45.32 or tot.sat.qc.ca")
-            if self.set_contact_dialog(text):
-                return
-
-        if ad_book.new_contact:
-            gui.contact_tree.append(    ["<b>" + gui.contact_name_entry.get_text()
-                                        + "</b>\n  IP: " + addr
-                                        + "\n  Port: " + port]  )
-            ad_book.list.append({})
-            gui.selection.select_path(len(ad_book.list) - 1)
-            ad_book.contact = ad_book.list[len(ad_book.list) - 1]
-            ad_book.new_contact = 0
-        else:
-            gui.contact_tree.set_value(gui.row, 0, "<b>" + gui.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
-        ad_book.contact["name"] = gui.contact_name_entry.get_text()
-        ad_book.contact["address"] = addr
-        ad_book.contact["port"] = int(port)
-        ad_book.write()
-        gui.edit_contact_window.hide()
-
-    def on_net_conf_set_but_clicked(self, gui, (widget)):
-        os.system('gksudo "network-admin"')
-
-    def on_sys_shutdown_but_clicked(self, gui, (widget)):
-        text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
-        if self.set_confirm_dialog(text):
-            os.system('gksudo "shutdown -h now"')
-
-    def on_sys_reboot_but_clicked(self, gui, (widget)):
-        text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
-        if self.set_confirm_dialog(text):
-            os.system('gksudo "shutdown -r now"')
-
-    def on_maint_upd_but_clicked(self, gui, (widget)):
-        os.system('gksudo "update-manager"')
-
-    def on_maint_send_but_clicked(self, gui, (widget)):
-        text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
-        if self.set_confirm_dialog(text):
-            msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n\n"
-            msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n\n"
-            msg += "--- uname -a ---\n"
-            try:
-                w, r, err = os.popen3('uname -a')
-                msg += r.read() + "\n"
-                errRead = err.read()
-                if errRead:
-                    msg += errRead + "\n"
-                w.close()
-                r.close()
-                err.close()
-            except:
-                msg += "Error executing 'uname -a'\n\n"
-            msg += "--- lsmod ---\n"
-            try:
-                w, r, err = os.popen3('lsmod')
-                msg += r.read()
-                errRead = err.read()
-                if errRead:
-                    msg += "\n" + errRead
-                w.close()
-                r.close()
-                err.close()
-            except:
-                msg += "Error executing 'lsmod'"
-
-            fromaddr = "maugis@sat.qc.ca"
-            toaddrs  = self.config.emailinfo
-            toaddrs = toaddrs.split(', ')
-            server = smtplib.SMTP(self.config.smtpserver)
-            server.set_debuglevel(0)
-            try:
-                server.sendmail(fromaddr, toaddrs, msg)
-            except:
-                text = _("<b><big>Could not send info.</big></b>\n\nCheck your internet connection.")
-                if self.set_contact_dialog(text):
-                    pass
-            server.quit()
-
-    def on_client_join_but_clicked(self, gui, (widget)):
-        gui.contacting_window.show()
-        msg = json.dumps({"command":"ask", "port":self.ad_book.contact["port"], "bandwidth":self.config.bandwidth})
-        client = Client(self)
-        gobject.idle_add(client.connect, self.ad_book.contact["address"], msg)
-
-    def on_server_rcv_command(self, server, (msg, addr, conn)):
-        if msg and "command" in msg:
-            cmd = msg["command"]
-            if cmd == "ask":
-                self.rcv_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr[0])
-                self.gui.contact_request_label.set_label("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
-                answ = self.gui.contact_request_dialog.run()
-                gobject.source_remove(self.rcv_watch)
-                self.gui.contact_request_dialog.hide()
-                if answ == gtk.RESPONSE_OK:
-                    if "bandwidth" in msg and self.config.bandwidth > msg["bandwidth"]:
-                        bandwidth = msg["bandwidth"]
-                    else:
-                        bandwidth = self.config.bandwidth
-                    conn.sendall(json.dumps({"answer":"accept", "bandwidth": bandwidth}))
-                    conn.close()
-                    self.process_manager.start(addr[0], bandwidth)
-                else:
-                    conn.sendall(json.dumps({"answer":"refuse"}))
-                    conn.close()
-            elif cmd == "stop":
-                self.process_manager.stop()
-                conn.sendall(json.dumps({"answer":"stopped"}))
-                conn.close()
-            else:
-                conn.close()
-        else:
-            conn.close()
-
-    def server_answer_timeout(self, addr):
-        self.gui.contact_request_dialog.response(gtk.RESPONSE_NONE)
-        self.gui.contact_request_dialog.hide()
-        text = _("<b><big>%s was contacting you.</big></b>\n\nBut you did not answer in reasonable delay.") % addr
-        if self.set_contact_dialog(text):
-            pass
-        return False
-
-    def on_client_socket_timeout(self, client):
-        self.hide_contacting_window("timeout")
-    
-    def on_client_socket_error(self, client, (err, msg)):
-        self.hide_contacting_window(msg)
-        print err
-
-    def on_client_add_timeout(self, client):
-        #~ if self.gui.contacting_window.get_property('visible'):
-        self.answ_watch = gobject.timeout_add(5000, self.client_answer_timeout, client)
-        #~ return False
-
-    def on_client_rcv_command(self, client, (msg)):
-        if(self.answ_watch):
-            gobject.source_remove(self.answ_watch)
-        if msg and "answer" in msg:
-            answ = msg["answer"]
-            if answ == "accept":
-                self.hide_contacting_window("accept")
-                if "bandwidth" in msg:
-                    bandwidth = msg["bandwidth"]
-                else:
-                    bandwidth = self.config.bandwidth
-                self.process_manager.start(client.host, bandwidth)
-            elif answ == "refuse":
-                self.hide_contacting_window("refuse")
-            elif answ == "stopped":
-                self.process_manager.stop()
-            else:
-                self.hide_contacting_window("badAnsw")
-
-    def client_answer_timeout(self, client):
-        if (client.io_watch):
-            gobject.source_remove(client.io_watch)
-        if self.gui.contacting_window.get_property('visible'):
-            self.hide_contacting_window("answTimeout")
-        return False
-    
-    def on_start_milhouse_send(self, colleague):
-        self.gui.contact_join_but.set_sensitive(False)
-
-    def on_stop_milhouse_send(self, colleague):
-        self.gui.contact_join_but.set_sensitive(True)
-
-    def watch_milhouse_recv(self, colleague, (child, condition)):
-        msg = json.dumps({"command":"stop"})
-        client = Client(self)
-        client.connect(self.ad_book.contact["address"], msg)
-        #~ client.close()
-
-class Colleague(object):
-    def __init__(self, med):
-        self.med = med
-
-    def _changed(self, colleague, event_args=None, event=None):
-        if not event:
-            event = sys._getframe(1).f_code.co_name
-        self.med.colleague_changed(colleague, event, event_args)
+gettext.bindtextdomain(APP_NAME, DIR)
+gettext.textdomain(APP_NAME)
+gtk.glade.bindtextdomain(APP_NAME, DIR)
+gtk.glade.textdomain(APP_NAME)
 
 class Config(object):
-    """
-    READING AND WRITING CONFIGURATION FILE
-    """# Default values
-    milhouse_sendport = 8000
-    negotiationport = 17446
-    streamer_command = "milhouse"
-    smtpserver = "smtp.sat.qc.ca"
-    emailinfo = "maugis@sat.qc.ca"
-    audio_input = "jackaudiosrc"
-    audio_output = "jackaudiosink"
-    audio_codec = "raw"
-    audio_channels = 8
-    video_input = "v4l2src"
-    video_device = "/dev/video0"
-    video_output = "xvimagesink"
-    video_codec = "mpeg4"
-    video_bitrate = "3000000"
-    video_port = milhouse_sendport
-    audio_port = video_port + 10
-    bandwidth = 30
-
     def __init__(self):
+        # Default values
+        self.negotiation_port = 17446
+        self.streamer_command = "milhouse"
+        self.smtpserver = "smtp.sat.qc.ca"
+        self.emailinfo = "maugis@sat.qc.ca"
+        self.audio_input = "jackaudiosrc"
+        self.audio_output = "jackaudiosink"
+        self.audio_codec = "raw"
+        self.audio_channels = 8
+        self.video_input = "v4l2src"
+        self.video_device = "/dev/video0"
+        self.video_output = "xvimagesink"
+        self.video_codec = "mpeg4"
+        self.video_bitrate = "3000000"
+        self.video_port = 8000
+        self.audio_port = self.video_port + 10
+        self.bandwidth = 30
+
         config_file = 'maugis.cfg'
         if os.path.isfile('/etc/' + config_file):
             config_path = '/etc/'
@@ -553,23 +178,26 @@ class AddressBook(object):
             except:
                 print _("Cannot write Address Book file")
 
-class GuiClass(Colleague):
+class Application(object):
     """
-    GTK GUI
+    Main application (arguably God) class
     """
-    def __init__(self, med, kiosk):
-        Colleague.__init__(self, med)
+    def __init__(self, kiosk):
+        self.config = Config()
+        self.ad_book = AddressBook()
+        self.process_manager = ProcessManager(self.config)
+        self.server = Server(self)
+
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
         if os.path.isfile(glade_file):
             glade_path = glade_file
-        #elif os.path.isfile('/usr/share/maugis/' + glade_file):
-        #    glade_path = '/usr/share/maugis/' + glade_file
         else:
-            text = _("<b><big>Could not find the Glade file?</big></b>\n\nBe sure the file %s is in /usr/share/maugis/. Quitting.") % glade_file
+            text = _("<b><big>Could not find the Glade file?</big></b>\n\n" \
+                    "Be sure the file %s is in /usr/share/maugis/. Quitting.") % glade_file
             print text
             sys.exit()
-        self.widgets = gtk.glade.XML(glade_path, domain=APP)
+        self.widgets = gtk.glade.XML(glade_path, domain=APP_NAME)
         
         # connects callbacks to widgets automatically
         cb = {}
@@ -583,7 +211,6 @@ class GuiClass(Colleague):
         self.dialog = self.widgets.get_widget("normalDialog")
         self.dialog.set_transient_for(self.main_window)
         self.confirm_label = self.widgets.get_widget("confirmLabel")
-#       self.client_preview = self.widgets.get_widget("clientPreviewWindow")
         self.contacting_window = self.widgets.get_widget("contactingWindow")
         self.contact_dialog = self.widgets.get_widget("contactDialog")
         self.contact_dialog.set_transient_for(self.main_window)
@@ -604,9 +231,8 @@ class GuiClass(Colleague):
         self.negotiation_port_entry = self.widgets.get_widget("netConfPortEntry")
         self.net_conf_bw_combo = self.widgets.get_widget("netConfBWCombo")
         
-        # adjust the bandwidth combobox iniline with the config
-        self._changed(self, event="init_bandwidth")
-        
+        self.server.start_listening()
+
         # switch to Kiosk mode if asked
         if kiosk:
             self.main_window.set_decorated(False)
@@ -614,88 +240,355 @@ class GuiClass(Colleague):
         
         # Build the contact list view
         self.selection = self.contact_list.get_selection()
-        self.selection.connect("changed", self.on_contact_list_changed, None)
-        
         self.contact_tree = gtk.ListStore(str)
         self.contact_list.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list.append_column(column)
-        
-        self._changed(self, event="init_ad_book_list")
-        self._changed(self, event="init_negotiation_port")
-        
         self.main_window.show()
         
-    ### GUI Callbacks ###
-    
     def on_main_window_destroy(self, *args):
-        self._changed(self, args)
+        self.server.close()
+        self.ad_book.write()
+        self.process_manager.stop()
+        gtk.main_quit()
 
-    def on_main_tabs_switch_page(self, *args):
-        self._changed(self, args)
+    def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
+        tab = widget.get_nth_page(page_number)
+        if tab == "localPan":
+            self.widgets.get_widget("netConfSetBut").grab_default()
+        elif tab == "contactPan":
+            self.widgets.get_widget("contactJoinBut").grab_default()
 
-    def on_contact_list_changed(self, *args):
-        self._changed(self, args)
+    def on_contact_list_changed(self, widget):
+        list, self.row = widget.get_selected()
+        if self.row:
+            self.contact_edit_but.set_sensitive(True)
+            self.remove_contact.set_sensitive(True)
+            self.contact_join_but.set_sensitive(True)
+            self.num = list.get_path(self.row)[0]
+            self.ad_book.contact = self.ad_book.list[self.num]
+            self.ad_book.selected = self.num
+        else:
+            self.contact_edit_but.set_sensitive(False)
+            self.remove_contact.set_sensitive(False)
+            self.contact_join_but.set_sensitive(False)
+            self.ad_book.contact = None
 
     def on_contact_list_row_activated(self, *args):
-        self._changed(self, args, event="on_contact_edit_but_clicked")
+        self.on_contact_edit_but_clicked(args)
 
     def on_add_contact_clicked(self, *args):
-        self._changed(self, args)
+        self.ad_book.new_contact = 1
+        self.contact_name_entry.set_text("")
+        self.contact_ip_entry.set_text("")
+        self.contact_port_entry.set_text("")
+        self.edit_contact_window.show()
 
     def on_remove_contact_clicked(self, *args):
-        self._changed(self, args)
+        text = _("<b><big>Delete this contact from the list?</big></b>\n\nAre you sure you want "
+                "to delete this contact from the list?")
+        if self.set_confirm_dialog(text):
+            del self.ad_book.list[self.num]
+            self.contact_tree.remove(self.row)
+            self.ad_book.write()
+            num = self.num - 1
+            if num < 0:
+                num = 0
+            self.selection.select_path(num)
 
     def on_contact_edit_but_clicked(self, *args):
-        self._changed(self, args)
+        self.contact_name_entry.set_text(self.ad_book.contact["name"])
+        self.contact_ip_entry.set_text(self.ad_book.contact["address"])
+        self.contact_port_entry.set_text(str(self.ad_book.contact["port"]))
+        self.edit_contact_window.show()
 
-    def on_edit_contact_window_delete_event(self, *args):
-        self._changed(self, args)
+    def on_edit_contact_window_delete_event(self, widget):
+        widget.hide()
         return True
 
     def on_edit_contact_cancel_but_clicked(self, *args):
-        self._changed(self, args)
+        self.edit_contact_window.hide()
 
     def on_edit_contact_save_but_clicked(self, *args):
-        self._changed(self, args)
+        ad_book = self.ad_book
+        #Validate the port number
+        port = self.contact_port_entry.get_text()
+        if port == "":
+            port = str(self.config.video_port) #set port to default
+        elif (not port.isdigit()) or (int(port) not in range(1,10000)):
+            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1000-99999")
+            if self.set_contact_dialog(text):
+                return
+
+        #Validate the address
+        addr = self.contact_ip_entry.get_text()
+        if len(addr) < 7:
+            text = _("<b><big>The address is not valid</big></b>\n\nEnter a valid address\nExample: 168.123.45.32 or tot.sat.qc.ca")
+            if self.set_contact_dialog(text):
+                return
+
+        if ad_book.new_contact:
+            self.contact_tree.append(    ["<b>" + self.contact_name_entry.get_text()
+                                        + "</b>\n  IP: " + addr
+                                        + "\n  Port: " + port]  )
+            ad_book.list.append({})
+            self.selection.select_path(len(ad_book.list) - 1)
+            ad_book.contact = ad_book.list[len(ad_book.list) - 1]
+            ad_book.new_contact = 0
+        else:
+            self.contact_tree.set_value(self.row, 0, "<b>" + self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
+        ad_book.contact["name"] = self.contact_name_entry.get_text()
+        ad_book.contact["address"] = addr
+        ad_book.contact["port"] = int(port)
+        ad_book.write()
+        self.edit_contact_window.hide()
 
     def on_net_conf_set_but_clicked(self, *args):
-        self._changed(self, args)
+        os.system('gksudo "network-admin"')
 
     def on_sys_shutdown_but_clicked(self, *args):
-        self._changed(self, args)
+        text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
+        if self.set_confirm_dialog(text):
+            os.system('gksudo "shutdown -h now"')
 
     def on_sys_reboot_but_clicked(self, *args):
-        self._changed(self, args)
+        text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
+        if self.set_confirm_dialog(text):
+            os.system('gksudo "shutdown -r now"')
 
     def on_maint_upd_but_clicked(self, *args):
-        self._changed(self, args)
+        os.system('gksudo "update-manager"')
 
     def on_maint_send_but_clicked(self, *args):
-        self._changed(self, args)
+        text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
+        if self.set_confirm_dialog(text):
+            msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n\n"
+            msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n\n"
+            msg += "--- uname -a ---\n"
+            try:
+                w, r, err = os.popen3('uname -a')
+                msg += r.read() + "\n"
+                errRead = err.read()
+                if errRead:
+                    msg += errRead + "\n"
+                w.close()
+                r.close()
+                err.close()
+            except:
+                msg += "Error executing 'uname -a'\n\n"
+            msg += "--- lsmod ---\n"
+            try:
+                w, r, err = os.popen3('lsmod')
+                msg += r.read()
+                errRead = err.read()
+                if errRead:
+                    msg += "\n" + errRead
+                w.close()
+                r.close()
+                err.close()
+            except:
+                msg += "Error executing 'lsmod'"
+
+            fromaddr = "maugis@sat.qc.ca"
+            toaddrs  = self.config.emailinfo
+            toaddrs = toaddrs.split(', ')
+            server = smtplib.SMTP(self.config.smtpserver)
+            server.set_debuglevel(0)
+            try:
+                server.sendmail(fromaddr, toaddrs, msg)
+            except:
+                text = _("<b><big>Could not send info.</big></b>\n\nCheck your internet connection.")
+                if self.set_contact_dialog(text):
+                    pass
+            server.quit()
 
     def on_client_join_but_clicked(self, *args):
-        self._changed(self, args)
+        self.contacting_window.show()
+        msg = json.dumps({"command":"ask", "port":self.ad_book.contact["port"], "bandwidth":self.config.bandwidth})
+        client = Client(self)
+        gobject.idle_add(client.connect, self.ad_book.contact["address"], msg)
 
     def on_net_conf_bw_combo_changed(self, *args):
-        self._changed(self, args)
+        base = 30
+        num = 2 # number of choice
+        step = base / num
+        selection = self.net_conf_bw_combo.get_active()
+        self.config.bandwidth = (selection + 1) * step
+        self.config._write()
 
     def on_net_conf_port_entry_changed(self, *args):
         gobject.timeout_add(0, self.on_net_conf_port_entry_changed2, args)
         return False
 
     def on_net_conf_port_entry_changed2(self, *args):
-        self._changed(self, args)
+        port = self.negotiation_port_entry.get_text()
+        if not port.isdigit():
+            self.widgets.get_widget("mainTabs").set_current_page(1)
+            self.init_negotiation_port()
+            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1-999999")
+            if self.set_contact_dialog(text):
+                self.negotiation_port_entry.grab_focus()
+                return False
+        else:
+            self.config.negotiation_port = int(port)
+            self.config._write()
+            self.server.close()
+            self.server = Server(self)
+            self.server.start_listening()
 
-class ProcessManager(Colleague):
+    def set_contact_dialog(self, text):
+        self.contact_problem_label.set_label(text)
+        answer = self.contact_dialog.run()
+        self.contact_dialog.hide()
+        return answer == gtk.RESPONSE_OK
+
+    def set_confirm_dialog(self, text):
+        self.confirm_label.set_label(text)
+        answer = self.dialog.run()
+        self.dialog.hide()
+        return answer == gtk.RESPONSE_OK
+
+    def hide_contacting_window(self, msg="", err=""):
+        self.contacting_window.hide()
+        text = None
+        if msg == "err":
+            text = _("<b><big>Contact unreacheable.</big></b>\n\nCould not connect to the IP address of this contact.")
+        elif msg == "timeout":
+            text = _("<b><big>Connection timeout.</big></b>\n\nCould not connect to the port of this contact.")
+        elif msg == "answTimeout":
+            text = _("<b><big>Contact answer timeout.</big></b>\n\nThe contact did not answer in an reasonable delay.")
+        elif msg == "send":
+            text = _("<b><big>Problem sending command.</big></b>\n\nError: %s") % err
+        elif msg == "refuse":
+            text = _("<b><big>Connection refuse.</big></b>\n\nThe contact refuse the connection.")
+        elif msg == "badAnsw":
+            text = _("<b><big>Invalid answer.</big></b>\n\nThe answer was not valid.")
+        if text:
+            if self.set_contact_dialog(text):
+                pass
+
+    def init_bandwidth(self):
+        base = 30
+        num = 2 # number of choice
+        selection = int(round((self.config.bandwidth - 1) * num / base))
+        if selection < 0:
+            selection = 0
+        elif selection > base:
+            selection = base
+        self.net_conf_bw_combo.set_active(selection)
+
+    def init_negotiation_port(self):
+        self.negotiation_port_entry.set_text(str(self.config.negotiation_port))
+
+    def init_ad_book_list(self):
+        ad_book = self.ad_book
+        ad_book.contact = None
+        ad_book.new_contact = 0
+        if len(ad_book.list) > 0:
+            for contact in ad_book.list:
+                self.contact_tree.append(    ["<b>" + contact["name"]
+                                            + "</b>\n  IP: "
+                                            + contact["address"] + "\n  Port: "
+                                            + str(contact["port"])] )
+            self.selection.select_path(ad_book.selected)
+        else:
+            self.contact_edit_but.set_sensitive(False)
+            self.remove_contact.set_sensitive(False)
+            self.contact_join_but.set_sensitive(False)
+
+    def on_server_rcv_command(self, server, (msg, addr, conn)):
+        if msg and "command" in msg:
+            cmd = msg["command"]
+            if cmd == "ask":
+                self.rcv_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr[0])
+                self.contact_request_label.set_label("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
+                answ = self.contact_request_dialog.run()
+                gobject.source_remove(self.rcv_watch)
+                self.contact_request_dialog.hide()
+                if answ == gtk.RESPONSE_OK:
+                    if "bandwidth" in msg and self.config.bandwidth > msg["bandwidth"]:
+                        bandwidth = msg["bandwidth"]
+                    else:
+                        bandwidth = self.config.bandwidth
+                    conn.sendall(json.dumps({"answer":"accept", "bandwidth": bandwidth}))
+                    conn.close()
+                    self.process_manager.start(addr[0], bandwidth)
+                else:
+                    conn.sendall(json.dumps({"answer":"refuse"}))
+                    conn.close()
+            elif cmd == "stop":
+                self.process_manager.stop()
+                conn.sendall(json.dumps({"answer":"stopped"}))
+                conn.close()
+            else:
+                conn.close()
+        else:
+            conn.close()
+
+    def server_answer_timeout(self, addr):
+        self.contact_request_dialog.response(gtk.RESPONSE_NONE)
+        self.contact_request_dialog.hide()
+        text = _("<b><big>%s was contacting you.</big></b>\n\nBut you did not answer in reasonable delay.") % addr
+        if self.set_contact_dialog(text):
+            pass
+        return False
+
+    def on_client_socket_timeout(self, client):
+        self.hide_contacting_window("timeout")
+    
+    def on_client_socket_error(self, client, (err, msg)):
+        self.hide_contacting_window(msg)
+        print err
+
+    def on_client_add_timeout(self, client):
+        self.answ_watch = gobject.timeout_add(5000, self.client_answer_timeout, client)
+
+    def on_client_rcv_command(self, client, (msg)):
+        if(self.answ_watch):
+            gobject.source_remove(self.answ_watch)
+        if msg and "answer" in msg:
+            answ = msg["answer"]
+            if answ == "accept":
+                self.hide_contacting_window("accept")
+                if "bandwidth" in msg:
+                    bandwidth = msg["bandwidth"]
+                else:
+                    bandwidth = self.config.bandwidth
+                self.process_manager.start(client.host, bandwidth)
+            elif answ == "refuse":
+                self.hide_contacting_window("refuse")
+            elif answ == "stopped":
+                self.process_manager.stop()
+            else:
+                self.hide_contacting_window("badAnsw")
+
+    def client_answer_timeout(self, client):
+        if (client.io_watch):
+            gobject.source_remove(client.io_watch)
+        if self.contacting_window.get_property('visible'):
+            self.hide_contacting_window("answTimeout")
+        return False
+    
+    def on_start_milhouse_send(self):
+        self.contact_join_but.set_sensitive(False)
+
+    def on_stop_milhouse_send(self):
+        self.contact_join_but.set_sensitive(True)
+
+    def watch_milhouse_recv(self, (child, condition)):
+        msg = json.dumps({"command":"stop"})
+        client = Client(self)
+        client.connect(self.ad_book.contact["address"], msg)
+
+
+class ProcessManager(object):
     """
     PROCESS manager.
     """
-    def __init__(self, med):
-        Colleague.__init__(self, med)
-        self.config = med.config
-        self.video_port = self.config.milhouse_sendport
-        self.audio_port = self.video_port + 10
+    def __init__(self, config):
+        self.config = config
+        self.video_port = self.config.video_port
+        self.audio_port = self.config.audio_port
         # receiver
         self.milhouse_recv_cmd = None
         self.milhouse_recv_pid = None
@@ -713,7 +606,6 @@ class ProcessManager(Colleague):
         self.milhouse_send_timeout = None
         
     def start(self, host, bandwidth):
-        self._changed(self, event="on_start_milhouse_send")
         base = 30
         divider = base / bandwidth
         # First, start the milhouse_recv process, milhouse_send needs a remote running propulseart --receive to work
@@ -762,13 +654,11 @@ class ProcessManager(Colleague):
 
     def watch_milhouse_recv(self, *args):
         print "watch_milhouse_recv"
-        self._changed(self, args)
         self.milhouse_recv_timeout = gobject.timeout_add(5000, self.stop)
         return False
 
     def watch_milhouse_send(self, *args):
         print "watch_milhouse_send"
-        self._changed(self, args)
         self.milhouse_send_timeout = gobject.timeout_add(5000, self.stop)
         return False
 
@@ -797,16 +687,14 @@ class ProcessManager(Colleague):
             print "send: after os.wait()"
         except:
             pass
-        self._changed(self, event="on_stop_milhouse_send")
+        self.on_stop_milhouse_send()
 
 ### NETWORK ###
 
-class Network(Colleague):
-    def __init__(self, med):
-        Colleague.__init__(self, med)
-        self.config = med.config
+class Network(object):
+    def __init__(self, negotiation_port):
         self.buf_size = 1024
-        self.port = self.config.negotiationport
+        self.port = negotiation_port
     
     def validate(self, msg):
         tmp_msg = msg.strip()
@@ -833,8 +721,9 @@ class Network(Colleague):
 
 
 class Server(Network):
-    def __init__(self, med):
-        Network.__init__(self, med)
+    def __init__(self, app):
+        Network.__init__(self, app.config.negotiation_port)
+        self.app = app
         self.host = ''
 
     def start_listening(self):
@@ -849,13 +738,14 @@ class Server(Network):
         conn, addr = source.accept()
         buffer = self.recv(conn)
         msg = self.validate(buffer)
-        self._changed(self, (msg, addr, conn), event="on_server_rcv_command")
+        self.app.on_server_rcv_command(self, (msg, addr, conn))
         return True
 
 
 class Client(Network):
-    def __init__(self, med):
-        Network.__init__(self, med)
+    def __init__(self, app):
+        Network.__init__(self, app.config.negotiation_port)
+        self.app = app
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(10)
 
@@ -864,40 +754,40 @@ class Client(Network):
         try:
             self.sock.connect((host, self.port))
         except socket.timeout, err:
-            self._changed(self, event="on_client_socket_timeout")
+            on_client_socket_timeout()
         except socket.error, err:
-            self._changed(self, (err, "err"), event="on_client_socket_error")
+            on_client_socket_error()
         else:
             if self.send(msg):
                 self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self.handle_data)
         return False
 
     def send(self, msg):
-        if not len(msg) % self.buf_size:
+        if not len(msg)%self.buf_size:
             msg += " "
         try:
             self.sock.sendall(msg)
-            self._changed(self, event="on_client_add_timeout")
+            self.app.on_client_add_timeout()
             return True
         except socket.error, err:
-            self._changed(self, err, event="on_client_add_timeout")
-            self._changed(self, "send", err, event="on_client_socket_error")
+            self.app.on_client_add_timeout()
+            self.app.on_client_socket_error()
             return False
 
     def handle_data(self, source, condition):
         buffer = self.recv(source)
         source.close()
         msg = self.validate(buffer)
-        self._changed(self, msg, event="on_client_rcv_command")
+        self.app.on_client_rcv_command()
         return False
 
 if __name__ == '__main__':
     # command line parsing
+    APP_NAME = sys.argv[0]
     parser = OptionParser(usage="%prog", version=str(__version__))
     parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
             help="Run maugis in kiosk mode")
     (options, args) = parser.parse_args()
-    main = Mediator(kiosk=options.kiosk)
-    APP_NAME = sys.argv[0]
+    main = Application(kiosk=options.kiosk)
     gtk.main()
     
