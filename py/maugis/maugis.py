@@ -154,31 +154,31 @@ class AddressBook(object):
     READING & WRITING ADDRESS BOOK FILE 
     """
     def __init__(self):
-        self.list = []
+        self.contact_list = []
         self.selected = 0
         self.ad_book_name = os.environ['HOME'] + '/.maugis/contacts.json'
         self.read()
 
     def read(self):
         if os.path.isfile(self.ad_book_name):
-            self.list = []
+            self.contact_list = []
             ad_book_file = file(self.ad_book_name, "r")
             for line in ad_book_file:
                 if line[:4] == "sel:":
                     self.selected = int(line[4:].strip())
                 else:
                     try:
-                        self.list.append(json.loads(line))
+                        self.contact_list.append(json.loads(line))
                     except Exception, e:
                         print str(e)
                         pass
             ad_book_file.close()
 
     def write(self):
-        if ((os.path.isfile(self.ad_book_name)) or (len(self.list) > 0)):
+        if ((os.path.isfile(self.ad_book_name)) or (len(self.contact_list) > 0)):
             try:
                 ad_book_file = file(self.ad_book_name, "w")
-                for contact in self.list:
+                for contact in self.contact_list:
                     ad_book_file.write(json.dumps(contact) + "\n")
                 if self.selected:
                     ad_book_file.write("sel:" + str(self.selected) + "\n")
@@ -238,6 +238,9 @@ class Application(object):
         self.contact_list = self.widgets.get_widget("contactList")
         self.negotiation_port_entry = self.widgets.get_widget("netConfPortEntry")
         self.net_conf_bw_combo = self.widgets.get_widget("netConfBWCombo")
+        # pos of currently selected contact
+        self.row = None
+        self.num = None
         
         self.server.start_listening()
 
@@ -252,8 +255,8 @@ class Application(object):
         self.contact_list.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list.append_column(column)
-
-        self.init_ad_book_list()
+        self.init_ad_book_contact_list()
+        #self.init_negotiation_port()
 
         self.main_window.show()
         
@@ -271,13 +274,13 @@ class Application(object):
             self.widgets.get_widget("contactJoinBut").grab_default()
 
     def on_contact_list_changed(self, widget):
-        list, self.row = widget.get_selected()
+        tree_list, self.row = widget.get_selected()
         if self.row:
             self.contact_edit_but.set_sensitive(True)
             self.remove_contact.set_sensitive(True)
             self.contact_join_but.set_sensitive(True)
-            self.num = list.get_path(self.row)[0]
-            self.ad_book.contact = self.ad_book.list[self.num]
+            self.num = tree_list.get_path(self.row)[0]
+            self.ad_book.contact = self.ad_book.contact_list[self.num]
             self.ad_book.selected = self.num
         else:
             self.contact_edit_but.set_sensitive(False)
@@ -298,8 +301,8 @@ class Application(object):
     def on_remove_contact_clicked(self, *args):
         text = _("<b><big>Delete this contact from the list?</big></b>\n\nAre you sure you want "
                 "to delete this contact from the list?")
-        if self.set_confirm_dialog(text):
-            del self.ad_book.list[self.num]
+        if self.show_confirm_dialog(text):
+            del self.ad_book.contact_list[self.num]
             self.contact_tree.remove(self.row)
             self.ad_book.write()
             num = self.num - 1
@@ -342,9 +345,9 @@ class Application(object):
             self.contact_tree.append(    ["<b>" + self.contact_name_entry.get_text()
                                         + "</b>\n  IP: " + addr
                                         + "\n  Port: " + port]  )
-            ad_book.list.append({})
-            self.selection.select_path(len(ad_book.list) - 1)
-            ad_book.contact = ad_book.list[len(ad_book.list) - 1]
+            ad_book.contact_list.append({})
+            self.selection.select_path(len(ad_book.contact_list) - 1)
+            ad_book.contact = ad_book.contact_list[len(ad_book.contact_list) - 1]
             ad_book.new_contact = 0
         else:
             self.contact_tree.set_value(self.row, 0, "<b>" + self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
@@ -359,12 +362,12 @@ class Application(object):
 
     def on_sys_shutdown_but_clicked(self, *args):
         text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
-        if self.set_confirm_dialog(text):
+        if self.show_confirm_dialog(text):
             os.system('gksudo "shutdown -h now"')
 
     def on_sys_reboot_but_clicked(self, *args):
         text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
-        if self.set_confirm_dialog(text):
+        if self.show_confirm_dialog(text):
             os.system('gksudo "shutdown -r now"')
 
     def on_maint_upd_but_clicked(self, *args):
@@ -372,7 +375,7 @@ class Application(object):
 
     def on_maint_send_but_clicked(self, *args):
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
-        if self.set_confirm_dialog(text):
+        if self.show_confirm_dialog(text):
             msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n\n"
             msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n\n"
             msg += "--- uname -a ---\n"
@@ -428,10 +431,11 @@ class Application(object):
         self.config._write()
 
     def on_net_conf_port_entry_changed(self, *args):
-        gobject.timeout_add(0, self.on_net_conf_port_entry_changed2, args)
+        # call later (we think)
+        gobject.timeout_add(0, self.on_net_conf_port_entry_changed_call_later, args)
         return False
 
-    def on_net_conf_port_entry_changed2(self, *args):
+    def on_net_conf_port_entry_changed_call_later(self, *args):
         port = self.negotiation_port_entry.get_text()
         if not port.isdigit():
             self.widgets.get_widget("mainTabs").set_current_page(1)
@@ -453,7 +457,7 @@ class Application(object):
         self.contact_dialog.hide()
         return answer == gtk.RESPONSE_OK
 
-    def set_confirm_dialog(self, text):
+    def show_confirm_dialog(self, text):
         self.confirm_label.set_label(text)
         answer = self.dialog.run()
         self.dialog.hide()
@@ -491,12 +495,12 @@ class Application(object):
     def init_negotiation_port(self):
         self.negotiation_port_entry.set_text(str(self.config.negotiation_port))
 
-    def init_ad_book_list(self):
+    def init_ad_book_contact_list(self):
         ad_book = self.ad_book
         ad_book.contact = None
         ad_book.new_contact = 0
-        if len(ad_book.list) > 0:
-            for contact in ad_book.list:
+        if len(ad_book.contact_list) > 0:
+            for contact in ad_book.contact_list:
                 self.contact_tree.append(    ["<b>" + contact["name"]
                                             + "</b>\n  IP: "
                                             + contact["address"] + "\n  Port: "
