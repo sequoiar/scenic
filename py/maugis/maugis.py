@@ -1,5 +1,23 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
+# 
+# Scenic
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Scenic is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
 ### GENERAL NOTES  ###
 """
@@ -10,8 +28,6 @@
 - en prod regler test a 0
 - bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
-
-
 ### CONSTANTS ###
 __version__ = 1.0
 APP_NAME = "maugis" # changed in __main__
@@ -58,7 +74,7 @@ class Mediator(object):
         """
         self.config = Config()
         self.ad_book = AddressBook()
-        self.milhouse_send_proc = ProcessManager(self)
+        self.process_manager = ProcessManager(self)
         self.gui = GuiClass(self, kiosk)
         self.server = Server(self)
         self.server.start_listening()
@@ -112,7 +128,7 @@ class Mediator(object):
     def on_main_window_destroy(self, colleague, (widget)):
         self.server.close()
         self.ad_book.write()
-        self.milhouse_send_proc.stop()
+        self.process_manager.stop()
         gtk.main_quit()
 
     def on_main_tabs_switch_page(self, gui, (widget, page, page_num)):
@@ -339,12 +355,12 @@ class Mediator(object):
                         bandwidth = self.config.bandwidth
                     conn.sendall(repr({"answer":"accept", "bandwidth": bandwidth}))
                     conn.close()
-                    self.milhouse_send_proc.start(addr[0], bandwidth)
+                    self.process_manager.start(addr[0], bandwidth)
                 else:
                     conn.sendall(repr({"answer":"refuse"}))
                     conn.close()
             elif cmd == "stop":
-                self.milhouse_send_proc.stop()
+                self.process_manager.stop()
                 conn.sendall(repr({"answer":"stopped"}))
                 conn.close()
             else:
@@ -383,11 +399,11 @@ class Mediator(object):
                     bandwidth = msg["bandwidth"]
                 else:
                     bandwidth = self.config.bandwidth
-                self.milhouse_send_proc.start(client.host, bandwidth)
+                self.process_manager.start(client.host, bandwidth)
             elif answ == "refuse":
                 self.hide_contacting_window("refuse")
             elif answ == "stopped":
-                self.milhouse_send_proc.stop()
+                self.process_manager.stop()
             else:
                 self.hide_contacting_window("badAnsw")
 
@@ -665,6 +681,21 @@ class ProcessManager(Colleague):
         self.config = med.config
         self.video_port = self.config.milhouse_sendport
         self.audio_port = self.video_port + 10
+        # receiver
+        self.milhouse_recv_cmd = None
+        self.milhouse_recv_pid = None
+        # files
+        self.milhouse_recv_input = None
+        self.milhouse_recv_output = None
+        self.milhouse_recv_error = None
+        # File description watcher
+        self.watched_milhouse_recv_id = None
+        self.milhouse_recv_timeout = None # call_later
+        # sender
+        self.milhouse_send_cmd = None
+        self.milhouse_send_subproc = None
+        self.milhouse_send_pid = None
+        self.milhouse_send_timeout = None
         
     def start(self, host, bandwidth):
         self._changed(self, event="on_start_milhouse_send")
@@ -696,7 +727,7 @@ class ProcessManager(Colleague):
             standard_input = False,
             standard_output = True,
             standard_error = True)
-        self.watched_milhouse_recv = gobject.io_add_watch(
+        self.watched_milhouse_recv_id = gobject.io_add_watch(
             self.milhouse_recv_output,
             gobject.IO_HUP,
             self.watch_milhouse_recv)
@@ -728,17 +759,16 @@ class ProcessManager(Colleague):
 
     def stop(self):
         print "stop: ", 
-        if hasattr(self, "watched_milhouse_recv"):
+        if hasattr(self, "watched_milhouse_recv_id"):
             print "watch"
-            gobject.source_remove(self.watched_milhouse_recv)
+            gobject.source_remove(self.watched_milhouse_recv_id)
         if hasattr(self, "timeout"):
             print "timeout"
             gobject.source_remove(self.timeout)
         try:
             print "killing milhouse_recv: ", self.milhouse_recv_pid
             os.kill(self.milhouse_recv_pid, signal.SIGTERM)
-            print "recv: before os.wait()"
-            print "recv: after os.wait()"
+            # not waiting for child process !!
         except:
             pass
         try:
@@ -763,7 +793,7 @@ class Network(Colleague):
     def validate(self, msg):
         tmp_msg = msg.strip()
         msg = None
-        if tmp_msg[0] == "{" and tmp_msg[-1] == "}" and tmp_msg.find("{",1,-2) == -1 and tmp_msg.find("}",1,-2) == -1:
+        if tmp_msg[0] == "{" and tmp_msg[-1] == "}" and tmp_msg.find("{", 1, -2) == -1 and tmp_msg.find("}", 1, -2) == -1:
             try:
                 tmp_msg = eval(tmp_msg)
                 if type(tmp_msg) is dict:
