@@ -80,42 +80,48 @@ gtk.glade.bindtextdomain(APP_NAME, DIR)
 gtk.glade.textdomain(APP_NAME)
 
 class Config(object):
+    """
+    Class attributes are default.
+    """
+    # Default values
+    negotiation_port = 17446
+    streamer_command = "milhouse"
+    smtpserver = "smtp.sat.qc.ca"
+    emailinfo = "maugis@sat.qc.ca"
+    audio_input = "jackaudiosrc"
+    audio_output = "jackaudiosink"
+    audio_codec = "raw"
+    audio_channels = 8
+    video_input = "v4l2src"
+    video_device = "/dev/video0"
+    video_output = "xvimagesink"
+    video_codec = "mpeg4"
+    video_bitrate = "3000000"
+    video_port = 8000
+    audio_port = video_port + 10
+    bandwidth = 30
+    
     def __init__(self):
-        # Default values
-        self.negotiation_port = 17446
-        self.streamer_command = "milhouse"
-        self.smtpserver = "smtp.sat.qc.ca"
-        self.emailinfo = "maugis@sat.qc.ca"
-        self.audio_input = "jackaudiosrc"
-        self.audio_output = "jackaudiosink"
-        self.audio_codec = "raw"
-        self.audio_channels = 8
-        self.video_input = "v4l2src"
-        self.video_device = "/dev/video0"
-        self.video_output = "xvimagesink"
-        self.video_codec = "mpeg4"
-        self.video_bitrate = "3000000"
-        self.video_port = 8000
-        self.audio_port = self.video_port + 10
-        self.bandwidth = 30
 
         config_file = 'maugis.cfg'
         if os.path.isfile('/etc/' + config_file):
-            config_path = '/etc/'
+            config_dir = '/etc'
         else:
-            config_path = os.environ['HOME'] + '/.maugis/'
-        self.config_path = config_path + config_file
-        if os.path.isfile(self.config_path):
+            config_dir = os.environ['HOME'] + '/.maugis'
+        self._config_path = os.path.join(config_dir, config_file)
+        if os.path.isfile(self._config_path):
             self._read()
         else:
-            if not os.path.isdir(config_path):
-                os.mkdir(config_path)
+            if not os.path.isdir(config_dir):
+                os.mkdir(config_dir)
             self._write()
 
     def _write(self):
-        global __version__
+        """
+        Comments out the options that have not been changed from default.
+        """
         config_str = _("# Configuration written by %(app)s %(version)s\n") % {'app': APP_NAME, 'version': __version__}
-        for c in dir(self.__class__):
+        for c in dir(self):
             if c[0] != '_' and hasattr(self, c):
                 inst_attr = getattr(self, c)
                 if inst_attr == getattr(Config, c):
@@ -123,12 +129,12 @@ class Config(object):
                 else:
                     comment = ""
                 config_str += "\n" + comment + c + "=" + str(inst_attr)
-        config_file = file(self.config_path, "w")
+        config_file = file(self._config_path, "w")
         config_file.write(config_str)
         config_file.close()
 
     def _read(self):
-        config_file  = file(self.config_path, "r")
+        config_file  = file(self._config_path, "r")
         for line in config_file:
             line = line.strip()
             if line and line[0] != "#" and len(line) > 2:
@@ -150,7 +156,7 @@ class AddressBook(object):
     def __init__(self):
         self.list = []
         self.selected = 0
-        self.ad_book_name = os.environ['HOME'] + '/.maugis/maugis.adb'
+        self.ad_book_name = os.environ['HOME'] + '/.maugis/contacts.json'
         self.read()
 
     def read(self):
