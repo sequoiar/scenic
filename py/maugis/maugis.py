@@ -767,18 +767,18 @@ class Client(Network):
             msg += " "
         try:
             self.sock.sendall(msg)
-            self.app.on_client_add_timeout()
+            self.app.on_client_add_timeout(self)
             return True
         except socket.error, err:
-            self.app.on_client_add_timeout()
-            self.app.on_client_socket_error()
+            self.app.on_client_add_timeout(self)
+            self.app.on_client_socket_error(self, (err, msg))
             return False
 
     def handle_data(self, source, condition):
         buffer = self.recv(source)
         source.close()
         msg = self.validate(buffer)
-        self.app.on_client_rcv_command()
+        self.app.on_client_rcv_command(self, msg)
         return False
 
 if __name__ == '__main__':
