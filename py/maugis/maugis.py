@@ -251,6 +251,7 @@ class Application(object):
         
         # Build the contact list view
         self.selection = self.contact_list.get_selection()
+        self.selection.connect("changed", self.on_contact_list_changed, None) 
         self.contact_tree = gtk.ListStore(str)
         self.contact_list.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
@@ -273,8 +274,8 @@ class Application(object):
         elif tab == "contactPan":
             self.widgets.get_widget("contactJoinBut").grab_default()
 
-    def on_contact_list_changed(self, widget):
-        tree_list, self.row = widget.get_selected()
+    def on_contact_list_changed(self, *args):
+        tree_list, self.row = args[0].get_selected()
         if self.row:
             self.contact_edit_but.set_sensitive(True)
             self.remove_contact.set_sensitive(True)
