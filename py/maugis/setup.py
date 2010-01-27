@@ -20,7 +20,12 @@ from setuptools import setup
 __version__ = "0.1.0"
 
 packages = [
-    'scenic',
+    "scenic",
+    "scenic.locale",
+    "scenic.locale.en_US",
+    "scenic.locale.en_US.LC_MESSAGES",
+    "scenic.locale.fr_CA",
+    "scenic.locale.fr_CA.LC_MESSAGES"
     ]
 
 setup(
@@ -43,6 +48,6 @@ setup(
     zip_safe = False,
     packages = packages,
     package_data = {
-        "":["*.png", "*.jpg", '*.txt', '.glade', '.pot', '.h', '.po', '.mo']
+        "":["*.png", "*.jpg", '*.txt', '*.glade', '*.pot', '*.h', '*.po', '*.mo']
     }
     )
