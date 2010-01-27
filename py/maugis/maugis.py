@@ -246,8 +246,8 @@ class Application(object):
         self.negotiation_port_entry = self.widgets.get_widget("netConfPortEntry")
         self.net_conf_bw_combo = self.widgets.get_widget("netConfBWCombo")
         # pos of currently selected contact
-        self.row = None
-        self.num = None
+        self.selected_contact_row = None
+        self.select_contact_num = None
 
         # adjust the bandwidth combobox iniline with the config 
         self.init_bandwidth()
@@ -285,14 +285,14 @@ class Application(object):
             self.widgets.get_widget("contactJoinBut").grab_default()
 
     def on_contact_list_changed(self, *args):
-        tree_list, self.row = args[0].get_selected()
-        if self.row:
+        tree_list, self.selected_contact_row = args[0].get_selected()
+        if self.selected_contact_row:
             self.contact_edit_but.set_sensitive(True)
             self.remove_contact.set_sensitive(True)
             self.contact_join_but.set_sensitive(True)
-            self.num = tree_list.get_path(self.row)[0]
-            self.ad_book.contact = self.ad_book.contact_list[self.num]
-            self.ad_book.selected = self.num
+            self.selected_contact_num = tree_list.get_path(self.selected_contact_row)[0]
+            self.ad_book.contact = self.ad_book.contact_list[self.selected_contact_num]
+            self.ad_book.selected = self.selected_contact_num
         else:
             self.contact_edit_but.set_sensitive(False)
             self.remove_contact.set_sensitive(False)
@@ -313,10 +313,10 @@ class Application(object):
         text = _("<b><big>Delete this contact from the list?</big></b>\n\nAre you sure you want "
                 "to delete this contact from the list?")
         if self.show_confirm_dialog(text):
-            del self.ad_book.contact_list[self.num]
-            self.contact_tree.remove(self.row)
+            del self.ad_book.contact_list[self.selected_contact_num]
+            self.contact_tree.remove(self.selected_contact_row)
             self.ad_book.write()
-            num = self.num - 1
+            num = self.selected_contact_num - 1
             if num < 0:
                 num = 0
             self.selection.select_path(num)
@@ -361,7 +361,7 @@ class Application(object):
             ad_book.contact = ad_book.contact_list[len(ad_book.contact_list) - 1]
             ad_book.new_contact = False
         else:
-            self.contact_tree.set_value(self.row, 0, "<b>" + self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
+            self.contact_tree.set_value(self.selected_contact_row, 0, "<b>" + self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
         ad_book.contact["name"] = self.contact_name_entry.get_text()
         ad_book.contact["address"] = addr
         ad_book.contact["port"] = int(port)
