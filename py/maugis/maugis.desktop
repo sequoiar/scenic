@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Version=1.0
 Type=Application
-Exec=maugis
+Exec=maugis.py
 TryExec=
 Icon=gnome-talk.png
 X-GNOME-DocPath=

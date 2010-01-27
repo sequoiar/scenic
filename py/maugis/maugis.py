@@ -35,13 +35,16 @@ APP_NAME = "maugis" # changed in __main__
 ### MODULES IMPORTS  ###
 
 import sys
-import os, signal
+import signal
+import os
 import time
 import socket
 import smtplib
 import re
 import subprocess
 from optparse import OptionParser
+import propulseart
+PACKAGE_DATA = os.path.dirname(propulseart.__file__)
 try:
     import pygtk
     pygtk.require("2.0")
@@ -69,7 +72,7 @@ except AttributeError:
 
 ### MULTILINGUAL SUPPORT ###
 APP = "maugis"
-DIR = "locale"
+DIR = os.path.join(PACKAGE_DATA, "locale")
 import gettext
 _ = gettext.gettext
 gettext.bindtextdomain(APP, DIR)
@@ -557,11 +560,11 @@ class GuiClass(Colleague):
     def __init__(self, med, kiosk):
         Colleague.__init__(self, med)
         # Set the Glade file
-        glade_file = 'maugis.glade'
+        glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
         if os.path.isfile(glade_file):
             glade_path = glade_file
-        elif os.path.isfile('/usr/share/maugis/' + glade_file):
-            glade_path = '/usr/share/maugis/' + glade_file
+        #elif os.path.isfile('/usr/share/maugis/' + glade_file):
+        #    glade_path = '/usr/share/maugis/' + glade_file
         else:
             text = _("<b><big>Could not find the Glade file?</big></b>\n\nBe sure the file %s is in /usr/share/maugis/. Quitting.") % glade_file
             print text
