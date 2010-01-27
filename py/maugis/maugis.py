@@ -241,9 +241,10 @@ class Application(object):
         # pos of currently selected contact
         self.row = None
         self.num = None
-        
-        self.server.start_listening()
 
+        # adjust the bandwidth combobox iniline with the config 
+        self.init_bandwidth()
+        
         # switch to Kiosk mode if asked
         if kiosk:
             self.main_window.set_decorated(False)
@@ -257,9 +258,11 @@ class Application(object):
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list.append_column(column)
         self.init_ad_book_contact_list()
-        #self.init_negotiation_port()
+        self.init_negotiation_port()
 
         self.main_window.show()
+
+        self.server.start_listening()
         
     def on_main_window_destroy(self, *args):
         self.server.close()
