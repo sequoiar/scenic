@@ -821,7 +821,6 @@ class Client(Network):
             self._changed(self, (err, "err"), event="on_client_socket_error")
         else:
             if self.send(msg):
-                #~ if self.widgets: ###############
                 self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self.handle_data)
         return False
 
