@@ -19,8 +19,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
-### GENERAL NOTES  ###
 """
+Maugis/Scenic GTK GUI.
+
 - voir si il faut gerer une demande de connexion alors que c'est deja connecte
 - voir si le bouton "cancel" est necesaire dans la fenetre "contacting" :
     - si oui il faudra trouver un moyen de faire la connection sans bloquer l'interface
@@ -29,7 +30,7 @@
 - bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
 ### CONSTANTS ###
-__version__ = 1.0
+__version__ = 0.1
 APP_NAME = "maugis" # changed in __main__
 
 ### MODULES IMPORTS  ###
@@ -162,7 +163,8 @@ class AddressBook(object):
                 else:
                     try:
                         self.list.append(json.loads(line))
-                    except:
+                    except Exception, e:
+                        print str(e)
                         pass
             ad_book_file.close()
 
