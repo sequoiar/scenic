@@ -185,7 +185,7 @@ class Application(object):
     def __init__(self, kiosk):
         self.config = Config()
         self.ad_book = AddressBook()
-        self.process_manager = ProcessManager(self.config)
+        self.process_manager = ProcessManager(self)
         self.server = Server(self)
 
         # Set the Glade file
@@ -244,6 +244,9 @@ class Application(object):
         self.contact_list.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list.append_column(column)
+
+        self.init_ad_book_list()
+
         self.main_window.show()
         
     def on_main_window_destroy(self, *args):
@@ -585,8 +588,9 @@ class ProcessManager(object):
     """
     PROCESS manager.
     """
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, app):
+        self.app = app
+        self.config = self.app.config
         self.video_port = self.config.video_port
         self.audio_port = self.config.audio_port
         # receiver
@@ -687,7 +691,7 @@ class ProcessManager(object):
             print "send: after os.wait()"
         except:
             pass
-        self.on_stop_milhouse_send()
+        self.app.on_stop_milhouse_send()
 
 ### NETWORK ###
 
