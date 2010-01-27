@@ -109,55 +109,6 @@ class Mediator(object):
 
     ### Callbacks ###
 
-    def check_ext_program(self, gui):
-        # verify milhouse version
-        try:
-            w, r, err = os.popen3(self.config.milhouse_send + ' -v')
-            err_str = err.read()
-            if err_str:
-                text = _("<b><big>Could not start milhouse_send?</big></b>\n\nError: %s. Quitting.") % err_str
-                if self.set_contact_dialog(text, gui):
-                    pass
-                sys.exit()
-            else:
-                match = re.search(r'version ([^ \n]+)', r.readline(), re.I)
-                if match:
-                    self.milhouse_send_version = match.group(1)
-                else:
-                    self.milhouse_send_version = "?"
-            w.close()
-            r.close()
-            err.close()
-        except:
-            text = _("<b><big>Could not start milhouse_send?</big></b>\n\nCould not start milhouse_send. Quitting.")
-            if self.set_contact_dialog(text, gui):
-                pass
-            sys.exit()
-        try:
-            w, r, err = os.popen3(self.config.milhouse_recv + ' -v')
-            err_str = err.read()
-            match = re.search(r'version ([^ \n]+)', r.readline(), re.I)
-            if match:
-                self.milhouse_recv_version = match.group(1)
-            else:
-                self.milhouse_recv_version = "?"
-            w.close()
-            r.close()
-            err.close()
-        except:
-            text = _("<b><big>Could not start milhouse_recv?</big></b>\n\nCould not start milhouse_recv. Quitting.")
-            if self.set_contact_dialog(text, gui):
-                pass
-            sys.exit()
-        else:
-            text = _("<b><big>maugis</big></b>\nVersion: ")
-            text += str(__version__)
-            text += _("\nmilhouse_send: ") + self.milhouse_send_version
-            text += _("\nmilhouse_recv: ") + self.milhouse_recv_version
-            text += _("\nCopyright: SAT")
-            text += _("\nAuthors: Etienne Desautels")
-        gui.info_label.set_label(text)
-
     def on_main_window_destroy(self, colleague, (widget)):
         self.server.close()
         self.ad_book.write()
@@ -621,9 +572,6 @@ class GuiClass(Colleague):
         self.contact_list = self.widgets.get_widget("contactList")
         self.negotiation_port_entry = self.widgets.get_widget("netConfPortEntry")
         self.net_conf_bw_combo = self.widgets.get_widget("netConfBWCombo")
-        
-        # verify milhouse_recv and milhouse_send
-        #self._changed(self, event="check_ext_program")
         
         # adjust the bandwidth combobox iniline with the config
         self._changed(self, event="init_bandwidth")
