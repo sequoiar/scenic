@@ -305,16 +305,18 @@ class Application(object):
         self.edit_contact_window.show()
 
     def on_remove_contact_clicked(self, *args):
+        def on_confirm_result(result):
+            if result:
+                del self.ad_book.contact_list[self.selected_contact_num]
+                self.contact_tree.remove(self.selected_contact_row)
+                self.ad_book.write()
+                num = self.selected_contact_num - 1
+                if num < 0:
+                    num = 0
+                self.selection.select_path(num)
         text = _("<b><big>Delete this contact from the list?</big></b>\n\nAre you sure you want "
                 "to delete this contact from the list?")
-        if self.show_confirm_dialog(text):
-            del self.ad_book.contact_list[self.selected_contact_num]
-            self.contact_tree.remove(self.selected_contact_row)
-            self.ad_book.write()
-            num = self.selected_contact_num - 1
-            if num < 0:
-                num = 0
-            self.selection.select_path(num)
+        self.show_confirm_dialog(text, on_confirm_result)
 
     def on_contact_edit_but_clicked(self, *args):
         self.contact_name_entry.set_text(self.ad_book.contact["name"])
@@ -331,96 +333,112 @@ class Application(object):
 
     def on_edit_contact_save_but_clicked(self, *args):
         ad_book = self.ad_book
-        #Validate the port number
+
+        def when_valid_save():
+            """ Saves contact info after it's been validated and then closes the window"""
+            if ad_book.new_contact:
+                self.contact_tree.append(    ["<b>" + self.contact_name_entry.get_text()
+                                            + "</b>\n  IP: " + addr
+                                            + "\n  Port: " + port]  )
+                ad_book.contact_list.append({})
+                self.selection.select_path(len(ad_book.contact_list) - 1)
+                ad_book.contact = ad_book.contact_list[len(ad_book.contact_list) - 1]
+                ad_book.new_contact = False
+            else:
+                self.contact_tree.set_value(self.selected_contact_row, 0, "<b>" + 
+                        self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
+            ad_book.contact["name"] = self.contact_name_entry.get_text()
+            ad_book.contact["address"] = addr
+            ad_book.contact["port"] = int(port)
+            ad_book.write()
+            self.edit_contact_window.hide()
+
+        # Validate the port number
         port = self.contact_port_entry.get_text()
         if port == "":
-            port = str(self.config.video_port) #set port to default
+            port = str(self.config.video_port) # set port to default
         elif (not port.isdigit()) or (int(port) not in range(1,10000)):
             text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1000-99999")
-            if self.set_contact_dialog(text):
-                return
+            self.show_error_dialog(text)
+            return
 
-        #Validate the address
+        # Validate the address
         addr = self.contact_ip_entry.get_text()
         if len(addr) < 7:
             text = _("<b><big>The address is not valid</big></b>\n\nEnter a valid address\nExample: 168.123.45.32 or tot.sat.qc.ca")
-            if self.set_contact_dialog(text):
-                return
+            self.show_error_dialog(text)
+            return
 
-        if ad_book.new_contact:
-            self.contact_tree.append(    ["<b>" + self.contact_name_entry.get_text()
-                                        + "</b>\n  IP: " + addr
-                                        + "\n  Port: " + port]  )
-            ad_book.contact_list.append({})
-            self.selection.select_path(len(ad_book.contact_list) - 1)
-            ad_book.contact = ad_book.contact_list[len(ad_book.contact_list) - 1]
-            ad_book.new_contact = False
-        else:
-            self.contact_tree.set_value(self.selected_contact_row, 0, "<b>" + self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
-        ad_book.contact["name"] = self.contact_name_entry.get_text()
-        ad_book.contact["address"] = addr
-        ad_book.contact["port"] = int(port)
-        ad_book.write()
-        self.edit_contact_window.hide()
+        when_valid_save()
+
 
     def on_net_conf_set_but_clicked(self, *args):
         os.system('gksudo "network-admin"')
 
     def on_sys_shutdown_but_clicked(self, *args):
+        def on_confirm_result(result):
+            if result:
+                os.system('gksudo "shutdown -h now"')
+
         text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
-        if self.show_confirm_dialog(text):
-            os.system('gksudo "shutdown -h now"')
+        self.show_confirm_dialog(text, on_confirm_result)
 
     def on_sys_reboot_but_clicked(self, *args):
+        def on_confirm_result(result):
+            if result:
+                os.system('gksudo "shutdown -r now"')
+
         text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
-        if self.show_confirm_dialog(text):
-            os.system('gksudo "shutdown -r now"')
+        self.show_confirm_dialog(text, on_confirm_result)
 
     def on_maint_upd_but_clicked(self, *args):
         os.system('gksudo "update-manager"')
 
     def on_maint_send_but_clicked(self, *args):
-        text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
-        if self.show_confirm_dialog(text):
-            msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n\n"
-            msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n\n"
-            msg += "--- uname -a ---\n"
-            try:
-                w, r, err = os.popen3('uname -a')
-                msg += r.read() + "\n"
-                errRead = err.read()
-                if errRead:
-                    msg += errRead + "\n"
-                w.close()
-                r.close()
-                err.close()
-            except:
-                msg += "Error executing 'uname -a'\n\n"
-            msg += "--- lsmod ---\n"
-            try:
-                w, r, err = os.popen3('lsmod')
-                msg += r.read()
-                errRead = err.read()
-                if errRead:
-                    msg += "\n" + errRead
-                w.close()
-                r.close()
-                err.close()
-            except:
-                msg += "Error executing 'lsmod'"
+        """ send button clicked will prompt via confirm dialog """
+        def on_confirm_result(result):
+            if result:
+                msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n\n"
+                msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n\n"
+                msg += "--- uname -a ---\n"
+                try:
+                    w, r, err = os.popen3('uname -a')
+                    msg += r.read() + "\n"
+                    errRead = err.read()
+                    if errRead:
+                        msg += errRead + "\n"
+                    w.close()
+                    r.close()
+                    err.close()
+                except:
+                    msg += "Error executing 'uname -a'\n\n"
+                msg += "--- lsmod ---\n"
+                try:
+                    w, r, err = os.popen3('lsmod')
+                    msg += r.read()
+                    errRead = err.read()
+                    if errRead:
+                        msg += "\n" + errRead
+                    w.close()
+                    r.close()
+                    err.close()
+                except:
+                    msg += "Error executing 'lsmod'"
 
-            fromaddr = "maugis@sat.qc.ca"
-            toaddrs  = self.config.emailinfo
-            toaddrs = toaddrs.split(', ')
-            server = smtplib.SMTP(self.config.smtpserver)
-            server.set_debuglevel(0)
-            try:
-                server.sendmail(fromaddr, toaddrs, msg)
-            except:
-                text = _("<b><big>Could not send info.</big></b>\n\nCheck your internet connection.")
-                if self.set_contact_dialog(text):
-                    pass
-            server.quit()
+                fromaddr = "maugis@sat.qc.ca"
+                toaddrs  = self.config.emailinfo
+                toaddrs = toaddrs.split(', ')
+                server = smtplib.SMTP(self.config.smtpserver)
+                server.set_debuglevel(0)
+                try:
+                    server.sendmail(fromaddr, toaddrs, msg)
+                except:
+                    text = _("<b><big>Could not send info.</big></b>\n\nCheck your internet connection.")
+                    self.show_error_dialog(text)
+                server.quit()
+
+        text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
+        self.show_confirm_dialog(text, on_confirm_result)
 
     def on_client_join_but_clicked(self, *args):
         self.contacting_window.show()
@@ -442,14 +460,16 @@ class Application(object):
         return False
 
     def on_net_conf_port_entry_changed_call_later(self, *args):
+        def on_error_dialog_result(result):
+            self.negotiation_port_entry.grab_focus()
+            return False
+
         port = self.negotiation_port_entry.get_text()
         if not port.isdigit():
             self.widgets.get_widget("mainTabs").set_current_page(1)
             self.init_negotiation_port()
             text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1-999999")
-            if self.set_contact_dialog(text):
-                self.negotiation_port_entry.grab_focus()
-                return False
+            self.show_error_dialog(text, on_error_dialog_result)
         else:
             self.config.negotiation_port = int(port)
             self.config._write()
@@ -457,27 +477,28 @@ class Application(object):
             self.server = Server(self)
             self.server.start_listening()
 
-    def set_contact_dialog(self, text):
-        self.contact_problem_label.set_label(text)
-        answer = self.contact_dialog.run()
-        self.contact_dialog.hide()
-        return answer == gtk.RESPONSE_OK
-
-    def show_error_dialog(self, text, callback):
+    def show_error_dialog(self, text, callback=None):
         def _cb(dialog, response_id, callback):
             dialog.hide()
-            callback(response_id == gtk.RESPONSE_OK)
+            if callback is not None:
+                callback()
         self.contact_problem_label.set_label(text)
         dialog = self.contact_dialog
         dialog.set_modal(True)
         dialog.connect('response', _cb, callback)
         dialog.show()
-
-    def show_confirm_dialog(self, text):
+    
+    def show_confirm_dialog(self, text, callback=None):
+        def _cb(dialog, response_id, callback):
+            dialog.hide()
+            if callback is not None:
+                callback(response_id == gtk.RESPONSE_OK)
         self.confirm_label.set_label(text)
-        answer = self.dialog.run()
-        self.dialog.hide()
-        return answer == gtk.RESPONSE_OK
+        # TODO rename confirm dialog
+        dialog = self.dialog
+        dialog.set_modal(True)
+        dialog.connect('response', _cb, callback)
+        dialog.show()
 
     def hide_contacting_window(self, msg="", err=""):
         self.contacting_window.hide()
@@ -495,9 +516,7 @@ class Application(object):
         elif msg == "badAnsw":
             text = _("<b><big>Invalid answer.</big></b>\n\nThe answer was not valid.")
         if text is not None:
-            def on_dialog_result(result):
-                pass
-            self.show_error_dialog(text, on_dialog_result)
+            self.show_error_dialog(text)
 
     def init_bandwidth(self):
         base = 30
@@ -561,8 +580,7 @@ class Application(object):
         self.contact_request_dialog.response(gtk.RESPONSE_NONE)
         self.contact_request_dialog.hide()
         text = _("<b><big>%s was contacting you.</big></b>\n\nBut you did not answer in reasonable delay.") % addr
-        if self.set_contact_dialog(text):
-            pass
+        self.show_error_dialog(text)
         return False
 
     def on_client_socket_timeout(self, client):
