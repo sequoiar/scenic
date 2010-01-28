@@ -19,10 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
-import gobject
-import subprocess
-import os
-import signal
+from scenic import process
 
 class ProcessManager(object):
     """
@@ -31,28 +28,17 @@ class ProcessManager(object):
     def __init__(self, app):
         self.app = app
         self.config = self.app.config
-        self.video_port = self.config.video_port
-        self.audio_port = self.config.audio_port
-        # receiver
+        self.video_port = self.config.video_port #TODO: different for each session
+        self.audio_port = self.config.audio_port # TODO
+        # commands
         self.milhouse_recv_cmd = None
-        self.milhouse_recv_pid = None
-        # files
-        self.milhouse_recv_input = None
-        self.milhouse_recv_output = None
-        self.milhouse_recv_error = None
-        # File description watcher
-        self.watched_milhouse_recv_id = None
-        self.milhouse_recv_timeout = None # call_later
-        # sender
         self.milhouse_send_cmd = None
-        self.milhouse_send_subproc = None
-        self.milhouse_send_pid = None
-        self.milhouse_send_timeout = None
+
+        self.sender = None
+        self.receiver = None
         
     def start(self, host, bandwidth):
-        base = 30
-        divider = base / bandwidth
-        # First, start the milhouse_recv process, milhouse_send needs a remote running propulseart --receive to work
+        # TODO: check if already streamers running.
         self.milhouse_recv_cmd = [
             self.config.streamer_command,
             '--receiver', 
@@ -64,25 +50,6 @@ class ProcessManager(object):
             '--videoport', str(self.video_port),
             '--audioport', str(self.audio_port) 
             ]
-        print "milhouse_recv_cmd: ", self.milhouse_recv_cmd
-        
-        # local function declaration:
-        def _env_sequence():
-            return [key + '=' + value for key, value in os.environ.items()]
-        
-        self.milhouse_recv_pid, self.milhouse_recv_input, self.milhouse_recv_output, self.milhouse_recv_error = gobject.spawn_async(
-            self.milhouse_recv_cmd,
-            envp = _env_sequence(),
-            working_directory = os.environ['PWD'],
-            flags = gobject.SPAWN_SEARCH_PATH,
-            standard_input = False,
-            standard_output = True,
-            standard_error = True)
-        self.watched_milhouse_recv_id = gobject.io_add_watch(
-            self.milhouse_recv_output,
-            gobject.IO_HUP,
-            self.watch_milhouse_recv)
-        
         self.milhouse_send_cmd = [
             self.config.streamer_command, 
             '--sender', 
@@ -94,46 +61,23 @@ class ProcessManager(object):
             '--audiocodec', self.config.audio_codec,
             '--videoport', str(self.video_port),
             '--audioport', str(self.audio_port)]
+        # setting up
+        recv_cmd = " ".join(self.milhouse_recv_cmd)
+        self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
+        self.receiver.state_changed_signal.connect(self.on_process_state_changed)
+        send_cmd = " ".join(self.milhouse_send_cmd)
+        self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
+        self.sender.state_changed_signal.connect(self.on_process_state_changed)
+        # starting
+        print "$", send_cmd
+        self.sender.start()
+        print "$", recv_cmd
+        self.receiver.start()
 
-        print "milhouse_send_cmd: ", self.milhouse_send_cmd
-        self.milhouse_send_subproc = subprocess.Popen(self.milhouse_send_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        print "milhouse_send_cmd launched "
-        self.milhouse_send_pid = self.milhouse_send_subproc.pid
-
-    def watch_milhouse_recv(self, *args):
-        print "watch_milhouse_recv"
-        self.milhouse_recv_timeout = gobject.timeout_add(5000, self.stop)
-        return False
-
-    def watch_milhouse_send(self, *args):
-        print "watch_milhouse_send"
-        self.milhouse_send_timeout = gobject.timeout_add(5000, self.stop)
-        return False
+    def on_process_state_changed(self, process_manager, new_state):
+        print process_manager, new_state
 
     def stop(self):
-        print "stop: ", 
-        if hasattr(self, "watched_milhouse_recv_id"):
-            print "watch"
-            try:
-                gobject.source_remove(self.watched_milhouse_recv_id)
-            except TypeError:
-                pass
-        if hasattr(self, "timeout"):
-            print "timeout"
-            gobject.source_remove(self.timeout)
-        try:
-            print "killing milhouse_recv: ", self.milhouse_recv_pid
-            os.kill(self.milhouse_recv_pid, signal.SIGTERM)
-            # not waiting for child process !!
-        except:
-            pass
-        try:
-            print "killing milhouse_send_pid: ", self.milhouse_send_pid
-            os.kill(self.milhouse_send_pid, signal.SIGTERM)
-            print "send: before os.wait()"
-            os.wait()
-            print "send: after os.wait()"
-        except:
-            pass
-        self.app.on_stop_milhouse_send()
-
+        # stopping
+        self.sender.stop()
+        self.receiver.stop()

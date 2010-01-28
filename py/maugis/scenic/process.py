@@ -12,6 +12,8 @@ from twisted.internet import error
 from twisted.internet import protocol
 from twisted.internet import reactor
 
+from scenic import sig
+
 # constants for the slave process
 STATE_STARTING = "STARTING"
 STATE_RUNNING = "RUNNING"
@@ -70,7 +72,6 @@ class ProcessManager(object):
         self._time_child_started = None
         self._child_running_time = None
         self.state = STATE_STOPPED
-        self.io_protocol = None # this attribute is set directly to the SlaveIO instance once created.
         self.command = command # string (bash)
         self.time_before_sigkill = 5.0 # seconds
         self.identifier = identifier # title
@@ -82,6 +83,8 @@ class ProcessManager(object):
             self.identifier = "default"
         self.log_level = logging.DEBUG
         self._delayed_kill = None # DelayedCall instance
+        
+        self.state_changed_signal = sig.Signal()
     
     def _before_shutdown(self):
         """
@@ -104,7 +107,7 @@ class ProcessManager(object):
                 proc.signalProcess(0)
             except (OSError, error.ProcessExitedAlready):
                 msg = "Lost process %s. Error sending it an empty signal." % (self.identifier)
-                self.io_protocol.send_error(msg)
+                print(msg)
                 return False
             else:
                 return True
@@ -125,7 +128,7 @@ class ProcessManager(object):
             msg = "You must provide a command to be run."
             raise ProcessError(msg)
         
-        self.log("Will run command %s" % (self.identifier, str(self.command)))
+        self.log("Will run command %s %s" % (self.identifier, str(self.command)))
         self._child_process = ProcessIO(self)
         environ = {}
         environ.update(os.environ)
@@ -152,7 +155,8 @@ class ProcessManager(object):
         def _later_check(pid):
             if self.pid == pid:
                 if self.state in [STATE_STOPPING]:
-                    self.io_protocol.send_error("Child process not dead.")
+                    msg = "Child process not dead."
+                    print msg
                     self.stop() # KILL
                 elif self.state in [STATE_STOPPED]:
                     msg = "Successfully killed process after least than the %f seconds. State is %s." % (self.time_before_sigkill, self.state)
@@ -222,9 +226,8 @@ class ProcessManager(object):
         if self.state != new_state:
             if new_state == STATE_STOPPED:
                 self.log("Child lived for %s seconds." % (self._child_running_time))
-                self.io_protocol.send_state(new_state, self._child_running_time)
-            else:
-                self.io_protocol.send_state(new_state)
+                #self.io_protocol.send_state(new_state, self._child_running_time)
+            self.state_changed_signal(self, new_state)
             self.log("child state: %s" % (new_state))
         else:
             self.log("State is same as before: %s" % (new_state))
