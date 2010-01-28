@@ -21,6 +21,8 @@
 
 import gobject
 import subprocess
+import os
+import signal
 
 class ProcessManager(object):
     """

@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import socket
 import gobject
 
