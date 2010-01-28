@@ -37,12 +37,8 @@ setup(
     description = "Scenic, interface to the milhouse streaming tool.",
     long_description = """Scenic software, a component of the PropulseART project
     Requires: twisted, simplejson.""",
-    install_requires = [], #'twisted'], # , 'nevow']
-    # The dependency to the 'nevow' package is not specified here, since there is a bug 
-    # in nevow, which installs it using easy_install even when the nevow ubuntu package is already installed. 
-    # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
-    # we removed twisted as well, since we prefer the user to install it himself.
-    scripts = ["maugis.py"],
+    install_requires = [], #'twisted'], 
+    scripts = ["scripts/scenic"],
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,

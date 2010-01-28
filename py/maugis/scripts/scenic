@@ -21,6 +21,19 @@
 """
 Executable script which calls scenic.runner.run()
 """
-from scenic import runner
+import os
+import sys
+
+SCRIPTS_DIR = "scripts"
+
+def _is_in_devel():
+    d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[1]
+    return d == SCRIPTS_DIR
+
 if __name__ == "__main__":
+    if _is_in_devel():
+        d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
+        sys.path.insert(0, d)
+        os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
+    from scenic import runner
     runner.run()
