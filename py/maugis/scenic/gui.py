@@ -74,6 +74,10 @@ gettext.textdomain(APP_NAME)
 gtk.glade.bindtextdomain(APP_NAME, DIR)
 gtk.glade.textdomain(APP_NAME)
 
+from scenic.communication import Server
+from scenic.communication import Client
+from scenic.streamer import ProcessManager
+
 class Config(object):
     """
     Class attributes are default.
@@ -199,7 +203,7 @@ class Application(object):
     def __init__(self, kiosk):
         self.config = Config()
         self.ad_book = AddressBook()
-        self.process_manager = ProcessManager(self)
+        self.streamer_manager = ProcessManager(self)
         self.server = Server(self)
 
         # Set the Glade file
@@ -273,7 +277,7 @@ class Application(object):
     def on_main_window_destroy(self, *args):
         self.server.close()
         self.ad_book.write()
-        self.process_manager.stop()
+        self.streamer_manager.stop()
         gtk.main_quit()
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
@@ -582,7 +586,7 @@ class Application(object):
                             bandwidth = self.config.bandwidth
                         conn.sendall(json.dumps({"answer":"accept", "bandwidth": bandwidth}))
                         conn.close()
-                        self.process_manager.start(addr[0], bandwidth)
+                        self.streamer_manager.start(addr[0], bandwidth)
                     else:
                         conn.sendall(json.dumps({"answer":"refuse"}))
                         conn.close()
@@ -590,7 +594,7 @@ class Application(object):
                 text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
                 self.show_contact_request_dialog(text, on_contact_request_dialog_result)
             elif cmd == "stop":
-                self.process_manager.stop()
+                self.streamer_manager.stop()
                 conn.sendall(json.dumps({"answer":"stopped"}))
                 conn.close()
             else:
@@ -610,7 +614,7 @@ class Application(object):
     
     def on_client_socket_error(self, client, (err, msg)):
         self.hide_contacting_window(msg)
-        print err
+        self.show_error_dialog(str(err) +": " +  str(msg))
 
     def on_client_add_timeout(self, client):
         self.answ_watch = gobject.timeout_add(5000, self.client_answer_timeout, client)
@@ -626,11 +630,11 @@ class Application(object):
                     bandwidth = msg["bandwidth"]
                 else:
                     bandwidth = self.config.bandwidth
-                self.process_manager.start(client.host, bandwidth)
+                self.streamer_manager.start(client.host, bandwidth)
             elif answer == "refuse":
                 self.hide_contacting_window("refuse")
             elif answ == "stopped":
-                self.process_manager.stop()
+                self.streamer_manager.stop()
             else:
                 self.hide_contacting_window("badAnsw")
 
@@ -652,206 +656,3 @@ class Application(object):
         client = Client(self)
         client.connect(self.ad_book.contact["address"], msg)
 
-class ProcessManager(object):
-    """
-    PROCESS manager.
-    """
-    def __init__(self, app):
-        self.app = app
-        self.config = self.app.config
-        self.video_port = self.config.video_port
-        self.audio_port = self.config.audio_port
-        # receiver
-        self.milhouse_recv_cmd = None
-        self.milhouse_recv_pid = None
-        # files
-        self.milhouse_recv_input = None
-        self.milhouse_recv_output = None
-        self.milhouse_recv_error = None
-        # File description watcher
-        self.watched_milhouse_recv_id = None
-        self.milhouse_recv_timeout = None # call_later
-        # sender
-        self.milhouse_send_cmd = None
-        self.milhouse_send_subproc = None
-        self.milhouse_send_pid = None
-        self.milhouse_send_timeout = None
-        
-    def start(self, host, bandwidth):
-        base = 30
-        divider = base / bandwidth
-        # First, start the milhouse_recv process, milhouse_send needs a remote running propulseart --receive to work
-        self.milhouse_recv_cmd = [
-            self.config.streamer_command,
-            '--receiver', 
-            '--address', str(host),
-            '--videosink', self.config.video_output,
-            '--audiosink', self.config.audio_output,
-            '--videocodec', self.config.video_codec,
-            '--audiocodec', self.config.audio_codec,
-            '--videoport', str(self.video_port),
-            '--audioport', str(self.audio_port) 
-            ]
-        print "milhouse_recv_cmd: ", self.milhouse_recv_cmd
-        
-        # local function declaration:
-        def _env_sequence():
-            return [key + '=' + value for key, value in os.environ.items()]
-        
-        self.milhouse_recv_pid, self.milhouse_recv_input, self.milhouse_recv_output, self.milhouse_recv_error = gobject.spawn_async(
-            self.milhouse_recv_cmd,
-            envp = _env_sequence(),
-            working_directory = os.environ['PWD'],
-            flags = gobject.SPAWN_SEARCH_PATH,
-            standard_input = False,
-            standard_output = True,
-            standard_error = True)
-        self.watched_milhouse_recv_id = gobject.io_add_watch(
-            self.milhouse_recv_output,
-            gobject.IO_HUP,
-            self.watch_milhouse_recv)
-        
-        self.milhouse_send_cmd = [
-            self.config.streamer_command, 
-            '--sender', 
-            '--address', str(host),
-            '--videosource', self.config.video_input,
-            '--videocodec', self.config.video_codec,
-            '--videobitrate', self.config.video_bitrate,
-            '--audiosource', self.config.audio_input,
-            '--audiocodec', self.config.audio_codec,
-            '--videoport', str(self.video_port),
-            '--audioport', str(self.audio_port)]
-
-        print "milhouse_send_cmd: ", self.milhouse_send_cmd
-        self.milhouse_send_subproc = subprocess.Popen(self.milhouse_send_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        print "milhouse_send_cmd launched "
-        self.milhouse_send_pid = self.milhouse_send_subproc.pid
-
-    def watch_milhouse_recv(self, *args):
-        print "watch_milhouse_recv"
-        self.milhouse_recv_timeout = gobject.timeout_add(5000, self.stop)
-        return False
-
-    def watch_milhouse_send(self, *args):
-        print "watch_milhouse_send"
-        self.milhouse_send_timeout = gobject.timeout_add(5000, self.stop)
-        return False
-
-    def stop(self):
-        print "stop: ", 
-        if hasattr(self, "watched_milhouse_recv_id"):
-            print "watch"
-            try:
-                gobject.source_remove(self.watched_milhouse_recv_id)
-            except TypeError:
-                pass
-        if hasattr(self, "timeout"):
-            print "timeout"
-            gobject.source_remove(self.timeout)
-        try:
-            print "killing milhouse_recv: ", self.milhouse_recv_pid
-            os.kill(self.milhouse_recv_pid, signal.SIGTERM)
-            # not waiting for child process !!
-        except:
-            pass
-        try:
-            print "killing milhouse_send_pid: ", self.milhouse_send_pid
-            os.kill(self.milhouse_send_pid, signal.SIGTERM)
-            print "send: before os.wait()"
-            os.wait()
-            print "send: after os.wait()"
-        except:
-            pass
-        self.app.on_stop_milhouse_send()
-
-### NETWORK ###
-
-class Network(object):
-    def __init__(self, negotiation_port):
-        self.buf_size = 1024
-        self.port = negotiation_port
-    
-    def validate(self, msg):
-        tmp_msg = msg.strip()
-        msg = None
-        if tmp_msg[0] == "{" and tmp_msg[-1] == "}" and tmp_msg.find("{", 1, -2) == -1 and tmp_msg.find("}", 1, -2) == -1:
-            try:
-                tmp_msg = json.loads(tmp_msg)
-                if type(tmp_msg) is dict:
-                    msg = tmp_msg
-            except:
-                pass
-        return msg
-
-    def recv(self, conn):
-        data = conn.recv(self.buf_size)
-        buffer = data
-        while len(data) == self.buf_size: # maybe we should recall handle_data on io_watch
-            data = conn.recv(self.buf_size)
-            buffer += data
-        return buffer
-
-    def close(self):
-        self.sock.close()
-
-class Server(Network):
-    def __init__(self, app):
-        Network.__init__(self, app.config.negotiation_port)
-        self.app = app
-        self.host = ''
-
-    def start_listening(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((self.host, self.port))
-        sock.listen(1)
-        gobject.io_add_watch(sock, gobject.IO_IN, self.handle_data)
-        self.sock = sock
-
-    def handle_data(self, source, condition):
-        conn, addr = source.accept()
-        buffer = self.recv(conn)
-        msg = self.validate(buffer)
-        self.app.on_server_rcv_command(self, (msg, addr, conn))
-        return True
-
-
-class Client(Network):
-    def __init__(self, app):
-        Network.__init__(self, app.config.negotiation_port)
-        self.app = app
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(10)
-
-    def connect(self, host, msg):
-        self.host = host
-        try:
-            self.sock.connect((host, self.port))
-        except socket.timeout, err:
-            self.app.on_client_socket_timeout(self)
-        except socket.error, err:
-            self.app.on_client_socket_error(self, (err, msg))
-        else:
-            if self.send(msg):
-                self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self.handle_data)
-        return False
-
-    def send(self, msg):
-        if not len(msg) % self.buf_size:
-            msg += " "
-        try:
-            self.sock.sendall(msg)
-            self.app.on_client_add_timeout(self)
-            return True
-        except socket.error, err:
-            self.app.on_client_add_timeout(self)
-            self.app.on_client_socket_error(self, (err, msg))
-            return False
-
-    def handle_data(self, source, condition):
-        buffer = self.recv(source)
-        source.close()
-        msg = self.validate(buffer)
-        self.app.on_client_rcv_command(self, msg)
-        return False
