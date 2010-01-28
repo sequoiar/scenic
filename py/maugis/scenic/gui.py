@@ -328,7 +328,8 @@ class Application(object):
         self.contact_port_entry.set_text(str(self.ad_book.contact["port"]))
         self.edit_contact_window.show()
 
-    def on_edit_contact_window_delete_event(self, widget):
+    def on_edit_contact_window_delete_event(self, *args):
+        widget = args[0]
         widget.hide()
         return True
 
