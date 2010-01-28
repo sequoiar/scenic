@@ -463,6 +463,16 @@ class Application(object):
         self.contact_dialog.hide()
         return answer == gtk.RESPONSE_OK
 
+    def show_error_dialog(self, text, callback):
+        def _cb(dialog, response_id, callback):
+            dialog.hide()
+            callback(response_id == gtk.RESPONSE_OK)
+        self.contact_problem_label.set_label(text)
+        dialog = self.contact_dialog
+        dialog.set_modal(True)
+        dialog.connect('response', _cb, callback)
+        dialog.show()
+
     def show_confirm_dialog(self, text):
         self.confirm_label.set_label(text)
         answer = self.dialog.run()
@@ -477,16 +487,17 @@ class Application(object):
         elif msg == "timeout":
             text = _("<b><big>Connection timeout.</big></b>\n\nCould not connect to the port of this contact.")
         elif msg == "answTimeout":
-            text = _("<b><big>Contact answer timeout.</big></b>\n\nThe contact did not answer in an reasonable delay.")
+            text = _("<b><big>Contact answer timeout.</big></b>\n\nThe contact did not answer soon enough.")
         elif msg == "send":
             text = _("<b><big>Problem sending command.</big></b>\n\nError: %s") % err
         elif msg == "refuse":
-            text = _("<b><big>Connection refuse.</big></b>\n\nThe contact refuse the connection.")
+            text = _("<b><big>Connection refused.</big></b>\n\nThe contact refused the connection.")
         elif msg == "badAnsw":
             text = _("<b><big>Invalid answer.</big></b>\n\nThe answer was not valid.")
-        if text:
-            if self.set_contact_dialog(text):
+        if text is not None:
+            def on_dialog_result(result):
                 pass
+            self.show_error_dialog(text, on_dialog_result)
 
     def init_bandwidth(self):
         base = 30
@@ -567,16 +578,16 @@ class Application(object):
     def on_client_rcv_command(self, client, (msg)):
         if(self.answ_watch):
             gobject.source_remove(self.answ_watch)
-        if msg and "answer" in msg:
-            answ = msg["answer"]
-            if answ == "accept":
+        if msg is not None and "answer" in msg:
+            answer = msg["answer"]
+            if answer == "accept":
                 self.hide_contacting_window("accept")
                 if "bandwidth" in msg:
                     bandwidth = msg["bandwidth"]
                 else:
                     bandwidth = self.config.bandwidth
                 self.process_manager.start(client.host, bandwidth)
-            elif answ == "refuse":
+            elif answer == "refuse":
                 self.hide_contacting_window("refuse")
             elif answ == "stopped":
                 self.process_manager.stop()
@@ -776,9 +787,9 @@ class Client(Network):
         try:
             self.sock.connect((host, self.port))
         except socket.timeout, err:
-            on_client_socket_timeout()
+            self.app.on_client_socket_timeout(self)
         except socket.error, err:
-            on_client_socket_error()
+            self.app.on_client_socket_error(self, (err, msg))
         else:
             if self.send(msg):
                 self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self.handle_data)
