@@ -29,8 +29,13 @@
 
 RtpPay::~RtpPay()
 {
-    Pipeline::Instance()->remove(&rtpPay_);
+    pipeline_.remove(&rtpPay_);
 }
+
+
+Pay::Pay(Pipeline &pipeline) : 
+    RtpPay(pipeline)
+{}
 
 Pay::~Pay()
 {
@@ -47,48 +52,51 @@ void Pay::setMTU(unsigned long long mtu)
     g_object_set(G_OBJECT(rtpPay_), "mtu", mtu, NULL);
 }
 
+Depay::Depay(Pipeline &pipeline) : 
+    RtpPay(pipeline)
+{}
 
-TheoraPay::TheoraPay()
+TheoraPay::TheoraPay(Pipeline &pipeline) : Pay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtptheorapay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtptheorapay", NULL);
 }
 
 
-TheoraDepay::TheoraDepay()
+TheoraDepay::TheoraDepay(Pipeline &pipeline) : Depay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtptheoradepay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtptheoradepay", NULL);
 }
 
-H264Pay::H264Pay()
+H264Pay::H264Pay(Pipeline &pipeline) : Pay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtph264pay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtph264pay", NULL);
     // FIXME: Find out why setting buffer-list to true breaks rtp so badly, DON'T SET THIS TO TRUE
     //g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
 }
 
 
-H264Depay::H264Depay()
+H264Depay::H264Depay(Pipeline &pipeline) : Depay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtph264depay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtph264depay", NULL);
 }
 
 
 
-H263Pay::H263Pay()
+H263Pay::H263Pay(Pipeline &pipeline) : Pay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtph263ppay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtph263ppay", NULL);
 }
 
 
-H263Depay::H263Depay()
+H263Depay::H263Depay(Pipeline &pipeline) : Depay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtph263pdepay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtph263pdepay", NULL);
 }
 
 
-Mpeg4Pay::Mpeg4Pay()
+Mpeg4Pay::Mpeg4Pay(Pipeline &pipeline) : Pay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpmp4vpay", NULL);
     // this will send config header in rtp packets
     g_object_set(rtpPay_, "send-config", TRUE, NULL);
 
@@ -124,46 +132,46 @@ bool Mpeg4Pay::handleMessage(const std::string &path, const std::string &/*argum
 }
 
 
-Mpeg4Depay::Mpeg4Depay()
+Mpeg4Depay::Mpeg4Depay(Pipeline &pipeline) : Depay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vdepay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpmp4vdepay", NULL);
 }
 
 
-VorbisPay::VorbisPay()
+VorbisPay::VorbisPay(Pipeline &pipeline) : Pay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbispay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpvorbispay", NULL);
     g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
 
-VorbisDepay::VorbisDepay()
+VorbisDepay::VorbisDepay(Pipeline &pipeline) : Depay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbisdepay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpvorbisdepay", NULL);
 }
 
 
-L16Pay::L16Pay()
+L16Pay::L16Pay(Pipeline &pipeline) : Pay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpL16pay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpL16pay", NULL);
     g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
 
-L16Depay::L16Depay()
+L16Depay::L16Depay(Pipeline &pipeline) : Depay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpL16depay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpL16depay", NULL);
 }
 
 
-MpaPay::MpaPay()
+MpaPay::MpaPay(Pipeline &pipeline) : Pay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpmpapay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpmpapay", NULL);
 }
 
 
-MpaDepay::MpaDepay()
+MpaDepay::MpaDepay(Pipeline &pipeline) : Depay(pipeline)
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtpmpadepay", NULL);
+    rtpPay_ = pipeline_.makeElement("rtpmpadepay", NULL);
 }
 

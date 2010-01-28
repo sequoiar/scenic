@@ -34,8 +34,10 @@
 
 /** Constructor sets by default emitMessages to true 
  * and message interval to one second */
-AudioLevel::AudioLevel() : 
-    level_(Pipeline::Instance()->makeElement("level", NULL)),
+AudioLevel::AudioLevel(Pipeline &pipeline) : 
+    BusMsgHandler(pipeline),
+    pipeline_(pipeline),
+    level_(pipeline_.makeElement("level", NULL)),
             emitMessages_(true) 
 {
     g_object_set(G_OBJECT(level_), "interval", 1000000000LL, "message", emitMessages_, NULL);
@@ -44,7 +46,7 @@ AudioLevel::AudioLevel() :
 /// Destructor 
 AudioLevel::~AudioLevel()
 {
-    Pipeline::Instance()->remove(&level_);
+    pipeline_.remove(&level_);
 }
 
 /**

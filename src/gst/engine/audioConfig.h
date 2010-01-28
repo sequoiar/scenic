@@ -27,6 +27,7 @@
 #include <string>
 
 // forward declarations
+class Pipeline;
 class AudioSource;
 class AudioSink;
 class MapMsg;
@@ -51,7 +52,7 @@ class AudioSourceConfig
 
         bool locationExists() const;
          
-        AudioSource* createSource() const;
+        AudioSource* createSource(Pipeline &pipeline) const;
 
     private:
         const std::string source_;
@@ -67,7 +68,7 @@ class AudioSinkConfig
     public:
         AudioSinkConfig(MapMsg &msg);
         
-        AudioSink* createSink() const;
+        AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *sinkName() const;
         const char *deviceName() const;

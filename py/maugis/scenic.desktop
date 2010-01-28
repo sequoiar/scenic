@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Exec=scenic
+Icon=gnome-talk.png
+X-GNOME-DocPath=
+Terminal=false
+Name=Scenic
+Name[en]=Scenic
+Comment=High-Quality Audio-Video Streaming for GNU/Linux
+Comment[en]=High-Quality Audio-Video Streaming for GNU/Linux
+Categories=Application;AudioVideo;Internet;

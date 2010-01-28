@@ -30,13 +30,14 @@
 /** GLImageSink
  *  A videosink that can handle raw video, as well as GLBuffers of video.
  */
+class Pipeline;
 
 class GLImageSink
 : public GtkVideoSink, public BusMsgHandler
 {
     public:
         /// Constructor 
-        GLImageSink(int width, int height, int screen_num);
+        GLImageSink(Pipeline &pipeline, int width, int height, int screen_num);
         bool handleBusMsg(_GstMessage *msg);
 
     private:

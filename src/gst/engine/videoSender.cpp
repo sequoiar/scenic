@@ -38,12 +38,17 @@
 using boost::shared_ptr;
 
 /// Constructor
-VideoSender::VideoSender(shared_ptr<VideoSourceConfig> vConfig, 
+VideoSender::VideoSender(Pipeline &pipeline,
+        shared_ptr<VideoSourceConfig> vConfig, 
         shared_ptr<SenderConfig> rConfig) : 
-    SenderBase(rConfig), videoConfig_(vConfig), session_(), source_(0), 
-    encoder_(0), payloader_(0) 
+    SenderBase(rConfig), 
+    videoConfig_(vConfig), 
+    session_(pipeline), 
+    source_(0), 
+    encoder_(0), 
+    payloader_(0) 
 {
-    createPipeline();
+    createPipeline(pipeline);
 }
 
 bool VideoSender::checkCaps() const
@@ -61,18 +66,18 @@ VideoSender::~VideoSender()
 }
 
 
-void VideoSender::createSource()
+void VideoSender::createSource(Pipeline &pipeline)
 {
-    tassert(source_ = videoConfig_->createSource());
+    tassert(source_ = videoConfig_->createSource(pipeline));
 }
 
 
-void VideoSender::createCodec()
+void VideoSender::createCodec(Pipeline &pipeline)
 {
     MapMsg settings;
     settings["bitrate"] = videoConfig_->bitrate();
     settings["quality"] = videoConfig_->quality();
-    tassert(encoder_ = remoteConfig_->createVideoEncoder(settings));
+    tassert(encoder_ = remoteConfig_->createVideoEncoder(pipeline, settings));
 
     gstlinkable::link(*source_, *encoder_);
 }

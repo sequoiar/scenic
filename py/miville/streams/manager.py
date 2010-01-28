@@ -182,7 +182,10 @@ class Session(object):
         self.manager.remote_stopped_streams(notif)
 
     def on_problem(self, problem):
-        """ Should be called when a Milhouse process has a problem """
+        """
+        Should be called when a Milhouse process has a problem 
+        Slot for a signal.
+        """
         #log.debug('RTCP SENDER STARTED: %s' % (value))
         log.info('MILHOUSE PROBLEM')
         self.stream_state = STATE_ERROR

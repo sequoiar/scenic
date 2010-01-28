@@ -28,29 +28,36 @@
 
 #include "videoSource.h"
 #include "videoScale.h"
+#include "videoFlip.h"
 #include "videoSink.h"
 
 using boost::shared_ptr;
 
 /// Constructor
-LocalVideo::LocalVideo(shared_ptr<VideoSourceConfig> sourceConfig, shared_ptr<VideoSinkConfig> sinkConfig) : 
+LocalVideo::LocalVideo(Pipeline &pipeline, 
+        shared_ptr<VideoSourceConfig> sourceConfig, 
+        shared_ptr<VideoSinkConfig> sinkConfig) : 
+    pipeline_(pipeline),
     sourceConfig_(sourceConfig),
     sinkConfig_(sinkConfig),
-    source_(sourceConfig_->createSource()), 
-    colourspace_(Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL)),
-    videoscale_(sinkConfig_->createVideoScale()),
-    sink_(sinkConfig_->createSink())
+    source_(sourceConfig_->createSource(pipeline_)), 
+    colourspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
+    videoscale_(sinkConfig_->createVideoScale(pipeline_)),
+    videoflip_(sinkConfig_->createVideoFlip(pipeline_)),
+    sink_(sinkConfig_->createSink(pipeline_))
 {
     if (sourceConfig_->sourceString() != "dc1394src")
     {
         gstlinkable::link(*source_, *videoscale_);
-        gstlinkable::link(*videoscale_, *sink_);
+        gstlinkable::link(*videoscale_, *videoflip_);
+        gstlinkable::link(*videoflip_, *sink_);
     }
     else
     {
         gstlinkable::link(*source_, colourspace_);
         gstlinkable::link(colourspace_, *videoscale_);
-        gstlinkable::link(*videoscale_, *sink_);
+        gstlinkable::link(*videoscale_, *videoflip_);
+        gstlinkable::link(*videoflip_, *sink_);
     }
 }
 
@@ -58,6 +65,9 @@ LocalVideo::LocalVideo(shared_ptr<VideoSourceConfig> sourceConfig, shared_ptr<Vi
 LocalVideo::~LocalVideo()
 {
     delete sink_;
-    Pipeline::Instance()->remove(&colourspace_);
+    pipeline_.remove(&colourspace_);
+    delete videoflip_;
+    delete videoscale_;
     delete source_;
 }
+

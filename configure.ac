@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(MILHOUSE, 0.3.5)
+AC_INIT(MILHOUSE, 0.3.6)
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -191,7 +191,6 @@ AC_CONFIG_FILES([Makefile
                  py/miville/Makefile
                  py/miville/connectors/Makefile
                  py/miville/connectors/basic/Makefile
-                 py/miville/connectors/sip/Makefile
                  py/miville/devices/Makefile
                  py/miville/protocols/Makefile
                  py/miville/streams/Makefile
@@ -209,7 +208,6 @@ AC_CONFIG_FILES([Makefile
                  ])
 
 AC_CONFIG_FILES([
-                 src/tcp/test/Makefile
                  src/gst/engine/test/Makefile
                  ])
 

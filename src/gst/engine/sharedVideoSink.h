@@ -34,7 +34,7 @@ class SharedVideoBuffer;
 class SharedVideoSink : public VideoSink 
 {
     public:
-        SharedVideoSink(int width, int height, const std::string& sharedId_);
+        SharedVideoSink(Pipeline &pipeline, int width, int height, const std::string& sharedId_);
         virtual ~SharedVideoSink();
 
     private:

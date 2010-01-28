@@ -1,1 +1,1 @@
-SUBDIRS = basic sip .
+SUBDIRS = basic .

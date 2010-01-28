@@ -30,7 +30,7 @@
 
 InterleavedAudioSource::Interleave::~Interleave()
 {
-    Pipeline::Instance()->remove(&interleave_);
+    pipeline_.remove(&interleave_);
 }
 
 
@@ -69,8 +69,9 @@ void InterleavedAudioSource::Interleave::set_channel_layout()
 }
 
 
-InterleavedAudioSource::Interleave::Interleave(const AudioSourceConfig &config)
-    : interleave_(Pipeline::Instance()->makeElement("interleave", NULL)), 
+InterleavedAudioSource::Interleave::Interleave(Pipeline &pipeline, const AudioSourceConfig &config)
+    : pipeline_(pipeline),
+      interleave_(pipeline_.makeElement("interleave", NULL)), 
     config_(config)
 {
     set_channel_layout();

@@ -35,7 +35,7 @@ STATE_STARTING = "STARTING"
 STATE_RUNNING = "RUNNING" # success
 STATE_STOPPING = "STOPPING"
 STATE_STOPPED = "STOPPED" # success
-STATE_ERROR = "ERROR"
+#STATE_ERROR = "ERROR" #TODO: deprecate
 
 class ManagedProcessError(Exception):
     """
@@ -47,6 +47,7 @@ class TextLinesLogger(object):
     """
     Logs lines of text.
     """
+    #TODO: use cStringIO ?
     def __init__(self, maxsize=0, prefix=""):
         self.lines = []
         self.maxsize = maxsize
@@ -153,7 +154,7 @@ class ProcessManager(object):
     # do not mix these process states with the streams states ! they are 2 diff. things.
     # default that can be overriden in children classes.
     
-    def __init__(self, name="default", log_max_size=100, command=None, verbose=False, process_protocol_class=ManagedProcessProtocol, env=None):
+    def __init__(self, name="default", log_max_size=100, command=None, verbose=False, process_protocol_class=ManagedProcessProtocol, env=None, delay_before_sigkill=5.0):
         """
         :param command: list or args. The first item is the name of the name of the executable.
         :param name: Any string, for printing infos. Does not need to be unique.
@@ -178,6 +179,8 @@ class ProcessManager(object):
         self.verbose = verbose
         self._process_protocol = None
         self._process_transport = None
+        self._delayed_sigkill = None # DelayedCall
+        self._delay_before_sigkill = delay_before_sigkill # seconds
         self.state_changed_signal = sig.Signal() # FIXME: this is only used in a test so far
         self.exitted_itself_signal = sig.Signal()
 
@@ -207,7 +210,7 @@ class ProcessManager(object):
             log.debug("Starting process (%s) %s %s" % (self.name, self.command, environ))
             self._process_transport = reactor.spawnProcess(self._process_protocol, proc_path, args, environ, usePTY=True)
         except TypeError, e:
-            self.set_state(STATE_ERROR)
+            self.set_state(STATE_STOPPED)
             raise
         else:
             log.debug("Process is started.")
@@ -216,7 +219,7 @@ class ProcessManager(object):
         if STATE_STARTING:
             self.set_state(STATE_RUNNING)
         else:
-            self.set_state(STATE_ERROR)
+            log.error("Process started, unexpectedly.") #self.set_state(STATE_ERROR)
         
     def _on_out_received(self, data):
         log.debug("stdout(%s): %s" % (self.name, data))
@@ -234,24 +237,44 @@ class ProcessManager(object):
         """
         if self.state == STATE_RUNNING:
             self.set_state(STATE_STOPPING)
+            if self._delayed_sigkill is None:
+                self._process_transport.signalProcess(15)
+                self._delayed_sigkill = reactor.callLater(self._delay_before_sigkill, self._cl_sigkill)
+            else:
+                log.error("There is already a delayed call to kill -9 this process.")
             self._process_transport.loseConnection()
         else:
             msg = "Cannot stop a process that is \"%s\" state." % (self.state)
-            self.set_state(STATE_ERROR)
+            #self.set_state(STATE_ERROR)
             raise ManagedProcessError(msg)
+    
+    def _cl_sigkill(self):
+        if self.state == STATE_STOPPING:
+            self._process_transport.signalProcess(9)
+        self._delayed_sigkill = None
 
     def _on_process_ended(self, reason):
         #log.warning("%s process ended. Reason: \n%s State:%s" % (self.name, str(reason), self.state))
         if self.state == STATE_STARTING:
-            self.set_state(STATE_ERROR)
+            #self.set_state(STATE_ERROR)
+            log.error("%s process ended. Reason: \n%s State:%s" % (self.name, str(reason), self.state))
         elif self.state == STATE_RUNNING:
             """ Don't error out if we exitted with exit code 0 (for now) """
             if str(reason).find('exit code 0') != -1:
                 log.warning('PROCESS EXITTED OF ITS OWN ACCORD, CLEANLY')
+                self.set_state(STATE_STOPPED) # !!!
                 self.exitted_itself_signal()
             else:
-                self.set_state(STATE_ERROR)
+                log.error("%s process ended. Reason: \n%s State:%s" % (self.name, str(reason), self.state))
+                #self.set_state(STATE_ERROR)
         if self.state == STATE_STOPPING:
+            if self._delayed_sigkill is not None:
+                if self._delayed_sigkill.active():
+                    self._delayed_sigkill.cancel()
+                    self._delayed_sigkill = None
             self.set_state(STATE_STOPPED)
         if self.verbose:
             print("%s process ended. Reason: \n%s" % (self.name, str(reason)))
+        # if nto already set a few lines ago:
+        if self.state != STATE_STOPPED:
+            self.set_state(STATE_STOPPED)

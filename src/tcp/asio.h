@@ -22,12 +22,11 @@
 
 #ifndef _ASIO_H_
 #define _ASIO_H_
-#include <cstdlib>
-#include <iostream>
+#include <string>
 
 namespace asio {
     std::string tcpGetBuffer(int port, int &id);
-    bool tcpSendBuffer(std::string ip, int port, int id, std::string caps);
+    bool tcpSendBuffer(const std::string &ip, int port, int id, const std::string &caps);
 }
 
 #endif //_ASIO_H_

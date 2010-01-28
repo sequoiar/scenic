@@ -30,19 +30,21 @@
 
 // forward declarations
 class AudioSinkConfig;
+class Pipeline;
 class _GstElement;
 
 /** Abstract base class representing a sink for audio streams */
 class AudioSink : public GstLinkableSink, boost::noncopyable
 {
     public:
-        AudioSink();
+        AudioSink(Pipeline &pipeline);
         
         ~AudioSink();
        
         virtual void adjustBufferTime(unsigned long long);
 
     protected:
+        Pipeline &pipeline_;
         _GstElement *sink_;
         const static unsigned long long BUFFER_TIME;
 
@@ -58,7 +60,7 @@ class AudioSink : public GstLinkableSink, boost::noncopyable
 class AudioAlsaSink : public AudioSink
 {
     public:
-        AudioAlsaSink(const AudioSinkConfig &config);
+        AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config);
         
     private:
         ~AudioAlsaSink();
@@ -75,7 +77,7 @@ class AudioAlsaSink : public AudioSink
 class AudioPulseSink : public AudioSink
 {
     public:
-        AudioPulseSink(const AudioSinkConfig &config);
+        AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config);
         ~AudioPulseSink();
     private:
         _GstElement *sinkElement() { return aconv_; }
@@ -87,7 +89,7 @@ class AudioPulseSink : public AudioSink
 class AudioJackSink : public AudioSink, public MessageHandler
 {
     public:
-        AudioJackSink(const AudioSinkConfig &config);
+        AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config);
         ~AudioJackSink();
     private:
         bool handleMessage(const std::string &message, const std::string &arguments);

@@ -62,7 +62,7 @@ class MilhouseProcessManager(proc.ProcessManager):
         """ Parse for problems in milhouse output. """
         for txt in ("CRITICAL", "ERROR", "error while loading shared libraries"):
             if data.find(txt) != -1:
-                problem = tools.StreamerProblem(constants.STATE_ERROR, data)
+                problem = tools.StreamerProblem(data)
                 log.error(problem)
                 # LocalMilhouseStreamer handles this signal in method on_process_event
                 self.problem_signal(problem) 

@@ -29,17 +29,17 @@
 #include "codec.h"
 #include "rtpPay.h"
 #include "capsParser.h"
-#include "playback.h"
-
 
 using boost::shared_ptr;
 
 /// Constructor 
-AudioSender::AudioSender(shared_ptr<AudioSourceConfig> aConfig, 
+AudioSender::AudioSender(Pipeline &pipeline,
+        shared_ptr<AudioSourceConfig> aConfig, 
         shared_ptr<SenderConfig> rConfig) : 
     SenderBase(rConfig),
     audioConfig_(aConfig), 
-    session_(), 
+    pipeline_(pipeline),
+    session_(pipeline), 
     source_(0), 
     encoder_(0), 
     payloader_(0)
@@ -55,7 +55,7 @@ AudioSender::AudioSender(shared_ptr<AudioSourceConfig> aConfig,
             THROW_CRITICAL("Raw currently only accepts 8 channels or less, not " << audioConfig_->numChannels());
     }
     LOG_DEBUG("Creating audio sender pipeline");
-    createPipeline();
+    createPipeline(pipeline);
 }
 
 
@@ -63,7 +63,7 @@ bool AudioSender::checkCaps() const
 {
     return CapsParser::getAudioCaps(remoteConfig_->codec(), 
             audioConfig_->numChannels(), 
-            playback::sampleRate()) != "";
+            pipeline_.actualSampleRate()) != "";
 }
 
 
@@ -75,14 +75,14 @@ AudioSender::~AudioSender()
     delete source_;
 }
 
-void AudioSender::createSource()
+void AudioSender::createSource(Pipeline &pipeline)
 {
-    tassert(source_ = audioConfig_->createSource());
+    tassert(source_ = audioConfig_->createSource(pipeline));
 }
 
-void AudioSender::createCodec()
+void AudioSender::createCodec(Pipeline &pipeline)
 {
-    tassert(encoder_ = remoteConfig_->createAudioEncoder());
+    tassert(encoder_ = remoteConfig_->createAudioEncoder(pipeline));
     gstlinkable::link(*source_, *encoder_);
 }
 

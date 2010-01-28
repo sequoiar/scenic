@@ -31,22 +31,25 @@
 
 class VideoSource;
 class VideoScale;
+class VideoFlip;
 class VideoSink;
 class _GstElement;
 
 class LocalVideo : public boost::noncopyable
 {
     public:
-        LocalVideo(boost::shared_ptr<VideoSourceConfig> sourceConfig,
+        LocalVideo(Pipeline &pipeline, boost::shared_ptr<VideoSourceConfig> sourceConfig,
                 boost::shared_ptr<VideoSinkConfig> sinkConfig);
         ~LocalVideo();
 
     private:
+        Pipeline &pipeline_;
         boost::shared_ptr<VideoSourceConfig> sourceConfig_;
         boost::shared_ptr<VideoSinkConfig> sinkConfig_;
         VideoSource *source_;
         _GstElement *colourspace_;
         VideoScale *videoscale_;
+        VideoFlip *videoflip_;
         VideoSink *sink_;
 };
 

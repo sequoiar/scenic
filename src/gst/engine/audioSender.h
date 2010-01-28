@@ -34,6 +34,7 @@
 #include <boost/shared_ptr.hpp>
 
 class AudioSource;
+class Pipeline;
 class Encoder;
 class Pay;
 class _GstMessage;
@@ -43,18 +44,21 @@ class AudioSender
     : public SenderBase, boost::noncopyable
 {
     public:
-        AudioSender(boost::shared_ptr<AudioSourceConfig> aConfig, 
+        AudioSender(Pipeline &pipeline,
+                boost::shared_ptr<AudioSourceConfig> aConfig, 
                 boost::shared_ptr<SenderConfig> rConfig);
 
         ~AudioSender();
 
     private:
-        void createSource();
-        void createCodec();
+        void createSource(Pipeline &pipeline);
+        void createCodec(Pipeline &pipeline);
         void createPayloader();
         virtual bool checkCaps() const;
 
+
         boost::shared_ptr<AudioSourceConfig> audioConfig_;
+        Pipeline &pipeline_;
         RtpSender session_;
         AudioSource *source_;
 
