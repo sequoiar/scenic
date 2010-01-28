@@ -22,6 +22,19 @@
 import socket
 import gobject
 
+# JSON import:
+try:
+    import json # python 2.6
+except ImportError:
+    import simplejson as json # python 2.4 to 2.5
+try:
+    _tmp = json.loads
+except AttributeError:
+    import warnings
+    warnings.warn("Use simplejson, not the old json module.")
+    sys.modules.pop('json') # get rid of the bad json module
+    import simplejson as json
+
 class Network(object):
     def __init__(self, negotiation_port):
         self.buf_size = 1024
@@ -30,7 +43,8 @@ class Network(object):
     def validate(self, msg):
         tmp_msg = msg.strip()
         msg = None
-        if tmp_msg[0] == "{" and tmp_msg[-1] == "}" and tmp_msg.find("{", 1, -2) == -1 and tmp_msg.find("}", 1, -2) == -1:
+        if tmp_msg.startswith("{") and tmp_msg.endswith("}"):
+        #if tmp_msg[0] == "{" and tmp_msg[-1] == "}" and tmp_msg.find("{", 1, -2) == -1 and tmp_msg.find("}", 1, -2) == -1:
             try:
                 tmp_msg = json.loads(tmp_msg)
                 if type(tmp_msg) is dict:
@@ -71,7 +85,6 @@ class Server(Network):
         self.app.on_server_rcv_command(self, (msg, addr, conn))
         return True
 
-
 class Client(Network):
     def __init__(self, app):
         Network.__init__(self, app.config.negotiation_port)
@@ -110,4 +123,3 @@ class Client(Network):
         msg = self.validate(buffer)
         self.app.on_client_rcv_command(self, msg)
         return False
-
