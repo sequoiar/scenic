@@ -36,7 +36,7 @@ class RtpSender
     : public RtpBin
 {
     public:
-        RtpSender() : rtp_sender_(0) {}
+        RtpSender(Pipeline &pipeline) : RtpBin(pipeline), rtp_sender_(0) {}
         ~RtpSender();
 
         void add(RtpPay * payloader, const SenderConfig & config);

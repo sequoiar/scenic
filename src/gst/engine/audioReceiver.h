@@ -31,6 +31,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+class Pipeline;
 class RtpPay;
 class Decoder;
 class AudioSink;
@@ -43,15 +44,16 @@ class AudioReceiver
     : public ReceiverBase, boost::noncopyable
 {
     public:
-        AudioReceiver(boost::shared_ptr<AudioSinkConfig> aConfig, 
-                      boost::shared_ptr<ReceiverConfig> rConfig);
+        AudioReceiver(Pipeline &pipeline,
+                boost::shared_ptr<AudioSinkConfig> aConfig, 
+                boost::shared_ptr<ReceiverConfig> rConfig);
 
         ~AudioReceiver();
 
     private:
-        void createCodec();
+        void createCodec(Pipeline &pipeline);
         void createDepayloader();
-        void createSink();
+        void createSink(Pipeline &pipeline);
         
         void setCaps(); 
 

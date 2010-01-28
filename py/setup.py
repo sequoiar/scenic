@@ -19,11 +19,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 #FIXME: get this from configure.ac
-__version__ = "0.3.5" # see miville.runner.__version__ as well
-
-# how I generated that list : 
-#packages = find_packages(exclude=["test", "miville.py"]),
-#print 'PACKAGES:', packages
+__version__ = "0.3.6" # see miville.runner.__version__ as well
 
 miville_packages = [
     'miville',
@@ -34,7 +30,6 @@ miville_packages = [
     'miville.protocols',
     'miville.streams',
     'miville.connectors.basic',
-    'miville.connectors.sip',
     'miville.ui.cli',
     'miville.ui.web',
     'miville.ui.web.pages',

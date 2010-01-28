@@ -23,7 +23,11 @@
 #ifndef _PLAYBACK_H_
 #define _PLAYBACK_H_
 
-namespace playback {
+class Pipeline;
+
+class Playback {
+    public:
+        Playback(Pipeline &pipeline);
         void start();
         void pause();
         void stop();
@@ -32,7 +36,9 @@ namespace playback {
         void quit();
         bool quitted();
         int sampleRate();
-}
+    private:
+        Pipeline &pipeline_;
+};
 
 #endif // _PLAYBACK_H_
 

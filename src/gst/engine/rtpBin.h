@@ -27,6 +27,7 @@
 
 #include "noncopyable.h"
 
+class Pipeline;
 class _GstElement;
 class _GstStructure;
 class _GObject;
@@ -38,11 +39,12 @@ class RtpBin : boost::noncopyable
 
     protected:
         /// FIXME: this sessionId is all kinds of gross
-        RtpBin();
+        explicit RtpBin(Pipeline& pipeline);
         const char *padStr(const char *padName) const;
 
         void registerSession(const std::string &codec);
         void unregisterSession();
+        Pipeline &pipeline_;
         static _GstElement *rtpbin_;
         static bool destroyed_;
         static int sessionCount_;

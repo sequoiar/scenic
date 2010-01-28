@@ -28,46 +28,48 @@
 #include "mapMsg.h"
 
 
-void playback::start()
+Playback::Playback(Pipeline &pipeline) : pipeline_(pipeline)
 {
-    Pipeline::Instance()->start();
+}
+
+void Playback::start()
+{
+    pipeline_.start();
 }
 
 
-void playback::stop()
+void Playback::stop()
 {
-    Pipeline::Instance()->stop();
+    pipeline_.stop();
 }
 
-void playback::pause()
+void Playback::pause()
 {
-    Pipeline::Instance()->pause();
+    pipeline_.pause();
 }
 
-bool playback::isPlaying()
+bool Playback::isPlaying()
 { 
-    return Pipeline::Instance()->isPlaying(); 
+    return pipeline_.isPlaying(); 
 }
 
-void playback::quit()
+void Playback::quit()
 {
-    stop();
-    Pipeline::Instance()->notifyQuitted();
-    gutil::killMainLoop();
+    pipeline_.quit();
 }
 
-void playback::makeVerbose()
+void Playback::makeVerbose()
 {
-    Pipeline::Instance()->makeVerbose();
+    pipeline_.makeVerbose();
 }
 
-bool playback::quitted()
+bool Playback::quitted()
 {
-    return Pipeline::Instance()->quitted();
+    return pipeline_.quitted();
 }
 
-int playback::sampleRate()
+int Playback::sampleRate()
 {
-    return Pipeline::Instance()->actualSampleRate();
+    return pipeline_.actualSampleRate();
 }
 

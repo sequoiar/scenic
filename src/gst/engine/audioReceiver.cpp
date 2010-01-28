@@ -37,11 +37,12 @@ using boost::shared_ptr;
 
 /** Constructor parameterized by an AudioSinkConfig 
  * and a ReceiverConfig */
-AudioReceiver::AudioReceiver(shared_ptr<AudioSinkConfig> aConfig, 
+AudioReceiver::AudioReceiver(Pipeline &pipeline,
+        shared_ptr<AudioSinkConfig> aConfig, 
         shared_ptr<ReceiverConfig> rConfig) : 
     audioConfig_(aConfig), 
     remoteConfig_(rConfig), 
-    session_(), 
+    session_(pipeline), 
     gotCaps_(false),
     depayloader_(0), 
     decoder_(0), 
@@ -49,7 +50,7 @@ AudioReceiver::AudioReceiver(shared_ptr<AudioSinkConfig> aConfig,
 { 
     tassert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
-    createPipeline();
+    createPipeline(pipeline);
 }
 
 /// Destructor 
@@ -62,9 +63,9 @@ AudioReceiver::~AudioReceiver()
 }
 
 
-void AudioReceiver::createCodec()
+void AudioReceiver::createCodec(Pipeline &pipeline)
 {
-    tassert(decoder_ = remoteConfig_->createAudioDecoder());
+    tassert(decoder_ = remoteConfig_->createAudioDecoder(pipeline));
 }
 
 
@@ -76,9 +77,9 @@ void AudioReceiver::createDepayloader()
 }
 
 
-void AudioReceiver::createSink()
+void AudioReceiver::createSink(Pipeline &pipeline)
 {
-    tassert(sink_ = audioConfig_->createSink());
+    tassert(sink_ = audioConfig_->createSink(pipeline));
     gstlinkable::link(*decoder_, *sink_);   
     setCaps();
     tassert(gotCaps_);
@@ -93,5 +94,4 @@ void AudioReceiver::setCaps()
     session_.setCaps(remoteConfig_->caps()); 
     gotCaps_ = true;
 }
-
 

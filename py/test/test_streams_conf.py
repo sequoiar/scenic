@@ -314,12 +314,11 @@ class Test_01_Ports_Allocator(unittest.TestCase):
 class Test_01_Streamer_Problem(unittest.TestCase):
     def test_01_str(self):
         """ Mostly just to make sure the error handling stays sane """
-        error = constants.STATE_ERROR
         message = "the pipeline is broken"
         details = "these would be details"
 
-        errstr = str(tools.StreamerProblem(error, message, details))
-        if errstr != '%s: %s %s' % (error, message, details):
+        errstr = str(tools.StreamerProblem(message, details))
+        if errstr != '%s %s' % (message, details):
             self.fail("stringified SteamerProblem does not match expected string %s" % (errstr))
 
 class Test_01_Session(unittest.TestCase):

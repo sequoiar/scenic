@@ -136,16 +136,16 @@ bool Jack::autoForcedSupported(GstElement *jackElement)
 
 
 /// Check that jack is running and is at the right sample rate
-void Jack::assertReady()
+void Jack::assertReady(Pipeline &pipeline)
 {
     if (!Jack::is_running())
         THROW_CRITICAL("Jack is not running");
 
-    if (Pipeline::Instance()->actualSampleRate() != samplerate())
+    if (pipeline.actualSampleRate() != samplerate())
     {
         LOG_WARNING("Jack's sample rate of " << samplerate()
-                << " does not match pipeline sample rate " << Pipeline::Instance()->actualSampleRate());
-        Pipeline::Instance()->updateSampleRate(samplerate());
+                << " does not match pipeline sample rate " << pipeline.actualSampleRate());
+        pipeline.updateSampleRate(samplerate());
     }
 }
 

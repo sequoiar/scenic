@@ -28,11 +28,12 @@
 
 Dv1394 *Dv1394::instance_ = 0;
 
-Dv1394::Dv1394() : 
-dv1394src_(Pipeline::Instance()->makeElement("dv1394src", NULL)), 
-dvdemux_(Pipeline::Instance()->makeElement("dvdemux", "demux")), 
-audioSink_(0), 
-videoSink_(0) 
+Dv1394::Dv1394(Pipeline &pipeline) : 
+    pipeline_(pipeline),
+    dv1394src_(pipeline_.makeElement("dv1394src", NULL)), 
+    dvdemux_(pipeline_.makeElement("dvdemux", "demux")), 
+    audioSink_(0), 
+    videoSink_(0) 
 {
     if (!Raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
@@ -47,20 +48,21 @@ videoSink_(0)
     // register connection callback for demux
     g_signal_connect(dvdemux_, "pad-added",
             G_CALLBACK(Dv1394::cb_new_src_pad),
-            NULL);
+            static_cast<gpointer>(this));
 }
 
 Dv1394::~Dv1394()
 {
-    Pipeline::Instance()->remove(&dvdemux_);
-    Pipeline::Instance()->remove(&dv1394src_);
+    pipeline_.remove(&dvdemux_);
+    pipeline_.remove(&dv1394src_);
 }
 
 
-Dv1394 * Dv1394::Instance()
+/// FIXME: this is crazy annoying, solution is for this not to be a singleton
+Dv1394 * Dv1394::Instance(Pipeline &pipeline)
 {
     if (instance_ == 0)
-        instance_ = new Dv1394();
+        instance_ = new Dv1394(pipeline);
     return instance_;
 }
 
@@ -105,23 +107,24 @@ void Dv1394::unsetAudioSink()
 
 
 /// Called due to incoming dv stream, either video or audio, links appropriately
-void Dv1394::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void * /*data */)
+void Dv1394::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gpointer data)
 {
     GstElement *sinkElement;
+    Dv1394 *context = static_cast<Dv1394*>(data);
 
     if (std::string("video") == gst_pad_get_name(srcPad))
     {
         LOG_DEBUG("Got video stream from DV");
-        if (Instance()->videoSink_ == 0)
+        if (context->videoSink_ == 0)
             return; // possible to get video streams from dv without wanting them
-        sinkElement = Instance()->videoSink_;
+        sinkElement = context->videoSink_;
     }
     else if (std::string("audio") == gst_pad_get_name(srcPad))
     {
         LOG_DEBUG("Got audio stream from DV");
-        if (Instance()->audioSink_ == 0)
+        if (context->audioSink_ == 0)
             return; // possible to get audio streams from dv with wanting them
-        sinkElement = Instance()->audioSink_;
+        sinkElement = context->audioSink_;
     }
     else {
         LOG_DEBUG("Ignoring unknown stream from DV");

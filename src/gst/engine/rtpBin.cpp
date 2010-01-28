@@ -29,7 +29,6 @@
 #include "rtpPay.h"
 #include "remoteConfig.h"
 #include "pipeline.h"
-#include "playback.h"
 
 // for posting 
 #include "mapMsg.h"
@@ -46,7 +45,8 @@ bool RtpBin::destroyed_ = false;
 
 std::map<int, RtpBin*> RtpBin::sessions_;
 
-RtpBin::RtpBin() : 
+RtpBin::RtpBin(Pipeline &pipeline) : 
+    pipeline_(pipeline),
     rtcp_sender_(0), 
     rtcp_receiver_(0), 
     sessionId_((++sessionCount_) - 1), 
@@ -56,7 +56,7 @@ RtpBin::RtpBin() :
     // only initialize rtpbin element once per process
     if (rtpbin_ == 0) 
     {
-        rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
+        rtpbin_ = pipeline_.makeElement("gstrtpbin", NULL);
         startPrintStatsCallback();
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
@@ -134,12 +134,12 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     else if (!context->printStats_)
     {
         LOG_DEBUG("Finished printing stats");
-        playback::quit();
+        context->pipeline_.quit();
         return FALSE;
     }
     else if (sessionCount_ <= 0) // no sessions to print yet
         return TRUE; 
-    else if (not Pipeline::Instance()->isPlaying())
+    else if (not context->pipeline_.isPlaying())
         return TRUE; // not playing yet
 
 
@@ -186,14 +186,14 @@ const char *RtpBin::padStr(const char *padName) const
 RtpBin::~RtpBin()
 {
     unregisterSession();
-    Pipeline::Instance()->remove(&rtcp_sender_);    // a pair for each session
-    Pipeline::Instance()->remove(&rtcp_receiver_);
+    pipeline_.remove(&rtcp_sender_);    // a pair for each session
+    pipeline_.remove(&rtcp_receiver_);
 
     --sessionCount_;
     if (sessionCount_ == 0) // destroy if no streams are present
     {
         LOG_DEBUG("No rtp sessions left, destroying rtpbin");
-        Pipeline::Instance()->remove(&rtpbin_); // one shared by all sessions
+        pipeline_.remove(&rtpbin_); // one shared by all sessions
         rtpbin_ = 0;
         destroyed_ = true;
     }

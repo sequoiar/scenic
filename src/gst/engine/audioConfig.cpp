@@ -39,8 +39,6 @@ AudioSourceConfig::AudioSourceConfig(MapMsg &msg) :
         THROW_CRITICAL("No source specified");
     if(numChannels_ < 1)
         THROW_CRITICAL("Invalid number of channels");
-    if (source_ == "jackaudiosrc")  // FIXME: this has to happen early but it's gross to have it here
-        Jack::assertReady();
 }
 
 
@@ -57,20 +55,23 @@ int AudioSourceConfig::numChannels() const
 }
 
 /// Factory method that creates an AudioSource based on this object's source_ string 
-AudioSource* AudioSourceConfig::createSource() const
+AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 {
     if (source_ == "audiotestsrc")
-        return new AudioTestSource(*this);
+        return new AudioTestSource(pipeline, *this);
     else if (source_ == "filesrc")
-        return new AudioFileSource(*this);
+        return new AudioFileSource(pipeline, *this);
     else if (source_ == "alsasrc")
-        return new AudioAlsaSource(*this);
+        return new AudioAlsaSource(pipeline, *this);
     else if (source_ == "jackaudiosrc") 
-        return new AudioJackSource(*this);
+    {
+        Jack::assertReady(pipeline);
+        return new AudioJackSource(pipeline, *this);
+    }
     else if (source_ == "dv1394src")
-        return new AudioDvSource(*this);
+        return new AudioDvSource(pipeline, *this);
     else if (source_ == "pulsesrc")
-        return new AudioPulseSource(*this);
+        return new AudioPulseSource(pipeline, *this);
     else 
         THROW_CRITICAL(source_ << " is an invalid source");
     return 0;
@@ -115,19 +116,20 @@ AudioSinkConfig::AudioSinkConfig(MapMsg &msg) :
     deviceName_(msg["device"]), 
     bufferTime_(static_cast<int>(msg["audio-buffer-usec"]))
 {
-    if (sink_ == "jackaudiosink") // FIXME: it's good for this to happen early 
-        Jack::assertReady();      // (before waiting on caps) but having it here is pretty gross
 }
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
-AudioSink* AudioSinkConfig::createSink() const
+AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")
-        return new AudioJackSink(*this);
+    {
+        Jack::assertReady(pipeline);      // (before waiting on caps) but having it here is pretty gross
+        return new AudioJackSink(pipeline, *this);
+    }
     else if (sink_ == "alsasink")
-        return new AudioAlsaSink(*this);
+        return new AudioAlsaSink(pipeline, *this);
     else if (sink_ == "pulsesink")
-        return new AudioPulseSink(*this);
+        return new AudioPulseSink(pipeline, *this);
     else
     {
         THROW_CRITICAL(sink_ << " is an invalid sink");

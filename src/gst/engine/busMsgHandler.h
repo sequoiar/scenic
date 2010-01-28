@@ -25,6 +25,7 @@
 #define _BUS_MSG_HANDLER_H_
 
 class _GstMessage;
+class Pipeline;
 
 #include "noncopyable.h"
 
@@ -44,8 +45,9 @@ class BusMsgHandler : boost::noncopyable
          * Destructor */
         
     protected:
-        BusMsgHandler();
+        explicit BusMsgHandler(Pipeline &pipeline);
         virtual ~BusMsgHandler();
+        Pipeline &pipeline_;
 };
 
 #endif // _BUS_MSG_HANDLER_H_ 

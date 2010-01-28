@@ -1,5 +1,6 @@
 import subprocess
-import unittest
+import platform
+from twisted.trial import unittest
 
 class TestDcCtl(unittest.TestCase):
     def test_dc_ctl_help(self):
@@ -19,3 +20,6 @@ class TestDcCtl(unittest.TestCase):
         assert(stdout_value == 'error: libdc1394 error: no camera found on bus\n' 
                 or stdout_value.find('Allowed options') != -1
                 or stdout_value.find('could not get a handle to your IEEE1394 card') != -1)
+
+    if ('karmic' in platform.dist()):
+        test_dc_ctl_help.skip = "Skipping test because it's broken on Karmic"

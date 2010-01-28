@@ -28,6 +28,7 @@
 #include "busMsgHandler.h"
 
 // forward declarations
+class Pipeline;
 class _GstElement;
 class _GstMessage;
 
@@ -39,7 +40,7 @@ class _GstMessage;
 class AudioLevel : public GstLinkableFilter, public BusMsgHandler
 {
     public:
-        AudioLevel();
+        AudioLevel(Pipeline &pipeline);
         ~AudioLevel();
         void interval(unsigned long long newInterval);
 
@@ -58,6 +59,7 @@ class AudioLevel : public GstLinkableFilter, public BusMsgHandler
 
         void print(const std::vector<double> &rmsValues) const;
 
+        Pipeline &pipeline_;
         _GstElement *level_;
         bool emitMessages_;
 
