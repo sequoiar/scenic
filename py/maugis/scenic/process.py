@@ -69,7 +69,6 @@ class ProcessManager(object):
         self._child_process = None
         self._time_child_started = None
         self._child_running_time = None
-        self._stdout_file = None
         self.state = STATE_STOPPED
         self.io_protocol = None # this attribute is set directly to the SlaveIO instance once created.
         self.command = command # string (bash)
@@ -215,7 +214,6 @@ class ProcessManager(object):
         self.log("Child exitted with %s" % (exit_code), logging.INFO)
         self.set_child_state(STATE_STOPPED)
         self.log("Closing slave's process stdout file.")
-        self._stdout_file.close()
         
     def set_child_state(self, new_state):
         """
