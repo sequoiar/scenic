@@ -503,6 +503,19 @@ class Application(object):
         dialog.connect('response', _cb, callback)
         dialog.show()
 
+    def show_contact_request_dialog(self, text, callback=None):
+        def _cb(dialog, response_id, callback):
+            dialog.hide()
+            if callback is not None:
+                callback(response_id == gtk.RESPONSE_OK)
+        self.contact_request_label.set_label(text)
+        # TODO rename confirm dialog
+        dialog = self.contact_request_dialog
+        dialog.set_modal(True)
+        dialog.connect('response', _cb, callback)
+        dialog.show()
+
+
     def hide_contacting_window(self, msg="", err=""):
         self.contacting_window.hide()
         text = None
@@ -555,21 +568,22 @@ class Application(object):
             cmd = msg["command"]
             if cmd == "ask":
                 self.rcv_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr[0])
-                self.contact_request_label.set_label("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
-                answ = self.contact_request_dialog.run()
-                gobject.source_remove(self.rcv_watch)
-                self.contact_request_dialog.hide()
-                if answ == gtk.RESPONSE_OK:
-                    if "bandwidth" in msg and self.config.bandwidth > msg["bandwidth"]:
-                        bandwidth = msg["bandwidth"]
+                def on_contact_request_dialog_result(result):
+                    gobject.source_remove(self.rcv_watch)
+                    if result:
+                        if "bandwidth" in msg and self.config.bandwidth > msg["bandwidth"]:
+                            bandwidth = msg["bandwidth"]
+                        else:
+                            bandwidth = self.config.bandwidth
+                        conn.sendall(json.dumps({"answer":"accept", "bandwidth": bandwidth}))
+                        conn.close()
+                        self.process_manager.start(addr[0], bandwidth)
                     else:
-                        bandwidth = self.config.bandwidth
-                    conn.sendall(json.dumps({"answer":"accept", "bandwidth": bandwidth}))
-                    conn.close()
-                    self.process_manager.start(addr[0], bandwidth)
-                else:
-                    conn.sendall(json.dumps({"answer":"refuse"}))
-                    conn.close()
+                        conn.sendall(json.dumps({"answer":"refuse"}))
+                        conn.close()
+
+                text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
+                self.show_contact_request_dialog(text, on_contact_request_dialog_result)
             elif cmd == "stop":
                 self.process_manager.stop()
                 conn.sendall(json.dumps({"answer":"stopped"}))
@@ -691,7 +705,10 @@ class ProcessManager(object):
             self.milhouse_recv_output,
             gobject.IO_HUP,
             self.watch_milhouse_recv)
-        self.milhouse_send_cmd = [self.config.streamer_command, '--sender', 
+        
+        self.milhouse_send_cmd = [
+            self.config.streamer_command, 
+            '--sender', 
             '--address', host,
             '--videosource', self.config.video_input,
             '--videocodec', self.config.video_codec,
@@ -700,6 +717,7 @@ class ProcessManager(object):
             '--audiocodec', self.config.audio_codec,
             '--videoport', str(self.video_port),
             '--audioport', str(self.audio_port)]
+
         print "milhouse_send_cmd: ", self.milhouse_send_cmd
         self.milhouse_send_subproc = subprocess.Popen(self.milhouse_send_cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         print "milhouse_send_cmd launched "
