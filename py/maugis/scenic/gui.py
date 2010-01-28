@@ -20,7 +20,7 @@
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Maugis/Scenic GTK GUI.
+Scenic GTK GUI.
 
 - voir si il faut gerer une demande de connexion alors que c'est deja connecte
 - voir si le bouton "cancel" est necesaire dans la fenetre "contacting" :
@@ -30,13 +30,14 @@ Maugis/Scenic GTK GUI.
 - bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
 ### CONSTANTS ###
-__version__ = 0.1
-APP_NAME = "maugis" # changed in __main__
+__version__ = "0.1.0"
+APP_NAME = "scenic"
 
 ### MODULES IMPORTS  ###
 
 import sys
-import os, signal
+import signal
+import os
 import time
 import socket
 import smtplib
