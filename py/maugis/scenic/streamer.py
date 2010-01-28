@@ -79,5 +79,7 @@ class ProcessManager(object):
 
     def stop(self):
         # stopping
-        self.sender.stop()
-        self.receiver.stop()
+        if self.sender is not None:
+            self.sender.stop()
+        if self.receiver is not None:
+            self.receiver.stop()
