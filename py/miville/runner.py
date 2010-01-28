@@ -39,7 +39,7 @@ from miville.utils import common
 log_file_name = log.LOG_FILE_NAME
 
 # FIXME: this should come from configure.ac
-__version__ = "0.3.5"
+__version__ = "0.3.6"
 VERSION = __version__
 
 def moo():

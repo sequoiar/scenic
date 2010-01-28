@@ -19,7 +19,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 #FIXME: get this from configure.ac
-__version__ = "0.3.5" # see miville.runner.__version__ as well
+__version__ = "0.3.6" # see miville.runner.__version__ as well
 
 miville_packages = [
     'miville',
