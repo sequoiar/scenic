@@ -172,7 +172,7 @@ class AddressBook(object):
                     try:
                         print("Loading contact %s" % (line))
                         d = json.loads(line)
-                        for k, v in d:
+                        for k, v in d.iteritems():
                             if type(v) is unicode:
                                 v = str(v) # FIXME
                         self.contact_list.append(d)
