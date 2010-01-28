@@ -36,8 +36,6 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
-
-
 class Network(object):
     def __init__(self, negotiation_port):
         self.buf_size = 1024
@@ -127,4 +125,53 @@ class Client(Network):
         self.app.on_client_rcv_command(self, msg)
         return False
 
+class NewServer(object):
+    def __init__(self, app):
+        self.app = app
+        self.port = self.app.config.negotiation_port
+        self.server_factory = sic.SICServerFactory()
+        self.server_factory.dict_received_signal.connect(self.on_dict_received)
+        self.listening = False
+ 
+    def start_listening(self):
+        if not self.listening:
+            reactor.listenTCP(self.port, self.server_factory)
+            self.listening = True
+        else:
+            print "Already listening"
 
+    def on_dict_received(self, protocol, d):
+        print "received", d
+        msg = d
+        addr = "secret"
+        conn = "what?"
+        self.app.on_server_rcv_command(self, (msg, addr, conn))
+
+class NewClient(object):
+    def __init__(self, app):
+        self.app = app
+        self.port = app.config.negotiation_port
+        self.host = None
+        self.client = None
+        
+    def connect(self, host, msg):
+        # FIXME: what to do with msg ???
+        self.host = host
+        self.client = sic.create_SIC_client(self.host, self.port).addCallback(self.on_connected, msg).addErrback(self.on_error)
+    
+    def send(self, msg):
+        """
+        @param msg: dict
+        """
+        if client is not None:
+            self.client.send_message(msg)
+        else:
+            print "Not connected" # FIXME
+    
+    def on_connected(self, result, message_to_send):
+        print "connected"
+        self.send(message_to_send)
+    
+    def on_error(self):
+        print "could not connect"
+        self.client = None
