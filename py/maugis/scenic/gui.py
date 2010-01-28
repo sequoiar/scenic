@@ -315,7 +315,7 @@ class Application(object):
                     num = 0
                 self.selection.select_path(num)
         text = _("<b><big>Delete this contact from the list?</big></b>\n\nAre you sure you want "
-                "to delete this contact from the list?")
+            "to delete this contact from the list?")
         self.show_confirm_dialog(text, on_confirm_result)
 
     def on_contact_edit_but_clicked(self, *args):
@@ -337,16 +337,19 @@ class Application(object):
         def when_valid_save():
             """ Saves contact info after it's been validated and then closes the window"""
             if ad_book.new_contact:
-                self.contact_tree.append(    ["<b>" + self.contact_name_entry.get_text()
-                                            + "</b>\n  IP: " + addr
-                                            + "\n  Port: " + port]  )
+                self.contact_tree.append([
+                    "<b>" + self.contact_name_entry.get_text()
+                    + "</b>\n  IP: " + addr
+                    + "\n  Port: " + port])
                 ad_book.contact_list.append({})
                 self.selection.select_path(len(ad_book.contact_list) - 1)
                 ad_book.contact = ad_book.contact_list[len(ad_book.contact_list) - 1]
                 ad_book.new_contact = False
             else:
-                self.contact_tree.set_value(self.selected_contact_row, 0, "<b>" + 
-                        self.contact_name_entry.get_text() + "</b>\n  IP: " + addr + "\n  Port: " + port)
+                self.contact_tree.set_value(
+                    self.selected_contact_row, 0, "<b>" + 
+                    self.contact_name_entry.get_text() + 
+                    "</b>\n  IP: " + addr + "\n  Port: " + port)
             ad_book.contact["name"] = self.contact_name_entry.get_text()
             ad_book.contact["address"] = addr
             ad_book.contact["port"] = int(port)
@@ -398,8 +401,8 @@ class Application(object):
         """ send button clicked will prompt via confirm dialog """
         def on_confirm_result(result):
             if result:
-                msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n\n"
-                msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n\n"
+                msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n"
+                msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n"
                 msg += "--- uname -a ---\n"
                 try:
                     w, r, err = os.popen3('uname -a')
@@ -411,7 +414,7 @@ class Application(object):
                     r.close()
                     err.close()
                 except:
-                    msg += "Error executing 'uname -a'\n\n"
+                    msg += "Error executing 'uname -a'\n"
                 msg += "--- lsmod ---\n"
                 try:
                     w, r, err = os.popen3('lsmod')
@@ -630,7 +633,6 @@ class Application(object):
         client = Client(self)
         client.connect(self.ad_book.contact["address"], msg)
 
-
 class ProcessManager(object):
     """
     PROCESS manager.
@@ -770,7 +772,6 @@ class Network(object):
     def close(self):
         self.sock.close()
 
-
 class Server(Network):
     def __init__(self, app):
         Network.__init__(self, app.config.negotiation_port)
@@ -814,7 +815,7 @@ class Client(Network):
         return False
 
     def send(self, msg):
-        if not len(msg)%self.buf_size:
+        if not len(msg) % self.buf_size:
             msg += " "
         try:
             self.sock.sendall(msg)
@@ -831,5 +832,3 @@ class Client(Network):
         msg = self.validate(buffer)
         self.app.on_client_rcv_command(self, msg)
         return False
-
-

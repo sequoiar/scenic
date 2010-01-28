@@ -19,12 +19,8 @@ except AttributeError:
 
 import types
 from twisted.internet import reactor
-from twisted.internet.protocol import Factory
-from twisted.internet.protocol import ClientCreator
-from twisted.internet.protocol import ClientFactory
-from twisted.internet.protocol import Protocol
+from twisted.internet import protocol
 from twisted.protocols import basic
-from twisted.python import log
 
 VERBOSE = False
 
@@ -82,7 +78,7 @@ class SICProtocol(basic.LineReceiver):
             data = json.dumps(d)
             self.transport.write(data + "\n")
 
-class SICServerFactory(Factory):
+class SICServerFactory(protocol.Factory):
     """
     Factory for SIC receivers.
     
@@ -106,15 +102,13 @@ def create_SIC_client(host, port, use_tcp=True):
     :return: deferred instance
     """
     if use_tcp:
-        deferred = ClientCreator(reactor, SICProtocol).connectTCP(host, port)
+        deferred = protocol.ClientCreator(reactor, SICProtocol).connectTCP(host, port)
     else:
-        deferred = ClientCreator(reactor, SICProtocol).connectUDP(host, port)
+        deferred = protocol.ClientCreator(reactor, SICProtocol).connectUDP(host, port)
     return deferred
 
 if __name__ == "__main__":
-    VERBOSE = True
-
-    def ping(protocol, d):
+    def on_ping(protocol, d):
         print "received ping", d
         reactor.stop()
 
@@ -126,11 +120,10 @@ if __name__ == "__main__":
         print "Error trying to connect.", failure
         reactor.stop()
         
+    VERBOSE = True
     PORT_NUMBER = 15555
-
     s = SICServerFactory()
-    s.register_handler("ping", ping)
+    s.register_handler("ping", on_ping)
     reactor.listenTCP(PORT_NUMBER, s)
-    
     create_SIC_client('localhost', PORT_NUMBER).addCallback(on_connected).addErrback(on_error)
     reactor.run()
