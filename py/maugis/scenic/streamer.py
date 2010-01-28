@@ -56,7 +56,7 @@ class ProcessManager(object):
         self.milhouse_recv_cmd = [
             self.config.streamer_command,
             '--receiver', 
-            '--address', host,
+            '--address', str(host),
             '--videosink', self.config.video_output,
             '--audiosink', self.config.audio_output,
             '--videocodec', self.config.video_codec,
@@ -86,7 +86,7 @@ class ProcessManager(object):
         self.milhouse_send_cmd = [
             self.config.streamer_command, 
             '--sender', 
-            '--address', host,
+            '--address', str(host),
             '--videosource', self.config.video_input,
             '--videocodec', self.config.video_codec,
             '--videobitrate', self.config.video_bitrate,
