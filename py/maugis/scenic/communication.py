@@ -36,6 +36,8 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
+
+
 class Network(object):
     def __init__(self, negotiation_port):
         self.buf_size = 1024
@@ -124,3 +126,5 @@ class Client(Network):
         msg = self.validate(buffer)
         self.app.on_client_rcv_command(self, msg)
         return False
+
+

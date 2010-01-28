@@ -21,18 +21,17 @@ import types
 from twisted.internet import reactor
 from twisted.internet import protocol
 from twisted.protocols import basic
-#from scenic import sig
+
+from scenic import sig
 
 VERBOSE = False
 
 class SICProtocol(basic.LineReceiver):
     """
     Receives and sends JSON lines.
+    Twisted add to it a factory attribute.
     """
-    #def connectionMade(self):
-    #    print "connection made", self.transport# , self.factory
     delimiter = '\n'
-    SELECTOR = "method"
 
     def lineReceived(self, data):
         """
@@ -45,24 +44,7 @@ class SICProtocol(basic.LineReceiver):
         except TypeError, e:
             print(str(e))
         else:
-            self.on_dict_received(d)
-    
-    def on_dict_received(self, d):
-        print "received", d
-        try:
-            selector = d[self.SELECTOR]
-        except KeyError, e:
-            print("Dict has not key %s" % (self.SELECTOR))
-        else:
-            if self.factory.callbacks.has_key(selector):
-                if VERBOSE:
-                    print "Calling :", selector, d
-                try:
-                    self.factory.callbacks[selector](self, d)
-                except TypeError, e:
-                    print "lineReceived():", e.message
-            else:
-                print "Invalid selector %s." % (selector)
+            self.factory.dict_received_signal(self, d)
 
     def send_message(self, d):
         """
@@ -74,8 +56,6 @@ class SICProtocol(basic.LineReceiver):
         if type(d) is not dict:
             raise TypeError("A dict is needed.")
         else:
-            if not d.has_key(self.SELECTOR):
-                raise RuntimeError("The key %s is needed" % (self.SELECTOR))
             data = json.dumps(d)
             self.transport.write(data + "\n")
 
@@ -88,30 +68,23 @@ class SICServerFactory(protocol.Factory):
     protocol = SICProtocol
     
     def __init__(self):
-        self.callbacks = {}
-
-    def register_handler(self, method, callback):
-        if type(callback) not in (types.FunctionType, types.MethodType):
-            raise TypeError("Callback '%s' is not callable" % repr(callback))    
-        self.callbacks[method] = callback
+        self.dict_received_signal = sig.Signal()
     
-def create_SIC_client(host, port, use_tcp=True):
+def create_SIC_client(host, port):
     """
     Creates a SIC sender.
 
     When connected, will call its callbacks with the sender instance.
     :return: deferred instance
     """
-    if use_tcp:
-        deferred = protocol.ClientCreator(reactor, SICProtocol).connectTCP(host, port)
-    else:
-        deferred = protocol.ClientCreator(reactor, SICProtocol).connectUDP(host, port)
+    deferred = protocol.ClientCreator(reactor, SICProtocol).connectTCP(host, port)
     return deferred
 
 if __name__ == "__main__":
-    def on_ping(protocol, d):
-        print "received ping", d
-        reactor.stop()
+    class Dummy(object):
+        def on_received(self, protocol, d):
+            print "received", d
+            reactor.stop()
 
     def on_connected(protocol):
         protocol.send_message({"method": "ping"})
@@ -124,7 +97,8 @@ if __name__ == "__main__":
     VERBOSE = True
     PORT_NUMBER = 15555
     s = SICServerFactory()
-    s.register_handler("ping", on_ping)
+    d = Dummy()
+    s.dict_received_signal.connect(d.on_received)
     reactor.listenTCP(PORT_NUMBER, s)
     create_SIC_client('localhost', PORT_NUMBER).addCallback(on_connected).addErrback(on_error)
     reactor.run()
