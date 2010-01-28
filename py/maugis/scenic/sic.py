@@ -21,6 +21,7 @@ import types
 from twisted.internet import reactor
 from twisted.internet import protocol
 from twisted.protocols import basic
+#from scenic import sig
 
 VERBOSE = False
 

@@ -171,7 +171,11 @@ class AddressBook(object):
                 else:
                     try:
                         print("Loading contact %s" % (line))
-                        self.contact_list.append(json.loads(line))
+                        d = json.loads(line)
+                        for k, v in d:
+                            if type(v) is unicode:
+                                v = str(v) # FIXME
+                        self.contact_list.append(d)
                     except Exception, e:
                         print str(e)
             ad_book_file.close()
