@@ -36,13 +36,8 @@ APP_NAME = "scenic"
 ### MODULES IMPORTS  ###
 
 import sys
-import signal
 import os
-import time
-import socket
 import smtplib
-import re
-import subprocess
 import scenic
 PACKAGE_DATA = os.path.dirname(scenic.__file__)
 try:
@@ -146,7 +141,7 @@ class Config(object):
                         v = str(v)
                     setattr(self, k, v)
                     print("Setting config %s = %s" % (k, v))
-                except Excepion, e:
+                except Exception, e:
                     print str(e)
         config_file.close()
 
@@ -633,7 +628,7 @@ class Application(object):
                 self.streamer_manager.start(client.host, bandwidth)
             elif answer == "refuse":
                 self.hide_contacting_window("refuse")
-            elif answ == "stopped":
+            elif answer == "stopped":
                 self.streamer_manager.stop()
             else:
                 self.hide_contacting_window("badAnsw")
