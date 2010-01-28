@@ -23,6 +23,9 @@
 Main of the application.
 """
 from optparse import OptionParser
+from twisted.internet import gtk2reactor
+gtk2reactor.install() # has to be done before importing reactor
+from twisted.internet import reactor
 
 try:
     import pygtk
@@ -43,4 +46,4 @@ def run():
             help="Run maugis in kiosk mode")
     (options, args) = parser.parse_args()
     app = gui.Application(kiosk=options.kiosk)
-    gtk.main()
+    reactor.run() #gtk.main()
