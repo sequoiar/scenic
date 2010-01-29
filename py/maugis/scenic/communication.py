@@ -162,7 +162,7 @@ class NewServer(object):
         self.received_command_signal.connect(app.on_server_rcv_command)
  
     def start_listening(self):
-        if not self.is_listening()
+        if not self.is_listening():
             self._port_obj = reactor.listenTCP(self.port, self.server_factory)
         else:
             print "Already listening"
