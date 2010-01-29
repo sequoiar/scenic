@@ -1,5 +1,5 @@
 include $(top_srcdir)/globals.mak 
-SUBDIRS = docs prism
+SUBDIRS = docs prism maugis
 DIST_SUBDIRS = miville maugis docs prism
 
 # Install my_script in $(bindir) and distribute it.
