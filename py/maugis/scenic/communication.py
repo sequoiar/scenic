@@ -152,17 +152,18 @@ class Client(Network):
 
 
 class NewServer(object):
-    def __init__(self, app):
-        self.app = app
-        self.port = self.app.config.negotiation_port
+    def __init__(self, app, negotiation_port):
+        self.port = negotiation_port
         self.server_factory = sic.SICServerFactory()
         self.server_factory.dict_received_signal.connect(self.on_dict_received)
-        self.listening = False
+        self._port_obj = None
+        
+        self.received_command_signal = sig.Signal()
+        self.received_command_signal.connect(app.on_server_rcv_command)
  
     def start_listening(self):
-        if not self.listening:
-            reactor.listenTCP(self.port, self.server_factory)
-            self.listening = True
+        if not self.is_listening()
+            self._port_obj = reactor.listenTCP(self.port, self.server_factory)
         else:
             print "Already listening"
 
@@ -171,36 +172,74 @@ class NewServer(object):
         msg = d
         addr = "secret"
         conn = "what?"
-        self.app.on_server_rcv_command(self, (msg, addr, conn))
+        self.received_command_signal(self, msg, addr, conn)
 
     def close(self): # TODO: important ! 
-        raise NotImplementedError("fixme")
+        if self.is_listening():
+            self._port_obj.stopListening()
+            self._port_obj = None
+        else:
+            print "no server to close"
+
+    def is_listening(self):
+        return self._port_obj is not None
+        
+        
 
 class NewClient(object):
-    def __init__(self, app):
-        self.app = app
-        self.port = app.config.negotiation_port
+    def __init__(self, app, negotiation_port):
+        self.port = negotiation_port
         self.host = None
         self.client = None
+        self._connected = False
+        
+        self.socket_error_signal = sig.Signal()
+        self.socket_error_signal.connect(app.on_client_socket_error)
+        self.connecting_signal = sig.Signal()
+        self.connecting_signal.connect(app.on_client_connecting)
+        self.received_command_signal = sig.Signal()
+        self.received_command_signal.connect(app.on_client_rcv_command)
+        # unused:
+        #self.socket_timeout_signal = sig.Signal()
+        #self.socket_timeout_signal.connect(app.on_client_socket_timeout)
         
     def connect(self, host, msg):
-        # FIXME: what to do with msg ???
-        self.host = host
-        self.client = sic.create_SIC_client(self.host, self.port).addCallback(self.on_connected, msg).addErrback(self.on_error)
+        """
+        Connects and sends an INVITE message
+        """
+        def _on_connected(result, message_to_send):
+            print "connected"
+            self._connected = True
+            self.send(message_to_send)
+        
+        def _on_error(reason):
+            print "could not connect"
+            self._connected = False
+            self.client = None
+            err = str(reason)
+            msg = "Could not send to remote host."
+            self.socket_error_signal(self, err, msg)
+        
+        if not self.is_connected():
+            self.connecting_signal(self)
+            self.host = host
+            self.client = sic.create_SIC_client(self.host, self.port).addCallback(_on_connected, msg).addErrback(_on_error)
+        else:
+            print "client already connected to some host"
+
+        #TODO: 
     
     def send(self, msg):
         """
         @param msg: dict
         """
-        if client is not None:
+        if self.is_connected():
             self.client.send_message(msg)
         else:
-            print "Not connected" # FIXME
+            msg = "Not connected. Client is None."
+            print msg
+            err = None
+            self.socket_error_signal(self, err, msg)
     
-    def on_connected(self, result, message_to_send):
-        print "connected"
-        self.send(message_to_send)
-    
-    def on_error(self):
-        print "could not connect"
-        self.client = None
+    def is_connected(self):
+        return self._connected
