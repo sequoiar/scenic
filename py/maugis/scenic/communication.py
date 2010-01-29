@@ -176,7 +176,7 @@ class NewServer(object):
             return defer.succeed(True) #FIXME
     
     def on_dict_received(self, protocol, d):
-        print "received", d
+        #print "received", d
         msg = d
         addr = "secret"
         conn = "what?"
@@ -223,7 +223,7 @@ class NewClient(object):
         @rettype: L{Deferred}
         """
         def _on_connected(proto):
-            print "connected"
+            #print "connected"
             self._connected = True
             self.sic_sender = proto
             return proto
@@ -253,6 +253,7 @@ class NewClient(object):
     def send(self, msg):
         """
         @param msg: dict
+        @rettype: None
         """
         if self.is_connected():
             self.sic_sender.send_message(msg)
@@ -266,6 +267,9 @@ class NewClient(object):
         return self._connected
 
     def disconnect(self):
+        """
+        @rettype: Deferred
+        """
         if self.is_connected():
             d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
             self._connected = False #FIXME

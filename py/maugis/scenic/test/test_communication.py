@@ -7,7 +7,7 @@ from scenic import communication
 from twisted.internet import reactor
 from twisted.internet import defer
 
-class Test_01_SIC(unittest.TestCase):
+class Test_01_SIC_Client_Server(unittest.TestCase):
     """
     Test the L{osc.Sender} and L{osc.Receiver} over UDP via localhost.
     """
@@ -36,7 +36,7 @@ class Test_01_SIC(unittest.TestCase):
         self.satisfaction_deferred.callback(True)
         return True
 
-    def testSingleMessage(self):
+    def test_single_message(self):
         msg = {"msg": "ping"}
         self.satisfaction_deferred = defer.Deferred()
         self._send(msg)
@@ -50,7 +50,8 @@ class DummyApp(object):
     def on_server_rcv_command(self, proto, d):
         pass
     def on_client_rcv_command(self, client, msg):
-        print "client received:", msg
+        #print "client received:", msg
+        pass
     def on_client_socket_timeout(self, client):
         pass
     def on_client_socket_error(self, client, err, msg):
@@ -69,7 +70,7 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
         self.client = communication.NewClient(app, PORT)
         d1 = self.server.start_listening()
         d2 = self.client.connect("localhost")
-        print "starting server...."
+        #print "starting server...."
         self.recv_deferred = None
         return defer.DeferredList([d1, d2])
         
@@ -78,7 +79,7 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
         self.recv_deferred.callback(True)
         return True
 
-    def test_client_server(self):
+    def test_single_message(self):
         #def _sent(result):
         #    return result
         self.recv_deferred = defer.Deferred()
@@ -89,5 +90,5 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
     def tearDown(self):
         d1 = self.server.close()
         d2 = self.client.disconnect()
-        print d2
+        #print d2
         return defer.DeferredList([d1, d2])
