@@ -36,12 +36,17 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
+from scenic import sig #TODO
+
 class Network(object):
     def __init__(self, negotiation_port):
         self.buf_size = 1024
         self.port = negotiation_port
     
-    def validate(self, msg):
+    def _validate(self, msg):
+        """
+        Parses binary data and return a dict or so.
+        """
         tmp_msg = msg.strip()
         msg = None
         if tmp_msg.startswith("{") and tmp_msg.endswith("}"):
@@ -54,10 +59,13 @@ class Network(object):
                 pass
         return msg
 
-    def recv(self, conn):
+    def _listen_for_data(self, conn):
+        """
+        @param conn: socket stuff
+        """
         data = conn.recv(self.buf_size)
         buffer = data
-        while len(data) == self.buf_size: # maybe we should recall handle_data on io_watch
+        while len(data) == self.buf_size: # maybe we should recall _handle_data on io_watch
             data = conn.recv(self.buf_size)
             buffer += data
         return buffer
@@ -76,13 +84,13 @@ class Server(Network):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.host, self.port))
         sock.listen(1)
-        gobject.io_add_watch(sock, gobject.IO_IN, self.handle_data)
+        gobject.io_add_watch(sock, gobject.IO_IN, self._handle_data)
         self.sock = sock
 
-    def handle_data(self, source, condition):
+    def _handle_data(self, source, condition):
         conn, addr = source.accept()
-        buffer = self.recv(conn)
-        msg = self.validate(buffer)
+        buffer = self._listen_for_data(conn)
+        msg = self._validate(buffer)
         self.app.on_server_rcv_command(self, (msg, addr, conn))
         return True
 
@@ -94,6 +102,10 @@ class Client(Network):
         self.sock.settimeout(10)
 
     def connect(self, host, msg):
+        """
+        @param host: ip
+        @param msg: sends it right now !!! (UDP)
+        """
         self.host = host
         try:
             self.sock.connect((host, self.port))
@@ -103,7 +115,7 @@ class Client(Network):
             self.app.on_client_socket_error(self, (err, msg))
         else:
             if self.send(msg):
-                self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self.handle_data)
+                self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self._handle_data)
         return False
 
     def send(self, msg):
@@ -118,12 +130,16 @@ class Client(Network):
             self.app.on_client_socket_error(self, (err, msg))
             return False
 
-    def handle_data(self, source, condition):
-        buffer = self.recv(source)
+    def _handle_data(self, source, condition):
+        buffer = self._listen_for_data(source)
         source.close()
-        msg = self.validate(buffer)
+        msg = self._validate(buffer)
         self.app.on_client_rcv_command(self, msg)
         return False
+
+
+
+
 
 class NewServer(object):
     def __init__(self, app):
