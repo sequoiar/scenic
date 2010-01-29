@@ -455,8 +455,8 @@ class Application(object):
         msg = {
             "msg":"INVITE",
             "sid":0, 
-            "videoport": self.config.videoport,
-            "audioport": self.config.audioport,
+            "videoport": self.config.video_port,
+            "audioport": self.config.audio_port,
             "please_send_to_port": self.config.negotiation_port
             }
         def _on_connected(proto):
@@ -623,7 +623,7 @@ class Application(object):
                 """
                 gobject.source_remove(self.rcv_watch)
                 if result:
-                    self.client.send({"msg":"ACCEPT", "videoport":self.config.videoport, "audioport":self.config.audioport, "sid":0})
+                    self.client.send({"msg":"ACCEPT", "videoport":self.config.video_port, "audioport":self.config.audio_port, "sid":0})
                 else:
                     self.client.send({"msg":"REFUSE", "sid":0})
 
