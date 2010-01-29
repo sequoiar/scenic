@@ -688,3 +688,9 @@ class Application(object):
         client = Client(self, self.config.negotiation_port)
         client.connect(self.ad_book.contact["address"], msg)
 
+# {"msg":"invite", "videoport":10000, "audioport":11000, "sid":0}
+# {"msg":"accept", "videoport":10000, "audioport":11000, "sid":0}
+# {"msg":"refuse", "sid":0}
+# {"msg":"ack", "sid":0}
+# {"msg":"bye", "sid":0}
+# {"msg":"ok", "sid":0}

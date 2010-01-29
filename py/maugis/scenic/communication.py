@@ -175,11 +175,11 @@ class NewServer(object):
             print "Already listening", "!!!!!!!!!!"  # FIXME
             return defer.succeed(True) #FIXME
     
-    def on_dict_received(self, protocol, d):
+    def on_dict_received(self, server_proto, d):
         #print "received", d
         msg = d
-        addr = "secret"
-        conn = "what?"
+        addr = server_proto.get_peer_ip()
+        conn = self #FIXME
         self.received_command_signal(msg, addr, conn)
 
     def close(self): # TODO: important ! 

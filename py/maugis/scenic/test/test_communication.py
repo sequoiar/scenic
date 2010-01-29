@@ -33,6 +33,7 @@ class Test_01_SIC_Client_Server(unittest.TestCase):
     def _on_received(self, server_protocol, msg):
         self.failUnlessEqual(msg, {"msg": "ping"})
         #print msg
+        ip = server_protocol.get_peer_ip()
         self.satisfaction_deferred.callback(True)
         return True
 

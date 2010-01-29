@@ -66,7 +66,14 @@ class SICProtocol(basic.LineReceiver):
         else:
             data = json.dumps(d)
             return self.transport.write(data + "\n")
-        
+    
+    def get_peer_ip(self):
+        try:
+            ip = self.transport.getPeer().host
+            return ip
+        except AttributeError:
+            print "not connected"
+            return None
 
 class ClientFactory(protocol.ClientFactory):
     protocol = SICProtocol
