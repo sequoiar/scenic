@@ -20,6 +20,7 @@ except AttributeError:
 import types
 from twisted.internet import reactor
 from twisted.internet import protocol
+from twisted.internet import defer
 from twisted.protocols import basic
 
 from scenic import sig
@@ -32,6 +33,11 @@ class SICProtocol(basic.LineReceiver):
     Twisted add to it a factory attribute.
     """
     delimiter = '\n'
+
+    def connectionMade(self):
+        if hasattr(self, "factory"):
+            if hasattr(self.factory, 'connected_deferred'):
+                self.factory.connected_deferred.callback(self)
 
     def lineReceived(self, data):
         """
@@ -57,7 +63,7 @@ class SICProtocol(basic.LineReceiver):
             raise TypeError("A dict is needed.")
         else:
             data = json.dumps(d)
-            self.transport.write(data + "\n")
+            return self.transport.write(data + "\n")
 
 class SICServerFactory(protocol.Factory):
     """
@@ -80,6 +86,18 @@ def create_SIC_client(host, port):
     deferred = protocol.ClientCreator(reactor, SICProtocol).connectTCP(host, port)
     return deferred
 
+
+# New stuff:
+class ClientFactory(protocol.ClientFactory):
+    protocol = SICProtocol
+    def __init__(self):
+        self.connected_deferred = defer.Deferred()
+
+class ServerFactory(protocol.ServerFactory):
+    protocol = SICProtocol
+    def __init__(self):
+        self.dict_received_signal = sig.Signal()
+
 if __name__ == "__main__":
     class Dummy(object):
         def on_received(self, protocol, d):
@@ -87,8 +105,9 @@ if __name__ == "__main__":
             reactor.stop()
 
     def on_connected(protocol):
-        protocol.send_message({"method": "ping"})
+        ret = protocol.send_message({"method": "ping"})
         print "sent ping"
+        return ret
 
     def on_error(failure):
         print "Error trying to connect.", failure

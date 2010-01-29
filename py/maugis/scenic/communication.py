@@ -225,11 +225,12 @@ class NewClient(object):
         if not self.is_connected():
             self.connecting_signal(self)
             self.host = host
-            self.client = sic.create_SIC_client(self.host, self.port).addCallback(_on_connected, msg).addErrback(_on_error)
+            deferred = sic.create_SIC_client(self.host, self.port).addCallback(_on_connected, msg).addErrback(_on_error)
+            return deferred
         else:
-            print "client already connected to some host"
-
-        #TODO: 
+            msg = "client already connected to some host"
+            print msg
+            #TODO: return failure?
     
     def send(self, msg):
         """
