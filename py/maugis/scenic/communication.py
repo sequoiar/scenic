@@ -74,8 +74,8 @@ class Network(object):
         self.sock.close()
 
 class Server(Network):
-    def __init__(self, app):
-        Network.__init__(self, app.config.negotiation_port)
+    def __init__(self, app, negotiation_port):
+        Network.__init__(self, negotiation_port)
         self.app = app
         self.host = ''
 
@@ -95,9 +95,18 @@ class Server(Network):
         return True
 
 class Client(Network):
-    def __init__(self, app):
-        Network.__init__(self, app.config.negotiation_port)
-        self.app = app
+    def __init__(self, app, negotiation_port):
+        Network.__init__(self, negotiation_port)
+        
+        self.socket_timeout_signal = sig.Signal()
+        self.socket_timeout_signal.connect(app.on_client_socket_timeout)
+        self.socket_error_signal = sig.Signal()
+        self.socket_error_signal.connect(app.on_client_socket_error)
+        self.connecting_signal = sig.Signal()
+        self.connecting_signal.connect(app.on_client_connecting)
+        self.received_command_signal = sig.Signal()
+        self.received_command_signal.connect(app.on_client_rcv_command)
+        
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.settimeout(10)
 
@@ -110,9 +119,9 @@ class Client(Network):
         try:
             self.sock.connect((host, self.port))
         except socket.timeout, err:
-            self.app.on_client_socket_timeout(self)
+            self.socket_timeout_signal(self)
         except socket.error, err:
-            self.app.on_client_socket_error(self, (err, msg))
+            self.socket_error_signal(self, err, msg)
         else:
             if self.send(msg):
                 self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self._handle_data)
@@ -123,21 +132,21 @@ class Client(Network):
             msg += " "
         try:
             self.sock.sendall(msg)
-            self.app.on_client_add_timeout(self)
+            self.connecting_signal(self)
             return True
         except socket.error, err:
-            self.app.on_client_add_timeout(self)
-            self.app.on_client_socket_error(self, (err, msg))
+            self.connecting_signal(self)
+            self.socket_error_signal(self, err, msg)
             return False
 
     def _handle_data(self, source, condition):
         buffer = self._listen_for_data(source)
         source.close()
         msg = self._validate(buffer)
-        self.app.on_client_rcv_command(self, msg)
+        self.received_command_signal(self, msg)
         return False
 
-
+# ------------------------------------ new stuf:
 
 
 
@@ -162,6 +171,9 @@ class NewServer(object):
         addr = "secret"
         conn = "what?"
         self.app.on_server_rcv_command(self, (msg, addr, conn))
+
+    def close(self): # TODO: important ! 
+        raise NotImplementedError("fixme")
 
 class NewClient(object):
     def __init__(self, app):

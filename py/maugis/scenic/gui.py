@@ -200,7 +200,7 @@ class Application(object):
         self.config = Config()
         self.ad_book = AddressBook()
         self.streamer_manager = ProcessManager(self)
-        self.server = Server(self)
+        self.server = Server(self, self.config.negotiation_port)
 
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
@@ -451,7 +451,7 @@ class Application(object):
     def on_client_join_but_clicked(self, *args):
         self.contacting_window.show()
         msg = json.dumps({"command":"ask", "port":self.ad_book.contact["port"], "bandwidth":self.config.bandwidth})
-        client = Client(self)
+        client = Client(self, self.config.negotiation_port)
         gobject.idle_add(client.connect, self.ad_book.contact["address"], msg)
 
     def on_net_conf_bw_combo_changed(self, *args):
@@ -481,8 +481,9 @@ class Application(object):
         else:
             self.config.negotiation_port = int(port)
             self.config._write()
+            # closes the server and opens a new one on the port number.
+            self.server = Server(self, self.config.negotiation_port) 
             self.server.close()
-            self.server = Server(self)
             self.server.start_listening()
 
     def show_error_dialog(self, text, callback=None):
@@ -635,14 +636,22 @@ class Application(object):
     def on_client_socket_timeout(self, client):
         self.hide_contacting_window("timeout")
     
-    def on_client_socket_error(self, client, (err, msg)):
+    def on_client_socket_error(self, client, err, msg):
         self.hide_contacting_window(msg)
         self.show_error_dialog(str(err) +": " +  str(msg))
 
-    def on_client_add_timeout(self, client):
+    def on_client_connecting(self, client):
+        """
+        Slot for the sending_signal of the client.
+        schedules some stuff.
+        """
+        # call later
         self.answ_watch = gobject.timeout_add(5000, self.client_answer_timeout, client)
 
-    def on_client_rcv_command(self, client, (msg)):
+    def on_client_rcv_command(self, client, msg):
+        """
+        Called when got message from negotiation listener.
+        """
         if(self.answ_watch):
             gobject.source_remove(self.answ_watch)
         if msg is not None and "answer" in msg:
@@ -676,6 +685,6 @@ class Application(object):
 
     def watch_milhouse_recv(self, (child, condition)):
         msg = json.dumps({"command":"stop"})
-        client = Client(self)
+        client = Client(self, self.config.negotiation_port)
         client.connect(self.ad_book.contact["address"], msg)
 
