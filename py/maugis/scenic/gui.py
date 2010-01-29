@@ -37,7 +37,6 @@ APP_NAME = "scenic"
 
 import sys
 import os
-import socket
 import smtplib
 import scenic
 PACKAGE_DATA = os.path.dirname(scenic.__file__)
@@ -70,8 +69,7 @@ gettext.textdomain(APP_NAME)
 gtk.glade.bindtextdomain(APP_NAME, DIR)
 gtk.glade.textdomain(APP_NAME)
 
-from scenic.communication import Server
-from scenic.communication import Client
+from scenic import communication
 from scenic.streamer import ProcessManager
 
 class Config(object):
@@ -200,7 +198,8 @@ class Application(object):
         self.config = Config()
         self.ad_book = AddressBook()
         self.streamer_manager = ProcessManager(self)
-        self.server = Server(self, self.config.negotiation_port)
+        self.server = communication.NewServer(self, self.config.negotiation_port)
+        self.client = None
 
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
@@ -449,10 +448,29 @@ class Application(object):
         self.show_confirm_dialog(text, on_confirm_result)
 
     def on_client_join_but_clicked(self, *args):
+        # XXX
+        """
+        Sends an INVITE to the remote peer.
+        """
+        msg = {
+            "msg":"INVITE",
+            "sid":0, 
+            "videoport": self.config.videoport,
+            "audioport": self.config.audioport,
+            "please_send_to_port": self.config.negotiation_port
+            }
+        def _on_connected(proto):
+            self.client.send(msg)
+            return proto
+        def _on_error(reason):
+            self.contacting_window.hide()
+            return reason
+            
+        self.client = communication.NewClient(self, self.ad_book.contact["port"])
+        deferred = client.connect(self.ad_book.contact["address"])
+        deferred.addCallback(_on_connected).addErrback(_on_error)
         self.contacting_window.show()
-        msg = json.dumps({"command":"ask", "port":self.ad_book.contact["port"], "bandwidth":self.config.bandwidth})
-        client = Client(self, self.config.negotiation_port)
-        gobject.idle_add(client.connect, self.ad_book.contact["address"], msg)
+        # window will be hidden when we receive ACCEPT or REFUSE
 
     def on_net_conf_bw_combo_changed(self, *args):
         base = 30
@@ -481,10 +499,8 @@ class Application(object):
         else:
             self.config.negotiation_port = int(port)
             self.config._write()
-            # closes the server and opens a new one on the port number.
-            self.server = Server(self, self.config.negotiation_port) 
-            self.server.close()
-            self.server.start_listening()
+
+            self.server.change_port(self.config.negotiation_port)
 
     def show_error_dialog(self, text, callback=None):
         def _deleted_cb(widget, event, callback):
@@ -518,7 +534,6 @@ class Application(object):
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
         self.confirm_label.set_label(text)
-        # TODO rename confirm dialog
         dialog = self.dialog
         dialog.set_modal(True)
         dialog.connect('response', _response_cb, callback)
@@ -538,13 +553,11 @@ class Application(object):
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
         self.contact_request_label.set_label(text)
-        # TODO rename confirm dialog
         dialog = self.contact_request_dialog
         dialog.set_modal(True)
         dialog.connect('response', _response_cb, callback)
         dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
-
 
     def hide_contacting_window(self, msg="", err=""):
         self.contacting_window.hide()
@@ -593,40 +606,53 @@ class Application(object):
             self.remove_contact.set_sensitive(False)
             self.contact_join_but.set_sensitive(False)
 
-    def on_server_rcv_command(self, server, msg, addr, conn):
-        if msg and "command" in msg:
-            cmd = msg["command"]
-            if cmd == "ask":
-                self.rcv_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr[0])
-                def on_contact_request_dialog_result(result):
-                    gobject.source_remove(self.rcv_watch)
-                    if result:
-                        if "bandwidth" in msg and self.config.bandwidth > msg["bandwidth"]:
-                            bandwidth = msg["bandwidth"]
-                        else:
-                            bandwidth = self.config.bandwidth
-                        conn.sendall(json.dumps({"answer":"accept", "bandwidth": bandwidth}))
-                        conn.close()
-                        self.streamer_manager.start(addr[0], bandwidth)
-                    else:
-                        try:
-                            conn.sendall(json.dumps({"answer":"refuse"}))
-                            conn.close()
-                        except socket.error, e:
-                            print "socket error:%s" % (str(e))
+    def on_server_rcv_command(self, message, addr, server):
+        # XXX
+        msg = message["msg"]
+        addr = server.get_peer_ip()
+        print "Got %s from %s" % (msg, addr)
+        
+        if msg == "INVITE":
+            # TODO
+            # if local user doesn't respond, close dialog in 5 seconds
+            
+            def on_contact_request_dialog_result(result):
+                """
+                User is accetping or declining an offer.
+                @param result: Answer to the dialog.
+                """
+                gobject.source_remove(self.rcv_watch)
+                if result:
+                    self.client.send({"msg":"ACCEPT", "videoport":self.config.videoport, "audioport":self.config.audioport, "sid":0})
+                else:
+                    self.client.send({"msg":"REFUSE", "sid":0})
 
-                text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
-                self.show_contact_request_dialog(text, on_contact_request_dialog_result)
-            elif cmd == "stop":
-                self.streamer_manager.stop()
-                conn.sendall(json.dumps({"answer":"stopped"}))
-                conn.close()
-            else:
-                conn.close()
-        else:
-            conn.close()
-
+            # TODO: if already streaming, answer REFUSE
+            send_to_port = message["please_send_to_port"]
+            self.client = communication.NewClient(self, send_to_port)
+            # user must respond in less than 5 seconds
+            self.rcv_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
+            text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
+            self.show_contact_request_dialog(text, on_contact_request_dialog_result)
+            # TODO: change our sending audio/video ports based on those remote told us
+            
+        elif msg == "ACCEPT":
+            # TODO: change our sending audio/video ports based on those remote told us
+            self.hide_contacting_window("accept")
+            self.client.send({"msg":"ACK", "sid":0})
+            self.streamer_manager.start(addr)
+        elif msg == "REFUSE":
+            self.hide_contacting_window("refuse")
+        elif msg == "ACK":
+            self.streamer_manager.start(addr)
+        elif msg == "BYE":
+            self.streamer_manager.stop()
+            self.client.send({"msg":"OK", "sid":0})
+        elif msg == "OK":
+            print "received ok. Everything has an end."
+            
     def server_answer_timeout(self, addr):
+        # XXX
         self.contact_request_dialog.response(gtk.RESPONSE_NONE)
         self.contact_request_dialog.hide()
         text = _("<b><big>%s was contacting you.</big></b>\n\nBut you did not answer in reasonable delay.") % addr
@@ -634,13 +660,16 @@ class Application(object):
         return False
 
     def on_client_socket_timeout(self, client):
+        # XXX
         self.hide_contacting_window("timeout")
     
     def on_client_socket_error(self, client, err, msg):
+        # XXX
         self.hide_contacting_window(msg)
         self.show_error_dialog(str(err) +": " +  str(msg))
 
     def on_client_connecting(self, client):
+        # XXX
         """
         Slot for the sending_signal of the client.
         schedules some stuff.
@@ -648,29 +677,8 @@ class Application(object):
         # call later
         self.answ_watch = gobject.timeout_add(5000, self.client_answer_timeout, client)
 
-    def on_client_rcv_command(self, client, msg):
-        """
-        Called when got message from negotiation listener.
-        """
-        if(self.answ_watch):
-            gobject.source_remove(self.answ_watch)
-        if msg is not None and "answer" in msg:
-            answer = msg["answer"]
-            if answer == "accept":
-                self.hide_contacting_window("accept")
-                if "bandwidth" in msg:
-                    bandwidth = msg["bandwidth"]
-                else:
-                    bandwidth = self.config.bandwidth
-                self.streamer_manager.start(client.host, bandwidth)
-            elif answer == "refuse":
-                self.hide_contacting_window("refuse")
-            elif answer == "stopped":
-                self.streamer_manager.stop()
-            else:
-                self.hide_contacting_window("badAnsw")
-
     def client_answer_timeout(self, client):
+        # XXX
         if (client.io_watch):
             gobject.source_remove(client.io_watch)
         if self.contacting_window.get_property('visible'):
@@ -683,14 +691,9 @@ class Application(object):
     def on_stop_milhouse_send(self):
         self.contact_join_but.set_sensitive(True)
 
-    def watch_milhouse_recv(self, (child, condition)):
-        msg = json.dumps({"command":"stop"})
-        client = Client(self, self.config.negotiation_port)
-        client.connect(self.ad_book.contact["address"], msg)
-
-# {"msg":"invite", "videoport":10000, "audioport":11000, "sid":0}
-# {"msg":"accept", "videoport":10000, "audioport":11000, "sid":0}
-# {"msg":"refuse", "sid":0}
-# {"msg":"ack", "sid":0}
-# {"msg":"bye", "sid":0}
-# {"msg":"ok", "sid":0}
+# {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
+# {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
+# {"msg":"REFUSE", "sid":0}
+# {"msg":"ACK", "sid":0}
+# {"msg":"BYE", "sid":0}
+# {"msg":"OK", "sid":0}

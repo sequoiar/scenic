@@ -182,6 +182,18 @@ class NewServer(object):
         conn = self #FIXME
         self.received_command_signal(msg, addr, conn)
 
+    def change_port(self, new_port):
+        """
+        Closes the server and starts it on an other port.
+       """
+        self.port = new_port
+        def _on_closed(result):
+            return self.start_listening()
+        
+        deferred = self.close()
+        deferred.addCallback(_on_closed)
+        return deferred
+
     def close(self): # TODO: important ! 
         if self.is_listening():
             def _cb(result):
@@ -211,8 +223,6 @@ class NewClient(object):
         self.socket_error_signal.connect(app.on_client_socket_error)
         self.connecting_signal = sig.Signal()
         self.connecting_signal.connect(app.on_client_connecting)
-        self.received_command_signal = sig.Signal()
-        self.received_command_signal.connect(app.on_client_rcv_command)
         # unused:
         #self.socket_timeout_signal = sig.Signal()
         #self.socket_timeout_signal.connect(app.on_client_socket_timeout)
