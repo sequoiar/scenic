@@ -467,7 +467,7 @@ class Application(object):
             return reason
             
         self.client = communication.NewClient(self, self.ad_book.contact["port"])
-        deferred = client.connect(self.ad_book.contact["address"])
+        deferred = self.client.connect(self.ad_book.contact["address"])
         deferred.addCallback(_on_connected).addErrback(_on_error)
         self.contacting_window.show()
         # window will be hidden when we receive ACCEPT or REFUSE
