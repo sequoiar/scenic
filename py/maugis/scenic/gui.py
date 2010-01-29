@@ -679,11 +679,8 @@ class Application(object):
 
     def client_answer_timeout(self, client):
         # XXX
-        if (client.io_watch):
-            gobject.source_remove(client.io_watch)
         if self.contacting_window.get_property('visible'):
             self.hide_contacting_window("answTimeout")
-        return False
     
     def on_start_milhouse_send(self):
         self.contact_join_but.set_sensitive(False)
