@@ -459,15 +459,19 @@ class Application(object):
             "audioport": self.config.audio_port,
             "please_send_to_port": self.config.negotiation_port
             }
+        port = self.config.negotiation_port # self.ad_book.contact["port"]
+        ip = self.ad_book.contact["address"]
+
         def _on_connected(proto):
             self.client.send(msg)
             return proto
         def _on_error(reason):
+            print "error trying to connect to %s:%s : %s" % (ip, port, reason)
             self.contacting_window.hide()
             return reason
             
-        self.client = communication.NewClient(self, self.ad_book.contact["port"])
-        deferred = self.client.connect(self.ad_book.contact["address"])
+        self.client = communication.NewClient(self, port)
+        deferred = self.client.connect(ip)
         deferred.addCallback(_on_connected).addErrback(_on_error)
         self.contacting_window.show()
         # window will be hidden when we receive ACCEPT or REFUSE
