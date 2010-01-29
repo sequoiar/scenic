@@ -65,29 +65,6 @@ class SICProtocol(basic.LineReceiver):
             data = json.dumps(d)
             return self.transport.write(data + "\n")
 
-class SICServerFactory(protocol.Factory):
-    """
-    Factory for SIC receivers.
-    
-    You should attach SIC methods callbacks to an instance of this.
-    """
-    protocol = SICProtocol
-    
-    def __init__(self):
-        self.dict_received_signal = sig.Signal()
-    
-def create_SIC_client(host, port):
-    """
-    Creates a SIC sender.
-
-    When connected, will call its callbacks with the sender instance.
-    :return: deferred instance
-    """
-    deferred = protocol.ClientCreator(reactor, SICProtocol).connectTCP(host, port)
-    return deferred
-
-
-# New stuff:
 class ClientFactory(protocol.ClientFactory):
     protocol = SICProtocol
     def __init__(self):
@@ -115,9 +92,12 @@ if __name__ == "__main__":
         
     VERBOSE = True
     PORT_NUMBER = 15555
-    s = SICServerFactory()
+    s = ServerFactory()
     d = Dummy()
     s.dict_received_signal.connect(d.on_received)
     reactor.listenTCP(PORT_NUMBER, s)
-    create_SIC_client('localhost', PORT_NUMBER).addCallback(on_connected).addErrback(on_error)
+
+    client_factory = ClientFactory()
+    clientPort = reactor.connectTCP("localhost", PORT_NUMBER, client_factory)
+    client_factory.connected_deferred.addCallback(on_connected)
     reactor.run()

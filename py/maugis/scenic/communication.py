@@ -156,7 +156,7 @@ class Client(Network):
 class NewServer(object):
     def __init__(self, app, negotiation_port):
         self.port = negotiation_port
-        self.server_factory = sic.SICServerFactory()
+        self.server_factory = sic.ServerFactory()
         self.server_factory.dict_received_signal.connect(self.on_dict_received)
         self._port_obj = None
         
@@ -225,7 +225,10 @@ class NewClient(object):
         if not self.is_connected():
             self.connecting_signal(self)
             self.host = host
-            deferred = sic.create_SIC_client(self.host, self.port).addCallback(_on_connected, msg).addErrback(_on_error)
+            self.client_factory = sic.ClientFactory()
+            self.clientPort = reactor.connectTCP(self.host, self.port, self.client_factory)
+            self.client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
+            #deferred = sic.create_SIC_client(self.host, self.port).addCallback(_on_connected, msg).addErrback(_on_error)
             return deferred
         else:
             msg = "client already connected to some host"
