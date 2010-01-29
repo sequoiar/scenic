@@ -71,7 +71,8 @@ class Network(object):
         return buffer
 
     def close(self):
-        self.sock.close()
+        if self.sock is not None:
+            self.sock.close()
 
 class Server(Network):
     def __init__(self, app, negotiation_port):
@@ -79,6 +80,7 @@ class Server(Network):
         self.received_command_signal = sig.Signal()
         self.received_command_signal.connect(app.on_server_rcv_command)
         self.host = ''
+        self.sock = None
 
     def start_listening(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
