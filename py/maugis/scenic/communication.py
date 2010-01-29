@@ -163,6 +163,7 @@ class NewServer(object):
         self.server_factory = sic.ServerFactory()
         self.server_factory.dict_received_signal.connect(self.on_dict_received)
         self._port_obj = None
+        self.remote_ip = None
         
         self.received_command_signal = sig.Signal()
         self.received_command_signal.connect(app.on_server_rcv_command)
@@ -179,6 +180,7 @@ class NewServer(object):
         #print "received", d
         msg = d
         addr = server_proto.get_peer_ip()
+        self.remote_ip = addr
         conn = self #FIXME
         self.received_command_signal(msg, addr, conn)
 
@@ -193,6 +195,9 @@ class NewServer(object):
         deferred = self.close()
         deferred.addCallback(_on_closed)
         return deferred
+
+    def get_peer_ip(self):
+        return self.remote_ip
 
     def close(self): # TODO: important ! 
         if self.is_listening():
@@ -259,7 +264,8 @@ class NewClient(object):
             print msg, "!!!!!!!!!!!!!!!"
             #TODO: return failure?
             return defer.succeed(True) # FIXME
-    
+   
+ 
     def send(self, msg):
         """
         @param msg: dict
