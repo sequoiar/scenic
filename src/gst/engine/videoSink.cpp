@@ -88,7 +88,7 @@ void GtkVideoSink::destroy_cb(GtkWidget * /*widget*/, gpointer data)
 
     LOG_DEBUG("Window closed, quitting.");
     GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
-    //context->pipeline_.quit();
+    context->pipeline_.quit();
     context->window_ = 0;
 }
 

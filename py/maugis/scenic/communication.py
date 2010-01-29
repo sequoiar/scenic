@@ -238,7 +238,7 @@ class NewClient(object):
         @rettype: L{Deferred}
         """
         def _on_connected(proto):
-            #print "connected"
+            print "connected"
             self._connected = True
             self.sic_sender = proto
             return proto
@@ -256,6 +256,8 @@ class NewClient(object):
             self.connecting_signal(self)
             self.host = host
             self.client_factory = sic.ClientFactory()
+            print 'trying to connect'
+            print self.host, self.port
             self.clientPort = reactor.connectTCP(self.host, self.port, self.client_factory)
             self.client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
             return self.client_factory.connected_deferred
