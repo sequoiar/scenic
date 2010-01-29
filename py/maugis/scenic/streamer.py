@@ -37,7 +37,7 @@ class ProcessManager(object):
         self.sender = None
         self.receiver = None
         
-    def start(self, host, bandwidth):
+    def start(self, host):
         # TODO: check if already streamers running.
         self.milhouse_recv_cmd = [
             self.config.streamer_command,
