@@ -198,6 +198,7 @@ class Application(object):
         self.config = Config()
         self.ad_book = AddressBook()
         self.streamer_manager = ProcessManager(self)
+        print "start server on %s" % (self.config.negotiation_port)
         self.server = communication.NewServer(self, self.config.negotiation_port)
         self.client = None
 
@@ -469,7 +470,8 @@ class Application(object):
             print "error trying to connect to %s:%s : %s" % (ip, port, reason)
             self.contacting_window.hide()
             return reason
-            
+           
+        print "sending %s to %s:%s" % (msg, ip, port) 
         self.client = communication.NewClient(self, port)
         deferred = self.client.connect(ip)
         deferred.addCallback(_on_connected).addErrback(_on_error)
