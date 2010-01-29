@@ -37,6 +37,7 @@ APP_NAME = "scenic"
 
 import sys
 import os
+import socket
 import smtplib
 import scenic
 PACKAGE_DATA = os.path.dirname(scenic.__file__)
@@ -485,38 +486,62 @@ class Application(object):
             self.server.start_listening()
 
     def show_error_dialog(self, text, callback=None):
-        def _cb(dialog, response_id, callback):
-            dialog.hide()
+        def _deleted_cb(widget, event, callback):
+            """ Act as if the user responded No, 
+            and do not propagate event """
+            widget.hide()
+            if callback is not None:
+                callback()
+            return True 
+        def _response_cb(widget, response_id, callback):
+            widget.hide()
             if callback is not None:
                 callback()
         self.contact_problem_label.set_label(text)
         dialog = self.contact_dialog
         dialog.set_modal(True)
-        dialog.connect('response', _cb, callback)
+        dialog.connect('response', _response_cb, callback)
+        dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
     
     def show_confirm_dialog(self, text, callback=None):
-        def _cb(dialog, response_id, callback):
-            dialog.hide()
+        def _deleted_cb(widget, event, callback):
+            """ Act as if the user responded No, 
+            and do not propagate event """
+            widget.hide()
+            if callback is not None:
+                callback(False)
+            return True 
+        def _response_cb(widget, response_id, callback):
+            widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
         self.confirm_label.set_label(text)
         # TODO rename confirm dialog
         dialog = self.dialog
         dialog.set_modal(True)
-        dialog.connect('response', _cb, callback)
+        dialog.connect('response', _response_cb, callback)
+        dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
 
     def show_contact_request_dialog(self, text, callback=None):
-        def _cb(dialog, response_id, callback):
-            dialog.hide()
+        def _deleted_cb(widget, event, callback):
+            """ Act as if the user responded No, 
+            and do not propagate event """
+            widget.hide()
+            if callback is not None:
+                callback(False)
+            return True 
+        def _response_cb(widget, response_id, callback):
+            widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
         self.contact_request_label.set_label(text)
         # TODO rename confirm dialog
         dialog = self.contact_request_dialog
         dialog.set_modal(True)
-        dialog.connect('response', _cb, callback)
+        dialog.connect('response', _response_cb, callback)
+        dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
 
 
@@ -583,8 +608,11 @@ class Application(object):
                         conn.close()
                         self.streamer_manager.start(addr[0], bandwidth)
                     else:
-                        conn.sendall(json.dumps({"answer":"refuse"}))
-                        conn.close()
+                        try:
+                            conn.sendall(json.dumps({"answer":"refuse"}))
+                            conn.close()
+                        except socket.error, e:
+                            print "socket error:%s" % (str(e))
 
                 text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
                 self.show_contact_request_dialog(text, on_contact_request_dialog_result)
