@@ -38,6 +38,8 @@ class SICProtocol(basic.LineReceiver):
         if hasattr(self, "factory"):
             if hasattr(self.factory, 'connected_deferred'):
                 self.factory.connected_deferred.callback(self)
+        else:
+            print "No connected_deferred"
 
     def lineReceived(self, data):
         """
@@ -64,6 +66,7 @@ class SICProtocol(basic.LineReceiver):
         else:
             data = json.dumps(d)
             return self.transport.write(data + "\n")
+        
 
 class ClientFactory(protocol.ClientFactory):
     protocol = SICProtocol
@@ -73,6 +76,7 @@ class ClientFactory(protocol.ClientFactory):
 class ServerFactory(protocol.ServerFactory):
     protocol = SICProtocol
     def __init__(self):
+        self.connected_deferred = defer.Deferred()
         self.dict_received_signal = sig.Signal()
 
 if __name__ == "__main__":

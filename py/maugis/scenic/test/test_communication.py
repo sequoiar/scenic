@@ -3,10 +3,11 @@
 
 from twisted.trial import unittest
 from scenic import sic
+from scenic import communication
 from twisted.internet import reactor
 from twisted.internet import defer
 
-class Test_01_TCPClientServer(unittest.TestCase):
+class Test_01_SIC(unittest.TestCase):
     """
     Test the L{osc.Sender} and L{osc.Receiver} over UDP via localhost.
     """
@@ -21,7 +22,7 @@ class Test_01_TCPClientServer(unittest.TestCase):
         self.satisfaction_deferred = None
         self.client_factory.connected_deferred.addCallback(self._on_client_connected)
         self.sender_proto = None
-        return self.client_factory.connected_deferred
+        return defer.DeferredList([self.client_factory.connected_deferred, self.server_factory.connected_deferred])
 
     def _on_client_connected(self, proto):
         self.sender_proto = proto
@@ -45,13 +46,48 @@ class Test_01_TCPClientServer(unittest.TestCase):
         self.clientPort.transport.loseConnection()
         return defer.DeferredList([self.serverPort.stopListening()])
 
- 
-class Test_Client_Server(unittest.TestCase):
-    def setUp(self):
+class DummyApp(object):
+    def on_server_rcv_command(self, proto, d):
+        pass
+    def on_client_rcv_command(self, client, msg):
+        print "client received:", msg
+    def on_client_socket_timeout(self, client):
+        pass
+    def on_client_socket_error(self, client, err, msg):
+        pass
+    def on_client_connecting(self, client):
+        pass
+    def client_answer_timeout(self, client):
         pass
 
+class Test_02_Scenic_Client_Server(unittest.TestCase):
+    def setUp(self):
+        PORT = 17474
+        app = DummyApp()
+        self.server = communication.NewServer(app, PORT)
+        self.server.received_command_signal.connect(self._on_received_command)
+        self.client = communication.NewClient(app, PORT)
+        d1 = self.server.start_listening()
+        d2 = self.client.connect("localhost")
+        print "starting server...."
+        self.recv_deferred = None
+        return defer.DeferredList([d1, d2])
+        
+    def _on_received_command(self, msg, addr, conn):
+        self.failUnlessEqual(msg, {"msg":"ping"})
+        self.recv_deferred.callback(True)
+        return True
+
     def test_client_server(self):
-        pass
+        #def _sent(result):
+        #    return result
+        self.recv_deferred = defer.Deferred()
+        self.client.send({"msg": "ping"})
+        #deferred.addCallback(_sent)
+        #return deferred
         
     def tearDown(self):
-        pass
+        d1 = self.server.close()
+        d2 = self.client.disconnect()
+        print d2
+        return defer.DeferredList([d1, d2])

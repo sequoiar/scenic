@@ -36,7 +36,11 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
-from scenic import sig #TODO
+from scenic import sig
+from scenic import sic
+from twisted.internet import reactor
+from twisted.internet import defer
+
 
 class Network(object):
     def __init__(self, negotiation_port):
@@ -94,7 +98,7 @@ class Server(Network):
         conn, addr = source.accept()
         buffer = self._listen_for_data(conn)
         msg = self._validate(buffer)
-        self.received_command_signal(self, msg, addr, conn)
+        self.received_command_signal(msg, addr, conn)
         return True
 
 class Client(Network):
@@ -146,7 +150,7 @@ class Client(Network):
         buffer = self._listen_for_data(source)
         source.close()
         msg = self._validate(buffer)
-        self.received_command_signal(self, msg)
+        self.received_command_signal(self, msg) # passing self
         return False
 
 # ------------------------------------ new stuf:
@@ -166,22 +170,29 @@ class NewServer(object):
     def start_listening(self):
         if not self.is_listening():
             self._port_obj = reactor.listenTCP(self.port, self.server_factory)
+            return self.server_factory.connected_deferred
         else:
-            print "Already listening"
-
+            print "Already listening", "!!!!!!!!!!"  # FIXME
+            return defer.succeed(True) #FIXME
+    
     def on_dict_received(self, protocol, d):
         print "received", d
         msg = d
         addr = "secret"
         conn = "what?"
-        self.received_command_signal(self, msg, addr, conn)
+        self.received_command_signal(msg, addr, conn)
 
     def close(self): # TODO: important ! 
         if self.is_listening():
-            self._port_obj.stopListening()
-            self._port_obj = None
+            def _cb(result):
+                self._port_obj = None
+                return result
+            d = self._port_obj.stopListening()
+            d.addCallback(_cb)
+            return d
         else:
             print "no server to close"
+            return defer.succeed(True) # FIXME!!!
 
     def is_listening(self):
         return self._port_obj is not None
@@ -192,7 +203,8 @@ class NewClient(object):
     def __init__(self, app, negotiation_port):
         self.port = negotiation_port
         self.host = None
-        self.client = None
+        self.sic_sender = None
+        self.clientPort = None
         self._connected = False
         
         self.socket_error_signal = sig.Signal()
@@ -205,42 +217,45 @@ class NewClient(object):
         #self.socket_timeout_signal = sig.Signal()
         #self.socket_timeout_signal.connect(app.on_client_socket_timeout)
         
-    def connect(self, host, msg):
+    def connect(self, host):
         """
         Connects and sends an INVITE message
+        @rettype: L{Deferred}
         """
-        def _on_connected(result, message_to_send):
+        def _on_connected(proto):
             print "connected"
             self._connected = True
-            self.send(message_to_send)
+            self.sic_sender = proto
+            return proto
         
         def _on_error(reason):
             print "could not connect"
             self._connected = False
-            self.client = None
+            self.sic_sender = None
             err = str(reason)
             msg = "Could not send to remote host."
             self.socket_error_signal(self, err, msg)
-        
+            return reason        
+
         if not self.is_connected():
             self.connecting_signal(self)
             self.host = host
             self.client_factory = sic.ClientFactory()
             self.clientPort = reactor.connectTCP(self.host, self.port, self.client_factory)
             self.client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
-            #deferred = sic.create_SIC_client(self.host, self.port).addCallback(_on_connected, msg).addErrback(_on_error)
-            return deferred
+            return self.client_factory.connected_deferred
         else:
             msg = "client already connected to some host"
-            print msg
+            print msg, "!!!!!!!!!!!!!!!"
             #TODO: return failure?
+            return defer.succeed(True) # FIXME
     
     def send(self, msg):
         """
         @param msg: dict
         """
         if self.is_connected():
-            self.client.send_message(msg)
+            self.sic_sender.send_message(msg)
         else:
             msg = "Not connected. Client is None."
             print msg
@@ -249,3 +264,16 @@ class NewClient(object):
     
     def is_connected(self):
         return self._connected
+
+    def disconnect(self):
+        if self.is_connected():
+            d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
+            self._connected = False #FIXME
+            self.sic_sender = None
+            #return d
+            return defer.succeed(True)
+        else:
+            msg = "Not connected. Client is None."
+            return defer.succeed(True) # FIXME
+            
+            
