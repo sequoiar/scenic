@@ -635,7 +635,9 @@ class Application(object):
 
             # TODO: if already streaming, answer REFUSE
             send_to_port = message["please_send_to_port"]
+            print "sending to %s:%s" % (addr, send_to_port)
             self.client = communication.NewClient(self, send_to_port)
+            self.client.connect(addr)
             # user must respond in less than 5 seconds
             self.rcv_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
             text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
