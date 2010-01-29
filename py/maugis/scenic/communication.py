@@ -76,7 +76,8 @@ class Network(object):
 class Server(Network):
     def __init__(self, app, negotiation_port):
         Network.__init__(self, negotiation_port)
-        self.app = app
+        self.received_command_signal = sig.Signal()
+        self.received_command_signal.connect(app.on_server_rcv_command)
         self.host = ''
 
     def start_listening(self):
@@ -91,7 +92,7 @@ class Server(Network):
         conn, addr = source.accept()
         buffer = self._listen_for_data(conn)
         msg = self._validate(buffer)
-        self.app.on_server_rcv_command(self, (msg, addr, conn))
+        self.received_command_signal(self, msg, addr, conn)
         return True
 
 class Client(Network):

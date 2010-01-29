@@ -593,7 +593,7 @@ class Application(object):
             self.remove_contact.set_sensitive(False)
             self.contact_join_but.set_sensitive(False)
 
-    def on_server_rcv_command(self, server, (msg, addr, conn)):
+    def on_server_rcv_command(self, server, msg, addr, conn):
         if msg and "command" in msg:
             cmd = msg["command"]
             if cmd == "ask":
