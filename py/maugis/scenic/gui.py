@@ -674,7 +674,8 @@ class Application(object):
             self.streamer_manager.start(addr, self.config)
         elif msg == "BYE":
             self.streamer_manager.stop()
-            self.client.send({"msg":"OK", "sid":0})
+            if self.client is not None:
+                self.client.send({"msg":"OK", "sid":0})
             self.disconnect_client()
         elif msg == "OK":
             print "received ok. Everything has an end."
@@ -684,15 +685,18 @@ class Application(object):
         Disconnects the SIC sender.
         @rettype: L{Deferred}
         """
-        d = defer.Deferred()
         def _cb(result, d1):
             self.client = None
             d1.callback(True)
         def _cl(d1):
             d2 = self.client.disconnect()
             d2.addCallback(_cb, d1)
-        reactor.callLater(0, _cl, d)
-        return d
+        if self.client is not None:
+            d = defer.Deferred()
+            reactor.callLater(0, _cl, d)
+            return d
+        else: 
+            return defer.succeed(True)
 
     def send_bye_and_disconnect(self):
         """
