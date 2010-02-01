@@ -84,6 +84,7 @@ from scenic import communication
 from scenic import process # just for constants
 from scenic.streamer import StreamerManager
 from twisted.internet import defer
+from twisted.internet import reactor
 
 class Config(object):
     """
