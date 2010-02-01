@@ -218,7 +218,7 @@ class Application(object):
         self._has_session = False
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed)
         print "Starting SIC server on port %s" % (self.config.negotiation_port)
-        self.server = communication.NewServer(self, self.config.negotiation_port)
+        self.server = communication.Server(self, self.config.negotiation_port)
         self.client = None
         self.got_bye = False
 
@@ -514,7 +514,7 @@ class Application(object):
             return reason
            
         print "sending %s to %s:%s" % (msg, ip, port) 
-        self.client = communication.NewClient(self, port)
+        self.client = communication.Client(self, port)
         deferred = self.client.connect(ip)
         deferred.addCallback(_on_connected).addErrback(_on_error)
         self.contacting_window.show()
@@ -677,7 +677,7 @@ class Application(object):
             # TODO: if already streaming, answer REFUSE
             send_to_port = message["please_send_to_port"]
             print "sending to %s:%s" % (addr, send_to_port)
-            self.client = communication.NewClient(self, send_to_port)
+            self.client = communication.Client(self, send_to_port)
             self.client.connect(addr)
             # user must respond in less than 5 seconds
             server_answer_timeout_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)

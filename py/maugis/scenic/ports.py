@@ -51,6 +51,7 @@ class PortsAllocator(object):
         :param port: int
         Raises a PortsAllocatorError if port is not available.
         """
+        #TODO: return bool
         # Set the socket parameters
         host = 'localhost'
         addr = (host, port)

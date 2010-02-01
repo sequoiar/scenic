@@ -41,8 +41,7 @@ from scenic import sic
 from twisted.internet import reactor
 from twisted.internet import defer
 
-
-class NewServer(object):
+class Server(object):
     """
     TCP receiver
     """
@@ -104,7 +103,7 @@ class NewServer(object):
         
         
 
-class NewClient(object):
+class Client(object):
     """
     TCP sender
     """
@@ -116,9 +115,9 @@ class NewClient(object):
         self._connected = False
         
         self.socket_error_signal = sig.Signal()
-        self.socket_error_signal.connect(app.on_client_socket_error)
+        self.socket_error_signal.connect(app.on_client_socket_error) # TODO
         self.connecting_signal = sig.Signal()
-        self.connecting_signal.connect(app.on_client_connecting)
+        self.connecting_signal.connect(app.on_client_connecting) # TODO
         # unused:
         #self.socket_timeout_signal = sig.Signal()
         #self.socket_timeout_signal.connect(app.on_client_socket_timeout)
