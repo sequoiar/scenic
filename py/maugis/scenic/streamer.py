@@ -95,19 +95,20 @@ class StreamerManager(object):
             # As soon as one is running, set our state to running
             if self.state == process.STATE_STARTING:
                 self._set_state(process.STATE_RUNNING)
-        if new_state == process.STATE_STOPPED:
+        elif new_state == process.STATE_STOPPED:
             # As soon as one crashes or is not able to start, stop all streamer processes.
             if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
                 print("A streamer process died. Stopping the local streamer manager.")
-                self.stop()
-            # If all streamers are dead, we can say this manager is stopped
-            one_is_left = False
-            for proc in [self.sender, self.receiver]:
-                if process_manager is not proc and proc.state != process.STATE_STOPPED:
-                    print("Streamer process %s is not dead, so we are not done stopping" % (proc))
-                    one_is_left = True
-            if not one_is_left:
-                self._set_state(process.STATE_STOPPED)
+                self.stop() # sets self.state to STOPPING
+            # Next, if all streamers are dead, we can say this manager is stopped
+            if self.state == process.STATE_STOPPING:
+                one_is_left = False
+                for proc in [self.sender, self.receiver]:
+                    if process_manager is not proc and proc.state != process.STATE_STOPPED:
+                        print("Streamer process %s is not dead, so we are not done stopping. Its state is %s." % (proc, proc.state))
+                        one_is_left = True
+                if not one_is_left:
+                    self._set_state(process.STATE_STOPPED)
     
     def _set_state(self, new_state):
         """
@@ -125,7 +126,7 @@ class StreamerManager(object):
         # stopping
         if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
             self._set_state(process.STATE_STOPPING)
-            if self.sender is not None:
-                self.sender.stop()
-            if self.receiver is not None:
-                self.receiver.stop()
+            for proc in [self.sender, self.receiver]:
+                if proc is not None:
+                    if proc.state != process.STATE_STOPPED:
+                        proc.stop()
