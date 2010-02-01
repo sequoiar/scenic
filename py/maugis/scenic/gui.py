@@ -22,12 +22,23 @@
 """
 Scenic GTK GUI.
 
-- voir si il faut gerer une demande de connexion alors que c'est deja connecte
-- voir si le bouton "cancel" est necesaire dans la fenetre "contacting" :
-    - si oui il faudra trouver un moyen de faire la connection sans bloquer l'interface
-    (thread, idle gtk ou io_watch?)
-- en prod regler test a 0
-- bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
+Negotiation is done as follow:
+------------------------------
+ * {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
+ * {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
+ * {"msg":"REFUSE", "sid":0}
+ * {"msg":"ACK", "sid":0}
+ * {"msg":"BYE", "sid":0}
+ * {"msg":"OK", "sid":0}
+
+Former Notes
+------------
+ * voir si il faut gerer une demande de connexion alors que c'est deja connecte
+ * voir si le bouton "cancel" est necesaire dans la fenetre "contacting" :
+ *   - si oui il faudra trouver un moyen de faire la connection sans bloquer l'interface
+ *   (thread, idle gtk ou io_watch?)
+ * en prod regler test a 0
+ * bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
 ### CONSTANTS ###
 __version__ = "0.1.0"
@@ -38,8 +49,8 @@ APP_NAME = "scenic"
 import sys
 import os
 import smtplib
-import scenic
-PACKAGE_DATA = os.path.dirname(scenic.__file__)
+from scenic import data
+PACKAGE_DATA = os.path.dirname(data.__file__)
 try:
     import gtk
     import gtk.glade
@@ -154,15 +165,15 @@ class AddressBook(object):
         self.contact_list = []
         self.selected = 0
         #FIXME: do not hard code
-        self.ad_book_name = os.path.join(os.environ['HOME'], '.maugis/contacts.json')
-        self.SELECTED_KEYNAME = "selected:"
+        self.contacts_file_name = os.path.join(os.environ['HOME'], '.maugis/contacts.json')
+        self.SELECTED_KEYNAME = "selected:" # FIXME
         self.read()
 
     def read(self):
         print("Loading addressbook.")
-        if os.path.isfile(self.ad_book_name):
+        if os.path.isfile(self.contacts_file_name):
             self.contact_list = []
-            ad_book_file = file(self.ad_book_name, "r")
+            ad_book_file = file(self.contacts_file_name, "r")
             kw_len = len(self.SELECTED_KEYNAME)
             for line in ad_book_file:
                 if line[:kw_len] == self.SELECTED_KEYNAME:
@@ -181,9 +192,9 @@ class AddressBook(object):
             ad_book_file.close()
 
     def write(self):
-        if ((os.path.isfile(self.ad_book_name)) or (len(self.contact_list) > 0)):
+        if ((os.path.isfile(self.contacts_file_name)) or (len(self.contact_list) > 0)):
             try:
-                ad_book_file = file(self.ad_book_name, "w")
+                ad_book_file = file(self.contacts_file_name, "w")
                 for contact in self.contact_list:
                     ad_book_file.write(json.dumps(contact) + "\n")
                 if self.selected:
@@ -700,9 +711,3 @@ class Application(object):
     def on_stop_milhouse_send(self):
         self.contact_join_but.set_sensitive(True)
 
-# {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
-# {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
-# {"msg":"REFUSE", "sid":0}
-# {"msg":"ACK", "sid":0}
-# {"msg":"BYE", "sid":0}
-# {"msg":"OK", "sid":0}
