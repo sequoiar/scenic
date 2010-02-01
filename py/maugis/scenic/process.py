@@ -41,12 +41,12 @@ class ProcessIO(protocol.ProcessProtocol):
     def outReceived(self, data):
         for line in data.splitlines():
             if line != "":
-                print line
+                print self.manager.identifier, line
 
     def errReceived(self, data):
         for line in data.splitlines().strip():
             if line != "":
-                print line
+                print self.manager.identifier, line
 
     def processEnded(self, reason):
         exit_code = reason.value.exitCode
@@ -155,7 +155,7 @@ class ProcessManager(object):
         def _later_check(pid):
             if self.pid == pid:
                 if self.state in [STATE_STOPPING]:
-                    msg = "Child process not dead."
+                    msg = "Child process %s not dead." % (self.identifier)
                     print msg
                     self.stop() # KILL
                 elif self.state in [STATE_STOPPED]:
@@ -181,11 +181,11 @@ class ProcessManager(object):
             try:
                 self._process_transport.signalProcess(signal_to_send)
             except OSError, e:
-                msg = "Error sending signal %s. %s" % (signal_to_send, e)
+                msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
                 print msg # raise?
             except error.ProcessExitedAlready:
                 if signal_to_send == signal.SIGTERM:
-                    msg = "Process had already exited while trying to send signal %s." % (signal_to_send)
+                    msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, signal_to_send)
                     print msg # raise ?
             else:
                 if signal_to_send == signal.SIGTERM:

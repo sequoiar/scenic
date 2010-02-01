@@ -42,6 +42,7 @@ class StreamerManager(object):
         
     def start(self, host, config):
         """
+            self.stop_streamers()
         Starts the sender and receiver processes.
         @param host: str ip addr
         @param config: gui.Config object
@@ -51,7 +52,7 @@ class StreamerManager(object):
             # FIXME: catch this and run ;-)
         
         self.milhouse_recv_cmd = [
-            config.streamer_command,
+            "milhouse",
             '--receiver', 
             '--address', str(host),
             '--videosink', config.video_output,
@@ -62,7 +63,7 @@ class StreamerManager(object):
             '--audioport', str(config.recv_audio_port) 
             ]
         self.milhouse_send_cmd = [
-            config.streamer_command, 
+            "milhouse", 
             '--sender', 
             '--address', str(host),
             '--videosource', config.video_input,
@@ -89,6 +90,7 @@ class StreamerManager(object):
     def on_process_state_changed(self, process_manager, new_state):
         """
         Slot for the ProcessManager.state_changed_signal
+        Calls stop() if one of the processes crashed.
         """
         print process_manager, new_state
         if new_state == process.STATE_RUNNING:

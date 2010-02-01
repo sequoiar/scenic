@@ -92,7 +92,6 @@ class Config(object):
     """
     # Default values
     negotiation_port = 17446 # sending/receiving TCP messages on it.
-    streamer_command = "milhouse"
     smtpserver = "smtp.sat.qc.ca"
     emailinfo = "maugis@sat.qc.ca"
     audio_input = "jackaudiosrc"
@@ -209,11 +208,13 @@ class AddressBook(object):
 class Application(object):
     """
     Main application (arguably God) class
+     * Contains the main GTK window
     """
     def __init__(self, kiosk_mode=False):
         self.config = Config()
         self.ad_book = AddressBook()
         self.streamer_manager = StreamerManager(self)
+        self._has_session = False
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed)
         print "Starting SIC server on port %s" % (self.config.negotiation_port)
         self.server = communication.NewServer(self, self.config.negotiation_port)
@@ -291,7 +292,7 @@ class Application(object):
     def on_main_window_destroy(self, *args):
         self.server.close()
         self.ad_book.write()
-        self.streamer_manager.stop()
+        self.stop_streamers()
         gtk.main_quit()
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
@@ -464,6 +465,12 @@ class Application(object):
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
         self.show_confirm_dialog(text, on_confirm_result)
 
+    def has_session(self):
+        """
+        @rettype: bool
+        """
+        return self._has_session
+        
     def on_client_join_but_clicked(self, *args):
         # XXX
         """
@@ -678,18 +685,19 @@ class Application(object):
                 self.config.send_audio_port = message["audioport"]
                 self.client.send({"msg":"ACK", "sid":0})
                 print("Got ACCEPT. Starting streamers as initiator.")
-                self.streamer_manager.start(addr, self.config)
+                self.start_streamers(addr)
             else:
                 print("Error ! Connection lost.") # FIXME
         elif msg == "REFUSE":
             self.hide_contacting_window("refuse")
         elif msg == "ACK":
             print("Got ACK. Starting streamers as answerer.")
-            self.streamer_manager.start(addr, self.config)
+            self.start_streamers(addr)
         elif msg == "BYE":
             self.got_bye = True
-            self.streamer_manager.stop()
+            self.stop_streamers()
             if self.client is not None:
+                print 'disconnecting client and sending BYE'
                 self.client.send({"msg":"OK", "sid":0})
                 self.disconnect_client()
         elif msg == "OK":
@@ -698,6 +706,20 @@ class Application(object):
                 print 'disconnecting client'
                 self.disconnect_client()
 
+    def start_streamers(self, addr):
+        self._has_session = True
+        self.streamer_manager.start(addr, self.config)
+
+    def stop_streamers(self):
+        self.streamer_manager.stop()
+
+    def on_streamers_stopped(self, addr):
+        """
+        We call this when all streamers are stopped.
+        """
+        print "on_streamers_stopped got called"
+        self._has_session = False
+        
     def disconnect_client(self):
         """
         Disconnects the SIC sender.
@@ -724,14 +746,15 @@ class Application(object):
         Sends BYE
         BYE stops the streaming on the remote host.
         """
-        self.client.send({"msg":"BYE"})
+        if self.client is not None:
+            self.client.send({"msg":"BYE", "sid":0})
 
     def on_streamer_state_changed(self, streamer, new_state):
         """
         Slot for scenic.streamer.StreamerManager.state_changed_signal
         """
-        if new_state in [process.STATE_STOPPING, process.STATE_STOPPED]:
-            if not self.got_bye and self.client is not None:
+        if new_state in [process.STATE_STOPPED]:
+            if not self.got_bye:
                 """ got_bye means our peer told us to stop """
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
@@ -767,10 +790,11 @@ class Application(object):
         if self.contacting_window.get_property('visible'):
             self.hide_contacting_window("answTimeout")
     
-    def on_start_milhouse_send(self):
-        self.contact_join_but.set_sensitive(False)
+#    def on_start_milhouse_send(self):
+#        self.contact_join_but.set_sensitive(False)
+#
+#    def on_stop_milhouse_send(self):
+#        # FIXME: what is that ?
+#        self.contact_join_but.set_sensitive(True)
 
-    def on_stop_milhouse_send(self):
-        # FIXME: what is that ?
-        self.contact_join_but.set_sensitive(True)
 
