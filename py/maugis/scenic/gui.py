@@ -84,6 +84,7 @@ from scenic import communication
 from scenic import process # just for constants
 from scenic.streamer import StreamerManager
 from twisted.internet import defer
+from twisted.internet import error
 from twisted.internet import reactor
 
 class Config(object):
@@ -287,13 +288,27 @@ class Application(object):
 
         self.main_window.show()
 
-        self.server.start_listening()
+        try:
+            self.server.start_listening()
+        except error.CannotListenError, e:
+            print("Cannot start SIC server.")
+            print str(e)
+            raise
+        reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
         
-    def on_main_window_destroy(self, *args):
+    def before_shutdown(self):
+        print("The application is shutting down.")
+        # TODO: stop streamers
+        if self.client is not None:
+            if not self.got_bye:
+                self.send_bye()
+                self.stop_streamers()
+            self.disconnect_client()
         self.server.close()
         self.ad_book.write()
-        self.stop_streamers()
-        gtk.main_quit()
+        
+    def on_main_window_destroy(self, *args):
+        pass # all done in before_shutdown above
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         tab = widget.get_nth_page(page_number)
