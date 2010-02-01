@@ -677,14 +677,14 @@ class Application(object):
                 self.config.send_video_port = message["videoport"]
                 self.config.send_audio_port = message["audioport"]
                 self.client.send({"msg":"ACK", "sid":0})
-                print "Gor ACCEPT. Starting streamers as initiator.")
+                print("Got ACCEPT. Starting streamers as initiator.")
                 self.streamer_manager.start(addr, self.config)
             else:
                 print("Error ! Connection lost.") # FIXME
         elif msg == "REFUSE":
             self.hide_contacting_window("refuse")
         elif msg == "ACK":
-            print "Got ACK. Starting streamers as answerer.")
+            print("Got ACK. Starting streamers as answerer.")
             self.streamer_manager.start(addr, self.config)
         elif msg == "BYE":
             self.got_bye = True
