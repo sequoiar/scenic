@@ -123,7 +123,9 @@ class StreamerManager(object):
         """
         if self.state != new_state:
             self.state_changed_signal(self, new_state)
-        self.state = new_state
+            self.state = new_state
+        else:
+            raise RuntimeError("Setting state to %s, which is already the current state." % (self.state))
             
     def stop(self):
         """
