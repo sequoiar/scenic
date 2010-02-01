@@ -26,6 +26,7 @@ from optparse import OptionParser
 from twisted.internet import gtk2reactor
 gtk2reactor.install() # has to be done before importing reactor
 from twisted.internet import reactor
+from twisted.internet import error
 
 try:
     import pygtk
@@ -45,5 +46,13 @@ def run():
     parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
             help="Run maugis in kiosk mode")
     (options, args) = parser.parse_args()
-    app = gui.Application(kiosk_mode=options.kiosk)
-    reactor.run() #gtk.main()
+    try:
+        app = gui.Application(kiosk_mode=options.kiosk)
+    except error.CannorListenError, e:
+        print("There must be an other Scenic running.")
+        print(str(e))
+    else:
+        try:
+            reactor.run()
+        except KeyboardInterrupt:
+            pass
