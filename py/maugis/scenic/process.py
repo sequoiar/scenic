@@ -231,3 +231,6 @@ class ProcessManager(object):
         else:
             self.log("State is same as before: %s" % (new_state))
         self.state = new_state
+
+    def __str__(self):
+        return "%s %s" % (self.identifier, id(self))

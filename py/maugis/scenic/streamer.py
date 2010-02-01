@@ -100,9 +100,11 @@ class StreamerManager(object):
             if self.state == process.STATE_RUNNING:
                 print("A streamer process died. Stopping the local streamer manager.")
                 self.stop()
+            # If all streamers are dead, we can say this manager is stopped
             one_is_left = False
             for proc in [self.sender, self.receiver]:
-                if proc.state != process.STATE_STOPPED:
+                if process_manager is not proc and proc.state != process.STATE_STOPPED:
+                    print("Streamer process %s is not dead, so we are not done stopping" % (proc))
                     one_is_left = True
             if not one_is_left:
                 self._set_state(process.STATE_STOPPED)
