@@ -154,11 +154,18 @@ class ProcessManager(object):
         """
         def _later_check(pid):
             if self.pid == pid:
-                if self.state in [STATE_STOPPING]:
+                if self.state == STATE_STOPPING:
                     msg = "Child process %s not dead." % (self.identifier)
                     print msg
-                    self.stop() # KILL
-                elif self.state in [STATE_STOPPED]:
+                    try:
+                        self._process_transport.signalProcess(signal.SIGKILL)
+                    except OSError, e:
+                        msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
+                        print msg # raise?
+                    except error.ProcessExitedAlready:
+                        msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, "SIGKILL")
+                        print msg # raise ?
+                elif self.state == STATE_STOPPED:
                     msg = "Successfully killed process after least than the %f seconds. State is %s." % (self.time_before_sigkill, self.state)
                     self.log(msg)
             self._delayed_kill = None
