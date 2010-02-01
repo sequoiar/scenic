@@ -755,7 +755,7 @@ class Application(object):
         """
         if new_state in [process.STATE_STOPPED]:
             if not self.got_bye:
-                """ got_bye means our peer told us to stop """
+                """ got_bye means our peer sent us a BYE, so we shouldn't send one back """
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             

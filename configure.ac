@@ -118,28 +118,6 @@ AX_BOOST_ASIO
 AX_BOOST_DATE_TIME
 AX_BOOST_FILESYSTEM
 AX_BOOST_UNIT_TEST_FRAMEWORK
-if test "x$with_boost_python" != "x" ; then 
-    AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
-    if test "x$with_boost_python" = "xyes" ; then
-        with_boost_python=no
-    fi
-    LDFLAGS_SAVE=$LDFLAGS
-    LDFLAGS=-l$PYTHON_LIB $LDFLAGS
-    AX_BOOST_PYTHON
-    if test "x$BOOST_PYTHON_LIB" = "x" ; then
-    	if test "x$with_boost_python" = "xno" ; then
-           with_boost_python=mt
-	else
-	   with_boost_python=$with_boost_python-mt
-	fi
-	AX_BOOST_PYTHON
-    fi
-    LDFLAGS=$LDFLAGS_SAVE
-fi
-
-
-
-AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
 
 AX_CHECK_GL
 AX_CHECK_GLU
