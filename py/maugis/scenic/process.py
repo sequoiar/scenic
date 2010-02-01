@@ -41,12 +41,12 @@ class ProcessIO(protocol.ProcessProtocol):
     def outReceived(self, data):
         for line in data.splitlines():
             if line != "":
-                print self.manager.identifier, line
+                print "%9s stdout: %s" % (self.manager.identifier, line)
 
     def errReceived(self, data):
         for line in data.splitlines().strip():
             if line != "":
-                print self.manager.identifier, line
+                print "%9s stderr: %s" % (self.manager.identifier, line)
 
     def processEnded(self, reason):
         exit_code = reason.value.exitCode
@@ -197,7 +197,7 @@ class ProcessManager(object):
         (through stdout)
         """
         if level >= self.log_level:
-            print msg
+            print "%9s process: %s" % (self.identifier, msg)
 
     def _on_process_ended(self, exit_code):
         self._child_running_time = time.time() - self._time_child_started

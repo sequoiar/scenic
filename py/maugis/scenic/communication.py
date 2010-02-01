@@ -65,7 +65,7 @@ class NewServer(object):
             return defer.succeed(True) #FIXME
     
     def on_dict_received(self, server_proto, d):
-        #print "received", d
+        print "Communication: received", d
         msg = d
         addr = server_proto.get_peer_ip()
         self.remote_ip = addr

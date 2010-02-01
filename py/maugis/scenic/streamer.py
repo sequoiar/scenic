@@ -87,17 +87,21 @@ class StreamerManager(object):
         print "$", recv_cmd
         self.receiver.start()
 
-    def on_process_state_changed(self, process_manager, new_state):
+    def on_process_state_changed(self, process_manager, process_state):
         """
         Slot for the ProcessManager.state_changed_signal
         Calls stop() if one of the processes crashed.
         """
-        print process_manager, new_state
-        if new_state == process.STATE_RUNNING:
+        print process_manager, process_state
+        if process_state == process.STATE_RUNNING:
             # As soon as one is running, set our state to running
             if self.state == process.STATE_STARTING:
                 self._set_state(process.STATE_RUNNING)
-        elif new_state == process.STATE_STOPPED:
+        elif process_state == process.STATE_STOPPING:
+            pass
+        elif process_state == process.STATE_STARTING:
+            pass
+        elif process_state == process.STATE_STOPPED:
             # As soon as one crashes or is not able to start, stop all streamer processes.
             if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
                 print("A streamer process died. Stopping the local streamer manager.")
@@ -110,6 +114,7 @@ class StreamerManager(object):
                         print("Streamer process %s is not dead, so we are not done stopping. Its state is %s." % (proc, proc.state))
                         one_is_left = True
                 if not one_is_left:
+                    print "Setting streamers manager to STOPPED"
                     self._set_state(process.STATE_STOPPED)
     
     def _set_state(self, new_state):
@@ -130,5 +135,5 @@ class StreamerManager(object):
             self._set_state(process.STATE_STOPPING)
             for proc in [self.sender, self.receiver]:
                 if proc is not None:
-                    if proc.state != process.STATE_STOPPED:
+                    if proc.state != process.STATE_STOPPED and proc.state != process.STATE_STOPPING:
                         proc.stop()
