@@ -699,8 +699,11 @@ class Application(object):
             self.client = None
             d1.callback(True)
         def _cl(d1):
-            d2 = self.client.disconnect()
-            d2.addCallback(_cb, d1)
+            if self.client is not None:
+                d2 = self.client.disconnect()
+                d2.addCallback(_cb, d1)
+            else:
+                d1.callback(True)
         if self.client is not None:
             d = defer.Deferred()
             reactor.callLater(0, _cl, d)
