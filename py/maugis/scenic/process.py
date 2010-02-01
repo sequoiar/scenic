@@ -217,7 +217,6 @@ class ProcessManager(object):
         self._process_transport.loseConnection() # close file handles
         self.log("Child exitted with %s" % (exit_code), logging.INFO)
         self.set_child_state(STATE_STOPPED)
-        self.log("Closing slave's process stdout file.")
         
     def set_child_state(self, new_state):
         """
