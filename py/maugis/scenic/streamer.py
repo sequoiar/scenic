@@ -97,7 +97,7 @@ class StreamerManager(object):
                 self._set_state(process.STATE_RUNNING)
         if new_state == process.STATE_STOPPED:
             # As soon as one crashes or is not able to start, stop all streamer processes.
-            if self.state == process.STATE_RUNNING:
+            if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
                 print("A streamer process died. Stopping the local streamer manager.")
                 self.stop()
             # If all streamers are dead, we can say this manager is stopped
