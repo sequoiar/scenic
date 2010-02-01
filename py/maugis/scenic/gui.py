@@ -222,6 +222,8 @@ class Application(object):
         self.client = None
         self.got_bye = False
 
+        self.request_times = 0
+
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
         if os.path.isfile(glade_file):
@@ -584,22 +586,31 @@ class Application(object):
         dialog.show()
 
     def show_contact_request_dialog(self, text, callback=None):
+        """ We disconnect and reconnect the callbacks every time
+            this is called, otherwise we'd would have multiple 
+            callback invokations per response since the widget 
+            stays alive """
         def _deleted_cb(widget, event, callback):
             """ Act as if the user responded No, 
             and do not propagate event """
             widget.hide()
             if callback is not None:
                 callback(False)
+            widget.disconnect(slot1)
+            widget.disconnect(slot2)
             return True 
         def _response_cb(widget, response_id, callback):
             widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
+            widget.disconnect(slot1)
+            widget.disconnect(slot2)
+
         self.contact_request_label.set_label(text)
         dialog = self.contact_request_dialog
         dialog.set_modal(True)
-        dialog.connect('response', _response_cb, callback)
-        dialog.connect('delete-event', _deleted_cb, callback)
+        slot1 = dialog.connect('response', _response_cb, callback)
+        slot2 = dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
 
     def hide_contacting_window(self, msg="", err=""):
@@ -666,7 +677,8 @@ class Application(object):
                 User is accetping or declining an offer.
                 @param result: Answer to the dialog.
                 """
-                print "on_contact_request_dialog_result called"
+                self.request_times += 1
+                print "ON_CONTACT_REQUEST_DIALOG_RESULT CALLED %d times" % (self.request_times)
                 gobject.source_remove(self.rcv_watch)
                 if result:
                     if self.client is not None:

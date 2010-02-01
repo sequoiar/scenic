@@ -233,6 +233,8 @@ class ProcessManager(object):
             if new_state == STATE_STOPPED:
                 self.log("Child lived for %s seconds." % (self._child_running_time))
                 #self.io_protocol.send_state(new_state, self._child_running_time)
+            elif self.state == STATE_STOPPED and new_state != STATE_STARTING:
+                raise RuntimeError("Cannot go from STATE_STOPPED to %s " % (new_state))
             self.state_changed_signal(self, new_state)
             self.log("child state: %s" % (new_state))
         else:
