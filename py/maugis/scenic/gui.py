@@ -554,16 +554,21 @@ class Application(object):
             widget.hide()
             if callback is not None:
                 callback()
+            widget.disconnect(slot1)
+            widget.disconnect(slot2)
             return True 
         def _response_cb(widget, response_id, callback):
             widget.hide()
             if callback is not None:
                 callback()
+            widget.disconnect(slot1)
+            widget.disconnect(slot2)
+
         self.contact_problem_label.set_label(text)
         dialog = self.contact_dialog
         dialog.set_modal(True)
-        dialog.connect('response', _response_cb, callback)
-        dialog.connect('delete-event', _deleted_cb, callback)
+        slot1 = dialog.connect('response', _response_cb, callback)
+        slot2 = dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
     
     def show_confirm_dialog(self, text, callback=None):
@@ -573,16 +578,21 @@ class Application(object):
             widget.hide()
             if callback is not None:
                 callback(False)
+            widget.disconnect(slot1)
+            widget.disconnect(slot2)
             return True 
         def _response_cb(widget, response_id, callback):
             widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
+            widget.disconnect(slot1)
+            widget.disconnect(slot2)
+
         self.confirm_label.set_label(text)
         dialog = self.dialog
         dialog.set_modal(True)
-        dialog.connect('response', _response_cb, callback)
-        dialog.connect('delete-event', _deleted_cb, callback)
+        slot1 = dialog.connect('response', _response_cb, callback)
+        slot2 = dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
 
     def show_contact_request_dialog(self, text, callback=None):
