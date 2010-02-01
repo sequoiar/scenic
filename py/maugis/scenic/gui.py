@@ -247,6 +247,7 @@ class Application(object):
         self.dialog.set_transient_for(self.main_window)
         self.confirm_label = self.widgets.get_widget("confirmLabel")
         self.contacting_window = self.widgets.get_widget("contactingWindow")
+        self.contacting_window.connect('delete-event', self.contacting_window.hide_on_delete)
         self.contact_dialog = self.widgets.get_widget("contactDialog")
         self.contact_dialog.connect('delete-event', self.contact_dialog.hide_on_delete)
         self.contact_dialog.set_transient_for(self.main_window)
