@@ -711,13 +711,12 @@ class Application(object):
         else: 
             return defer.succeed(True)
 
-    def send_bye_and_disconnect(self):
+    def send_bye(self):
         """
-        Sends BYE and closes the SIC sender.
-        BYE stops the streaming.
+        Sends BYE
+        BYE stops the streaming on the remote host.
         """
         self.client.send({"msg":"BYE"})
-        #self.disconnect_client()
 
     def on_streamer_state_changed(self, streamer, new_state):
         """
@@ -725,8 +724,8 @@ class Application(object):
         """
         if new_state in [process.STATE_STOPPING, process.STATE_STOPPED]:
             if self.client is not None:
-                print("Local StreamerManager stopped. Sending BYE and disconnecting.")
-                self.send_bye_and_disconnect()
+                print("Local StreamerManager stopped. Sending BYE")
+                self.send_bye()
             
     def server_answer_timeout(self, addr):
         # XXX
