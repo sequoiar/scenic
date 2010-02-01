@@ -308,7 +308,7 @@ class Application(object):
         self.ad_book.write()
         
     def on_main_window_destroy(self, *args):
-        pass # all done in before_shutdown above
+        reactor.stop()
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         tab = widget.get_nth_page(page_number)
