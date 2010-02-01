@@ -19,51 +19,59 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
-from scenic import process
+"""
+Manages local streamer processes.
+"""
 
-class ProcessManager(object):
+from scenic import process
+from scenic import sig
+
+class StreamerManager(object):
     """
-    PROCESS manager.
+    Manages local streamer processes.
     """
     def __init__(self, app):
         self.app = app
-        self.config = self.app.config
-        #FIXME: Using different for each session ?
-        self.recv_video_port = self.config.recv_video_port 
-        self.recv_audio_port = self.config.recv_audio_port
-        self.send_video_port = self.config.send_video_port
-        self.send_audio_port = self.config.send_audio_port
         # commands
         self.milhouse_recv_cmd = None
         self.milhouse_send_cmd = None
-
         self.sender = None
         self.receiver = None
+        self.state = process.STATE_STOPPED
+        self.state_changed_signal = sig.Signal()
         
-    def start(self, host):
-        # TODO: check if already streamers running.
+    def start(self, host, config):
+        """
+        Starts the sender and receiver processes.
+        @param host: str ip addr
+        @param config: gui.Config object
+        """
+        if self.state != process.STATE_STOPPED:
+            raise RuntimeError("Cannot start streamers since they are %s." % (self.state))
+            # FIXME: catch this and run ;-)
+        
         self.milhouse_recv_cmd = [
-            self.config.streamer_command,
+            config.streamer_command,
             '--receiver', 
             '--address', str(host),
-            '--videosink', self.config.video_output,
-            '--audiosink', self.config.audio_output,
-            '--videocodec', self.config.video_codec,
-            '--audiocodec', self.config.audio_codec,
-            '--videoport', str(self.recv_video_port),
-            '--audioport', str(self.recv_audio_port) 
+            '--videosink', config.video_output,
+            '--audiosink', config.audio_output,
+            '--videocodec', config.video_codec,
+            '--audiocodec', config.audio_codec,
+            '--videoport', str(config.recv_video_port),
+            '--audioport', str(config.recv_audio_port) 
             ]
         self.milhouse_send_cmd = [
-            self.config.streamer_command, 
+            config.streamer_command, 
             '--sender', 
             '--address', str(host),
-            '--videosource', self.config.video_input,
-            '--videocodec', self.config.video_codec,
-            '--videobitrate', self.config.video_bitrate,
-            '--audiosource', self.config.audio_input,
-            '--audiocodec', self.config.audio_codec,
-            '--videoport', str(self.send_video_port),
-            '--audioport', str(self.send_audio_port)]
+            '--videosource', config.video_input,
+            '--videocodec', config.video_codec,
+            '--videobitrate', config.video_bitrate,
+            '--audiosource', config.audio_input,
+            '--audiocodec', config.audio_codec,
+            '--videoport', str(config.send_video_port),
+            '--audioport', str(config.send_audio_port)]
         # setting up
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
@@ -72,17 +80,49 @@ class ProcessManager(object):
         self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
         self.sender.state_changed_signal.connect(self.on_process_state_changed)
         # starting
+        self._set_state(process.STATE_STARTING)
         print "$", send_cmd
         self.sender.start()
         print "$", recv_cmd
         self.receiver.start()
 
     def on_process_state_changed(self, process_manager, new_state):
+        """
+        Slot for the ProcessManager.state_changed_signal
+        """
         print process_manager, new_state
-
+        if new_state == process.STATE_RUNNING:
+            # As soon as one is running, set our state to running
+            if self.state == process.STATE_STARTING:
+                self._set_state(process.STATE_RUNNING)
+        if new_state == process.STATE_STOPPED:
+            # As soon as one crashes or is not able to start, stop all streamer processes.
+            if self.state == process.STATE_RUNNING:
+                print("A streamer process died. Stopping the local streamer manager.")
+                self.stop()
+            one_is_left = False
+            for proc in [self.sender, self.receiver]:
+                if proc.state != process.STATE_STOPPED:
+                    one_is_left = True
+            if not one_is_left:
+                self._set_state(process.STATE_STOPPED)
+    
+    def _set_state(self, new_state):
+        """
+        Handles state changes.
+        """
+        if self.state != new_state:
+            self.state_changed_signal(self, new_state)
+        self.state = new_state
+            
     def stop(self):
+        """
+        Stops the sender and receiver processes.
+        Does not send any message to the remote peer ! This must be done somewhere else.
+        """
         # stopping
-        if self.sender is not None:
-            self.sender.stop()
-        if self.receiver is not None:
-            self.receiver.stop()
+        if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
+            if self.sender is not None:
+                self.sender.stop()
+            if self.receiver is not None:
+                self.receiver.stop()

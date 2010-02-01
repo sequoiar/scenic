@@ -81,7 +81,8 @@ gtk.glade.bindtextdomain(APP_NAME, DIR)
 gtk.glade.textdomain(APP_NAME)
 
 from scenic import communication
-from scenic.streamer import ProcessManager
+from scenic import process # just for constants
+from scenic.streamer import StreamerManager
 
 class Config(object):
     """
@@ -210,7 +211,8 @@ class Application(object):
     def __init__(self, kiosk_mode=False):
         self.config = Config()
         self.ad_book = AddressBook()
-        self.streamer_manager = ProcessManager(self)
+        self.streamer_manager = StreamerManager(self)
+        self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed)
         print "Starting SIC server on port %s" % (self.config.negotiation_port)
         self.server = communication.NewServer(self, self.config.negotiation_port)
         self.client = None
@@ -640,9 +642,7 @@ class Application(object):
                 gobject.source_remove(self.rcv_watch)
                 if result:
                     self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
-                    # we must send A/V to the remote's right ports
-                    # FIXME: should be in session, or for the contact, not
-                    # a global configuration for the whole app.
+                    # TODO: Use session to contain settings and ports
                     self.config.send_video_port = message["videoport"]
                     self.config.send_audio_port = message["audioport"]
                 else:
@@ -660,19 +660,54 @@ class Application(object):
             # TODO: change our sending audio/video ports based on those remote told us
             
         elif msg == "ACCEPT":
-            # TODO: change our sending audio/video ports based on those remote told us
+            # TODO: Use session to contain settings and ports
             self.hide_contacting_window("accept")
+            self.config.send_video_port = message["videoport"]
+            self.config.send_audio_port = message["audioport"]
             self.client.send({"msg":"ACK", "sid":0})
-            self.streamer_manager.start(addr)
+            self.streamer_manager.start(addr, self.config)
         elif msg == "REFUSE":
             self.hide_contacting_window("refuse")
         elif msg == "ACK":
-            self.streamer_manager.start(addr)
+            self.streamer_manager.start(addr, self.config)
         elif msg == "BYE":
             self.streamer_manager.stop()
             self.client.send({"msg":"OK", "sid":0})
+            self.disconnect_client()
         elif msg == "OK":
             print "received ok. Everything has an end."
+
+    def disconnect_client(self):
+        """
+        Disconnects the SIC sender.
+        @rettype: L{Deferred}
+        """
+        d = defer.Deferred()
+        def _cb(result, d1):
+            self.client = None
+            d1.callback(True)
+        def _cl(d1):
+            d2 = self.client.disconnect
+            d2.addCallback(_cb, d1)
+        reactor.callLater(0, _cl, d)
+        return d
+
+    def send_bye_and_disconnect(self):
+        """
+        Sends BYE and closes the SIC sender.
+        BYE stops the streaming.
+        """
+        self.client.send({"msg":"BYE"})
+        return self.disconnect_client()
+
+    def on_streamer_state_changed(self, streamer, new_state):
+        """
+        Slot for scenic.streamer.StreamerManager.state_changed_signal
+        """
+        if new_state == process.STATE_STOPPED:
+            if self.client is not None:
+                print("Local StreamerManager stopped. Sending BYE and disconnecting.")
+                self.send_bye_and_disconnect()
             
     def server_answer_timeout(self, addr):
         # XXX
@@ -709,5 +744,6 @@ class Application(object):
         self.contact_join_but.set_sensitive(False)
 
     def on_stop_milhouse_send(self):
+        # FIXME: what is that ?
         self.contact_join_but.set_sensitive(True)
 

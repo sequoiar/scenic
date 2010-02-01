@@ -42,122 +42,10 @@ from twisted.internet import reactor
 from twisted.internet import defer
 
 
-class Network(object):
-    def __init__(self, negotiation_port):
-        self.buf_size = 1024
-        self.port = negotiation_port
-    
-    def _validate(self, msg):
-        """
-        Parses binary data and return a dict or so.
-        """
-        tmp_msg = msg.strip()
-        msg = None
-        if tmp_msg.startswith("{") and tmp_msg.endswith("}"):
-        #if tmp_msg[0] == "{" and tmp_msg[-1] == "}" and tmp_msg.find("{", 1, -2) == -1 and tmp_msg.find("}", 1, -2) == -1:
-            try:
-                tmp_msg = json.loads(tmp_msg)
-                if type(tmp_msg) is dict:
-                    msg = tmp_msg
-            except:
-                pass
-        return msg
-
-    def _listen_for_data(self, conn):
-        """
-        @param conn: socket stuff
-        """
-        data = conn.recv(self.buf_size)
-        buffer = data
-        while len(data) == self.buf_size: # maybe we should recall _handle_data on io_watch
-            data = conn.recv(self.buf_size)
-            buffer += data
-        return buffer
-
-    def close(self):
-        if self.sock is not None:
-            self.sock.close()
-
-class Server(Network):
-    def __init__(self, app, negotiation_port):
-        Network.__init__(self, negotiation_port)
-        self.received_command_signal = sig.Signal()
-        self.received_command_signal.connect(app.on_server_rcv_command)
-        self.host = ''
-        self.sock = None
-
-    def start_listening(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((self.host, self.port))
-        sock.listen(1)
-        gobject.io_add_watch(sock, gobject.IO_IN, self._handle_data)
-        self.sock = sock
-
-    def _handle_data(self, source, condition):
-        conn, addr = source.accept()
-        buffer = self._listen_for_data(conn)
-        msg = self._validate(buffer)
-        self.received_command_signal(msg, addr, conn)
-        return True
-
-class Client(Network):
-    def __init__(self, app, negotiation_port):
-        Network.__init__(self, negotiation_port)
-        
-        self.socket_timeout_signal = sig.Signal()
-        self.socket_timeout_signal.connect(app.on_client_socket_timeout)
-        self.socket_error_signal = sig.Signal()
-        self.socket_error_signal.connect(app.on_client_socket_error)
-        self.connecting_signal = sig.Signal()
-        self.connecting_signal.connect(app.on_client_connecting)
-        self.received_command_signal = sig.Signal()
-        self.received_command_signal.connect(app.on_client_rcv_command)
-        
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(10)
-
-    def connect(self, host, msg):
-        """
-        @param host: ip
-        @param msg: sends it right now !!! (UDP)
-        """
-        self.host = host
-        try:
-            self.sock.connect((host, self.port))
-        except socket.timeout, err:
-            self.socket_timeout_signal(self)
-        except socket.error, err:
-            self.socket_error_signal(self, err, msg)
-        else:
-            if self.send(msg):
-                self.io_watch = gobject.io_add_watch(self.sock, gobject.IO_IN, self._handle_data)
-        return False
-
-    def send(self, msg):
-        if not len(msg) % self.buf_size:
-            msg += " "
-        try:
-            self.sock.sendall(msg)
-            self.connecting_signal(self)
-            return True
-        except socket.error, err:
-            self.connecting_signal(self)
-            self.socket_error_signal(self, err, msg)
-            return False
-
-    def _handle_data(self, source, condition):
-        buffer = self._listen_for_data(source)
-        source.close()
-        msg = self._validate(buffer)
-        self.received_command_signal(self, msg) # passing self
-        return False
-
-# ------------------------------------ new stuf:
-
-
-
 class NewServer(object):
+    """
+    TCP receiver
+    """
     def __init__(self, app, negotiation_port):
         self.port = negotiation_port
         self.server_factory = sic.ServerFactory()
@@ -217,6 +105,9 @@ class NewServer(object):
         
 
 class NewClient(object):
+    """
+    TCP sender
+    """
     def __init__(self, app, negotiation_port):
         self.port = negotiation_port
         self.host = None
