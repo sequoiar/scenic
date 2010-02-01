@@ -222,8 +222,6 @@ class Application(object):
         self.client = None
         self.got_bye = False
 
-        self.request_times = 0
-
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
         if os.path.isfile(glade_file):
@@ -245,13 +243,16 @@ class Application(object):
         # get all the widgets that we use
         self.main_window = self.widgets.get_widget("mainWindow")
         self.dialog = self.widgets.get_widget("normalDialog")
+        self.dialog.connect('delete-event', self.dialog.hide_on_delete)
         self.dialog.set_transient_for(self.main_window)
         self.confirm_label = self.widgets.get_widget("confirmLabel")
         self.contacting_window = self.widgets.get_widget("contactingWindow")
         self.contact_dialog = self.widgets.get_widget("contactDialog")
+        self.contact_dialog.connect('delete-event', self.contact_dialog.hide_on_delete)
         self.contact_dialog.set_transient_for(self.main_window)
         self.contact_problem_label = self.widgets.get_widget("contactProblemLabel")
         self.contact_request_dialog = self.widgets.get_widget("contactRequestDialog")
+        self.contact_request_dialog.connect('delete-event', self.contact_request_dialog.hide_on_delete)
         self.contact_request_dialog.set_transient_for(self.main_window)
         self.contact_request_label = self.widgets.get_widget("contactRequestLabel")
         self.edit_contact_window = self.widgets.get_widget("editContactWindow")
@@ -548,51 +549,31 @@ class Application(object):
             self.server.change_port(self.config.negotiation_port)
 
     def show_error_dialog(self, text, callback=None):
-        def _deleted_cb(widget, event, callback):
-            """ Act as if the user responded No, 
-            and do not propagate event """
-            widget.hide()
-            if callback is not None:
-                callback()
-            widget.disconnect(slot1)
-            widget.disconnect(slot2)
-            return True 
         def _response_cb(widget, response_id, callback):
-            widget.hide()
+            if response_id != gtk.RESPONSE_DELETE_EVENT:
+                widget.hide()
             if callback is not None:
                 callback()
             widget.disconnect(slot1)
-            widget.disconnect(slot2)
 
         self.contact_problem_label.set_label(text)
         dialog = self.contact_dialog
         dialog.set_modal(True)
         slot1 = dialog.connect('response', _response_cb, callback)
-        slot2 = dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
     
     def show_confirm_dialog(self, text, callback=None):
-        def _deleted_cb(widget, event, callback):
-            """ Act as if the user responded No, 
-            and do not propagate event """
-            widget.hide()
-            if callback is not None:
-                callback(False)
-            widget.disconnect(slot1)
-            widget.disconnect(slot2)
-            return True 
         def _response_cb(widget, response_id, callback):
-            widget.hide()
+            if response_id != gtk.RESPONSE_DELETE_EVENT:
+                widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
             widget.disconnect(slot1)
-            widget.disconnect(slot2)
 
         self.confirm_label.set_label(text)
         dialog = self.dialog
         dialog.set_modal(True)
         slot1 = dialog.connect('response', _response_cb, callback)
-        slot2 = dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
 
     def show_contact_request_dialog(self, text, callback=None):
@@ -600,27 +581,17 @@ class Application(object):
             this is called, otherwise we'd would have multiple 
             callback invokations per response since the widget 
             stays alive """
-        def _deleted_cb(widget, event, callback):
-            """ Act as if the user responded No, 
-            and do not propagate event """
-            widget.hide()
-            if callback is not None:
-                callback(False)
-            widget.disconnect(slot1)
-            widget.disconnect(slot2)
-            return True 
         def _response_cb(widget, response_id, callback):
-            widget.hide()
+            if response_id != gtk.RESPONSE_DELETE_EVENT:
+                widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
             widget.disconnect(slot1)
-            widget.disconnect(slot2)
 
         self.contact_request_label.set_label(text)
         dialog = self.contact_request_dialog
         dialog.set_modal(True)
         slot1 = dialog.connect('response', _response_cb, callback)
-        slot2 = dialog.connect('delete-event', _deleted_cb, callback)
         dialog.show()
 
     def hide_contacting_window(self, msg="", err=""):
@@ -682,14 +653,13 @@ class Application(object):
             # TODO
             # if local user doesn't respond, close dialog in 5 seconds
             
-            def on_contact_request_dialog_result(result):
+            def _on_contact_request_dialog_result(result):
                 """
                 User is accetping or declining an offer.
                 @param result: Answer to the dialog.
                 """
-                self.request_times += 1
-                print "ON_CONTACT_REQUEST_DIALOG_RESULT CALLED %d times" % (self.request_times)
-                gobject.source_remove(self.rcv_watch)
+                # unschedule server answer timeout
+                gobject.source_remove(server_answer_timeout_watch)
                 if result:
                     if self.client is not None:
                         self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
@@ -709,9 +679,9 @@ class Application(object):
             self.client = communication.NewClient(self, send_to_port)
             self.client.connect(addr)
             # user must respond in less than 5 seconds
-            self.rcv_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
+            server_answer_timeout_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
             text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
-            self.show_contact_request_dialog(text, on_contact_request_dialog_result)
+            self.show_contact_request_dialog(text, _on_contact_request_dialog_result)
             # TODO: change our sending audio/video ports based on those remote told us
             
         elif msg == "ACCEPT":
