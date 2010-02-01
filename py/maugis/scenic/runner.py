@@ -48,7 +48,7 @@ def run():
     (options, args) = parser.parse_args()
     try:
         app = gui.Application(kiosk_mode=options.kiosk)
-    except error.CannorListenError, e:
+    except error.CannotListenError, e:
         print("There must be an other Scenic running.")
         print(str(e))
     else:
