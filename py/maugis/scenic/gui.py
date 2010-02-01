@@ -218,6 +218,7 @@ class Application(object):
         print "Starting SIC server on port %s" % (self.config.negotiation_port)
         self.server = communication.NewServer(self, self.config.negotiation_port)
         self.client = None
+        self.got_bye = False
 
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
@@ -633,6 +634,8 @@ class Application(object):
         print "Got %s from %s" % (msg, addr)
         
         if msg == "INVITE":
+            # FIXME: this doesn't make sense here
+            self.got_bye = False
             # TODO
             # if local user doesn't respond, close dialog in 5 seconds
             
@@ -666,6 +669,8 @@ class Application(object):
             # TODO: change our sending audio/video ports based on those remote told us
             
         elif msg == "ACCEPT":
+            # FIXME: this doesn't make sense here
+            self.got_bye = False
             # TODO: Use session to contain settings and ports
             if self.client is not None:
                 self.hide_contacting_window("accept")
@@ -680,6 +685,7 @@ class Application(object):
         elif msg == "ACK":
             self.streamer_manager.start(addr, self.config)
         elif msg == "BYE":
+            self.got_bye = True
             self.streamer_manager.stop()
             if self.client is not None:
                 self.client.send({"msg":"OK", "sid":0})
@@ -723,7 +729,8 @@ class Application(object):
         Slot for scenic.streamer.StreamerManager.state_changed_signal
         """
         if new_state in [process.STATE_STOPPING, process.STATE_STOPPED]:
-            if self.client is not None:
+            if not self.got_bye and self.client is not None:
+                """ got_bye means our peer told us to stop """
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
