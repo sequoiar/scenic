@@ -45,5 +45,5 @@ def run():
     parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
             help="Run maugis in kiosk mode")
     (options, args) = parser.parse_args()
-    app = gui.Application(kiosk=options.kiosk)
+    app = gui.Application(kiosk_mode=options.kiosk)
     reactor.run() #gtk.main()

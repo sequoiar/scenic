@@ -28,8 +28,11 @@ class ProcessManager(object):
     def __init__(self, app):
         self.app = app
         self.config = self.app.config
-        self.video_port = self.config.video_port #TODO: different for each session
-        self.audio_port = self.config.audio_port # TODO
+        #FIXME: Using different for each session ?
+        self.recv_video_port = self.config.recv_video_port 
+        self.recv_audio_port = self.config.recv_audio_port
+        self.send_video_port = self.config.send_video_port
+        self.send_audio_port = self.config.send_audio_port
         # commands
         self.milhouse_recv_cmd = None
         self.milhouse_send_cmd = None
@@ -47,8 +50,8 @@ class ProcessManager(object):
             '--audiosink', self.config.audio_output,
             '--videocodec', self.config.video_codec,
             '--audiocodec', self.config.audio_codec,
-            '--videoport', str(self.video_port),
-            '--audioport', str(self.audio_port) 
+            '--videoport', str(self.recv_video_port),
+            '--audioport', str(self.recv_audio_port) 
             ]
         self.milhouse_send_cmd = [
             self.config.streamer_command, 
@@ -59,8 +62,8 @@ class ProcessManager(object):
             '--videobitrate', self.config.video_bitrate,
             '--audiosource', self.config.audio_input,
             '--audiocodec', self.config.audio_codec,
-            '--videoport', str(self.video_port),
-            '--audioport', str(self.audio_port)]
+            '--videoport', str(self.send_video_port),
+            '--audioport', str(self.send_audio_port)]
         # setting up
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")

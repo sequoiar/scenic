@@ -77,7 +77,7 @@ class Config(object):
     Class attributes are default.
     """
     # Default values
-    negotiation_port = 17446
+    negotiation_port = 17446 # sending/receiving TCP messages on it.
     streamer_command = "milhouse"
     smtpserver = "smtp.sat.qc.ca"
     emailinfo = "maugis@sat.qc.ca"
@@ -90,8 +90,10 @@ class Config(object):
     video_output = "xvimagesink"
     video_codec = "mpeg4"
     video_bitrate = "3000000"
-    video_port = 8000
-    audio_port = video_port + 10
+    send_video_port = 8000
+    recv_video_port = 8000
+    send_audio_port = send_video_port + 10
+    recv_audio_port = recv_video_port + 10
     bandwidth = 30
     
     def __init__(self):
@@ -168,7 +170,7 @@ class AddressBook(object):
                     print("Loading selected contact: %s" % (self.selected))
                 else:
                     try:
-                        print("Loading contact %s" % (line))
+                        print("Loading contact %s" % (line.strip()))
                         d = json.loads(line)
                         for k, v in d.iteritems():
                             if type(v) is unicode:
@@ -194,11 +196,11 @@ class Application(object):
     """
     Main application (arguably God) class
     """
-    def __init__(self, kiosk):
+    def __init__(self, kiosk_mode=False):
         self.config = Config()
         self.ad_book = AddressBook()
         self.streamer_manager = ProcessManager(self)
-        print "start server on %s" % (self.config.negotiation_port)
+        print "Starting SIC server on port %s" % (self.config.negotiation_port)
         self.server = communication.NewServer(self, self.config.negotiation_port)
         self.client = None
 
@@ -252,7 +254,7 @@ class Application(object):
         self.init_bandwidth()
         
         # switch to Kiosk mode if asked
-        if kiosk:
+        if kiosk_mode:
             self.main_window.set_decorated(False)
             self.widgets.get_widget("sysBox").show()
         
@@ -364,21 +366,19 @@ class Application(object):
         # Validate the port number
         port = self.contact_port_entry.get_text()
         if port == "":
-            port = str(self.config.video_port) # set port to default
-        elif (not port.isdigit()) or (int(port) not in range(1,10000)):
-            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1000-99999")
+            port = str(self.config.negotiation_port) # set port to default
+        elif (not port.isdigit()) or (int(port) not in range(10000, 65535)):
+            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 10000-65535")
             self.show_error_dialog(text)
             return
-
         # Validate the address
         addr = self.contact_ip_entry.get_text()
         if len(addr) < 7:
-            text = _("<b><big>The address is not valid</big></b>\n\nEnter a valid address\nExample: 168.123.45.32 or tot.sat.qc.ca")
+            text = _("<b><big>The address is not valid</big></b>\n\nEnter a valid address\nExample: 168.123.45.32 or example.org")
             self.show_error_dialog(text)
             return
-
+        # save it.
         when_valid_save()
-
 
     def on_net_conf_set_but_clicked(self, *args):
         os.system('gksudo "network-admin"')
@@ -456,8 +456,8 @@ class Application(object):
         msg = {
             "msg":"INVITE",
             "sid":0, 
-            "videoport": self.config.video_port,
-            "audioport": self.config.audio_port,
+            "videoport": self.config.recv_video_port,
+            "audioport": self.config.recv_audio_port,
             "please_send_to_port": self.config.negotiation_port
             }
         port = self.config.negotiation_port # self.ad_book.contact["port"]
@@ -505,7 +505,6 @@ class Application(object):
         else:
             self.config.negotiation_port = int(port)
             self.config._write()
-
             self.server.change_port(self.config.negotiation_port)
 
     def show_error_dialog(self, text, callback=None):
@@ -629,7 +628,12 @@ class Application(object):
                 """
                 gobject.source_remove(self.rcv_watch)
                 if result:
-                    self.client.send({"msg":"ACCEPT", "videoport":self.config.video_port, "audioport":self.config.audio_port, "sid":0})
+                    self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
+                    # we must send A/V to the remote's right ports
+                    # FIXME: should be in session, or for the contact, not
+                    # a global configuration for the whole app.
+                    self.config.send_video_port = message["videoport"]
+                    self.config.send_audio_port = message["audioport"]
                 else:
                     self.client.send({"msg":"REFUSE", "sid":0})
 
