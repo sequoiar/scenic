@@ -651,6 +651,7 @@ class Application(object):
                 User is accetping or declining an offer.
                 @param result: Answer to the dialog.
                 """
+                print "on_contact_request_dialog_result called"
                 gobject.source_remove(self.rcv_watch)
                 if result:
                     if self.client is not None:
@@ -663,6 +664,7 @@ class Application(object):
                 else:
                     if self.client is not None:
                         self.client.send({"msg":"REFUSE", "sid":0})
+                return True
 
             # TODO: if already streaming, answer REFUSE
             send_to_port = message["please_send_to_port"]
