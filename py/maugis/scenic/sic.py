@@ -37,7 +37,8 @@ class SICProtocol(basic.LineReceiver):
     def connectionMade(self):
         if hasattr(self, "factory"):
             if hasattr(self.factory, 'connected_deferred'):
-                self.factory.connected_deferred.callback(self)
+                if not self.factory.connected_deferred.called:
+                    self.factory.connected_deferred.callback(self)
         else:
             print "No connected_deferred"
 
