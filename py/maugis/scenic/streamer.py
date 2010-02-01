@@ -122,6 +122,7 @@ class StreamerManager(object):
         """
         # stopping
         if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
+            self._set_state(process.STATE_STOPPING)
             if self.sender is not None:
                 self.sender.stop()
             if self.receiver is not None:

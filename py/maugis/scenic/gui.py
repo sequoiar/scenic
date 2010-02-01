@@ -704,7 +704,7 @@ class Application(object):
         """
         Slot for scenic.streamer.StreamerManager.state_changed_signal
         """
-        if new_state == process.STATE_STOPPED:
+        if new_state in [process.STATE_STOPPING, process.STATE_STOPPED]:
             if self.client is not None:
                 print("Local StreamerManager stopped. Sending BYE and disconnecting.")
                 self.send_bye_and_disconnect()
