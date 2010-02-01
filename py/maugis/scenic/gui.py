@@ -683,9 +683,12 @@ class Application(object):
             self.streamer_manager.stop()
             if self.client is not None:
                 self.client.send({"msg":"OK", "sid":0})
-            self.disconnect_client()
+                self.disconnect_client()
         elif msg == "OK":
             print "received ok. Everything has an end."
+            if self.client is not None:
+                print 'disconnecting client'
+                self.disconnect_client()
 
     def disconnect_client(self):
         """
@@ -711,7 +714,7 @@ class Application(object):
         BYE stops the streaming.
         """
         self.client.send({"msg":"BYE"})
-        return self.disconnect_client()
+        #self.disconnect_client()
 
     def on_streamer_state_changed(self, streamer, new_state):
         """
