@@ -643,12 +643,16 @@ class Application(object):
                 """
                 gobject.source_remove(self.rcv_watch)
                 if result:
-                    self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
-                    # TODO: Use session to contain settings and ports
-                    self.config.send_video_port = message["videoport"]
-                    self.config.send_audio_port = message["audioport"]
+                    if self.client is not None:
+                        self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
+                        # TODO: Use session to contain settings and ports
+                        self.config.send_video_port = message["videoport"]
+                        self.config.send_audio_port = message["audioport"]
+                    else:
+                        print "Error: connection lost, so we could not accept." # FIXME
                 else:
-                    self.client.send({"msg":"REFUSE", "sid":0})
+                    if self.client is not None:
+                        self.client.send({"msg":"REFUSE", "sid":0})
 
             # TODO: if already streaming, answer REFUSE
             send_to_port = message["please_send_to_port"]
@@ -663,11 +667,14 @@ class Application(object):
             
         elif msg == "ACCEPT":
             # TODO: Use session to contain settings and ports
-            self.hide_contacting_window("accept")
-            self.config.send_video_port = message["videoport"]
-            self.config.send_audio_port = message["audioport"]
-            self.client.send({"msg":"ACK", "sid":0})
-            self.streamer_manager.start(addr, self.config)
+            if self.client is not None:
+                self.hide_contacting_window("accept")
+                self.config.send_video_port = message["videoport"]
+                self.config.send_audio_port = message["audioport"]
+                self.client.send({"msg":"ACK", "sid":0})
+                self.streamer_manager.start(addr, self.config)
+            else:
+                print("Error ! Connection lost.") # FIXME
         elif msg == "REFUSE":
             self.hide_contacting_window("refuse")
         elif msg == "ACK":
