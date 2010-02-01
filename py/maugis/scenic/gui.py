@@ -83,6 +83,7 @@ gtk.glade.textdomain(APP_NAME)
 from scenic import communication
 from scenic import process # just for constants
 from scenic.streamer import StreamerManager
+from twisted.internet import defer
 
 class Config(object):
     """
