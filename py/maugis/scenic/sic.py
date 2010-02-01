@@ -25,7 +25,7 @@ from twisted.protocols import basic
 
 from scenic import sig
 
-VERBOSE = False
+VERBOSE = True
 
 class SICProtocol(basic.LineReceiver):
     """
@@ -40,16 +40,16 @@ class SICProtocol(basic.LineReceiver):
                 if not self.factory.connected_deferred.called:
                     self.factory.connected_deferred.callback(self)
         else:
-            print "No connected_deferred"
+            print "SIC: No connected_deferred"
 
     def lineReceived(self, data):
         """
         Received JSON.
         """
         if VERBOSE:
-            print "Received:", data
+            print "SIC: Received:", data.strip()
         try:
-            d = json.loads(data)
+            d = json.loads(data.strip())
         except TypeError, e:
             print(str(e))
         else:
@@ -61,7 +61,7 @@ class SICProtocol(basic.LineReceiver):
         :param d: dict
         """
         if VERBOSE:
-            print "send_message", d
+            print "SIC: send_message", d
         if type(d) is not dict:
             raise TypeError("A dict is needed.")
         else:
@@ -73,7 +73,7 @@ class SICProtocol(basic.LineReceiver):
             ip = self.transport.getPeer().host
             return ip
         except AttributeError:
-            print "not connected"
+            print "SIC: not connected"
             return None
 
 class ClientFactory(protocol.ClientFactory):
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         return ret
 
     def on_error(failure):
-        print "Error trying to connect.", failure
+        print "SIC: Error trying to connect.", failure
         reactor.stop()
         
     VERBOSE = True
