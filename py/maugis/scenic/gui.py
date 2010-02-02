@@ -87,6 +87,7 @@ from twisted.internet import defer
 from twisted.internet import error
 from twisted.internet import reactor
 from scenic import dialogs
+from scenic import ports
 
 class Config(object):
     """
@@ -241,42 +242,45 @@ class Application(object):
                 cb[n] = getattr(self, n)
         self.widgets.signal_autoconnect(cb)
 
-        # get all the widgets that we use
+        # Get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
         self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
-        # confirm_dialog
+        # confirm_dialog:
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
         self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
         self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_label = self.widgets.get_widget("confirm_label")
-        # contacting...
+        # calling_dialog:
         self.calling_dialog = self.widgets.get_widget("calling_dialog")
         self.calling_dialog.connect('delete-event', self.calling_dialog.hide_on_delete)
-        # Error!
+        # error_dialog:
         self.error_dialog = self.widgets.get_widget("error_dialog")
         self.error_dialog.connect('delete-event', self.error_dialog.hide_on_delete)
         self.error_dialog.set_transient_for(self.main_window)
-        # Could not connect
+        # Could not connect:
         self.error_label_widget = self.widgets.get_widget("error_dialog_label")
-        
+        # invited_dialog:
         self.invited_dialog = self.widgets.get_widget("invited_dialog")
         self.invited_dialog.set_transient_for(self.main_window)
         self.invited_dialog.connect('delete-event', self.invited_dialog.hide_on_delete)
         self.invited_dialog_label_widget = self.widgets.get_widget("invited_dialog_label")
+        # edit_contact_window:
         self.edit_contact_window = self.widgets.get_widget("edit_contact_window")
         self.edit_contact_window.set_transient_for(self.main_window) # child of main window
         self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
         self.contact_name_widget = self.widgets.get_widget("contact_name")
         self.contact_addr_widget = self.widgets.get_widget("contact_addr")
         self.contact_port_widget = self.widgets.get_widget("contact_port")
+        # address book buttons and list:
         self.edit_contact_widget = self.widgets.get_widget("edit_contact")
         self.remove_contact_widget = self.widgets.get_widget("remove_contact")
         self.invite_contact_widget = self.widgets.get_widget("invite_contact")
         self.contact_list_widget = self.widgets.get_widget("contact_list")
+        # local settings:
         self.negotiation_port_widget = self.widgets.get_widget("negotiation_port")
         self.conf_bandwidth_widget = self.widgets.get_widget("conf_bandwidth")
-        # pos of currently selected contact
+        # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_num = None
 
@@ -299,7 +303,7 @@ class Application(object):
         self.init_negotiation_port()
 
         self.main_window.show()
-
+        self.ports_allocator = ports.PortsAllocator()
         try:
             self.server.start_listening()
         except error.CannotListenError, e:
@@ -533,11 +537,28 @@ class Application(object):
         @rettype: bool
         """
         return self._has_session
+
+    def allocate_ports(self):
+        # TODO: start_session
+        self.config.recv_video_port = self.ports_allocator.allocate()
+        self.config.recv_audio_port = self.ports_allocator.allocate()
+
+    def free_ports(self):
+        # TODO: stop_session
+        try:
+            self.ports_allocator.free(self.config.recv_video_port)
+        except ports.PortsAllocatorError, e:
+            print(e)
+        try:    
+            self.ports_allocator.free(self.config.recv_audio_port)
+        except ports.PortsAllocatorError, e:
+            print(e)
         
     def on_invite_contact_clicked(self, *args):
         """
         Sends an INVITE to the remote peer.
         """
+        self.allocate_ports()
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.")
         else:
@@ -723,6 +744,7 @@ class Application(object):
                 gobject.source_remove(answer_invite_timed_out_watch)
                 if result:
                     if self.client is not None:
+                        self.allocate_ports()
                         self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
                         # TODO: Use session to contain settings and ports
                         self.config.send_video_port = message["videoport"]
@@ -747,7 +769,6 @@ class Application(object):
                 answer_invite_timed_out_watch = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
-                # TODO: change our sending audio/video ports based on those remote told us
             
         elif msg == "ACCEPT":
             # FIXME: this doesn't make sense here
@@ -766,6 +787,7 @@ class Application(object):
             else:
                 print("Error ! Connection lost.") # FIXME
         elif msg == "REFUSE":
+            self.free_ports()
             self.hide_calling_dialog("refuse")
         elif msg == "ACK":
             print("Got ACK. Starting streamers as answerer.")
@@ -796,6 +818,7 @@ class Application(object):
         """
         print "on_streamers_stopped got called"
         self._has_session = False
+        self.free_ports()
         
     def disconnect_client(self):
         """
