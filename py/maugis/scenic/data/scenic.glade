@@ -1621,7 +1621,6 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
-  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:18:03 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox1">
@@ -1757,7 +1756,6 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
-  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:20:26 GMT"/>
 
   <child>
     <widget class="GtkAlignment" id="alignment38">
@@ -1990,7 +1988,6 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
-  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:17:29 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox2">
@@ -2125,7 +2122,6 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
-  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:16:45 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox3">
@@ -2247,7 +2243,6 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
-  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:18:35 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox4">
@@ -2507,7 +2502,6 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
-  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:21:26 GMT"/>
 
   <child>
     <widget class="GtkTable" id="table1">

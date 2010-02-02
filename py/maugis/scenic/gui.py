@@ -246,21 +246,27 @@ class Application(object):
         self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
         # confirm_dialog
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
+        self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
+        self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_label = self.widgets.get_widget("confirm_label")
         # contacting...
         self.calling_dialog = self.widgets.get_widget("calling_dialog")
+        self.calling_dialog.connect('delete-event', self.calling_dialog.hide_on_delete)
         # Error!
         self.error_dialog = self.widgets.get_widget("error_dialog")
+        self.error_dialog.connect('delete-event', self.error_dialog.hide_on_delete)
         self.error_dialog.set_transient_for(self.main_window)
         # Could not connect
         self.error_label_widget = self.widgets.get_widget("error_dialog_label")
         
         self.invited_dialog = self.widgets.get_widget("invited_dialog")
         self.invited_dialog.set_transient_for(self.main_window)
+        self.invited_dialog.connect('delete-event', self.invited_dialog.hide_on_delete)
         self.invited_dialog_label_widget = self.widgets.get_widget("invited_dialog_label")
         self.edit_contact_window = self.widgets.get_widget("edit_contact_window")
         self.edit_contact_window.set_transient_for(self.main_window) # child of main window
+        self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
         self.contact_name_widget = self.widgets.get_widget("contact_name")
         self.contact_addr_widget = self.widgets.get_widget("contact_addr")
         self.contact_port_widget = self.widgets.get_widget("contact_port")
@@ -633,8 +639,7 @@ class Application(object):
         stays alive 
         """
         def _response_cb(widget, response_id, callback):
-            if response_id != gtk.RESPONSE_DELETE_EVENT:
-                widget.hide()
+            widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
             widget.disconnect(slot1)
@@ -727,6 +732,7 @@ class Application(object):
                 else:
                     if self.client is not None:
                         self.client.send({"msg":"REFUSE", "sid":0})
+                        self.client = None
                 return True
             # answer REFUSE if busy
             if self.streamer_manager.is_busy():
