@@ -806,7 +806,6 @@ class Application(object):
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
 
         elif msg == "CANCEL":
-            print 'GOT CANCEL!!!!!!!!!'
             self._unschedule_answer_invite_timeout()
             self.client = None
             self.invited_dialog.hide()
