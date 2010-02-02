@@ -214,7 +214,7 @@ class Application(object):
     """
     def __init__(self, kiosk_mode=False):
         self.config = Config()
-        self.ad_book = AddressBook()
+        self.address_book = AddressBook()
         self.streamer_manager = StreamerManager(self)
         self._has_session = False
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed)
@@ -242,33 +242,37 @@ class Application(object):
         self.widgets.signal_autoconnect(cb)
 
         # get all the widgets that we use
-        self.main_window = self.widgets.get_widget("mainWindow")
-        self.dialog = self.widgets.get_widget("normalDialog")
-        self.dialog.connect('delete-event', self.dialog.hide_on_delete)
-        self.dialog.set_transient_for(self.main_window)
-        self.confirm_label = self.widgets.get_widget("confirmLabel")
-        self.contacting_window = self.widgets.get_widget("contactingWindow")
-        self.contacting_window.connect('delete-event', self.contacting_window.hide_on_delete)
-        self.contact_dialog = self.widgets.get_widget("contactDialog")
-        self.contact_dialog.connect('delete-event', self.contact_dialog.hide_on_delete)
-        self.contact_dialog.set_transient_for(self.main_window)
-        self.contact_problem_label = self.widgets.get_widget("contactProblemLabel")
-        self.contact_request_dialog = self.widgets.get_widget("contactRequestDialog")
-        self.contact_request_dialog.connect('delete-event', self.contact_request_dialog.hide_on_delete)
-        self.contact_request_dialog.set_transient_for(self.main_window)
-        self.contact_request_label = self.widgets.get_widget("contactRequestLabel")
-        self.edit_contact_window = self.widgets.get_widget("editContactWindow")
-        self.edit_contact_window.set_transient_for(self.main_window)
-        self.contact_name_entry = self.widgets.get_widget("contactNameEntry")
-        self.contact_ip_entry = self.widgets.get_widget("contactIPEntry")
-        self.contact_port_entry = self.widgets.get_widget("contactPortEntry")
-        self.contact_edit_but = self.widgets.get_widget("contactEditBut")
-        self.remove_contact = self.widgets.get_widget("removeContact")
-        self.contact_join_but = self.widgets.get_widget("contactJoinBut")
-        self.info_label = self.widgets.get_widget("infoLabel")
-        self.contact_list = self.widgets.get_widget("contactList")
-        self.negotiation_port_entry = self.widgets.get_widget("netConfPortEntry")
-        self.net_conf_bw_combo = self.widgets.get_widget("netConfBWCombo")
+        self.main_window = self.widgets.get_widget("main_window")
+        # confirm_dialog
+        self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
+        self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
+        self.confirm_dialog.set_transient_for(self.main_window)
+        self.confirm_label = self.widgets.get_widget("confirm_label")
+        # contacting...
+        self.calling_dialog = self.widgets.get_widget("calling_dialog")
+        self.calling_dialog.connect('delete-event', self.calling_dialog.hide_on_delete)
+        # Error!
+        self.error_dialog = self.widgets.get_widget("error_dialog")
+        self.error_dialog.connect('delete-event', self.error_dialog.hide_on_delete)
+        self.error_dialog.set_transient_for(self.main_window)
+        # Could not connect
+        self.error_label_widget = self.widgets.get_widget("error_dialog_label")
+        
+        self.invited_dialog = self.widgets.get_widget("invited_dialog")
+        self.invited_dialog.connect('delete-event', self.invited_dialog.hide_on_delete)
+        self.invited_dialog.set_transient_for(self.main_window)
+        self.invited_dialog_label_widget = self.widgets.get_widget("invited_dialog_label")
+        self.edit_contact_window = self.widgets.get_widget("edit_contact_window")
+        self.edit_contact_window.set_transient_for(self.main_window) # child of main window
+        self.contact_name_widget = self.widgets.get_widget("contact_name")
+        self.contact_addr_widget = self.widgets.get_widget("contact_addr")
+        self.contact_port_widget = self.widgets.get_widget("contact_port")
+        self.edit_contact_widget = self.widgets.get_widget("edit_contact")
+        self.remove_contact_widget = self.widgets.get_widget("remove_contact")
+        self.invite_contact_widget = self.widgets.get_widget("invite_contact")
+        self.contact_list_widget = self.widgets.get_widget("contact_list")
+        self.negotiation_port_widget = self.widgets.get_widget("negotiation_port")
+        self.conf_bandwidth_widget = self.widgets.get_widget("conf_bandwidth")
         # pos of currently selected contact
         self.selected_contact_row = None
         self.select_contact_num = None
@@ -282,12 +286,12 @@ class Application(object):
             self.widgets.get_widget("sysBox").show()
         
         # Build the contact list view
-        self.selection = self.contact_list.get_selection()
+        self.selection = self.contact_list_widget.get_selection()
         self.selection.connect("changed", self.on_contact_list_changed, None) 
         self.contact_tree = gtk.ListStore(str)
-        self.contact_list.set_model(self.contact_tree)
+        self.contact_list_widget.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
-        self.contact_list.append_column(column)
+        self.contact_list_widget.append_column(column)
         self.init_ad_book_contact_list()
         self.init_negotiation_port()
 
@@ -310,49 +314,61 @@ class Application(object):
                 self.stop_streamers()
             self.disconnect_client()
         self.server.close()
-        self.ad_book.write()
+        self.address_book.write()
         
-    def on_main_window_destroy(self, *args):
+    def on_main_window_destroyed(self, *args):
         reactor.stop()
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         tab = widget.get_nth_page(page_number)
         if tab == "localPan":
-            self.widgets.get_widget("netConfSetBut").grab_default()
+            self.widgets.get_widget("network_admin").grab_default()
         elif tab == "contactPan":
             self.widgets.get_widget("contactJoinBut").grab_default()
 
     def on_contact_list_changed(self, *args):
         tree_list, self.selected_contact_row = args[0].get_selected()
         if self.selected_contact_row:
-            self.contact_edit_but.set_sensitive(True)
-            self.remove_contact.set_sensitive(True)
-            self.contact_join_but.set_sensitive(True)
+            self.edit_contact_widget.set_sensitive(True)
+            self.remove_contact_widget.set_sensitive(True)
+            self.invite_contact_widget.set_sensitive(True)
             self.selected_contact_num = tree_list.get_path(self.selected_contact_row)[0]
-            self.ad_book.contact = self.ad_book.contact_list[self.selected_contact_num]
-            self.ad_book.selected = self.selected_contact_num
+            self.address_book.contact = self.address_book.contact_list[self.selected_contact_num]
+            self.address_book.selected = self.selected_contact_num
         else:
-            self.contact_edit_but.set_sensitive(False)
-            self.remove_contact.set_sensitive(False)
-            self.contact_join_but.set_sensitive(False)
-            self.ad_book.contact = None
+            self.edit_contact_widget.set_sensitive(False)
+            self.remove_contact_widget.set_sensitive(False)
+            self.invite_contact_widget.set_sensitive(False)
+            self.address_book.contact = None
 
-    def on_contact_list_row_activated(self, *args):
-        self.on_contact_edit_but_clicked(args)
+    def on_contact_double_clicked(self, *args):
+        """
+        When a contact in the list is double-clicked, 
+        shows the edit contact dialog.
+        """
+        self.on_edit_contact_clicked(args)
 
     def on_add_contact_clicked(self, *args):
-        self.ad_book.new_contact = True
-        self.contact_name_entry.set_text("")
-        self.contact_ip_entry.set_text("")
-        self.contact_port_entry.set_text("")
+        """
+        Pops up a dialog to be filled with new contact infos.
+        
+        The add_contact buttons has been clicked.
+        """
+        self.address_book.new_contact = True
+        self.contact_name_widget.set_text("")
+        self.contact_addr_widget.set_text("")
+        self.contact_port_widget.set_text("")
         self.edit_contact_window.show()
 
     def on_remove_contact_clicked(self, *args):
+        """
+        Upon confirmation, the selected contact is removed.
+        """
         def on_confirm_result(result):
             if result:
-                del self.ad_book.contact_list[self.selected_contact_num]
+                del self.address_book.contact_list[self.selected_contact_num]
                 self.contact_tree.remove(self.selected_contact_row)
-                self.ad_book.write()
+                self.address_book.write()
                 num = self.selected_contact_num - 1
                 if num < 0:
                     num = 0
@@ -361,47 +377,53 @@ class Application(object):
             "to delete this contact from the list?")
         self.show_confirm_dialog(text, on_confirm_result)
 
-    def on_contact_edit_but_clicked(self, *args):
-        self.contact_name_entry.set_text(self.ad_book.contact["name"])
-        self.contact_ip_entry.set_text(self.ad_book.contact["address"])
-        self.contact_port_entry.set_text(str(self.ad_book.contact["port"]))
+    def on_edit_contact_clicked(self, *args):
+        """
+        Shows the edit contact dialog.
+        """
+        self.contact_name_widget.set_text(self.address_book.contact["name"])
+        self.contact_addr_widget.set_text(self.address_book.contact["address"])
+        self.contact_port_widget.set_text(str(self.address_book.contact["port"]))
         self.edit_contact_window.show()
 
-    def on_edit_contact_window_delete_event(self, *args):
-        widget = args[0]
-        widget.hide()
-        return True
-
-    def on_edit_contact_cancel_but_clicked(self, *args):
+    def on_edit_contact_cancel_clicked(self, *args):
+        """
+        The cancel button in the "edit_contact" window has been clicked.
+        Hides the edit_contact window.
+        """
         self.edit_contact_window.hide()
 
-    def on_edit_contact_save_but_clicked(self, *args):
-        ad_book = self.ad_book
+    def on_edit_contact_save_clicked(self, *args):
+        """
+        The save button in the "edit_contact" window has been clicked.
+        Hides the edit_contact window and saves the changes. (new or modified contact)
+        """
+        address_book = self.address_book
 
         def when_valid_save():
             """ Saves contact info after it's been validated and then closes the window"""
-            if ad_book.new_contact:
+            if address_book.new_contact:
                 self.contact_tree.append([
-                    "<b>" + self.contact_name_entry.get_text()
+                    "<b>" + self.contact_name_widget.get_text()
                     + "</b>\n  IP: " + addr
                     + "\n  Port: " + port])
-                ad_book.contact_list.append({})
-                self.selection.select_path(len(ad_book.contact_list) - 1)
-                ad_book.contact = ad_book.contact_list[len(ad_book.contact_list) - 1]
-                ad_book.new_contact = False
+                address_book.contact_list.append({})
+                self.selection.select_path(len(address_book.contact_list) - 1)
+                address_book.contact = address_book.contact_list[len(address_book.contact_list) - 1]
+                address_book.new_contact = False
             else:
                 self.contact_tree.set_value(
                     self.selected_contact_row, 0, "<b>" + 
-                    self.contact_name_entry.get_text() + 
+                    self.contact_name_widget.get_text() + 
                     "</b>\n  IP: " + addr + "\n  Port: " + port)
-            ad_book.contact["name"] = self.contact_name_entry.get_text()
-            ad_book.contact["address"] = addr
-            ad_book.contact["port"] = int(port)
-            ad_book.write()
+            address_book.contact["name"] = self.contact_name_widget.get_text()
+            address_book.contact["address"] = addr
+            address_book.contact["port"] = int(port)
+            address_book.write()
             self.edit_contact_window.hide()
 
         # Validate the port number
-        port = self.contact_port_entry.get_text()
+        port = self.contact_port_widget.get_text()
         if port == "":
             port = str(self.config.negotiation_port) # set port to default
         elif (not port.isdigit()) or (int(port) not in range(10000, 65535)):
@@ -409,7 +431,7 @@ class Application(object):
             self.show_error_dialog(text)
             return
         # Validate the address
-        addr = self.contact_ip_entry.get_text()
+        addr = self.contact_addr_widget.get_text()
         if len(addr) < 7:
             text = _("<b><big>The address is not valid</big></b>\n\nEnter a valid address\nExample: 168.123.45.32 or example.org")
             self.show_error_dialog(text)
@@ -417,10 +439,16 @@ class Application(object):
         # save it.
         when_valid_save()
 
-    def on_net_conf_set_but_clicked(self, *args):
+    def on_network_admin_clicked(self, *args):
+        """
+        Opens the network-admin Gnome applet.
+        """
         os.system('gksudo "network-admin"')
 
-    def on_sys_shutdown_but_clicked(self, *args):
+    def on_system_shutdown_clicked(self, *args):
+        """
+        Shuts down the computer.
+        """
         def on_confirm_result(result):
             if result:
                 os.system('gksudo "shutdown -h now"')
@@ -428,7 +456,10 @@ class Application(object):
         text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
         self.show_confirm_dialog(text, on_confirm_result)
 
-    def on_sys_reboot_but_clicked(self, *args):
+    def on_system_reboot_clicked(self, *args):
+        """
+        Reboots the computer.
+        """
         def on_confirm_result(result):
             if result:
                 os.system('gksudo "shutdown -r now"')
@@ -436,15 +467,24 @@ class Application(object):
         text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
         self.show_confirm_dialog(text, on_confirm_result)
 
-    def on_maint_upd_but_clicked(self, *args):
+    def on_maintenance_apt_update_clicked(self, *args):
+        """
+        Opens APT update manager.
+        """
         os.system('gksudo "update-manager"')
 
-    def on_maint_send_but_clicked(self, *args):
-        """ send button clicked will prompt via confirm dialog """
+    def on_maintenance_send_info_clicked(self, *args):
+        """
+        Sends an email to SAT with this information : 
+         * milhouse version
+         * kernel version
+         * Loaded kernel modules
+        """
         def on_confirm_result(result):
+            milhouse_version = "unknown"
+            
             if result:
-                msg = "--- milhouse_send ---\n" + self.milhouse_send_version + "\n"
-                msg += "--- milhouse_recv ---\n" + self.milhouse_recv_version + "\n"
+                msg = "--- milhouse_version ---\n" + milhouse_version + "\n"
                 msg += "--- uname -a ---\n"
                 try:
                     w, r, err = os.popen3('uname -a')
@@ -491,7 +531,7 @@ class Application(object):
         """
         return self._has_session
         
-    def on_client_join_but_clicked(self, *args):
+    def on_invite_contact_clicked(self, *args):
         """
         Sends an INVITE to the remote peer.
         """
@@ -505,15 +545,15 @@ class Application(object):
                 "audioport": self.config.recv_audio_port,
                 "please_send_to_port": self.config.negotiation_port
                 }
-            port = self.config.negotiation_port # self.ad_book.contact["port"]
-            ip = self.ad_book.contact["address"]
+            port = self.config.negotiation_port # self.address_book.contact["port"]
+            ip = self.address_book.contact["address"]
 
             def _on_connected(proto):
                 self.client.send(msg)
                 return proto
             def _on_error(reason):
                 print "error trying to connect to %s:%s : %s" % (ip, port, reason)
-                self.contacting_window.hide()
+                self.calling_dialog.hide()
                 self.client = None
                 return None
                
@@ -521,28 +561,35 @@ class Application(object):
             self.client = communication.Client(self, port)
             deferred = self.client.connect(ip)
             deferred.addCallback(_on_connected).addErrback(_on_error)
-            self.contacting_window.show()
+            self.calling_dialog.show()
             # window will be hidden when we receive ACCEPT or REFUSE
 
-    def on_net_conf_bw_combo_changed(self, *args):
+    def on_conf_bandwidth_changed(self, *args):
+        """
+        Changes the bandwidth setting.
+        Called when the bandwidth drop-down menu value has changed.
+        """
         base = 30
         num = 2 # number of choice
         step = base / num
-        selection = self.net_conf_bw_combo.get_active()
+        selection = self.conf_bandwidth_widget.get_active()
         self.config.bandwidth = (selection + 1) * step
         self.config._write()
 
-    def on_net_conf_port_entry_changed(self, *args):
-        # call later (we think)
-        gobject.timeout_add(0, self.on_net_conf_port_entry_changed_call_later, args)
+    def on_negotiation_port_changed(self, *args):
+        """
+        Changes the local SIC server port number.
+        """
+        # call later 
+        gobject.timeout_add(0, self._later_check_negotiation_port, args)
         return False
 
-    def on_net_conf_port_entry_changed_call_later(self, *args):
+    def _later_check_negotiation_port(self, *args):
         def on_error_dialog_result(result):
-            self.negotiation_port_entry.grab_focus()
+            self.negotiation_port_widget.grab_focus()
             return False
 
-        port = self.negotiation_port_entry.get_text()
+        port = self.negotiation_port_widget.get_text()
         if not port.isdigit():
             self.widgets.get_widget("mainTabs").set_current_page(1)
             self.init_negotiation_port()
@@ -561,8 +608,8 @@ class Application(object):
                 callback()
             widget.disconnect(slot1)
 
-        self.contact_problem_label.set_label(text)
-        dialog = self.contact_dialog
+        self.error_label_widget.set_label(text)
+        dialog = self.error_dialog
         dialog.set_modal(True)
         slot1 = dialog.connect('response', _response_cb, callback)
         dialog.show()
@@ -576,16 +623,18 @@ class Application(object):
             widget.disconnect(slot1)
 
         self.confirm_label.set_label(text)
-        dialog = self.dialog
+        dialog = self.confirm_dialog
         dialog.set_modal(True)
         slot1 = dialog.connect('response', _response_cb, callback)
         dialog.show()
 
-    def show_contact_request_dialog(self, text, callback=None):
-        """ We disconnect and reconnect the callbacks every time
-            this is called, otherwise we'd would have multiple 
-            callback invokations per response since the widget 
-            stays alive """
+    def show_invited_dialog(self, text, callback=None):
+        """ 
+        We disconnect and reconnect the callbacks every time
+        this is called, otherwise we'd would have multiple 
+        callback invokations per response since the widget 
+        stays alive 
+        """
         def _response_cb(widget, response_id, callback):
             if response_id != gtk.RESPONSE_DELETE_EVENT:
                 widget.hide()
@@ -593,14 +642,18 @@ class Application(object):
                 callback(response_id == gtk.RESPONSE_OK)
             widget.disconnect(slot1)
 
-        self.contact_request_label.set_label(text)
-        dialog = self.contact_request_dialog
+        self.invited_dialog_label_widget.set_label(text)
+        dialog = self.invited_dialog
         dialog.set_modal(True)
         slot1 = dialog.connect('response', _response_cb, callback)
         dialog.show()
 
-    def hide_contacting_window(self, msg="", err=""):
-        self.contacting_window.hide()
+    def hide_calling_dialog(self, msg="", err=""):
+        """
+        Hides the "calling_dialog" dialog.
+        Shows an error dialog if the argument msg is set to "err", "timeout", "answTimeout", "send", "refuse" or "badAnsw".
+        """
+        self.calling_dialog.hide()
         text = None
         if msg == "err":
             text = _("<b><big>Contact unreacheable.</big></b>\n\nCould not connect to the IP address of this contact.")
@@ -625,26 +678,26 @@ class Application(object):
             selection = 0
         elif selection > base:
             selection = base
-        self.net_conf_bw_combo.set_active(selection)
+        self.conf_bandwidth_widget.set_active(selection)
 
     def init_negotiation_port(self):
-        self.negotiation_port_entry.set_text(str(self.config.negotiation_port))
+        self.negotiation_port_widget.set_text(str(self.config.negotiation_port))
 
     def init_ad_book_contact_list(self):
-        ad_book = self.ad_book
-        ad_book.contact = None
-        ad_book.new_contact = False
-        if len(ad_book.contact_list) > 0:
-            for contact in ad_book.contact_list:
+        address_book = self.address_book
+        address_book.contact = None
+        address_book.new_contact = False
+        if len(address_book.contact_list) > 0:
+            for contact in address_book.contact_list:
                 self.contact_tree.append(    ["<b>" + contact["name"]
                                             + "</b>\n  IP: "
                                             + contact["address"] + "\n  Port: "
                                             + str(contact["port"])] )
-            self.selection.select_path(ad_book.selected)
+            self.selection.select_path(address_book.selected)
         else:
-            self.contact_edit_but.set_sensitive(False)
-            self.remove_contact.set_sensitive(False)
-            self.contact_join_but.set_sensitive(False)
+            self.edit_contact_widget.set_sensitive(False)
+            self.remove_contact_widget.set_sensitive(False)
+            self.invite_contact_widget.set_sensitive(False)
 
     def on_server_rcv_command(self, message, addr, server):
         # XXX
@@ -690,7 +743,7 @@ class Application(object):
                 # user must respond in less than 5 seconds
                 server_answer_timeout_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
-                self.show_contact_request_dialog(text, _on_contact_request_dialog_result)
+                self.show_invited_dialog(text, _on_contact_request_dialog_result)
                 # TODO: change our sending audio/video ports based on those remote told us
             
         elif msg == "ACCEPT":
@@ -698,7 +751,7 @@ class Application(object):
             self.got_bye = False
             # TODO: Use session to contain settings and ports
             if self.client is not None:
-                self.hide_contacting_window("accept")
+                self.hide_calling_dialog("accept")
                 self.config.send_video_port = message["videoport"]
                 self.config.send_audio_port = message["audioport"]
                 if self.streamer_manager.is_busy():
@@ -710,7 +763,7 @@ class Application(object):
             else:
                 print("Error ! Connection lost.") # FIXME
         elif msg == "REFUSE":
-            self.hide_contacting_window("refuse")
+            self.hide_calling_dialog("refuse")
         elif msg == "ACK":
             print("Got ACK. Starting streamers as answerer.")
             self.start_streamers(addr)
@@ -782,19 +835,19 @@ class Application(object):
             
     def server_answer_timeout(self, addr):
         # XXX
-        self.contact_request_dialog.response(gtk.RESPONSE_NONE)
-        self.contact_request_dialog.hide()
+        self.invited_dialog.response(gtk.RESPONSE_NONE)
+        self.invited_dialog.hide()
         text = _("<b><big>%s was contacting you.</big></b>\n\nBut you did not answer in reasonable delay.") % addr
         self.show_error_dialog(text)
         return False
 
     def on_client_socket_timeout(self, client):
         # XXX
-        self.hide_contacting_window("timeout")
+        self.hide_calling_dialog("timeout")
     
     def on_client_socket_error(self, client, err, msg):
         # XXX
-        self.hide_contacting_window(msg)
+        self.hide_calling_dialog(msg)
         self.show_error_dialog(str(err) +": " +  str(msg))
 
     def on_client_connecting(self, client):
@@ -808,14 +861,14 @@ class Application(object):
 
     def client_answer_timeout(self, client):
         # XXX
-        if self.contacting_window.get_property('visible'):
-            self.hide_contacting_window("answTimeout")
+        if self.calling_dialog.get_property('visible'):
+            self.hide_calling_dialog("answTimeout")
     
 #    def on_start_milhouse_send(self):
-#        self.contact_join_but.set_sensitive(False)
+#        self.invite_contact_widget.set_sensitive(False)
 #
 #    def on_stop_milhouse_send(self):
 #        # FIXME: what is that ?
-#        self.contact_join_but.set_sensitive(True)
+#        self.invite_contact_widget.set_sensitive(True)
 
 

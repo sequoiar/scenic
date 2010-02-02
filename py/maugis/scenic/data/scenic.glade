@@ -3,7 +3,7 @@
 
 <glade-interface>
 
-<widget class="GtkWindow" id="mainWindow">
+<widget class="GtkWindow" id="main_window">
   <property name="width_request">640</property>
   <property name="height_request">480</property>
   <property name="title" translatable="yes">Scenic</property>
@@ -19,7 +19,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
-  <signal name="destroy" handler="on_main_window_destroy"/>
+  <signal name="destroy" handler="on_main_window_destroyed" last_modification_time="Tue, 02 Feb 2010 21:20:43 GMT"/>
 
   <child>
     <widget class="GtkNotebook" id="mainTabs">
@@ -56,7 +56,7 @@
 		  <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
 		  <child>
-		    <widget class="GtkTreeView" id="contactList">
+		    <widget class="GtkTreeView" id="contact_list">
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="headers_visible">True</property>
@@ -66,7 +66,7 @@
 		      <property name="fixed_height_mode">False</property>
 		      <property name="hover_selection">False</property>
 		      <property name="hover_expand">False</property>
-		      <signal name="row_activated" handler="on_contact_list_row_activated"/>
+		      <signal name="row_activated" handler="on_contact_double_clicked" last_modification_time="Tue, 02 Feb 2010 20:50:03 GMT"/>
 		    </widget>
 		  </child>
 		</widget>
@@ -112,7 +112,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkButton" id="removeContact">
+		    <widget class="GtkButton" id="remove_contact">
 		      <property name="visible">True</property>
 		      <property name="tooltip" translatable="yes">Delete this contact</property>
 		      <property name="can_focus">True</property>
@@ -140,14 +140,14 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkButton" id="contactEditBut">
+		    <widget class="GtkButton" id="edit_contact">
 		      <property name="visible">True</property>
 		      <property name="tooltip" translatable="yes">Edit this contact</property>
 		      <property name="can_default">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="relief">GTK_RELIEF_NONE</property>
 		      <property name="focus_on_click">True</property>
-		      <signal name="clicked" handler="on_contact_edit_but_clicked"/>
+		      <signal name="clicked" handler="on_edit_contact_clicked" last_modification_time="Tue, 02 Feb 2010 20:34:41 GMT"/>
 
 		      <child>
 			<widget class="GtkHBox" id="contactEditButBox">
@@ -232,7 +232,7 @@
 		  <property name="spacing">0</property>
 
 		  <child>
-		    <widget class="GtkButton" id="contactJoinBut">
+		    <widget class="GtkButton" id="invite_contact">
 		      <property name="visible">True</property>
 		      <property name="can_default">True</property>
 		      <property name="has_default">True</property>
@@ -240,7 +240,7 @@
 		      <property name="has_focus">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
 		      <property name="focus_on_click">True</property>
-		      <signal name="clicked" handler="on_client_join_but_clicked"/>
+		      <signal name="clicked" handler="on_invite_contact_clicked" last_modification_time="Tue, 02 Feb 2010 20:41:15 GMT"/>
 
 		      <child>
 			<widget class="GtkHBox" id="contactJoinButBox">
@@ -594,7 +594,7 @@
 			  <property name="right_padding">0</property>
 
 			  <child>
-			    <widget class="GtkEntry" id="netConfPortEntry">
+			    <widget class="GtkEntry" id="negotiation_port">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
 			      <property name="editable">True</property>
@@ -605,7 +605,7 @@
 			      <property name="invisible_char">*</property>
 			      <property name="activates_default">False</property>
 			      <property name="width_chars">6</property>
-			      <signal name="focus_out_event" handler="on_net_conf_port_entry_changed"/>
+			      <signal name="focus_out_event" handler="on_negotiation_port_changed" last_modification_time="Tue, 02 Feb 2010 20:45:35 GMT"/>
 			    </widget>
 			  </child>
 			</widget>
@@ -666,13 +666,13 @@
 			      <property name="spacing">10</property>
 
 			      <child>
-				<widget class="GtkButton" id="netConfSetBut">
+				<widget class="GtkButton" id="network_admin">
 				  <property name="visible">True</property>
 				  <property name="can_default">True</property>
 				  <property name="can_focus">True</property>
 				  <property name="relief">GTK_RELIEF_NORMAL</property>
 				  <property name="focus_on_click">True</property>
-				  <signal name="clicked" handler="on_net_conf_set_but_clicked"/>
+				  <signal name="clicked" handler="on_network_admin_clicked" last_modification_time="Tue, 02 Feb 2010 20:19:00 GMT"/>
 
 				  <child>
 				    <widget class="GtkAlignment" id="alignment41">
@@ -799,13 +799,13 @@
 			  <property name="right_padding">0</property>
 
 			  <child>
-			    <widget class="GtkComboBox" id="netConfBWCombo">
+			    <widget class="GtkComboBox" id="conf_bandwidth">
 			      <property name="visible">True</property>
 			      <property name="items" translatable="yes">15 Mbps
 30 Mbps</property>
 			      <property name="add_tearoffs">False</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="changed" handler="on_net_conf_bw_combo_changed"/>
+			      <signal name="changed" handler="on_conf_bandwidth_changed" last_modification_time="Tue, 02 Feb 2010 20:43:19 GMT"/>
 			    </widget>
 			  </child>
 			</widget>
@@ -915,13 +915,13 @@
 			  <property name="spacing">10</property>
 
 			  <child>
-			    <widget class="GtkButton" id="maintUpdBut">
+			    <widget class="GtkButton" id="maintenance_apt_update">
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Update Scenic and related librairies</property>
 			      <property name="can_focus">True</property>
 			      <property name="relief">GTK_RELIEF_NORMAL</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="clicked" handler="on_maint_upd_but_clicked"/>
+			      <signal name="clicked" handler="on_maintenance_apt_update_clicked" last_modification_time="Tue, 02 Feb 2010 20:25:08 GMT"/>
 
 			      <child>
 				<widget class="GtkAlignment" id="maintUpdButAlgn">
@@ -996,13 +996,13 @@
 			  </child>
 
 			  <child>
-			    <widget class="GtkButton" id="maintSendBut">
+			    <widget class="GtkButton" id="maintenance_send_info">
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Send the configuration information for troubleshooting</property>
 			      <property name="can_focus">True</property>
 			      <property name="relief">GTK_RELIEF_NORMAL</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="clicked" handler="on_maint_send_but_clicked"/>
+			      <signal name="clicked" handler="on_maintenance_send_info_clicked" last_modification_time="Tue, 02 Feb 2010 20:24:13 GMT"/>
 
 			      <child>
 				<widget class="GtkAlignment" id="maintSendButAlgn">
@@ -1166,13 +1166,13 @@
 			  <property name="spacing">10</property>
 
 			  <child>
-			    <widget class="GtkButton" id="sysShutdownBut">
+			    <widget class="GtkButton" id="system_shutdown">
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Shutdown the computer</property>
 			      <property name="can_focus">True</property>
 			      <property name="relief">GTK_RELIEF_NORMAL</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="clicked" handler="on_sys_shutdown_but_clicked"/>
+			      <signal name="clicked" handler="on_system_shutdown_clicked" last_modification_time="Tue, 02 Feb 2010 20:48:26 GMT"/>
 
 			      <child>
 				<widget class="GtkAlignment" id="sysShutdownButAlgn">
@@ -1247,13 +1247,13 @@
 			  </child>
 
 			  <child>
-			    <widget class="GtkButton" id="sysRebootBut">
+			    <widget class="GtkButton" id="system_reboot">
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Reboot the computer</property>
 			      <property name="can_focus">True</property>
 			      <property name="relief">GTK_RELIEF_NORMAL</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="clicked" handler="on_sys_reboot_but_clicked"/>
+			      <signal name="clicked" handler="on_system_reboot_clicked" last_modification_time="Tue, 02 Feb 2010 20:26:03 GMT"/>
 
 			      <child>
 				<widget class="GtkAlignment" id="sysRebootButAlgn">
@@ -1605,7 +1605,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   </child>
 </widget>
 
-<widget class="GtkDialog" id="normalDialog">
+<widget class="GtkDialog" id="confirm_dialog">
   <property name="border_width">5</property>
   <property name="title" translatable="yes">Confirmation</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -1621,6 +1621,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
+  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:18:03 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox1">
@@ -1706,7 +1707,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
 	      <property name="right_padding">5</property>
 
 	      <child>
-		<widget class="GtkLabel" id="confirmLabel">
+		<widget class="GtkLabel" id="confirm_label">
 		  <property name="visible">True</property>
 		  <property name="label" translatable="yes"></property>
 		  <property name="use_underline">False</property>
@@ -1756,7 +1757,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
-  <signal name="delete_event" handler="on_client_preview_window_delete_event"/>
+  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:20:26 GMT"/>
 
   <child>
     <widget class="GtkAlignment" id="alignment38">
@@ -1973,7 +1974,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   </child>
 </widget>
 
-<widget class="GtkDialog" id="contactingWindow">
+<widget class="GtkDialog" id="calling_dialog">
   <property name="width_request">250</property>
   <property name="title" translatable="yes">Contacting...</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -1989,6 +1990,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
+  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:17:29 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox2">
@@ -2108,7 +2110,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   </child>
 </widget>
 
-<widget class="GtkDialog" id="contactDialog">
+<widget class="GtkDialog" id="error_dialog">
   <property name="title" translatable="yes">Contact Problem</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
@@ -2123,6 +2125,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
+  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:16:45 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox3">
@@ -2193,7 +2196,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
 	      <property name="right_padding">5</property>
 
 	      <child>
-		<widget class="GtkLabel" id="contactProblemLabel">
+		<widget class="GtkLabel" id="error_dialog_label">
 		  <property name="visible">True</property>
 		  <property name="label" translatable="yes"></property>
 		  <property name="use_underline">False</property>
@@ -2229,7 +2232,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   </child>
 </widget>
 
-<widget class="GtkDialog" id="contactRequestDialog">
+<widget class="GtkDialog" id="invited_dialog">
   <property name="title" translatable="yes">Contact Request</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
@@ -2244,6 +2247,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
+  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:18:35 GMT"/>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="dialog-vbox4">
@@ -2452,7 +2456,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
 	      <property name="right_padding">5</property>
 
 	      <child>
-		<widget class="GtkLabel" id="contactRequestLabel">
+		<widget class="GtkLabel" id="invited_dialog_label">
 		  <property name="visible">True</property>
 		  <property name="label" translatable="yes"></property>
 		  <property name="use_underline">False</property>
@@ -2488,7 +2492,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   </child>
 </widget>
 
-<widget class="GtkWindow" id="editContactWindow">
+<widget class="GtkWindow" id="edit_contact_window">
   <property name="width_request">300</property>
   <property name="title" translatable="yes">Edit Contact</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -2503,7 +2507,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
-  <signal name="delete_event" handler="on_edit_contact_window_delete_event"/>
+  <signal name="delete_event" handler="gtk_widget_hide" last_modification_time="Tue, 02 Feb 2010 21:21:26 GMT"/>
 
   <child>
     <widget class="GtkTable" id="table1">
@@ -2544,7 +2548,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
       </child>
 
       <child>
-	<widget class="GtkEntry" id="contactPortEntry">
+	<widget class="GtkEntry" id="contact_port">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="editable">True</property>
@@ -2565,7 +2569,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
       </child>
 
       <child>
-	<widget class="GtkEntry" id="contactIPEntry">
+	<widget class="GtkEntry" id="contact_addr">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="editable">True</property>
@@ -2586,7 +2590,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
       </child>
 
       <child>
-	<widget class="GtkEntry" id="contactNameEntry">
+	<widget class="GtkEntry" id="contact_name">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="has_focus">True</property>
@@ -2634,7 +2638,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_edit_contact_cancel_but_clicked"/>
+		  <signal name="clicked" handler="on_edit_contact_cancel_clicked" last_modification_time="Tue, 02 Feb 2010 20:59:45 GMT"/>
 		</widget>
 	      </child>
 
@@ -2648,7 +2652,7 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
 		  <property name="use_stock">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
 		  <property name="focus_on_click">True</property>
-		  <signal name="clicked" handler="on_edit_contact_save_but_clicked"/>
+		  <signal name="clicked" handler="on_edit_contact_save_clicked" last_modification_time="Tue, 02 Feb 2010 21:22:13 GMT"/>
 		</widget>
 	      </child>
 	    </widget>
