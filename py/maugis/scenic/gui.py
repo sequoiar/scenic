@@ -715,7 +715,7 @@ class Application(object):
                 @param result: Answer to the dialog.
                 """
                 # unschedule server answer timeout
-                gobject.source_remove(server_answer_timeout_watch)
+                gobject.source_remove(answer_invite_timed_out_watch)
                 if result:
                     if self.client is not None:
                         self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
@@ -728,17 +728,17 @@ class Application(object):
                     if self.client is not None:
                         self.client.send({"msg":"REFUSE", "sid":0})
                 return True
+            # answer REFUSE if busy
             if self.streamer_manager.is_busy():
                 print("Got invitation, but we are busy.")
                 #self.client.send({"msg":"REFUSE", "sid":0})
                 communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
             else:
-                # TODO: if already streaming, answer REFUSE
                 print "sending to %s:%s" % (addr, send_to_port)
                 self.client = communication.Client(self, send_to_port)
                 self.client.connect(addr)
                 # user must respond in less than 5 seconds
-                server_answer_timeout_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
+                answer_invite_timed_out_watch = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
                 # TODO: change our sending audio/video ports based on those remote told us
@@ -830,12 +830,16 @@ class Application(object):
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
-    def server_answer_timeout(self, addr):
-        # XXX
+    def _cl_answer_invite_timed_out(self, addr):
+        """ 
+        This is called if we haven't responded to our peer's invitation within a 
+        reasonable delay (hardcoded to 5000 ms)
+        """
         self.invited_dialog.response(gtk.RESPONSE_NONE)
         self.invited_dialog.hide()
-        text = _("%s was contacting you.\n\nBut you did not answer in reasonable delay.") % addr
+        text = _("%s was inviting you.\n\nBut you did not answer in reasonable delay.") % addr
         self.show_error_dialog(text)
+        self.client = None
         return False
 
     def on_client_socket_timeout(self, client):
