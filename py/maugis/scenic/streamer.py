@@ -46,6 +46,8 @@ class StreamerManager(object):
         Starts the sender and receiver processes.
         @param host: str ip addr
         @param config: gui.Config object
+        
+        Raises a RuntimeError if a sesison is already in progress.
         """
         if self.state != process.STATE_STOPPED:
             raise RuntimeError("Cannot start streamers since they are %s." % (self.state))
@@ -86,6 +88,12 @@ class StreamerManager(object):
         self.sender.start()
         print "$", recv_cmd
         self.receiver.start()
+
+    def is_busy(self):
+        """
+        Retuns True if a streaming session is in progress.
+        """
+        return self.state != process.STATE_STOPPED
 
     def on_process_state_changed(self, process_manager, process_state):
         """

@@ -171,4 +171,18 @@ class Client(object):
             msg = "Not connected. Client is None."
             return defer.succeed(True) # FIXME
             
-            
+def connect_send_and_disconnect(host, port, mess):
+    d = defer.Deferred()
+    def _on_connected(sic_sender):
+        sic_sender.send_message(mess)
+        clientPort.transport.loseConnection()
+        d.callback(True)
+    def _on_error(reason):
+        print reason
+        d.errback(reason)
+        return None
+    client_factory = sic.ClientFactory()
+    print 'trying to connect to', host, port, 'to send message', mess
+    clientPort = reactor.connectTCP(host, port, client_factory)
+    client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
+    return d

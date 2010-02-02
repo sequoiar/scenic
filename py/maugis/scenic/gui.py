@@ -86,6 +86,7 @@ from scenic.streamer import StreamerManager
 from twisted.internet import defer
 from twisted.internet import error
 from twisted.internet import reactor
+from scenic import dialogs
 
 class Config(object):
     """
@@ -495,30 +496,33 @@ class Application(object):
         """
         Sends an INVITE to the remote peer.
         """
-        msg = {
-            "msg":"INVITE",
-            "sid":0, 
-            "videoport": self.config.recv_video_port,
-            "audioport": self.config.recv_audio_port,
-            "please_send_to_port": self.config.negotiation_port
-            }
-        port = self.config.negotiation_port # self.ad_book.contact["port"]
-        ip = self.ad_book.contact["address"]
+        if self.streamer_manager.is_busy():
+            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.")
+        else:
+            msg = {
+                "msg":"INVITE",
+                "sid":0, 
+                "videoport": self.config.recv_video_port,
+                "audioport": self.config.recv_audio_port,
+                "please_send_to_port": self.config.negotiation_port
+                }
+            port = self.config.negotiation_port # self.ad_book.contact["port"]
+            ip = self.ad_book.contact["address"]
 
-        def _on_connected(proto):
-            self.client.send(msg)
-            return proto
-        def _on_error(reason):
-            print "error trying to connect to %s:%s : %s" % (ip, port, reason)
-            self.contacting_window.hide()
-            return reason
-           
-        print "sending %s to %s:%s" % (msg, ip, port) 
-        self.client = communication.Client(self, port)
-        deferred = self.client.connect(ip)
-        deferred.addCallback(_on_connected).addErrback(_on_error)
-        self.contacting_window.show()
-        # window will be hidden when we receive ACCEPT or REFUSE
+            def _on_connected(proto):
+                self.client.send(msg)
+                return proto
+            def _on_error(reason):
+                print "error trying to connect to %s:%s : %s" % (ip, port, reason)
+                self.contacting_window.hide()
+                return reason
+               
+            print "sending %s to %s:%s" % (msg, ip, port) 
+            self.client = communication.Client(self, port)
+            deferred = self.client.connect(ip)
+            deferred.addCallback(_on_connected).addErrback(_on_error)
+            self.contacting_window.show()
+            # window will be hidden when we receive ACCEPT or REFUSE
 
     def on_net_conf_bw_combo_changed(self, *args):
         base = 30
@@ -651,6 +655,7 @@ class Application(object):
         if msg == "INVITE":
             # FIXME: this doesn't make sense here
             self.got_bye = False
+            send_to_port = message["please_send_to_port"]
             # TODO
             # if local user doesn't respond, close dialog in 5 seconds
             
@@ -673,17 +678,20 @@ class Application(object):
                     if self.client is not None:
                         self.client.send({"msg":"REFUSE", "sid":0})
                 return True
-
-            # TODO: if already streaming, answer REFUSE
-            send_to_port = message["please_send_to_port"]
-            print "sending to %s:%s" % (addr, send_to_port)
-            self.client = communication.Client(self, send_to_port)
-            self.client.connect(addr)
-            # user must respond in less than 5 seconds
-            server_answer_timeout_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
-            text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
-            self.show_contact_request_dialog(text, _on_contact_request_dialog_result)
-            # TODO: change our sending audio/video ports based on those remote told us
+            if self.streamer_manager.is_busy():
+                print("Got invitation, but we are busy.")
+                #self.client.send({"msg":"REFUSE", "sid":0})
+                communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
+            else:
+                # TODO: if already streaming, answer REFUSE
+                print "sending to %s:%s" % (addr, send_to_port)
+                self.client = communication.Client(self, send_to_port)
+                self.client.connect(addr)
+                # user must respond in less than 5 seconds
+                server_answer_timeout_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
+                text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
+                self.show_contact_request_dialog(text, _on_contact_request_dialog_result)
+                # TODO: change our sending audio/video ports based on those remote told us
             
         elif msg == "ACCEPT":
             # FIXME: this doesn't make sense here
@@ -693,9 +701,12 @@ class Application(object):
                 self.hide_contacting_window("accept")
                 self.config.send_video_port = message["videoport"]
                 self.config.send_audio_port = message["audioport"]
-                self.client.send({"msg":"ACK", "sid":0})
-                print("Got ACCEPT. Starting streamers as initiator.")
-                self.start_streamers(addr)
+                if self.streamer_manager.is_busy():
+                    dialogs.ErrorDialog.create("A streaming session is already in progress.")
+                else:
+                    print("Got ACCEPT. Starting streamers as initiator.")
+                    self.start_streamers(addr)
+                    self.client.send({"msg":"ACK", "sid":0})
             else:
                 print("Error ! Connection lost.") # FIXME
         elif msg == "REFUSE":
