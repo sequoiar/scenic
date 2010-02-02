@@ -48,6 +48,7 @@ class ErrorDialog(object):
             type=gtk.MESSAGE_ERROR, 
             buttons=gtk.BUTTONS_CLOSE, 
             message_format=message)
+        error_dialog.set_modal(True)
         error_dialog.connect("close", self.on_close)
         error_dialog.connect("response", self.on_response)
         error_dialog.show()
@@ -88,16 +89,16 @@ class YesNoDialog(object):
     def __init__(self, deferred, message):
         self.deferredResult = deferred
         parent = None
-        error_dialog = gtk.MessageDialog(
+        yes_no_dialog = gtk.MessageDialog(
             parent=None, 
             flags=0, 
             type=gtk.MESSAGE_QUESTION, 
             buttons=gtk.BUTTONS_YES_NO, 
             message_format=message)
-        error_dialog.set_modal(True)
-        error_dialog.connect("close", self.on_close)
-        error_dialog.connect("response", self.on_response)
-        error_dialog.show()
+        yes_no_dialog.set_modal(True)
+        yes_no_dialog.connect("close", self.on_close)
+        yes_no_dialog.connect("response", self.on_response)
+        yes_no_dialog.show()
 
     @staticmethod
     def create(message):
@@ -129,3 +130,8 @@ class YesNoDialog(object):
         dialog.destroy()
         self.deferredResult.callback(answer)
 
+
+if __name__ == '__main__': 
+    d = ErrorDialog.create('BOBBBBBBBBBB')
+    d.addCallback(lambda result: reactor.stop())
+    reactor.run()
