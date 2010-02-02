@@ -689,7 +689,7 @@ class Application(object):
                 self.client.connect(addr)
                 # user must respond in less than 5 seconds
                 server_answer_timeout_watch = gobject.timeout_add(5000, self.server_answer_timeout, addr)
-                text = _("<b><big>" + addr[0] + " is contacting you.</big></b>\n\nDo you accept the connection?")
+                text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_contact_request_dialog(text, _on_contact_request_dialog_result)
                 # TODO: change our sending audio/video ports based on those remote told us
             
