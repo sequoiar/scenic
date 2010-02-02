@@ -21,11 +21,12 @@ __version__ = "0.1.0"
 
 packages = [
     "scenic",
-    "scenic.locale",
-    "scenic.locale.en_US",
-    "scenic.locale.en_US.LC_MESSAGES",
-    "scenic.locale.fr_CA",
-    "scenic.locale.fr_CA.LC_MESSAGES"
+    "scenic.data",
+    "scenic.data.locale",
+    "scenic.data.locale.en_US",
+    "scenic.data.locale.en_US.LC_MESSAGES",
+    "scenic.data.locale.fr_CA",
+    "scenic.data.locale.fr_CA.LC_MESSAGES"
     ]
 
 setup(
