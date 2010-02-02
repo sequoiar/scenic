@@ -40,8 +40,10 @@ class SICProtocol(basic.LineReceiver):
             if hasattr(self.factory, 'connected_deferred'):
                 if not self.factory.connected_deferred.called:
                     self.factory.connected_deferred.callback(self)
+            else:
+                print "SIC: No connected_deferred"
         else:
-            print "SIC: No connected_deferred"
+            print "SIC: No factory"
 
     def lineReceived(self, data):
         """
@@ -81,6 +83,10 @@ class ClientFactory(protocol.ClientFactory):
     protocol = SICProtocol
     def __init__(self):
         self.connected_deferred = defer.Deferred()
+
+    def clientConnectionFailed(self, connector, reason):
+        print 'Connection failed. Reason:', reason
+        self.connected_deferred.errback(reason)
 
 class ServerFactory(protocol.ServerFactory):
     protocol = SICProtocol

@@ -120,7 +120,7 @@ class Client(object):
             print "could not connect"
             self._connected = False
             self.sic_sender = None
-            err = str(reason)
+            err = str(reason.getErrorMessage())
             msg = "Could not send to remote host."
             self.socket_error_signal(self, err, msg)
             return reason        
