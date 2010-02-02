@@ -4,6 +4,8 @@
 Simple protocol using JSON over TCP.
 SIC Stands for "SIP Spelled Incorrectly".
 """
+
+import sys 
 # JSON import:
 try:
     import json # python 2.6
@@ -17,7 +19,6 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
-import types
 from twisted.internet import reactor
 from twisted.internet import protocol
 from twisted.internet import defer

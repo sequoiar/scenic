@@ -27,17 +27,6 @@ from twisted.internet import gtk2reactor
 gtk2reactor.install() # has to be done before importing reactor
 from twisted.internet import reactor
 from twisted.internet import error
-
-try:
-    import pygtk
-    pygtk.require("2.0")
-except Exception, e:
-    print e
-try:
-    import gtk
-except ImportError, e:
-    print "Could not load GTK or glade. Install python-gtk2 and python-glade2.", str(e)
-    sys.exit(1)
 from scenic import gui
 
 def run():

@@ -19,23 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-import socket
-import gobject
-
-# JSON import:
-try:
-    import json # python 2.6
-except ImportError:
-    import simplejson as json # python 2.4 to 2.5
-try:
-    _tmp = json.loads
-except AttributeError:
-    import warnings
-    warnings.warn("Use simplejson, not the old json module.")
-    sys.modules.pop('json') # get rid of the bad json module
-    import simplejson as json
-
 from scenic import sig
 from scenic import sic
 from twisted.internet import reactor
