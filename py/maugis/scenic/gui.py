@@ -246,21 +246,17 @@ class Application(object):
         self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
         # confirm_dialog
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
-        self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
         self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_label = self.widgets.get_widget("confirm_label")
         # contacting...
         self.calling_dialog = self.widgets.get_widget("calling_dialog")
-        self.calling_dialog.connect('delete-event', self.calling_dialog.hide_on_delete)
         # Error!
         self.error_dialog = self.widgets.get_widget("error_dialog")
-        self.error_dialog.connect('delete-event', self.error_dialog.hide_on_delete)
         self.error_dialog.set_transient_for(self.main_window)
         # Could not connect
         self.error_label_widget = self.widgets.get_widget("error_dialog_label")
         
         self.invited_dialog = self.widgets.get_widget("invited_dialog")
-        self.invited_dialog.connect('delete-event', self.invited_dialog.hide_on_delete)
         self.invited_dialog.set_transient_for(self.main_window)
         self.invited_dialog_label_widget = self.widgets.get_widget("invited_dialog_label")
         self.edit_contact_window = self.widgets.get_widget("edit_contact_window")
