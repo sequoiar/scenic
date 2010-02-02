@@ -57,7 +57,7 @@ int dc1394_caps_print_format_vmode_caps(int mode)
   {
 #define PRINT_CASE(x) \
             case (DC1394_VIDEO_MODE_ ##x): \
-                      LOG_PRINT("\t" << # x << " (vmode " << mode << ")" << std::endl); \
+                      LOG_PRINT("    " << # x << " (vmode " << mode << ")" << std::endl); \
             break
 
     PRINT_CASE(160x120_YUV444);
@@ -252,7 +252,7 @@ int DC1394::capsToMode(int cameraId, int width, int height,
 
 void printSupportedFramerates(dc1394framerates_t framerates)
 {
-    LOG_PRINT("\tFramerates: ");
+    LOG_PRINT("    Framerates: ");
     std::string delimiter;
 
 #define PRINT_CASE_FRACTION(whole, fraction) \

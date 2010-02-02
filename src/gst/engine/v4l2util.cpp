@@ -169,13 +169,13 @@ void v4l2util::printCaptureFormat(const std::string &device)
     v4l2_format vfmt = getCaptureFormat(device);
 
     LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
-    LOG_PRINT("\tWidth/Height  : " << vfmt.fmt.pix.width << "/" << vfmt.fmt.pix.height << "\n");
-    LOG_PRINT("\tPixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
-    LOG_PRINT("\tCapture Type  : " << vfmt.type << "\n");
-    LOG_PRINT("\tField         : " << field2s(vfmt.fmt.pix.field) << "\n");
-    LOG_PRINT("\tBytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
-    LOG_PRINT("\tSize Image    : " << vfmt.fmt.pix.sizeimage << "\n");
-    LOG_PRINT("\tColorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
+    LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "/" << vfmt.fmt.pix.height << "\n");
+    LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
+    LOG_PRINT("    Capture Type  : " << vfmt.type << "\n");
+    LOG_PRINT("    Field         : " << field2s(vfmt.fmt.pix.field) << "\n");
+    LOG_PRINT("    Bytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
+    LOG_PRINT("    Size Image    : " << vfmt.fmt.pix.sizeimage << "\n");
+    LOG_PRINT("    Colorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
     printSupportedSizes(device);
 }
 
