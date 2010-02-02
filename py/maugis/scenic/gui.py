@@ -243,6 +243,7 @@ class Application(object):
 
         # get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
+        self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
         # confirm_dialog
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
         self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
