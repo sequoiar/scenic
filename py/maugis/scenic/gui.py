@@ -253,7 +253,7 @@ class Application(object):
         self.confirm_label = self.widgets.get_widget("confirm_label")
         # calling_dialog:
         self.calling_dialog = self.widgets.get_widget("calling_dialog")
-        self.calling_dialog.connect('delete-event', self.calling_dialog.hide_on_delete)
+        self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         # error_dialog:
         self.error_dialog = self.widgets.get_widget("error_dialog")
         self.error_dialog.connect('delete-event', self.error_dialog.hide_on_delete)
@@ -587,6 +587,33 @@ class Application(object):
             deferred.addCallback(_on_connected).addErrback(_on_error)
             self.calling_dialog.show()
             # window will be hidden when we receive ACCEPT or REFUSE
+    
+    def on_invite_contact_cancelled(self, *args):
+        """
+        Sends a CANCEL to the remote peer.
+        """
+        msg = {
+            "msg":"CANCEL",
+            "sid":0
+            }
+        port = self.config.negotiation_port # self.address_book.contact["port"]
+        ip = self.address_book.contact["address"]
+
+        def _on_connected(proto):
+            self.client.send(msg)
+            self.client = None
+            return proto
+        def _on_error(reason):
+            print "error trying to connect to %s:%s : %s" % (ip, port, reason)
+            self.client = None
+            return None
+           
+        print "SENDING %s TO %s:%s FUCKKKKKKKK" % (msg, ip, port) 
+        self.client = communication.Client(self, port)
+        deferred = self.client.connect(ip)
+        deferred.addCallback(_on_connected).addErrback(_on_error)
+        self.calling_dialog.hide()
+        # window will be hidden when we receive ACCEPT or REFUSE
 
     def on_conf_bandwidth_changed(self, *args):
         """
@@ -769,6 +796,9 @@ class Application(object):
                 answer_invite_timed_out_watch = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
+        elif msg == "CANCEL":
+            print 'GOT CANCEL!!!!!!!!!'
+            client = None
             
         elif msg == "ACCEPT":
             # FIXME: this doesn't make sense here
@@ -840,6 +870,14 @@ class Application(object):
             return d
         else: 
             return defer.succeed(True)
+    
+    def send_cancel(self):
+        """
+        Sends CANCEL
+        CANCEL cancels the invite sent to the remote host.
+        """
+        if self.client is not None:
+            self.client.send({"msg":"CANCEL", "sid":0})
 
     def send_bye(self):
         """
