@@ -95,7 +95,7 @@ class Config(object):
     # Default values
     negotiation_port = 17446 # sending/receiving TCP messages on it.
     smtpserver = "smtp.sat.qc.ca"
-    emailinfo = "maugis@sat.qc.ca"
+    emailinfo = "scenic@sat.qc.ca"
     audio_input = "jackaudiosrc"
     audio_output = "jackaudiosink"
     audio_codec = "raw"
@@ -112,11 +112,11 @@ class Config(object):
     bandwidth = 30
     
     def __init__(self):
-        config_file = 'maugis.cfg'
+        config_file = 'scenic.cfg'
         if os.path.isfile('/etc/' + config_file):
             config_dir = '/etc'
         else:
-            config_dir = os.environ['HOME'] + '/.maugis'
+            config_dir = os.environ['HOME'] + '/.scenic'
         self._config_path = os.path.join(config_dir, config_file)
         if os.path.isfile(self._config_path):
             self._read()
@@ -169,7 +169,7 @@ class AddressBook(object):
         self.contact_list = []
         self.selected = 0
         #FIXME: do not hard code
-        self.contacts_file_name = os.path.join(os.environ['HOME'], '.maugis/contacts.json')
+        self.contacts_file_name = os.path.join(os.environ['HOME'], '.scenic/contacts.json')
         self.SELECTED_KEYNAME = "selected:" # FIXME
         self.read()
 
@@ -224,12 +224,12 @@ class Application(object):
         self.got_bye = False
 
         # Set the Glade file
-        glade_file = os.path.join(PACKAGE_DATA, 'maugis.glade')
+        glade_file = os.path.join(PACKAGE_DATA, 'scenic.glade')
         if os.path.isfile(glade_file):
             glade_path = glade_file
         else:
             text = _("<b><big>Could not find the Glade file?</big></b>\n\n" \
-                    "Be sure the file %s is in /usr/share/maugis/. Quitting.") % glade_file
+                    "Be sure the file %s exists. Quitting.") % glade_file
             print text
             sys.exit()
         self.widgets = gtk.glade.XML(glade_path, domain=APP_NAME)
@@ -470,7 +470,7 @@ class Application(object):
                 except:
                     msg += "Error executing 'lsmod'"
 
-                fromaddr = "maugis@sat.qc.ca"
+                fromaddr = "scenic@sat.qc.ca"
                 toaddrs  = self.config.emailinfo
                 toaddrs = toaddrs.split(', ')
                 server = smtplib.SMTP(self.config.smtpserver)
@@ -482,7 +482,7 @@ class Application(object):
                     self.show_error_dialog(text)
                 server.quit()
 
-        text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of maugis?")
+        text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
         self.show_confirm_dialog(text, on_confirm_result)
 
     def has_session(self):
