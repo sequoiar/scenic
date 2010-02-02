@@ -427,13 +427,13 @@ class Application(object):
         if port == "":
             port = str(self.config.negotiation_port) # set port to default
         elif (not port.isdigit()) or (int(port) not in range(10000, 65535)):
-            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 10000-65535")
+            text = _("The port number is not valid\n\nEnter a valid port number in the range of 10000-65535")
             self.show_error_dialog(text)
             return
         # Validate the address
         addr = self.contact_addr_widget.get_text()
         if len(addr) < 7:
-            text = _("<b><big>The address is not valid</big></b>\n\nEnter a valid address\nExample: 168.123.45.32 or example.org")
+            text = _("The address is not valid\n\nEnter a valid address\nExample: 168.123.45.32 or example.org")
             self.show_error_dialog(text)
             return
         # save it.
@@ -518,7 +518,7 @@ class Application(object):
                 try:
                     server.sendmail(fromaddr, toaddrs, msg)
                 except:
-                    text = _("<b><big>Could not send info.</big></b>\n\nCheck your internet connection.")
+                    text = _("Could not send info.\n\nCheck your internet connection.")
                     self.show_error_dialog(text)
                 server.quit()
 
@@ -593,7 +593,7 @@ class Application(object):
         if not port.isdigit():
             self.widgets.get_widget("mainTabs").set_current_page(1)
             self.init_negotiation_port()
-            text = _("<b><big>The port number is not valid</big></b>\n\nEnter a valid port number in the range of 1-999999")
+            text = _("The port number is not valid\n\nEnter a valid port number in the range of 1-999999")
             self.show_error_dialog(text, on_error_dialog_result)
         else:
             self.config.negotiation_port = int(port)
@@ -608,7 +608,7 @@ class Application(object):
                 callback()
             widget.disconnect(slot1)
 
-        self.error_label_widget.set_label(text)
+        self.error_label_widget.set_text(text)
         dialog = self.error_dialog
         dialog.set_modal(True)
         slot1 = dialog.connect('response', _response_cb, callback)
@@ -656,17 +656,17 @@ class Application(object):
         self.calling_dialog.hide()
         text = None
         if msg == "err":
-            text = _("<b><big>Contact unreacheable.</big></b>\n\nCould not connect to the IP address of this contact.")
+            text = _("Contact unreacheable.\n\nCould not connect to the IP address of this contact.")
         elif msg == "timeout":
-            text = _("<b><big>Connection timeout.</big></b>\n\nCould not connect to the port of this contact.")
+            text = _("Connection timeout.\n\nCould not connect to the port of this contact.")
         elif msg == "answTimeout":
-            text = _("<b><big>Contact answer timeout.</big></b>\n\nThe contact did not answer soon enough.")
+            text = _("Contact answer timeout.\n\nThe contact did not answer soon enough.")
         elif msg == "send":
-            text = _("<b><big>Problem sending command.</big></b>\n\nError: %s") % err
+            text = _("Problem sending command.\n\nError: %s") % err
         elif msg == "refuse":
-            text = _("<b><big>Connection refused.</big></b>\n\nThe contact refused the connection.")
+            text = _("Connection refused.\n\nThe contact refused the connection.")
         elif msg == "badAnsw":
-            text = _("<b><big>Invalid answer.</big></b>\n\nThe answer was not valid.")
+            text = _("Invalid answer.\n\nThe answer was not valid.")
         if text is not None:
             self.show_error_dialog(text)
 
@@ -837,7 +837,7 @@ class Application(object):
         # XXX
         self.invited_dialog.response(gtk.RESPONSE_NONE)
         self.invited_dialog.hide()
-        text = _("<b><big>%s was contacting you.</big></b>\n\nBut you did not answer in reasonable delay.") % addr
+        text = _("%s was contacting you.\n\nBut you did not answer in reasonable delay.") % addr
         self.show_error_dialog(text)
         return False
 
@@ -848,7 +848,8 @@ class Application(object):
     def on_client_socket_error(self, client, err, msg):
         # XXX
         self.hide_calling_dialog(msg)
-        self.show_error_dialog(str(err) +": " +  str(msg))
+        text = _("%s: %s") % (str(err), str(msg))
+        self.show_error_dialog(text)
 
     def on_client_connecting(self, client):
         # XXX
@@ -864,11 +865,3 @@ class Application(object):
         if self.calling_dialog.get_property('visible'):
             self.hide_calling_dialog("answTimeout")
     
-#    def on_start_milhouse_send(self):
-#        self.invite_contact_widget.set_sensitive(False)
-#
-#    def on_stop_milhouse_send(self):
-#        # FIXME: what is that ?
-#        self.invite_contact_widget.set_sensitive(True)
-
-
