@@ -608,7 +608,7 @@ class Application(object):
             self.client = None
             return None
            
-        print "SENDING %s TO %s:%s FUCKKKKKKKK" % (msg, ip, port) 
+        print "SENDING %s TO %s:%s" % (msg, ip, port) 
         self.client = communication.Client(self, port)
         deferred = self.client.connect(ip)
         deferred.addCallback(_on_connected).addErrback(_on_error)
