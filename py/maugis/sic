@@ -1,2 +1,0 @@
-#!/bin/bash
-PYTHONPATH=$PWD python ./scenic/sic.py

@@ -492,7 +492,6 @@ class Application(object):
         return self._has_session
         
     def on_client_join_but_clicked(self, *args):
-        # XXX
         """
         Sends an INVITE to the remote peer.
         """
@@ -515,7 +514,8 @@ class Application(object):
             def _on_error(reason):
                 print "error trying to connect to %s:%s : %s" % (ip, port, reason)
                 self.contacting_window.hide()
-                return reason
+                self.client = None
+                return None
                
             print "sending %s to %s:%s" % (msg, ip, port) 
             self.client = communication.Client(self, port)

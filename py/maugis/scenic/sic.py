@@ -87,6 +87,7 @@ class ClientFactory(protocol.ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         print 'Connection failed. Reason:', reason
         self.connected_deferred.errback(reason)
+        return True
 
 class ServerFactory(protocol.ServerFactory):
     protocol = SICProtocol
