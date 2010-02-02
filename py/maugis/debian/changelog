@@ -1,0 +1,5 @@
+toonloop (0.1.0-0ubuntu1) hardy; urgency=low
+
+  * Initial packaging
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Tue, 02 Feb 2010 17:50:03 -0500

@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+DEB_PYTHON_SYSTEM=pycentral
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/python-distutils.mk
+
+# Add here any variable or target overrides you need.
+# dh_install toonloop.svg usr/share/icons/hicolor/scalable/apps
+# dh_install toonloop.png usr/share/icons/hicolor/48x48/apps
+binary-install/scenic::
+	dh_pycentral -pscenic
+	dh_install scenic.desktop usr/share/applications
+	convert -geometry 48x48 -background none scenic.svg scenic.png
+	dh_install scenic.png usr/share/pixmaps
+	dh_installdocs debian/copyright
+	help2man --no-info --name="Scenic Video Streaming Software for GNU/Linux" ./scripts/scenic > scenic.1 
+	dh_installman scenic.1
