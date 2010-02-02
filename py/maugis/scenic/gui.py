@@ -283,6 +283,9 @@ class Application(object):
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_num = None
+            
+        # corresponds to the answer_invite_timeout function
+        self._answer_invite_timed_out_watch = None
 
         # adjust the bandwidth combobox iniline with the config 
         self.init_bandwidth()
@@ -749,6 +752,12 @@ class Application(object):
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
 
+    def _unschedule_answer_invite_timeout(self):
+        """ Unschedules our answer invite timeout function """
+        if self._answer_invite_timed_out_watch is not None:
+            gobject.source_remove(self._answer_invite_timed_out_watch)
+            self._answer_invite_timed_out_watch = None
+
     def on_server_rcv_command(self, message, addr, server):
         # XXX
         msg = message["msg"]
@@ -767,8 +776,7 @@ class Application(object):
                 User is accetping or declining an offer.
                 @param result: Answer to the dialog.
                 """
-                # unschedule server answer timeout
-                gobject.source_remove(answer_invite_timed_out_watch)
+                self._unschedule_answer_invite_timeout()
                 if result:
                     if self.client is not None:
                         self.allocate_ports()
@@ -793,12 +801,16 @@ class Application(object):
                 self.client = communication.Client(self, send_to_port)
                 self.client.connect(addr)
                 # user must respond in less than 5 seconds
-                answer_invite_timed_out_watch = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
+                self._answer_invite_timed_out_watch = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
+
         elif msg == "CANCEL":
             print 'GOT CANCEL!!!!!!!!!'
-            client = None
+            self._unschedule_answer_invite_timeout()
+            self.client = None
+            self.invited_dialog.hide()
+            dialogs.ErrorDialog.create("Remote peer cancelled invitation.")
             
         elif msg == "ACCEPT":
             # FIXME: this doesn't make sense here
