@@ -543,7 +543,8 @@ class Application(object):
         self._unschedule_offerer_invite_timeout()
         self.send_cancel_and_disconnect()
         # don't let the delete-event propagate
-        self.hide_calling_dialog("answTimeout")
+        if self.calling_dialog.get_property('visible'):
+            self.calling_dialog.hide()
         return True
 
     def on_conf_bandwidth_changed(self, *args):
