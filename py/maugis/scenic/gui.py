@@ -506,7 +506,7 @@ class Application(object):
             "msg":"CANCEL",
             "sid":0
             }
-        port = self.config.negotiation_port # self.address_book.contact["port"]
+        port = self.config.negotiation_port
         ip = self.address_book.contact["address"]
 
         def _on_connected(proto):
@@ -663,16 +663,23 @@ class Application(object):
     def _unschedule_answerer_invite_timeout(self):
         """ Unschedules our answer invite timeout function """
         if self._answerer_invite_timeout is not None:
-            print 'UNSCHEDULE ANSWERER INVITE'
             gobject.source_remove(self._answerer_invite_timeout)
             self._answerer_invite_timeout = None
     
     def _unschedule_offerer_invite_timeout(self):
         """ Unschedules our offer invite timeout function """
         if self._offerer_invite_timeout is not None:
-            print 'UNSCHEDULE OFFERER INVITE'
             gobject.source_remove(self._offerer_invite_timeout)
             self._offerer_invite_timeout = None
+    
+    def _schedule_answerer_invite_timeout(self, data):
+        """ Schedules our answer invite timeout function """
+        # user must respond in less than 6 seconds
+        self._answerer_invite_timeout = gobject.timeout_add(6000, self._cl_answerer_invite_timed_out, data)
+    
+    def _schedule_offerer_invite_timeout(self, data):
+        """ Schedules our offer invite timeout function """
+        self._offerer_invite_timeout = gobject.timeout_add(6000, self._cl_offerer_invite_timed_out, data)
 
     def on_server_rcv_command(self, message, addr, server):
         # XXX
@@ -716,8 +723,7 @@ class Application(object):
                 print "sending to %s:%s" % (addr, send_to_port)
                 self.client = communication.Client(self, send_to_port)
                 self.client.connect(addr)
-                # user must respond in less than 6 seconds
-                self._answerer_invite_timeout = gobject.timeout_add(6000, self._cl_answerer_invite_timed_out, addr)
+                self_.schedule_answerer_invite_timeout(addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
 
@@ -822,7 +828,6 @@ class Application(object):
         This is called if we haven't responded to our peer's invitation within a 
         reasonable delay (hardcoded to 5000 ms)
         """
-        self.invited_dialog.response(gtk.RESPONSE_NONE)
         self.invited_dialog.hide()
         text = _("%s was inviting you.\n\nBut you did not answer in reasonable delay.") % addr
         self.show_error_dialog(text)
@@ -843,10 +848,10 @@ class Application(object):
         # XXX
         """
         Slot for the sending_signal of the client.
-        schedules some stuff.
+        Schedules a timeout that will make our invitation expire
+        if we haven't gotten an answer soon enough.
         """
-        # call later
-        self._offerer_invite_timeout = gobject.timeout_add(5000, self._cl_offerer_invite_timed_out, client)
+        self._schedule_offerer_invite_timeout(client)
 
     def _cl_offerer_invite_timed_out(self, client):
         # XXX
