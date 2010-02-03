@@ -509,6 +509,7 @@ class Application(object):
         deferred = self.client.connect(ip)
         deferred.addCallback(_on_connected).addErrback(_on_error)
         self.calling_dialog.hide()
+        return True
         # window will be hidden when we receive ACCEPT or REFUSE
 
     def on_conf_bandwidth_changed(self, *args):
