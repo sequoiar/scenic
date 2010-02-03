@@ -33,11 +33,6 @@ Negotiation is done as follow:
 
 Former Notes
 ------------
- * voir si il faut gerer une demande de connexion alors que c'est deja connecte
- * voir si le bouton "cancel" est necesaire dans la fenetre "contacting" :
- *   - si oui il faudra trouver un moyen de faire la connection sans bloquer l'interface
- *   (thread, idle gtk ou io_watch?)
- * en prod regler test a 0
  * bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
 ### CONSTANTS ###
@@ -49,47 +44,32 @@ APP_NAME = "scenic"
 import sys
 import os
 import smtplib
-from scenic import data
-PACKAGE_DATA = os.path.dirname(data.__file__)
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-except ImportError, e:
-    print "Could not load GTK or glade. Install python-gtk2 and python-glade2.", str(e)
-    sys.exit(1)
-# JSON import:
-try:
-    import json # python 2.6
-except ImportError:
-    import simplejson as json # python 2.4 to 2.5
-try:
-    _tmp = json.loads
-except AttributeError:
-    import warnings
-    warnings.warn("Use simplejson, not the old json module.")
-    sys.modules.pop('json') # get rid of the bad json module
-    import simplejson as json
-
-### MULTILINGUAL SUPPORT ###
-DIR = os.path.join(PACKAGE_DATA, "locale")
+import gtk
+import gtk.glade
+import gobject
 import gettext
-_ = gettext.gettext
-gettext.bindtextdomain(APP_NAME, DIR)
-gettext.textdomain(APP_NAME)
-gtk.glade.bindtextdomain(APP_NAME, DIR)
-gtk.glade.textdomain(APP_NAME)
 
-from scenic import communication
-from scenic import process # just for constants
-from scenic.streamer import StreamerManager
 from twisted.internet import defer
 from twisted.internet import error
 from twisted.internet import reactor
+
+from scenic import communication
+from scenic import saving
+from scenic import process # just for constants
+from scenic.streamer import StreamerManager
 from scenic import dialogs
 from scenic import ports
+from scenic import data
+PACKAGE_DATA = os.path.dirname(data.__file__)
 
-class Config(object):
+### MULTILINGUAL SUPPORT ###
+_ = gettext.gettext
+gettext.bindtextdomain(APP_NAME, os.path.join(PACKAGE_DATA, "locale"))
+gettext.textdomain(APP_NAME)
+gtk.glade.bindtextdomain(APP_NAME, os.path.join(PACKAGE_DATA, "locale"))
+gtk.glade.textdomain(APP_NAME)
+
+class Config(saving.ConfigStateSaving):
     """
     Class attributes are default.
     """
@@ -111,102 +91,15 @@ class Config(object):
     send_audio_port = send_video_port + 10
     recv_audio_port = recv_video_port + 10
     bandwidth = 30
-    
+
     def __init__(self):
         config_file = 'scenic.cfg'
         if os.path.isfile('/etc/' + config_file):
             config_dir = '/etc'
         else:
             config_dir = os.environ['HOME'] + '/.scenic'
-        self._config_path = os.path.join(config_dir, config_file)
-        if os.path.isfile(self._config_path):
-            self._read()
-        else:
-            if not os.path.isdir(config_dir):
-                os.mkdir(config_dir)
-            self._write()
-
-    def _write(self):
-        """
-        Comments out the options that have not been changed from default.
-        """
-        config_str = _("# Configuration written by %(app)s %(version)s\n") % {'app': APP_NAME, 'version': __version__}
-        for c in dir(self):
-            if c[0] != '_' and hasattr(self, c):
-                inst_attr = getattr(self, c)
-                if inst_attr == getattr(Config, c):
-                    comment = "# "
-                else:
-                    comment = ""
-                config_str += "\n" + comment + c + "=" + str(inst_attr)
-        config_file = file(self._config_path, "w")
-        config_file.write(config_str)
-        config_file.close()
-
-    def _read(self):
-        config_file  = file(self._config_path, "r")
-        for line in config_file:
-            line = line.strip()
-            if line and line[0] != "#" and len(line) > 2:
-                try:
-                    tokens = line.split("=")
-                    k = tokens[0].strip()
-                    v = tokens[1].strip()
-                    if v.isdigit():
-                        v = int(v)
-                    else:
-                        v = str(v)
-                    setattr(self, k, v)
-                    print("Setting config %s = %s" % (k, v))
-                except Exception, e:
-                    print str(e)
-        config_file.close()
-
-class AddressBook(object):
-    """
-    READING & WRITING ADDRESS BOOK FILE 
-    """
-    def __init__(self):
-        self.contact_list = []
-        self.selected = 0
-        #FIXME: do not hard code
-        self.contacts_file_name = os.path.join(os.environ['HOME'], '.scenic/contacts.json')
-        self.SELECTED_KEYNAME = "selected:" # FIXME
-        self.read()
-
-    def read(self):
-        print("Loading addressbook.")
-        if os.path.isfile(self.contacts_file_name):
-            self.contact_list = []
-            ad_book_file = file(self.contacts_file_name, "r")
-            kw_len = len(self.SELECTED_KEYNAME)
-            for line in ad_book_file:
-                if line[:kw_len] == self.SELECTED_KEYNAME:
-                    self.selected = int(line[kw_len:].strip())
-                    print("Loading selected contact: %s" % (self.selected))
-                else:
-                    try:
-                        print("Loading contact %s" % (line.strip()))
-                        d = json.loads(line)
-                        for k, v in d.iteritems():
-                            if type(v) is unicode:
-                                v = str(v) # FIXME
-                        self.contact_list.append(d)
-                    except Exception, e:
-                        print str(e)
-            ad_book_file.close()
-
-    def write(self):
-        if ((os.path.isfile(self.contacts_file_name)) or (len(self.contact_list) > 0)):
-            try:
-                ad_book_file = file(self.contacts_file_name, "w")
-                for contact in self.contact_list:
-                    ad_book_file.write(json.dumps(contact) + "\n")
-                if self.selected:
-                    ad_book_file.write(self.SELECTED_KEYNAME + str(self.selected) + "\n")
-                ad_book_file.close()
-            except:
-                print _("Cannot write Address Book file")
+        config_file_path = os.path.join(config_dir, config_file)
+        saving.ConfigStateSaving.__init__(self, config_file_path)
 
 class Application(object):
     """
@@ -215,7 +108,7 @@ class Application(object):
     """
     def __init__(self, kiosk_mode=False):
         self.config = Config()
-        self.address_book = AddressBook()
+        self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
         self._has_session = False
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed)
@@ -324,7 +217,7 @@ class Application(object):
                 self.stop_streamers()
             self.disconnect_client()
         self.server.close()
-        self.address_book.write()
+        self.address_book.save()
         
     def on_main_window_destroyed(self, *args):
         reactor.stop()
@@ -378,7 +271,7 @@ class Application(object):
             if result:
                 del self.address_book.contact_list[self.selected_contact_num]
                 self.contact_tree.remove(self.selected_contact_row)
-                self.address_book.write()
+                self.address_book.save()
                 num = self.selected_contact_num - 1
                 if num < 0:
                     num = 0
@@ -429,7 +322,7 @@ class Application(object):
             address_book.contact["name"] = self.contact_name_widget.get_text()
             address_book.contact["address"] = addr
             address_book.contact["port"] = int(port)
-            address_book.write()
+            address_book.save()
             self.edit_contact_window.hide()
 
         # Validate the port number
@@ -628,7 +521,7 @@ class Application(object):
         step = base / num
         selection = self.conf_bandwidth_widget.get_active()
         self.config.bandwidth = (selection + 1) * step
-        self.config._write()
+        self.config.save()
 
     def on_negotiation_port_changed(self, *args):
         """
@@ -651,7 +544,7 @@ class Application(object):
             self.show_error_dialog(text, on_error_dialog_result)
         else:
             self.config.negotiation_port = int(port)
-            self.config._write()
+            self.config.save()
             self.server.change_port(self.config.negotiation_port)
 
     def show_error_dialog(self, text, callback=None):
