@@ -541,9 +541,9 @@ class Application(object):
         """
         # unschedule this timeout as we don't care if our peer answered or not
         self._unschedule_offerer_invite_timeout()
-        self.send_cancel()
+        self.send_cancel_and_disconnect()
         # don't let the delete-event propagate
-        self.calling_dialog.hide()
+        self.hide_calling_dialog("answTimeout")
         return True
 
     def on_conf_bandwidth_changed(self, *args):
@@ -719,7 +719,10 @@ class Application(object):
     
     def _schedule_offerer_invite_timeout(self, data):
         """ Schedules our offer invite timeout function """
-        self._offerer_invite_timeout = gobject.timeout_add(6000, self._cl_offerer_invite_timed_out, data)
+        if self._offerer_invite_timeout is None:
+            self._offerer_invite_timeout = gobject.timeout_add(5000, self._cl_offerer_invite_timed_out, data)
+        else:
+            print 'ONLY ONE AT A TIME'
 
     def on_server_rcv_command(self, message, addr, server):
         # XXX
@@ -749,16 +752,14 @@ class Application(object):
                     else:
                         print "Error: connection lost, so we could not accept." # FIXME
                 elif response == gtk.RESPONSE_CANCEL:
-                    if self.client is not None:
-                        self.client.send({"msg":"REFUSE", "sid":0})
-                        self.client = None
+                    self.send_refuse_and_disconnect() 
                 else:
-                    print 'GOT RESPONSE %s' % (str(response))
+                    # FIXME: maybe we should handle window being closed?
+                    pass
                 return True
-            # answer REFUSE if busy
+
             if self.streamer_manager.is_busy():
                 print("Got invitation, but we are busy.")
-                #self.client.send({"msg":"REFUSE", "sid":0})
                 communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
             else:
                 self.client = communication.Client(self, send_to_port)
@@ -767,7 +768,9 @@ class Application(object):
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
 
         elif msg == "CANCEL":
-            self.client = None
+            if self.client is not None:
+                self.client.disconnect()
+                self.client = None
             self.invited_dialog.hide()
             dialogs.ErrorDialog.create("Remote peer cancelled invitation.")
             
@@ -851,14 +854,29 @@ class Application(object):
         if self.client is not None:
             self.client.send({"msg":"BYE", "sid":0})
     
-    def send_cancel(self):
+    def send_cancel_and_disconnect(self):
         """
         Sends CANCEL
         CANCEL cancels the invite on the remote host.
         """
         if self.client is not None:
             self.client.send({"msg":"CANCEL", "sid":0})
-        self.client = None
+            self.client.disconnect()
+            self.client = None
+        else:
+            print 'Warning: Client is None'
+    
+    def send_refuse_and_disconnect(self):
+        """
+        Sends REFUSE 
+        REFUSE tells the offerer we can't have a session.
+        """
+        if self.client is not None:
+            self.client.send({"msg":"REFUSE", "sid":0})
+            self.client.disconnect()
+            self.client = None
+        else:
+            print 'Warning: Client is None'
 
 
     def on_streamer_state_changed(self, streamer, new_state):
@@ -892,6 +910,9 @@ class Application(object):
 
     def _cl_offerer_invite_timed_out(self, client):
         # XXX
-        self.send_cancel()
+        # in case of invite timeout, act as if we'd cancelled the invite ourselves
+        self.on_invite_contact_cancelled()
         if self.calling_dialog.get_property('visible'):
             self.hide_calling_dialog("answTimeout")
+        # here we return false so that this callback is unregistered
+        return False
