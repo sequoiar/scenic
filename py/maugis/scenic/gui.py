@@ -755,6 +755,9 @@ class Application(object):
                         print "Error: connection lost, so we could not accept." # FIXME
                 elif response == gtk.RESPONSE_CANCEL:
                     self.send_refuse_and_disconnect() 
+                elif response == gtk.RESPONSE_DELETE_EVENT:
+                # For now, treat delete the same as if the user had clicked refuse
+                    self.send_refuse_and_disconnect() 
                 else:
                     # FIXME: maybe we should handle window being closed?
                     pass
