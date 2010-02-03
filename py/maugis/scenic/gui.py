@@ -584,6 +584,7 @@ class Application(object):
 
     def show_error_dialog(self, text, callback=None):
         def _response_cb(widget, response_id, callback):
+            widget.hide()
             if callback is not None:
                 callback()
             widget.disconnect(slot1)
@@ -596,6 +597,7 @@ class Application(object):
     
     def show_confirm_dialog(self, text, callback=None):
         def _response_cb(widget, response_id, callback):
+            widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
             widget.disconnect(slot1)
