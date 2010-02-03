@@ -66,6 +66,8 @@ class ConfigStateSaving(object):
         config_file.close()
 
     def _load(self):
+        # FIXME: use JSON, please.
+        print "Loading configuration file %s" % (self._config_path)
         config_file  = file(self._config_path, "r")
         for line in config_file:
             line = line.strip()
@@ -73,13 +75,19 @@ class ConfigStateSaving(object):
                 try:
                     tokens = line.split("=")
                     k = tokens[0].strip()
-                    v = tokens[1].strip()
-                    if v.isdigit():
-                        v = int(v)
+                    if not hasattr(self, k):
+                        print "Unknown configuration attribute: %s" % (k)
                     else:
-                        v = str(v)
-                    setattr(self, k, v)
-                    print("Setting config %s = %s" % (k, v))
+                        cast = type(getattr(self, k))
+                        v = tokens[1].strip()
+                        if v.isdigit():
+                            v = int(v)
+                        elif cast == bool:
+                            v = v == 'True' # FIXME
+                        else:
+                            v = cast(v)
+                        setattr(self, k, v)
+                        print("Config: %s = %s (%s)" % (k, v, type(v).__name__))
                 except Exception, e:
                     print str(e)
         config_file.close()

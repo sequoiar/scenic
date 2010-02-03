@@ -85,7 +85,11 @@ class Config(saving.ConfigStateSaving):
     video_device = "/dev/video0"
     video_sink = "xvimagesink"
     video_codec = "mpeg4"
+    video_display = ":0.0"
     video_bitrate = "3000000"
+    video_width = 640
+    video_height = 480
+    confirm_quit = False
     #soon to be deprecated:
     bandwidth = 30
 
@@ -97,6 +101,40 @@ class Config(saving.ConfigStateSaving):
             config_dir = os.environ['HOME'] + '/.scenic'
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
+
+def _get_combobox_value(widget):
+    """
+    Returns the current value of a GTK ComboBox widget.
+    """
+    index = widget.get_active()
+    tree_model = widget.get_model()
+    tree_model_row = tree_model[index]
+    return tree_model_row[0] 
+
+def _set_combobox_value(widget, value=None):
+    """
+    Sets the current value of a GTK ComboBox widget.
+    """
+    index = None
+    tree_model = widget.get_model()
+    index = 0
+    for i in iter(tree_model):
+        v = i[0]
+        if v == value:
+            break # got it
+        index += 1
+    if index is None:
+        widget.set_active(-1)
+    else:
+        widget.set_active(index)
+
+# GUI value to milhouse value mapping:
+VIDEO_CODECS = {
+    "h.264": "h264",
+    "h.263": "h263",
+    "Theora": "theora",
+    "MPEG4": "mpeg4"
+    }
 
 class Application(object):
     """
@@ -117,7 +155,6 @@ class Application(object):
         self.server = communication.Server(self, self.config.negotiation_port)
         self.client = None
         self.got_bye = False
-        self.confirm_close = True
         self._offerer_invite_timeout = None
 
         # Set the Glade file
@@ -181,9 +218,10 @@ class Application(object):
         self.selected_contact_row = None
         self.select_contact_num = None
         # video tab drop-down menus
-        self.video_image_size_widget = self.widgets.get_widget("video_image_size")
+        self.video_size_widget = self.widgets.get_widget("video_size")
         self.video_display_widget = self.widgets.get_widget("video_display")
         self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
+        self.video_source_widget = self.widgets.get_widget("video_source")
         self.video_codec_widget = self.widgets.get_widget("video_codec")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
             
@@ -202,8 +240,10 @@ class Application(object):
         self.contact_list_widget.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list_widget.append_column(column)
+        # set value of widgets.
         self.init_ad_book_contact_list()
         self.init_negotiation_port()
+        self.init_widgets_value()
 
         self.main_window.show()
         self.ports_allocator = ports.PortsAllocator()
@@ -223,6 +263,7 @@ class Application(object):
                 self.send_bye()
                 self.stop_streamers()
             self.disconnect_client()
+        print 'stopping server'
         self.server.close()
 
     def on_main_window_deleted(self, *args):
@@ -236,9 +277,10 @@ class Application(object):
         def _cb(result):
             if result:
                 print("Destroying the window.")
-                if reactor.running:
-                    print("reactor.stop()")
-                    reactor.stop()
+                self.main_window.destroy()
+                #if reactor.running:
+                #    print("reactor.stop()")
+                #    reactor.stop()
             else:
                 print("Not quitting.")
         # If you return FALSE in the "delete_event" signal handler,
@@ -246,17 +288,21 @@ class Application(object):
         # you don't want the window to be destroyed.
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
-        if self.confirm_close:
-            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.")
+        if self.config.confirm_quit:
+            print 'FUCKKKKKKKKKKKKKKK'
+            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.\nMake sure to save your settings if desired.")
             d.addCallback(_cb)
             return True
         else:
+            print 'YOUUUUUUUUUUUU'
             _cb(True)
             return False
         
     def on_main_window_destroyed(self, *args):
         # TODO: confirm dialog!
-        reactor.stop()
+        if reactor.running:
+            print("reactor.stop()")
+            reactor.stop()
 
     def on_video_view_preview_toggled(self, widget):
         """
@@ -269,9 +315,9 @@ class Application(object):
         print 'video_view_preview toggled', widget.get_active()
         if widget.get_active():
             command = "milhouse --videosource v4l2src --videodevice %s --localvideo --window-title preview" % (self.config.video_device)
-            #self.preview_process = reactor.spawnProcess()
             print "spawning", command
             process.run_once(*command.split())
+            dialogs.ErrorDialog.create("You must manually close the preview window.")
         else:
             print "stopping preview"
 
@@ -397,7 +443,7 @@ class Application(object):
         """
         Opens the network-admin Gnome applet.
         """
-        os.system('gksudo "network-admin"')
+        process.run_once("gksudo", "network-admin")
 
     def on_system_shutdown_clicked(self, *args):
         """
@@ -405,7 +451,7 @@ class Application(object):
         """
         def on_confirm_result(result):
             if result:
-                os.system('gksudo "shutdown -h now"')
+                process.run_once("gksudo", "shutdown -h now")
 
         text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
         self.show_confirm_dialog(text, on_confirm_result)
@@ -416,7 +462,7 @@ class Application(object):
         """
         def on_confirm_result(result):
             if result:
-                os.system('gksudo "shutdown -r now"')
+                process.run_once("gksudo", "shutdown -r now")
 
         text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
         self.show_confirm_dialog(text, on_confirm_result)
@@ -425,7 +471,7 @@ class Application(object):
         """
         Opens APT update manager.
         """
-        os.system('gksudo "update-manager"')
+        process.run_once("gksudo", "update-manager")
 
     def on_maintenance_send_info_clicked(self, *args):
         """
@@ -566,7 +612,7 @@ class Application(object):
         Saves the addressbook and settings.
         """
         print menu_item, "chosen"
-        print "Saving addressbook and configuration."
+        print "-- Saving addressbook and configuration. -- "
         self._gather_configuration()
         self.config.save()
         self.address_book.save()
@@ -576,7 +622,71 @@ class Application(object):
         Updates the configuration with the value of each widget.
         """
         print "gathering configuration"
-        # TODO
+        # VIDEO SIZE
+        video_size = _get_combobox_value(self.video_size_widget)
+        print ' * video_size:', video_size
+        self.config.video_width = int(video_size.split("x")[0])
+        self.config.video_height = int(video_size.split("x")[1])
+        
+        # DISPLAY
+        video_display = _get_combobox_value(self.video_display_widget)
+        print ' * video_display:', video_display
+        self.config.video_display = video_display
+        
+        # BITRATE
+        video_bitrate = _get_combobox_value(self.video_bitrate_widget)
+        print ' * video_bitrate:', video_bitrate
+        self.config.video_bitrate = int(video_bitrate.split(" ")[0]) * 1000000
+        
+        # VIDEO SOURCE AND DEVICE
+        video_source = _get_combobox_value(self.video_source_widget)
+        if video_source == "Color bars":
+            self.config.video_source = "videotestsrc"
+        elif video_source.startswith("/dev/video"): # TODO: firewire!
+            self.config.video_device = video_source
+            self.config.video_source = "v4l2src"
+        print ' * videosource:', video_source
+        
+        # CODEC
+        video_codec = _get_combobox_value(self.video_codec_widget)
+        video_codec = VIDEO_CODECS[video_codec]
+        print ' * video_codec:', video_codec
+        
+        #TODO: get toggle fullscreen value
+    
+    def init_widgets_value(self):
+        """
+        Sets the value of each widget according to the data stored in the configuration file.
+        """
+        print "Changing widgets value according to configuration."
+        # VIDEO SIZE
+        video_size = "%sx%s" % (self.config.video_width, self.config.video_height)
+        _set_combobox_value(self.video_size_widget, video_size)
+        print ' * video_size:', video_size
+        
+        # DISPLAY
+        video_display = self.config.video_display
+        _set_combobox_value(self.video_display_widget, video_display)
+        print ' * video_display:', video_display
+        
+        # BITRATE
+        video_bitrate = "%s Mbps" % (self.config.video_bitrate / 1000000)
+        _set_combobox_value(self.video_bitrate_widget, video_bitrate)
+        print ' * video_bitrate:', video_bitrate
+        
+        # VIDEO SOURCE AND DEVICE
+        if self.config.video_source == "videotestsrc":
+            video_source = "Color bars"
+        elif self.config.video_source == "v4l2src":
+            video_source = self.config.video_device
+        _set_combobox_value(self.video_source_widget, video_source)
+        print ' * videosource:', video_source
+
+        # CODEC
+        # gets key for a value
+        video_codec = VIDEO_CODECS.keys()[VIDEO_CODECS.values().index(self.config.video_codec)]
+        _set_combobox_value(self.video_codec_widget, video_codec)
+        print ' * video_codec:', video_codec
 
     def on_quit_menu_item_activated(self, menu_item):
         """
@@ -697,6 +807,7 @@ class Application(object):
     def init_negotiation_port(self):
         self.negotiation_port_widget.set_text(str(self.config.negotiation_port))
 
+
     def init_ad_book_contact_list(self):
         address_book = self.address_book
         address_book.contact = None
@@ -796,13 +907,16 @@ class Application(object):
                     self.client.send({"msg":"ACK", "sid":0})
             else:
                 print("Error ! Connection lost.") # FIXME
+
         elif msg == "REFUSE":
             self._unschedule_offerer_invite_timeout()
             self.free_ports()
             self.hide_calling_dialog("refuse")
+
         elif msg == "ACK":
             print("Got ACK. Starting streamers as answerer.")
             self.start_streamers(addr)
+
         elif msg == "BYE":
             self.got_bye = True
             self.stop_streamers()
@@ -810,6 +924,7 @@ class Application(object):
                 print 'disconnecting client and sending BYE'
                 self.client.send({"msg":"OK", "sid":0})
                 self.disconnect_client()
+
         elif msg == "OK":
             print "received ok. Everything has an end."
             if self.client is not None:
@@ -883,7 +998,6 @@ class Application(object):
             self.client = None
         else:
             print ('Warning: Trying to send REFUSE even though client is None')
-
 
     def on_streamer_state_changed(self, streamer, new_state):
         """

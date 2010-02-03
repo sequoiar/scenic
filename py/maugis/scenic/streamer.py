@@ -76,6 +76,8 @@ class StreamerManager(object):
             '--audiocodec', config.audio_codec,
             '--videoport', str(self.app.send_video_port),
             '--audioport', str(self.app.send_audio_port)]
+        if config.video_source == "v4l2src":
+            self.milhouse_send_cmd.extend(["--videodevice", config.video_device])
         # setting up
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")

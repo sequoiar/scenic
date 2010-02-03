@@ -1142,7 +1142,7 @@
                                             <property name="left_padding">5</property>
                                             <property name="right_padding">5</property>
                                             <child>
-                                              <widget class="GtkComboBox" id="video_image_size">
+                                              <widget class="GtkComboBox" id="video_size">
                                                 <property name="visible">True</property>
                                                 <property name="items" translatable="yes">640x480
 720x480
