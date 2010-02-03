@@ -229,6 +229,9 @@ class Application(object):
         Destroy method causes appliaction to exit
         when main window closed
         """
+        return self._confirm_and_quit()
+
+    def _confirm_and_quit(self):
         def _cb(result):
             if result:
                 print("Destroying the window.")
@@ -545,16 +548,33 @@ class Application(object):
         self.config.bandwidth = (selection + 1) * step
 
     def on_save_menu_item_activated(self, menu_item):
+        """
+        Saves the addressbook and settings.
+        """
         print menu_item, "chosen"
         print "Saving addressbook and configuration."
+        self._gather_configuration()
         self.config.save()
         self.address_book.save()
 
+    def _gather_configuration(self):
+        """
+        Updates the configuration with the value of each widget.
+        """
+        print "gathering configuration"
+        # TODO
+
     def on_quit_menu_item_activated(self, menu_item):
+        """
+        Quits the application.
+        """
         print menu_item, "chosen"
-        self.main_window.destroy()
+        self._confirm_and_quit()
     
     def on_help_menu_item_activated(self, menu_item):
+        """
+        Opens a web browser to the scenic web site.
+        """
         print menu_item, "chosen"
         url = "http://scenic.sat.qc.ca"
         webbrowser.open(url)
