@@ -70,7 +70,7 @@ class StreamerManager(object):
             '--address', str(host),
             '--videosource', config.video_input,
             '--videocodec', config.video_codec,
-            '--videobitrate', config.video_bitrate,
+            '--videobitrate', str(config.video_bitrate),
             '--audiosource', config.audio_input,
             '--audiocodec', config.audio_codec,
             '--videoport', str(config.send_video_port),
@@ -79,7 +79,7 @@ class StreamerManager(object):
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
         self.receiver.state_changed_signal.connect(self.on_process_state_changed)
-        send_cmd = " ".join(str(self.milhouse_send_cmd))
+        send_cmd = " ".join(self.milhouse_send_cmd)
         self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
         self.sender.state_changed_signal.connect(self.on_process_state_changed)
         # starting
