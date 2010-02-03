@@ -22,12 +22,17 @@
 """
 Main of the application.
 """
+import sys
 from optparse import OptionParser
 from twisted.internet import gtk2reactor
 gtk2reactor.install() # has to be done before importing reactor
 from twisted.internet import reactor
 from twisted.internet import error
+from twisted.python import log
 from scenic import gui
+
+def start_logging_to_stdout():
+    log.startLogging(sys.stdout)
 
 def run():
     # command line parsing
@@ -35,6 +40,7 @@ def run():
     parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
             help="Run maugis in kiosk mode")
     (options, args) = parser.parse_args()
+    start_logging_to_stdout()
     try:
         app = gui.Application(kiosk_mode=options.kiosk)
     except error.CannotListenError, e:
