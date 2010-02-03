@@ -584,8 +584,6 @@ class Application(object):
 
     def show_error_dialog(self, text, callback=None):
         def _response_cb(widget, response_id, callback):
-            if response_id != gtk.RESPONSE_DELETE_EVENT:
-                widget.hide()
             if callback is not None:
                 callback()
             widget.disconnect(slot1)
@@ -598,8 +596,6 @@ class Application(object):
     
     def show_confirm_dialog(self, text, callback=None):
         def _response_cb(widget, response_id, callback):
-            if response_id != gtk.RESPONSE_DELETE_EVENT:
-                widget.hide()
             if callback is not None:
                 callback(response_id == gtk.RESPONSE_OK)
             widget.disconnect(slot1)
@@ -620,7 +616,7 @@ class Application(object):
         def _response_cb(widget, response_id, callback):
             widget.hide()
             if callback is not None:
-                callback(response_id == gtk.RESPONSE_OK)
+                callback(response_id)
             widget.disconnect(slot1)
 
         self.invited_dialog_label_widget.set_label(text)
@@ -703,12 +699,12 @@ class Application(object):
             # TODO
             # if local user doesn't respond, close dialog in 5 seconds
             
-            def _on_contact_request_dialog_result(result):
+            def _on_contact_request_dialog_result(response):
                 """
                 User is accetping or declining an offer.
                 @param result: Answer to the dialog.
                 """
-                if result:
+                if response == gtk.RESPONSE_OK:
                     if self.client is not None:
                         self.allocate_ports()
                         self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
@@ -717,10 +713,12 @@ class Application(object):
                         self.config.send_audio_port = message["audioport"]
                     else:
                         print "Error: connection lost, so we could not accept." # FIXME
-                else:
+                elif response == gtk.RESPONSE_CANCEL:
                     if self.client is not None:
                         self.client.send({"msg":"REFUSE", "sid":0})
                         self.client = None
+                else:
+                    print 'GOT RESPONSE %s' % (str(response))
                 return True
             # answer REFUSE if busy
             if self.streamer_manager.is_busy():
@@ -728,7 +726,6 @@ class Application(object):
                 #self.client.send({"msg":"REFUSE", "sid":0})
                 communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
             else:
-                print "sending to %s:%s" % (addr, send_to_port)
                 self.client = communication.Client(self, send_to_port)
                 self.client.connect(addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
