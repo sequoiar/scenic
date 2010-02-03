@@ -857,6 +857,8 @@ class Application(object):
                 """
                 if response == gtk.RESPONSE_OK:
                     if self.client is not None:
+                        # UPDATE config once we accept the invitie
+                        self._gather_configuration()
                         self.allocate_ports()
                         self.client.send({"msg":"ACCEPT", "videoport":self.recv_video_port, "audioport":self.recv_audio_port, "sid":0})
                         # TODO: Use session to contain settings and ports
