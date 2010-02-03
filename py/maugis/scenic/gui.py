@@ -516,10 +516,11 @@ class Application(object):
                 "audioport": self.recv_audio_port,
                 "please_send_to_port": self.config.negotiation_port
                 }
-            port = self.config.negotiation_port # self.address_book.contact["port"]
+            port = self.config.negotiation_port
             ip = self.address_book.contact["address"]
 
             def _on_connected(proto):
+                self._schedule_offerer_invite_timeout(self.client)
                 self.client.send(msg)
                 return proto
             def _on_error(reason):
@@ -533,7 +534,6 @@ class Application(object):
             deferred = self.client.connect(ip)
             deferred.addCallback(_on_connected).addErrback(_on_error)
             self.calling_dialog.show()
-            self._schedule_offerer_invite_timeout()
             # window will be hidden when we receive ACCEPT or REFUSE
     
     def on_invite_contact_cancelled(self, *args):
