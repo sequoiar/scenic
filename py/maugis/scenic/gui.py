@@ -116,7 +116,6 @@ class Application(object):
         self.client = None
         self.got_bye = False
         self._offerer_invite_timeout = None
-        self._answerer_invite_timeout = None
 
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'scenic.glade')
@@ -502,29 +501,10 @@ class Application(object):
         """
         # unschedule this timeout as we don't care if our peer answered or not
         self._unschedule_offerer_invite_timeout()
-        msg = {
-            "msg":"CANCEL",
-            "sid":0
-            }
-        port = self.config.negotiation_port
-        ip = self.address_book.contact["address"]
-
-        def _on_connected(proto):
-            self.client.send(msg)
-            self.client = None
-            return proto
-        def _on_error(reason):
-            print "error trying to connect to %s:%s : %s" % (ip, port, reason)
-            self.client = None
-            return None
-           
-        print "SENDING %s TO %s:%s" % (msg, ip, port) 
-        self.client = communication.Client(self, port)
-        deferred = self.client.connect(ip)
-        deferred.addCallback(_on_connected).addErrback(_on_error)
+        self.send_cancel()
+        # don't let the delete-event propagate
         self.calling_dialog.hide()
         return True
-        # window will be hidden when we receive ACCEPT or REFUSE
 
     def on_conf_bandwidth_changed(self, *args):
         """
@@ -660,22 +640,11 @@ class Application(object):
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
 
-    def _unschedule_answerer_invite_timeout(self):
-        """ Unschedules our answer invite timeout function """
-        if self._answerer_invite_timeout is not None:
-            gobject.source_remove(self._answerer_invite_timeout)
-            self._answerer_invite_timeout = None
-    
     def _unschedule_offerer_invite_timeout(self):
         """ Unschedules our offer invite timeout function """
         if self._offerer_invite_timeout is not None:
             gobject.source_remove(self._offerer_invite_timeout)
             self._offerer_invite_timeout = None
-    
-    def _schedule_answerer_invite_timeout(self, data):
-        """ Schedules our answer invite timeout function """
-        # user must respond in less than 6 seconds
-        self._answerer_invite_timeout = gobject.timeout_add(6000, self._cl_answerer_invite_timed_out, data)
     
     def _schedule_offerer_invite_timeout(self, data):
         """ Schedules our offer invite timeout function """
@@ -699,7 +668,6 @@ class Application(object):
                 User is accetping or declining an offer.
                 @param result: Answer to the dialog.
                 """
-                self._unschedule_answerer_invite_timeout()
                 if result:
                     if self.client is not None:
                         self.allocate_ports()
@@ -723,12 +691,10 @@ class Application(object):
                 print "sending to %s:%s" % (addr, send_to_port)
                 self.client = communication.Client(self, send_to_port)
                 self.client.connect(addr)
-                self_.schedule_answerer_invite_timeout(addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
 
         elif msg == "CANCEL":
-            self._unschedule_answerer_invite_timeout()
             self.client = None
             self.invited_dialog.hide()
             dialogs.ErrorDialog.create("Remote peer cancelled invitation.")
@@ -812,6 +778,16 @@ class Application(object):
         """
         if self.client is not None:
             self.client.send({"msg":"BYE", "sid":0})
+    
+    def send_cancel(self):
+        """
+        Sends CANCEL
+        CANCEL cancels the invite on the remote host.
+        """
+        if self.client is not None:
+            self.client.send({"msg":"CANCEL", "sid":0})
+        self.client = None
+
 
     def on_streamer_state_changed(self, streamer, new_state):
         """
@@ -823,17 +799,6 @@ class Application(object):
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
-    def _cl_answerer_invite_timed_out(self, addr):
-        """ 
-        This is called if we haven't responded to our peer's invitation within a 
-        reasonable delay (hardcoded to 5000 ms)
-        """
-        self.invited_dialog.hide()
-        text = _("%s was inviting you.\n\nBut you did not answer in reasonable delay.") % addr
-        self.show_error_dialog(text)
-        self.client = None
-        return False
-
     def on_client_socket_timeout(self, client):
         # XXX
         self.hide_calling_dialog("timeout")
@@ -855,6 +820,6 @@ class Application(object):
 
     def _cl_offerer_invite_timed_out(self, client):
         # XXX
+        self.send_cancel()
         if self.calling_dialog.get_property('visible'):
             self.hide_calling_dialog("answTimeout")
-    
