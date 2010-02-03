@@ -780,6 +780,7 @@ class Application(object):
             dialogs.ErrorDialog.create("Remote peer cancelled invitation.")
             
         elif msg == "ACCEPT":
+            self._unschedule_offerer_invite_timeout()
             # FIXME: this doesn't make sense here
             self.got_bye = False
             # TODO: Use session to contain settings and ports
