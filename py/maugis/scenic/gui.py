@@ -140,6 +140,7 @@ class Application(object):
         # Get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
         self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
+        self.main_tabs_widget = self.widgets.get_widget("mainTabs")
         # confirm_dialog:
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
         self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
@@ -178,6 +179,12 @@ class Application(object):
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_num = None
+        # video tab drop-down menus
+        self.video_image_size_widget = self.widgets.get_widget("video_image_size")
+        self.video_display_widget = self.widgets.get_widget("video_display")
+        self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
+        self.video_codec_widget = self.widgets.get_widget("video_codec")
+        self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
             
         # adjust the bandwidth combobox iniline with the config 
         self.init_bandwidth()
@@ -220,6 +227,13 @@ class Application(object):
         
     def on_main_window_destroyed(self, *args):
         reactor.stop()
+
+    def on_video_view_preview_toggled(self, widget):
+        """
+        Shows a preview of the video input.
+        """
+        # It can be the user that pushed the button, or it can be toggled by the software.
+        print 'video_view_preview toggled', widget.get_active()
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         tab = widget.get_nth_page(page_number)
@@ -529,25 +543,25 @@ class Application(object):
         """
         Changes the local SIC server port number.
         """
+        def _later_check_negotiation_port(*args):
+            def on_error_dialog_result(result):
+                self.negotiation_port_widget.grab_focus()
+                return False
+
+            port = self.negotiation_port_widget.get_text()
+            if not port.isdigit():
+                self.main_tabs_widget.set_current_page(1)
+                self.init_negotiation_port() # FIXME: what?
+                text = _("The port number is not valid\n\nEnter a valid port number in the range of 10000-65535")
+                self.show_error_dialog(text, on_error_dialog_result)
+            else:
+                if port != self.config.negotiation_port:
+                    self.config.negotiation_port = int(port)
+                    self.config.save()
+                    self.server.change_port(self.config.negotiation_port)
         # call later 
-        gobject.timeout_add(0, self._later_check_negotiation_port, args)
+        gobject.timeout_add(0, _later_check_negotiation_port, args)
         return False
-
-    def _later_check_negotiation_port(self, *args):
-        def on_error_dialog_result(result):
-            self.negotiation_port_widget.grab_focus()
-            return False
-
-        port = self.negotiation_port_widget.get_text()
-        if not port.isdigit():
-            self.widgets.get_widget("mainTabs").set_current_page(1)
-            self.init_negotiation_port()
-            text = _("The port number is not valid\n\nEnter a valid port number in the range of 1-999999")
-            self.show_error_dialog(text, on_error_dialog_result)
-        else:
-            self.config.negotiation_port = int(port)
-            self.config.save()
-            self.server.change_port(self.config.negotiation_port)
 
     def show_error_dialog(self, text, callback=None):
         def _response_cb(widget, response_id, callback):
