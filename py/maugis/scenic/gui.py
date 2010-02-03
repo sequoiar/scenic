@@ -116,6 +116,8 @@ class Application(object):
         self.server = communication.Server(self, self.config.negotiation_port)
         self.client = None
         self.got_bye = False
+        self._offerer_invite_timeout = None
+        self._answerer_invite_timeout = None
 
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'scenic.glade')
@@ -177,9 +179,6 @@ class Application(object):
         self.selected_contact_row = None
         self.select_contact_num = None
             
-        # corresponds to the answer_invite_timeout function
-        self._answer_invite_timed_out_watch = None
-
         # adjust the bandwidth combobox iniline with the config 
         self.init_bandwidth()
         
@@ -486,8 +485,10 @@ class Application(object):
     
     def on_invite_contact_cancelled(self, *args):
         """
-        Sends a CANCEL to the remote peer.
+        Sends a CANCEL to the remote peer when invite contact window is closed.
         """
+        # unschedule this timeout as we don't care if our peer answered or not
+        self._unschedule_offerer_invite_timeout()
         msg = {
             "msg":"CANCEL",
             "sid":0
@@ -646,11 +647,17 @@ class Application(object):
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
 
-    def _unschedule_answer_invite_timeout(self):
+    def _unschedule_answerer_invite_timeout(self):
         """ Unschedules our answer invite timeout function """
-        if self._answer_invite_timed_out_watch is not None:
-            gobject.source_remove(self._answer_invite_timed_out_watch)
-            self._answer_invite_timed_out_watch = None
+        if self._answerer_invite_timeout is not None:
+            gobject.source_remove(self._answerer_invite_timeout)
+            self._answerer_invite_timeout = None
+    
+    def _unschedule_offerer_invite_timeout(self):
+        """ Unschedules our offer invite timeout function """
+        if self._offerer_invite_timeout is not None:
+            gobject.source_remove(self._offerer_invite_timeout)
+            self._offerer_invite_timeout = None
 
     def on_server_rcv_command(self, message, addr, server):
         # XXX
@@ -670,7 +677,7 @@ class Application(object):
                 User is accetping or declining an offer.
                 @param result: Answer to the dialog.
                 """
-                self._unschedule_answer_invite_timeout()
+                self._unschedule_answerer_invite_timeout()
                 if result:
                     if self.client is not None:
                         self.allocate_ports()
@@ -695,12 +702,12 @@ class Application(object):
                 self.client = communication.Client(self, send_to_port)
                 self.client.connect(addr)
                 # user must respond in less than 5 seconds
-                self._answer_invite_timed_out_watch = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
+                self._answerer_invite_timeout = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
 
         elif msg == "CANCEL":
-            self._unschedule_answer_invite_timeout()
+            self._unschedule_answerer_invite_timeout()
             self.client = None
             self.invited_dialog.hide()
             dialogs.ErrorDialog.create("Remote peer cancelled invitation.")
@@ -722,6 +729,7 @@ class Application(object):
             else:
                 print("Error ! Connection lost.") # FIXME
         elif msg == "REFUSE":
+            self._unschedule_offerer_invite_timeout()
             self.free_ports()
             self.hide_calling_dialog("refuse")
         elif msg == "ACK":
@@ -776,14 +784,6 @@ class Application(object):
         else: 
             return defer.succeed(True)
     
-    def send_cancel(self):
-        """
-        Sends CANCEL
-        CANCEL cancels the invite sent to the remote host.
-        """
-        if self.client is not None:
-            self.client.send({"msg":"CANCEL", "sid":0})
-
     def send_bye(self):
         """
         Sends BYE
@@ -831,9 +831,9 @@ class Application(object):
         schedules some stuff.
         """
         # call later
-        self.answ_watch = gobject.timeout_add(5000, self.client_answer_timeout, client)
+        self._offerer_invite_timeout = gobject.timeout_add(5000, self._cl_client_answer_timeout, client)
 
-    def client_answer_timeout(self, client):
+    def _cl_client_answer_timeout(self, client):
         # XXX
         if self.calling_dialog.get_property('visible'):
             self.hide_calling_dialog("answTimeout")
