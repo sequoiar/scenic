@@ -44,7 +44,6 @@ APP_NAME = "scenic"
 import sys
 import os
 import smtplib
-import gtk
 import gtk.glade
 import gobject
 import gettext
@@ -664,12 +663,14 @@ class Application(object):
     def _unschedule_answerer_invite_timeout(self):
         """ Unschedules our answer invite timeout function """
         if self._answerer_invite_timeout is not None:
+            print 'UNSCHEDULE ANSWERER INVITE'
             gobject.source_remove(self._answerer_invite_timeout)
             self._answerer_invite_timeout = None
     
     def _unschedule_offerer_invite_timeout(self):
         """ Unschedules our offer invite timeout function """
         if self._offerer_invite_timeout is not None:
+            print 'UNSCHEDULE OFFERER INVITE'
             gobject.source_remove(self._offerer_invite_timeout)
             self._offerer_invite_timeout = None
 
@@ -715,8 +716,8 @@ class Application(object):
                 print "sending to %s:%s" % (addr, send_to_port)
                 self.client = communication.Client(self, send_to_port)
                 self.client.connect(addr)
-                # user must respond in less than 5 seconds
-                self._answerer_invite_timeout = gobject.timeout_add(5000, self._cl_answer_invite_timed_out, addr)
+                # user must respond in less than 6 seconds
+                self._answerer_invite_timeout = gobject.timeout_add(6000, self._cl_answerer_invite_timed_out, addr)
                 text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
                 self.show_invited_dialog(text, _on_contact_request_dialog_result)
 
@@ -816,7 +817,7 @@ class Application(object):
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
-    def _cl_answer_invite_timed_out(self, addr):
+    def _cl_answerer_invite_timed_out(self, addr):
         """ 
         This is called if we haven't responded to our peer's invitation within a 
         reasonable delay (hardcoded to 5000 ms)
@@ -845,9 +846,9 @@ class Application(object):
         schedules some stuff.
         """
         # call later
-        self._offerer_invite_timeout = gobject.timeout_add(5000, self._cl_client_answer_timeout, client)
+        self._offerer_invite_timeout = gobject.timeout_add(5000, self._cl_offerer_invite_timed_out, client)
 
-    def _cl_client_answer_timeout(self, client):
+    def _cl_offerer_invite_timed_out(self, client):
         # XXX
         if self.calling_dialog.get_property('visible'):
             self.hide_calling_dialog("answTimeout")
