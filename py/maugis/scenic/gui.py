@@ -289,12 +289,10 @@ class Application(object):
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
         if self.config.confirm_quit:
-            print 'FUCKKKKKKKKKKKKKKK'
             d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.\nMake sure to save your settings if desired.")
             d.addCallback(_cb)
             return True
         else:
-            print 'YOUUUUUUUUUUUU'
             _cb(True)
             return False
         
@@ -555,6 +553,8 @@ class Application(object):
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.")
         else:
+            # UPDATE when initiating session
+            self._gather_configuration()
             msg = {
                 "msg":"INVITE",
                 "sid":0, 
@@ -649,7 +649,7 @@ class Application(object):
         
         # CODEC
         video_codec = _get_combobox_value(self.video_codec_widget)
-        video_codec = VIDEO_CODECS[video_codec]
+        self.config.video_codec = VIDEO_CODECS[video_codec]
         print ' * video_codec:', video_codec
         
         #TODO: get toggle fullscreen value
