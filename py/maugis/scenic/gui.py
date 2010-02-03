@@ -46,6 +46,7 @@ import os
 import smtplib
 import gtk.glade
 import gobject
+import webbrowser
 import gettext
 
 from twisted.internet import defer
@@ -115,6 +116,7 @@ class Application(object):
         self.server = communication.Server(self, self.config.negotiation_port)
         self.client = None
         self.got_bye = False
+        self.confirm_close = True
         self._offerer_invite_timeout = None
 
         # Set the Glade file
@@ -137,12 +139,12 @@ class Application(object):
 
         # Get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
+        self.main_window.connect('delete-event', self.on_main_window_deleted)
         self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
         self.main_tabs_widget = self.widgets.get_widget("mainTabs")
         # confirm_dialog:
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
         self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
-        self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_label = self.widgets.get_widget("confirm_label")
         # calling_dialog:
@@ -221,9 +223,35 @@ class Application(object):
                 self.stop_streamers()
             self.disconnect_client()
         self.server.close()
-        self.address_book.save()
+
+    def on_main_window_deleted(self, *args):
+        """
+        Destroy method causes appliaction to exit
+        when main window closed
+        """
+        def _cb(result):
+            if result:
+                print("Destroying the window.")
+                if reactor.running:
+                    print("reactor.stop()")
+                    reactor.stop()
+            else:
+                print("Not quitting.")
+        # If you return FALSE in the "delete_event" signal handler,
+        # GTK will emit the "destroy" signal. Returning TRUE means
+        # you don't want the window to be destroyed.
+        # This is useful for popping up 'are you sure you want to quit?'
+        # type dialogs. 
+        if self.confirm_close:
+            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.")
+            d.addCallback(_cb)
+            return True
+        else:
+            _cb(True)
+            return False
         
     def on_main_window_destroyed(self, *args):
+        # TODO: confirm dialog!
         reactor.stop()
 
     def on_video_view_preview_toggled(self, widget):
@@ -236,9 +264,9 @@ class Application(object):
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         tab = widget.get_nth_page(page_number)
         if tab == "localPan":
-            self.widgets.get_widget("network_admin").grab_default()
+            self.widgets.get_widget("network_admin").grab_default() # FIXME
         elif tab == "contactPan":
-            self.widgets.get_widget("contactJoinBut").grab_default()
+            self.widgets.get_widget("contactJoinBut").grab_default() # FIXME
 
     def on_contact_list_changed(self, *args):
         tree_list, self.selected_contact_row = args[0].get_selected()
@@ -282,7 +310,6 @@ class Application(object):
             if result:
                 del self.address_book.contact_list[self.selected_contact_num]
                 self.contact_tree.remove(self.selected_contact_row)
-                self.address_book.save()
                 num = self.selected_contact_num - 1
                 if num < 0:
                     num = 0
@@ -333,7 +360,6 @@ class Application(object):
             address_book.contact["name"] = self.contact_name_widget.get_text()
             address_book.contact["address"] = addr
             address_book.contact["port"] = int(port)
-            address_book.save()
             self.edit_contact_window.hide()
 
         # Validate the port number
@@ -511,12 +537,27 @@ class Application(object):
         Changes the bandwidth setting.
         Called when the bandwidth drop-down menu value has changed.
         """
+        #FIXME: why does it exists????
         base = 30
         num = 2 # number of choice
         step = base / num
         selection = self.conf_bandwidth_widget.get_active()
         self.config.bandwidth = (selection + 1) * step
+
+    def on_save_menu_item_activated(self, menu_item):
+        print menu_item, "chosen"
+        print "Saving addressbook and configuration."
         self.config.save()
+        self.address_book.save()
+
+    def on_quit_menu_item_activated(self, menu_item):
+        print menu_item, "chosen"
+        self.main_window.destroy()
+    
+    def on_help_menu_item_activated(self, menu_item):
+        print menu_item, "chosen"
+        url = "http://scenic.sat.qc.ca"
+        webbrowser.open(url)
 
     def on_negotiation_port_changed(self, *args):
         """
@@ -536,7 +577,6 @@ class Application(object):
             else:
                 if port != self.config.negotiation_port:
                     self.config.negotiation_port = int(port)
-                    self.config.save()
                     self.server.change_port(self.config.negotiation_port)
         # call later 
         gobject.timeout_add(0, _later_check_negotiation_port, args)

@@ -11,6 +11,8 @@ import signal
 from twisted.internet import error
 from twisted.internet import protocol
 from twisted.internet import reactor
+from twisted.python import procutils
+from twisted.internet import utils
 
 from scenic import sig
 
@@ -22,6 +24,25 @@ STATE_STOPPED = "STOPPED"
 
 class ProcessError(Exception):
     pass
+
+def run_once(executable, *args):
+    """
+    Runs a command, without looking at its output or return value.
+    Returns a Deferred or None.
+    """
+    def _cb(result):
+        #print(result)
+        pass
+    try:
+        executable = procutils.which(executable)[0]
+    except IndexError:
+        print("Could not find executable %s" % (executable))
+        return None
+    else:
+        print("Calling %s %s" % (executable, list(args)))
+        d = utils.getProcessValue(executable, args, os.environ, '.', reactor)
+        d.addCallback(_cb)
+        return d
 
 class ProcessIO(protocol.ProcessProtocol):
     """
