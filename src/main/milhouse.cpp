@@ -142,6 +142,10 @@ void Milhouse::runAsLocal(const po::variables_map &options)
     localVideo = videofactory::buildLocalVideo(pipeline, ipcp);
 
     playback.start();
+    
+    if(options["fullscreen"].as<bool>())
+        MessageDispatcher::sendMessage("fullscreen");
+    MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
 
     gutil::runMainLoop(options["timeout"].as<int>());
 
