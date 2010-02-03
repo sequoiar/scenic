@@ -724,7 +724,7 @@ class Application(object):
         if self._offerer_invite_timeout is None:
             self._offerer_invite_timeout = gobject.timeout_add(5000, self._cl_offerer_invite_timed_out, data)
         else:
-            print 'ONLY ONE AT A TIME'
+            raise RuntimeError("Already scheduled a timeout as we're already inviting a contact")
 
     def on_server_rcv_command(self, message, addr, server):
         # XXX
@@ -869,7 +869,7 @@ class Application(object):
             self.client.disconnect()
             self.client = None
         else:
-            print 'Warning: Client is None'
+            raise RuntimeError('Trying to send CANCEL even though client is None')
     
     def send_refuse_and_disconnect(self):
         """
@@ -881,7 +881,7 @@ class Application(object):
             self.client.disconnect()
             self.client = None
         else:
-            print 'Warning: Client is None'
+            raise RuntimeError('Trying to send REFUSE even though client is None')
 
 
     def on_streamer_state_changed(self, streamer, new_state):
