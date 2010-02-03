@@ -74,22 +74,19 @@ class Config(saving.ConfigStateSaving):
     Class attributes are default.
     """
     # Default values
-    negotiation_port = 17446 # sending/receiving TCP messages on it.
+    negotiation_port = 17446 # receiving TCP (SIC) messages on it.
     smtpserver = "smtp.sat.qc.ca"
-    emailinfo = "scenic@sat.qc.ca"
-    audio_input = "jackaudiosrc"
-    audio_output = "jackaudiosink"
+    email_info = "scenic@sat.qc.ca"
+    audio_source = "jackaudiosrc"
+    audio_sink = "jackaudiosink"
     audio_codec = "raw"
     audio_channels = 8
-    video_input = "v4l2src"
+    video_source = "v4l2src"
     video_device = "/dev/video0"
-    video_output = "xvimagesink"
+    video_sink = "xvimagesink"
     video_codec = "mpeg4"
     video_bitrate = "3000000"
-    send_video_port = 8000
-    recv_video_port = 8000
-    send_audio_port = send_video_port + 10
-    recv_audio_port = recv_video_port + 10
+    #soon to be deprecated:
     bandwidth = 30
 
     def __init__(self):
@@ -108,6 +105,10 @@ class Application(object):
     """
     def __init__(self, kiosk_mode=False):
         self.config = Config()
+        self.send_video_port = None
+        self.recv_video_port = None
+        self.send_audio_port = None
+        self.recv_audio_port = None
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
         self._has_session = False
@@ -261,8 +262,18 @@ class Application(object):
         """
         Shows a preview of the video input.
         """
+        #TODO: create a new process protocol for the preview window
+        #TODO: stop it when starting to stream, if running
+        #TODO: stop it when button is toggled to false.
         # It can be the user that pushed the button, or it can be toggled by the software.
         print 'video_view_preview toggled', widget.get_active()
+        if widget.get_active():
+            command = "milhouse --videosource v4l2src --videodevice %s --localvideo --window-title preview" % (self.config.video_device)
+            #self.preview_process = reactor.spawnProcess()
+            print "spawning", command
+            process.run_once(*command.split())
+        else:
+            print "stopping preview"
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         tab = widget.get_nth_page(page_number)
@@ -453,8 +464,8 @@ class Application(object):
                 except:
                     msg += "Error executing 'lsmod'"
 
-                fromaddr = "scenic@sat.qc.ca"
-                toaddrs  = self.config.emailinfo
+                fromaddr = self.config.email_info
+                toaddrs  = self.config.email_info
                 toaddrs = toaddrs.split(', ')
                 server = smtplib.SMTP(self.config.smtpserver)
                 server.set_debuglevel(0)
@@ -476,17 +487,17 @@ class Application(object):
 
     def allocate_ports(self):
         # TODO: start_session
-        self.config.recv_video_port = self.ports_allocator.allocate()
-        self.config.recv_audio_port = self.ports_allocator.allocate()
+        self.recv_video_port = self.ports_allocator.allocate()
+        self.recv_audio_port = self.ports_allocator.allocate()
 
     def free_ports(self):
         # TODO: stop_session
         try:
-            self.ports_allocator.free(self.config.recv_video_port)
+            self.ports_allocator.free(self.recv_video_port)
         except ports.PortsAllocatorError, e:
             print(e)
         try:    
-            self.ports_allocator.free(self.config.recv_audio_port)
+            self.ports_allocator.free(self.recv_audio_port)
         except ports.PortsAllocatorError, e:
             print(e)
         
@@ -501,8 +512,8 @@ class Application(object):
             msg = {
                 "msg":"INVITE",
                 "sid":0, 
-                "videoport": self.config.recv_video_port,
-                "audioport": self.config.recv_audio_port,
+                "videoport": self.recv_video_port,
+                "audioport": self.recv_audio_port,
                 "please_send_to_port": self.config.negotiation_port
                 }
             port = self.config.negotiation_port # self.address_book.contact["port"]
@@ -541,6 +552,7 @@ class Application(object):
         Called when the bandwidth drop-down menu value has changed.
         """
         #FIXME: why does it exists????
+        #TODO: deprecate this
         base = 30
         num = 2 # number of choice
         step = base / num
@@ -670,6 +682,7 @@ class Application(object):
             self.show_error_dialog(text)
 
     def init_bandwidth(self):
+        #TODO: deprecate this
         base = 30
         num = 2 # number of choice
         selection = int(round((self.config.bandwidth - 1) * num / base))
@@ -729,10 +742,10 @@ class Application(object):
                 if response == gtk.RESPONSE_OK:
                     if self.client is not None:
                         self.allocate_ports()
-                        self.client.send({"msg":"ACCEPT", "videoport":self.config.recv_video_port, "audioport":self.config.recv_audio_port, "sid":0})
+                        self.client.send({"msg":"ACCEPT", "videoport":self.recv_video_port, "audioport":self.recv_audio_port, "sid":0})
                         # TODO: Use session to contain settings and ports
-                        self.config.send_video_port = message["videoport"]
-                        self.config.send_audio_port = message["audioport"]
+                        self.send_video_port = message["videoport"]
+                        self.send_audio_port = message["audioport"]
                     else:
                         print "Error: connection lost, so we could not accept." # FIXME
                 elif response == gtk.RESPONSE_CANCEL:
@@ -764,8 +777,8 @@ class Application(object):
             # TODO: Use session to contain settings and ports
             if self.client is not None:
                 self.hide_calling_dialog("accept")
-                self.config.send_video_port = message["videoport"]
-                self.config.send_audio_port = message["audioport"]
+                self.send_video_port = message["videoport"]
+                self.send_audio_port = message["audioport"]
                 if self.streamer_manager.is_busy():
                     dialogs.ErrorDialog.create("A streaming session is already in progress.")
                 else:

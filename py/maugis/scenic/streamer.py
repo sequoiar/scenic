@@ -49,6 +49,7 @@ class StreamerManager(object):
         
         Raises a RuntimeError if a sesison is already in progress.
         """
+        #FIXME: uses self.app.*_port variables to know which ports to use.
         if self.state != process.STATE_STOPPED:
             raise RuntimeError("Cannot start streamers since they are %s." % (self.state))
             # FIXME: catch this and run ;-)
@@ -57,24 +58,24 @@ class StreamerManager(object):
             "milhouse",
             '--receiver', 
             '--address', str(host),
-            '--videosink', config.video_output,
-            '--audiosink', config.audio_output,
+            '--videosink', config.video_sink,
+            '--audiosink', config.audio_sink,
             '--videocodec', config.video_codec,
             '--audiocodec', config.audio_codec,
-            '--videoport', str(config.recv_video_port),
-            '--audioport', str(config.recv_audio_port) 
+            '--videoport', str(self.app.recv_video_port),
+            '--audioport', str(self.app.recv_audio_port) 
             ]
         self.milhouse_send_cmd = [
             "milhouse", 
             '--sender', 
             '--address', str(host),
-            '--videosource', config.video_input,
+            '--videosource', config.video_source,
             '--videocodec', config.video_codec,
             '--videobitrate', str(config.video_bitrate),
-            '--audiosource', config.audio_input,
+            '--audiosource', config.audio_source,
             '--audiocodec', config.audio_codec,
-            '--videoport', str(config.send_video_port),
-            '--audioport', str(config.send_audio_port)]
+            '--videoport', str(self.app.send_video_port),
+            '--audioport', str(self.app.send_audio_port)]
         # setting up
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
