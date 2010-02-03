@@ -533,6 +533,7 @@ class Application(object):
             deferred = self.client.connect(ip)
             deferred.addCallback(_on_connected).addErrback(_on_error)
             self.calling_dialog.show()
+            self._schedule_offerer_invite_timeout()
             # window will be hidden when we receive ACCEPT or REFUSE
     
     def on_invite_contact_cancelled(self, *args):
@@ -899,16 +900,6 @@ class Application(object):
         self.hide_calling_dialog(msg)
         text = _("%s: %s") % (str(err), str(msg))
         self.show_error_dialog(text)
-
-    def on_client_connecting(self, client):
-        # XXX
-        """
-        Slot for the sending_signal of the client.
-        Schedules a timeout that will make our invitation expire
-        if we haven't gotten an answer soon enough.
-        """
-        self._schedule_offerer_invite_timeout(client)
-        print 'CONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN'
 
     def _cl_offerer_invite_timed_out(self, client):
         # XXX

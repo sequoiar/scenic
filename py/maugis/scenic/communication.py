@@ -99,8 +99,6 @@ class Client(object):
         
         self.socket_error_signal = sig.Signal()
         self.socket_error_signal.connect(app.on_client_socket_error) # TODO
-        self.connecting_signal = sig.Signal()
-        self.connecting_signal.connect(app.on_client_connecting) # TODO
         # unused:
         #self.socket_timeout_signal = sig.Signal()
         #self.socket_timeout_signal.connect(app.on_client_socket_timeout)
@@ -126,7 +124,6 @@ class Client(object):
             return reason        
 
         if not self.is_connected():
-            self.connecting_signal(self)
             self.host = host
             self.client_factory = sic.ClientFactory()
             print 'trying to connect'
