@@ -141,10 +141,11 @@ class Application(object):
     Main application (arguably God) class
      * Contains the main GTK window
     """
-    def __init__(self, kiosk_mode=False):
+    def __init__(self, kiosk_mode=False, fullscreen=False):
         # --------------------------------------
         # TODO: move that stuff to the Application class
         self.config = Config() # XXX
+        self.kiosk_mode_on = kiosk_mode
         self.send_video_port = None # XXX
         self.recv_video_port = None # XXX
         self.send_audio_port = None # XXX
@@ -183,6 +184,7 @@ class Application(object):
         self.main_window.connect('delete-event', self.on_main_window_deleted)
         self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
         self.main_tabs_widget = self.widgets.get_widget("mainTabs")
+        self.main_window.connect("window-state-event", self.on_window_state_event)
         # confirm_dialog:
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
         self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
@@ -225,11 +227,13 @@ class Application(object):
         self.video_codec_widget = self.widgets.get_widget("video_codec")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
             
-        
         # switch to Kiosk mode if asked
-        if kiosk_mode:
+        if self.kiosk_mode_on:
             self.main_window.set_decorated(False)
-            self.widgets.get_widget("sysBox").show()
+            self.widgets.get_widget("sysBox").show() # shows shutdown and reboot buttons.
+        self.is_fullscreen = False
+        if fullscreen:
+            self.toggle_fullscreen()
         
         # Build the contact list view
         self.selection = self.contact_list_widget.get_selection()
@@ -240,8 +244,7 @@ class Application(object):
         self.contact_list_widget.append_column(column)
         # set value of widgets.
         # TODO: get rid of those methods
-        self.init_ad_book_contact_list() # XXX
-        self.init_widgets_value() # XXX
+        self._init_widgets_value() # XXX
 
         self.main_window.show()
         self.ports_allocator = ports.PortsAllocator()
@@ -252,6 +255,23 @@ class Application(object):
             print(str(e))
             raise
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
+    
+    def toggle_fullscreen(self):
+        """
+        Toggles the fullscreen mode on/off.
+        """
+        if self.is_fullscreen:
+            self.main_window.unfullscreen()
+        else:
+            self.main_window.fullscreen()
+    
+    def on_window_state_event(self, widget, event):
+        """
+        Called when toggled fullscreen.
+        """
+        self.is_fullscreen = event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN != 0
+        print('fullscreen %s' % (self.is_fullscreen))
+        return True
         
     def before_shutdown(self):
         print("The application is shutting down.")
@@ -611,11 +631,12 @@ class Application(object):
         
         #TODO: get toggle fullscreen value
     
-    def init_widgets_value(self):
+    def _init_widgets_value(self):
         """
-        Sets the value of each widget according to the data stored in the configuration file.
+        Called once at startup.
+         * Once the config file is read, 
+         * Sets the value of each widget according to the data stored in the configuration file.
         """
-        
         print("Changing widgets value according to configuration.")
         # VIDEO SIZE
         video_size = "%sx%s" % (self.config.video_width, self.config.video_height)
@@ -645,6 +666,21 @@ class Application(object):
         video_codec = VIDEO_CODECS.keys()[VIDEO_CODECS.values().index(self.config.video_codec)]
         _set_combobox_value(self.video_codec_widget, video_codec)
         print ' * video_codec:', video_codec
+
+        # ADDRESSBOOK
+        # Init addressbook contact list:
+        address_book = self.address_book
+        address_book.selected_contact = None
+        address_book.new_contact = False
+        if len(address_book.contact_list) > 0:
+            for contact in address_book.contact_list:
+                contact_markup = "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
+                self.contact_tree.append([contact_markup])
+            self.selection.select_path(address_book.selected)
+        else:
+            self.edit_contact_widget.set_sensitive(False)
+            self.remove_contact_widget.set_sensitive(False)
+            self.invite_contact_widget.set_sensitive(False)
 
     def on_quit_menu_item_activated(self, menu_item):
         """
@@ -729,19 +765,6 @@ class Application(object):
         if text is not None:
             self.show_error_dialog(text)
 
-    def init_ad_book_contact_list(self):
-        address_book = self.address_book
-        address_book.selected_contact = None
-        address_book.new_contact = False
-        if len(address_book.contact_list) > 0:
-            for contact in address_book.contact_list:
-                contact_markup = "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
-                self.contact_tree.append([contact_markup])
-            self.selection.select_path(address_book.selected)
-        else:
-            self.edit_contact_widget.set_sensitive(False)
-            self.remove_contact_widget.set_sensitive(False)
-            self.invite_contact_widget.set_sensitive(False)
 
     def _unschedule_offerer_invite_timeout(self):
         """ Unschedules our offer invite timeout function """

@@ -37,12 +37,12 @@ def start_logging_to_stdout():
 def run():
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(gui.__version__))
-    parser.add_option("-k", "--kiosk", action="store_true", dest="kiosk", \
-            help="Run maugis in kiosk mode")
+    parser.add_option("-k", "--kiosk", action="store_true", help="Run in kiosk mode")
+    parser.add_option("-f", "--fullscreen", action="store_true", help="Run in fullscreen mode")
     (options, args) = parser.parse_args()
     start_logging_to_stdout()
     try:
-        app = gui.Application(kiosk_mode=options.kiosk)
+        app = gui.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen)
     except error.CannotListenError, e:
         print("There must be an other Scenic running.")
         print(str(e))
