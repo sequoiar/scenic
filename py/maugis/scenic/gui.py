@@ -25,8 +25,10 @@ Scenic GTK GUI.
 Negotiation is done as follow:
 ------------------------------
  * {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
+   * Each peer ask for ports to send to, and of media settings as well. "video": [{"port":10000, "codec":"mpeg4", "bitrate":3000000}]
  * {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
  * {"msg":"REFUSE", "sid":0}
+ * {"msg":"CANCEL", "sid":0}
  * {"msg":"ACK", "sid":0}
  * {"msg":"BYE", "sid":0}
  * {"msg":"OK", "sid":0}
@@ -290,7 +292,7 @@ class Application(object):
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
         if self.config.confirm_quit:
-            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.\nMake sure to save your settings if desired.")
+            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.\nMake sure to save your settings if desired.", parent=self.main_window)
             d.addCallback(_cb)
             return True
         else:
@@ -316,7 +318,7 @@ class Application(object):
             command = "milhouse --videosource v4l2src --videodevice %s --localvideo --window-title preview" % (self.config.video_device)
             print "spawning", command
             process.run_once(*command.split())
-            dialogs.ErrorDialog.create("You must manually close the preview window.")
+            dialogs.ErrorDialog.create("You must manually close the preview window.", parent=self.main_window)
         else:
             print "stopping preview"
 
@@ -552,7 +554,7 @@ class Application(object):
         """
         self.allocate_ports()
         if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.")
+            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.main_window)
         else:
             # UPDATE when initiating session
             self._gather_configuration()
@@ -865,7 +867,7 @@ class Application(object):
                 self.client.disconnect()
                 self.client = None
             self.invited_dialog.hide()
-            dialogs.ErrorDialog.create("Remote peer cancelled invitation.")
+            dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.main_window)
             
         elif msg == "ACCEPT":
             self._unschedule_offerer_invite_timeout()
@@ -877,7 +879,7 @@ class Application(object):
                 self.send_video_port = message["videoport"]
                 self.send_audio_port = message["audioport"]
                 if self.streamer_manager.is_busy():
-                    dialogs.ErrorDialog.create("A streaming session is already in progress.")
+                    dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.main_window)
                 else:
                     print("Got ACCEPT. Starting streamers as initiator.")
                     self.start_streamers(addr)

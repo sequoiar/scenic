@@ -35,7 +35,7 @@ class ErrorDialog(object):
     Error dialog. Fires the deferred given to it once done.
     Use the create static method as a factory.
     """
-    def __init__(self, deferred, message):
+    def __init__(self, deferred, message, parent=None):
         """
         @param deferred: L{Deferred}
         @param message: str
@@ -43,7 +43,7 @@ class ErrorDialog(object):
         self.deferredResult = deferred
         parent = None
         error_dialog = gtk.MessageDialog(
-            parent=None, 
+            parent=parent, 
             flags=0, 
             type=gtk.MESSAGE_ERROR, 
             buttons=gtk.BUTTONS_CLOSE, 
@@ -54,14 +54,14 @@ class ErrorDialog(object):
         error_dialog.show()
 
     @staticmethod
-    def create(message):
+    def create(message, parent=None):
         """
         Returns a Deferred which will be called with a True result.
         @param message: str
         @rettype: L{Deferred}
         """
         d = defer.Deferred()
-        dialog = ErrorDialog(d, message)
+        dialog = ErrorDialog(d, message, parent)
         return d
 
     def on_close(self, dialog, *params):
@@ -86,11 +86,10 @@ class YesNoDialog(object):
     Yes/no confirmation dialog.
     Use the create static method as a factory.
     """
-    def __init__(self, deferred, message):
+    def __init__(self, deferred, message, parent=None):
         self.deferredResult = deferred
-        parent = None
         yes_no_dialog = gtk.MessageDialog(
-            parent=None, 
+            parent=parent, 
             flags=0, 
             type=gtk.MESSAGE_QUESTION, 
             buttons=gtk.BUTTONS_YES_NO, 
@@ -101,14 +100,14 @@ class YesNoDialog(object):
         yes_no_dialog.show()
 
     @staticmethod
-    def create(message):
+    def create(message, parent=None):
         """
         Returns a Deferred which will be called with a boolean result.
         @param message: str
         @rettype: L{Deferred}
         """
         d = defer.Deferred()
-        dialog = YesNoDialog(d, message)
+        dialog = YesNoDialog(d, message, parent)
         return d
 
     def on_close(self, dialog, *params):
