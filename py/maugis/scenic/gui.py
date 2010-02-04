@@ -142,21 +142,24 @@ class Application(object):
      * Contains the main GTK window
     """
     def __init__(self, kiosk_mode=False):
-        self.config = Config()
-        self.send_video_port = None
-        self.recv_video_port = None
-        self.send_audio_port = None
-        self.recv_audio_port = None
-        self.address_book = saving.AddressBook()
-        self.streamer_manager = StreamerManager(self)
-        self._has_session = False
-        self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed)
-        print "Starting SIC server on port %s" % (self.config.negotiation_port)
-        self.server = communication.Server(self, self.config.negotiation_port)
-        self.client = None
-        self.got_bye = False
+        # --------------------------------------
+        # TODO: move that stuff to the Application class
+        self.config = Config() # XXX
+        self.send_video_port = None # XXX
+        self.recv_video_port = None # XXX
+        self.send_audio_port = None # XXX
+        self.recv_audio_port = None # XXX
+        self.address_book = saving.AddressBook() # XXX
+        self.streamer_manager = StreamerManager(self) # XXX
+        self._has_session = False # XXX
+        self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
+        print "Starting SIC server on port %s" % (self.config.negotiation_port) # XXX
+        self.server = communication.Server(self, self.config.negotiation_port) # XXX
+        self.client = None # XXX
+        self.got_bye = False # XXX
+        # ---------------------------------------
+        
         self._offerer_invite_timeout = None
-
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'scenic.glade')
         if os.path.isfile(glade_file):
@@ -241,9 +244,10 @@ class Application(object):
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list_widget.append_column(column)
         # set value of widgets.
-        self.init_ad_book_contact_list()
-        self.init_negotiation_port()
-        self.init_widgets_value()
+        # TODO: get rid of those methods
+        self.init_ad_book_contact_list() # XXX
+        self.init_negotiation_port() # XXX
+        self.init_widgets_value() # XXX
 
         self.main_window.show()
         self.ports_allocator = ports.PortsAllocator()
