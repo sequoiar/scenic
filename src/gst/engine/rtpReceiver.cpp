@@ -78,10 +78,8 @@ void RtpReceiver::setCaps(const char *capsStr)
 }
 
 
-void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /*data*/)
+void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /* data*/)
 {
-    //RtpReceiver *context = static_cast<RtpReceiver*>(data);
-
     // don't look at the full name
     static const std::string expectedPadPrefix = "recv_rtp_src";
     if (gst_pad_is_linked(srcPad))
@@ -92,15 +90,16 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
         LOG_DEBUG("Wrong pad");
     else
     {
+        /// we can't just use context->depayloader because this signal may have been called for the rtp pad
+        /// of another rtpreceiver than context
         GstPad *sinkPad = getMatchingDepayloaderSinkPad(srcPad);
 
         if (gst_pad_is_linked(sinkPad)) // only link once
         {
-            LOG_WARNING("sink pad is already linked, are you trying to connect a new sender to an "
-                    "existing receiver that lost its sender? You may have specified the wrong port numbers."
-                    "This will likely crash.");
-            gst_object_unref(sinkPad);
-            return;
+            LOG_DEBUG("depayloader's sink pad is already linked, unlinking from old src pad");
+            GstPad *oldSrcPad = gst_pad_get_peer(sinkPad);
+            gst_pad_unlink(oldSrcPad, sinkPad);
+            gst_object_unref(oldSrcPad);
         }
         gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
         gchar *srcPadName;
@@ -114,11 +113,11 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
 }
 
 
-void RtpReceiver::onSenderTimeout(GstElement *  /*rtpbin*/, guint /* session */, guint /* ssrc */, gpointer data)
+void RtpReceiver::onSenderTimeout(GstElement *  /*rtpbin*/, guint session, guint /* ssrc */, gpointer /*data*/)
 {
-    LOG_INFO("Sender timeout.");
-    RtpReceiver *context = static_cast<RtpReceiver*>(data);
-    context->printStats_ = false;
+    LOG_DEBUG("Sender timeout for session " << session);
+    //RtpReceiver *context = static_cast<RtpReceiver*>(data);
+    //context->printStats_ = false;
 }
 
 
@@ -221,7 +220,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", 
             G_CALLBACK(RtpReceiver::onPadAdded), 
-            this);
+            NULL);
 
     g_signal_connect(rtpbin_, "on-sender-timeout", 
             G_CALLBACK(RtpReceiver::onSenderTimeout), 

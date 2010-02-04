@@ -30,8 +30,6 @@
 #include "remoteConfig.h"
 #include "pipeline.h"
 
-// for posting 
-#include "mapMsg.h"
 #include <boost/lexical_cast.hpp>
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -78,28 +76,35 @@ void RtpBin::printStatsVal(const std::string &idStr,
         const std::string &formatStr, 
         GstStructure *stats)
 {
-    MapMsg mapMsg;
     std::string paramStr("");
     if (type == "guint64")
     {
-        guint64 val = g_value_get_uint64(gst_structure_get_value(stats, key));
-        paramStr += formatStr + boost::lexical_cast<std::string>(val);
+        if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, key)))
+        {
+            guint64 val = g_value_get_uint64(gst_structure_get_value(stats, key));
+            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+        }
     }
     else if (type == "guint32")
     {
+        if (G_VALUE_HOLDS_UINT(gst_structure_get_value(stats, key)))
+        {
         guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
         paramStr += formatStr + boost::lexical_cast<std::string>(val);
+        }
     }
     else if (type == "gint32")
     {
-        gint32 val = g_value_get_int(gst_structure_get_value(stats, key));
-        paramStr += formatStr + boost::lexical_cast<std::string>(val);
+        if (G_VALUE_HOLDS_INT(gst_structure_get_value(stats, key)))
+        {
+            gint32 val = g_value_get_int(gst_structure_get_value(stats, key));
+            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+        }
     }
     else
         THROW_ERROR("Unexpected type");
 
-    mapMsg["stats"] = idStr + paramStr;
-    LOG_INFO(mapMsg["stats"]);
+    LOG_INFO(idStr << paramStr);
 }
 
 
@@ -134,7 +139,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     else if (!context->printStats_)
     {
         LOG_DEBUG("Finished printing stats for now");
-        return FALSE;
+        return TRUE;
     }
     else if (sessionCount_ <= 0) // no sessions to print yet
         return TRUE; 
