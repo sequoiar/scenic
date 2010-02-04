@@ -38,7 +38,8 @@ Former Notes
  * bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
 ### CONSTANTS ###
-__version__ = "0.1.0"
+from scenic import version
+__version__ = version.__version__
 APP_NAME = "scenic"
 
 ### MODULES IMPORTS  ###
@@ -145,6 +146,15 @@ def format_contact_markup(contact):
     """
     return "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
 
+ABOUT_LABEL = """<b><big>Scenic</big></b>
+Version: %s
+Copyright: SAT
+Authors: Etienne Desautels, Alexandre Quessy, Tristan Matthews, Simon Piette""" % (__version__)
+
+ABOUT_TEXT_VIEW = """
+Scenic is the advanced user graphical interface for the Milhouse audio/video streamer for GNU/Linux. 
+"""
+
 class Gui(object):
     """
     Main application (arguably God) class
@@ -235,6 +245,9 @@ class Gui(object):
         self.video_source_widget = self.widgets.get_widget("video_source")
         self.video_codec_widget = self.widgets.get_widget("video_codec")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
+        # about tab contents:
+        self.about_label_widget = self.widgets.get_widget("about_label")
+        self.about_text_view_widget = self.widgets.get_widget("about_text_view")
             
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
@@ -674,6 +687,12 @@ class Gui(object):
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
+
+        # ABOUT TAB CONTENTS:
+        self.about_label_widget.set_markup(ABOUT_LABEL)
+        about_text_buffer = gtk.TextBuffer()
+        about_text_buffer.set_text(ABOUT_TEXT_VIEW)
+        self.about_text_view_widget.set_buffer(about_text_buffer)
 
     # -------------------------- menu items -----------------
     
