@@ -372,7 +372,7 @@ class Application(object):
             self.invite_contact_widget.set_sensitive(False)
             self.address_book.selected_contact = None
 
-    # ---------------------- slots for addressbook events --------
+    # ---------------------- slots for addressbook widgets events --------
     
     def on_contact_double_clicked(self, *args):
         """
@@ -416,7 +416,7 @@ class Application(object):
         self.contact_name_widget.set_text(self.address_book.selected_contact["name"])
         self.contact_addr_widget.set_text(self.address_book.selected_contact["address"])
         self.contact_port_widget.set_text(str(self.address_book.selected_contact["port"]))
-        self.edit_contact_window.show()
+        self.edit_contact_window.show() # addr
 
     def on_edit_contact_cancel_clicked(self, *args):
         """
@@ -436,7 +436,7 @@ class Application(object):
             """ Saves contact info after it's been validated and then closes the window"""
             contact = {
                 "name": self.contact_name_widget.get_text(),
-                "addr": addr, 
+                "address": addr, 
                 "port": int(port)
                 }
             contact_markup = format_contact_markup(contact)
@@ -517,7 +517,6 @@ class Application(object):
         """
         def on_confirm_result(result):
             milhouse_version = "unknown"
-            
             if result:
                 msg = "--- milhouse_version ---\n" + milhouse_version + "\n"
                 msg += "--- uname -a ---\n"
@@ -544,7 +543,6 @@ class Application(object):
                     err.close()
                 except:
                     msg += "Error executing 'lsmod'"
-
                 fromaddr = self.config.email_info
                 toaddrs  = self.config.email_info
                 toaddrs = toaddrs.split(', ')
@@ -556,7 +554,7 @@ class Application(object):
                     text = _("Could not send info.\n\nCheck your internet connection.")
                     self.show_error_dialog(text)
                 server.quit()
-
+        
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
         self.show_confirm_dialog(text, on_confirm_result)
 
@@ -566,13 +564,13 @@ class Application(object):
         @rettype: bool
         """
         return self._has_session
+    # -------------------- streamer ports -----------------
 
     def allocate_ports(self):
         # TODO: start_session
         self.recv_video_port = self.ports_allocator.allocate()
         self.recv_audio_port = self.ports_allocator.allocate()
 
-    # -------------------- streamer ports -----------------
     def free_ports(self):
         # TODO: stop_session
         try:
@@ -590,9 +588,9 @@ class Application(object):
         Saves the configuration to a file.
         Reads the widget value prior to do it.
         """
-        self._gather_configuration()
+        self._gather_configuration() # need to get the value of the configuration widgets.
         self.config.save()
-        self.address_book.save()
+        self.address_book.save() # addressbook values are already stored.
 
     def _gather_configuration(self):
         """
@@ -848,7 +846,8 @@ class Application(object):
         else:
             self.client = communication.Client(self, send_to_port)
             self.client.connect(addr)
-            text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
+            # TODO: if a contact in the addressbook has this address, displays it!
+            text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % addr)
             self.show_invited_dialog(text, _on_contact_request_dialog_response)
 
     def handle_cancel(self):

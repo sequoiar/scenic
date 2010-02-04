@@ -118,6 +118,9 @@ class AddressBook(object):
                     try:
                         print("Loading contact %s" % (line.strip()))
                         d = json.loads(line)
+                        for k in ['address', 'port', 'name']:
+                            if not d.has_key(k):
+                                raise RuntimeError("The contacts in %s have a wrong format! The key %s is needed." % (self.contacts_file_name, k))
                         for k, v in d.iteritems():
                             if type(v) is unicode:
                                 v = str(v) # FIXME
