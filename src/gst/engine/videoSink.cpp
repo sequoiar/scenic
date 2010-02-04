@@ -225,6 +225,9 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
         case GDK_F:
             context->toggleFullscreen(widget);
             break;
+        case GDK_Escape:
+            context->toggleFullscreen(widget);
+            break;
 
         case GDK_Q:
             // Quit application, this quits the main loop
