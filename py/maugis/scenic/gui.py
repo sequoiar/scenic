@@ -670,7 +670,7 @@ class Application(object):
         print ' * video_display:', video_display
         
         # BITRATE
-        video_bitrate = "%s Mbps" % (self.config.video_bitrate / 1000000)
+        video_bitrate = "%s Mbps" % (int(self.config.video_bitrate) / 1000000)
         _set_combobox_value(self.video_bitrate_widget, video_bitrate)
         print ' * video_bitrate:', video_bitrate
         
