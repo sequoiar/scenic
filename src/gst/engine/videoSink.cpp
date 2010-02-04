@@ -223,17 +223,18 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
     {
         case GDK_f:
         case GDK_F:
-            context->toggleFullscreen(widget);
-            break;
         case GDK_Escape:
             context->toggleFullscreen(widget);
             break;
 
-        case GDK_Q:
-            // Quit application, this quits the main loop
+        case GDK_q:
+            // Quit application on ctrl-q, this quits the main loop
             // (if there is one)
-            LOG_INFO("Q key pressed, quitting.");
-            context->VideoSink::pipeline_.quit();
+            if (event->state & GDK_CONTROL_MASK)
+            {
+                LOG_INFO("Ctrl-Q key pressed, quitting.");
+                context->VideoSink::pipeline_.quit();
+            }
             break;
 
         default:
@@ -249,13 +250,13 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     // ignore anything but 'prepare-xwindow-id' element messages
     if (GST_MESSAGE_TYPE (message) != GST_MESSAGE_ELEMENT)
         return false;
- 
+
     if (!gst_structure_has_name(message->structure, "prepare-xwindow-id"))
         return false;
- 
+
     LOG_DEBUG("Got prepare-xwindow-id msg");
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), getXWindow());
-  
+
     return true;
 }
 
