@@ -36,7 +36,7 @@ class Server(object):
         self.remote_ip = None
         
         self.received_command_signal = sig.Signal()
-        self.received_command_signal.connect(app.on_server_rcv_command)
+        self.received_command_signal.connect(app.on_server_receive_command)
  
     def start_listening(self):
         if not self.is_listening():

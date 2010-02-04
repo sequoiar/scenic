@@ -758,100 +758,105 @@ class Application(object):
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
-    def on_server_rcv_command(self, message, addr):
+    def handle_invite(self, message, addr):
+        # FIXME: this doesn't make sense here
+        self.got_bye = False
+        send_to_port = message["please_send_to_port"]
+        
+        def _on_contact_request_dialog_response(response):
+            """
+            User is accetping or declining an offer.
+            @param result: Answer to the dialog.
+            """
+            if response == gtk.RESPONSE_OK:
+                if self.client is not None:
+                    self.send_accept(message, addr)
+                else:
+                    print("Error: connection lost, so we could not accept.")# FIXME
+            elif response == gtk.RESPONSE_CANCEL or gtk.RESPONSE_DELETE_EVENT:
+                self.send_refuse_and_disconnect() 
+            else:
+                pass
+            return True
+
+        if self.streamer_manager.is_busy():
+            print("Got invitation, but we are busy.")
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
+        else:
+            self.client = communication.Client(self, send_to_port)
+            self.client.connect(addr)
+            text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
+            self.show_invited_dialog(text, _on_contact_request_dialog_response)
+
+    def handle_cancel(self):
+        if self.client is not None:
+            self.client.disconnect()
+            self.client = None
+        self.invited_dialog.hide()
+        dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.main_window)
+
+    def handle_accept(self, message, addr):
+        self._unschedule_offerer_invite_timeout()
+        # FIXME: this doesn't make sense here
+        self.got_bye = False
+        # TODO: Use session to contain settings and ports
+        if self.client is not None:
+            self.hide_calling_dialog("accept")
+            self.send_video_port = message["videoport"]
+            self.send_audio_port = message["audioport"]
+            if self.streamer_manager.is_busy():
+                dialogs.ErrorDialog.create("A streaming session is already in progress.")
+            else:
+                print("Got ACCEPT. Starting streamers as initiator.")
+                self.start_streamers(addr)
+                self.send_ack()
+        else:
+            print("Error ! Connection lost.") # FIXME
+
+    def handle_refuse(self):
+        self._unschedule_offerer_invite_timeout()
+        self.free_ports()
+        self.hide_calling_dialog("refuse")
+
+    def handle_ack(self, addr):
+        print("Got ACK. Starting streamers as answerer.")
+        self.start_streamers(addr)
+
+    def handle_bye(self):
+        self.got_bye = True
+        self.stop_streamers()
+        if self.client is not None:
+            print('disconnecting client and sending BYE')
+            self.client.send({"msg":"OK", "sid":0})
+            self.disconnect_client()
+
+    def handle_ok(self):
+        print("received ok. Everything has an end.")
+        if self.client is not None:
+            print('disconnecting client')
+            self.disconnect_client()
+
+    def on_server_receive_command(self, message, addr):
         # XXX
         msg = message["msg"]
         print("Got %s from %s" % (msg, addr))
         
         if msg == "INVITE":
-            # FIXME: this doesn't make sense here
-            self.got_bye = False
-            send_to_port = message["please_send_to_port"]
-            # TODO
-            # if local user doesn't respond, close dialog in 5 seconds
-            
-            def _on_contact_request_dialog_result(response):
-                """
-                User is accetping or declining an offer.
-                @param result: Answer to the dialog.
-                """
-                if response == gtk.RESPONSE_OK:
-                    if self.client is not None:
-                        # UPDATE config once we accept the invitie
-                        self._gather_configuration()
-                        self.allocate_ports()
-                        self.client.send({"msg":"ACCEPT", "videoport":self.recv_video_port, "audioport":self.recv_audio_port, "sid":0})
-                        # TODO: Use session to contain settings and ports
-                        self.send_video_port = message["videoport"]
-                        self.send_audio_port = message["audioport"]
-                    else:
-                        print("Error: connection lost, so we could not accept.")# FIXME
-                elif response == gtk.RESPONSE_CANCEL:
-                    self.send_refuse_and_disconnect() 
-                elif response == gtk.RESPONSE_DELETE_EVENT:
-                # For now, treat delete the same as if the user had clicked refuse
-                    self.send_refuse_and_disconnect() 
-                else:
-                    # FIXME: maybe we should handle window being closed?
-                    pass
-                return True
-
-            if self.streamer_manager.is_busy():
-                print("Got invitation, but we are busy.")
-                communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
-            else:
-                self.client = communication.Client(self, send_to_port)
-                self.client.connect(addr)
-                text = _("<b><big>" + addr + " is inviting you.</big></b>\n\nDo you accept the connection?")
-                self.show_invited_dialog(text, _on_contact_request_dialog_result)
-
+            self.handle_invite(message, addr)
         elif msg == "CANCEL":
-            if self.client is not None:
-                self.client.disconnect()
-                self.client = None
-            self.invited_dialog.hide()
-            dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.main_window)
-            
+            self.handle_cancel()
         elif msg == "ACCEPT":
-            self._unschedule_offerer_invite_timeout()
-            # FIXME: this doesn't make sense here
-            self.got_bye = False
-            # TODO: Use session to contain settings and ports
-            if self.client is not None:
-                self.hide_calling_dialog("accept")
-                self.send_video_port = message["videoport"]
-                self.send_audio_port = message["audioport"]
-                if self.streamer_manager.is_busy():
-                    dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.main_window)
-                else:
-                    print("Got ACCEPT. Starting streamers as initiator.")
-                    self.start_streamers(addr)
-                    self.client.send({"msg":"ACK", "sid":0})
-            else:
-                print("Error ! Connection lost.") # FIXME
-
+            self.handle_accept(message, addr)
         elif msg == "REFUSE":
-            self._unschedule_offerer_invite_timeout()
-            self.free_ports()
-            self.hide_calling_dialog("refuse")
-
+            self.handle_refuse()
         elif msg == "ACK":
-            print("Got ACK. Starting streamers as answerer.")
-            self.start_streamers(addr)
-
+            self.handle_ack(addr)
         elif msg == "BYE":
-            self.got_bye = True
-            self.stop_streamers()
-            if self.client is not None:
-                print('disconnecting client and sending BYE')
-                self.client.send({"msg":"OK", "sid":0})
-                self.disconnect_client()
-
+            self.handle_bye()
         elif msg == "OK":
-            print("received ok. Everything has an end.")
-            if self.client is not None:
-                print('disconnecting client')
-                self.disconnect_client()
+            self.handle_ok()
+        else:
+            print ('WARNING: Unexpected message %s' % (msg))
 
     def start_streamers(self, addr):
         self._has_session = True
@@ -917,6 +922,18 @@ class Application(object):
         self.calling_dialog.show()
         # window will be hidden when we receive ACCEPT or REFUSE
     
+    def send_accept(self, message, addr):
+        # UPDATE config once we accept the invitie
+        self._gather_configuration()
+        self.allocate_ports()
+        self.client.send({"msg":"ACCEPT", "videoport":self.recv_video_port, "audioport":self.recv_audio_port, "sid":0})
+        # TODO: Use session to contain settings and ports
+        self.send_video_port = message["videoport"]
+        self.send_audio_port = message["audioport"]
+        
+    def send_ack(self):
+        self.client.send({"msg":"ACK", "sid":0})
+
     def send_bye(self):
         """
         Sends BYE
