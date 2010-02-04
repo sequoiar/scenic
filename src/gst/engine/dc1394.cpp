@@ -372,7 +372,7 @@ void DC1394::listCameras()
         camera =
             dc1394_camera_new_unit (dc1394, cameras->ids[srcCamNum].guid,
                     cameras->ids[srcCamNum].unit);
-        LOG_PRINT("\nDC1394 Camera " << srcCamNum << std::endl);
+        LOG_PRINT("\nDC1394 Camera " << srcCamNum << ": " << camera->vendor << " " << camera->model << std::endl);
         LOG_PRINT("GUID = " << std::hex << cameras->ids[srcCamNum].guid << std::endl);
 
         camerr = dc1394_video_get_supported_modes(camera, &modes);
