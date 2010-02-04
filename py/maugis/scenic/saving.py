@@ -97,6 +97,7 @@ class AddressBook(object):
     READING & WRITING ADDRESS BOOK FILE 
     """
     def __init__(self):
+        self.current_contact_is_new = False
         self.contact_list = []
         self.selected = 0
         #FIXME: do not hard code

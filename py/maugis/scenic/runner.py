@@ -42,7 +42,7 @@ def run():
     (options, args) = parser.parse_args()
     start_logging_to_stdout()
     try:
-        app = gui.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen)
+        app = gui.Gui(kiosk_mode=options.kiosk, fullscreen=options.fullscreen)
     except error.CannotListenError, e:
         print("There must be an other Scenic running.")
         print(str(e))

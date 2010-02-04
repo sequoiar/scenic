@@ -145,7 +145,7 @@ def format_contact_markup(contact):
     """
     return "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
 
-class Application(object):
+class Gui(object):
     """
     Main application (arguably God) class
      * Contains the main GTK window
@@ -387,7 +387,8 @@ class Application(object):
         
         The add_contact buttons has been clicked.
         """
-        self.address_book.new_contact = True
+        self.address_book.current_contact_is_new = True
+        # Update the text in the edit/new contact dialog:
         self.contact_name_widget.set_text("")
         self.contact_addr_widget.set_text("")
         self.contact_port_widget.set_text("")
@@ -430,8 +431,6 @@ class Application(object):
         The save button in the "edit_contact" window has been clicked.
         Hides the edit_contact window and saves the changes. (new or modified contact)
         """
-        address_book = self.address_book
-
         def when_valid_save():
             """ Saves contact info after it's been validated and then closes the window"""
             contact = {
@@ -440,15 +439,15 @@ class Application(object):
                 "port": int(port)
                 }
             contact_markup = format_contact_markup(contact)
-            if address_book.new_contact:
+            if self.address_book.current_contact_is_new:
                 self.contact_tree.append([contact_markup]) # add it to the tree list
-                address_book.contact_list.append([contact_markup]) # and the internal address book
-                self.selection.select_path(len(address_book.contact_list) - 1) # select it ...?
-                address_book.selected_contact = address_book.contact_list[len(address_book.contact_list) - 1] #FIXME: we should not copy a dict like that
-                address_book.new_contact = False # FIXME: what does that mean?
+                self.address_book.contact_list.append([contact_markup]) # and the internal address book
+                self.selection.select_path(len(self.address_book.contact_list) - 1) # select it ...?
+                self.address_book.selected_contact = self.address_book.contact_list[len(self.address_book.contact_list) - 1] #FIXME: we should not copy a dict like that
+                self.address_book.current_contact_is_new = False # FIXME: what does that mean?
             else:
                 self.contact_tree.set_value(self.selected_contact_row, 0, contact_markup)
-            address_book.selected_contact = contact
+            self.address_book.selected_contact = contact
             self.edit_contact_window.hide()
 
         # Validate the port number
@@ -573,14 +572,11 @@ class Application(object):
 
     def free_ports(self):
         # TODO: stop_session
-        try:
-            self.ports_allocator.free(self.recv_video_port)
-        except ports.PortsAllocatorError, e:
-            print(e)
-        try:    
-            self.ports_allocator.free(self.recv_audio_port)
-        except ports.PortsAllocatorError, e:
-            print(e)
+        for port in [self.recv_video_port, self.recv_audio_port]:
+            try:
+                self.ports_allocator.free(port)
+            except ports.PortsAllocatorError, e:
+                print(e)
         
     # --------------------- configuration and widgets value ------------
     def save_configuration(self):
@@ -667,19 +663,17 @@ class Application(object):
 
         # ADDRESSBOOK
         # Init addressbook contact list:
-        address_book = self.address_book
-        address_book.selected_contact = None
-        address_book.new_contact = False
-        if len(address_book.contact_list) > 0:
-            for contact in address_book.contact_list:
+        self.address_book.selected_contact = None
+        self.address_book.current_contact_is_new = False
+        if len(self.address_book.contact_list) > 0:
+            for contact in self.address_book.contact_list:
                 contact_markup = format_contact_markup(contact)
                 self.contact_tree.append([contact_markup])
-            self.selection.select_path(address_book.selected)
+            self.selection.select_path(self.address_book.selected)
         else:
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
-
 
     # -------------------------- menu items -----------------
     
