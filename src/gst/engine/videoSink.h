@@ -78,6 +78,7 @@ class GtkVideoSink
         void makeUnfullscreen(_GtkWidget *widget);
         void toggleFullscreen(_GtkWidget *widget);
         void hideCursor();
+        void showCursor();
 
     private:
         virtual bool handleMessage(const std::string &path, const std::string &arguments);

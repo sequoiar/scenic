@@ -72,6 +72,10 @@ gboolean GtkVideoSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindow
 {
     GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
     context->isFullscreen_ = (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN);
+    if (context->isFullscreen_)
+        context->hideCursor();
+    else
+        context->showCursor();
     return TRUE;
 }
 
@@ -112,19 +116,28 @@ void GtkVideoSink::hideCursor()
 {
     // FIXME: this is because gtk doesn't support GDK_BLANK_CURSOR before gtk-2.16
     char invisible_cursor_bits[] = { 0x0 };
-    GdkCursor* cursor;
-    GdkBitmap *empty_bitmap;
-    GdkColor color = {0, 0, 0, 0};
-    empty_bitmap = gdk_bitmap_create_from_data(GDK_WINDOW(drawingArea_->window),
+    static GdkCursor* cursor = 0;
+
+    if (cursor == 0)
+    {
+        static GdkBitmap *empty_bitmap;
+        const static GdkColor color = {0, 0, 0, 0};
+        empty_bitmap = gdk_bitmap_create_from_data(GDK_WINDOW(drawingArea_->window),
             invisible_cursor_bits,
             1, 1);
-
-    cursor = gdk_cursor_new_from_pixmap(empty_bitmap, empty_bitmap, &color,
-            &color, 0, 0);
+        cursor = gdk_cursor_new_from_pixmap(empty_bitmap, empty_bitmap, &color,
+                &color, 0, 0);
+    }
 
     gdk_window_set_cursor(GDK_WINDOW(drawingArea_->window), cursor);
 }
 
+
+void GtkVideoSink::showCursor()
+{
+    /// sets to default
+    gdk_window_set_cursor(GDK_WINDOW(drawingArea_->window), NULL);
+}
 
 void GtkVideoSink::toggleFullscreen(GtkWidget *widget)
 {
@@ -263,7 +276,6 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNu
             G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
     showWindow();
-    hideCursor();
 
     gtk_widget_set_size_request(drawingArea_, width, height);
 }
