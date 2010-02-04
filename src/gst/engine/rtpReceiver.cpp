@@ -78,9 +78,9 @@ void RtpReceiver::setCaps(const char *capsStr)
 }
 
 
-void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * data)
+void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /*data*/)
 {
-    RtpReceiver *context = static_cast<RtpReceiver*>(data);
+    //RtpReceiver *context = static_cast<RtpReceiver*>(data);
 
     // don't look at the full name
     static const std::string expectedPadPrefix = "recv_rtp_src";
