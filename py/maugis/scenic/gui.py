@@ -813,10 +813,9 @@ class Application(object):
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
-    def on_server_rcv_command(self, message, addr, server):
+    def on_server_rcv_command(self, message, addr):
         # XXX
         msg = message["msg"]
-        addr = server.get_peer_ip()
         print("Got %s from %s" % (msg, addr))
         
         if msg == "INVITE":

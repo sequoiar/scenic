@@ -51,8 +51,7 @@ class Server(object):
         msg = d
         addr = server_proto.get_peer_ip()
         self.remote_ip = addr
-        conn = self #FIXME
-        self.received_command_signal(msg, addr, conn)
+        self.received_command_signal(msg, addr)
 
     def change_port(self, new_port):
         """
