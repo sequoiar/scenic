@@ -136,6 +136,15 @@ VIDEO_CODECS = {
     "MPEG4": "mpeg4"
     }
 
+def format_contact_markup(contact):
+    """
+    Formats a contact for the Adressbook GTK widget.
+    @param contact: A dict with keys "name", "address" and "port"
+    @rettype: str
+    @return: Pango markup for the TreeView widget.
+    """
+    return "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
+
 class Application(object):
     """
     Main application (arguably God) class
@@ -255,7 +264,9 @@ class Application(object):
             print(str(e))
             raise
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
-    
+   
+    # ------------------ window events and actions --------------------
+     
     def toggle_fullscreen(self):
         """
         Toggles the fullscreen mode on/off.
@@ -272,25 +283,14 @@ class Application(object):
         self.is_fullscreen = event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN != 0
         print('fullscreen %s' % (self.is_fullscreen))
         return True
-        
-    def before_shutdown(self):
-        print("The application is shutting down.")
-        # TODO: stop streamers
-        if self.client is not None:
-            if not self.got_bye:
-                self.send_bye()
-                self.stop_streamers()
-            self.disconnect_client()
-        print('stopping server')
-        self.server.close()
-
+    
     def on_main_window_deleted(self, *args):
         """
         Destroy method causes appliaction to exit
         when main window closed
         """
         return self._confirm_and_quit()
-
+        
     def _confirm_and_quit(self):
         def _cb(result):
             if result:
@@ -310,12 +310,28 @@ class Application(object):
         else:
             _cb(True)
             return False
+    
+    def before_shutdown(self):
+        """
+        Last things done before quitting.
+        """
+        print("The application is shutting down.")
+        # TODO: stop streamers
+        if self.client is not None:
+            if not self.got_bye:
+                self.send_bye()
+                self.stop_streamers()
+            self.disconnect_client()
+        print('stopping server')
+        self.server.close()
         
     def on_main_window_destroyed(self, *args):
         # TODO: confirm dialog!
         if reactor.running:
             print("reactor.stop()")
             reactor.stop()
+
+    # --------------- slots for some widget events ------------
 
     def on_video_view_preview_toggled(self, widget):
         """
@@ -356,6 +372,8 @@ class Application(object):
             self.invite_contact_widget.set_sensitive(False)
             self.address_book.selected_contact = None
 
+    # ---------------------- slots for addressbook events --------
+    
     def on_contact_double_clicked(self, *args):
         """
         When a contact in the list is double-clicked, 
@@ -416,31 +434,33 @@ class Application(object):
 
         def when_valid_save():
             """ Saves contact info after it's been validated and then closes the window"""
+            contact = {
+                "name": self.contact_name_widget.get_text(),
+                "addr": addr, 
+                "port": int(port)
+                }
+            contact_markup = format_contact_markup(contact)
             if address_book.new_contact:
-                self.contact_tree.append([
-                    "<b>" + self.contact_name_widget.get_text()
-                    + "</b>\n  IP: " + addr
-                    + "\n  Port: " + port])
-                address_book.contact_list.append({})
-                self.selection.select_path(len(address_book.contact_list) - 1)
-                address_book.selected_contact = address_book.contact_list[len(address_book.contact_list) - 1]
-                address_book.new_contact = False
+                self.contact_tree.append([contact_markup]) # add it to the tree list
+                address_book.contact_list.append([contact_markup]) # and the internal address book
+                self.selection.select_path(len(address_book.contact_list) - 1) # select it ...?
+                address_book.selected_contact = address_book.contact_list[len(address_book.contact_list) - 1] #FIXME: we should not copy a dict like that
+                address_book.new_contact = False # FIXME: what does that mean?
             else:
-                self.contact_tree.set_value(
-                    self.selected_contact_row, 0, "<b>" + 
-                    self.contact_name_widget.get_text() + 
-                    "</b>\n  IP: " + addr + "\n  Port: " + port)
-            address_book.selected_contact["name"] = self.contact_name_widget.get_text()
-            address_book.selected_contact["address"] = addr
-            address_book.selected_contact["port"] = int(port)
+                self.contact_tree.set_value(self.selected_contact_row, 0, contact_markup)
+            address_book.selected_contact = contact
             self.edit_contact_window.hide()
 
         # Validate the port number
         port = self.contact_port_widget.get_text()
         if port == "":
             port = str(self.config.negotiation_port) # set port to default
-        elif (not port.isdigit()) or (int(port) not in range(10000, 65535)):
-            text = _("The port number is not valid\n\nEnter a valid port number in the range of 10000-65535")
+        elif not port.isdigit():
+            text = _("The port number must be an integer.")
+            self.show_error_dialog(text)
+            return
+        elif int(port) not in range(10000, 65535):
+            text = _("The port number must be in the range of 10000-65535")
             self.show_error_dialog(text)
             return
         # Validate the address
@@ -451,6 +471,8 @@ class Application(object):
             return
         # save it.
         when_valid_save()
+
+    # ---------------------------- Custom system tab buttons -----------------------
 
     def on_network_admin_clicked(self, *args):
         """
@@ -538,6 +560,7 @@ class Application(object):
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
         self.show_confirm_dialog(text, on_confirm_result)
 
+    # ------------------------- session occuring -------------
     def has_session(self):
         """
         @rettype: bool
@@ -549,6 +572,7 @@ class Application(object):
         self.recv_video_port = self.ports_allocator.allocate()
         self.recv_audio_port = self.ports_allocator.allocate()
 
+    # -------------------- streamer ports -----------------
     def free_ports(self):
         # TODO: stop_session
         try:
@@ -560,36 +584,12 @@ class Application(object):
         except ports.PortsAllocatorError, e:
             print(e)
         
-    def on_invite_contact_clicked(self, *args):
+    # --------------------- configuration and widgets value ------------
+    def save_configuration(self):
         """
-        Sends an INVITE to the remote peer.
+        Saves the configuration to a file.
+        Reads the widget value prior to do it.
         """
-        self.allocate_ports()
-        if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.main_window)
-        else:
-            # UPDATE when initiating session
-            self._gather_configuration()
-            self.send_invite()
-    
-    def on_invite_contact_cancelled(self, *args):
-        """
-        Sends a CANCEL to the remote peer when invite contact window is closed.
-        """
-        # unschedule this timeout as we don't care if our peer answered or not
-        self._unschedule_offerer_invite_timeout()
-        self.send_cancel_and_disconnect()
-        # don't let the delete-event propagate
-        if self.calling_dialog.get_property('visible'):
-            self.calling_dialog.hide()
-        return True
-
-    def on_save_menu_item_activated(self, menu_item):
-        """
-        Saves the addressbook and settings.
-        """
-        print menu_item, "chosen"
-        print("-- Saving addressbook and configuration. -- ")
         self._gather_configuration()
         self.config.save()
         self.address_book.save()
@@ -629,8 +629,8 @@ class Application(object):
         self.config.video_codec = VIDEO_CODECS[video_codec]
         print ' * video_codec:', video_codec
         
-        #TODO: get toggle fullscreen value
-    
+        #TODO: get toggle fullscreen (milhouse) value
+
     def _init_widgets_value(self):
         """
         Called once at startup.
@@ -674,7 +674,7 @@ class Application(object):
         address_book.new_contact = False
         if len(address_book.contact_list) > 0:
             for contact in address_book.contact_list:
-                contact_markup = "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
+                contact_markup = format_contact_markup(contact)
                 self.contact_tree.append([contact_markup])
             self.selection.select_path(address_book.selected)
         else:
@@ -682,6 +682,9 @@ class Application(object):
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
 
+
+    # -------------------------- menu items -----------------
+    
     def on_quit_menu_item_activated(self, menu_item):
         """
         Quits the application.
@@ -697,6 +700,39 @@ class Application(object):
         url = "http://scenic.sat.qc.ca"
         webbrowser.open(url)
 
+    def on_save_menu_item_activated(self, menu_item):
+        """
+        Saves the addressbook and settings.
+        """
+        print menu_item, "chosen"
+        print("-- Saving addressbook and configuration. -- ")
+        self.save_configuration()
+
+    # ---------------------- invitation dialogs -------------------
+
+    def on_invite_contact_clicked(self, *args):
+        """
+        Sends an INVITE to the remote peer.
+        """
+        self.allocate_ports()
+        if self.streamer_manager.is_busy():
+            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.main_window)
+        else:
+            # UPDATE when initiating session
+            self._gather_configuration()
+            self.send_invite()
+    
+    def on_invite_contact_cancelled(self, *args):
+        """
+        Sends a CANCEL to the remote peer when invite contact window is closed.
+        """
+        # unschedule this timeout as we don't care if our peer answered or not
+        self._unschedule_offerer_invite_timeout()
+        self.send_cancel_and_disconnect()
+        # don't let the delete-event propagate
+        if self.calling_dialog.get_property('visible'):
+            self.calling_dialog.hide()
+        return True
 
     def show_error_dialog(self, text, callback=None):
         def _response_cb(widget, response_id, callback):
@@ -752,8 +788,6 @@ class Application(object):
         text = None
         if msg == "err":
             text = _("Contact unreacheable.\n\nCould not connect to the IP address of this contact.")
-        elif msg == "timeout":
-            text = _("Connection timeout.\n\nCould not connect to the port of this contact.")
         elif msg == "answTimeout":
             text = _("Contact answer timeout.\n\nThe contact did not answer soon enough.")
         elif msg == "send":
@@ -764,7 +798,6 @@ class Application(object):
             text = _("Invalid answer.\n\nThe answer was not valid.")
         if text is not None:
             self.show_error_dialog(text)
-
 
     def _unschedule_offerer_invite_timeout(self):
         """ Unschedules our offer invite timeout function """
@@ -779,8 +812,17 @@ class Application(object):
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
+    def _cl_offerer_invite_timed_out(self, client):
+        # XXX
+        # in case of invite timeout, act as if we'd cancelled the invite ourselves
+        self.on_invite_contact_cancelled()
+        if self.calling_dialog.get_property('visible'):
+            self.hide_calling_dialog("answTimeout")
+        # here we return false so that this callback is unregistered
+        return False
+
+    # --------------------------- network receives ------------
     def handle_invite(self, message, addr):
-        # FIXME: this doesn't make sense here
         self.got_bye = False
         send_to_port = message["please_send_to_port"]
         
@@ -879,6 +921,8 @@ class Application(object):
         else:
             print ('WARNING: Unexpected message %s' % (msg))
 
+    # -------------------------- actions on streamer manager --------
+
     def start_streamers(self, addr):
         self._has_session = True
         self.streamer_manager.start(addr, self.config)
@@ -893,6 +937,8 @@ class Application(object):
         print("on_streamers_stopped got called")
         self._has_session = False
         self.free_ports()
+
+    # ---------------------- sending messages -----------
         
     def disconnect_client(self):
         """
@@ -987,6 +1033,8 @@ class Application(object):
         else:
             print('Warning: Trying to send REFUSE even though client is None')
 
+    # ------------------- streaming events handlers ----------------
+    
     def on_streamer_state_changed(self, streamer, new_state):
         """
         Slot for scenic.streamer.StreamerManager.state_changed_signal
@@ -997,21 +1045,9 @@ class Application(object):
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
-    def on_client_socket_timeout(self, client):
-        # XXX
-        self.hide_calling_dialog("timeout")
-    
     def on_client_socket_error(self, client, err, msg):
         # XXX
         self.hide_calling_dialog(msg)
         text = _("%s: %s") % (str(err), str(msg))
         self.show_error_dialog(text)
 
-    def _cl_offerer_invite_timed_out(self, client):
-        # XXX
-        # in case of invite timeout, act as if we'd cancelled the invite ourselves
-        self.on_invite_contact_cancelled()
-        if self.calling_dialog.get_property('visible'):
-            self.hide_calling_dialog("answTimeout")
-        # here we return false so that this callback is unregistered
-        return False

@@ -98,9 +98,6 @@ class Client(object):
         
         self.socket_error_signal = sig.Signal()
         self.socket_error_signal.connect(app.on_client_socket_error) # TODO
-        # unused:
-        #self.socket_timeout_signal = sig.Signal()
-        #self.socket_timeout_signal.connect(app.on_client_socket_timeout)
         
     def connect(self, host):
         """
