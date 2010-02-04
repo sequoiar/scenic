@@ -153,7 +153,7 @@ class Application(object):
         self.streamer_manager = StreamerManager(self) # XXX
         self._has_session = False # XXX
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
-        print "Starting SIC server on port %s" % (self.config.negotiation_port) # XXX
+        print("Starting SIC server on port %s" % (self.config.negotiation_port)) # XXX
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = None # XXX
         self.got_bye = False # XXX
@@ -167,7 +167,7 @@ class Application(object):
         else:
             text = _("<b><big>Could not find the Glade file?</big></b>\n\n" \
                     "Be sure the file %s exists. Quitting.") % glade_file
-            print text
+            print(text)
             sys.exit()
         self.widgets = gtk.glade.XML(glade_path, domain=APP_NAME)
         
@@ -255,7 +255,7 @@ class Application(object):
             self.server.start_listening()
         except error.CannotListenError, e:
             print("Cannot start SIC server.")
-            print str(e)
+            print(str(e))
             raise
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
         
@@ -267,7 +267,7 @@ class Application(object):
                 self.send_bye()
                 self.stop_streamers()
             self.disconnect_client()
-        print 'stopping server'
+        print('stopping server')
         self.server.close()
 
     def on_main_window_deleted(self, *args):
@@ -282,9 +282,6 @@ class Application(object):
             if result:
                 print("Destroying the window.")
                 self.main_window.destroy()
-                #if reactor.running:
-                #    print("reactor.stop()")
-                #    reactor.stop()
             else:
                 print("Not quitting.")
         # If you return FALSE in the "delete_event" signal handler,
@@ -574,12 +571,12 @@ class Application(object):
                 self.client.send(msg)
                 return proto
             def _on_error(reason):
-                print "error trying to connect to %s:%s : %s" % (ip, port, reason)
+                print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
                 self.calling_dialog.hide()
                 self.client = None
                 return None
                
-            print "sending %s to %s:%s" % (msg, ip, port) 
+            print ("sending %s to %s:%s" % (msg, ip, port))
             self.client = communication.Client(self, port)
             deferred = self.client.connect(ip)
             deferred.addCallback(_on_connected).addErrback(_on_error)
@@ -616,7 +613,7 @@ class Application(object):
         Saves the addressbook and settings.
         """
         print menu_item, "chosen"
-        print "-- Saving addressbook and configuration. -- "
+        print("-- Saving addressbook and configuration. -- ")
         self._gather_configuration()
         self.config.save()
         self.address_book.save()
@@ -625,7 +622,7 @@ class Application(object):
         """
         Updates the configuration with the value of each widget.
         """
-        print "gathering configuration"
+        print("gathering configuration")
         # VIDEO SIZE
         video_size = _get_combobox_value(self.video_size_widget)
         print ' * video_size:', video_size
@@ -662,7 +659,7 @@ class Application(object):
         """
         Sets the value of each widget according to the data stored in the configuration file.
         """
-        print "Changing widgets value according to configuration."
+        print("Changing widgets value according to configuration.")
         # VIDEO SIZE
         video_size = "%sx%s" % (self.config.video_width, self.config.video_height)
         _set_combobox_value(self.video_size_widget, video_size)
@@ -845,7 +842,7 @@ class Application(object):
         # XXX
         msg = message["msg"]
         addr = server.get_peer_ip()
-        print "Got %s from %s" % (msg, addr)
+        print("Got %s from %s" % (msg, addr))
         
         if msg == "INVITE":
             # FIXME: this doesn't make sense here
@@ -869,7 +866,7 @@ class Application(object):
                         self.send_video_port = message["videoport"]
                         self.send_audio_port = message["audioport"]
                     else:
-                        print "Error: connection lost, so we could not accept." # FIXME
+                        print("Error: connection lost, so we could not accept.")# FIXME
                 elif response == gtk.RESPONSE_CANCEL:
                     self.send_refuse_and_disconnect() 
                 elif response == gtk.RESPONSE_DELETE_EVENT:
@@ -927,14 +924,14 @@ class Application(object):
             self.got_bye = True
             self.stop_streamers()
             if self.client is not None:
-                print 'disconnecting client and sending BYE'
+                print('disconnecting client and sending BYE')
                 self.client.send({"msg":"OK", "sid":0})
                 self.disconnect_client()
 
         elif msg == "OK":
-            print "received ok. Everything has an end."
+            print("received ok. Everything has an end.")
             if self.client is not None:
-                print 'disconnecting client'
+                print('disconnecting client')
                 self.disconnect_client()
 
     def start_streamers(self, addr):
@@ -948,7 +945,7 @@ class Application(object):
         """
         We call this when all streamers are stopped.
         """
-        print "on_streamers_stopped got called"
+        print("on_streamers_stopped got called")
         self._has_session = False
         self.free_ports()
         
@@ -991,7 +988,7 @@ class Application(object):
             self.client.disconnect()
             self.client = None
         else:
-            print ('Warning: Trying to send CANCEL even though client is None')
+            print('Warning: Trying to send CANCEL even though client is None')
     
     def send_refuse_and_disconnect(self):
         """
@@ -1003,7 +1000,7 @@ class Application(object):
             self.client.disconnect()
             self.client = None
         else:
-            print ('Warning: Trying to send REFUSE even though client is None')
+            print('Warning: Trying to send REFUSE even though client is None')
 
     def on_streamer_state_changed(self, streamer, new_state):
         """
