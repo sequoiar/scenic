@@ -417,8 +417,39 @@ void DC1394::listCameras()
 }
 
 
+bool DC1394::areCamerasConnected()
+{
+    bool result;
+    dc1394error_t camerr;
+
+    dc1394_t * dc1394 = 0;
+    dc1394camera_list_t *cameras = 0;
+    dc1394camera_t *camera = 0;
+
+    dc1394 = dc1394_new();
+
+    camerr = dc1394_camera_enumerate(dc1394, &cameras);
+
+    if (camerr != DC1394_SUCCESS or cameras == 0)
+    {
+        cleanup(dc1394, camera, cameras);
+        THROW_CRITICAL("Can't find cameras error : " << camerr);
+    }
+    result = cameras->num == 0;
+        
+    cleanup(dc1394, camera, cameras);
+    return result;
+}
+
+
 int DC1394::GUIDToCameraNumber(unsigned long long GUID)
 {
+    if (not areCamerasConnected())
+    {
+        LOG_INFO("There are no dc1394 cameras connected");
+        return -1;
+    }
+
     int result = -1;
     dc1394error_t camerr;
 
@@ -433,13 +464,6 @@ int DC1394::GUIDToCameraNumber(unsigned long long GUID)
     if (camerr != DC1394_SUCCESS or cameras == 0)
     {
         LOG_ERROR("Can't find cameras error : " << camerr);
-        cleanup(dc1394, camera, cameras);
-        return -1;
-    }
-
-    if (cameras->num == 0) 
-    {
-        LOG_INFO("There were no dc1394 cameras");
         cleanup(dc1394, camera, cameras);
         return -1;
     }

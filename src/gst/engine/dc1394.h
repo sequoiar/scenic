@@ -36,6 +36,7 @@ class DC1394
         static int GUIDToCameraNumber(unsigned long long GUID);
         static bool requiresMoreISOSpeed(int mode);
         static const int MAX_ISO_SPEED = 800;
+        static bool areCamerasConnected();
 };
 
 #endif //_DC1394_H_

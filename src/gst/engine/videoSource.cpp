@@ -221,6 +221,9 @@ std::string VideoV4lSource::srcCaps() const
 VideoDc1394Source::VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig &config) : 
     VideoSource(pipeline, config) 
 {
+    if (DC1394::areCamerasConnected())
+        THROW_CRITICAL("No dc1394 camera connected");
+
     source_ = pipeline_.makeElement(config_.source(), NULL);
     if (config_.hasGUID())
         g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
