@@ -36,13 +36,22 @@ class RtpSender
     : public RtpBin
 {
     public:
-        RtpSender(Pipeline &pipeline) : RtpBin(pipeline), rtp_sender_(0) {}
+        RtpSender(Pipeline &pipeline) : 
+            RtpBin(pipeline), 
+            rtp_sender_(0),
+            send_rtp_sink_(0),
+            send_rtcp_src_(0),
+            recv_rtcp_sink_(0)
+            {}
         ~RtpSender();
 
         void add(RtpPay * payloader, const SenderConfig & config);
 
     private:
         _GstElement *rtp_sender_;
+        _GstPad *send_rtp_sink_;
+        _GstPad *send_rtcp_src_;
+        _GstPad *recv_rtcp_sink_;
         static void sendCapsChanged(_GstPad *pad, _GParamSpec *pspec, RtpSender *context);
         virtual void subParseSourceStats(_GstStructure *stats);
 };

@@ -52,6 +52,14 @@ RtpReceiver::~RtpReceiver()
         tassert(iter != depayloaders_.end());
         depayloaders_.erase(iter);
     }
+    
+    // Now we can unref our request pads
+    if (recv_rtp_sink_)
+        gst_object_unref(recv_rtp_sink_);
+    if (send_rtcp_src_)
+        gst_object_unref(send_rtcp_src_);
+    if (recv_rtcp_sink_)
+        gst_object_unref(recv_rtcp_sink_);
 }
 
 
@@ -166,9 +174,6 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     // rule of thumb: 2-3 times the maximum network jitter
     setLatency(INIT_LATENCY);
 
-    GstPad *recv_rtp_sink;
-    GstPad *send_rtcp_src;
-    GstPad *recv_rtcp_sink;
     GstPad *rtpReceiverSrc;
     GstPad *rtcpReceiverSrc;
     GstPad *rtcpSenderSink;
@@ -201,20 +206,20 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 
     /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
     tassert(rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src"));
-    tassert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
-    tassert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink));
+    tassert(recv_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
+    tassert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink_));
     gst_object_unref(rtpReceiverSrc);
 
     /* get an RTCP sinkpad in session n */
     tassert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
-    tassert(recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
-    tassert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    tassert(recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
+    tassert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_));
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
 
     /* get an RTCP srcpad for sending RTCP back to the sender */
-    tassert(send_rtcp_src = gst_element_get_request_pad (rtpbin_, padStr("send_rtcp_src_")));
+    tassert(send_rtcp_src_ = gst_element_get_request_pad (rtpbin_, padStr("send_rtcp_src_")));
     tassert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
-    tassert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
+    tassert(gstlinkable::link_pads(send_rtcp_src_, rtcpSenderSink));
     gst_object_unref(rtcpSenderSink);
 
     // when pad is created, it must be linked to new sink
