@@ -76,7 +76,7 @@ void RtpBin::printStatsVal(const std::string &idStr,
         const std::string &formatStr, 
         GstStructure *stats)
 {
-    std::string paramStr("");
+    std::string paramStr;
     if (type == "guint64")
     {
         if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, key)))
@@ -104,7 +104,8 @@ void RtpBin::printStatsVal(const std::string &idStr,
     else
         THROW_ERROR("Unexpected type");
 
-    LOG_INFO(idStr << paramStr);
+    if (!paramStr.empty())
+        LOG_INFO(idStr << paramStr);
 }
 
 
