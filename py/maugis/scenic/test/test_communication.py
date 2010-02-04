@@ -48,7 +48,7 @@ class Test_01_SIC_Client_Server(unittest.TestCase):
         return defer.DeferredList([self.serverPort.stopListening()])
 
 class DummyApp(object):
-    def on_server_rcv_command(self, proto, d):
+    def on_server_receive_command(self, proto, d):
         pass
     def on_client_rcv_command(self, client, msg):
         #print "client received:", msg
@@ -75,7 +75,7 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
         self.recv_deferred = None
         return defer.DeferredList([d1, d2])
         
-    def _on_received_command(self, msg, addr, conn):
+    def _on_received_command(self, msg, addr):
         self.failUnlessEqual(msg, {"msg":"ping"})
         self.recv_deferred.callback(True)
         return True
