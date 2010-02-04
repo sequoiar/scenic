@@ -219,7 +219,7 @@ class Application(object):
         self.conf_bandwidth_widget = self.widgets.get_widget("conf_bandwidth")
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
-        self.select_contact_num = None
+        self.select_contact_index = None
         # video tab drop-down menus
         self.video_size_widget = self.widgets.get_widget("video_size")
         self.video_display_widget = self.widgets.get_widget("video_display")
@@ -333,14 +333,14 @@ class Application(object):
             self.edit_contact_widget.set_sensitive(True)
             self.remove_contact_widget.set_sensitive(True)
             self.invite_contact_widget.set_sensitive(True)
-            self.selected_contact_num = tree_list.get_path(self.selected_contact_row)[0]
-            self.address_book.contact = self.address_book.contact_list[self.selected_contact_num]
-            self.address_book.selected = self.selected_contact_num
+            self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0]
+            self.address_book.selected_contact = self.address_book.contact_list[self.selected_contact_index]
+            self.address_book.selected_index = self.selected_contact_index
         else:
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
-            self.address_book.contact = None
+            self.address_book.selected_contact = None
 
     def on_contact_double_clicked(self, *args):
         """
@@ -367,9 +367,9 @@ class Application(object):
         """
         def on_confirm_result(result):
             if result:
-                del self.address_book.contact_list[self.selected_contact_num]
+                del self.address_book.contact_list[self.selected_contact_index]
                 self.contact_tree.remove(self.selected_contact_row)
-                num = self.selected_contact_num - 1
+                num = self.selected_contact_index - 1
                 if num < 0:
                     num = 0
                 self.selection.select_path(num)
@@ -381,9 +381,9 @@ class Application(object):
         """
         Shows the edit contact dialog.
         """
-        self.contact_name_widget.set_text(self.address_book.contact["name"])
-        self.contact_addr_widget.set_text(self.address_book.contact["address"])
-        self.contact_port_widget.set_text(str(self.address_book.contact["port"]))
+        self.contact_name_widget.set_text(self.address_book.selected_contact["name"])
+        self.contact_addr_widget.set_text(self.address_book.selected_contact["address"])
+        self.contact_port_widget.set_text(str(self.address_book.selected_contact["port"]))
         self.edit_contact_window.show()
 
     def on_edit_contact_cancel_clicked(self, *args):
@@ -409,16 +409,16 @@ class Application(object):
                     + "\n  Port: " + port])
                 address_book.contact_list.append({})
                 self.selection.select_path(len(address_book.contact_list) - 1)
-                address_book.contact = address_book.contact_list[len(address_book.contact_list) - 1]
+                address_book.selected_contact = address_book.contact_list[len(address_book.contact_list) - 1]
                 address_book.new_contact = False
             else:
                 self.contact_tree.set_value(
                     self.selected_contact_row, 0, "<b>" + 
                     self.contact_name_widget.get_text() + 
                     "</b>\n  IP: " + addr + "\n  Port: " + port)
-            address_book.contact["name"] = self.contact_name_widget.get_text()
-            address_book.contact["address"] = addr
-            address_book.contact["port"] = int(port)
+            address_book.selected_contact["name"] = self.contact_name_widget.get_text()
+            address_book.selected_contact["address"] = addr
+            address_book.selected_contact["port"] = int(port)
             self.edit_contact_window.hide()
 
         # Validate the port number
@@ -556,32 +556,7 @@ class Application(object):
         else:
             # UPDATE when initiating session
             self._gather_configuration()
-            msg = {
-                "msg":"INVITE",
-                "sid":0, 
-                "videoport": self.recv_video_port,
-                "audioport": self.recv_audio_port,
-                "please_send_to_port": self.config.negotiation_port
-                }
-            port = self.config.negotiation_port
-            ip = self.address_book.contact["address"]
-
-            def _on_connected(proto):
-                self._schedule_offerer_invite_timeout(self.client)
-                self.client.send(msg)
-                return proto
-            def _on_error(reason):
-                print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
-                self.calling_dialog.hide()
-                self.client = None
-                return None
-               
-            print ("sending %s to %s:%s" % (msg, ip, port))
-            self.client = communication.Client(self, port)
-            deferred = self.client.connect(ip)
-            deferred.addCallback(_on_connected).addErrback(_on_error)
-            self.calling_dialog.show()
-            # window will be hidden when we receive ACCEPT or REFUSE
+            self.send_invite()
     
     def on_invite_contact_cancelled(self, *args):
         """
@@ -811,7 +786,7 @@ class Application(object):
 
     def init_ad_book_contact_list(self):
         address_book = self.address_book
-        address_book.contact = None
+        address_book.selected_contact = None
         address_book.new_contact = False
         if len(address_book.contact_list) > 0:
             for contact in address_book.contact_list:
@@ -969,6 +944,34 @@ class Application(object):
             return d
         else: 
             return defer.succeed(True)
+
+    def send_invite(self):
+        msg = {
+            "msg":"INVITE",
+            "sid":0, 
+            "videoport": self.recv_video_port,
+            "audioport": self.recv_audio_port,
+            "please_send_to_port": self.config.negotiation_port
+            }
+        port = self.config.negotiation_port
+        ip = self.address_book.selected_contact["address"]
+
+        def _on_connected(proto):
+            self._schedule_offerer_invite_timeout(self.client)
+            self.client.send(msg)
+            return proto
+        def _on_error(reason):
+            print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
+            self.calling_dialog.hide()
+            self.client = None
+            return None
+           
+        print ("sending %s to %s:%s" % (msg, ip, port))
+        self.client = communication.Client(self, port)
+        deferred = self.client.connect(ip)
+        deferred.addCallback(_on_connected).addErrback(_on_error)
+        self.calling_dialog.show()
+        # window will be hidden when we receive ACCEPT or REFUSE
     
     def send_bye(self):
         """
