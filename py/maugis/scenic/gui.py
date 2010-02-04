@@ -92,8 +92,6 @@ class Config(saving.ConfigStateSaving):
     video_width = 640
     video_height = 480
     confirm_quit = False
-    #soon to be deprecated:
-    bandwidth = 30
 
     def __init__(self):
         config_file = 'scenic.cfg'
@@ -216,9 +214,6 @@ class Application(object):
         self.remove_contact_widget = self.widgets.get_widget("remove_contact")
         self.invite_contact_widget = self.widgets.get_widget("invite_contact")
         self.contact_list_widget = self.widgets.get_widget("contact_list")
-        # local settings:
-        self.negotiation_port_widget = self.widgets.get_widget("negotiation_port")
-        self.conf_bandwidth_widget = self.widgets.get_widget("conf_bandwidth")
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_index = None
@@ -230,8 +225,6 @@ class Application(object):
         self.video_codec_widget = self.widgets.get_widget("video_codec")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
             
-        # adjust the bandwidth combobox iniline with the config 
-        self.init_bandwidth()
         
         # switch to Kiosk mode if asked
         if kiosk_mode:
@@ -248,7 +241,6 @@ class Application(object):
         # set value of widgets.
         # TODO: get rid of those methods
         self.init_ad_book_contact_list() # XXX
-        self.init_negotiation_port() # XXX
         self.init_widgets_value() # XXX
 
         self.main_window.show()
@@ -572,19 +564,6 @@ class Application(object):
             self.calling_dialog.hide()
         return True
 
-    def on_conf_bandwidth_changed(self, *args):
-        """
-        Changes the bandwidth setting.
-        Called when the bandwidth drop-down menu value has changed.
-        """
-        #FIXME: why does it exists????
-        #TODO: deprecate this
-        base = 30
-        num = 2 # number of choice
-        step = base / num
-        selection = self.conf_bandwidth_widget.get_active()
-        self.config.bandwidth = (selection + 1) * step
-
     def on_save_menu_item_activated(self, menu_item):
         """
         Saves the addressbook and settings.
@@ -636,6 +615,7 @@ class Application(object):
         """
         Sets the value of each widget according to the data stored in the configuration file.
         """
+        
         print("Changing widgets value according to configuration.")
         # VIDEO SIZE
         video_size = "%sx%s" % (self.config.video_width, self.config.video_height)
@@ -681,28 +661,6 @@ class Application(object):
         url = "http://scenic.sat.qc.ca"
         webbrowser.open(url)
 
-    def on_negotiation_port_changed(self, *args):
-        """
-        Changes the local SIC server port number.
-        """
-        def _later_check_negotiation_port(*args):
-            def on_error_dialog_result(result):
-                self.negotiation_port_widget.grab_focus()
-                return False
-
-            port = self.negotiation_port_widget.get_text()
-            if not port.isdigit():
-                self.main_tabs_widget.set_current_page(1)
-                self.init_negotiation_port() # FIXME: what?
-                text = _("The port number is not valid\n\nEnter a valid port number in the range of 10000-65535")
-                self.show_error_dialog(text, on_error_dialog_result)
-            else:
-                if port != self.config.negotiation_port:
-                    self.config.negotiation_port = int(port)
-                    self.server.change_port(self.config.negotiation_port)
-        # call later 
-        gobject.timeout_add(0, _later_check_negotiation_port, args)
-        return False
 
     def show_error_dialog(self, text, callback=None):
         def _response_cb(widget, response_id, callback):
@@ -770,21 +728,6 @@ class Application(object):
             text = _("Invalid answer.\n\nThe answer was not valid.")
         if text is not None:
             self.show_error_dialog(text)
-
-    def init_bandwidth(self):
-        #TODO: deprecate this
-        base = 30
-        num = 2 # number of choice
-        selection = int(round((self.config.bandwidth - 1) * num / base))
-        if selection < 0:
-            selection = 0
-        elif selection > base:
-            selection = base
-        self.conf_bandwidth_widget.set_active(selection)
-
-    def init_negotiation_port(self):
-        self.negotiation_port_widget.set_text(str(self.config.negotiation_port))
-
 
     def init_ad_book_contact_list(self):
         address_book = self.address_book
