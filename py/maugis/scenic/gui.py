@@ -735,10 +735,8 @@ class Application(object):
         address_book.new_contact = False
         if len(address_book.contact_list) > 0:
             for contact in address_book.contact_list:
-                self.contact_tree.append(    ["<b>" + contact["name"]
-                                            + "</b>\n  IP: "
-                                            + contact["address"] + "\n  Port: "
-                                            + str(contact["port"])] )
+                contact_markup = "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
+                self.contact_tree.append([contact_markup])
             self.selection.select_path(address_book.selected)
         else:
             self.edit_contact_widget.set_sensitive(False)
