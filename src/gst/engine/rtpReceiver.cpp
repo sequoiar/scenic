@@ -78,8 +78,10 @@ void RtpReceiver::setCaps(const char *capsStr)
 }
 
 
-void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /* data*/)
+void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * data)
 {
+    RtpReceiver *context = static_cast<RtpReceiver*>(data);
+
     // don't look at the full name
     static const std::string expectedPadPrefix = "recv_rtp_src";
     if (gst_pad_is_linked(srcPad))
@@ -100,7 +102,6 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
             gst_object_unref(sinkPad);
             return;
         }
-
         gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
         gchar *srcPadName;
         srcPadName = gst_pad_get_name(srcPad);
@@ -115,10 +116,9 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
 
 void RtpReceiver::onSenderTimeout(GstElement *  /*rtpbin*/, guint /* session */, guint /* ssrc */, gpointer data)
 {
-    LOG_INFO("Sender timeout, quitting.");
+    LOG_INFO("Sender timeout.");
     RtpReceiver *context = static_cast<RtpReceiver*>(data);
     context->printStats_ = false;
-    //playback::quit(); // can't do this here without crashing
 }
 
 
@@ -221,7 +221,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", 
             G_CALLBACK(RtpReceiver::onPadAdded), 
-            NULL);
+            this);
 
     g_signal_connect(rtpbin_, "on-sender-timeout", 
             G_CALLBACK(RtpReceiver::onSenderTimeout), 
