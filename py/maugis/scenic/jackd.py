@@ -36,13 +36,9 @@ import os
 import sys
 import glob
 import pprint
-from exceptions import DeprecationWarning
-import warnings
 
 # Twisted imports
-from twisted.internet import protocol
 from twisted.internet import reactor
-from twisted.python import procutils
 from twisted.python import failure
 
 # App imports
