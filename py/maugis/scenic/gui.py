@@ -153,6 +153,8 @@ Authors: Etienne Desautels, Alexandre Quessy, Tristan Matthews, Simon Piette""" 
 
 ABOUT_TEXT_VIEW = """
 Scenic is the advanced user graphical interface for the Milhouse audio/video streamer for GNU/Linux. 
+
+Each peer decides what to receive from the other peer. Next, one peer can invite an other one to stream high-quality audio and video.
 """
 
 class Gui(object):
@@ -204,6 +206,7 @@ class Gui(object):
         self.main_window.connect('delete-event', self.on_main_window_deleted)
         self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
         self.main_tabs_widget = self.widgets.get_widget("mainTabs")
+        self.system_tab_contents_widget = self.widgets.get_widget("system_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
         # confirm_dialog:
         self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
@@ -253,7 +256,12 @@ class Gui(object):
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
             self.main_window.set_decorated(False)
-            self.widgets.get_widget("sysBox").show() # shows shutdown and reboot buttons.
+        else:
+            # Removes the sytem_tab 
+            tab_num = self.main_tabs_widget.page_num(self.system_tab_contents_widget)
+            print "Removing tab #", tab_num
+            self.main_tabs_widget.remove_page(tab_num)
+        
         self.is_fullscreen = False
         if fullscreen:
             self.toggle_fullscreen()
@@ -268,6 +276,7 @@ class Gui(object):
         # set value of widgets.
         # TODO: get rid of those methods
         self._init_widgets_value() # XXX
+
 
         self.main_window.show()
         self.ports_allocator = ports.PortsAllocator()
