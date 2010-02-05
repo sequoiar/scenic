@@ -73,10 +73,12 @@ class Config(saving.ConfigStateSaving):
 class Application(object):
     def __init__(self, kiosk_mode=False, fullscreen=False):
         self.config = Config()
-        self.send_video_port = None
+        #self.send_video_port = None
         self.recv_video_port = None
-        self.send_audio_port = None
+        #self.send_audio_port = None
         self.recv_audio_port = None
+        self.send_audio_details = {} # dict
+        self.send_video_details = {} # dict
         self.ports_allocator = ports.PortsAllocator()
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
@@ -141,7 +143,6 @@ class Application(object):
     # --------------------------- network receives ------------
     def handle_invite(self, message, addr):
         self.got_bye = False
-        send_to_port = message["please_send_to_port"]
         
         def _on_contact_request_dialog_response(response):
             """
@@ -149,7 +150,7 @@ class Application(object):
             @param result: Answer to the dialog.
             """
             if response == gtk.RESPONSE_OK:
-                self.send_accept(message, addr)
+                self.send_accept(addr)
             elif response == gtk.RESPONSE_CANCEL or gtk.RESPONSE_DELETE_EVENT:
                 self.send_refuse_and_disconnect() 
             else:
@@ -160,7 +161,11 @@ class Application(object):
             print("Got invitation, but we are busy.")
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
         else:
-            self.client.connect(addr, send_to_port)
+            #self.send_video_port = message["videoport"]
+            #self.send_audio_port = message["audioport"]
+            self.send_audio_details = message["audio"]
+            self.send_video_details = message["video"]
+            self.client.connect(addr, message["please_send_to_port"])
             # TODO: if a contact in the addressbook has this address, displays it!
             text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % addr)
             self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
@@ -177,8 +182,10 @@ class Application(object):
         self.got_bye = False
         # TODO: Use session to contain settings and ports
         self.gui.hide_calling_dialog("accept")
-        self.send_video_port = message["videoport"]
-        self.send_audio_port = message["audioport"]
+        #self.send_video_port = message["videoport"]
+        #self.send_audio_port = message["audioport"]
+        self.send_audio_details = message["audio"]
+        self.send_video_details = message["video"]
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.gui.main_window)
         else:
@@ -279,12 +286,23 @@ class Application(object):
         msg = {
             "msg":"INVITE",
             "sid":0, 
-            "videoport": self.recv_video_port,
-            "audioport": self.recv_audio_port,
-            "please_send_to_port": self.config.negotiation_port
+            "videoport": self.recv_video_port, # TODO: remove
+            "audioport": self.recv_audio_port, # TODO: remove
+            "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
+            "video": {
+                "codec": self.config.video_codec,
+                "bitrate": self.config.video_bitrate,
+                "port": self.recv_video_port
+                },
+            "audio": {
+                "codec": self.config.audio_codec,
+                "channels": self.config.audio_channels,
+                "port": self.recv_audio_port
+                }
             }
-        port = self.config.negotiation_port
-        ip = self.address_book.selected_contact["address"]
+        contact = self.address_book.selected_contact
+        port = contact["port"]
+        ip = contact["address"]
 
         def _on_connected(proto):
             self.gui._schedule_offerer_invite_timeout()
@@ -301,14 +319,27 @@ class Application(object):
         self.gui.calling_dialog.show()
         # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
     
-    def send_accept(self, message, addr):
+    def send_accept(self, addr):
         # UPDATE config once we accept the invitie
         self.gui._gather_configuration()
         self.allocate_ports()
-        self.client.send({"msg":"ACCEPT", "videoport":self.recv_video_port, "audioport":self.recv_audio_port, "sid":0})
-        # TODO: Use session to contain settings and ports
-        self.send_video_port = message["videoport"]
-        self.send_audio_port = message["audioport"]
+        d = {
+            "msg":"ACCEPT", 
+            "sid":0,
+            "videoport":self.recv_video_port, 
+            "audioport":self.recv_audio_port, 
+            "video": {
+                "codec": self.config.video_codec,
+                "bitrate": self.config.video_bitrate,
+                "port": self.recv_video_port
+                },
+            "audio": {
+                "codec": self.config.audio_codec,
+                "channels": self.config.audio_channels,
+                "port": self.recv_audio_port
+                }
+            }
+        self.client.send(d)
         
     def send_ack(self):
         self.client.send({"msg":"ACK", "sid":0})

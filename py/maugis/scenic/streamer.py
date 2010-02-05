@@ -70,12 +70,12 @@ class StreamerManager(object):
             '--sender', 
             '--address', str(host),
             '--videosource', config.video_source,
-            '--videocodec', config.video_codec,
-            '--videobitrate', str(config.video_bitrate),
+            '--videocodec', self.app.send_video_details["codec"], #config.video_codec,
+            '--videobitrate', str(self.app.send_video_details["bitrate"]), #str(config.video_bitrate),
             '--audiosource', config.audio_source,
-            '--audiocodec', config.audio_codec,
-            '--videoport', str(self.app.send_video_port),
-            '--audioport', str(self.app.send_audio_port)]
+            '--audiocodec', self.app.send_audio_details["codec"], #config.audio_codec,
+            '--videoport', str(self.app.send_video_details["port"]), #str(self.app.send_video_port),
+            '--audioport', str(self.app.send_audio_details["port"])] #str(self.app.send_audio_port)]
         if config.video_source == "v4l2src":
             self.milhouse_send_cmd.extend(["--videodevice", config.video_device])
         # setting up
