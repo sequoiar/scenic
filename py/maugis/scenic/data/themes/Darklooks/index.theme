@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Darklooks
+Name[ca]=Darklooks
+Name[en_GB]=Darklooks
+Name[eu]=Itxura iluna
+Name[sv]=Darklooks
+Type=X-GNOME-Metatheme
+Comment=A dark Clearlooks theme
+Comment[ca]=Un tema fosc del Clearlooks
+Comment[en_GB]=A dark Clearlooks theme
+Comment[eu]=Itxura garbiko gai iluna
+Comment[sv]=Ett mörkt Clearlooks-tema
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Darklooks
+MetacityTheme=Clearlooks
+IconTheme=Foxtrot
