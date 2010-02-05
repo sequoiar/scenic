@@ -164,7 +164,7 @@ class Gui(object):
         # --------------------------------------
         # TODO: move that stuff to the Application class
         self.config = Config() # XXX
-        #self.load_gtk_theme(config.theme)
+        self.load_gtk_theme(self.config.theme)
         self.kiosk_mode_on = kiosk_mode
         self.send_video_port = None # XXX
         self.recv_video_port = None # XXX
