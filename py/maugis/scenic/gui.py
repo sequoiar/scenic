@@ -774,3 +774,12 @@ class Gui(object):
             self._offerer_invite_timeout = reactor.callLater(5, _cl_offerer_invite_timed_out)
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
+
+    def update_jackd_status(self, is_running=False):
+        if is_running:
+            self.audio_jack_state_widget.set_markup("<b>Running</b>")
+            self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_YES, 4)
+        else:
+            self.audio_jack_state_widget.set_markup("<b>Not running</b>")
+            self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
+            

@@ -188,7 +188,7 @@ def jackd_get_infos():
     return ret
 
 
-def poll_jackd():
+def _poll_jackd():
     """
     @rettype: Deferred
     """
@@ -200,4 +200,4 @@ def poll_jackd():
         print jack_servers
 
 if __name__ == "__main__":
-    poll_jackd()
+    _poll_jackd()

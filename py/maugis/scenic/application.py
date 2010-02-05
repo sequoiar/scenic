@@ -27,6 +27,7 @@ import gtk # for dialog responses. TODO: remove
 
 from twisted.internet import defer
 from twisted.internet import error
+from twisted.internet import task
 from twisted.internet import reactor
 
 from scenic import communication
@@ -36,6 +37,7 @@ from scenic.streamer import StreamerManager
 from scenic import dialogs
 from scenic import ports
 from scenic import gui
+from scenic import jackd
 from scenic.gui import _ # gettext
 
 class Config(saving.ConfigStateSaving):
@@ -95,6 +97,22 @@ class Application(object):
             print("Cannot start SIC server.")
             print(str(e))
             raise
+        self._jackd_watch_task = task.LoopingCall(self._watch_jackd)
+        self._jackd_watch_task.start(10)
+        
+    def _watch_jackd(self):
+        result = False
+        try:
+            jack_servers = jackd.jackd_get_infos() # returns a list a dict such as :
+        except jackd.JackFrozenError, e:
+            print e
+        else:
+            print jack_servers
+            if len(jack_servers) == 0:
+                result = False
+            else:
+                result = True
+        self.gui.update_jackd_status(result)
     
     def before_shutdown(self):
         """
