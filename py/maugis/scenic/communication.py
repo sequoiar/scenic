@@ -155,7 +155,6 @@ class Client(object):
             d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
             self.sic_sender = None
             self.port = None
-            #return d
             return defer.succeed(True)
         else:
             msg = "Not connected. Client is None."

@@ -745,7 +745,7 @@ class Gui(object):
     
     def _schedule_offerer_invite_timeout(self):
         """ Schedules our offer invite timeout function """
-        def _cl_offerer_invite_timed_out(self):
+        def _cl_offerer_invite_timed_out():
             # XXX
             # in case of invite timeout, act as if we'd cancelled the invite ourselves
             self.on_invite_contact_cancelled()
