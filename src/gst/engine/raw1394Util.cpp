@@ -41,21 +41,21 @@
 
 int raw1394_get_num_ports()
 {
-	int n_ports;
-	struct raw1394_portinfo pinf[ 16 ];
-	raw1394handle_t handle;
+    int n_ports;
+    struct raw1394_portinfo pinf[ 16 ];
+    raw1394handle_t handle;
 
-	/* get a raw1394 handle */
-	if (!(handle = raw1394_new_handle()))
-		THROW_ERROR("raw1394 - failed to get handle: " << strerror(errno));
+    /* get a raw1394 handle */
+    if (!(handle = raw1394_new_handle()))
+        THROW_ERROR("raw1394 - failed to get handle: " << strerror(errno));
 
-	n_ports = raw1394_get_port_info(handle, pinf, 16);
-	raw1394_destroy_handle(handle);
+    n_ports = raw1394_get_port_info(handle, pinf, 16);
+    raw1394_destroy_handle(handle);
 
-	if (n_ports  < 0)
-		THROW_ERROR("raw1394 - failed to get port info: " << strerror(errno));
+    if (n_ports  < 0)
+        THROW_ERROR("raw1394 - failed to get port info: " << strerror(errno));
 
-	return n_ports;
+    return n_ports;
 }
 
 
@@ -66,96 +66,96 @@ int raw1394_get_num_ports()
  */
 
 #ifdef RAW1394_V_0_8
-	raw1394handle_t (* const rawHandle)(void) = raw1394_get_handle;
+    raw1394handle_t (* const rawHandle)(void) = raw1394_get_handle;
 #else
-	raw1394handle_t (* const rawHandle)(void) = raw1394_new_handle;
+    raw1394handle_t (* const rawHandle)(void) = raw1394_new_handle;
 #endif
 
 raw1394handle_t raw1394_open(int port)
 {
-	struct raw1394_portinfo pinf[ 16 ];
-	/* get a raw1394 handle */
-	raw1394handle_t handle = rawHandle();
+    struct raw1394_portinfo pinf[ 16 ];
+    /* get a raw1394 handle */
+    raw1394handle_t handle = rawHandle();
 
 
-	if (!handle)
-		THROW_ERROR("raw1394 - failed to get handle: " << strerror(errno) );
+    if (!handle)
+        THROW_ERROR("raw1394 - failed to get handle: " << strerror(errno) );
 
-	if (raw1394_get_port_info( handle, pinf, 16 ) < 0 )
-	{
-		raw1394_destroy_handle(handle);
-		THROW_ERROR("raw1394 - failed to get port info: " <<  strerror(errno));
-	}
+    if (raw1394_get_port_info( handle, pinf, 16 ) < 0 )
+    {
+        raw1394_destroy_handle(handle);
+        THROW_ERROR("raw1394 - failed to get port info: " <<  strerror(errno));
+    }
 
-	/* tell raw1394 which host adapter to use */
-	if (raw1394_set_port(handle, port) < 0)
-	{
-		raw1394_destroy_handle(handle);
-		THROW_ERROR("raw1394 - failed to set set port: " <<  strerror(errno) );
-	}
+    /* tell raw1394 which host adapter to use */
+    if (raw1394_set_port(handle, port) < 0)
+    {
+        raw1394_destroy_handle(handle);
+        THROW_ERROR("raw1394 - failed to set set port: " <<  strerror(errno) );
+    }
 
-	return handle;
+    return handle;
 }
 
 
 int discoverAVC(int* port, octlet_t* guid)
 {
-	rom1394_directory rom_dir;
-	raw1394handle_t handle;
-	int device = -1;
-	int i, j = 0;
-	int m = raw1394_get_num_ports();
+    rom1394_directory rom_dir;
+    raw1394handle_t handle;
+    int device = -1;
+    int i, j = 0;
+    int m = raw1394_get_num_ports();
 
-	if (*port >= 0)
-	{
-		/* search on explicit port */
-		j = *port;
-		m = *port + 1;
-	}
+    if (*port >= 0)
+    {
+        /* search on explicit port */
+        j = *port;
+        m = *port + 1;
+    }
 
-	for (; j < m and device == -1; j++)
-	{
-		handle = raw1394_open(j);
-		for (i = 0; i < raw1394_get_nodecount(handle); ++i)
-		{
-			if (*guid > 1)
-			{
-				/* select explicitly by GUID */
-				if (*guid == rom1394_get_guid(handle, i))
-				{
-					device = i;
-					*port = j;
-					break;
-				}
-			}
-			else
-			{
-				/* select first AV/C Tape Reccorder Player node */
-				if (rom1394_get_directory(handle, i, &rom_dir) < 0)
-				{
-					rom1394_free_directory(&rom_dir);
-					LOG_WARNING("error reading config rom directory for node " << i);
-				}
-				if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) and 
-				         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or 
-				       (rom_dir.unit_spec_id == MOTDCT_SPEC_ID))
-				{
-					rom1394_free_directory(&rom_dir);
-					octlet_t my_guid, *pguid = (*guid == 1)? guid : &my_guid;
-					*pguid = rom1394_get_guid( handle, i );
-					LOG_DEBUG("Found AV/C device with GUID 0x" << 
-						(quadlet_t) (*pguid>>32) << (quadlet_t) (*pguid & 0xffffffff) << std::endl);
-					device = i;
-					*port = j;
-					break;
-				}
-				rom1394_free_directory(&rom_dir);
-			}
-		}
-	    raw1394_destroy_handle(handle);
-	}
+    for (; j < m and device == -1; j++)
+    {
+        handle = raw1394_open(j);
+        for (i = 0; i < raw1394_get_nodecount(handle); ++i)
+        {
+            if (*guid > 1)
+            {
+                /* select explicitly by GUID */
+                if (*guid == rom1394_get_guid(handle, i))
+                {
+                    device = i;
+                    *port = j;
+                    break;
+                }
+            }
+            else
+            {
+                /* select first AV/C Tape Reccorder Player node */
+                if (rom1394_get_directory(handle, i, &rom_dir) < 0)
+                {
+                    rom1394_free_directory(&rom_dir);
+                    LOG_WARNING("error reading config rom directory for node " << i);
+                }
+                if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) and 
+                         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or 
+                       (rom_dir.unit_spec_id == MOTDCT_SPEC_ID))
+                {
+                    rom1394_free_directory(&rom_dir);
+                    octlet_t my_guid, *pguid = (*guid == 1)? guid : &my_guid;
+                    *pguid = rom1394_get_guid( handle, i );
+                    LOG_DEBUG("Found AV/C device with GUID 0x" << 
+                        (quadlet_t) (*pguid>>32) << (quadlet_t) (*pguid & 0xffffffff) << std::endl);
+                    device = i;
+                    *port = j;
+                    break;
+                }
+                rom1394_free_directory(&rom_dir);
+            }
+        }
+        raw1394_destroy_handle(handle);
+    }
 
-	return device;
+    return device;
 }
 
 
