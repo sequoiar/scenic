@@ -151,7 +151,6 @@ class Client(object):
         """
         @rettype: Deferred
         """
-        self.sic_sender = None
         if self.is_connected():
             d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
             self.port = None
