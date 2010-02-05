@@ -62,7 +62,7 @@ class StreamerManager(object):
             '--videocodec', config.video_codec,
             '--videoport', str(self.app.recv_video_port),
             '--audiosink', config.audio_sink,
-            '--numchannels', config.audio_channels,
+            '--numchannels', str(config.audio_channels),
             '--audiocodec', config.audio_codec,
             '--audioport', str(self.app.recv_audio_port) 
             ]
@@ -75,7 +75,7 @@ class StreamerManager(object):
             '--videobitrate', str(self.app.send_video_details["bitrate"]),
             '--videoport', str(self.app.send_video_details["port"]),
             '--audiosource', config.audio_source,
-            '--numchannels', self.app.send_audio_details["numchannels"],
+            '--numchannels', str(self.app.send_audio_details["numchannels"]),
             '--audiocodec', self.app.send_audio_details["codec"],
             '--audioport', str(self.app.send_audio_details["port"])]
         if config.video_source == "v4l2src":
