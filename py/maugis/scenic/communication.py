@@ -89,24 +89,22 @@ class Client(object):
     """
     TCP sender
     """
-    def __init__(self, app, negotiation_port):
-        self.port = negotiation_port
+    def __init__(self, connection_error_handler):
+        self.port = None
         self.host = None
         self.sic_sender = None
         self.clientPort = None
-        self._connected = False
         
-        self.socket_error_signal = sig.Signal()
-        self.socket_error_signal.connect(app.on_client_socket_error) # TODO
+        self.connection_error_signal = sig.Signal()
+        self.connection_error_signal.connect(connection_error_handler) # TODO
         
-    def connect(self, host):
+    def connect(self, host, port):
         """
         Connects and sends an INVITE message
         @rettype: L{Deferred}
         """
         def _on_connected(proto):
             print "connected"
-            self._connected = True
             self.sic_sender = proto
             return proto
         
@@ -116,11 +114,12 @@ class Client(object):
             self.sic_sender = None
             err = str(reason.getErrorMessage())
             msg = "Could not send to remote host."
-            self.socket_error_signal(self, err, msg)
+            self.connection_error_signal(err, msg)
             return reason        
 
         if not self.is_connected():
             self.host = host
+            self.port = port
             self.client_factory = sic.ClientFactory()
             print 'trying to connect'
             print self.host, self.port
@@ -143,12 +142,10 @@ class Client(object):
             self.sic_sender.send_message(msg)
         else:
             msg = "Not connected. Client is None."
-            print msg
-            err = None
-            self.socket_error_signal(self, err, msg)
+            raise AssertionError(msg)
     
     def is_connected(self):
-        return self._connected
+        return self.sic_sender is not None
 
     def disconnect(self):
         """
@@ -156,8 +153,8 @@ class Client(object):
         """
         if self.is_connected():
             d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
-            self._connected = False #FIXME
             self.sic_sender = None
+            self.port = None
             #return d
             return defer.succeed(True)
         else:

@@ -84,7 +84,7 @@ class Application(object):
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
-        self.client = None 
+        self.client = communication.Client(self.on_connection_error) # XXX
         self.got_bye = False 
         # starting the GUI:
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
@@ -102,7 +102,7 @@ class Application(object):
         """
         print("The application is shutting down.")
         # TODO: stop streamers
-        if self.client is not None:
+        if self.client.is_connected():
             if not self.got_bye:
                 self.send_bye()
                 self.stop_streamers()
@@ -149,10 +149,7 @@ class Application(object):
             @param result: Answer to the dialog.
             """
             if response == gtk.RESPONSE_OK:
-                if self.client is not None:
-                    self.send_accept(message, addr)
-                else:
-                    print("Error: connection lost, so we could not accept.")# FIXME
+                self.send_accept(message, addr)
             elif response == gtk.RESPONSE_CANCEL or gtk.RESPONSE_DELETE_EVENT:
                 self.send_refuse_and_disconnect() 
             else:
@@ -163,16 +160,14 @@ class Application(object):
             print("Got invitation, but we are busy.")
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
         else:
-            self.client = communication.Client(self, send_to_port)
-            self.client.connect(addr)
+            self.client.connect(addr, send_to_port)
             # TODO: if a contact in the addressbook has this address, displays it!
             text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % addr)
             self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
 
     def handle_cancel(self):
-        if self.client is not None:
+        if self.client.is_connected():
             self.client.disconnect()
-            self.client = None
         self.gui.invited_dialog.hide()
         dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.gui.main_window)
 
@@ -181,18 +176,15 @@ class Application(object):
         # FIXME: this doesn't make sense here
         self.got_bye = False
         # TODO: Use session to contain settings and ports
-        if self.client is not None:
-            self.gui.hide_calling_dialog("accept")
-            self.send_video_port = message["videoport"]
-            self.send_audio_port = message["audioport"]
-            if self.streamer_manager.is_busy():
-                dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.gui.main_window)
-            else:
-                print("Got ACCEPT. Starting streamers as initiator.")
-                self.start_streamers(addr)
-                self.send_ack()
+        self.gui.hide_calling_dialog("accept")
+        self.send_video_port = message["videoport"]
+        self.send_audio_port = message["audioport"]
+        if self.streamer_manager.is_busy():
+            dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.gui.main_window)
         else:
-            print("Error ! Connection lost.") # FIXME
+            print("Got ACCEPT. Starting streamers as initiator.")
+            self.start_streamers(addr)
+            self.send_ack()
 
     def handle_refuse(self):
         self.gui._unschedule_offerer_invite_timeout()
@@ -206,7 +198,7 @@ class Application(object):
     def handle_bye(self):
         self.got_bye = True
         self.stop_streamers()
-        if self.client is not None:
+        if self.client.is_connected():
             print('disconnecting client and sending BYE')
             self.client.send({"msg":"OK", "sid":0})
             self.disconnect_client()
@@ -263,15 +255,14 @@ class Application(object):
         @rettype: L{Deferred}
         """
         def _cb(result, d1):
-            self.client = None
             d1.callback(True)
         def _cl(d1):
-            if self.client is not None:
+            if self.client.is_connected():
                 d2 = self.client.disconnect()
                 d2.addCallback(_cb, d1)
             else:
                 d1.callback(True)
-        if self.client is not None:
+        if self.client.is_connected():
             d = defer.Deferred()
             reactor.callLater(0, _cl, d)
             return d
@@ -302,15 +293,13 @@ class Application(object):
         def _on_error(reason):
             print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
             self.gui.calling_dialog.hide()
-            self.client = None
             return None
            
         print ("sending %s to %s:%s" % (msg, ip, port))
-        self.client = communication.Client(self, port)
-        deferred = self.client.connect(ip)
+        deferred = self.client.connect(ip, port)
         deferred.addCallback(_on_connected).addErrback(_on_error)
         self.gui.calling_dialog.show()
-        # window will be hidden when we receive ACCEPT or REFUSE
+        # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
     
     def send_accept(self, message, addr):
         # UPDATE config once we accept the invitie
@@ -329,32 +318,23 @@ class Application(object):
         Sends BYE
         BYE stops the streaming on the remote host.
         """
-        if self.client is not None:
-            self.client.send({"msg":"BYE", "sid":0})
+        self.client.send({"msg":"BYE", "sid":0})
     
     def send_cancel_and_disconnect(self):
         """
         Sends CANCEL
         CANCEL cancels the invite on the remote host.
         """
-        if self.client is not None:
-            self.client.send({"msg":"CANCEL", "sid":0})
-            self.client.disconnect()
-            self.client = None
-        else:
-            print('Warning: Trying to send CANCEL even though client is None')
+        self.client.send({"msg":"CANCEL", "sid":0})
+        self.client.disconnect()
     
     def send_refuse_and_disconnect(self):
         """
         Sends REFUSE 
         REFUSE tells the offerer we can't have a session.
         """
-        if self.client is not None:
-            self.client.send({"msg":"REFUSE", "sid":0})
-            self.client.disconnect()
-            self.client = None
-        else:
-            print('Warning: Trying to send REFUSE even though client is None')
+        self.client.send({"msg":"REFUSE", "sid":0})
+        self.client.disconnect()
 
     # ------------------- streaming events handlers ----------------
     
@@ -368,7 +348,7 @@ class Application(object):
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
-    def on_client_socket_error(self, client, err, msg):
+    def on_connection_error(self, err, msg):
         # XXX
         self.gui.hide_calling_dialog(msg)
         text = _("%s: %s") % (str(err), str(msg))
