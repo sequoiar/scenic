@@ -376,4 +376,4 @@ class Application(object):
         # XXX
         self.gui.hide_calling_dialog(msg)
         text = _("%s: %s") % (str(err), str(msg))
-        self.gui.show_error_dialog(text)
+        dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
