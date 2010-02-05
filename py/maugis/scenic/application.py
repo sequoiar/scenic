@@ -107,7 +107,7 @@ class Application(object):
         except jackd.JackFrozenError, e:
             print e
         else:
-            print jack_servers
+            #print jack_servers
             if len(jack_servers) == 0:
                 result = False
             else:
