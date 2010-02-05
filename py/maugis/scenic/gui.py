@@ -157,29 +157,18 @@ Scenic is the advanced user graphical interface for the Milhouse audio/video str
 Each peer decides what to receive from the other peer. Next, one peer can invite an other one to stream high-quality audio and video.
 """
 
+
 class Gui(object):
     """
     Main application (arguably God) class
      * Contains the main GTK window
     """
-    def __init__(self, kiosk_mode=False, fullscreen=False):
+    def __init__(self, app, kiosk_mode=False, fullscreen=False):
         # --------------------------------------
         # TODO: move that stuff to the Application class
-        self.config = Config() # XXX
-        self.load_gtk_theme(self.config.theme)
+        self.app = app
+        self.load_gtk_theme(self.app.config.theme)
         self.kiosk_mode_on = kiosk_mode
-        self.send_video_port = None # XXX
-        self.recv_video_port = None # XXX
-        self.send_audio_port = None # XXX
-        self.recv_audio_port = None # XXX
-        self.address_book = saving.AddressBook() # XXX
-        self.streamer_manager = StreamerManager(self) # XXX
-        self._has_session = False # XXX
-        self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
-        print("Starting SIC server on port %s" % (self.config.negotiation_port)) # XXX
-        self.server = communication.Server(self, self.config.negotiation_port) # XXX
-        self.client = None # XXX
-        self.got_bye = False # XXX
         # ---------------------------------------
         
         self._offerer_invite_timeout = None
@@ -277,16 +266,7 @@ class Gui(object):
         # TODO: get rid of those methods
         self._init_widgets_value() # XXX
 
-
         self.main_window.show()
-        self.ports_allocator = ports.PortsAllocator()
-        try:
-            self.server.start_listening()
-        except error.CannotListenError, e:
-            print("Cannot start SIC server.")
-            print(str(e))
-            raise
-        reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
    
     # ------------------ window events and actions --------------------
 
@@ -341,7 +321,7 @@ class Gui(object):
         # you don't want the window to be destroyed.
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
-        if self.config.confirm_quit:
+        if self.app.config.confirm_quit:
             d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.\nMake sure to save your settings if desired.", parent=self.main_window)
             d.addCallback(_cb)
             return True
@@ -349,20 +329,6 @@ class Gui(object):
             _cb(True)
             return False
     
-    def before_shutdown(self):
-        """
-        Last things done before quitting.
-        """
-        print("The application is shutting down.")
-        # TODO: stop streamers
-        if self.client is not None:
-            if not self.got_bye:
-                self.send_bye()
-                self.stop_streamers()
-            self.disconnect_client()
-        print('stopping server')
-        self.server.close()
-        
     def on_main_window_destroyed(self, *args):
         # TODO: confirm dialog!
         if reactor.running:
@@ -381,7 +347,7 @@ class Gui(object):
         # It can be the user that pushed the button, or it can be toggled by the software.
         print 'video_view_preview toggled', widget.get_active()
         if widget.get_active():
-            command = "milhouse --videosource v4l2src --videodevice %s --localvideo --window-title preview" % (self.config.video_device)
+            command = "milhouse --videosource v4l2src --videodevice %s --localvideo --window-title preview" % (self.app.config.video_device)
             print "spawning", command
             process.run_once(*command.split())
             dialogs.ErrorDialog.create("You must manually close the preview window.", parent=self.main_window)
@@ -402,13 +368,13 @@ class Gui(object):
             self.remove_contact_widget.set_sensitive(True)
             self.invite_contact_widget.set_sensitive(True)
             self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0]
-            self.address_book.selected_contact = self.address_book.contact_list[self.selected_contact_index]
-            self.address_book.selected_index = self.selected_contact_index
+            self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index]
+            self.app.address_book.selected_index = self.selected_contact_index
         else:
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
-            self.address_book.selected_contact = None
+            self.app.address_book.selected_contact = None
 
     # ---------------------- slots for addressbook widgets events --------
     
@@ -425,7 +391,7 @@ class Gui(object):
         
         The add_contact buttons has been clicked.
         """
-        self.address_book.current_contact_is_new = True
+        self.app.address_book.current_contact_is_new = True
         # Update the text in the edit/new contact dialog:
         self.contact_name_widget.set_text("")
         self.contact_addr_widget.set_text("")
@@ -438,7 +404,7 @@ class Gui(object):
         """
         def on_confirm_result(result):
             if result:
-                del self.address_book.contact_list[self.selected_contact_index]
+                del self.app.address_book.contact_list[self.selected_contact_index]
                 self.contact_tree.remove(self.selected_contact_row)
                 num = self.selected_contact_index - 1
                 if num < 0:
@@ -452,9 +418,9 @@ class Gui(object):
         """
         Shows the edit contact dialog.
         """
-        self.contact_name_widget.set_text(self.address_book.selected_contact["name"])
-        self.contact_addr_widget.set_text(self.address_book.selected_contact["address"])
-        self.contact_port_widget.set_text(str(self.address_book.selected_contact["port"]))
+        self.contact_name_widget.set_text(self.app.address_book.selected_contact["name"])
+        self.contact_addr_widget.set_text(self.app.address_book.selected_contact["address"])
+        self.contact_port_widget.set_text(str(self.app.address_book.selected_contact["port"]))
         self.edit_contact_window.show() # addr
 
     def on_edit_contact_cancel_clicked(self, *args):
@@ -477,21 +443,21 @@ class Gui(object):
                 "port": int(port)
                 }
             contact_markup = format_contact_markup(contact)
-            if self.address_book.current_contact_is_new:
+            if self.app.address_book.current_contact_is_new:
                 self.contact_tree.append([contact_markup]) # add it to the tree list
-                self.address_book.contact_list.append([contact_markup]) # and the internal address book
-                self.selection.select_path(len(self.address_book.contact_list) - 1) # select it ...?
-                self.address_book.selected_contact = self.address_book.contact_list[len(self.address_book.contact_list) - 1] #FIXME: we should not copy a dict like that
-                self.address_book.current_contact_is_new = False # FIXME: what does that mean?
+                self.app.address_book.contact_list.append([contact_markup]) # and the internal address book
+                self.selection.select_path(len(self.app.address_book.contact_list) - 1) # select it ...?
+                self.app.address_book.selected_contact = self.app.address_book.contact_list[len(self.app.address_book.contact_list) - 1] #FIXME: we should not copy a dict like that
+                self.app.address_book.current_contact_is_new = False # FIXME: what does that mean?
             else:
                 self.contact_tree.set_value(self.selected_contact_row, 0, contact_markup)
-            self.address_book.selected_contact = contact
+            self.app.address_book.selected_contact = contact
             self.edit_contact_window.hide()
 
         # Validate the port number
         port = self.contact_port_widget.get_text()
         if port == "":
-            port = str(self.config.negotiation_port) # set port to default
+            port = str(self.app.config.negotiation_port) # set port to default
         elif not port.isdigit():
             text = _("The port number must be an integer.")
             self.show_error_dialog(text)
@@ -509,7 +475,7 @@ class Gui(object):
         # save it.
         when_valid_save()
 
-    # ---------------------------- Custom system tab buttons -----------------------
+    # ---------------------------- Custom system tab buttons ---------------
 
     def on_network_admin_clicked(self, *args):
         """
@@ -580,10 +546,10 @@ class Gui(object):
                     err.close()
                 except:
                     msg += "Error executing 'lsmod'"
-                fromaddr = self.config.email_info
-                toaddrs  = self.config.email_info
+                fromaddr = self.app.config.email_info
+                toaddrs  = self.app.config.email_info
                 toaddrs = toaddrs.split(', ')
-                server = smtplib.SMTP(self.config.smtpserver)
+                server = smtplib.SMTP(self.app.config.smtpserver)
                 server.set_debuglevel(0)
                 try:
                     server.sendmail(fromaddr, toaddrs, msg)
@@ -595,36 +561,8 @@ class Gui(object):
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
         self.show_confirm_dialog(text, on_confirm_result)
 
-    # ------------------------- session occuring -------------
-    def has_session(self):
-        """
-        @rettype: bool
-        """
-        return self._has_session
-    # -------------------- streamer ports -----------------
-
-    def allocate_ports(self):
-        # TODO: start_session
-        self.recv_video_port = self.ports_allocator.allocate()
-        self.recv_audio_port = self.ports_allocator.allocate()
-
-    def free_ports(self):
-        # TODO: stop_session
-        for port in [self.recv_video_port, self.recv_audio_port]:
-            try:
-                self.ports_allocator.free(port)
-            except ports.PortsAllocatorError, e:
-                print(e)
         
     # --------------------- configuration and widgets value ------------
-    def save_configuration(self):
-        """
-        Saves the configuration to a file.
-        Reads the widget value prior to do it.
-        """
-        self._gather_configuration() # need to get the value of the configuration widgets.
-        self.config.save()
-        self.address_book.save() # addressbook values are already stored.
 
     def _gather_configuration(self):
         """
@@ -634,31 +572,31 @@ class Gui(object):
         # VIDEO SIZE
         video_size = _get_combobox_value(self.video_size_widget)
         print ' * video_size:', video_size
-        self.config.video_width = int(video_size.split("x")[0])
-        self.config.video_height = int(video_size.split("x")[1])
+        self.app.config.video_width = int(video_size.split("x")[0])
+        self.app.config.video_height = int(video_size.split("x")[1])
         
         # DISPLAY
         video_display = _get_combobox_value(self.video_display_widget)
         print ' * video_display:', video_display
-        self.config.video_display = video_display
+        self.app.config.video_display = video_display
         
         # BITRATE
         video_bitrate = _get_combobox_value(self.video_bitrate_widget)
         print ' * video_bitrate:', video_bitrate
-        self.config.video_bitrate = int(video_bitrate.split(" ")[0]) * 1000000
+        self.app.config.video_bitrate = int(video_bitrate.split(" ")[0]) * 1000000
         
         # VIDEO SOURCE AND DEVICE
         video_source = _get_combobox_value(self.video_source_widget)
         if video_source == "Color bars":
-            self.config.video_source = "videotestsrc"
+            self.app.config.video_source = "videotestsrc"
         elif video_source.startswith("/dev/video"): # TODO: firewire!
-            self.config.video_device = video_source
-            self.config.video_source = "v4l2src"
+            self.app.config.video_device = video_source
+            self.app.config.video_source = "v4l2src"
         print ' * videosource:', video_source
         
         # CODEC
         video_codec = _get_combobox_value(self.video_codec_widget)
-        self.config.video_codec = VIDEO_CODECS[video_codec]
+        self.app.config.video_codec = VIDEO_CODECS[video_codec]
         print ' * video_codec:', video_codec
         
         #TODO: get toggle fullscreen (milhouse) value
@@ -671,43 +609,43 @@ class Gui(object):
         """
         print("Changing widgets value according to configuration.")
         # VIDEO SIZE
-        video_size = "%sx%s" % (self.config.video_width, self.config.video_height)
+        video_size = "%sx%s" % (self.app.config.video_width, self.app.config.video_height)
         _set_combobox_value(self.video_size_widget, video_size)
         print ' * video_size:', video_size
         
         # DISPLAY
-        video_display = self.config.video_display
+        video_display = self.app.config.video_display
         _set_combobox_value(self.video_display_widget, video_display)
         print ' * video_display:', video_display
         
         # BITRATE
-        video_bitrate = "%s Mbps" % (int(self.config.video_bitrate) / 1000000)
+        video_bitrate = "%s Mbps" % (int(self.app.config.video_bitrate) / 1000000)
         _set_combobox_value(self.video_bitrate_widget, video_bitrate)
         print ' * video_bitrate:', video_bitrate
         
         # VIDEO SOURCE AND DEVICE
-        if self.config.video_source == "videotestsrc":
+        if self.app.config.video_source == "videotestsrc":
             video_source = "Color bars"
-        elif self.config.video_source == "v4l2src":
-            video_source = self.config.video_device
+        elif self.app.config.video_source == "v4l2src":
+            video_source = self.app.config.video_device
         _set_combobox_value(self.video_source_widget, video_source)
         print ' * videosource:', video_source
 
         # CODEC
         # gets key for a value
-        video_codec = VIDEO_CODECS.keys()[VIDEO_CODECS.values().index(self.config.video_codec)]
+        video_codec = VIDEO_CODECS.keys()[VIDEO_CODECS.values().index(self.app.config.video_codec)]
         _set_combobox_value(self.video_codec_widget, video_codec)
         print ' * video_codec:', video_codec
 
         # ADDRESSBOOK
         # Init addressbook contact list:
-        self.address_book.selected_contact = None
-        self.address_book.current_contact_is_new = False
-        if len(self.address_book.contact_list) > 0:
-            for contact in self.address_book.contact_list:
+        self.app.address_book.selected_contact = None
+        self.app.address_book.current_contact_is_new = False
+        if len(self.app.address_book.contact_list) > 0:
+            for contact in self.app.address_book.contact_list:
                 contact_markup = format_contact_markup(contact)
                 self.contact_tree.append([contact_markup])
-            self.selection.select_path(self.address_book.selected)
+            self.selection.select_path(self.app.address_book.selected)
         else:
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
@@ -750,13 +688,7 @@ class Gui(object):
         """
         Sends an INVITE to the remote peer.
         """
-        self.allocate_ports()
-        if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.main_window)
-        else:
-            # UPDATE when initiating session
-            self._gather_configuration()
-            self.send_invite()
+        self.app.send_invite()
     
     def on_invite_contact_cancelled(self, *args):
         """
@@ -764,13 +696,17 @@ class Gui(object):
         """
         # unschedule this timeout as we don't care if our peer answered or not
         self._unschedule_offerer_invite_timeout()
-        self.send_cancel_and_disconnect()
+        self.app.send_cancel_and_disconnect()
         # don't let the delete-event propagate
         if self.calling_dialog.get_property('visible'):
             self.calling_dialog.hide()
         return True
 
     def show_error_dialog(self, text, callback=None):
+        """
+        Shows an error dialog, the old way.
+        """
+        # TODO: deprecate
         def _response_cb(widget, response_id, callback):
             widget.hide()
             if callback is not None:
@@ -784,6 +720,10 @@ class Gui(object):
         dialog.show()
     
     def show_confirm_dialog(self, text, callback=None):
+        """
+        Shows a confirm dialog, the old way.
+        """
+        # TODO: deprecate
         def _response_cb(widget, response_id, callback):
             widget.hide()
             if callback is not None:
@@ -841,22 +781,92 @@ class Gui(object):
             self._offerer_invite_timeout.cancel()
             self._offerer_invite_timeout = None
     
-    def _schedule_offerer_invite_timeout(self, data):
+    def _schedule_offerer_invite_timeout(self):
         """ Schedules our offer invite timeout function """
+        def _cl_offerer_invite_timed_out(self):
+            # XXX
+            # in case of invite timeout, act as if we'd cancelled the invite ourselves
+            self.on_invite_contact_cancelled()
+            if self.calling_dialog.get_property('visible'):
+                self.hide_calling_dialog("answTimeout")
+            # here we return false so that this callback is unregistered
+            return False
+
         if self._offerer_invite_timeout is None or not self._offerer_invite_timeout.active():
-            self._offerer_invite_timeout = reactor.callLater(5, self._cl_offerer_invite_timed_out, data)
+            self._offerer_invite_timeout = reactor.callLater(5, _cl_offerer_invite_timed_out)
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
-    def _cl_offerer_invite_timed_out(self, client):
-        # XXX
-        # in case of invite timeout, act as if we'd cancelled the invite ourselves
-        self.on_invite_contact_cancelled()
-        if self.calling_dialog.get_property('visible'):
-            self.hide_calling_dialog("answTimeout")
-        # here we return false so that this callback is unregistered
-        return False
+###########################################################
 
+class Application(object):
+    def __init__(self, kiosk_mode=False, fullscreen=False):
+        self.config = Config()
+        self.send_video_port = None
+        self.recv_video_port = None
+        self.send_audio_port = None
+        self.recv_audio_port = None
+        self.ports_allocator = ports.PortsAllocator()
+        self.address_book = saving.AddressBook()
+        self.streamer_manager = StreamerManager(self)
+        self._has_session = False
+        self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
+        print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
+        self.server = communication.Server(self, self.config.negotiation_port) # XXX
+        self.client = None 
+        self.got_bye = False 
+        # starting the GUI:
+        self.gui = Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
+        reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
+        try:
+            self.server.start_listening()
+        except error.CannotListenError, e:
+            print("Cannot start SIC server.")
+            print(str(e))
+            raise
+    
+    def before_shutdown(self):
+        """
+        Last things done before quitting.
+        """
+        print("The application is shutting down.")
+        # TODO: stop streamers
+        if self.client is not None:
+            if not self.got_bye:
+                self.send_bye()
+                self.stop_streamers()
+            self.disconnect_client()
+        print('stopping server')
+        self.server.close()
+    # ------------------------- session occuring -------------
+    def has_session(self):
+        """
+        @rettype: bool
+        """
+        return self._has_session
+    # -------------------- streamer ports -----------------
+
+    def allocate_ports(self):
+        # TODO: start_session
+        self.recv_video_port = self.ports_allocator.allocate()
+        self.recv_audio_port = self.ports_allocator.allocate()
+
+    def free_ports(self):
+        # TODO: stop_session
+        for port in [self.recv_video_port, self.recv_audio_port]:
+            try:
+                self.ports_allocator.free(port)
+            except ports.PortsAllocatorError, e:
+                print(e)
+
+    def save_configuration(self):
+        """
+        Saves the configuration to a file.
+        Reads the widget value prior to do it.
+        """
+        self.gui._gather_configuration() # need to get the value of the configuration widgets.
+        self.config.save()
+        self.address_book.save() # addressbook values are already stored.
     # --------------------------- network receives ------------
     def handle_invite(self, message, addr):
         self.got_bye = False
@@ -886,26 +896,26 @@ class Gui(object):
             self.client.connect(addr)
             # TODO: if a contact in the addressbook has this address, displays it!
             text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % addr)
-            self.show_invited_dialog(text, _on_contact_request_dialog_response)
+            self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
 
     def handle_cancel(self):
         if self.client is not None:
             self.client.disconnect()
             self.client = None
-        self.invited_dialog.hide()
-        dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.main_window)
+        self.gui.invited_dialog.hide()
+        dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
-        self._unschedule_offerer_invite_timeout()
+        self.gui._unschedule_offerer_invite_timeout()
         # FIXME: this doesn't make sense here
         self.got_bye = False
         # TODO: Use session to contain settings and ports
         if self.client is not None:
-            self.hide_calling_dialog("accept")
+            self.gui.hide_calling_dialog("accept")
             self.send_video_port = message["videoport"]
             self.send_audio_port = message["audioport"]
             if self.streamer_manager.is_busy():
-                dialogs.ErrorDialog.create("A streaming session is already in progress.")
+                dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.gui.main_window)
             else:
                 print("Got ACCEPT. Starting streamers as initiator.")
                 self.start_streamers(addr)
@@ -914,9 +924,9 @@ class Gui(object):
             print("Error ! Connection lost.") # FIXME
 
     def handle_refuse(self):
-        self._unschedule_offerer_invite_timeout()
+        self.gui._unschedule_offerer_invite_timeout()
         self.free_ports()
-        self.hide_calling_dialog("refuse")
+        self.gui.hide_calling_dialog("refuse")
 
     def handle_ack(self, addr):
         print("Got ACK. Starting streamers as answerer.")
@@ -998,6 +1008,12 @@ class Gui(object):
             return defer.succeed(True)
 
     def send_invite(self):
+        self.allocate_ports()
+        if self.streamer_manager.is_busy():
+            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.gui.main_window)
+        else:
+            # UPDATE when initiating session
+            self.gui._gather_configuration()
         msg = {
             "msg":"INVITE",
             "sid":0, 
@@ -1009,12 +1025,12 @@ class Gui(object):
         ip = self.address_book.selected_contact["address"]
 
         def _on_connected(proto):
-            self._schedule_offerer_invite_timeout(self.client)
+            self.gui._schedule_offerer_invite_timeout()
             self.client.send(msg)
             return proto
         def _on_error(reason):
             print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
-            self.calling_dialog.hide()
+            self.gui.calling_dialog.hide()
             self.client = None
             return None
            
@@ -1022,12 +1038,12 @@ class Gui(object):
         self.client = communication.Client(self, port)
         deferred = self.client.connect(ip)
         deferred.addCallback(_on_connected).addErrback(_on_error)
-        self.calling_dialog.show()
+        self.gui.calling_dialog.show()
         # window will be hidden when we receive ACCEPT or REFUSE
     
     def send_accept(self, message, addr):
         # UPDATE config once we accept the invitie
-        self._gather_configuration()
+        self.gui._gather_configuration()
         self.allocate_ports()
         self.client.send({"msg":"ACCEPT", "videoport":self.recv_video_port, "audioport":self.recv_audio_port, "sid":0})
         # TODO: Use session to contain settings and ports
@@ -1083,7 +1099,6 @@ class Gui(object):
             
     def on_client_socket_error(self, client, err, msg):
         # XXX
-        self.hide_calling_dialog(msg)
+        self.gui.hide_calling_dialog(msg)
         text = _("%s: %s") % (str(err), str(msg))
-        self.show_error_dialog(text)
-
+        self.gui.show_error_dialog(text)
