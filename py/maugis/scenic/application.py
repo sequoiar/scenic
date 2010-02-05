@@ -167,8 +167,7 @@ class Application(object):
             self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
 
     def handle_cancel(self):
-        if self.client.is_connected():
-            self.client.disconnect()
+        self.client.disconnect()
         self.gui.invited_dialog.hide()
         dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.gui.main_window)
 
