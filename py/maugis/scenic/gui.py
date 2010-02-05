@@ -51,6 +51,8 @@ import gtk.glade
 import gobject
 import webbrowser
 import gettext
+import shutil
+import tempfile
 
 from twisted.internet import defer
 from twisted.internet import error
@@ -164,6 +166,7 @@ class Gui(object):
         # --------------------------------------
         # TODO: move that stuff to the Application class
         self.config = Config() # XXX
+        self.load_gtk_theme()
         self.kiosk_mode_on = kiosk_mode
         self.send_video_port = None # XXX
         self.recv_video_port = None # XXX
@@ -277,8 +280,19 @@ class Gui(object):
             print(str(e))
             raise
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
+        reactor.callLater(3, self.load_gtk_theme, "/usr/share/themes/Glossy/gtk-2.0/gtkrc")
    
     # ------------------ window events and actions --------------------
+
+    def load_gtk_theme(self, file_name="/usr/share/themes/Darklooks/gtk-2.0/gtkrc"):
+        # FIXME: not able to reload themes dynamically.
+        if os.path.exists(file_name):
+            gtk.rc_reset_styles(gtk.settings_get_default())
+            print "loading theme", file_name
+            gtk.rc_parse(file_name)
+            gtk.rc_reparse_all()
+        else:
+            print("File name not found: %s" % (file_name))
      
     def toggle_fullscreen(self):
         """
