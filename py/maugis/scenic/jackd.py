@@ -31,26 +31,12 @@ Attributes of its (jackd) devices:
 
 WARNING: For now, only supports short options to jackd. (such as "-d alsa" and not "--driver alsa")
 """
-# System imports
 import os
 import sys
 import glob
 import pprint
-
-# Twisted imports
 from twisted.internet import reactor
 from twisted.python import failure
-
-# App imports
-from miville.devices import devices
-from miville.utils.commands import *
-from miville.errors import DeviceError
-from miville.utils import log as logger
-
-log = logger.start('debug', True, True, 'devices_jackd')
-
-_state_printed_jackd_is_frozen = False
-_enable_kill_jackd = True
 
 def double_fork(args):
     """
@@ -63,6 +49,8 @@ def double_fork(args):
     if os.fork() != 0: # die if not in the child process 
         return 
         # sys.exit(0)
+    if reactor.running:
+        reactor.stop()
     os.umask(0) # set current process' file creation mode to octal 000
     os.setsid() # setsid runs a program in a new session. 
     if os.fork() != 0: # die if not the child process 
@@ -84,34 +72,8 @@ def double_fork(args):
     os.dup2(stderr.fileno(), sys.stderr.fileno())
     os.execv(args[0], args) # TODO: use execve to send os.environ
 
-def _parse_jack_lsp(lines):
-    """
-    Parses the output of the `jack_lsp` command.
-    Returns a dict.
-    """
-    ret = {}
-
-    if len(lines) == 1 and lines[0].strip() == "JACK server not running":
-        ret['nb_sys_sinks'] = 0
-        ret['nb_sys_sources'] = 0
-        ret['running'] = False
-    else:
-        ret['running'] = True
-        system_sinks = []
-        system_sources = []
-        for line in lines:
-            line = line.strip()
-            name = line.split(":")[1]
-            if line.startswith("system:capture"):
-                system_sources.append(name)
-            elif line.startswith("system:playback"):
-                system_sinks.append(name)
-        ret['nb_sys_sinks'] = len(system_sinks)
-        ret['nb_sys_sources'] = len(system_sources)
-        #log.debug('sys_sinks, sys_sources:%d %d' % (len(system_sinks), len(system_sources)))
-        #ret['sample_rate'] = 48000 # TODO
-        #ret['server_name'] = "SPAM" # TODO
-    return ret
+class JackFrozenError(Exception):
+    pass
 
 def jackd_get_infos():
     """
@@ -155,10 +117,8 @@ def jackd_get_infos():
                 s = f.read()
                 f.close()
             except IOError, e:
-                if not _state_printed_jackd_is_frozen:
-                    log.info("Jackd seems frozen. IOError : (trying to read %s) %s" % (filename , str(e.message))) # log.error(e.message)
-                    _state_printed_jackd_is_frozen = True 
-                ret.pop(i)
+                msg = "Jackd seems frozen. IOError : (trying to read %s) %s" % (filename , e)
+                raise JackFrozenError(msg)
             else:
                 _state_printed_jackd_is_frozen = False 
                 # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'
@@ -228,234 +188,16 @@ def jackd_get_infos():
     return ret
 
 
-class JackDriver(devices.AudioDriver):
+def poll_jackd():
     """
-    JACK audio server.
-    
-    /usr/bin/jackd -dalsa -dhw:0 -r48000 -p1024 -n2 2>&1 > /dev/null
+    @rettype: Deferred
     """
-    name = 'jackd'
-    
-    def prepare(self):
-        """
-        Returns a Deferred instance? no
-        """
-        try:
-            tmp = find_command('jack_lsp')
-        except:
-            self.api.notify(None, "jack_lsp command not found. Please sudo apt-get install jackd", "error")
-            log.error("jack_lsp command not found. Please sudo apt-get install jackd")
-            #raise CommandNotFoundError("jacklsp command not found. Please sudo apt-get install jackd")
-        #name = os.getenv("JACK_DEFAULT_SERVER")
-        #if isinstance(name, str):
-        #    self._jack_server_name = name
-        return devices.Driver.prepare(self)
-    
-    def _on_devices_polling(self, caller=None, event_key=None):
-        """
-        Get all infos for all devices.
-        Starts the commands.
+    try:
+        jack_servers = jackd_get_infos() # returns a list a dict such as :
+    except JackFrozenError, e:
+        print e
+    else:
+        print jack_servers
 
-        Must return a Deferred instance.
-        """
-        jacks = jackd_get_infos() # returns a list a dict such as :
-        #[{'backend': 'alsa',
-        #'device': 'hw:0',
-        #'name': 'default',
-        #'nperiods': 2,
-        #'period': 1024,
-        #'pid': 7471,
-        #'rate': 44100}]
-        commands_to_start = []
-        extra_args = []
-        
-        for jack in jacks:
-            d = devices.Device(jack['name']) # name is the jackd name
-            self._add_new_device(d)
-            try:
-                # CRUCIAL ATTRIBUTES : 
-                d.add_attribute(devices.StringAttribute('name', jack['name'], 'default'))
-                d.add_attribute(devices.IntAttribute('pid', jack['pid']))  # no default, min or max
-                d.add_attribute(devices.StringAttribute('args', jack['cmdline'], ''))
-                
-            except KeyError, e:
-                log.error("no such key in _on_devices_polling : KeyError "+ e.message) # TODO
-                self.kill_and_resurrect_jackd(None, self._new_devices) # TODO: is this abusive ?
-                
-            else:
-                if jack.has_key('device'):
-                    d.add_attribute(devices.StringAttribute('device', jack['device'], ''))
-                if jack.has_key('backend'):
-                    d.add_attribute(devices.StringAttribute('backend', jack['backend'], ''))
-                if jack.has_key('nperiods'):
-                    d.add_attribute(devices.IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
-                if jack.has_key('period'):
-                    d.add_attribute(devices.IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
-                if jack.has_key('rate'):
-                    d.add_attribute(devices.IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
-                
-                commands_to_start.append(['jack_lsp']) # TODO: can we specify the server name??
-                extra_args.append(jack['name'])
-        #print "will start commands:"
-        #pprint.pprint(commands_to_start)  # TODO: add a timeout !!!
-        deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
-        # setTimeout(self, seconds, timeoutFunc=timeout, *args, **kw):
-        #warnings.simplefilter("ignore", DeprecationWarning)
-        # XXX TODO XXX TODO : this is deprecated !
-        deferred.setTimeout(2.0, self._on_timeout, commands_to_start) #, (extra_args)) # 1 second is plenty
-        # TODO: setTimeout is deprecated !!!!!
-        return deferred 
-    
-    def _on_timeout(self, commands, devices_names=None, what_is_that=None):
-        log.warning("jackd seems to be frozen !!")
-        #print "4th arg to _on_timeout:" + str(what_is_that)
-        #for d in devices_names
-        # TODO 
-        # self.kill_and_resurrect_jackd()
-        self.kill_and_resurrect_jackd(None, self._new_devices)
-        self._new_devices.clear()
-        self._on_done_devices_polling() 
- 
-    def on_attribute_change(self, attr, caller=None, event_key=None):
-        #if attr.name == 'running':
-        #    pass
-        #else:
-        raise DeviceError("It is not possible to change jackd devices attributes.")
-        # name = attr.name
-        #  val = attr.get_value() # new value
-        #  dev_name = attr.device.name
-        #  ret = None
-        #  #ret = single_command_start(command, self.on_commands_results, 'attr_change', caller) 
-        
-    def on_commands_results(self, results, commands, extra_arg=None, caller=None): 
-        """
-        Parses commands results
-        
-        extra_arg is a device name, such as /dev/video0
-        """
-        for i in range(len(results)):
-            result = results[i]
-            success, results_infos = result
-            if isinstance(results_infos, failure.Failure):
-                print "failure ::: ", results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
-            else:
-                command = commands[i]
-                stdout, stderr, signal_or_code = results_infos
-                if success:
-                    arg = None
-                    if isinstance(extra_arg, list):
-                        arg = extra_arg[i]
-                    self._handle_shell_infos_results(command, stdout, arg, caller) # this is where all the poutine happens
-                else:
-                    log.warning("failure for command %s with stderr %s and signal: %s" % (command[0], stderr, str(signal_or_code)))
-                    #print "stderr: %s" % (stderr)
-                    #print "signal is ", signal_or_code
-        self._on_done_devices_polling() #TODO add caller argument 
-    
-    def _handle_shell_infos_results(self, command, results, extra_arg=None, caller=None):
-    	"""
-        Handles results for only one command received by on_commands_results
-        
-        See on_command_results() 
-        extra_arg should be the jackd name.
-        """
-        if command[0] == 'jack_lsp':
-            try:
-                device = self._new_devices[extra_arg]
-            except KeyError:
-                pass # TODO: notify with exception
-            else:
-                splitted = results.splitlines()
-                dic = _parse_jack_lsp(splitted)
-                if not dic['running']:
-                    devs = self._new_devices
-                    self.kill_and_resurrect_jackd(caller, devs) # XXX
-                    #self._new_devices.pop(extra_arg)
-                else:
-                    #device.attributes['running'].set_value(False)
-                    #else:
-                    device.add_attribute(devices.IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
-                    device.add_attribute(devices.IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
-                    #device.attributes['running'].set_value(True)
-    
-    def kill_and_resurrect_jackd(self, caller=None, devs={}):
-        """
-        Kills all running jackd, makes sure they were killed, and then restarts them.
-        
-        sequence : 
-        1) kill_and_resurrect_jackd
-        2) _kill_kill_jackd
-        3) _resurrect_jackd
-        """
-        global _enable_kill_jackd
-
-        if _enable_kill_jackd:
-            log.info("will now kill and resurrect all jackd instances")#  + str(devices.values()))
-            for device in devs.values():
-                try:
-                    args = device.attributes["args"].get_value() # str
-                    pid = device.attributes["pid"].get_value() # int
-                except KeyError, e:
-                    log.error("impossible to kill and resurrect jackd. KeyError :" + e.message)
-                else:
-                    # first kill with SIG 15, next with 9
-                    try:
-                        os.kill(pid, 15)
-                    except OSError, e:
-                        log.error("error killing jackd "+ e.message)
-                    else:
-                        log.info("Just KILLED jackd (pid:%d)" % pid)
-                        if caller is not None:
-                            self.api.notify(caller, "Killed -15 jackd", "info")
-                    reactor.callLater(1.0, self._kill_kill_jackd, caller, args, pid)
-
-    def _kill_kill_jackd(self, caller, args, pid):
-        """
-        Kills -9 every running jackd
-        
-        (makes sure it has been killed)
-        """
-        log.info("kill -9 jackd")
-        try:
-            os.kill(pid, 9)
-        except OSError, e:
-            log.error("error killing jackd:" + e.message)
-        else:
-            if caller is not None:
-                self.api.notify(caller, "Killed -9 jackd", "info")
-        reactor.callLater(1.0, self._resurrect_jackd, args)
-
-    def _resurrect_jackd(self, str_args):
-        """
-        New version using the double fork.
-        """
-        argv = ["jackd"] # TODO: store which jackd and use the same !!!
-        for arg in str_args.strip().split():
-            argv.append(arg)
-        double_fork(argv)
-        log.info("We did restart jackd.")
-        
-        
-
-def start(api):
-    """
-    Starts this driver.
-    
-    Called from the core.
-    """
-    driver = JackDriver()
-    driver.api = api
-    devices.managers['audio'].add_driver(driver)
-    reactor.callLater(0, driver.prepare)
-
-def toggle_kill_jackd_enabled(enabled=False):
-    """
-    Enables or disables the auto kill and resurrect jackd when it seems to be frozen.
-    """
-    global _enable_kill_jackd
-    _enable_kill_jackd = enabled
-
-if __name__ == '__name__':
-    print "JACK infos:"
-    pprint.pprint(jackd_get_infos())
-
+if __name__ == "__main__":
+    poll_jackd()
