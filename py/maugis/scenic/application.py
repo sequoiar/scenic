@@ -49,7 +49,7 @@ class Config(saving.ConfigStateSaving):
     audio_source = "jackaudiosrc"
     audio_sink = "jackaudiosink"
     audio_codec = "raw"
-    audio_channels = 8
+    audio_channels = 2
     video_source = "v4l2src"
     video_device = "/dev/video0"
     video_sink = "xvimagesink"

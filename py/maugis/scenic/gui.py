@@ -66,6 +66,14 @@ gettext.textdomain(APP_NAME)
 gtk.glade.bindtextdomain(APP_NAME, os.path.join(PACKAGE_DATA, "locale"))
 gtk.glade.textdomain(APP_NAME)
 
+def _get_key_for_value(dictionnary, value):
+    """
+    Returns the key for a value in a dict.
+    @param dictionnary: dict
+    @param value: The value.
+    """
+    return dictionnary.keys()[dictionnary.values().index(value)]
+
 def _get_combobox_value(widget):
     """
     Returns the current value of a GTK ComboBox widget.
@@ -98,6 +106,15 @@ VIDEO_CODECS = {
     "h.263": "h263",
     "Theora": "theora",
     "MPEG4": "mpeg4"
+    }
+AUDIO_CODECS = {
+    "Raw": "raw",
+    "MP3": "mp3",
+    "Vorbis": "vorbis",
+    }
+AUDIO_SOURCES = {
+    "JACK": "jackaudiosrc",
+    "Test sound": "audiotestsrc"
     }
 
 def format_contact_markup(contact):
@@ -203,6 +220,12 @@ class Gui(object):
         # about tab contents:
         self.about_label_widget = self.widgets.get_widget("about_label")
         self.about_text_view_widget = self.widgets.get_widget("about_text_view")
+        # audio tab contents:
+        self.audio_source_widget = self.widgets.get_widget("audio_source")
+        self.audio_codec_widget = self.widgets.get_widget("audio_codec")
+        self.audio_jack_icon_widget = self.widgets.get_widget("audio_jack_icon")
+        self.audio_jack_state_widget = self.widgets.get_widget("audio_jack_state")
+        self.audio_numchannels_widget = self.widgets.get_widget("audio_numchannels")
             
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
@@ -531,23 +554,20 @@ class Gui(object):
         Updates the configuration with the value of each widget.
         """
         print("gathering configuration")
-        # VIDEO SIZE
+        # VIDEO SIZE:
         video_size = _get_combobox_value(self.video_size_widget)
         print ' * video_size:', video_size
         self.app.config.video_width = int(video_size.split("x")[0])
         self.app.config.video_height = int(video_size.split("x")[1])
-        
-        # DISPLAY
+        # DISPLAY:
         video_display = _get_combobox_value(self.video_display_widget)
         print ' * video_display:', video_display
         self.app.config.video_display = video_display
-        
-        # BITRATE
+        # BITRATE:
         video_bitrate = _get_combobox_value(self.video_bitrate_widget)
         print ' * video_bitrate:', video_bitrate
         self.app.config.video_bitrate = int(video_bitrate.split(" ")[0]) * 1000000
-        
-        # VIDEO SOURCE AND DEVICE
+        # VIDEO SOURCE AND DEVICE:
         video_source = _get_combobox_value(self.video_source_widget)
         if video_source == "Color bars":
             self.app.config.video_source = "videotestsrc"
@@ -555,13 +575,23 @@ class Gui(object):
             self.app.config.video_device = video_source
             self.app.config.video_source = "v4l2src"
         print ' * videosource:', video_source
-        
-        # CODEC
+        # VIDEO CODEC:
         video_codec = _get_combobox_value(self.video_codec_widget)
         self.app.config.video_codec = VIDEO_CODECS[video_codec]
         print ' * video_codec:', video_codec
         
         #TODO: get toggle fullscreen (milhouse) value
+
+        # AUDIO:
+        audio_source_readable = _get_combobox_value(self.audio_source_widget)
+        audio_codec_readable = _get_combobox_value(self.audio_codec_widget)
+        audio_numchannels = self.audio_numchannels_widget.get_value_as_int() # spinbutton
+        print " * audio_source:", audio_source_readable
+        print " * audio_codec:", audio_codec_readable
+        print " * audio_numchannels:", audio_numchannels
+        self.app.config.audio_source = AUDIO_SOURCES[audio_source_readable]
+        self.app.config.audio_codec = AUDIO_CODECS[audio_codec_readable]
+        self.app.config.audio_channels = audio_numchannels
 
     def _init_widgets_value(self):
         """
@@ -570,36 +600,30 @@ class Gui(object):
          * Sets the value of each widget according to the data stored in the configuration file.
         """
         print("Changing widgets value according to configuration.")
-        # VIDEO SIZE
+        # VIDEO SIZE:
         video_size = "%sx%s" % (self.app.config.video_width, self.app.config.video_height)
         _set_combobox_value(self.video_size_widget, video_size)
         print ' * video_size:', video_size
-        
-        # DISPLAY
+        # DISPLAY:
         video_display = self.app.config.video_display
         _set_combobox_value(self.video_display_widget, video_display)
         print ' * video_display:', video_display
-        
-        # BITRATE
+        # BITRATE:
         video_bitrate = "%s Mbps" % (int(self.app.config.video_bitrate) / 1000000)
         _set_combobox_value(self.video_bitrate_widget, video_bitrate)
         print ' * video_bitrate:', video_bitrate
-        
-        # VIDEO SOURCE AND DEVICE
+        # VIDEO SOURCE AND DEVICE:
         if self.app.config.video_source == "videotestsrc":
             video_source = "Color bars"
         elif self.app.config.video_source == "v4l2src":
             video_source = self.app.config.video_device
         _set_combobox_value(self.video_source_widget, video_source)
         print ' * videosource:', video_source
-
-        # CODEC
-        # gets key for a value
-        video_codec = VIDEO_CODECS.keys()[VIDEO_CODECS.values().index(self.app.config.video_codec)]
+        # VIDEO CODEC:
+        video_codec = _get_key_for_value(VIDEO_CODECS, self.app.config.video_codec)
         _set_combobox_value(self.video_codec_widget, video_codec)
         print ' * video_codec:', video_codec
-
-        # ADDRESSBOOK
+        # ADDRESSBOOK:
         # Init addressbook contact list:
         self.app.address_book.selected_contact = None
         self.app.address_book.current_contact_is_new = False
@@ -612,12 +636,22 @@ class Gui(object):
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
-
         # ABOUT TAB CONTENTS:
         self.about_label_widget.set_markup(ABOUT_LABEL)
         about_text_buffer = gtk.TextBuffer()
         about_text_buffer.set_text(ABOUT_TEXT_VIEW)
         self.about_text_view_widget.set_buffer(about_text_buffer)
+        # AUDIO:
+        audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
+        audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
+        audio_numchannels = self.app.config.audio_channels
+        print " * audio_source:", audio_source_readable
+        print " * audio_codec:", audio_codec
+        print " * audio_numchannels:", audio_numchannels
+        self.audio_numchannels_widget.set_value(audio_numchannels) # spinbutton
+        _set_combobox_value(self.audio_source_widget, audio_source_readable)
+        _set_combobox_value(self.audio_codec_widget, audio_codec)
+        
 
     # -------------------------- menu items -----------------
     
@@ -642,7 +676,7 @@ class Gui(object):
         """
         print menu_item, "chosen"
         print("-- Saving addressbook and configuration. -- ")
-        self.save_configuration()
+        self.app.save_configuration()
 
     # ---------------------- invitation dialogs -------------------
 
