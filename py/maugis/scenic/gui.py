@@ -93,6 +93,7 @@ class Config(saving.ConfigStateSaving):
     video_width = 640
     video_height = 480
     confirm_quit = False
+    theme = "Darklooks"
 
     def __init__(self):
         config_file = 'scenic.cfg'
@@ -164,7 +165,7 @@ class Gui(object):
         # --------------------------------------
         # TODO: move that stuff to the Application class
         self.config = Config() # XXX
-        #self.load_gtk_theme()
+        self.load_gtk_theme()
         self.kiosk_mode_on = kiosk_mode
         self.send_video_port = None # XXX
         self.recv_video_port = None # XXX
@@ -281,12 +282,13 @@ class Gui(object):
    
     # ------------------ window events and actions --------------------
 
-    #def load_gtk_theme(self, file_name=None):
+    def load_gtk_theme(self, name="Darklooks"):
+        file_name = os.path.join(PACKAGE_DATA, "themes/%s/gtk-2.0/gtkrc" % (name))
     #    if file_name is None:
     #        file_name = os.path.join(PACKAGE_DATA, "themes/Darklooks/gtk-2.0/gtkrc")
     #    # FIXME: not able to reload themes dynamically.
-    #    if os.path.exists(file_name):
-    #        os.environ["GTK2_RC_FILES"] = file_name
+        if os.path.exists(file_name):
+            os.environ["GTK2_RC_FILES"] = file_name
     #        gtk.rc_reset_styles(gtk.settings_get_default())
     #        print "loading theme", file_name
     #        gtk.rc_parse(file_name)
