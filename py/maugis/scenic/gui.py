@@ -749,8 +749,7 @@ class Gui(object):
             # XXX
             # in case of invite timeout, act as if we'd cancelled the invite ourselves
             self.on_invite_contact_cancelled()
-            if self.calling_dialog.get_property('visible'):
-                self.hide_calling_dialog("answTimeout")
+            self.hide_calling_dialog("answTimeout")
             # here we return false so that this callback is unregistered
             return False
 

@@ -141,7 +141,7 @@ class Client(object):
         if self.is_connected():
             self.sic_sender.send_message(msg)
         else:
-            msg = "Not connected. Client is None."
+            msg = "Not connected, cannot send message " + msg
             raise AssertionError(msg)
     
     def is_connected(self):
@@ -151,13 +151,13 @@ class Client(object):
         """
         @rettype: Deferred
         """
+        self.sic_sender = None
         if self.is_connected():
             d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
-            self.sic_sender = None
             self.port = None
             return defer.succeed(True)
         else:
-            msg = "Not connected. Client is None."
+            msg = "Not connected."
             return defer.succeed(True) # FIXME
             
 def connect_send_and_disconnect(host, port, mess):
