@@ -444,18 +444,16 @@ class Gui(object):
         if port == "":
             port = str(self.app.config.negotiation_port) # set port to default
         elif not port.isdigit():
-            text = _("The port number must be an integer.")
-            self.show_error_dialog(text)
+            dialogs.ErrorDialog.create("The port number must be an integer", parent=self.main_window)
             return
         elif int(port) not in range(10000, 65535):
-            text = _("The port number must be in the range of 10000-65535")
-            self.show_error_dialog(text)
+            dialogs.ErrorDialog.create("The port number must be in the range of 10000-65535", parent=self.main_window)
             return
         # Validate the address
         addr = self.contact_addr_widget.get_text()
         if len(addr) < 7:
-            text = _("The address is not valid\n\nEnter a valid address\nExample: 168.123.45.32 or example.org")
-            self.show_error_dialog(text)
+            dialogs.ErrorDialog.create("The address is not valid\n\nEnter a valid address\n" +
+                    "Example: 168.123.45.32 or example.org", parent=self.main_window)
             return
         # save it.
         when_valid_save()
@@ -539,8 +537,7 @@ class Gui(object):
                 try:
                     server.sendmail(fromaddr, toaddrs, msg)
                 except:
-                    text = _("Could not send info.\n\nCheck your internet connection.")
-                    self.show_error_dialog(text)
+                    dialogs.ErrorDialog.create("Could not send info.\n\nCheck your internet connection.", parent=self.main_window)
                 server.quit()
         
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
@@ -698,23 +695,6 @@ class Gui(object):
             self.calling_dialog.hide()
         return True
 
-    def show_error_dialog(self, text, callback=None):
-        """
-        Shows an error dialog, the old way.
-        """
-        # TODO: deprecate
-        def _response_cb(widget, response_id, callback):
-            widget.hide()
-            if callback is not None:
-                callback()
-            widget.disconnect(slot1)
-
-        self.error_label_widget.set_text(text)
-        dialog = self.error_dialog
-        dialog.set_modal(True)
-        slot1 = dialog.connect('response', _response_cb, callback)
-        dialog.show()
-    
     def show_confirm_dialog(self, text, callback=None):
         """
         Shows a confirm dialog, the old way.
@@ -769,7 +749,7 @@ class Gui(object):
         elif msg == "badAnsw":
             text = _("Invalid answer.\n\nThe answer was not valid.")
         if text is not None:
-            self.show_error_dialog(text)
+            dialogs.ErrorDialog.create(text, parent=self.main_window)
 
     def _unschedule_offerer_invite_timeout(self):
         """ Unschedules our offer invite timeout function """
