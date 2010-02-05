@@ -51,8 +51,6 @@ import gtk.glade
 import gobject
 import webbrowser
 import gettext
-import shutil
-import tempfile
 
 from twisted.internet import defer
 from twisted.internet import error
@@ -922,9 +920,8 @@ class Gui(object):
 
     def handle_ok(self):
         print("received ok. Everything has an end.")
-        if self.client is not None:
-            print('disconnecting client')
-            self.disconnect_client()
+        print('disconnecting client')
+        self.disconnect_client()
 
     def on_server_receive_command(self, message, addr):
         # XXX
