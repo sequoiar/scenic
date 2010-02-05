@@ -175,6 +175,7 @@ class Application(object):
 
         if self.streamer_manager.is_busy():
             print("Got invitation, but we are busy.")
+            send_to_port = message["please_send_to_port"]
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
         else:
             self.send_audio_details = message["audio"]
