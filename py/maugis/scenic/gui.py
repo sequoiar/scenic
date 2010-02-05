@@ -588,6 +588,9 @@ class Gui(object):
         print " * audio_numchannels:", audio_numchannels
         self.app.config.audio_source = AUDIO_SOURCES[audio_source_readable]
         self.app.config.audio_codec = AUDIO_CODECS[audio_codec_readable]
+        if audio_numchannels > 2 and self.app.config.audio_codec == "mp3":
+            dialogs.ErrorDialog.create("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels.")
+            audio_numchannels = 2
         self.app.config.audio_channels = audio_numchannels
 
     def _init_widgets_value(self):
