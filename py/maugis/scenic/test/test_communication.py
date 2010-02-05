@@ -55,7 +55,7 @@ class DummyApp(object):
         pass
     def on_client_socket_timeout(self, client):
         pass
-    def on_client_socket_error(self, client, err, msg):
+    def on_connection_error(self, client, err, msg):
         pass
     def on_client_connecting(self, client):
         pass
@@ -68,9 +68,9 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
         app = DummyApp()
         self.server = communication.Server(app, PORT)
         self.server.received_command_signal.connect(self._on_received_command)
-        self.client = communication.Client(app, PORT)
+        self.client = communication.Client(app.on_connection_error)
         d1 = self.server.start_listening()
-        d2 = self.client.connect("localhost")
+        d2 = self.client.connect("localhost", PORT)
         #print "starting server...."
         self.recv_deferred = None
         return defer.DeferredList([d1, d2])
