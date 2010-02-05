@@ -48,7 +48,6 @@ import sys
 import os
 import smtplib
 import gtk.glade
-import gobject
 import webbrowser
 import gettext
 
@@ -828,14 +827,14 @@ class Gui(object):
 
     def _unschedule_offerer_invite_timeout(self):
         """ Unschedules our offer invite timeout function """
-        if self._offerer_invite_timeout is not None:
-            gobject.source_remove(self._offerer_invite_timeout)
+        if self._offerer_invite_timeout is not None and self._offerer_invite_timeout.active():
+            self._offerer_invite_timeout.cancel()
             self._offerer_invite_timeout = None
     
     def _schedule_offerer_invite_timeout(self, data):
         """ Schedules our offer invite timeout function """
-        if self._offerer_invite_timeout is None:
-            self._offerer_invite_timeout = gobject.timeout_add(5000, self._cl_offerer_invite_timed_out, data)
+        if self._offerer_invite_timeout is None or not self._offerer_invite_timeout.active():
+            self._offerer_invite_timeout = reactor.callLater(5, self._cl_offerer_invite_timed_out, data)
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
