@@ -41,7 +41,6 @@ class ErrorDialog(object):
         @param message: str
         """
         self.deferredResult = deferred
-        parent = None
         error_dialog = gtk.MessageDialog(
             parent=parent, 
             flags=0, 
