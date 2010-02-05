@@ -297,8 +297,6 @@ class Application(object):
         msg = {
             "msg":"INVITE",
             "sid":0, 
-            "videoport": self.recv_video_port, # TODO: remove
-            "audioport": self.recv_audio_port, # TODO: remove
             "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
             "video": {
                 "codec": self.config.video_codec,
@@ -337,8 +335,6 @@ class Application(object):
         d = {
             "msg":"ACCEPT", 
             "sid":0,
-            "videoport":self.recv_video_port, 
-            "audioport":self.recv_audio_port, 
             "video": {
                 "codec": self.config.video_codec,
                 "bitrate": self.config.video_bitrate,
