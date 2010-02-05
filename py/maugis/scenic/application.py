@@ -73,9 +73,7 @@ class Config(saving.ConfigStateSaving):
 class Application(object):
     def __init__(self, kiosk_mode=False, fullscreen=False):
         self.config = Config()
-        #self.send_video_port = None
         self.recv_video_port = None
-        #self.send_audio_port = None
         self.recv_audio_port = None
         self.send_audio_details = {} # dict
         self.send_video_details = {} # dict
@@ -161,8 +159,6 @@ class Application(object):
             print("Got invitation, but we are busy.")
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
         else:
-            #self.send_video_port = message["videoport"]
-            #self.send_audio_port = message["audioport"]
             self.send_audio_details = message["audio"]
             self.send_video_details = message["video"]
             self.client.connect(addr, message["please_send_to_port"])
@@ -178,12 +174,9 @@ class Application(object):
 
     def handle_accept(self, message, addr):
         self.gui._unschedule_offerer_invite_timeout()
-        # FIXME: this doesn't make sense here
         self.got_bye = False
         # TODO: Use session to contain settings and ports
         self.gui.hide_calling_dialog("accept")
-        #self.send_video_port = message["videoport"]
-        #self.send_audio_port = message["audioport"]
         self.send_audio_details = message["audio"]
         self.send_video_details = message["video"]
         if self.streamer_manager.is_busy():
@@ -296,7 +289,7 @@ class Application(object):
                 },
             "audio": {
                 "codec": self.config.audio_codec,
-                "channels": self.config.audio_channels,
+                "numchannels": self.config.audio_channels,
                 "port": self.recv_audio_port
                 }
             }
@@ -335,7 +328,7 @@ class Application(object):
                 },
             "audio": {
                 "codec": self.config.audio_codec,
-                "channels": self.config.audio_channels,
+                "numchannels": self.config.audio_channels,
                 "port": self.recv_audio_port
                 }
             }
@@ -375,7 +368,7 @@ class Application(object):
         """
         if new_state in [process.STATE_STOPPED]:
             if not self.got_bye:
-                """ got_bye means our peer sent us a BYE, so we shouldn't send one back """
+                # got_bye means our peer sent us a BYE, so we shouldn't send one back 
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             

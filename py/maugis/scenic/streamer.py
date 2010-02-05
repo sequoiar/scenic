@@ -59,10 +59,11 @@ class StreamerManager(object):
             '--receiver', 
             '--address', str(host),
             '--videosink', config.video_sink,
-            '--audiosink', config.audio_sink,
             '--videocodec', config.video_codec,
-            '--audiocodec', config.audio_codec,
             '--videoport', str(self.app.recv_video_port),
+            '--audiosink', config.audio_sink,
+            '--numchannels', config.audio_channels,
+            '--audiocodec', config.audio_codec,
             '--audioport', str(self.app.recv_audio_port) 
             ]
         self.milhouse_send_cmd = [
@@ -70,12 +71,13 @@ class StreamerManager(object):
             '--sender', 
             '--address', str(host),
             '--videosource', config.video_source,
-            '--videocodec', self.app.send_video_details["codec"], #config.video_codec,
-            '--videobitrate', str(self.app.send_video_details["bitrate"]), #str(config.video_bitrate),
+            '--videocodec', self.app.send_video_details["codec"],
+            '--videobitrate', str(self.app.send_video_details["bitrate"]),
+            '--videoport', str(self.app.send_video_details["port"]),
             '--audiosource', config.audio_source,
-            '--audiocodec', self.app.send_audio_details["codec"], #config.audio_codec,
-            '--videoport', str(self.app.send_video_details["port"]), #str(self.app.send_video_port),
-            '--audioport', str(self.app.send_audio_details["port"])] #str(self.app.send_audio_port)]
+            '--numchannels', self.app.send_audio_details["numchannels"],
+            '--audiocodec', self.app.send_audio_details["codec"],
+            '--audioport', str(self.app.send_audio_details["port"])]
         if config.video_source == "v4l2src":
             self.milhouse_send_cmd.extend(["--videodevice", config.video_device])
         # setting up
