@@ -280,17 +280,18 @@ class Gui(object):
             print(str(e))
             raise
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
-        reactor.callLater(3, self.load_gtk_theme, "/usr/share/themes/Glossy/gtk-2.0/gtkrc")
    
     # ------------------ window events and actions --------------------
 
-    def load_gtk_theme(self, file_name="/usr/share/themes/Darklooks/gtk-2.0/gtkrc"):
+    def load_gtk_theme(self, file_name=None):
+        if file_name is None:
+            file_name = os.path.join(PACKAGE_DATA, 'themes', 'dark-gtkrc')
         # FIXME: not able to reload themes dynamically.
         if os.path.exists(file_name):
-            gtk.rc_reset_styles(gtk.settings_get_default())
+            #gtk.rc_reset_styles(gtk.settings_get_default())
             print "loading theme", file_name
             gtk.rc_parse(file_name)
-            gtk.rc_reparse_all()
+            #gtk.rc_reparse_all()
         else:
             print("File name not found: %s" % (file_name))
      
