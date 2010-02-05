@@ -164,7 +164,7 @@ class Gui(object):
         # --------------------------------------
         # TODO: move that stuff to the Application class
         self.config = Config() # XXX
-        self.load_gtk_theme()
+        #self.load_gtk_theme()
         self.kiosk_mode_on = kiosk_mode
         self.send_video_port = None # XXX
         self.recv_video_port = None # XXX
@@ -281,17 +281,18 @@ class Gui(object):
    
     # ------------------ window events and actions --------------------
 
-    def load_gtk_theme(self, file_name=None):
-        if file_name is None:
-            file_name = os.path.join(PACKAGE_DATA, 'themes', 'dark-gtkrc')
-        # FIXME: not able to reload themes dynamically.
-        if os.path.exists(file_name):
-            #gtk.rc_reset_styles(gtk.settings_get_default())
-            print "loading theme", file_name
-            gtk.rc_parse(file_name)
-            #gtk.rc_reparse_all()
-        else:
-            print("File name not found: %s" % (file_name))
+    #def load_gtk_theme(self, file_name=None):
+    #    if file_name is None:
+    #        file_name = os.path.join(PACKAGE_DATA, "themes/Darklooks/gtk-2.0/gtkrc")
+    #    # FIXME: not able to reload themes dynamically.
+    #    if os.path.exists(file_name):
+    #        os.environ["GTK2_RC_FILES"] = file_name
+    #        gtk.rc_reset_styles(gtk.settings_get_default())
+    #        print "loading theme", file_name
+    #        gtk.rc_parse(file_name)
+    #        gtk.rc_reparse_all()
+    #    else:
+    #        print("File name not found: %s" % (file_name))
      
     def toggle_fullscreen(self):
         """
