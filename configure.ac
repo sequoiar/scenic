@@ -151,6 +151,8 @@ AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
 AC_MSG_NOTICE([define CONFIG_IEEE1394])
 fi
 AC_CONFIG_FILES([Makefile
+         py/miville/runner.py
+         py/setup.py
 		 doc/Makefile
 		 doc/notes/Makefile
 		 doc/test/Makefile
