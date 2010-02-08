@@ -4,7 +4,7 @@ include $(top_srcdir)/globals.mak
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/maugis:$(PATH) trial
 
 TESTS = scenic/test/test_communication.py \
-		scenic/tests/test_x11.py \
-		scenic/tests/test_ports.py \
-		scenic/tests/test_signals.py
+		scenic/test/test_x11.py \
+		scenic/test/test_ports.py \
+		scenic/test/test_signals.py
 
