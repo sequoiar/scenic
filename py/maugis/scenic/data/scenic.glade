@@ -837,7 +837,6 @@
                                   <widget class="GtkImage" id="addContactIcon">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-add</property>
-                                    <property name="icon_size">1</property>
                                   </widget>
                                 </child>
                               </widget>
@@ -859,7 +858,6 @@
                                   <widget class="GtkImage" id="removeContactIcon">
                                     <property name="visible">True</property>
                                     <property name="stock">gtk-remove</property>
-                                    <property name="icon_size">2</property>
                                   </widget>
                                 </child>
                               </widget>
@@ -885,8 +883,7 @@
                                     <child>
                                       <widget class="GtkImage" id="contactEditButIcon">
                                         <property name="visible">True</property>
-                                        <property name="stock">gtk-justify-fill</property>
-                                        <property name="icon_size">1</property>
+                                        <property name="stock">gtk-edit</property>
                                       </widget>
                                       <packing>
                                         <property name="expand">False</property>
@@ -940,6 +937,7 @@
                                 <property name="has_focus">True</property>
                                 <property name="can_default">True</property>
                                 <property name="has_default">True</property>
+                                <property name="tooltip" translatable="yes">Click this button to make a call</property>
                                 <property name="response_id">0</property>
                                 <signal name="clicked" handler="on_invite_contact_clicked"/>
                                 <child>
@@ -947,9 +945,9 @@
                                     <property name="visible">True</property>
                                     <property name="spacing">3</property>
                                     <child>
-                                      <widget class="GtkImage" id="contactJoinButIcon">
+                                      <widget class="GtkImage" id="invite_icon">
                                         <property name="visible">True</property>
-                                        <property name="stock">gtk-go-forward</property>
+                                        <property name="stock">gtk-disconnect</property>
                                       </widget>
                                       <packing>
                                         <property name="expand">False</property>
@@ -957,9 +955,9 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkLabel" id="contactJoinButLabel">
+                                      <widget class="GtkLabel" id="invite_label">
                                         <property name="visible">True</property>
-                                        <property name="label" translatable="yes">Join this contact</property>
+                                        <property name="label" translatable="yes">Invite this contact</property>
                                         <property name="use_underline">True</property>
                                       </widget>
                                       <packing>
@@ -1621,7 +1619,7 @@ Vorbis</property>
                     <child>
                       <widget class="GtkImage" id="audio_tab_icon">
                         <property name="visible">True</property>
-                        <property name="stock">gtk-missing-image</property>
+                        <property name="stock">gtk-cdrom</property>
                         <property name="icon_size">1</property>
                       </widget>
                       <packing>
@@ -2196,6 +2194,17 @@ Vorbis</property>
               </widget>
               <packing>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="status_label">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="xpad">15</property>
+                <property name="label" translatable="yes">Welcome to Scenic</property>
+              </widget>
+              <packing>
+                <property name="position">2</property>
               </packing>
             </child>
           </widget>
