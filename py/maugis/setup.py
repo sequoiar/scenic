@@ -22,6 +22,8 @@ __version__ = configure.VERSION
 
 packages = [
     "scenic",
+    "scenic.test",
+    "scenic.devices",
     "scenic.data",
     "scenic.data.locale",
     "scenic.data.locale.en_US",
