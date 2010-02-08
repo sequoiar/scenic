@@ -49,27 +49,32 @@ void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features,
     }
 }
 
+
+static std::map<std::string, dc1394feature_t> FEATURE_MAP;
+
+void initFeatureMap()
+{
+    if (FEATURE_MAP.empty())
+    {
+        FEATURE_MAP["brightness"] = DC1394_FEATURE_BRIGHTNESS;
+        FEATURE_MAP["auto-exposure"] = DC1394_FEATURE_EXPOSURE; 
+        FEATURE_MAP["sharpness"] = DC1394_FEATURE_SHARPNESS;
+        FEATURE_MAP["whitebalance"] = DC1394_FEATURE_WHITE_BALANCE;
+        FEATURE_MAP["saturation"] = DC1394_FEATURE_SATURATION;
+        FEATURE_MAP["gamma"] = DC1394_FEATURE_GAMMA;
+        FEATURE_MAP["shutter-time"] = DC1394_FEATURE_GAMMA;
+        FEATURE_MAP["gain"] = DC1394_FEATURE_GAIN;
+    }
+}
+
 /// converts from feature name (string) to the corresponding constant
 dc1394feature_t featureNameToConstant(const std::string &featureName)
 {
-    using std::map;
-    using std::string;
+    initFeatureMap();
 
-    static map<string, dc1394feature_t> featureMap;
-    if (featureMap.empty())
-    {
-        featureMap["brightness"] = DC1394_FEATURE_BRIGHTNESS;
-        featureMap["auto-exposure"] = DC1394_FEATURE_EXPOSURE; 
-        featureMap["sharpness"] = DC1394_FEATURE_SHARPNESS;
-        featureMap["whitebalance"] = DC1394_FEATURE_WHITE_BALANCE;
-        featureMap["saturation"] = DC1394_FEATURE_SATURATION;
-        featureMap["gamma"] = DC1394_FEATURE_GAMMA;
-        featureMap["shutter-time"] = DC1394_FEATURE_GAMMA;
-        featureMap["gain"] = DC1394_FEATURE_GAIN;
-    }
-    return featureMap[featureName];
+    return FEATURE_MAP[featureName];
 }
-            
+
 std::string getFeatureValue(const dc1394featureset_t &features, dc1394feature_t feature, dc1394camera_t * camera)
 {
     // if it's auto, we don't care about the value
@@ -110,7 +115,7 @@ void printFeatureValue(const std::string &featureName, dc1394camera_t *camera)
     dc1394error_t camerr = dc1394_feature_get_all(camera, &features);
     if (camerr != DC1394_SUCCESS)
         throw std::runtime_error("libdc1394 error: this should be more verbose");
-    
+
     // special case, whitebalance has multiple values
     if (featureName == "whitebalance")
     {
@@ -125,6 +130,17 @@ void printFeatureValue(const std::string &featureName, dc1394camera_t *camera)
             << std::endl;
     }
 }
+
+void printAllFeatureValues(dc1394camera_t *camera)
+{
+    using std::map;
+    using std::string;
+    initFeatureMap();
+    for (map<string, dc1394feature_t>::iterator iter = FEATURE_MAP.begin(); 
+            iter != FEATURE_MAP.end(); ++iter)
+                printFeatureValue(iter->first, camera);
+}
+
 
 void saveSettings(const std::string &filename, dc1394camera_t * camera)
 {
@@ -280,6 +296,7 @@ int run(int argc, char *argv[])
             ("gain,G", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
             ("config,C", po::value<string>(), "path of file with configuration presets")
             ("list-features,l", po::bool_switch(), "print available features for this camera")
+            ("list-settings,L", po::bool_switch(), "print current settings for this camera")
             ("save,x", po::value<string>(), "save current camera settings to the specified filename")
             ;
 
@@ -344,6 +361,13 @@ int run(int argc, char *argv[])
             if (camerr != DC1394_SUCCESS)
                 throw std::runtime_error("libdc1394 error: could not print features");
             std::cout << std::endl;
+            cleanup(dc1394, camera, cameras);
+            return 0;
+        }
+
+        if (vm["list-settings"].as<bool>())
+        {
+            printAllFeatureValues(camera);
             cleanup(dc1394, camera, cameras);
             return 0;
         }
