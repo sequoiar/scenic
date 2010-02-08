@@ -32,10 +32,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-#ifdef CONFIG_DEBUG_LOCAL
-#define RTP_REPORTING 0
-#endif
-
 GstElement *RtpBin::rtpbin_ = 0;
 int RtpBin::sessionCount_ = 0;
 bool RtpBin::destroyed_ = false;

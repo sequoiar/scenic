@@ -22,6 +22,8 @@
 
 #ifndef _V4L2UTIL_H_
 #define _V4L2UTIL_H_
+
+#include <string>
  	
 class v4l2util
 {
@@ -33,6 +35,7 @@ class v4l2util
         static void printCaptureFormat(const std::string &device);
         static void printSupportedSizes(const std::string &device);
     public:
+        static std::string getStandard(const std::string &device);
         static bool checkStandard(const std::string &expected, 
                 std::string &actual, const std::string &device);
         static void setFormatVideo(const std::string &device, int width, int height);

@@ -33,7 +33,6 @@
 #include "milhouseLogger.h"
 #include "programOptions.h"
 
-
 namespace po = boost::program_options;
 
 void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo, bool disableAudio)
@@ -240,11 +239,7 @@ short Milhouse::run(int argc, char **argv)
 }
 
 void onExit()
-{
-#ifdef CONFIG_DEBUG_LOCAL
-    std::cerr << "Leaving Milhouse" << std::endl;
-#endif
-}
+{}
 
 
 int main(int argc, char **argv)

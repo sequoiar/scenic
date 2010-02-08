@@ -41,6 +41,8 @@
 #include "util.h"
 #include "v4l2util.h"
 
+#include <boost/lexical_cast.hpp>
+
 static int doioctl(int fd, long request, void *data, const std::string &name)
 {
     int result = ioctl(fd, request, data);
@@ -65,6 +67,48 @@ static v4l2_format getCaptureFormat(const std::string &device)
     return vfmt;
 }
 
+static std::string getDriverInfo(const std::string &device)
+{
+    int fd = -1;
+    std::string result;
+	struct v4l2_capability vcap;	/* list_cap */
+	memset(&vcap, 0, sizeof(vcap));
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device);
+
+    doioctl(fd, VIDIOC_QUERYCAP, &vcap, "VIDIOC_QUERYCAP");
+    result += "    Driver name   : " +  boost::lexical_cast<std::string>(vcap.driver) + "\n";
+    result += "    Card type     : " + boost::lexical_cast<std::string>(vcap.card) + "\n";
+    result += "    Bus info      : " + boost::lexical_cast<std::string>(vcap.bus_info) + "\n";
+    result += "    Driver version: " +  boost::lexical_cast<std::string>(vcap.version) + "\n";
+
+    close(fd);
+    return result;
+}
+
+static std::string getInputName(const std::string &device)
+{
+    std::string result;
+    int input;
+    struct v4l2_input vin;		/* list_inputs */
+    memset(&vin, 0, sizeof(vin));
+    int fd = -1;
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device);
+
+    if (doioctl(fd, VIDIOC_G_INPUT, &input, "VIDIOC_G_INPUT") == 0) 
+    {
+        result += boost::lexical_cast<std::string>(input);
+        vin.index = input;
+        if (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0)
+            result += " (" + boost::lexical_cast<std::string>(vin.name) + ")";
+    }
+
+    close(fd);
+    return result;
+}
 
 static void setCaptureFormat(const std::string &device, v4l2_format format)
 {
@@ -93,11 +137,11 @@ bool v4l2util::checkStandard(const std::string &expected,
 
     // map of format codes
     static std::map<std::string, unsigned long long> FORMATS = map_list_of
-    ("PAL", 0xfff)
-    ("NTSC", 0xf000)
-    ("SECAM", 0xff0000)
-    ("ATSC/HDTV", 0xf000000);
-    
+        ("PAL", 0xfff)
+        ("NTSC", 0xf000)
+        ("SECAM", 0xff0000)
+        ("ATSC/HDTV", 0xf000000);
+
     if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
         THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
 
@@ -117,32 +161,62 @@ bool v4l2util::checkStandard(const std::string &expected,
 }
 
 
+std::string v4l2util::getStandard(const std::string &device)
+{
+    using namespace boost::assign;
+    std::string result;
+    v4l2_std_id std;
+    int fd = -1;
+
+    // map of format codes
+    static std::map<std::string, unsigned long long> FORMATS = map_list_of
+        ("PAL", 0xfff)
+        ("NTSC", 0xf000)
+        ("SECAM", 0xff0000)
+        ("ATSC/HDTV", 0xf000000);
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
+    if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
+    {
+        std::map<std::string, unsigned long long>::const_iterator iter;
+        for (iter = FORMATS.begin(); iter != FORMATS.end() and result == ""; ++iter)
+            if (std & (*iter).second)    // true if current format matches this iter's key
+                result = (*iter).first; // save the actual standard
+    }
+
+    close(fd);
+    return result;
+}
+
+
 std::string v4l2util::field2s(int val)
 {
-        switch (val) {
+    switch (val) {
         case V4L2_FIELD_ANY:
-                return "Any";
+            return "Any";
         case V4L2_FIELD_NONE:
-                return "None";
+            return "None";
         case V4L2_FIELD_TOP:
-                return "Top";
+            return "Top";
         case V4L2_FIELD_BOTTOM:
-                return "Bottom";
+            return "Bottom";
         case V4L2_FIELD_INTERLACED:
-                return "Interlaced";
+            return "Interlaced";
         case V4L2_FIELD_SEQ_TB:
-                return "Sequential Top-Bottom";
+            return "Sequential Top-Bottom";
         case V4L2_FIELD_SEQ_BT:
-                return "Sequential Bottom-Top";
+            return "Sequential Bottom-Top";
         case V4L2_FIELD_ALTERNATE:
-                return "Alternating";
+            return "Alternating";
         case V4L2_FIELD_INTERLACED_TB:
-                return "Interlaced Top-Bottom";
+            return "Interlaced Top-Bottom";
         case V4L2_FIELD_INTERLACED_BT:
-                return "Interlaced Bottom-Top";
+            return "Interlaced Bottom-Top";
         default:
-                return "Unknown (" + num2s(val) + ")";
-        }
+            return "Unknown (" + num2s(val) + ")";
+    }
 }
 
 std::string v4l2util::num2s(unsigned num)
@@ -169,7 +243,10 @@ void v4l2util::printCaptureFormat(const std::string &device)
     v4l2_format vfmt = getCaptureFormat(device);
 
     LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
-    LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "/" << vfmt.fmt.pix.height << "\n");
+    LOG_PRINT(getDriverInfo(device));
+    LOG_PRINT("    Video input   : " << getInputName(device) << "\n");
+    LOG_PRINT("    Standard      : " << getStandard(device) << "\n");
+    LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "x" << vfmt.fmt.pix.height << "\n");
     LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
     LOG_PRINT("    Capture Type  : " << vfmt.type << "\n");
     LOG_PRINT("    Field         : " << field2s(vfmt.fmt.pix.field) << "\n");
@@ -241,11 +318,11 @@ DeviceList getDevices()
             std::string pathString(dir_itr->path().string());
             if (pathString.find("video") != std::string::npos)  // devices matching video
                 if (pathString.find("1394") == std::string::npos)   // that don't contain 1394
-                   deviceList.push_back(pathString);
+                    deviceList.push_back(pathString);
         }
-        catch ( const std::exception & ex )
+        catch (const std::exception & ex)
         {
-            THROW_CRITICAL(dir_itr->path()<< " " << ex.what());
+            THROW_CRITICAL(dir_itr->path() << " " << ex.what());
         }
     }
     return deviceList;
@@ -326,10 +403,10 @@ void v4l2util::printSupportedSizes(const std::string &device)
         v4l2_format currentFormat = getCaptureFormat(device);
 
         if (!formatsMatch(format, currentFormat))
-            LOG_PRINT("\tFormat " << size->first << "x" << size->second << " not supported\n");
+            LOG_PRINT("    Format " << size->first << "x" << size->second << " not supported\n");
         else
-            LOG_PRINT("\tFormat " << size->first << "x" << size->second << " supported\n");
-            
+            LOG_PRINT("    Format " << size->first << "x" << size->second << " supported\n");
+
     }
 
     // restore old format
