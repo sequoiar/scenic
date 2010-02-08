@@ -25,9 +25,13 @@ Uses xpyinfo, looping until no more screen/display is found. ::
 
   xdpyinfo -display :0.0
 """
+import os
 import subprocess
 from twisted.internet import threads
+from twisted.internet import utils
+from twisted.internet import defer
 from twisted.internet import reactor
+from twisted.python import procutils
 
 def _list_x11_displays(verbose):
     """
@@ -73,6 +77,37 @@ def list_x11_displays(verbose=True):
     @rettype: Deferred
     """
     return threads.deferToThread(_list_x11_displays, verbose)
+
+def xvideo_extension_is_present():
+    """
+    Checks for XV extension.
+    Result is boolean.
+    
+    @rettype: Deferred
+    """
+    def _cb(result, deferred):
+        ret = True
+        for line in result.splitlines():
+            if line.find("no adaptors present") != -1: # Hardy
+                ret = False
+            if line.find("no adaptor present") != -1: # Karmic
+                ret = False
+        deferred.callback(ret)
+        
+    def _eb(reason, deferred):
+        deferred.errback(reason)
+
+    command_name = "xvinfo"
+    try:
+        executable = procutils.which(command_name)[0] # gets the executable
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = defer.Deferred()
+    d = utils.getProcessOutput(executable, env=os.environ)
+    d.addCallback(_cb, deferred)
+    d.addErrback(_eb, deferred)
+    return deferred
+    
 
 if __name__ == "__main__":
     def _cb(result):

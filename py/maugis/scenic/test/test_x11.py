@@ -15,3 +15,6 @@ class Test_X11(unittest.TestCase):
         deferred = x11.list_x11_displays(verbose=False)
         deferred.addCallback(_cb)
         return deferred
+    
+    def test_xvideo_is_present(self):
+        return x11.xvideo_extension_is_present()
