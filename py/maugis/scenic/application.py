@@ -37,7 +37,7 @@ from scenic.streamer import StreamerManager
 from scenic import dialogs
 from scenic import ports
 from scenic import gui
-from scenic import jackd
+from scenic.devices import jackd
 from scenic.gui import _ # gettext
 
 class Config(saving.ConfigStateSaving):
