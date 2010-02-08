@@ -394,19 +394,19 @@ int run(int argc, char *argv[])
 
         if(vm.count("brightness"))
         {
-            std::cout << "Setting brightness: " << vm["brightness"].as<string>() << std::endl;
+            std::cout << "Setting brightness=" << vm["brightness"].as<string>() << std::endl;
             setFeature(camera, features, DC1394_FEATURE_BRIGHTNESS, vm["brightness"].as<string>());
         }
 
         if(vm.count("auto-exposure"))
         {
-            std::cout << "Setting auto-exposure: " << vm["auto-exposure"].as<string>() << std::endl;
+            std::cout << "Setting auto-exposure=" << vm["auto-exposure"].as<string>() << std::endl;
             setFeature(camera, features, DC1394_FEATURE_EXPOSURE, vm["auto-exposure"].as<string>());
         }
 
         if(vm.count("sharpness"))
         {
-            std::cout << "Setting sharpness: " << vm["sharpness"].as<string>() << std::endl;
+            std::cout << "Setting sharpness=" << vm["sharpness"].as<string>() << std::endl;
             setFeature(camera, features, DC1394_FEATURE_SHARPNESS, vm["sharpness"].as<string>());
         }
 
@@ -424,7 +424,7 @@ int run(int argc, char *argv[])
                 if (camerr != DC1394_SUCCESS)
                     throw std::runtime_error("libdc1394 error: this should be more verbose");
                 autoWhiteBalance = true;
-                std::cout << "Setting whitebalance: auto\n";
+                std::cout << "Setting whitebalance=auto\n";
             }
             else // need to parse tokens
             {
@@ -462,7 +462,7 @@ int run(int argc, char *argv[])
                         v_r >= MIN_WHITE_BALANCE and 
                         v_r <= MAX_WHITE_BALANCE)
                 {
-                    std::cout << "Setting white balance: Blue/U=" << u_b << ", Red/V=" << v_r << "\n";
+                    std::cout << "Setting white balance=Blue/U=" << u_b << ", Red/V=" << v_r << "\n";
                     camerr = dc1394_feature_set_mode(camera, DC1394_FEATURE_WHITE_BALANCE, DC1394_FEATURE_MODE_MANUAL);
                     camerr = dc1394_feature_whitebalance_set_value(camera, u_b, v_r);
                     if (camerr != DC1394_SUCCESS)
@@ -480,25 +480,25 @@ int run(int argc, char *argv[])
 
         if (vm.count("saturation"))
         {
-            std::cout << "Setting saturation : " << vm["saturation"].as<string>() << std::endl;
+            std::cout << "Setting saturation=" << vm["saturation"].as<string>() << std::endl;
             setFeature(camera, features, DC1394_FEATURE_SATURATION, vm["saturation"].as<string>());
         }
 
         if (vm.count("gamma"))
         {
-            std::cout << "Setting gamma: " << vm["gamma"].as<string>() << std::endl;
+            std::cout << "Setting gamma=" << vm["gamma"].as<string>() << std::endl;
             setFeature(camera, features, DC1394_FEATURE_GAMMA, vm["gamma"].as<string>());
         }
 
         if (vm.count("shutter-time"))
         {
-            std::cout << "Setting shutter-time: " << vm["shutter-time"].as<string>() << std::endl;
+            std::cout << "Setting shutter-time=" << vm["shutter-time"].as<string>() << std::endl;
             setFeature(camera, features, DC1394_FEATURE_SHUTTER, vm["shutter-time"].as<string>());
         }
 
         if (vm.count("gain"))
         {
-            std::cout << "Setting gain : " << vm["gain"].as<string>() << std::endl;
+            std::cout << "Setting gain=" << vm["gain"].as<string>() << std::endl;
             setFeature(camera, features, DC1394_FEATURE_GAIN, vm["gain"].as<string>());
         }
     }
