@@ -20,25 +20,36 @@
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Main application 
+Main application classes.
+
+Negotiation is done as follow:
+------------------------------
+ * {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
+   * Each peer ask for ports to send to, and of media settings as well. "video": [{"port":10000, "codec":"mpeg4", "bitrate":3000000}]
+ * {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
+ * {"msg":"REFUSE", "sid":0}
+ * {"msg":"CANCEL", "sid":0}
+ * {"msg":"ACK", "sid":0}
+ * {"msg":"BYE", "sid":0}
+ * {"msg":"OK", "sid":0}
+
 """
 import os
 import gtk # for dialog responses. TODO: remove
-
 from twisted.internet import defer
 from twisted.internet import error
 from twisted.internet import task
 from twisted.internet import reactor
-
 from scenic import communication
 from scenic import saving
 from scenic import process # just for constants
 from scenic.streamer import StreamerManager
 from scenic import dialogs
 from scenic import ports
-from scenic import gui
 from scenic.devices import jackd
-from scenic.gui import _ # gettext
+from scenic.devices import x11
+from scenic import gui
+_ = gui._ # gettext
 
 class Config(saving.ConfigStateSaving):
     """
@@ -57,7 +68,7 @@ class Config(saving.ConfigStateSaving):
     video_sink = "xvimagesink"
     video_codec = "mpeg4"
     video_display = ":0.0"
-    video_bitrate = "3000000"
+    video_bitrate = 3000000
     video_width = 640
     video_height = 480
     confirm_quit = False
@@ -72,7 +83,13 @@ class Config(saving.ConfigStateSaving):
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
 
+
 class Application(object):
+    """
+    Main class of the application.
+
+    The devices attributes is a very interesting dict. See the source code.
+    """
     def __init__(self, kiosk_mode=False, fullscreen=False):
         self.config = Config()
         self.recv_video_port = None
@@ -90,6 +107,20 @@ class Application(object):
         self.got_bye = False 
         # starting the GUI:
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
+        self.devices = {
+            "x11_displays": [], # list of dicts
+            #"v4l2_devices": [], # list of dicts
+            #"dc_cameras": [], # list of dicts
+            "xvideo_is_present": False, # bool
+            "jackd": None # FIXME
+            }
+        self._jackd_watch_task = task.LoopingCall(self._watch_jackd)
+        self.start_application()
+
+    def start_application(self):
+        """
+        Should be called only once.
+        """
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
         try:
             self.server.start_listening()
@@ -97,21 +128,51 @@ class Application(object):
             print("Cannot start SIC server.")
             print(str(e))
             raise
-        self._jackd_watch_task = task.LoopingCall(self._watch_jackd)
-        self._jackd_watch_task.start(10)
+        #print "will poll jackd"
+        self._jackd_watch_task.start(10, now=True)
+        #print "done polling jackd"
+        def _cb(result):
+            print("Set widgets value with config once devices have been polled.")
+            self.gui.update_devices_widgets_values()
+            self.gui.init_widgets_value()
+        deferred_list = self.poll_all_devices()
+        deferred_list.addCallback(_cb)
+        
+    def poll_all_devices(self):
+        """
+        @rettype DeferredList
+        """
+        # list X11 Displays
+        d1 = x11.list_x11_displays(verbose=True)
+        def _cb1(x11_displays):
+            self.devices["x11_displays"] = x11_displays
+        d1.addCallback(_cb1)
+        # check for XV
+        d2 = x11.xvideo_extension_is_present()
+        def _cb2(xvideo_is_present):
+            self.devices["xvideo_is_present"] = xvideo_is_present
+        d2.addCallback(_cb2)
+        # return deferredlist
+        deferred_list = defer.DeferredList([d1, d2])
+        return deferred_list
         
     def _watch_jackd(self):
+        """
+        Checks if the jackd default audio server is running.
+        Called every n seconds.
+        """
         result = False
         try:
             jack_servers = jackd.jackd_get_infos() # returns a list a dict such as :
         except jackd.JackFrozenError, e:
             print e
         else:
-            #print jack_servers
+            #print "jackd servers:", jack_servers
             if len(jack_servers) == 0:
                 result = False
             else:
                 result = True
+        self.devices["jackd"] = result
         self.gui.update_jackd_status(result)
     
     def before_shutdown(self):

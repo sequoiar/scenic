@@ -22,17 +22,6 @@
 """
 Scenic GTK GUI.
 
-Negotiation is done as follow:
-------------------------------
- * {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
-   * Each peer ask for ports to send to, and of media settings as well. "video": [{"port":10000, "codec":"mpeg4", "bitrate":3000000}]
- * {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
- * {"msg":"REFUSE", "sid":0}
- * {"msg":"CANCEL", "sid":0}
- * {"msg":"ACK", "sid":0}
- * {"msg":"BYE", "sid":0}
- * {"msg":"OK", "sid":0}
-
 Former Notes
 ------------
  * bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
@@ -78,6 +67,16 @@ def _get_combobox_value(widget):
     tree_model = widget.get_model()
     tree_model_row = tree_model[index]
     return tree_model_row[0] 
+
+def _set_combobox_choices(widget, choices=[]):
+    """
+    Sets the choices in a GTK combobox.
+    """
+    #TODO
+    tree_model = gtk.ListStore(str)
+    for choice in choices:
+        tree_model.append([choice])
+    widget.set_model(tree_model)
 
 def _set_combobox_value(widget, value=None):
     """
@@ -241,12 +240,10 @@ class Gui(object):
         self.selection.connect("changed", self.on_contact_list_changed, None) 
         self.contact_tree = gtk.ListStore(str)
         self.contact_list_widget.set_model(self.contact_tree)
-        column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
+        column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=False)
         self.contact_list_widget.append_column(column)
-        # set value of widgets.
-        self._init_widgets_value()
-
         self.main_window.show()
+        # The main app must call init_widgets_value
    
     # ------------------ window events and actions --------------------
 
@@ -588,7 +585,7 @@ class Gui(object):
             audio_numchannels = 2
         self.app.config.audio_channels = audio_numchannels
 
-    def _init_widgets_value(self):
+    def init_widgets_value(self):
         """
         Called once at startup.
          * Once the config file is read, 
@@ -604,7 +601,7 @@ class Gui(object):
         _set_combobox_value(self.video_display_widget, video_display)
         print ' * video_display:', video_display
         # BITRATE:
-        video_bitrate = "%s Mbps" % (int(self.app.config.video_bitrate) / 1000000)
+        video_bitrate = "%s Mbps" % (self.app.config.video_bitrate / 1000000)
         _set_combobox_value(self.video_bitrate_widget, video_bitrate)
         print ' * video_bitrate:', video_bitrate
         # VIDEO SOURCE AND DEVICE:
@@ -647,6 +644,11 @@ class Gui(object):
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         _set_combobox_value(self.audio_codec_widget, audio_codec)
         
+    def update_devices_widgets_values(self):
+        # X11 displays:
+        x11_displays = [display["name"] for display in self.app.devices["x11_displays"]]
+        print("Updating X11 displays with values %s" % (x11_displays))
+        _set_combobox_choices(self.video_display_widget, x11_displays)
 
     # -------------------------- menu items -----------------
     
