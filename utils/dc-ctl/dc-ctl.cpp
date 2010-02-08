@@ -45,10 +45,29 @@ void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features,
         if (value >=  MIN and value <= MAX)
             dc1394_feature_set_value(camera, feature, value);
         else
-        {
             std::cerr << "error: value must be in range [" << MIN <<  "," << MAX << "], ignoring\n"; 
-        }
     }
+}
+
+/// converts from feature name (string) to the corresponding constant
+dc1394feature_t featureNameToConstant(const std::string &featureName)
+{
+    using std::map;
+    using std::string;
+
+    static map<string, dc1394feature_t> featureMap;
+    if (featureMap.empty())
+    {
+        featureMap["brightness"] = DC1394_FEATURE_BRIGHTNESS;
+        featureMap["auto-exposure"] = DC1394_FEATURE_EXPOSURE; 
+        featureMap["sharpness"] = DC1394_FEATURE_SHARPNESS;
+        featureMap["whitebalance"] = DC1394_FEATURE_WHITE_BALANCE;
+        featureMap["saturation"] = DC1394_FEATURE_SATURATION;
+        featureMap["gamma"] = DC1394_FEATURE_GAMMA;
+        featureMap["shutter-time"] = DC1394_FEATURE_GAMMA;
+        featureMap["gain"] = DC1394_FEATURE_GAIN;
+    }
+    return featureMap[featureName];
 }
             
 std::string getFeatureValue(const dc1394featureset_t &features, dc1394feature_t feature, dc1394camera_t * camera)
@@ -68,7 +87,6 @@ std::string getFeatureValue(const dc1394featureset_t &features, dc1394feature_t 
     }
 }
 
-
 /// pass by reference because we're expecting multiple values, alternately could return a vector
 std::string getWhiteBalance(const dc1394featureset_t &features, dc1394camera_t * camera)
 {
@@ -86,6 +104,27 @@ std::string getWhiteBalance(const dc1394featureset_t &features, dc1394camera_t *
     }
 }
 
+void printFeatureValue(const std::string &featureName, dc1394camera_t *camera)
+{
+    dc1394featureset_t features;
+    dc1394error_t camerr = dc1394_feature_get_all(camera, &features);
+    if (camerr != DC1394_SUCCESS)
+        throw std::runtime_error("libdc1394 error: this should be more verbose");
+    
+    // special case, whitebalance has multiple values
+    if (featureName == "whitebalance")
+    {
+        std::cout << featureName << "=" 
+            << getWhiteBalance(features,camera)
+            << std::endl;
+    }
+    else
+    {
+        std::cout << featureName << "=" 
+            << getFeatureValue(features, featureNameToConstant(featureName), camera)
+            << std::endl;
+    }
+}
 
 void saveSettings(const std::string &filename, dc1394camera_t * camera)
 {
@@ -95,7 +134,7 @@ void saveSettings(const std::string &filename, dc1394camera_t * camera)
         throw std::runtime_error("libdc1394 error: this should be more verbose");
 
     std::cout << "Saving settings to " << filename << std::endl;
-    /// FIXME: find reference on how to safely, idiomatically open and write to a file
+
     std::ofstream fout;
     try 
     {
@@ -226,18 +265,19 @@ int run(int argc, char *argv[])
         // FIXME: right now we can only use camera 0. But we can't display the valid ranges in the help if we
         // don't know ahead of time which camera to use.
 
-        // using strings so that value can be "auto"
+        // using strings so that value can be "auto", set default value so that if they're not 
+        // given values we can print out their current values
         desc.add_options()
             ("help,h", "produce help message")
             ("camera,c", po::value<string>()->default_value("0"), "guid of camera number to use (0 is first camera on bus)")
-            ("brightness,b", po::value<string>(), featureHelp(features, DC1394_FEATURE_BRIGHTNESS).c_str())
-            ("auto-exposure,e", po::value<string>(), featureHelp(features, DC1394_FEATURE_EXPOSURE).c_str())
-            ("sharpness,s", po::value<string>(), featureHelp(features, DC1394_FEATURE_SHARPNESS).c_str())
-            ("whitebalance,w", po::value<string>(), featureHelp(features, DC1394_FEATURE_WHITE_BALANCE).c_str())
-            ("saturation,S", po::value<string>(), featureHelp(features, DC1394_FEATURE_SATURATION).c_str())
-            ("gamma,g", po::value<string>(), featureHelp(features, DC1394_FEATURE_GAMMA).c_str())
-            ("shutter-time,t", po::value<string>(), featureHelp(features, DC1394_FEATURE_SHUTTER).c_str())
-            ("gain,G", po::value<string>(), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
+            ("brightness,b", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_BRIGHTNESS).c_str())
+            ("auto-exposure,e", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_EXPOSURE).c_str())
+            ("sharpness,s", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_SHARPNESS).c_str())
+            ("whitebalance,w", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_WHITE_BALANCE).c_str())
+            ("saturation,S", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_SATURATION).c_str())
+            ("gamma,g", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_GAMMA).c_str())
+            ("shutter-time,t", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_SHUTTER).c_str())
+            ("gain,G", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
             ("config,C", po::value<string>(), "path of file with configuration presets")
             ("list-features,l", po::bool_switch(), "print available features for this camera")
             ("save,x", po::value<string>(), "save current camera settings to the specified filename")
@@ -304,6 +344,26 @@ int run(int argc, char *argv[])
             if (camerr != DC1394_SUCCESS)
                 throw std::runtime_error("libdc1394 error: could not print features");
             std::cout << std::endl;
+            cleanup(dc1394, camera, cameras);
+            return 0;
+        }
+
+        /// check if we're just printing a feature's current value
+        bool gotFeature = false;
+        for (po::variables_map::iterator iter = vm.begin(); iter != vm.end(); ++iter)
+        {
+            /// parameter has been given with no value
+            if (iter->second.value().type() == typeid(string))
+                if (iter->second.as<string>().empty())
+                {
+                    gotFeature = true;
+                    printFeatureValue(iter->first, camera);
+                }
+        }
+
+        /// this is all we're supposed to do, time to exit
+        if (gotFeature)
+        {
             cleanup(dc1394, camera, cameras);
             return 0;
         }
