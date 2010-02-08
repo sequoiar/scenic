@@ -38,20 +38,14 @@ AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
 AC_ARG_ENABLE([svn-revision], [ --enable-svn-revision ],,enable_svn_revision=no)
 AM_CONDITIONAL([SVN],test "x${enable_svn_revision}" = "xyes")
-AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=yes)
-if test "x${enable_logs}" = "xyes" ; then
-    AC_DEFINE(MAPLOGS,[],[send logs to listeners])
-fi
 
 AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
-
 
 PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0], have_glib=true, have_glib=false)
 if test "x${have_glib}" = "xfalse" ; then
     AC_MSG_ERROR([Missing libglib2.0-dev])
 fi
-
 
 #Trying to set GTK+-2.0 using pkg-config
 PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=true, have_gtk=false)
@@ -65,13 +59,11 @@ if test "x${have_gstreamer}" = "xfalse" ; then
     AC_MSG_ERROR([Missing libgstreamer0.10-dev GStreamer not found.])
 fi
 
-
 #Trying to set GSTAUDIO using pkg-config
 PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
 if test "x${have_gstreamer_audio}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
 fi
-
 
 #Trying to set GSTAPP using pkg-config
 PKG_CHECK_MODULES(GSTAPP, gstreamer-app-0.10, have_gstreamer_app=true, have_gstreamer_app=false)
@@ -79,13 +71,11 @@ if test "x${have_gstreamer_app}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
 fi
 
-
 #Trying to set JACK using pkg-config
 PKG_CHECK_MODULES(JACK, jack >= 0.99.10, have_jack=true, have_jack=false)
 if test "x${have_jack}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
 fi
-
 
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
