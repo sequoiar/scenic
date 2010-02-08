@@ -38,9 +38,10 @@ Former Notes
  * bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
 ### CONSTANTS ###
-from scenic import version
-__version__ = version.__version__
-APP_NAME = "scenic"
+from scenic import configure
+__version__ = configure.VERSION
+APP_NAME = configure.APPNAME
+PACKAGE_DATA = configure.PKGDATADIR
 
 ### MODULES IMPORTS  ###
 
@@ -50,14 +51,9 @@ import smtplib
 import gtk.glade
 import webbrowser
 import gettext
-
 from twisted.internet import reactor
-
 from scenic import process # just for constants
 from scenic import dialogs
-from scenic import data
-
-PACKAGE_DATA = os.path.dirname(data.__file__)
 
 ### MULTILINGUAL SUPPORT ###
 _ = gettext.gettext
@@ -248,8 +244,7 @@ class Gui(object):
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list_widget.append_column(column)
         # set value of widgets.
-        # TODO: get rid of those methods
-        self._init_widgets_value() # XXX
+        self._init_widgets_value()
 
         self.main_window.show()
    

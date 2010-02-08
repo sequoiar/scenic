@@ -16,8 +16,9 @@ For distribution packages::
   python setup.py bdist_egg
 """
 from setuptools import setup
+from scenic import configure
 
-__version__ = "0.1.0"
+__version__ = configure.VERSION
 
 packages = [
     "scenic",
