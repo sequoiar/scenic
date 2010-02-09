@@ -55,7 +55,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
         ReceiverSession(boost::asio::io_service& io_service, std::string &receiverBuffer) : 
             socket_(io_service), 
             receiverBuffer_(receiverBuffer),
-            timer_(io_service, millisec(500))
+            timer_(io_service, millisec(1))
     {
         // periodically check if we've been quit/interrupted, every millisecond
         timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, error));
@@ -115,8 +115,8 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
                 {
                     socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
                             boost::bind(&ReceiverSession::handle_receive_from, shared_from_this(),
-                                error,
-                                bytes_transferred));
+                                boost::asio::placeholders::error,
+                                boost::asio::placeholders::bytes_transferred));
                 }
             }
             else
