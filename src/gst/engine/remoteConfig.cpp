@@ -169,8 +169,8 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
             LOG_DEBUG("Sending caps for codec " << codec());
 
             message_ = std::string(newCapsStr);
-            enum {MESSAGE_SEND_TIMEOUT = 500};
-            g_timeout_add(MESSAGE_SEND_TIMEOUT /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), 
+            enum {MESSAGE_SEND_TIMEOUT = 500}; // ms
+            g_timeout_add(MESSAGE_SEND_TIMEOUT, static_cast<GSourceFunc>(SenderConfig::sendMessage), 
                     static_cast<gpointer>(this));
             return true;
         }
@@ -257,24 +257,16 @@ Decoder * ReceiverConfig::createAudioDecoder(Pipeline &pipeline) const
 }
 
 
+/// compares internal codec names and RTP-header codec names
 bool RemoteConfig::capsMatchCodec(const std::string &encodingName, const std::string &codec)
 {
-    if (encodingName == "VORBIS" and codec == "vorbis")
-        return true;
-    else if (encodingName == "L16" and codec == "raw")
-        return true;
-    else if (encodingName == "MPA" and codec == "mp3")
-        return true;
-    else if (encodingName == "MP4V-ES" and codec == "mpeg4")
-        return true;
-    else if (encodingName == "H264" and codec == "h264")
-        return true;
-    else if (encodingName == "H263-1998" and codec == "h263")
-        return true;
-    else if (encodingName == "THEORA" and codec == "theora")
-        return true;
-    else
-        return false;
+    return (encodingName == "VORBIS" and codec == "vorbis")
+    or (encodingName == "L16" and codec == "raw")
+    or (encodingName == "MPA" and codec == "mp3")
+    or (encodingName == "MP4V-ES" and codec == "mpeg4")
+    or (encodingName == "H264" and codec == "h264")
+    or (encodingName == "H263-1998" and codec == "h263")
+    or (encodingName == "THEORA" and codec == "theora");
 }
 
 /// This function makes sure that the caps set on this receiver by a sender, match the codec

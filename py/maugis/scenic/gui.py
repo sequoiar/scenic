@@ -330,7 +330,7 @@ class Gui(object):
             process.run_once(*command.split())
             dialogs.ErrorDialog.create("You must manually close the preview window.", parent=self.main_window)
         else:
-            print "stopping preview"
+            print "should be stopping preview"
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         tab = widget.get_nth_page(page_number)
