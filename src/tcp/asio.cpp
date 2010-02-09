@@ -41,10 +41,7 @@
 #pragma GCC diagnostic ignored "-Weffc++"
 
 using boost::asio::ip::tcp;
-//using boost::system::error_code;
 using boost::asio::buffer;
-//using boost::asio::placeholders::error;
-//using boost::asio::placeholders::bytes_transferred;
 using namespace boost::posix_time;
 
 using boost::asio::ip::tcp;
