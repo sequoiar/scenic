@@ -50,15 +50,15 @@ using namespace boost::posix_time;
 using boost::asio::ip::tcp;
 static const std::string SENTINEL = "END_BUFFER";
 
-class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_session> {
+class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
     public:
-        tcp_receiver_session(boost::asio::io_service& io_service, std::string &receiverBuffer) : 
+        ReceiverSession(boost::asio::io_service& io_service, std::string &receiverBuffer) : 
             socket_(io_service), 
             receiverBuffer_(receiverBuffer),
             timer_(io_service, millisec(1))
     {
         // periodically check if we've been quit/interrupted, every millisecond
-        timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error));
+        timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, error));
     }
 
         tcp::socket& socket()
@@ -69,8 +69,8 @@ class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_
         void start()
         {
             // shared_from_this gives shared_ptr to this, this way we cleanly avoid memory leaks
-            socket_.async_read_some(boost::asio::buffer(data_, max_length),
-                    boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
+            socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
+                    boost::bind(&ReceiverSession::handle_receive_from, shared_from_this(),
                         error,
                         bytes_transferred));
         }
@@ -80,7 +80,7 @@ class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_
             if (!err)
             {
                 timer_.expires_at(timer_.expires_at() + seconds(1));
-                timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error)); // schedule this check for later
+                timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, error)); // schedule this check for later
 
                 if (signal_handlers::signalFlag())
                 {
@@ -113,8 +113,8 @@ class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_
                 }
                 else
                 {
-                    socket_.async_read_some(boost::asio::buffer(data_, max_length),
-                            boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
+                    socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
+                            boost::bind(&ReceiverSession::handle_receive_from, shared_from_this(),
                                 error,
                                 bytes_transferred));
                 }
@@ -126,25 +126,25 @@ class tcp_receiver_session : public boost::enable_shared_from_this<tcp_receiver_
     private:
         tcp::socket socket_;
         // FIXME: is this the best way of having a buffer? see boost/asio/examples/reference_counted.cpp
-        enum { max_length = 8000 };
-        char data_[max_length];
+        enum { MAX_LENGTH = 8000 };
+        char data_[MAX_LENGTH];
         std::string &receiverBuffer_;
         boost::asio::deadline_timer timer_;
 };
 
 
-class tcp_receiver {
-    typedef boost::shared_ptr<tcp_receiver_session> session_ptr;
+class TcpReceiver {
+    typedef boost::shared_ptr<ReceiverSession> session_ptr;
 
     public:
-    tcp_receiver(boost::asio::io_service& io_service, int port, std::string &buffer) : 
+    TcpReceiver(boost::asio::io_service& io_service, int port, std::string &buffer) : 
         io_service_(io_service),
         acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
         buffer_(buffer)
     {
-        session_ptr new_session(new tcp_receiver_session(io_service_, buffer_));
+        session_ptr new_session(new ReceiverSession(io_service_, buffer_));
         acceptor_.async_accept(new_session->socket(),
-                boost::bind(&tcp_receiver::handle_accept, this, new_session,
+                boost::bind(&TcpReceiver::handle_accept, this, new_session,
                     error));
     }
 
@@ -154,9 +154,9 @@ class tcp_receiver {
         if (!error)
         {
             new_session->start();
-            new_session.reset(new tcp_receiver_session(io_service_, buffer_));
+            new_session.reset(new ReceiverSession(io_service_, buffer_));
             acceptor_.async_accept(new_session->socket(),
-                    boost::bind(&tcp_receiver::handle_accept, this, new_session,
+                    boost::bind(&TcpReceiver::handle_accept, this, new_session,
                         error));
         }
         else
@@ -172,10 +172,10 @@ class tcp_receiver {
 
 std::string asio::tcpGetBuffer(int port, int &/*id*/)
 {
-    std::string buffer("");
+    std::string buffer;
     boost::asio::io_service io_service;
 
-    tcp_receiver receiver(io_service, port, buffer);
+    TcpReceiver receiver(io_service, port, buffer);
     LOG_DEBUG("Waiting for msg on port " << port);
 
     io_service.run();
@@ -185,7 +185,7 @@ std::string asio::tcpGetBuffer(int port, int &/*id*/)
 }
 
 
-bool asio::tcpSendBuffer(const std::string &ip, int port, int /*id*/, const std::string &caps)
+bool asio::tcpSendBuffer(const std::string &ip, int port, int /*id*/, std::string caps)
 {
     using boost::lexical_cast;
 
