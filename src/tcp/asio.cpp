@@ -102,7 +102,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
 
                 receiverBuffer_ += os.str();
 
-                LOG_DEBUG("receiver buffer looks like " << receiverBuffer_);
+                // LOG_DEBUG("receiver buffer looks like " << receiverBuffer_);
                 // Got the quit message, now stop the service
                 std::string::size_type sentinelPos = receiverBuffer_.find(SENTINEL);
                 if (sentinelPos != std::string::npos)   // end of message
