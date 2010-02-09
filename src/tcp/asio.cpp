@@ -55,7 +55,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
         ReceiverSession(boost::asio::io_service& io_service, std::string &receiverBuffer) : 
             socket_(io_service), 
             receiverBuffer_(receiverBuffer),
-            timer_(io_service, millisec(1))
+            timer_(io_service, millisec(500))
     {
         // periodically check if we've been quit/interrupted, every millisecond
         timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, error));
@@ -126,7 +126,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
     private:
         tcp::socket socket_;
         // FIXME: is this the best way of having a buffer? see boost/asio/examples/reference_counted.cpp
-        enum { MAX_LENGTH = 8000 };
+        enum { MAX_LENGTH = 1500 };
         char data_[MAX_LENGTH];
         std::string &receiverBuffer_;
         boost::asio::deadline_timer timer_;
@@ -203,8 +203,11 @@ bool asio::tcpSendBuffer(const std::string &ip, int port, int /*id*/, std::strin
         tcp::socket s(io_service);
         err = s.connect(*iterator, err);
 
-        LOG_DEBUG("Sending " << caps.length() << " characters");
-        boost::asio::write(s, boost::asio::buffer(caps + SENTINEL, caps.length() + SENTINEL.length()));
+        std::string msg(caps);
+        msg += SENTINEL;
+        LOG_DEBUG("Sending " << msg.length() << " characters");
+        LOG_DEBUG(msg);
+        boost::asio::write(s, boost::asio::buffer(msg, msg.length()));
         success = true;
     }
     catch (const std::exception& e)
