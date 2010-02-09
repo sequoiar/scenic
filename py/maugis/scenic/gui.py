@@ -651,17 +651,16 @@ class Gui(object):
         the range of the numchannels box.
         """
         old_numchannels = self.audio_numchannels_widget.get_value()
-        new_max = None
+        max_channels = None
         if _get_combobox_value(self.audio_codec_widget) == "MP3":
-            new_max = 2
+            max_channels = 2
         elif _get_combobox_value(self.audio_codec_widget) == "Raw":
-            new_max = 8
+            max_channels = 8
         elif _get_combobox_value(self.audio_codec_widget) == "Vorbis":
-            new_max = 24 
-        
-        new_numchannels = min(old_numchannels, new_max) # clamp numchannels to new range
-        self.audio_numchannels_widget.set_range(1, new_max)
-        self.audio_numchannels_widget.set_value(new_numchannels)
+            max_channels = 24 
+        # update range and clamp numchannels to new range 
+        self.audio_numchannels_widget.set_range(1, max_channels)
+        self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
         self._gather_configuration()
 
         
