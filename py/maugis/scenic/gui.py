@@ -324,7 +324,8 @@ class Gui(object):
         # It can be the user that pushed the button, or it can be toggled by the software.
         print 'video_view_preview toggled', widget.get_active()
         if widget.get_active():
-            command = "milhouse --videosource v4l2src --videodevice %s --localvideo --window-title preview" % (self.app.config.video_device)
+            self._gather_configuration()
+            command = "milhouse --videosource %s --videodevice %s --localvideo --window-title preview" % (self.app.config.video_source, self.app.config.video_device)
             print "spawning", command
             process.run_once(*command.split())
             dialogs.ErrorDialog.create("You must manually close the preview window.", parent=self.main_window)
