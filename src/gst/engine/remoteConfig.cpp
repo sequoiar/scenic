@@ -172,7 +172,7 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
             LOG_DEBUG("Sending caps for codec " << codec());
 
             message_ = std::string(newCapsStr);
-            enum {MESSAGE_SEND_TIMEOUT = 5000}; // ms
+            enum {MESSAGE_SEND_TIMEOUT = 1000}; // send caps once every second
             g_timeout_add(MESSAGE_SEND_TIMEOUT, static_cast<GSourceFunc>(SenderConfig::sendMessage), 
                     static_cast<gpointer>(this));
             return true;
