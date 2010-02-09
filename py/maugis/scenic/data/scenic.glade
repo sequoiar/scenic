@@ -1540,6 +1540,7 @@ JACK</property>
                                     <property name="items" translatable="yes">Raw
 MP3
 Vorbis</property>
+                                    <signal name="changed" handler="on_audio_codec_changed"/>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>

@@ -270,7 +270,7 @@ class Gui(object):
             self.main_window.unfullscreen()
         else:
             self.main_window.fullscreen()
-    
+
     def on_window_state_event(self, widget, event):
         """
         Called when toggled fullscreen.
@@ -580,6 +580,7 @@ class Gui(object):
         print " * audio_numchannels:", audio_numchannels
         self.app.config.audio_source = AUDIO_SOURCES[audio_source_readable]
         self.app.config.audio_codec = AUDIO_CODECS[audio_codec_readable]
+        # FIXME: the interface should already prevent this case from happening
         if audio_numchannels > 2 and self.app.config.audio_codec == "mp3":
             dialogs.ErrorDialog.create("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels.")
             audio_numchannels = 2
@@ -643,6 +644,26 @@ class Gui(object):
         self.audio_numchannels_widget.set_value(audio_numchannels) # spinbutton
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         _set_combobox_value(self.audio_codec_widget, audio_codec)
+
+    def on_audio_codec_changed(self, widget):
+        """
+        Called when the user selects a different audio codec, updates
+        the range of the numchannels box.
+        """
+        old_numchannels = self.audio_numchannels_widget.get_value()
+        new_max = None
+        if _get_combobox_value(self.audio_codec_widget) == "MP3":
+            new_max = 2
+        elif _get_combobox_value(self.audio_codec_widget) == "Raw":
+            new_max = 8
+        elif _get_combobox_value(self.audio_codec_widget) == "Vorbis":
+            new_max = 24 
+        
+        new_numchannels = min(old_numchannels, new_max) # clamp numchannels to new range
+        self.audio_numchannels_widget.set_range(1, new_max)
+        self.audio_numchannels_widget.set_value(new_numchannels)
+        self._gather_configuration()
+
         
     def update_devices_widgets_values(self):
         # X11 displays:
