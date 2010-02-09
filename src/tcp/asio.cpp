@@ -41,10 +41,10 @@
 #pragma GCC diagnostic ignored "-Weffc++"
 
 using boost::asio::ip::tcp;
-using boost::system::error_code;
+//using boost::system::error_code;
 using boost::asio::buffer;
-using boost::asio::placeholders::error;
-using boost::asio::placeholders::bytes_transferred;
+//using boost::asio::placeholders::error;
+//using boost::asio::placeholders::bytes_transferred;
 using namespace boost::posix_time;
 
 using boost::asio::ip::tcp;
@@ -58,7 +58,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
             timer_(io_service, millisec(1))
     {
         // periodically check if we've been quit/interrupted, every millisecond
-        timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, error));
+        timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, boost::asio::placeholders::error));
     }
 
         tcp::socket& socket()
@@ -75,12 +75,13 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
                         boost::asio::placeholders::bytes_transferred));
         }
 
-        void handle_timer(const error_code& err)
+        void handle_timer(const boost::system::error_code& err)
         {
             if (!err)
-            {
+            { 
+                // schedule this handler to be called again in 1 second
                 timer_.expires_at(timer_.expires_at() + seconds(1));
-                timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, error)); // schedule this check for later
+                timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, boost::asio::placeholders::error));
 
                 if (signal_handlers::signalFlag())
                 {
