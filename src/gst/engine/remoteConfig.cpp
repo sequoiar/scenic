@@ -140,10 +140,7 @@ gboolean SenderConfig::sendMessage(gpointer data)
     /// FIXME: everytime a receiver starts, it should ask sender for caps, then the sender can
     /// send them.
     if (asio::tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
-    {
         LOG_INFO("Caps sent successfully");
-        return FALSE;
-    }
     return TRUE;    // try again later, in case we have a new receiver
 }
 
