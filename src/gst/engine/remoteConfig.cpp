@@ -294,5 +294,6 @@ void ReceiverConfig::receiveCaps()
     std::string msg(asio::tcpGetBuffer(capsPort(), id));
     //tassert(id == msgId_);
     caps_ = msg;
+    LOG_DEBUG("Received caps " << caps_);
 }
 

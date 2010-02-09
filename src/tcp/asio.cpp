@@ -71,8 +71,8 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
             // shared_from_this gives shared_ptr to this, this way we cleanly avoid memory leaks
             socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
                     boost::bind(&ReceiverSession::handle_receive_from, shared_from_this(),
-                        error,
-                        bytes_transferred));
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred));
         }
 
         void handle_timer(const error_code& err)
@@ -126,7 +126,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
     private:
         tcp::socket socket_;
         // FIXME: is this the best way of having a buffer? see boost/asio/examples/reference_counted.cpp
-        enum { MAX_LENGTH = 1500 };
+        enum { MAX_LENGTH = 8000 };
         char data_[MAX_LENGTH];
         std::string &receiverBuffer_;
         boost::asio::deadline_timer timer_;
@@ -145,7 +145,7 @@ class TcpReceiver {
         session_ptr new_session(new ReceiverSession(io_service_, buffer_));
         acceptor_.async_accept(new_session->socket(),
                 boost::bind(&TcpReceiver::handle_accept, this, new_session,
-                    error));
+                    boost::asio::placeholders::error));
     }
 
     void handle_accept(session_ptr new_session,
@@ -157,7 +157,7 @@ class TcpReceiver {
             new_session.reset(new ReceiverSession(io_service_, buffer_));
             acceptor_.async_accept(new_session->socket(),
                     boost::bind(&TcpReceiver::handle_accept, this, new_session,
-                        error));
+                        boost::asio::placeholders::error));
         }
         else
             LOG_WARNING("Got error" << boost::system::system_error(error).what());
