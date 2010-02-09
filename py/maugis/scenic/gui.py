@@ -661,7 +661,6 @@ class Gui(object):
         # update range and clamp numchannels to new range 
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
-        self._gather_configuration()
 
         
     def update_devices_widgets_values(self):
