@@ -74,10 +74,12 @@ def _set_combobox_choices(widget, choices=[]):
     Sets the choices in a GTK combobox.
     """
     #TODO
+    previous_value = _get_combobox_value(widget)
     tree_model = gtk.ListStore(str)
     for choice in choices:
         tree_model.append([choice])
     widget.set_model(tree_model)
+    _set_combobox_value(widget, previous_value)
 
 def _set_combobox_value(widget, value=None):
     """
@@ -346,7 +348,7 @@ class Gui(object):
         if tab_name == "contacts_tab_contents":
             self.invite_contact_widget.grab_default()
         elif tab_name == "video_tab_contents":
-            #self.app.poll_x11_devices()
+            self.app.poll_x11_devices()
             #TODO
         elif tab_name == "audio_tab_contents":
             pass
