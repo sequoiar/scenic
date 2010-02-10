@@ -25,6 +25,7 @@
 
 #include <string>
  	
+/// FIXME: this should be a real object that only opens the device ONCE
 class v4l2util
 {
     private:
@@ -34,6 +35,7 @@ class v4l2util
         static std::string colorspace2s(int val);
         static void printCaptureFormat(const std::string &device);
         static void printSupportedSizes(const std::string &device);
+        static std::string inputsPerDevice(const std::string &device);
     public:
         static std::string getStandard(const std::string &device);
         static bool checkStandard(const std::string &expected, 

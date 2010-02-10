@@ -245,6 +245,7 @@ void v4l2util::printCaptureFormat(const std::string &device)
     LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
     LOG_PRINT(getDriverInfo(device));
     LOG_PRINT("    Video input   : " << getInputName(device) << "\n");
+    LOG_PRINT("    All inputs    : " << inputsPerDevice(device) << "\n");
     LOG_PRINT("    Standard      : " << getStandard(device) << "\n");
     LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "x" << vfmt.fmt.pix.height << "\n");
     LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
@@ -513,31 +514,23 @@ void v4l2util::setInput(const std::string &device, int input)
 }
 
 
-#if 0
-std::string inputsPerDevice(int fd)
+std::string v4l2util::inputsPerDevice(const std::string &device)
 {
     struct v4l2_input vin;		/* list_inputs */
     memset(&vin, 0, sizeof(vin));
     vin.index = 0;
+    std::string result;
+    int fd = -1;
+    
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
     while (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0) 
     {
         if (vin.index)
-            printf("\n");
-        printf("\tInput   : %d\n", vin.index);
-        printf("\tName    : %s\n", vin.name);
-        printf("\tType    : 0x%08X\n", vin.type);
-        printf("\tAudioset: 0x%08X\n", vin.audioset);
-        printf("\tTuner   : 0x%08X\n", vin.tuner);
-        printf("\tStandard: 0x%016llX ( ", (unsigned long long)vin.std);
-        if (vin.std & 0x000FFF)
-            printf("PAL ");	// hack
-        if (vin.std & 0x00F000)
-            printf("NTSC ");	// hack
-        if (vin.std & 0x7F0000)
-            printf("SECAM ");	// hack
-        printf(")\n");
-        printf("\tStatus  : %d\n", vin.status);
+            result += ", ";
+        result += boost::lexical_cast<std::string>(vin.index) + " (" + boost::lexical_cast<std::string>(vin.name) + ")";
         vin.index++;
     }
+    return result;
 }
-#endif
