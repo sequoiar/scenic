@@ -253,9 +253,13 @@ class Application(object):
             return True
 
         if self.streamer_manager.is_busy():
-            print("Got invitation, but we are busy.")
             send_to_port = message["please_send_to_port"]
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
+            print("Refused invitation: we are busy.")
+        elif not self.devices["jackd_is_running"]:
+            send_to_port = message["please_send_to_port"]
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
+            dialogs.ErrorDialog.create("Refused invitation: jack is not running.", parent=self.gui.main_window)
         else:
             self.remote_audio_config = message["audio"]
             self.remote_video_config = message["video"]
@@ -386,6 +390,10 @@ class Application(object):
             }
 
     def send_invite(self):
+        if not self.devices["jackd_is_running"]:
+            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming, jackd is not running.", parent=self.gui.main_window)
+            return
+            
         self.allocate_ports()
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.gui.main_window)
