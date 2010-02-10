@@ -72,6 +72,7 @@ class Config(saving.ConfigStateSaving):
     video_bitrate = 3000000
     video_width = 640
     video_height = 480
+    video_aspect_ratio = "4:3" 
     confirm_quit = False
     theme = "Darklooks"
 
@@ -91,8 +92,8 @@ class Application(object):
         self.config = Config()
         self.recv_video_port = None
         self.recv_audio_port = None
-        self.send_audio_details = {} # dict
-        self.send_video_details = {} # dict
+        self.remote_audio_config = {} # dict
+        self.remote_video_config = {} # dict
         self.ports_allocator = ports.PortsAllocator()
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
@@ -250,8 +251,8 @@ class Application(object):
             send_to_port = message["please_send_to_port"]
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
         else:
-            self.send_audio_details = message["audio"]
-            self.send_video_details = message["video"]
+            self.remote_audio_config = message["audio"]
+            self.remote_video_config = message["video"]
             self.client.connect(addr, message["please_send_to_port"])
             # TODO: if a contact in the addressbook has this address, displays it!
             text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % addr)
@@ -267,8 +268,8 @@ class Application(object):
         self.got_bye = False
         # TODO: Use session to contain settings and ports
         self.gui.hide_calling_dialog("accept")
-        self.send_audio_details = message["audio"]
-        self.send_video_details = message["video"]
+        self.remote_audio_config = message["audio"]
+        self.remote_video_config = message["video"]
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.gui.main_window)
         else:
@@ -358,6 +359,25 @@ class Application(object):
             return d
         else: 
             return defer.succeed(True)
+    
+    def _get_local_config_message_items(self):
+        """
+        Returns a dict with keys 'audio' and 'video' to send to remote peer.
+        @rettype: dict
+        """
+        return {
+            "video": {
+                "codec": self.config.video_codec,
+                "bitrate": self.config.video_bitrate,
+                "port": self.recv_video_port,
+                "aspect_ratio": self.config.video_aspect_ratio 
+                },
+            "audio": {
+                "codec": self.config.audio_codec,
+                "numchannels": self.config.audio_channels,
+                "port": self.recv_audio_port
+                }
+            }
 
     def send_invite(self):
         self.allocate_ports()
@@ -370,17 +390,8 @@ class Application(object):
             "msg":"INVITE",
             "sid":0, 
             "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
-            "video": {
-                "codec": self.config.video_codec,
-                "bitrate": self.config.video_bitrate,
-                "port": self.recv_video_port
-                },
-            "audio": {
-                "codec": self.config.audio_codec,
-                "numchannels": self.config.audio_channels,
-                "port": self.recv_audio_port
-                }
             }
+        msg.update(self._get_local_config_message_items())
         contact = self.address_book.selected_contact
         port = contact["port"]
         ip = contact["address"]
@@ -404,21 +415,12 @@ class Application(object):
         # UPDATE config once we accept the invitie
         self.gui._gather_configuration()
         self.allocate_ports()
-        d = {
+        msg = {
             "msg":"ACCEPT", 
             "sid":0,
-            "video": {
-                "codec": self.config.video_codec,
-                "bitrate": self.config.video_bitrate,
-                "port": self.recv_video_port
-                },
-            "audio": {
-                "codec": self.config.audio_codec,
-                "numchannels": self.config.audio_channels,
-                "port": self.recv_audio_port
-                }
             }
-        self.client.send(d)
+        msg.update(self._get_local_config_message_items())
+        self.client.send(msg)
         
     def send_ack(self):
         self.client.send({"msg":"ACK", "sid":0})

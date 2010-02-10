@@ -61,6 +61,7 @@ class StreamerManager(object):
             '--videosink', config.video_sink,
             '--videocodec', config.video_codec,
             '--videoport', str(self.app.recv_video_port),
+            '--aspect-ratio', str(self.app.remote_video_config["aspect_ratio"]),
             '--audiosink', config.audio_sink,
             '--numchannels', str(config.audio_channels),
             '--audiocodec', config.audio_codec,
@@ -73,13 +74,14 @@ class StreamerManager(object):
             '--sender', 
             '--address', str(host),
             '--videosource', config.video_source,
-            '--videocodec', self.app.send_video_details["codec"],
-            '--videobitrate', str(self.app.send_video_details["bitrate"]),
-            '--videoport', str(self.app.send_video_details["port"]),
+            '--videocodec', self.app.remote_video_config["codec"],
+            '--videobitrate', str(self.app.remote_video_config["bitrate"]),
+            '--videoport', str(self.app.remote_video_config["port"]),
+            '--aspect-ratio', str(self.app.config.video_aspect_ratio),
             '--audiosource', config.audio_source,
-            '--numchannels', str(self.app.send_audio_details["numchannels"]),
-            '--audiocodec', self.app.send_audio_details["codec"],
-            '--audioport', str(self.app.send_audio_details["port"])]
+            '--numchannels', str(self.app.remote_audio_config["numchannels"]),
+            '--audiocodec', self.app.remote_audio_config["codec"],
+            '--audioport', str(self.app.remote_audio_config["port"])]
         if config.video_source == "v4l2src":
             self.milhouse_send_cmd.extend(["--videodevice", config.video_device])
         # setting up

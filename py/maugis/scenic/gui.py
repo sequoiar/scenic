@@ -204,7 +204,7 @@ class Gui(object):
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_index = None
-        # video tab drop-down menus
+        # video
         self.video_size_widget = self.widgets.get_widget("video_size")
         self.video_display_widget = self.widgets.get_widget("video_display")
         self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
@@ -212,10 +212,11 @@ class Gui(object):
         self.video_codec_widget = self.widgets.get_widget("video_codec")
         self.video_fullscreen_widget = self.widgets.get_widget("video_fullscreen")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
-        # about tab contents:
+        self.aspect_ratio_widget = self.widgets.get_widget("aspect_ratio")
+        # about 
         self.about_label_widget = self.widgets.get_widget("about_label")
         self.about_text_view_widget = self.widgets.get_widget("about_text_view")
-        # audio tab contents:
+        # audio
         self.audio_source_widget = self.widgets.get_widget("audio_source")
         self.audio_codec_widget = self.widgets.get_widget("audio_codec")
         self.audio_jack_icon_widget = self.widgets.get_widget("audio_jack_icon")
@@ -592,6 +593,10 @@ class Gui(object):
         video_codec = _get_combobox_value(self.video_codec_widget)
         self.app.config.video_codec = VIDEO_CODECS[video_codec]
         print ' * video_codec:', video_codec
+        # VIDEO ASPECT RATIO:
+        video_aspect_ratio = _get_combobox_value(self.aspect_ratio_widget)
+        self.app.config.video_aspect_ratio = video_aspect_ratio
+        print ' * video_aspect_ratio:', video_aspect_ratio
         #VIDEO FULLSCREEN
         video_fullscreen = self.video_fullscreen_widget.get_active()
         self.app.config.video_fullscreen = video_fullscreen
@@ -643,6 +648,10 @@ class Gui(object):
         video_codec = _get_key_for_value(VIDEO_CODECS, self.app.config.video_codec)
         _set_combobox_value(self.video_codec_widget, video_codec)
         print ' * video_codec:', video_codec
+        # VIDEO ASPECT RATIO:
+        video_aspect_ratio = self.app.config.video_aspect_ratio
+        _set_combobox_value(self.aspect_ratio_widget, video_aspect_ratio)
+        print ' * video_aspect_ratio:', video_aspect_ratio
         # VIDEO FULLSCREEN:
         video_fullscreen = self.app.config.video_fullscreen
         self.video_fullscreen_widget.set_active(video_fullscreen)
