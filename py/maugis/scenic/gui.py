@@ -124,7 +124,8 @@ def format_contact_markup(contact):
 ABOUT_LABEL = """<b><big>Scenic</big></b>
 Version: %s
 Copyright: SAT
-Authors: Etienne Desautels, Alexandre Quessy, Tristan Matthews, Simon Piette""" % (__version__)
+Authors: Etienne Desautels, Alexandre Quessy, Tristan Matthews, Simon Piette
+Web site: http://svn.sat.qc.ca/trac/scenic""" % (__version__)
 
 ABOUT_TEXT_VIEW = """
 Scenic is the advanced user graphical interface for the Milhouse audio/video streamer for GNU/Linux. 
