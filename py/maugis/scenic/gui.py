@@ -210,6 +210,7 @@ class Gui(object):
         self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
         self.video_source_widget = self.widgets.get_widget("video_source")
         self.video_codec_widget = self.widgets.get_widget("video_codec")
+        self.video_fullscreen_widget = self.widgets.get_widget("video_fullscreen")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
         # about tab contents:
         self.about_label_widget = self.widgets.get_widget("about_label")
@@ -246,6 +247,11 @@ class Gui(object):
         self.main_window.show()
         # The main app must call init_widgets_value
    
+    #TODO: for the preview in the drawing area   
+    #def on_expose_event(self, widget, event):
+    #    self.preview_xid = widget.window.xid
+    #    return False
+
     # ------------------ window events and actions --------------------
 
     def load_gtk_theme(self, name="Darklooks"):
@@ -554,7 +560,6 @@ class Gui(object):
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
         self.show_confirm_dialog(text, _on_confirm_result)
 
-        
     # --------------------- configuration and widgets value ------------
 
     def _gather_configuration(self):
@@ -587,8 +592,10 @@ class Gui(object):
         video_codec = _get_combobox_value(self.video_codec_widget)
         self.app.config.video_codec = VIDEO_CODECS[video_codec]
         print ' * video_codec:', video_codec
-        
-        #TODO: get toggle fullscreen (milhouse) value
+        #VIDEO FULLSCREEN
+        video_fullscreen = self.video_fullscreen_widget.get_active()
+        self.app.config.video_fullscreen = video_fullscreen
+        print ' * video_fullscreen:', video_fullscreen
 
         # AUDIO:
         audio_source_readable = _get_combobox_value(self.audio_source_widget)
@@ -636,6 +643,10 @@ class Gui(object):
         video_codec = _get_key_for_value(VIDEO_CODECS, self.app.config.video_codec)
         _set_combobox_value(self.video_codec_widget, video_codec)
         print ' * video_codec:', video_codec
+        # VIDEO FULLSCREEN:
+        video_fullscreen = self.app.config.video_fullscreen
+        self.video_fullscreen_widget.set_active(video_fullscreen)
+        print ' * video_fullscreen:', video_fullscreen
         # ADDRESSBOOK:
         # Init addressbook contact list:
         self.app.address_book.selected_contact = None

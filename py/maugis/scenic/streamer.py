@@ -66,6 +66,8 @@ class StreamerManager(object):
             '--audiocodec', config.audio_codec,
             '--audioport', str(self.app.recv_audio_port) 
             ]
+        if config.video_fullscreen:
+            self.milhouse_recv_cmd.append('--fullscreen')
         self.milhouse_send_cmd = [
             "milhouse", 
             '--sender', 

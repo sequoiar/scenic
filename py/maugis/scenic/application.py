@@ -68,6 +68,7 @@ class Config(saving.ConfigStateSaving):
     video_sink = "xvimagesink"
     video_codec = "mpeg4"
     video_display = ":0.0"
+    video_fullscreen = False
     video_bitrate = 3000000
     video_width = 640
     video_height = 480
