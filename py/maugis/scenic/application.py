@@ -114,7 +114,7 @@ class Application(object):
             "xvideo_is_present": False, # bool
             "jackd": None # FIXME
             }
-        self._jackd_watch_task = None
+        self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         reactor.callLater(0, self._start_the_application)
 
     def _start_the_application(self):
@@ -122,7 +122,6 @@ class Application(object):
         Should be called only once.
         (once Twisted's reactor is running)
         """
-        self._jackd_watch_task = task.LoopingCall(self._watch_jackd)
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
         try:
             self.server.start_listening()
@@ -130,35 +129,40 @@ class Application(object):
             print("Cannot start SIC server.")
             print(str(e))
             raise
-        #print "will poll jackd"
+        # Devices: JACKD
         self._jackd_watch_task.start(10, now=True)
-        #print "done polling jackd"
-        def _cb(result):
+        # Devices: X11 and XV
+        def _callback(result):
             print("Set widgets value with config once devices have been polled.")
             self.gui.update_devices_widgets_values()
             self.gui.init_widgets_value()
-        deferred_list = self.poll_all_devices()
-        deferred_list.addCallback(_cb)
-        
-    def poll_all_devices(self):
+        deferred_list = defer.DeferredList([
+            self.poll_x11_devices(), 
+            self.poll_xvideo_extension()
+            ])
+        deferred_list.addCallback(_callback)
+
+    def poll_x11_devices(self):
         """
-        @rettype DeferredList
+        @rettype: Deferred
         """
-        # list X11 Displays
-        d1 = x11.list_x11_displays(verbose=True)
-        def _cb1(x11_displays):
+        deferred = x11.list_x11_displays(verbose=True)
+        def _callback(x11_displays):
             self.devices["x11_displays"] = x11_displays
-        d1.addCallback(_cb1)
-        # check for XV
-        d2 = x11.xvideo_extension_is_present()
-        def _cb2(xvideo_is_present):
+        deferred.addCallback(_callback)
+        return deferred
+
+    def poll_xvideo_extension(self):
+        """
+        @rettype: Deferred
+        """
+        deferred = x11.xvideo_extension_is_present()
+        def _callback(xvideo_is_present):
             self.devices["xvideo_is_present"] = xvideo_is_present
-        d2.addCallback(_cb2)
-        # return deferredlist
-        deferred_list = defer.DeferredList([d1, d2])
-        return deferred_list
+        deferred.addCallback(_callback)
+        return deferred
         
-    def _watch_jackd(self):
+    def _poll_jackd(self):
         """
         Checks if the jackd default audio server is running.
         Called every n seconds.

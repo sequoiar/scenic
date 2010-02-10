@@ -41,6 +41,7 @@ import gtk.glade
 import webbrowser
 import gettext
 from twisted.internet import reactor
+from twisted.python.reflect import prefixedMethods
 from scenic import process # just for constants
 from scenic import dialogs
 
@@ -95,7 +96,7 @@ def _set_combobox_value(widget, value=None):
     else:
         widget.set_active(index)
 
-# GUI value to milhouse value mapping:
+# GUI legible value to milhouse value mapping:
 VIDEO_CODECS = {
     "h.264": "h264",
     "h.263": "h263",
@@ -135,36 +136,31 @@ Each peer decides what to receive from the other peer. Next, one peer can invite
 
 class Gui(object):
     """
-    Main application (arguably God) class
-     * Contains the main GTK window
+    Graphical User Interface
+     * Contains the main GTK window.
+     * And some dialogs.
     """
     def __init__(self, app, kiosk_mode=False, fullscreen=False):
-        # --------------------------------------
-        # TODO: move that stuff to the Application class
         self.app = app
         self.load_gtk_theme(self.app.config.theme)
         self.kiosk_mode_on = kiosk_mode
-        # ---------------------------------------
-        
         self._offerer_invite_timeout = None
         # Set the Glade file
         glade_file = os.path.join(PACKAGE_DATA, 'scenic.glade')
         if os.path.isfile(glade_file):
             glade_path = glade_file
         else:
-            text = _("<b><big>Could not find the Glade file?</big></b>\n\n" \
-                    "Be sure the file %s exists. Quitting.") % glade_file
+            text = _("Error : Could not find the Glade file %s. Exitting.") % (glade_file)
             print(text)
             sys.exit()
         self.widgets = gtk.glade.XML(glade_path, domain=APP_NAME)
         
         # connects callbacks to widgets automatically
-        cb = {}
-        for n in dir(self.__class__):
-            if n[0] != '_' and hasattr(self, n):
-                cb[n] = getattr(self, n)
-        self.widgets.signal_autoconnect(cb)
-
+        glade_signal_slots = {}
+        for method in prefixedMethods(self, "on_"):
+            glade_signal_slots[method.__name__] = method
+        self.widgets.signal_autoconnect(glade_signal_slots)
+        
         # Get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
         self.main_window.connect('delete-event', self.on_main_window_deleted)
@@ -381,7 +377,7 @@ class Gui(object):
         """
         Upon confirmation, the selected contact is removed.
         """
-        def on_confirm_result(result):
+        def _on_confirm_result(result):
             if result:
                 del self.app.address_book.contact_list[self.selected_contact_index]
                 self.contact_tree.remove(self.selected_contact_row)
@@ -391,7 +387,7 @@ class Gui(object):
                 self.selection.select_path(num)
         text = _("<b><big>Delete this contact from the list?</big></b>\n\nAre you sure you want "
             "to delete this contact from the list?")
-        self.show_confirm_dialog(text, on_confirm_result)
+        self.show_confirm_dialog(text, _on_confirm_result)
 
     def on_edit_contact_clicked(self, *args):
         """
@@ -414,7 +410,7 @@ class Gui(object):
         The save button in the "edit_contact" window has been clicked.
         Hides the edit_contact window and saves the changes. (new or modified contact)
         """
-        def when_valid_save():
+        def _when_valid_save():
             """ Saves contact info after it's been validated and then closes the window"""
             contact = {
                 "name": self.contact_name_widget.get_text(),
@@ -450,7 +446,7 @@ class Gui(object):
                     "Example: 168.123.45.32 or example.org", parent=self.main_window)
             return
         # save it.
-        when_valid_save()
+        _when_valid_save()
 
     # ---------------------------- Custom system tab buttons ---------------
 
@@ -464,23 +460,23 @@ class Gui(object):
         """
         Shuts down the computer.
         """
-        def on_confirm_result(result):
+        def _on_confirm_result(result):
             if result:
                 process.run_once("gksudo", "shutdown -h now")
 
         text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
-        self.show_confirm_dialog(text, on_confirm_result)
+        self.show_confirm_dialog(text, _on_confirm_result)
 
     def on_system_reboot_clicked(self, *args):
         """
         Reboots the computer.
         """
-        def on_confirm_result(result):
+        def _on_confirm_result(result):
             if result:
                 process.run_once("gksudo", "shutdown -r now")
 
         text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
-        self.show_confirm_dialog(text, on_confirm_result)
+        self.show_confirm_dialog(text, _on_confirm_result)
 
     def on_maintenance_apt_update_clicked(self, *args):
         """
@@ -495,7 +491,7 @@ class Gui(object):
          * kernel version
          * Loaded kernel modules
         """
-        def on_confirm_result(result):
+        def _on_confirm_result(result):
             milhouse_version = "unknown"
             if result:
                 msg = "--- milhouse_version ---\n" + milhouse_version + "\n"
@@ -535,7 +531,7 @@ class Gui(object):
                 server.quit()
         
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
-        self.show_confirm_dialog(text, on_confirm_result)
+        self.show_confirm_dialog(text, _on_confirm_result)
 
         
     # --------------------- configuration and widgets value ------------
@@ -663,7 +659,6 @@ class Gui(object):
         # update range and clamp numchannels to new range 
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
-
         
     def update_devices_widgets_values(self):
         # X11 displays:
