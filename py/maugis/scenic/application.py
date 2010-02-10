@@ -127,8 +127,12 @@ class Application(object):
         try:
             self.server.start_listening()
         except error.CannotListenError, e:
+            def _cb(result):
+                reactor.stop()
             print("Cannot start SIC server. %s" % (e))
-            raise
+            deferred = dialogs.ErrorDialog.create("Is another Scenic running? Cannot bind to port %d" % (self.config.negotiation_port), parent=self.gui.main_window)
+            deferred.addCallback(_cb)
+            return
         # Devices: JACKD
         self._jackd_watch_task.start(10, now=True)
         # Devices: X11 and XV
