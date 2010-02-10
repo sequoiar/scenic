@@ -80,7 +80,7 @@ GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_n
     BusMsgHandler(pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
-    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
 
     gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
