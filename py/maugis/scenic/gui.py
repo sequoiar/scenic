@@ -685,7 +685,7 @@ class Gui(object):
         Opens a web browser to the scenic web site.
         """
         print menu_item, "chosen"
-        url = "http://scenic.sat.qc.ca"
+        url = "https://svn.sat.qc.ca/trac/miville/wiki/Documentation"
         webbrowser.open(url)
 
     def on_save_menu_item_activated(self, menu_item):
