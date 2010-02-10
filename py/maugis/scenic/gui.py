@@ -218,6 +218,8 @@ class Gui(object):
         self.audio_jack_icon_widget = self.widgets.get_widget("audio_jack_icon")
         self.audio_jack_state_widget = self.widgets.get_widget("audio_jack_state")
         self.audio_numchannels_widget = self.widgets.get_widget("audio_numchannels")
+        # system tab contents:
+        self.network_admin_widget = self.widgets.get_widget("network_admin")
             
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
@@ -330,11 +332,28 @@ class Gui(object):
             print "should be stopping preview"
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
-        tab = widget.get_nth_page(page_number)
-        if tab == "localPan":
-            self.widgets.get_widget("network_admin").grab_default() # FIXME
-        elif tab == "contactPan":
-            self.widgets.get_widget("contactJoinBut").grab_default() # FIXME
+        """
+        Called when the user switches to a different page.
+        Pages names are : 
+         * contacts_tab_contents
+         * video_tab_contents
+         * audio_tab_contents
+         * system_tab_contents
+         * about_tab_contents
+        """
+        tab_widget = widget.get_nth_page(page_number)
+        tab_name = tab_widget.get_name()
+        if tab_name == "contacts_tab_contents":
+            self.invite_contact_widget.grab_default()
+        elif tab_name == "video_tab_contents":
+            #self.app.poll_x11_devices()
+            #TODO
+        elif tab_name == "audio_tab_contents":
+            pass
+        elif tab_name == "system_tab_contents":
+            self.network_admin_widget.grab_default()
+        elif tab_name == "about_tab_contents":
+            pass
 
     def on_contact_list_changed(self, *args):
         tree_list, self.selected_contact_row = args[0].get_selected()

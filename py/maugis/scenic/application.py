@@ -144,6 +144,7 @@ class Application(object):
         deferred = x11.list_x11_displays(verbose=False)
         def _callback(x11_displays):
             self.devices["x11_displays"] = x11_displays
+            print("displays: %s" % (x11_displays))
             self.gui.update_x11_devices()
         deferred.addCallback(_callback)
         return deferred
