@@ -193,6 +193,7 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
     switch (event->keyval) {
         case GDK_f:
         case GDK_F:
+        case GDK_Escape:
             context->toggleFullscreen(widget);
             break;
         case GDK_x:
@@ -246,10 +247,14 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             LOG_DEBUG("Resetting GL texture position");
             resetGLparams();
             break;
-        case GDK_Q:
-            // Quit application, this quits the main loop
+        case GDK_q:
+            // Quit application on ctrl-q, this quits the main loop
             // (if there is one)
-            context->VideoSink::pipeline_.quit();
+            if (event->state & GDK_CONTROL_MASK)
+            {
+                LOG_INFO("Ctrl-Q key pressed, quitting.");
+                context->VideoSink::pipeline_.quit();
+            }
             break;
         default:
             LOG_DEBUG("unknown keypress " << event->keyval);
