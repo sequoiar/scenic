@@ -167,7 +167,7 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
         else if (capsOutOfBand_) 
         { 
             LOG_DEBUG("Sending caps for codec " << codec());
-
+            /// FIXME: don't use timeout_add, just call tcpSendBuffer which will schedule itself repeatedly
             message_ = std::string(newCapsStr);
             enum {MESSAGE_SEND_TIMEOUT = 1000}; // send caps once every second
             g_timeout_add(MESSAGE_SEND_TIMEOUT, static_cast<GSourceFunc>(SenderConfig::sendMessage), 

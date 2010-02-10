@@ -96,7 +96,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
                 LOG_DEBUG("received " << bytes_transferred << " bytes");
 
                 std::ostringstream os;
-                os.write(data_, bytes_transferred);
+                os.write(data_.data(), bytes_transferred);
 
                 receiverBuffer_ += os.str();
 
@@ -125,7 +125,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
         tcp::socket socket_;
         // FIXME: is this the best way of having a buffer? see boost/asio/examples/reference_counted.cpp
         enum { MAX_LENGTH = 8000 };
-        char data_[MAX_LENGTH];
+        boost::array<char, MAX_LENGTH> data_;
         std::string &receiverBuffer_;
         boost::asio::deadline_timer timer_;
 };
