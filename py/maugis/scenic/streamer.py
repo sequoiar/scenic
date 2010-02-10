@@ -69,6 +69,8 @@ class StreamerManager(object):
             ]
         if config.video_fullscreen:
             self.milhouse_recv_cmd.append('--fullscreen')
+        if config.video_deinterlace:
+            self.milhouse_recv_cmd.append('--deinterlace')
         self.milhouse_send_cmd = [
             "milhouse", 
             '--sender', 

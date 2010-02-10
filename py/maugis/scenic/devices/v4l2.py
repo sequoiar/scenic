@@ -19,75 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 
-def _parse_v4l2_ctl_all(lines):
-    """
-    Parses the output of the `v4l2-ctl --all -d /dev/video0` command
-    @rettype: dict
-    """
-    results = dict()
-    category = None
-    sub_category = None
-    pixel_format_is_done = False
-    #print lines
-    for line in lines:
-        is_value = False
-        if line.startswith('\t\t'):
-            pass # subvalue
-        elif line.startswith('\t'):
-            # value ------------------------------
-            splitted = line.strip('\t').split(':')
-            try:
-                key = splitted[0].strip()
-                value = splitted[1].strip()
-                is_value = True
-                #print "key is "+key+" and value is "+ value
-            except IndexError:
-                pass
-            if is_value:
-                if key == 'Driver name':
-                    results['driver'] = value
-                elif key == 'card type':
-                    results['card'] = value
-                elif key == 'Pixel Format' and not pixel_format_is_done:
-                    results['pixel format'] = value
-                    pixel_format_is_done= True
-                elif key == 'Width/Height' and category.startswith('Format Video Capture'):
-                    #log.debug("parsing width/height in category %s/%s" % (category, sub_category))
-                    dimen = value.split('/')
-                    results['width'] = dimen[0]
-                    results['height'] = dimen[1]
-                #elif key == 'Video input':
-                #    results['input'] = value.split('(')[1].split(')')[0] # 0 (Composite0)
-                    # log.debug('V4L2 input: ' + results['input'])
-                    # TODO : possibilities are Composite0, Composite1, 
-                # norm
-            elif category == "Video Standard":
-                norm = line.strip('\t').strip('\n')
-                if norm.startswith('NTSC-'):
-                    norm = 'ntsc'
-                elif norm.startswith('PAL-'):
-                    norm = 'pal'
-                elif norm.startswith('SECAM-'):
-                    norm = 'secam'
-                results['norm'] = norm
-        elif line.find("Video input") == 0:
-            try:
-                results['input'] = line.split('(')[1].split(')')[0]
-            except IndexError, e:
-                # Sometimes you don't have parentheses for Video input: x
-                log.error("_parse_v4l2_ctl_all: " + e.message)
-                results['input'] = line.split(':')[1].strip()
-            # log.debug('V4L2 input: ' + results['input'])
-            # TODO : possibilities are Composite0, Composite1, 
-        elif line.find(":") > 0:
-            try:
-                category = line.split(':')[0]
-            except IndexError:
-                pass
-        elif line.find("Video Standard") == 0:
-            category  = "Video Standard"
-    #pprint.pprint(results)
-    return results
+"""
+V4L2 Video Devices Utilities.
+"""
+
+from twisted.internet import reactor
+from twisted.internet import utils
 
 def _parse_v4l2_ctl_list_inputs(lines):
     """
@@ -116,15 +53,58 @@ def list_v4l2_cameras():
     @rettype Deferred
     """
     commands.append(['v4l2-ctl', '--all', '-d', name])
-    commands.append(['v4l2-ctl', '--list-inputs', '-d', name])
+    raise Exception()
+    
+def list_v4l2_inputs(device_name="/dev/video0"):
+    """
+    Calls the Deferred with the list of the names of inputs as argument. 
+    The input numbers are the positions in the list.
+    @param device_name: String like /dev/video0 or /dev/video1, etc.
+    @rettype: Deferred
+    """
+    def _cb(lines, deferred):
+        ret = _parse_v4l2_ctl_list_inputs(lines)
+        deferred.callback(ret)
+        
+    def _eb(reason, deferred):
+        deferred.errback(reason)
+    
+    command_name = "v4l2-ctl"
+    args = ['--list-inputs', '-d', name])
+    try:
+        executable = procutils.which(command_name)[0] # gets the executable
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = defer.Deferred()
+    d = utils.getProcessOutput(executable, args=args, env=os.environ)
+    d.addCallback(_cb, deferred)
+    d.addErrback(_eb, deferred)
+    return deferred
     
 def set_v4l2_video_standard(device_name="/dev/video0", norm="ntsc"):
     """
-    Norm
+    Sets norm for a V4L2 device.
+    @rettype: Deferred
     """
-    command = ['v4l2-ctl', '--set-standard=%s' % (norm), '-d', device_name]
-    raise NotImplementedError('to do')
+    command_name = "v4l2-ctl"
+    args = ['--set-standard=%s' % (norm), '-d', device_name]
+    try:
+        executable = procutils.which(command_name)[0]
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
+    return deferred
 
 def set_v4l2_input_number(device_name="/dev/video0", input_number=0):
-    command = ['v4l2-ctl', '--set-input=' + str(input_number), '-d', device_name]
-    raise NotImplementedError('to do')
+    """
+    Sets input number for a V4L2 device.
+    @rettype: Deferred
+    """
+    command_name = "v4l2-ctl"
+    args = ['--set-input=' + str(input_number), '-d', device_name]
+    try:
+        executable = procutils.which(command_name)[0]
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
+    return deferred

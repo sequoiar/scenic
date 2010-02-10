@@ -65,6 +65,9 @@ class Config(saving.ConfigStateSaving):
     audio_channels = 2
     video_source = "v4l2src"
     video_device = "/dev/video0"
+    video_deinterlace = False
+    video_input = 0
+    video_standard = "ntsc"
     video_sink = "xvimagesink"
     video_codec = "mpeg4"
     video_display = ":0.0"

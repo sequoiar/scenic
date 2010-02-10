@@ -212,6 +212,7 @@ class Gui(object):
         self.video_codec_widget = self.widgets.get_widget("video_codec")
         self.video_fullscreen_widget = self.widgets.get_widget("video_fullscreen")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
+        self.video_deinterlace_widget = self.widgets.get_widget("video_deinterlace")
         self.aspect_ratio_widget = self.widgets.get_widget("aspect_ratio")
         # about 
         self.about_label_widget = self.widgets.get_widget("about_label")
@@ -601,6 +602,11 @@ class Gui(object):
         video_fullscreen = self.video_fullscreen_widget.get_active()
         self.app.config.video_fullscreen = video_fullscreen
         print ' * video_fullscreen:', video_fullscreen
+        #VIDEO DEINTERLACE
+        video_deinterlace = self.video_deinterlace_widget.get_active()
+        self.app.config.video_deinterlace = video_deinterlace
+        print ' * video_deinterlace:', video_deinterlace
+        
 
         # AUDIO:
         audio_source_readable = _get_combobox_value(self.audio_source_widget)
@@ -656,6 +662,10 @@ class Gui(object):
         video_fullscreen = self.app.config.video_fullscreen
         self.video_fullscreen_widget.set_active(video_fullscreen)
         print ' * video_fullscreen:', video_fullscreen
+        # VIDEO DEINTERLACE:
+        video_deinterlace = self.app.config.video_deinterlace
+        self.video_deinterlace_widget.set_active(video_deinterlace)
+        print ' * video_deinterlace:', video_deinterlace
         # ADDRESSBOOK:
         # Init addressbook contact list:
         self.app.address_book.selected_contact = None
