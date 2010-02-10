@@ -50,7 +50,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("fullscreen,f", po::bool_switch(), "display video in fullscreen")
             ("shared-video-id,B", po::value<string>()->default_value("shared_memory"), "name for shared video buffer output")
             ("deinterlace,o", po::bool_switch(), "deinterlace video on reception")
-            ("videodevice,d", po::value<string>()->default_value(""), "name of video device (/dev/video0,/dev/video1)")
+            ("videodevice,d", po::value<string>()->default_value("/dev/video0"), "name of video device (/dev/video0,/dev/video1)")
             ("audiodevice,q", po::value<string>()->default_value(""), "name of audio device (hw:0,hw:2,plughw:0,plughw:2)")
             ("videolocation,L", po::value<string>()->default_value(""), "video filename")
             ("audiolocation,K", po::value<string>()->default_value(""), "audio filename")
@@ -93,6 +93,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("flip-video", po::value<string>()->default_value("none"), "flip video (none, clockwise, rotate-180, "
              "counterclockwise, horizontal-flip, vertical-flip, upper-left-diagonal, upper-right-diagonal)")
             ("display", po::value<string>(), "set DISPLAY environment variable")
+            ("v4l2-standard", po::value<string>(), "set v4l2 standard (NTSC,PAL)")
             ;
 
         descriptionInitialized = true;

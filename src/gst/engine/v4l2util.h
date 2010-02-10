@@ -43,6 +43,7 @@ class v4l2util
         static unsigned captureHeight(const std::string &device);
         static void listCameras();
         static bool isInterlaced(const std::string &device);
+        static void setStandard(const std::string &device, const std::string &standard);
 };
 
 #endif // _V4L2UTIL_H_

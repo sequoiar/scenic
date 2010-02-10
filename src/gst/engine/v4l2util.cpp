@@ -451,3 +451,34 @@ void v4l2util::setFormatVideo(const std::string &device, int width, int height)
 #undef FmtHeight
 }
 
+
+void v4l2util::setStandard(const std::string &device, const std::string &standard)
+{
+    int fd = -1;
+	v4l2_std_id std;		/* get_std/set_std */
+	struct v4l2_standard vs;	/* list_std */
+	memset(&vs, 0, sizeof(vs));
+
+    if (standard == "NTSC")
+        std = V4L2_STD_NTSC;
+    else if (standard == "PAL")
+		std = V4L2_STD_PAL;
+    else
+    {
+        LOG_WARNING("Unsupported standard " << standard << ", using NTSC instead");
+        std = V4L2_STD_NTSC;
+    }
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
+    if (std & (1ULL << 63)) 
+    {
+        vs.index = std & 0xffff;
+        if (ioctl(fd, VIDIOC_ENUMSTD, &vs) >= 0)
+            std = vs.id;
+    }
+    if (doioctl(fd, VIDIOC_S_STD, &std, "VIDIOC_S_STD") == 0)
+        LOG_DEBUG("Standard set to " << std::hex << (unsigned long long)std << std::dec);
+}
+

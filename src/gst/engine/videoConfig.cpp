@@ -148,7 +148,10 @@ int VideoSourceConfig::listCameras()
     return 0;
 }
 
-
+void VideoSourceConfig::setStandard(const std::string &device, const std::string &standard)
+{
+    v4l2util::setStandard(device, standard);
+}
 
 std::string VideoSourceConfig::pixelAspectRatio() const
 {

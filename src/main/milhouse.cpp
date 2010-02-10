@@ -199,6 +199,12 @@ short Milhouse::run(int argc, char **argv)
     if (options["list-cameras"].as<bool>())
         return VideoSourceConfig::listCameras();
 
+    if (options.count("v4l2-standard"))
+    {
+        VideoSourceConfig::setStandard(options["videodevice"].as<std::string>(), options["v4l2-standard"].as<std::string>());
+        return 0;
+    }
+
     if (options["localvideo"].as<bool>()) 
     {
         runAsLocal(options);
