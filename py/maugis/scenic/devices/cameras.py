@@ -1,10 +1,162 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# 
+# Scenic
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Scenic is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Scenic. If not, see <http://www.gnu.org/licenses/>.
+"""
+Tools to lists avaliable cameras.
+"""
 import os
 import pprint
 from twisted.internet import utils
 from twisted.internet import defer
 from twisted.python import procutils
 from twisted.internet import reactor
+
+def _parse_milhouse_list_cameras(text):
+    """
+    Parses the output of `milhouse --list-cameras`
+    Returns a list of dict with keys "name", "size", "standard", "is_interlaced", "input", "inputs", "supported_sizes"
+    For now, considers only V4L2 cameras.
+    @rettype: list
+    """
+    v4l2_devices = []
+    currently_parsed_is_v4l2 = False
+    for line in text.splitlines():
+        line = line.strip()
+        #print(line)
+        if line.startswith('Video4Linux Camera'):
+            name = line.split()[2].split(":")[0]
+            #print "  name", name
+            v4l2_devices.append({
+                "name": name,
+                "size": None,
+                "standard": None,
+                "is_interlaced": False,
+                "input": None,
+                "inputs": [],
+                "supported_sizes": []
+                })
+            currently_parsed_is_v4l2 = True
+        elif line.startswith("DC1394 Camera"):
+            currently_parsed_is_v4l2 = False
+        # TODO: know if currently parsed is a V4L 1
+        elif currently_parsed_is_v4l2:
+            try:
+                value = line.split(":")[1].strip()
+            except IndexError:
+                value = None
+            if line.startswith("Standard"):
+                try:
+                    standard = line.split(":")[1].strip()
+                except IndexError:
+                    standard = None
+                else:
+                    if standard == '':
+                        standard = None
+                    v4l2_devices[-1]["standard"] = standard
+                    #print "  standard:", standard
+            elif line.startswith("Width/Height"):
+                size = value
+                v4l2_devices[-1]["size"] = size
+                #print "  size:", size
+            elif line.startswith("Format"):
+                size = value
+                v4l2_devices[-1]["supported_sizes"].append(size)
+                #print "  adding supported_size:", size
+            elif line.startswith("Field"):
+                is_interlaced = value == "Interlaced"
+                v4l2_devices[-1]["is_interlaced"] = is_interlaced
+                #print "  interlaced:", is_interlaced
+            elif line.startswith("Video input"):
+                try:
+                    input = value.split(" ")[0]
+                except IndexError:
+                    input = None
+                else:
+                    # now, let's try to get an int out of it:
+                    try:
+                        print input
+                        input = int(input)
+                    except ValueError, e:
+                        print e
+                        input = None
+                    except TypeError, e:
+                        print e
+                        input = None
+                    else:
+                        #print "  input", input
+                        v4l2_devices[-1]["input"] = input
+            elif line.startswith("All inputs"):
+                for each in value.split(","):
+                    tokens = each.strip().split(" ")
+                    try:
+                        num = tokens[0]
+                        name = tokens[1].replace("(", "").replace(")", "")
+                    except IndexError:
+                        pass
+                    else:
+                        # actually, we assume their number is sequential, starting at 0
+                        v4l2_devices[-1]["inputs"].append(name)
+    #print v4l2_devices
+    return v4l2_devices
+
+def list_cameras():
+    """
+    Calls the Deferred with the list of device names as argument. 
+    
+    @rettype: Deferred
+    """
+    def _cb(text, deferred):
+        #print text
+        ret = _parse_milhouse_list_cameras(text)
+        deferred.callback(ret)
+        
+    def _eb(reason, deferred):
+        deferred.errback(reason)
+        print(reason)
+    
+    command_name = "milhouse"
+    args = ['--list-cameras']
+    try:
+        executable = procutils.which(command_name)[0] # gets the executable
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = defer.Deferred()
+    d = utils.getProcessOutput(executable, args=args, env=os.environ)
+    d.addCallback(_cb, deferred)
+    d.addErrback(_eb, deferred)
+    return deferred
+
+
+#if __name__ == "__main__":
+#    def _go():
+#        def _cb(result):
+#            reactor.stop()
+#        def _eb(reason):
+#            print(reason)
+#            return None
+#        d = list_cameras()
+#        d.addCallback(_cb)
+#
+#    reactor.callLater(0, _go)
+#    reactor.run()
+
 
 TESTDATA = """Ver:0.3.6
 INFO:Built on Feb 10 2010 at 10:17:35
@@ -75,112 +227,6 @@ Video4Linux Camera /dev/video0:
     Format 176x120 supported
 Exitting Milhouse
 """
-
-
-def _parse_milhouse_list_cameras(text):
-    v4l2_devices = []
-    currently_parsed_is_v4l2 = False
-    for line in text.splitlines():
-        line = line.strip()
-        print("line:" + line)
-        if line.startswith('Video4Linux Camera'):
-            name = line.split()[2].split(":")[0]
-            #print "  name", name
-            v4l2_devices.append({
-                "name": name,
-                "size": None,
-                "standard": None,
-                "is_interlaced": False,
-                "input": None,
-                "supported_sizes": []
-                })
-            currently_parsed_is_v4l2 = True
-        elif line.startswith("DC1394 Camera"):
-            currently_parsed_is_v4l2 = False
-        # TODO: know if currently parsed is a V4L 1
-        elif currently_parsed_is_v4l2:
-            if line.startswith("Standard"):
-                try:
-                    standard = line.split(":")[1].strip()
-                except IndexError:
-                    standard = None
-                else:
-                    if standard == '':
-                        standard = None
-                    v4l2_devices[-1]["standard"] = standard
-                    print "  standard:", standard
-            elif line.startswith("Width/Height"):
-                size = line.split(":")[1].strip()
-                v4l2_devices[-1]["size"] = size
-                print "  size:", size
-            elif line.startswith("Format"):
-                if line.find("not") == -1:
-                    pass
-                else:
-                    size = line.split(" ")[1].strip()
-                    v4l2_devices[-1]["supported_sizes"].append(size)
-                    print "  adding supported_size:", size
-            elif line.startswith("Field"):
-                is_interlaced = line.split(":")[1].strip() == "Interlaced"
-                v4l2_devices[-1]["is_interlaced"] = is_interlaced
-                print "  interlaced:", is_interlaced
-            elif line.startswith("Video input"):
-                try:
-                    input = line.split(":")[1].split(" ")[0]
-                except IndexError:
-                    input = None
-                else:
-                    try:
-                        input = int(input)
-                    except ValueError:
-                        input = None
-                    else:
-                        print "  input", input
-                        v4l2_devices[-1]["input"] = input
-    #print v4l2_devices
-    return v4l2_devices
-
-def list_cameras():
-    """
-    Calls the Deferred with the list of device names as argument. 
-    
-    @rettype: Deferred
-    """
-    def _cb(text, deferred):
-        print text
-        ret = _parse_milhouse_list_cameras(text)
-        deferred.callback(ret)
-        
-    def _eb(reason, deferred):
-        deferred.errback(reason)
-        print(reason)
-    
-    command_name = "milhouse"
-    args = ['--list-cameras']
-    try:
-        executable = procutils.which(command_name)[0] # gets the executable
-    except IndexError:
-        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
-    deferred = defer.Deferred()
-    d = utils.getProcessOutput(executable, args=args, env=os.environ)
-    d.addCallback(_cb, deferred)
-    d.addErrback(_eb, deferred)
-    return deferred
-
-
-#if __name__ == "__main__":
-#    def _go():
-#        def _cb(result):
-#            reactor.stop()
-#        def _eb(reason):
-#            print(reason)
-#            return None
-#        d = list_cameras()
-#        d.addCallback(_cb)
-#
-#    reactor.callLater(0, _go)
-#    reactor.run()
-
 
 if __name__ == "__main__":
     pprint.pprint(_parse_milhouse_list_cameras(TESTDATA))

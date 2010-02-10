@@ -6,5 +6,6 @@ TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/maugis:$(PATH) trial
 TESTS = scenic/test/test_communication.py \
 		scenic/test/test_x11.py \
 		scenic/test/test_ports.py \
+		scenic/test/test_cameras.py \
 		scenic/test/test_signals.py
 

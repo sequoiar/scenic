@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Unit tests for the X11 function.
+""" 
+from twisted.trial import unittest
+from scenic.devices import cameras
+
+class Test_Cameras(unittest.TestCase):
+    def test_list_cameras(self):
+        def _cb(result):
+            #print result
+            return result
+        deferred = cameras.list_cameras()
+        deferred.addCallback(_cb)
+        return deferred
