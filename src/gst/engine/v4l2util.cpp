@@ -403,9 +403,7 @@ void v4l2util::printSupportedSizes(const std::string &device)
         setCaptureFormat(device, format);
         v4l2_format currentFormat = getCaptureFormat(device);
 
-        if (!formatsMatch(format, currentFormat))
-            LOG_PRINT("    Format " << size->first << "x" << size->second << " not supported\n");
-        else
+        if (formatsMatch(format, currentFormat))
             LOG_PRINT("    Format " << size->first << "x" << size->second << " supported\n");
 
     }
