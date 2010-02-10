@@ -52,30 +52,21 @@ static int doioctl(int fd, long request, void *data, const std::string &name)
     return result;
 }
 
-static v4l2_format getCaptureFormat(const std::string &device)
+static v4l2_format getCaptureFormat(int fd)
 {
     v4l2_format vfmt;
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    int fd = -1;
-
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device);
 
     doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT");
 
-    close(fd);
     return vfmt;
 }
 
-static std::string getDriverInfo(const std::string &device)
+static std::string getDriverInfo(int fd)
 {
-    int fd = -1;
     std::string result;
 	struct v4l2_capability vcap;	/* list_cap */
 	memset(&vcap, 0, sizeof(vcap));
-
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device);
 
     doioctl(fd, VIDIOC_QUERYCAP, &vcap, "VIDIOC_QUERYCAP");
     result += "    Driver name   : " +  boost::lexical_cast<std::string>(vcap.driver) + "\n";
@@ -83,20 +74,15 @@ static std::string getDriverInfo(const std::string &device)
     result += "    Bus info      : " + boost::lexical_cast<std::string>(vcap.bus_info) + "\n";
     result += "    Driver version: " +  boost::lexical_cast<std::string>(vcap.version) + "\n";
 
-    close(fd);
     return result;
 }
 
-static std::string getInputName(const std::string &device)
+static std::string getInputName(int fd)
 {
     std::string result;
     int input;
     struct v4l2_input vin;		/* list_inputs */
     memset(&vin, 0, sizeof(vin));
-    int fd = -1;
-
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device);
 
     if (doioctl(fd, VIDIOC_G_INPUT, &input, "VIDIOC_G_INPUT") == 0) 
     {
@@ -106,21 +92,13 @@ static std::string getInputName(const std::string &device)
             result += " (" + boost::lexical_cast<std::string>(vin.name) + ")";
     }
 
-    close(fd);
     return result;
 }
 
-static void setCaptureFormat(const std::string &device, v4l2_format format)
+static void setCaptureFormat(int fd, v4l2_format format)
 {
     format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    int fd = -1;
-
-    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
-        THROW_ERROR("Failed to open " << device);
-
     doioctl(fd, VIDIOC_S_FMT, &format, "VIDIOC_S_FMT");
-
-    close(fd);
 }
 
 /// Check current standard of v4l2 device to make sure it is what we expect
@@ -161,12 +139,25 @@ bool v4l2util::checkStandard(const std::string &expected,
 }
 
 
+/// public version
 std::string v4l2util::getStandard(const std::string &device)
+{
+    int fd = -1;
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
+    std::string result = getStandard(fd);
+
+    close(fd);
+    return result;
+}
+
+std::string v4l2util::getStandard(int fd)
 {
     using namespace boost::assign;
     std::string result;
     v4l2_std_id std;
-    int fd = -1;
 
     // map of format codes
     static std::map<std::string, unsigned long long> FORMATS = map_list_of
@@ -175,9 +166,6 @@ std::string v4l2util::getStandard(const std::string &device)
         ("SECAM", 0xff0000)
         ("ATSC/HDTV", 0xf000000);
 
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
     {
         std::map<std::string, unsigned long long>::const_iterator iter;
@@ -185,8 +173,6 @@ std::string v4l2util::getStandard(const std::string &device)
             if (std & (*iter).second)    // true if current format matches this iter's key
                 result = (*iter).first; // save the actual standard
     }
-
-    close(fd);
     return result;
 }
 
@@ -240,13 +226,16 @@ std::string v4l2util::fcc2s(unsigned int val)
 
 void v4l2util::printCaptureFormat(const std::string &device)
 {
-    v4l2_format vfmt = getCaptureFormat(device);
+    int fd = -1;
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+    v4l2_format vfmt = getCaptureFormat(fd);
 
     LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
-    LOG_PRINT(getDriverInfo(device));
-    LOG_PRINT("    Video input   : " << getInputName(device) << "\n");
-    LOG_PRINT("    All inputs    : " << inputsPerDevice(device) << "\n");
-    LOG_PRINT("    Standard      : " << getStandard(device) << "\n");
+    LOG_PRINT(getDriverInfo(fd));
+    LOG_PRINT("    Video input   : " << getInputName(fd) << "\n");
+    LOG_PRINT("    All inputs    : " << inputsPerDevice(fd) << "\n");
+    LOG_PRINT("    Standard      : " << getStandard(fd) << "\n");
     LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "x" << vfmt.fmt.pix.height << "\n");
     LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
     LOG_PRINT("    Capture Type  : " << vfmt.type << "\n");
@@ -254,20 +243,29 @@ void v4l2util::printCaptureFormat(const std::string &device)
     LOG_PRINT("    Bytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
     LOG_PRINT("    Size Image    : " << vfmt.fmt.pix.sizeimage << "\n");
     LOG_PRINT("    Colorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
-    printSupportedSizes(device);
+    printSupportedSizes(fd);
+    close(fd);
 }
 
 
 unsigned v4l2util::captureWidth(const std::string &device)
 {
-    v4l2_format vfmt = getCaptureFormat(device);
+    int fd = -1;
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+    v4l2_format vfmt = getCaptureFormat(fd);
+    close(fd);
     return vfmt.fmt.pix.width;
 }
 
 
 unsigned v4l2util::captureHeight(const std::string &device)
 {
-    v4l2_format vfmt = getCaptureFormat(device);
+    int fd = -1;
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+    v4l2_format vfmt = getCaptureFormat(fd);
+    close(fd);
     return vfmt.fmt.pix.height;
 }
 
@@ -352,7 +350,11 @@ bool v4l2util::isInterlaced(const std::string &device)
 {
     if (fileExists(device))
     {
-        v4l2_format vfmt = getCaptureFormat(device);
+        int fd = -1;
+        if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+            THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+        v4l2_format vfmt = getCaptureFormat(fd);
+        close(fd);
         if (vfmt.fmt.pix.field == V4L2_FIELD_INTERLACED)
             return true;
         else
@@ -368,13 +370,13 @@ bool v4l2util::isInterlaced(const std::string &device)
 
 bool formatsMatch(const v4l2_format &lhs, const v4l2_format &rhs)
 {
-    return lhs.type                 == rhs.type                 and
-        lhs.fmt.pix.width           == rhs.fmt.pix.width        and
-        lhs.fmt.pix.height          == rhs.fmt.pix.height;
+    return lhs.type == rhs.type and
+        lhs.fmt.pix.width == rhs.fmt.pix.width and
+        lhs.fmt.pix.height == rhs.fmt.pix.height;
 }
 
 
-void v4l2util::printSupportedSizes(const std::string &device)
+void v4l2util::printSupportedSizes(int fd)
 {
     typedef std::pair<int, int> Size;
     typedef std::vector< Size > SizeList;
@@ -389,7 +391,7 @@ void v4l2util::printSupportedSizes(const std::string &device)
     sizes.push_back(Size(320, 240));    
     sizes.push_back(Size(176, 120));    // QCIF
 
-    v4l2_format format = getCaptureFormat(device);
+    v4l2_format format = getCaptureFormat(fd);
 
     // save values
     int oldWidth = format.fmt.pix.width;
@@ -400,8 +402,8 @@ void v4l2util::printSupportedSizes(const std::string &device)
         // change some fields
         format.fmt.pix.width = size->first;
         format.fmt.pix.height = size->second;
-        setCaptureFormat(device, format);
-        v4l2_format currentFormat = getCaptureFormat(device);
+        setCaptureFormat(fd, format);
+        v4l2_format currentFormat = getCaptureFormat(fd);
 
         if (formatsMatch(format, currentFormat))
             LOG_PRINT("    Format " << size->first << "x" << size->second << " supported\n");
@@ -411,8 +413,8 @@ void v4l2util::printSupportedSizes(const std::string &device)
     // restore old format
     format.fmt.pix.width = oldWidth;
     format.fmt.pix.height = oldHeight;
-    setCaptureFormat(device, format);
-    v4l2_format currentFormat = getCaptureFormat(device);
+    setCaptureFormat(fd, format);
+    v4l2_format currentFormat = getCaptureFormat(fd);
     if (!formatsMatch(format, currentFormat))
         LOG_WARNING("Format " << oldWidth << "x" << oldHeight << "not reverted correctly");
 }
@@ -423,7 +425,10 @@ void v4l2util::setFormatVideo(const std::string &device, int width, int height)
 #define FmtHeight		(1L<<1)
     unsigned int set_fmts = 0;
     int fd = -1;
-    v4l2_format vfmt = getCaptureFormat(device);
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
+    v4l2_format vfmt = getCaptureFormat(fd);
     vfmt.fmt.pix.width = width;
     set_fmts |= FmtWidth;
     vfmt.fmt.pix.height = height;
@@ -431,10 +436,6 @@ void v4l2util::setFormatVideo(const std::string &device, int width, int height)
     struct v4l2_format in_vfmt;
 
     in_vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-
 
     if (doioctl(fd, VIDIOC_G_FMT, &in_vfmt, "VIDIOC_G_FMT") == 0) 
     {
@@ -455,15 +456,15 @@ void v4l2util::setStandard(const std::string &device, const std::string &standar
 {
     int fd = -1;
     bool usingDefault;
-	v4l2_std_id std;		/* get_std/set_std */
-	struct v4l2_standard vs;	/* list_std */
+    v4l2_std_id std;		/* get_std/set_std */
+    struct v4l2_standard vs;	/* list_std */
     const std::string DEFAULT_STANDARD("NTSC");
-	memset(&vs, 0, sizeof(vs));
+    memset(&vs, 0, sizeof(vs));
 
     if (standard == "NTSC")
         std = V4L2_STD_NTSC;
     else if (standard == "PAL")
-		std = V4L2_STD_PAL;
+        std = V4L2_STD_PAL;
     else
     {
         LOG_WARNING("Unsupported standard " << standard << ", using NTSC instead");
@@ -488,13 +489,14 @@ void v4l2util::setStandard(const std::string &device, const std::string &standar
             LOG_INFO("Standard set to " << DEFAULT_STANDARD);
         LOG_DEBUG("Standard set to " << std::hex << (unsigned long long)std << std::dec);
     }
+    close(fd);
 }
 
 void v4l2util::setInput(const std::string &device, int input)
 {
     int fd = -1;
-	struct v4l2_input vin;		/* list_inputs */
-	memset(&vin, 0, sizeof(vin));
+    struct v4l2_input vin;		/* list_inputs */
+    memset(&vin, 0, sizeof(vin));
 
     if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
         THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
@@ -509,19 +511,16 @@ void v4l2util::setInput(const std::string &device, int input)
     }
     else
         THROW_ERROR("Failed to set input to " << input << " on device " << device);
+    close(fd);
 }
 
 
-std::string v4l2util::inputsPerDevice(const std::string &device)
+std::string v4l2util::inputsPerDevice(int fd)
 {
     struct v4l2_input vin;		/* list_inputs */
     memset(&vin, 0, sizeof(vin));
     vin.index = 0;
     std::string result;
-    int fd = -1;
-    
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
 
     while (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0) 
     {

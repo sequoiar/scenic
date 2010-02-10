@@ -34,8 +34,9 @@ class v4l2util
         static std::string num2s(unsigned num);
         static std::string colorspace2s(int val);
         static void printCaptureFormat(const std::string &device);
-        static void printSupportedSizes(const std::string &device);
-        static std::string inputsPerDevice(const std::string &device);
+        static std::string inputsPerDevice(int fd);
+        static std::string getStandard(int fd);
+        static void printSupportedSizes(int fd);
     public:
         static std::string getStandard(const std::string &device);
         static bool checkStandard(const std::string &expected, 
