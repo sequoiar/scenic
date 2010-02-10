@@ -455,8 +455,10 @@ void v4l2util::setFormatVideo(const std::string &device, int width, int height)
 void v4l2util::setStandard(const std::string &device, const std::string &standard)
 {
     int fd = -1;
+    bool usingDefault;
 	v4l2_std_id std;		/* get_std/set_std */
 	struct v4l2_standard vs;	/* list_std */
+    const std::string DEFAULT_STANDARD("NTSC");
 	memset(&vs, 0, sizeof(vs));
 
     if (standard == "NTSC")
@@ -467,6 +469,7 @@ void v4l2util::setStandard(const std::string &device, const std::string &standar
     {
         LOG_WARNING("Unsupported standard " << standard << ", using NTSC instead");
         std = V4L2_STD_NTSC;
+        usingDefault = true;
     }
 
     if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
@@ -479,6 +482,12 @@ void v4l2util::setStandard(const std::string &device, const std::string &standar
             std = vs.id;
     }
     if (doioctl(fd, VIDIOC_S_STD, &std, "VIDIOC_S_STD") == 0)
+    {
+        if (not usingDefault)
+            LOG_INFO("Standard set to " << standard);
+        else 
+            LOG_INFO("Standard set to " << DEFAULT_STANDARD);
         LOG_DEBUG("Standard set to " << std::hex << (unsigned long long)std << std::dec);
+    }
 }
 

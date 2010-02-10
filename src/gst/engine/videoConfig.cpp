@@ -148,8 +148,10 @@ int VideoSourceConfig::listCameras()
     return 0;
 }
 
-void VideoSourceConfig::setStandard(const std::string &device, const std::string &standard)
+void VideoSourceConfig::setStandard(const std::string &device, std::string standard)
 {
+    // convert to upper case
+    std::transform(standard.begin(), standard.end(), standard.begin(), ::toupper);
     v4l2util::setStandard(device, standard);
 }
 

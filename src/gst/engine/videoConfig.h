@@ -62,7 +62,7 @@ class VideoSourceConfig
         /// used by other classes, that's why it's not a member function
         static std::string calculatePixelAspectRatio(int width, int height, 
                 const std::string &pictureAspectRatio);
-        static void setStandard(const std::string &videoDevice, const std::string &videoStandard);
+        static void setStandard(const std::string &videoDevice, std::string videoStandard);
 
     private:
         const std::string source_;
