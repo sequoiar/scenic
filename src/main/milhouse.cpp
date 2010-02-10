@@ -204,6 +204,12 @@ short Milhouse::run(int argc, char **argv)
         VideoSourceConfig::setStandard(options["videodevice"].as<std::string>(), options["v4l2-standard"].as<std::string>());
         return 0;
     }
+    
+    if (options.count("v4l2-input"))
+    {
+        VideoSourceConfig::setInput(options["videodevice"].as<std::string>(), options["v4l2-input"].as<int>());
+        return 0;
+    }
 
     if (options["localvideo"].as<bool>()) 
     {

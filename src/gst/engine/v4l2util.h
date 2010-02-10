@@ -44,6 +44,7 @@ class v4l2util
         static void listCameras();
         static bool isInterlaced(const std::string &device);
         static void setStandard(const std::string &device, const std::string &standard);
+        static void setInput(const std::string &device, int input);
 };
 
 #endif // _V4L2UTIL_H_

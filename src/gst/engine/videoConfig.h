@@ -63,6 +63,7 @@ class VideoSourceConfig
         static std::string calculatePixelAspectRatio(int width, int height, 
                 const std::string &pictureAspectRatio);
         static void setStandard(const std::string &videoDevice, std::string videoStandard);
+        static void setInput(const std::string &videoDevice, int input);
 
     private:
         const std::string source_;

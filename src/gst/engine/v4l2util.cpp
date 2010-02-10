@@ -491,3 +491,24 @@ void v4l2util::setStandard(const std::string &device, const std::string &standar
     }
 }
 
+void v4l2util::setInput(const std::string &device, int input)
+{
+    int fd = -1;
+	struct v4l2_input vin;		/* list_inputs */
+	memset(&vin, 0, sizeof(vin));
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
+    if (doioctl(fd, VIDIOC_S_INPUT, &input, "VIDIOC_S_INPUT") == 0) 
+    {
+        vin.index = input;
+        std::string longName;
+        if (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0)
+            longName = " (" + boost::lexical_cast<std::string>(vin.name) + ")";
+        LOG_INFO("Video input set to " << input << longName);
+    }
+    else
+        THROW_ERROR("Failed to set input to " << input << " on device " << device);
+}
+

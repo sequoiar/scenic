@@ -155,6 +155,12 @@ void VideoSourceConfig::setStandard(const std::string &device, std::string stand
     v4l2util::setStandard(device, standard);
 }
 
+
+void VideoSourceConfig::setInput(const std::string &device, int input)
+{
+    v4l2util::setInput(device, input);
+}
+
 std::string VideoSourceConfig::pixelAspectRatio() const
 {
     return calculatePixelAspectRatio(captureWidth_, captureHeight_, pictureAspectRatio_);

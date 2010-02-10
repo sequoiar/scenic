@@ -94,6 +94,7 @@ po::options_description ProgramOptions::createDefaultOptions()
              "counterclockwise, horizontal-flip, vertical-flip, upper-left-diagonal, upper-right-diagonal)")
             ("display", po::value<string>(), "set DISPLAY environment variable")
             ("v4l2-standard", po::value<string>(), "set v4l2 standard (NTSC,PAL)")
+            ("v4l2-input", po::value<int>(), "set v4l2 input (0,1,2)")
             ;
 
         descriptionInitialized = true;
