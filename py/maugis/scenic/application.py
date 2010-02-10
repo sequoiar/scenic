@@ -114,13 +114,15 @@ class Application(object):
             "xvideo_is_present": False, # bool
             "jackd": None # FIXME
             }
-        self._jackd_watch_task = task.LoopingCall(self._watch_jackd)
-        self.start_application()
+        self._jackd_watch_task = None
+        reactor.callLater(0, self._start_the_application)
 
-    def start_application(self):
+    def _start_the_application(self):
         """
         Should be called only once.
+        (once Twisted's reactor is running)
         """
+        self._jackd_watch_task = task.LoopingCall(self._watch_jackd)
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
         try:
             self.server.start_listening()
