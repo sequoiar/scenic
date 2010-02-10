@@ -117,8 +117,14 @@ def jackd_get_infos():
                 s = f.read()
                 f.close()
             except IOError, e:
-                msg = "Jackd seems frozen. IOError : (trying to read %s) %s" % (filename , e)
-                raise JackFrozenError(msg)
+                try:
+                    os.kill(pid, 0) # test if process is running
+                except OSError, e:
+                    pass # it is running
+                    ret.pop()
+                else:
+                    msg = "Jackd seems frozen. IOError : (trying to read %s) PID %s is still alive. %s" % (filename, pid, e)
+                    raise JackFrozenError(msg)
             else:
                 _state_printed_jackd_is_frozen = False 
                 # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'

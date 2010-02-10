@@ -160,7 +160,7 @@ class Application(object):
         def _callback(xvideo_is_present):
             self.devices["xvideo_is_present"] = xvideo_is_present
             if not xvideo_is_present:
-                msg = _("It seems like the xvideo extension is not present our your X11 display ! It might be impossible to do video streaming.")
+                msg = _("It seems like the xvideo extension is not present our your X11 display ! It is likely to be impossible to receive a video stream.")
                 print(msg)
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
         deferred.addCallback(_callback)
@@ -171,21 +171,24 @@ class Application(object):
         Checks if the jackd default audio server is running.
         Called every n seconds.
         """
-        result = False
+        is_running = False
+        is_zombie = False
         try:
             jack_servers = jackd.jackd_get_infos() # returns a list a dict such as :
         except jackd.JackFrozenError, e:
             print e 
             msg = _("The JACK audio server seems frozen ! \n%s") % (e)
-            dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+            print(msg)
+            #dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+            is_zombie = True
         else:
             #print "jackd servers:", jack_servers
             if len(jack_servers) == 0:
-                result = False
+                is_running = False
             else:
-                result = True
-        self.devices["jackd_is_running"] = result
-        self.gui.update_jackd_status(result)
+                is_running = True
+        self.devices["jackd_is_running"] = is_running
+        self.gui.update_jackd_status(is_running, is_zombie)
     
     def before_shutdown(self):
         """

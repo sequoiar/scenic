@@ -832,11 +832,15 @@ class Gui(object):
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
-    def update_jackd_status(self, is_running=False):
-        if is_running:
-            self.audio_jack_state_widget.set_markup("<b>Running</b>")
-            self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_YES, 4)
+    def update_jackd_status(self, is_running=False, is_zombie=False):
+        if is_zombie:
+                self.audio_jack_state_widget.set_markup("<b>Zombie</b>")
+                self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_DIALOG_WARNING, 4)
         else:
-            self.audio_jack_state_widget.set_markup("<b>Not running</b>")
-            self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
+            if is_running:
+                self.audio_jack_state_widget.set_markup("<b>Running</b>")
+                self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_YES, 4)
+            else:
+                self.audio_jack_state_widget.set_markup("<b>Stopped</b>")
+                self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
             
