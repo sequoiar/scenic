@@ -584,11 +584,12 @@ class Gui(object):
             audio_numchannels = 2
         self.app.config.audio_channels = audio_numchannels
 
-    def init_widgets_value(self):
+    def update_widgets_with_saved_config(self):
         """
         Called once at startup.
-         * Once the config file is read, 
+         * Once the config file is read, and the devices have been polled
          * Sets the value of each widget according to the data stored in the configuration file.
+        It could be called again, once another config file has been read.
         """
         print("Changing widgets value according to configuration.")
         # VIDEO SIZE:
@@ -660,8 +661,10 @@ class Gui(object):
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
         
-    def update_devices_widgets_values(self):
-        # X11 displays:
+    def update_x11_devices(self):
+        """
+        Called once Application.poll_x11_devices has been run
+        """
         x11_displays = [display["name"] for display in self.app.devices["x11_displays"]]
         print("Updating X11 displays with values %s" % (x11_displays))
         _set_combobox_choices(self.video_display_widget, x11_displays)

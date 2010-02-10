@@ -76,13 +76,9 @@ class Config(saving.ConfigStateSaving):
 
     def __init__(self):
         config_file = 'scenic.cfg'
-        if os.path.isfile('/etc/' + config_file):
-            config_dir = '/etc'
-        else:
-            config_dir = os.environ['HOME'] + '/.scenic'
+        config_dir = os.environ['HOME'] + '/.scenic'
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
-
 
 class Application(object):
     """
@@ -112,7 +108,7 @@ class Application(object):
             #"v4l2_devices": [], # list of dicts
             #"dc_cameras": [], # list of dicts
             "xvideo_is_present": False, # bool
-            "jackd": None # FIXME
+            "jackd_is_running": False 
             }
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         reactor.callLater(0, self._start_the_application)
@@ -126,16 +122,13 @@ class Application(object):
         try:
             self.server.start_listening()
         except error.CannotListenError, e:
-            print("Cannot start SIC server.")
-            print(str(e))
+            print("Cannot start SIC server. %s" % (e))
             raise
         # Devices: JACKD
         self._jackd_watch_task.start(10, now=True)
         # Devices: X11 and XV
         def _callback(result):
-            print("Set widgets value with config once devices have been polled.")
-            self.gui.update_devices_widgets_values()
-            self.gui.init_widgets_value()
+            self.gui.update_widgets_with_saved_config()
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_xvideo_extension()
@@ -144,21 +137,29 @@ class Application(object):
 
     def poll_x11_devices(self):
         """
+        Called once at startup, and then the GUI can call it.
+        Calls gui.update_x11_devices.
         @rettype: Deferred
         """
-        deferred = x11.list_x11_displays(verbose=True)
+        deferred = x11.list_x11_displays(verbose=False)
         def _callback(x11_displays):
             self.devices["x11_displays"] = x11_displays
+            self.gui.update_x11_devices()
         deferred.addCallback(_callback)
         return deferred
 
     def poll_xvideo_extension(self):
         """
+        Called once at startup, and then the GUI can call it.
         @rettype: Deferred
         """
         deferred = x11.xvideo_extension_is_present()
         def _callback(xvideo_is_present):
             self.devices["xvideo_is_present"] = xvideo_is_present
+            if not xvideo_is_present:
+                msg = _("It seems like the xvideo extension is not present our your X11 display ! It might be impossible to do video streaming.")
+                print(msg)
+                dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
         deferred.addCallback(_callback)
         return deferred
         
@@ -171,14 +172,16 @@ class Application(object):
         try:
             jack_servers = jackd.jackd_get_infos() # returns a list a dict such as :
         except jackd.JackFrozenError, e:
-            print e
+            print e 
+            msg = _("The JACK audio server seems frozen ! \n%s") % (e)
+            dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
         else:
             #print "jackd servers:", jack_servers
             if len(jack_servers) == 0:
                 result = False
             else:
                 result = True
-        self.devices["jackd"] = result
+        self.devices["jackd_is_running"] = result
         self.gui.update_jackd_status(result)
     
     def before_shutdown(self):
