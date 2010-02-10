@@ -512,3 +512,32 @@ void v4l2util::setInput(const std::string &device, int input)
         THROW_ERROR("Failed to set input to " << input << " on device " << device);
 }
 
+
+#if 0
+std::string inputsPerDevice(int fd)
+{
+    struct v4l2_input vin;		/* list_inputs */
+    memset(&vin, 0, sizeof(vin));
+    vin.index = 0;
+    while (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0) 
+    {
+        if (vin.index)
+            printf("\n");
+        printf("\tInput   : %d\n", vin.index);
+        printf("\tName    : %s\n", vin.name);
+        printf("\tType    : 0x%08X\n", vin.type);
+        printf("\tAudioset: 0x%08X\n", vin.audioset);
+        printf("\tTuner   : 0x%08X\n", vin.tuner);
+        printf("\tStandard: 0x%016llX ( ", (unsigned long long)vin.std);
+        if (vin.std & 0x000FFF)
+            printf("PAL ");	// hack
+        if (vin.std & 0x00F000)
+            printf("NTSC ");	// hack
+        if (vin.std & 0x7F0000)
+            printf("SECAM ");	// hack
+        printf(")\n");
+        printf("\tStatus  : %d\n", vin.status);
+        vin.index++;
+    }
+}
+#endif

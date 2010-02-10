@@ -23,6 +23,7 @@
 #include "util.h"
 
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 #include "gstLinkable.h"
 #include "videoSource.h"
@@ -200,7 +201,12 @@ std::string VideoV4lSource::srcCaps() const
     else if (actualStandard_ == "PAL")
         capsSuffix = "25/1"; // PAL is not drop frame
     else 
-        THROW_CRITICAL("Unsupported standard " << actualStandard_);
+    {
+        capsSuffix = boost::lexical_cast<std::string>(config_.framerate()); 
+        capsSuffix += "/1";
+        LOG_WARNING("Unsupported standard, " << actualStandard_
+                << "trying to add framerate " << capsSuffix << " to caps");
+    }
 
     if (v4l2util::isInterlaced(deviceStr()))
         capsSuffix +=", interlaced=true";
