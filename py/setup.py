@@ -30,6 +30,11 @@ packages = [
     "scenic.data.locale.en_US.LC_MESSAGES",
     "scenic.data.locale.fr_CA",
     "scenic.data.locale.fr_CA.LC_MESSAGES"
+    'rtpmidi',
+    'rtpmidi.protocols',
+    'rtpmidi.protocols.rtp',
+    'rtpmidi.engines',
+    'rtpmidi.engines.midi',
     ]
 
 setup(
@@ -38,11 +43,11 @@ setup(
     author = "SAT",
     author_email = "info@sat.qc.ca",
     url = "http://svn.sat.qc.ca/trac/scenic",
-    description = "Scenic, interface to the milhouse streaming tool.",
+    description = "Scenic audio/video streaming tool for GNU/Linux.",
     long_description = """Scenic software, a component of the PropulseART project
     Requires: twisted, simplejson.""",
     install_requires = [], #'twisted'], 
-    scripts = ["scripts/scenic"],
+    scripts = ["scripts/scenic", "midistream"],
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,

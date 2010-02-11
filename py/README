@@ -1,9 +1,0 @@
-From the ~/src/miville/trunk/py directory,
-
-cd ~/src/miville/trunk/py
-./mivilled
-
-You can then access miville locally through a web browser (Firefox 3.x supported) at the following url: [http://localhost:8080]
-
-see http://svn.sat.qc.ca/trac/miville/wiki/Starting%20miville for more up to date version of this README
-

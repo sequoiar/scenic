@@ -139,7 +139,6 @@ AC_MSG_NOTICE([define CONFIG_IEEE1394])
 fi
 
 AC_CONFIG_FILES([Makefile
-        py/setup.py
         doc/Makefile
         doc/notes/Makefile
         doc/test/Makefile
@@ -152,9 +151,8 @@ AC_CONFIG_FILES([Makefile
         utils/dc-ctl/Makefile
         src/Makefile
         py/Makefile
-        py/docs/Makefile
-        py/maugis/Makefile
-        py/maugis/scenic/configure.py
+        py/doc/Makefile
+        py/scenic/configure.py
         src/include/Makefile
         src/util/Makefile
         src/gutil/Makefile

@@ -1,13 +1,19 @@
 include $(top_srcdir)/globals.mak 
-SUBDIRS = docs maugis
-DIST_SUBDIRS = maugis docs
+SUBDIRS = doc 
+DIST_SUBDIRS = doc
 
 # Install my_script in $(bindir) and distribute it.
 # FIXME: find out if this is uninstalled by 
-dist_bin_SCRIPTS = midistream
+dist_bin_SCRIPTS = midistream scripts/scenic
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/src/main:$(PATH) trial
         
+TESTS = scenic/test/test_communication.py \
+		scenic/test/test_x11.py \
+		scenic/test/test_ports.py \
+		scenic/test/test_cameras.py \
+		scenic/test/test_signals.py
+
 all: 
 
 install-exec-hook: 
