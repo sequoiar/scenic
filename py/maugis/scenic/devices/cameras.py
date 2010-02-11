@@ -48,7 +48,7 @@ def _parse_milhouse_list_cameras(text):
                 "size": None,
                 "standard": None,
                 "is_interlaced": False,
-                "input": None,
+                "input": None, # int
                 "card": "",
                 "inputs": [],
                 "supported_sizes": []
@@ -232,6 +232,20 @@ Video4Linux Camera /dev/video0:
     Format 176x120 supported
 Exitting Milhouse
 """
+
+def set_v4l2_input_number(device_name="/dev/video0", input_number=0):
+    """
+    Sets input number for a V4L2 device.
+    @rettype: Deferred
+    """
+    command_name = "milhouse"
+    args = ['--v4l2-input', str(input_number), '--videodevice', device_name]
+    try:
+        executable = procutils.which(command_name)[0]
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
+    return deferred
 
 if __name__ == "__main__":
     pprint.pprint(_parse_milhouse_list_cameras(TESTDATA))

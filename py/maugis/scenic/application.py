@@ -111,7 +111,7 @@ class Application(object):
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
         self.devices = {
             "x11_displays": [], # list of dicts
-            "cameras": [], # list of dicts (only V4L2 cameras for now)
+            "cameras": {}, # dict of dicts (only V4L2 cameras for now)
             #"dc_cameras": [], # list of dicts
             "xvideo_is_present": False, # bool
             "jackd_is_running": False 
@@ -170,7 +170,10 @@ class Application(object):
         """
         deferred = cameras.list_cameras()
         def _callback(cameras):
-            self.devices["cameras"] = cameras
+            cameras_dict = {}
+            for camera in cameras:
+                cameras_dict[camera["name"]] = camera
+            self.devices["cameras"] = cameras_dict
             print("displays: %s" % (cameras))
             self.gui.update_camera_devices()
         deferred.addCallback(_callback)

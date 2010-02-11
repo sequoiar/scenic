@@ -70,7 +70,7 @@ def list_v4l2_inputs(device_name="/dev/video0"):
         deferred.errback(reason)
     
     command_name = "v4l2-ctl"
-    args = ['--list-inputs', '-d', name])
+    args = ['--list-inputs', '-d', name]
     try:
         executable = procutils.which(command_name)[0] # gets the executable
     except IndexError:
@@ -95,16 +95,3 @@ def set_v4l2_video_standard(device_name="/dev/video0", norm="ntsc"):
     deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
     return deferred
 
-def set_v4l2_input_number(device_name="/dev/video0", input_number=0):
-    """
-    Sets input number for a V4L2 device.
-    @rettype: Deferred
-    """
-    command_name = "v4l2-ctl"
-    args = ['--set-input=' + str(input_number), '-d', device_name]
-    try:
-        executable = procutils.which(command_name)[0]
-    except IndexError:
-        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
-    deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
-    return deferred

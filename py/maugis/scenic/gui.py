@@ -44,6 +44,7 @@ from twisted.internet import reactor
 from twisted.python.reflect import prefixedMethods
 from scenic import process # just for constants
 from scenic import dialogs
+from scenic.devices import cameras
 
 ### MULTILINGUAL SUPPORT ###
 _ = gettext.gettext
@@ -99,6 +100,8 @@ def _set_combobox_value(widget, value=None):
         widget.set_active(index)
 
 # GUI legible value to milhouse value mapping:
+
+VIDEO_TEST_INPUT = "Color bars"
 VIDEO_CODECS = {
     "h.264": "h264",
     "h.263": "h263",
@@ -214,6 +217,8 @@ class Gui(object):
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
         self.video_deinterlace_widget = self.widgets.get_widget("video_deinterlace")
         self.aspect_ratio_widget = self.widgets.get_widget("aspect_ratio")
+        self.v4l2_input_widget = self.widgets.get_widget("v4l2_input")
+        self.v4l2_standard_widget = self.widgets.get_widget("v4l2_standard")
         # about 
         self.about_label_widget = self.widgets.get_widget("about_label")
         self.about_text_view_widget = self.widgets.get_widget("about_text_view")
@@ -720,15 +725,68 @@ class Gui(object):
         print("Updating X11 displays with values %s" % (x11_displays))
         _set_combobox_choices(self.video_display_widget, x11_displays)
 
-
     def update_camera_devices(self):
         """
         Called once Application.poll_camera_devices has been run
         """
-        cameras = [cam["name"] for cam in self.app.devices["cameras"]]
-        cameras.insert(0, "Color bars")
+        cameras = self.app.devices["cameras"].keys()
+        cameras.insert(0, VIDEO_TEST_INPUT)
         print("Updating cameras displays with values %s" % (cameras))
         _set_combobox_choices(self.video_source_widget, cameras)
+        self.update_v4l2_inputs_and_norm()
+
+    def update_v4l2_inputs_and_norm(self):
+        """
+        Called when : 
+         * user chooses a different video source.
+        If the selected is not a V4L2, disables the input and norm widgets.
+        """
+        value = _get_combobox_value(self.video_source_widget)
+        if value == VIDEO_TEST_INPUT:
+            self.v4l2_input_widget.set_sensitive(False)
+            self.v4l2_input_widget.set_active(-1)
+            #_set_combobox_choices(self.v4l2_input_widget, [" "]) # TODO: set to None, or so
+            self.v4l2_standard_widget.set_sensitive(False)
+        else:
+            # INPUTS:
+            current_camera_name = _get_combobox_value(self.video_source_widget)
+            cam = self.app.devices["cameras"][current_camera_name]
+            current_input = cam["input"]
+            if current_input is not None:
+                self.v4l2_input_widget.set_sensitive(True)
+                _set_combobox_choices(self.v4l2_input_widget, cam["inputs"])
+                _set_combobox_value(self.v4l2_input_widget, cam["inputs"][current_input])
+            else:
+                self.v4l2_input_widget.set_sensitive(False)
+                self.v4l2_input_widget.set_active(-1)
+                #_set_combobox_choices(self.v4l2_input_widget, [" "]) # TODO: set to None, or so
+                
+            # STANDARD: 
+            #self.v4l2_standard_widget.set_sensitive(True)
+            
+    def on_video_source_changed(self, widget):
+        """
+        Called when the user changes the video source.
+         * updates the input
+        """
+        self.update_v4l2_inputs_and_norm()
+        
+    def on_v4l2_input_changed(self, widget):
+        """
+        When the user changes the V4L2 input, we actually change this input using milhouse.
+        Calls `milhouse --videodevice /dev/videoX --v4l2-input N
+        """
+        # change input for device
+        current_camera_name = _get_combobox_value(self.video_source_widget)
+        print "video_source:", current_camera_name
+        if current_camera_name != VIDEO_TEST_INPUT:
+            input_name = _get_combobox_value(widget)
+            cam = self.app.devices["cameras"][current_camera_name]
+            input_number = cam["inputs"].index(input_name)
+            d = cameras.set_v4l2_input_number(device_name=current_camera_name, input_number=input_number)
+            def _cb(result):
+                pass #TODO : self.app.poll_camera_devices()
+            d.addCallback(_cb)
 
     # -------------------------- menu items -----------------
     
