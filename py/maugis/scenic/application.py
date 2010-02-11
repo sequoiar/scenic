@@ -171,7 +171,7 @@ class Application(object):
         deferred = cameras.list_cameras()
         def _callback(cameras):
             self.devices["cameras"] = cameras
-            print("displays: %s" % (cameras))
+            print("cameras: %s" % (cameras))
             self.gui.update_camera_devices()
         deferred.addCallback(_callback)
         return deferred

@@ -136,7 +136,7 @@ def list_cameras():
         
     def _eb(reason, deferred):
         deferred.errback(reason)
-        print(reason)
+        print("Error listing cameras: %s" % (reason))
     
     command_name = "milhouse"
     args = ['--list-cameras']

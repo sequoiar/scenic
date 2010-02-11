@@ -74,7 +74,7 @@ def _set_combobox_choices(widget, choices=[]):
     """
     Sets the choices in a GTK combobox.
     """
-    #TODO
+    #TODO When we change a widget value, its changed callback is called...
     previous_value = _get_combobox_value(widget)
     tree_model = gtk.ListStore(str)
     for choice in choices:
@@ -251,6 +251,7 @@ class Gui(object):
         self.contact_list_widget.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=False)
         self.contact_list_widget.append_column(column)
+        self._v4l2_input_changed_by_user = True
         self.main_window.show()
         # The main app must call init_widgets_value
    
@@ -731,7 +732,7 @@ class Gui(object):
         """
         cameras = self.app.devices["cameras"].keys()
         cameras.insert(0, VIDEO_TEST_INPUT)
-        print("Updating cameras displays with values %s" % (cameras))
+        print("Updating video sources with values %s" % (cameras))
         _set_combobox_choices(self.video_source_widget, cameras)
         self.update_v4l2_inputs_and_norm()
 
@@ -742,6 +743,7 @@ class Gui(object):
         If the selected is not a V4L2, disables the input and norm widgets.
         """
         value = _get_combobox_value(self.video_source_widget)
+        self._v4l2_input_changed_by_user = False
         if value == VIDEO_TEST_INPUT:
             self.v4l2_input_widget.set_sensitive(False)
             self.v4l2_input_widget.set_active(-1)
@@ -755,7 +757,7 @@ class Gui(object):
             if current_input is not None:
                 self.v4l2_input_widget.set_sensitive(True)
                 _set_combobox_choices(self.v4l2_input_widget, cam["inputs"])
-                _set_combobox_value(self.v4l2_input_widget, cam["inputs"][current_input])
+                _set_combobox_value(self.v4l2_input_widget, cam["inputs"][current_input]) # which in turn calls on_v4l2_input_changed
             else:
                 self.v4l2_input_widget.set_sensitive(False)
                 self.v4l2_input_widget.set_active(-1)
@@ -763,6 +765,7 @@ class Gui(object):
                 
             # STANDARD: 
             #self.v4l2_standard_widget.set_sensitive(True)
+        self._v4l2_input_changed_by_user = True
             
     def on_video_source_changed(self, widget):
         """
@@ -776,17 +779,31 @@ class Gui(object):
         When the user changes the V4L2 input, we actually change this input using milhouse.
         Calls `milhouse --videodevice /dev/videoX --v4l2-input N
         """
-        # change input for device
-        current_camera_name = _get_combobox_value(self.video_source_widget)
-        print "video_source:", current_camera_name
-        if current_camera_name != VIDEO_TEST_INPUT:
-            input_name = _get_combobox_value(widget)
-            cam = self.app.devices["cameras"][current_camera_name]
-            input_number = cam["inputs"].index(input_name)
-            d = cameras.set_v4l2_input_number(device_name=current_camera_name, input_number=input_number)
-            def _cb(result):
-                pass #TODO : self.app.poll_camera_devices()
-            d.addCallback(_cb)
+        if self._v4l2_input_changed_by_user:
+            # change input for device
+            current_camera_name = _get_combobox_value(self.video_source_widget)
+            if current_camera_name != VIDEO_TEST_INPUT:
+                input_name = _get_combobox_value(widget)
+                cam = self.app.devices["cameras"][current_camera_name]
+                input_number = cam["inputs"].index(input_name)
+                d = cameras.set_v4l2_input_number(device_name=current_camera_name, input_number=input_number)
+                def _cb2(cameras):
+                    try:
+                        cam = cameras[current_camera_name]
+                    except KeyError, e:
+                        print("Camera %s disappeared !" % (current_camera_name))
+                    else:
+                        actual_input = cam["input"]
+                        if actual_input != input_number:
+                            msg = _("Could not change V4L2 input from %s to %s for device %s.") % (actual_input, input_number, current_camera_name)
+                            print(msg)
+                        else:
+                            print("Successfully changed input to %s." % (actual_input))
+                def _cb(result):
+                    #self.app.poll_camera_devices()
+                    d2 = cameras.list_cameras()
+                    d2.addCallback(_cb2)
+                d.addCallback(_cb)
 
     # -------------------------- menu items -----------------
     
