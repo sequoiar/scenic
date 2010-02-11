@@ -6,7 +6,7 @@ DIST_SUBDIRS = doc
 # FIXME: find out if this is uninstalled by 
 dist_bin_SCRIPTS = midistream scripts/scenic
 
-TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/src/main:$(PATH) trial
+TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../$(src)/main:$(PATH) trial
         
 TESTS = scenic/test/test_communication.py \
 		scenic/test/test_x11.py \
