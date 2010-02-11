@@ -28,6 +28,7 @@
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include "videoFlip.h"
 #include "videoScale.h"
 #include "sharedVideoSink.h"
 
@@ -62,25 +63,26 @@ VideoSourceConfig::VideoSourceConfig(MapMsg &msg) :
     framerate_(msg["framerate"]),
     captureWidth_(msg["width"]),
     captureHeight_(msg["height"]),
-    grayscale_(msg["grayscale"])
+    grayscale_(msg["grayscale"]),
+    pictureAspectRatio_(msg["aspect-ratio"])
 {}
 
 
-VideoSource * VideoSourceConfig::createSource() const
+VideoSource * VideoSourceConfig::createSource(Pipeline &pipeline) const
 {
     // FIXME: should derived class specific arguments just be passed in here to their constructors?
     if (source_ == "videotestsrc")
-        return new VideoTestSource(*this);
+        return new VideoTestSource(pipeline, *this);
     else if (source_ == "v4l2src")
-        return new VideoV4lSource(*this);
+        return new VideoV4lSource(pipeline, *this);
     else if (source_ == "v4lsrc")
-        return new VideoV4lSource(*this);
+        return new VideoV4lSource(pipeline, *this);
     else if (source_ == "dv1394src")
-        return new VideoDvSource(*this);
+        return new VideoDvSource(pipeline, *this);
     else if (source_ == "filesrc")
-        return new VideoFileSource(*this);
+        return new VideoFileSource(pipeline, *this);
     else if (source_ == "dc1394src")
-        return new VideoDc1394Source(*this);
+        return new VideoDc1394Source(pipeline, *this);
     else 
         THROW_ERROR(source_ << " is an invalid source!");
 
@@ -99,6 +101,13 @@ unsigned VideoSourceConfig::captureWidth() const
 unsigned VideoSourceConfig::captureHeight() const
 {
     return captureHeight_;
+}
+
+
+std::string VideoSourceConfig::pictureAspectRatio() const
+{
+    /// FIXME: have this be settable
+    return pictureAspectRatio_;
 }
 
 
@@ -140,29 +149,102 @@ int VideoSourceConfig::listCameras()
 }
 
 
+
+std::string VideoSourceConfig::pixelAspectRatio() const
+{
+    return calculatePixelAspectRatio(captureWidth_, captureHeight_, pictureAspectRatio_);
+}
+
+std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, const std::string &pictureAspectRatio)
+{
+// Reference:
+// http://en.wikipedia.org/wiki/Pixel_aspect_ratio#Pixel_aspect_ratios_of_common_video_formats
+
+    using std::map;
+    using std::string;
+    typedef map < string, map < string, string > > Table;
+
+    static Table PIXEL_ASPECT_RATIO_TABLE;
+    // only does this once
+    if (PIXEL_ASPECT_RATIO_TABLE.empty())
+    {
+        // PAL
+        PIXEL_ASPECT_RATIO_TABLE["720x576"]["4:3"] = 
+            PIXEL_ASPECT_RATIO_TABLE["704x576"]["4:3"] = "59/54";
+
+        PIXEL_ASPECT_RATIO_TABLE["704x576"]["16:9"] = 
+            PIXEL_ASPECT_RATIO_TABLE["352x288"]["16:9"] = "118/81";
+
+        // NTSC
+        PIXEL_ASPECT_RATIO_TABLE["720x480"]["4:3"] = 
+            PIXEL_ASPECT_RATIO_TABLE["704x480"]["4:3"] = "10/11";
+
+        PIXEL_ASPECT_RATIO_TABLE["704x480"]["16:9"] = 
+            PIXEL_ASPECT_RATIO_TABLE["352x240"]["16:9"] = "40/33";
+
+        /// Misc. Used by us
+        PIXEL_ASPECT_RATIO_TABLE["768x480"]["4:3"] = "6/7";
+        PIXEL_ASPECT_RATIO_TABLE["640x480"]["4:3"] = "1/1"; // square pixels
+    }
+    std::stringstream resolution;
+    resolution << width << "x" << height;
+    std::string result = PIXEL_ASPECT_RATIO_TABLE[resolution.str()][pictureAspectRatio];
+    if (result == "")
+        result = "1/1"; // default to square pixels
+
+    LOG_DEBUG("Pixel-aspect-ratio is " << result);
+    return result;
+}
+
+
 VideoSinkConfig::VideoSinkConfig(MapMsg &msg) : 
     sink_(msg["sink"]), 
     screenNum_(msg["screen"]), 
     doDeinterlace_(msg["deinterlace"]), 
     sharedVideoId_(msg["shared-video-id"]),
     /// if display-resolution is not specified, default to capture-resolution
-    displayWidth_(msg["display-width"] ? msg["display-width"] : msg["width"]),
-    displayHeight_(msg["display-height"] ? msg["display-height"] : msg["height"])
+    displayWidth_(std::min(static_cast<int>(msg["display-width"] ? msg["display-width"] : msg["width"]), VideoScale::MAX_SCALE)),
+    displayHeight_(std::min(static_cast<int>(msg["display-height"] ? msg["display-height"] : msg["height"]), VideoScale::MAX_SCALE)),
+    flipMethod_(msg["flip-video"])
 {}
 
 
-VideoSink * VideoSinkConfig::createSink() const
+bool VideoSinkConfig::resolutionIsInverted() const
+{
+    return flipMethod_ == "clockwise" or flipMethod_ == "counterclockwise"
+        or flipMethod_ == "upper-left-diagonal" or flipMethod_ == "upper-right-diagonal";
+}
+
+int VideoSinkConfig::effectiveDisplayWidth() const
+{
+    if (resolutionIsInverted())
+        return displayHeight_;
+    else
+        return displayWidth_;
+}
+
+
+int VideoSinkConfig::effectiveDisplayHeight() const
+{
+    if (resolutionIsInverted())
+        return displayWidth_;
+    else
+        return displayHeight_;
+}
+
+
+VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(displayWidth_, displayHeight_, screenNum_);
+        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
     else if (sink_ == "ximagesink")
-        return new XImageSink();
+        return new XImageSink(pipeline);
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(displayWidth_, displayHeight_, screenNum_);
+        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
 #endif
     else if (sink_ == "sharedvideosink")
-        return new SharedVideoSink(displayWidth_, displayHeight_, sharedVideoId_);
+        return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid sink");
 
@@ -171,14 +253,14 @@ VideoSink * VideoSinkConfig::createSink() const
 }
 
 
-VideoScale* VideoSinkConfig::createVideoScale() const
+VideoScale* VideoSinkConfig::createVideoScale(Pipeline &pipeline) const
 {
-    return new VideoScale(displayWidth_, displayHeight_);
+    return new VideoScale(pipeline, displayWidth_, displayHeight_);
 }
 
 
-bool VideoSinkConfig::hasCustomResolution() const
+VideoFlip* VideoSinkConfig::createVideoFlip(Pipeline &pipeline) const
 {
-    return displayWidth_ != videosize::WIDTH or displayHeight_ != videosize::HEIGHT;
+    return new VideoFlip(pipeline, flipMethod_);
 }
 

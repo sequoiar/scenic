@@ -39,6 +39,7 @@ Streams.methods(
 		// Get DOM elements.
 		self.start_btn = $('strm_start');
 		self.strm_details = $('strm_details');
+		self.strm_sets = $('strm_sets');
 		self.global_slct = $('strm_global_setts');
 		
 		// Get string translations.
@@ -126,23 +127,59 @@ Streams.methods(
 			self.global_slct.disabled = true;
 		}
 	},
-
+    /**
+     * Called when a user changes the value of a select drop-down.
+     *
+     * Will change the value of a set in a profile to a setting ID.
+     *
+     * @member Streams
+     * @param {int} profile_id
+     * @param {string} set_name
+     * @param {int} setting_id
+     */
+    function set_set_value(self, profile_id, set_name, setting_id) {
+        dbug.info("set_set_value " + profile_id + " " + set_name + " " + setting_id);
+        self.callRemote('rc_set_value_of_set_for_profile', profile_id, set_name, setting_id, self.contact.get('name'));
+    },
 	/**
 	 * Update the details for the currently selected profile.
 	 * (called from server)
+	 *
+	 * sets = [ { set_name:set_name, settings:{setting_id:setting_desc}, chosen:setting_id , desc:desc}
 	 * 
 	 * @member Streams
-     * @param {array} details An array of dict with keys "name" and "value".
+     * @param {array} entries_details An array of dict with keys "name" and "value". (each entry value)
+     * @param {array} sets An array of dict with keys "name" and "value". (each set with the chosen setting in each)
 	 */
-    function update_details(self, details) {
-        // XXX
+    function update_details(self, entries_details, sets_details, profile_id) {
+        // Creating the table with all the details for each entry. (expert mode)
         self.strm_details.empty();
+        self.strm_sets.empty();
         var is_odd = true;
         var style_name = "";
-        if (details.length > 0) {
-            var table = new Element('table', {"class": "tight_table"});
-            table.inject(self.strm_details);
-            details.each(function(detail) 
+        //if (entries_details.length > 0) {
+        //    var table = new Element('table', {"class": "tight_table"});
+        //    table.inject(self.strm_details);
+        //    entries_details.each(function(detail) 
+        //    {
+        //        if (is_odd) {
+        //            style_name = "color_zebra";
+        //        } else {
+        //            style_name = "";
+        //        }
+        //        var tr = new Element('tr', {"class": style_name});
+        //        var td1 = new Element("td").inject(tr);
+        //        var td2 = new Element("td").inject(tr);
+        //        td1.appendText(detail.name + " :");
+        //        td2.appendText(detail.value);
+        //        tr.inject(table);
+        //        is_odd = ! is_odd;
+        //    });
+        //}
+        if (sets_details.length > 0) {
+            var sets_table = new Element("table");
+            sets_table.inject(self.strm_sets);
+            sets_details.each(function(a_set)
             {
                 if (is_odd) {
                     style_name = "color_zebra";
@@ -152,9 +189,25 @@ Streams.methods(
                 var tr = new Element('tr', {"class": style_name});
                 var td1 = new Element("td").inject(tr);
                 var td2 = new Element("td").inject(tr);
-                td1.appendText(detail.name + " :");
-                td2.appendText(detail.value);
-                tr.inject(table);
+                td1.appendText(a_set.desc + " :");
+                var sel = new Element('select', {"set_name":a_set.set_name, "profile_id":profile_id}).inject(td2);
+                a_set.settings.each(function(setting)
+                {
+                    var opt = new Element('option', {
+						'html': setting.setting_desc,
+						'value': setting.setting_id,
+						'selected': setting.is_selected
+                        }).inject(sel);
+                });
+                sel.addEvent('change', function(event) {
+                    dbug.info("on change " + a_set.desc);
+                    var profile_id = event.target.getProperty("profile_id");
+                    var set_name = event.target.getProperty("set_name");
+                    var setting_id = event.target.value;
+                    self.set_set_value(profile_id, set_name, setting_id);
+                    event.target.blur(); // lose focus on form element
+                });
+                tr.inject(sets_table);
                 is_odd = ! is_odd;
             });
         }

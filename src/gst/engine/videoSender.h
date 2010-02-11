@@ -41,14 +41,15 @@ class VideoSender
     : public SenderBase, boost::noncopyable
 {
     public:
-        VideoSender(boost::shared_ptr<VideoSourceConfig> vConfig, 
+        VideoSender(Pipeline &pipeline,
+                boost::shared_ptr<VideoSourceConfig> vConfig, 
                 boost::shared_ptr<SenderConfig> rConfig);
         ~VideoSender();
 
     private:
-        void init_source();
-        void init_codec();
-        void init_payloader();
+        void createSource(Pipeline &pipeline);
+        void createCodec(Pipeline &pipeline);
+        void createPayloader();
         virtual bool checkCaps() const;
 
         boost::shared_ptr<VideoSourceConfig> videoConfig_;

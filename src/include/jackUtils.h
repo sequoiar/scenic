@@ -25,17 +25,18 @@
 #include <jack/jack.h>
 
 class _GstElement;
+class Pipeline;
 
 /// Utility functions for jack related issues. 
 namespace Jack {
-    void assertReady();
-    bool is_running();
-    bool autoForcedSupported(_GstElement *jackElement);
-    jack_nframes_t samplerate();
-    unsigned int framesPerPeriod();
-    unsigned long long minBufferTime();
-    unsigned long long safeBufferTime();
-    const unsigned long long SAFETY_OFFSET = 10000LL;   // extra buffering
+        void assertReady(Pipeline &pipeline);
+        bool is_running();
+        bool autoForcedSupported(_GstElement *jackElement);
+        jack_nframes_t samplerate();
+        unsigned int framesPerPeriod();
+        unsigned long long minBufferTime();
+        unsigned long long safeBufferTime();
+        const unsigned long long SAFETY_OFFSET = 10000LL;   // extra buffering
 }
 
 #endif //  _JACK_UTILS_H_

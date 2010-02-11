@@ -432,7 +432,7 @@ Addressbook.methods(
 		}
 		self.ask_win = new StickyWin.PointyTip(caption, body, {
 			relativeTo: self.list,
-			offset: {x: 10, y: -52},
+			offset: {x: 10, y: -72},
 			zIndex: 404004,
 	//	    width: 238,
 			pointyOptions: {
@@ -471,10 +471,10 @@ Addressbook.methods(
 		}
 		self.ask_win = new StickyWin.PointyTip(caption, body, {
 			relativeTo: self.list,
-			offset: {x: 10, y: -52},
+			offset: {x: 10, y: -72},
 			zIndex: 404004,
 //		    width: 238, // TODO: should modify the css and remove the css hack in clientcide StickyWin.UI.Pointy
-		    closeButton: false,
+		    closeButton: true,
 		    point: 10
 		});
 	},

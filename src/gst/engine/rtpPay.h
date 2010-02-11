@@ -27,17 +27,19 @@
 
 #include "noncopyable.h"
 
+class Pipeline;
 class _GstElement;
 
 class RtpPay : public GstLinkableFilter, boost::noncopyable
 {
     public:
-        RtpPay() : rtpPay_(0) {}
+        explicit RtpPay(Pipeline &pipeline) : pipeline_(pipeline), rtpPay_(0) {}
         virtual ~RtpPay();
         _GstElement *srcElement() { return rtpPay_; }
         _GstElement *sinkElement() { return rtpPay_; }
 
     protected:
+        Pipeline &pipeline_;
         _GstElement *rtpPay_;
 };
 
@@ -47,6 +49,7 @@ class Pay : public RtpPay
         virtual ~Pay();
 
     protected:
+        Pay(Pipeline &pipeline);
         static const long long MAX_PTIME = 2000000LL;
 
     private:
@@ -62,48 +65,50 @@ class Pay : public RtpPay
 
 class Depay : public RtpPay
 {
+    protected:
+        Depay(Pipeline &pipeline);
 };
 
 
 class TheoraPay : public Pay
 {
     public:
-        TheoraPay();
+        explicit TheoraPay(Pipeline &pipeline);
 };
 
 
 class TheoraDepay : public Depay
 {
     public:
-        TheoraDepay();
+        explicit TheoraDepay(Pipeline &pipeline);
 };
 
 
 class H264Pay : public Pay
 {
     public:
-        H264Pay();
+        explicit H264Pay(Pipeline &pipeline);
 };
 
 
 class H264Depay : public Depay
 {
     public:
-        H264Depay();
+        explicit H264Depay(Pipeline &pipeline);
 };
 
 
 class H263Pay : public Pay
 {
     public:
-        H263Pay();
+        explicit H263Pay(Pipeline &pipeline);
 };
 
 
 class H263Depay : public Depay
 {
     public:
-        H263Depay();
+        explicit H263Depay(Pipeline &pipeline);
 };
 
 
@@ -112,54 +117,54 @@ class Mpeg4Pay : public Pay, public MessageHandler
     private: 
         bool handleMessage(const std::string &path, const std::string &arguments); 
     public:
-        Mpeg4Pay();
+        explicit Mpeg4Pay(Pipeline &pipeline);
 };
 
 
 class Mpeg4Depay : public Depay
 {
     public:
-        Mpeg4Depay();
+        explicit Mpeg4Depay(Pipeline &pipeline);
 };
 
 
 class VorbisPay : public Pay
 {
     public:
-        VorbisPay();
+        explicit VorbisPay(Pipeline &pipeline);
 };
 
 
 class VorbisDepay : public Depay 
 {
     public:
-        VorbisDepay();
+        explicit VorbisDepay(Pipeline &pipeline);
 };
 
 
 class L16Pay : public Pay
 {
     public:
-        L16Pay();
+        explicit L16Pay(Pipeline &pipeline);
 };
 
 class L16Depay : public Depay 
 {
     public:
-        L16Depay();
+        explicit L16Depay(Pipeline &pipeline);
 };
 
 
 class MpaPay : public Pay
 {
     public:
-        MpaPay();
+       explicit MpaPay(Pipeline &pipeline);
 };
 
 class MpaDepay : public Depay
 {
     public:
-        MpaDepay();
+        explicit MpaDepay(Pipeline &pipeline);
 };
 
 #endif //_PAY_H_

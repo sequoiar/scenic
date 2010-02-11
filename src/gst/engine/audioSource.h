@@ -24,6 +24,7 @@
 
 #pragma GCC diagnostic ignored "-pedantic"
 #include <gst/audio/multichannel.h>
+#include <vector>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
 #include "messageHandler.h"
@@ -32,6 +33,7 @@
 
 // forward declarations
 class AudioSourceConfig;
+class Pipeline;
 
 /** 
  *  Abstract base class from which our audio sources are derived.
@@ -44,18 +46,14 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
 {
     public:
         ~AudioSource();
-        virtual void init();
 
     protected:
-        explicit AudioSource(const AudioSourceConfig &config);
+        AudioSource(Pipeline &pipeline, const AudioSourceConfig &config);
         
-        /// Implemented by subclasses to perform other specific initialization 
-        virtual void sub_init() = 0;
-
+        Pipeline &pipeline_;
         /// Audio parameter object 
         const AudioSourceConfig &config_;
         
-        /// GstElements representing each source and audioconvert 
         GstElement *source_;
 
         /// Caps used by any source with a capsfilter
@@ -83,15 +81,14 @@ class InterleavedAudioSource : public AudioSource
                  * separate classes, it make sense for them to be friends. Also
                  * InterleavedAudioSource's internals are safe
                  * as InterleavedAudioSource's children will not have access here. */
-                explicit Interleave(const AudioSourceConfig &config)
-                    : interleave_(0), config_(config) {}
+                Interleave(Pipeline &pipeline, const AudioSourceConfig &config);
                 ~Interleave();
-                void init();
 
                 GstElement *srcElement() { return interleave_; }
                 GstElement *sinkElement() { return interleave_; }
 
             private:
+                Pipeline &pipeline_;
                 GstElement *interleave_;
                 const AudioSourceConfig &config_;
                 static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
@@ -101,10 +98,7 @@ class InterleavedAudioSource : public AudioSource
         GstElement *srcElement() { return interleave_.srcElement(); }
 
     protected:
-        /// Object initializer 
-        void sub_init();
-
-        explicit InterleavedAudioSource(const AudioSourceConfig &config);
+        InterleavedAudioSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
         ~InterleavedAudioSource();
 
@@ -123,11 +117,9 @@ class InterleavedAudioSource : public AudioSource
 class AudioTestSource : public InterleavedAudioSource
 {
     public:
-        explicit AudioTestSource(const AudioSourceConfig &config);
+        AudioTestSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
-        void sub_init();
-
         ~AudioTestSource();
 
         static int timedCallback(GstClock *clock, 
@@ -136,10 +128,9 @@ class AudioTestSource : public InterleavedAudioSource
                 void *user_data);
         void toggle_frequency();
 
+        std::vector< std::vector <double> > frequencies_;
         GstClockID clockId_;
         int offset_;
-
-        static const double FREQUENCY[2][8];
 };
 
 /** 
@@ -156,7 +147,7 @@ class AudioTestSource : public InterleavedAudioSource
 class AudioFileSource : public AudioSource, public BusMsgHandler
 {
     public:
-        explicit AudioFileSource(const AudioSourceConfig &config);
+        AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioFileSource();
@@ -165,7 +156,6 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
 
         void loop(int nTimes);
         GstElement *srcElement() { return aconv_; }
-        void sub_init();
 
         void restartPlayback();
         GstElement *aconv_;
@@ -181,12 +171,11 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
 class AudioAlsaSource : public AudioSource
 {
     public:
-        AudioAlsaSource(const AudioSourceConfig &config);
+        AudioAlsaSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioAlsaSource();
 
-        void sub_init();
         GstElement *srcElement() { return capsFilter_; }
 
         GstElement *capsFilter_;
@@ -201,11 +190,10 @@ class AudioAlsaSource : public AudioSource
 class AudioPulseSource : public AudioSource
 {
     public:
-        AudioPulseSource(const AudioSourceConfig &config);
+        AudioPulseSource(Pipeline &pipeline, const AudioSourceConfig &config);
     private:
         ~AudioPulseSource();
 
-        void sub_init();
         GstElement *srcElement() { return capsFilter_; }
 
         GstElement *capsFilter_;
@@ -220,14 +208,13 @@ class AudioPulseSource : public AudioSource
 class AudioJackSource : public AudioSource, public MessageHandler
 {
     public:
-        AudioJackSource(const AudioSourceConfig &config);
+        AudioJackSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioJackSource();
 
         bool handleMessage(const std::string &path, const std::string &arguments);
         GstElement *srcElement() { return capsFilter_; }
-        void sub_init();
         /// Caps used by any source with a capsfilter
         std::string getCapsFilterCapsString();
 
@@ -247,11 +234,10 @@ class AudioJackSource : public AudioSource, public MessageHandler
 class AudioDvSource : public AudioSource
 {
     public:
-        explicit AudioDvSource(const AudioSourceConfig &config);
+        AudioDvSource(Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
         ~AudioDvSource();
-        void sub_init();
 
         GstElement *queue_;
         GstElement *aconv_;

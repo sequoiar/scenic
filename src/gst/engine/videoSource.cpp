@@ -22,6 +22,8 @@
 
 #include "util.h"
 
+#include <sstream>
+
 #include "gstLinkable.h"
 #include "videoSource.h"
 #include "pipeline.h"
@@ -33,8 +35,10 @@
 
 #include "fileSource.h"
 
+
 /// Constructor
-VideoSource::VideoSource(const VideoSourceConfig &config) : 
+VideoSource::VideoSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    pipeline_(pipeline),
     config_(config), 
     source_(0), 
     capsFilter_(0)
@@ -44,8 +48,8 @@ VideoSource::VideoSource(const VideoSourceConfig &config) :
 /// Destructor
 VideoSource::~VideoSource()
 {
-    Pipeline::Instance()->remove(&capsFilter_);
-    Pipeline::Instance()->remove(&source_);
+    pipeline_.remove(&capsFilter_);
+    pipeline_.remove(&source_);
 }
 
 std::string VideoSource::defaultSrcCaps() const
@@ -53,7 +57,8 @@ std::string VideoSource::defaultSrcCaps() const
     std::ostringstream capsStr;
     capsStr << "video/x-raw-yuv, width=" << config_.captureWidth()
         << ", height=" << config_.captureHeight() << ", framerate="
-        << config_.framerate() << "000/1001";
+        << config_.framerate() << "000/1001, pixel-aspect-ratio=" 
+        << config_.pixelAspectRatio();
     return capsStr.str();
 }
 
@@ -82,13 +87,13 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
 
 
 /// Constructor
-VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
-    VideoSource(config)
+VideoTestSource::VideoTestSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config)
 {
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    source_ = pipeline_.makeElement(config_.source(), NULL);
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
     setCapsFilter(srcCaps());
 }
@@ -99,32 +104,32 @@ VideoTestSource::~VideoTestSource()
 
 
 /// Constructor
-VideoFileSource::VideoFileSource(const VideoSourceConfig &config) : 
-    VideoSource(config), 
-    identity_(Pipeline::Instance()->makeElement("identity", NULL))
+VideoFileSource::VideoFileSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config), 
+    identity_(pipeline_.makeElement("identity", NULL))
 {
     tassert(config_.locationExists());
     g_object_set(identity_, "silent", TRUE, NULL);
 
-    GstElement * queue = FileSource::acquireVideo(config_.location());
+    GstElement * queue = FileSource::acquireVideo(pipeline, config_.location());
     gstlinkable::link(queue, identity_);
 }
 
 /// Destructor
 VideoFileSource::~VideoFileSource()
 {
-    Pipeline::Instance()->remove(&identity_);
+    pipeline_.remove(&identity_);
     FileSource::releaseVideo(config_.location());
 }
 
 
 /// Constructor
-VideoDvSource::VideoDvSource(const VideoSourceConfig &config) : 
-    VideoSource(config), 
-    queue_(Pipeline::Instance()->makeElement("queue", NULL)), 
-    dvdec_(Pipeline::Instance()->makeElement("dvdec", NULL))
+VideoDvSource::VideoDvSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config), 
+    queue_(pipeline_.makeElement("queue", NULL)), 
+    dvdec_(pipeline_.makeElement("dvdec", NULL))
 {
-    Dv1394::Instance()->setVideoSink(queue_);
+    Dv1394::Instance(pipeline_)->setVideoSink(queue_);
     gstlinkable::link(queue_, dvdec_);
 }
 
@@ -132,9 +137,9 @@ VideoDvSource::VideoDvSource(const VideoSourceConfig &config) :
 /// Destructor
 VideoDvSource::~VideoDvSource()
 {
-    Pipeline::Instance()->remove(&queue_);
-    Pipeline::Instance()->remove(&dvdec_);
-    Dv1394::Instance()->unsetVideoSink();
+    pipeline_.remove(&queue_);
+    pipeline_.remove(&dvdec_);
+    Dv1394::Instance(pipeline_)->unsetVideoSink();
 }
 
 
@@ -145,25 +150,29 @@ bool VideoV4lSource::willModifyCaptureResolution() const
 } 
 
 
-VideoV4lSource::VideoV4lSource(const VideoSourceConfig &config)
-    : VideoSource(config), expectedStandard_("NTSC") 
+VideoV4lSource::VideoV4lSource(Pipeline &pipeline, const VideoSourceConfig &config)
+    : VideoSource(pipeline, config), expectedStandard_("NTSC"), actualStandard_("")
 {
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    source_ = pipeline_.makeElement(config_.source(), NULL);
     // set a v4l2src if given to config as an arg, otherwise use default
     if (config_.hasDeviceName() && config_.deviceExists())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
-    if (!v4l2util::checkStandard(expectedStandard_, deviceStr()))
-        LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard " << expectedStandard_);
+    if (!v4l2util::checkStandard(expectedStandard_, actualStandard_, deviceStr()))
+        LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard " 
+                << expectedStandard_ << ", it is " << actualStandard_);
 
     LOG_DEBUG("v4l width is " << v4l2util::captureWidth(deviceStr()));
     LOG_DEBUG("v4l height is " << v4l2util::captureHeight(deviceStr()));
 
     if (willModifyCaptureResolution())  
+    {
         LOG_INFO("Changing v4l resolution to " << 
                 config_.captureWidth() << "x" << config_.captureHeight());
+        v4l2util::setFormatVideo(deviceStr(), config_.captureWidth(), config_.captureHeight());
+    }
 
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
     setCapsFilter(srcCaps());
@@ -184,28 +193,35 @@ std::string VideoV4lSource::deviceStr() const
 std::string VideoV4lSource::srcCaps() const
 {
     std::ostringstream capsStr;
-    /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
-      << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
 
     std::string capsSuffix;
-    if (v4l2util::isInterlaced(deviceStr()))
-        capsSuffix = "000/1001, interlaced=true";
-    else
-        capsSuffix = "/1";
+    if (actualStandard_ == "NTSC")
+        capsSuffix = "30000/1001"; // NTSC is drop frame
+    else if (actualStandard_ == "PAL")
+        capsSuffix = "25/1"; // PAL is not drop frame
+    else 
+        THROW_CRITICAL("Unsupported standard " << actualStandard_);
 
-    capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" 
-        << v4l2util::captureHeight(deviceStr()) 
-        << ", framerate=" << config_.framerate() 
+    if (v4l2util::isInterlaced(deviceStr()))
+        capsSuffix +=", interlaced=true";
+
+    capsSuffix += ", pixel-aspect-ratio=";
+    capsSuffix += config_.pixelAspectRatio();
+
+    capsStr << "video/x-raw-yuv, width=" << config_.captureWidth() << ", height=" 
+        << config_.captureHeight() 
+        << ", framerate="
         << capsSuffix;
+    LOG_DEBUG("V4l2src caps are " << capsStr.str());
 
     return capsStr.str();
 }
 
 
-VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) : 
-    VideoSource(config) 
+VideoDc1394Source::VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig &config) : 
+    VideoSource(pipeline, config) 
 {
-    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
+    source_ = pipeline_.makeElement(config_.source(), NULL);
     if (config_.hasGUID())
         g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
@@ -215,7 +231,7 @@ VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) :
     /// TODO: test. this will hopefully help reduce the lag we're seeing with dc1394src
     g_object_set(G_OBJECT(source_), "buffer-size", DMA_BUFFER_SIZE_IN_FRAMES, NULL);
 
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
     setCapsFilter(srcCaps());
@@ -224,14 +240,14 @@ VideoDc1394Source::VideoDc1394Source(const VideoSourceConfig &config) :
 
 std::string VideoDc1394Source::srcCaps() const 
 { 
-    typedef std::vector<std::string> SpaceList; 
+    typedef std::vector<std::string> ColourspaceList; 
     std::ostringstream capsStr; 
     int cameraNumber; 
     int mode = 0; 
     g_object_get(source_, "camera-number", &cameraNumber, NULL); 
 
     std::string colourSpace; 
-    SpaceList spaces; 
+    ColourspaceList spaces; 
     // if we support other colourspaces besides grayscale 
     if (!config_.forceGrayscale()) 
     { 
@@ -241,7 +257,7 @@ std::string VideoDc1394Source::srcCaps() const
     } 
     spaces.push_back("gray"); 
 
-    for (SpaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space) 
+    for (ColourspaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space) 
     { 
         colourSpace = *space; 
         mode = DC1394::capsToMode(cameraNumber, config_.captureWidth(),  

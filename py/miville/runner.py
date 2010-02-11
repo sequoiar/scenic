@@ -26,15 +26,20 @@ corresponding miville configuration variables.
 
 See the MivilleConfiguration class in miville/core.py
 """
+from twisted.internet.error import CannotListenError
+from twisted.internet import reactor
 import sys
+import os
 import socket
 from optparse import OptionParser
 from miville.options import MivilleConfiguration
 from miville.utils import log
+from miville.utils import common
 
-log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSSAGES
+log_file_name = log.LOG_FILE_NAME
 
-__version__ = "0.3.1"
+# FIXME: this should come from configure.ac
+__version__ = "0.3.6"
 VERSION = __version__
 
 def moo():
@@ -81,6 +86,8 @@ def run():
         help="""Communication channel listen only to those network interfaces IP. Use this flag many times if needed. Default is all. Example: -i 127.0.0.1 -i 10.10.10.55""")
     parser.add_option("-m", "--miville-home", type="string", \
         help="Path to miville configuration files. (dot files)")
+    parser.add_option("-w", "--web-template", type="string", default="default", \
+        help="Name of the template for the Web interface.")
     parser.add_option("-M", "--moo", action="store_true", \
         help="There is no easter egg in this program.")
     parser.add_option("-C", "--disable-escape-sequences", action="store_true", \
@@ -97,7 +104,7 @@ def run():
     if options.moo:
         moo()
         sys.exit(0)
-    from miville.core import *
+    
     # configure miville
     config = MivilleConfiguration()
     # network interfaces for the communication channel
@@ -114,6 +121,8 @@ def run():
             config.ui_network_interfaces = options.ui_interfaces
     if options.all_interfaces:
         config.ui_network_interfaces = ''
+    if options.web_template:
+        config.web_template = options.web_template
     if options.miville_home:
         config.miville_home = options.miville_home
     if options.verbose:
@@ -124,7 +133,25 @@ def run():
         config.enable_escape_sequences = False
     # set the port offset        
     config.port_numbers_offset = options.offset
+    # checks if files we need to write to are writable
+    for f in [common.install_dir(log_file_name), common.install_dir(config.addressbook_filename)]:
+        try:
+            fp = open(f, 'a')
+        except IOError, e:
+            if os.path.exists(f):
+                print("File %s is not writable by this user. Check its permission and try again.", f)
+            else:
+                d = os.path.dirname(f)
+                if os.path.exists(d):
+                    print("Directory %s is not writable by this user. Check its permissions and try again." % (d))
+                else:
+                    print("Directory %s does not exist. The application should be able to write in this directory." % (d))
+            exit(1)
+        else:
+            fp.close()
+    log.start('warning') # THIS IS THE LOG LEVEL FOR TWISTED AND PYTHON MESSAGES
     log.info('Starting Miville...')
+    from miville.core import main
     # changes terminal title
     for terminal in ['xterm', 'rxvt']:
         if terminal.find and config.enable_escape_sequences:

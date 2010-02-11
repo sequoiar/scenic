@@ -32,40 +32,25 @@
 #include "rtpPay.h"
 #include "rtpReceiver.h"
 #include "remoteConfig.h"
-#include "playback.h"
 
 #include <gtk/gtk.h>
-
-bool RtpReceiver::controlEnabled_ = false;
-bool RtpReceiver::madeControl_ = false;
-GtkWidget *RtpReceiver::control_ = 0;
 
 
 std::list<GstElement *> RtpReceiver::depayloaders_;
 
-void RtpReceiver::enableControl() 
-{ 
-    controlEnabled_ = true; 
-}
-
 RtpReceiver::~RtpReceiver()
 {
-    Pipeline::Instance()->remove(&rtp_receiver_);
+    pipeline_.remove(&rtp_receiver_);
 
     // find this->depayloader in the static list of depayloaders
-    std::list<GstElement *>::iterator iter;
-    iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
-
-    // make sure we found it and remove it
-    tassert(iter != depayloaders_.end());
-    depayloaders_.erase(iter);
-
-    if (control_)
+    if (depayloader_) // in case destructor was called before depayloader was created
     {
-        madeControl_ = false;
-        gtk_widget_destroy(control_);
-        LOG_DEBUG("RTP jitterbuffer control window destroyed");
-        control_ = 0;
+        std::list<GstElement *>::iterator iter;
+        iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
+
+        // make sure we found it and remove it
+        tassert(iter != depayloaders_.end());
+        depayloaders_.erase(iter);
     }
 }
 
@@ -176,7 +161,6 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
 
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
-    RtpBin::init();
     registerSession(config.codec());
 
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
@@ -192,9 +176,12 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 
     // store copy so that destructor knows which depayloader to remove from its list
     depayloader_ = depayloader->sinkElement();
+    // add to our list of active depayloaders
+    depayloaders_.push_back(depayloader_);
 
-    rtp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtp_receiver_, "port", config.port(), NULL);
+    rtp_receiver_ = pipeline_.makeElement("udpsrc", NULL);
+    int rtpsrc_socket = RtpBin::createSourceSocket(config.port());
+    g_object_set(rtp_receiver_, "sockfd", rtpsrc_socket, "port", config.port(), NULL);
 
     // this is a multicast session
     if (config.hasMulticastInterface())
@@ -204,11 +191,13 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
         LOG_DEBUG("Using IFACE for multicast" << config.multicastInterface());
     }
 
-    rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtcp_receiver_, "port", config.rtcpFirstPort(), NULL);
+    rtcp_receiver_ = pipeline_.makeElement("udpsrc", NULL);
+    int rtcpsrc_socket = RtpBin::createSourceSocket(config.rtcpFirstPort());
+    g_object_set(rtcp_receiver_, "sockfd", rtcpsrc_socket, "port", config.rtcpFirstPort(), NULL);
 
-    rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port",
+    rtcp_sender_ = pipeline_.makeElement("udpsink", NULL);
+    int rtcpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.rtcpSecondPort());
+    g_object_set(rtcp_sender_, "host", config.remoteHost(), "sockfd", rtcpsink_socket, "port",
             config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);
 
     /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
@@ -229,7 +218,6 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     tassert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
     gst_object_unref(rtcpSenderSink);
 
-    depayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", 
             G_CALLBACK(RtpReceiver::onPadAdded), 
@@ -238,66 +226,14 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     g_signal_connect(rtpbin_, "on-sender-timeout", 
             G_CALLBACK(RtpReceiver::onSenderTimeout), 
             this);
-
-    if (controlEnabled_)
-        createLatencyControl();
 }
 
 
-void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
+void RtpReceiver::updateLatencyCb(GtkWidget *scale)
 {
-    unsigned val = static_cast<unsigned>(adj->value);
+    unsigned val = static_cast<unsigned>(gtk_range_get_value(GTK_RANGE(scale)));
     LOG_DEBUG("Setting latency to " << val);
     setLatency(val);
-}
-
-/* makes the latency window */
-void RtpReceiver::createLatencyControl()
-{
-    if (madeControl_)   // one control sets all jitterbuffers
-        return;
-
-    static bool gtk_initialized = false;
-    if (!gtk_initialized)
-    {
-        gtk_init(0, NULL);
-        gtk_initialized = true;
-    }
-
-    GtkWidget *box1;
-    GtkWidget *hscale;
-    GtkObject *adj;
-    const int WIDTH = 400;
-    const int HEIGHT = 70;
-
-    /* Standard window-creating stuff */
-    control_ = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(control_), WIDTH, HEIGHT);
-    gtk_window_set_title (GTK_WINDOW (control_), "Rtpjitterbuffer Latency (ms)");
-
-    box1 = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (control_), box1);
-
-    /* value, lower, upper, step_increment, page_increment, page_size */
-    /* Note that the page_size value only makes a difference for
-     * scrollbar widgets, and the highest value you'll get is actually
-     * (upper - page_size). */
-
-    adj = gtk_adjustment_new (INIT_LATENCY, MIN_LATENCY, MAX_LATENCY + 1, 1.0, 1.0, 1.0);
-
-    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
-            GTK_SIGNAL_FUNC(updateLatencyCb), NULL);
-
-
-    hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
-    // Signal emitted only when value is done changing
-    gtk_range_set_update_policy (GTK_RANGE (hscale), 
-            GTK_UPDATE_DISCONTINUOUS);
-    gtk_box_pack_start (GTK_BOX (box1), hscale, TRUE, TRUE, 0);
-    gtk_widget_show (hscale);
-    gtk_widget_show (box1);
-    gtk_widget_show (control_);
-    madeControl_ = true;
 }
 
 

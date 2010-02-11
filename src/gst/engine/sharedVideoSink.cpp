@@ -69,7 +69,8 @@ bool SharedVideoSink::removeSharedMemory(const std::string &id)
 }
 
 
-SharedVideoSink::SharedVideoSink(int width, int height, const std::string &id) : 
+SharedVideoSink::SharedVideoSink(Pipeline &pipeline, int width, int height, const std::string &id) : 
+    VideoSink(pipeline),
     id_(id),
     colorspc_(0), 
     shm_(createSharedMemory(id_)), 
@@ -82,8 +83,8 @@ SharedVideoSink::SharedVideoSink(int width, int height, const std::string &id) :
     // construct the shared structure in memory with placement new
     sharedBuffer_ = new (addr) SharedVideoBuffer(width, height);
 
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
-    sink_ = Pipeline::Instance()->makeElement("appsink", NULL);
+    colorspc_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
+    sink_ = pipeline_.makeElement("appsink", NULL);
     gstlinkable::link(colorspc_, sink_);
     prepareSink(width, height);
 }
@@ -157,7 +158,7 @@ void SharedVideoSink::prepareSink(int width, int height)
 SharedVideoSink::~SharedVideoSink()
 {
     destroySink();
-    Pipeline::Instance()->remove(&colorspc_);
+    pipeline_.remove(&colorspc_);
     removeSharedMemory(id_);
 }
 

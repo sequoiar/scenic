@@ -25,17 +25,20 @@
 #include <string>
 
 class MapMsg;
+class Pipeline;
 class VideoSource;
 class VideoScale;
+class VideoFlip;
 class VideoSink;
 
 class VideoSourceConfig
 {
     public:
         VideoSourceConfig(MapMsg &msg);
-        VideoSource* createSource() const;  // factory method
+        VideoSource* createSource(Pipeline &pipeline) const;  // factory method
 
         const char *source() const { return source_.c_str(); }
+        std::string sourceString() const { return source_; }
         static int listCameras();
         int bitrate() const { return bitrate_; }
         int quality() const { return quality_; }
@@ -53,7 +56,12 @@ class VideoSourceConfig
         const char *deviceName() const;
         unsigned captureWidth() const;
         unsigned captureHeight() const;
+        std::string pictureAspectRatio() const;
         bool forceGrayscale() const;
+        std::string pixelAspectRatio() const;
+        /// used by other classes, that's why it's not a member function
+        static std::string calculatePixelAspectRatio(int width, int height, 
+                const std::string &pictureAspectRatio);
 
     private:
         const std::string source_;
@@ -67,6 +75,7 @@ class VideoSourceConfig
         const int captureWidth_;
         const int captureHeight_;
         const bool grayscale_;
+        const std::string pictureAspectRatio_;
 };
 
 
@@ -75,19 +84,22 @@ class VideoSinkConfig
     public:
 
         VideoSinkConfig(MapMsg &msg);
-        VideoSink* createSink() const;
-        VideoScale* createVideoScale() const;
+        VideoSink* createSink(Pipeline &pipeline) const;
+        VideoScale* createVideoScale(Pipeline &pipeline) const;
+        VideoFlip* createVideoFlip(Pipeline &pipeline) const;
         bool doDeinterlace() const { return doDeinterlace_; }
-        bool hasCustomResolution() const;
 
     private:
-
+        bool resolutionIsInverted() const;
+        int effectiveDisplayWidth() const;
+        int effectiveDisplayHeight() const;
         const std::string sink_;
         const int screenNum_;
         bool doDeinterlace_;
         const std::string sharedVideoId_;
         const int displayWidth_;
         const int displayHeight_;
+        const std::string flipMethod_;
 };
 
 #endif // _VIDEO_CONFIG_H_

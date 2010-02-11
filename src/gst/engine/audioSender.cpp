@@ -29,25 +29,33 @@
 #include "codec.h"
 #include "rtpPay.h"
 #include "capsParser.h"
-#include "playback.h"
-
 
 using boost::shared_ptr;
 
 /// Constructor 
-AudioSender::AudioSender(shared_ptr<AudioSourceConfig> aConfig, 
+AudioSender::AudioSender(Pipeline &pipeline,
+        shared_ptr<AudioSourceConfig> aConfig, 
         shared_ptr<SenderConfig> rConfig) : 
     SenderBase(rConfig),
     audioConfig_(aConfig), 
-    session_(), 
+    pipeline_(pipeline),
+    session_(pipeline), 
     source_(0), 
-    //level_(), 
     encoder_(0), 
     payloader_(0)
 {
     if (remoteConfig_->codec() == "mp3")
+    {
         if (audioConfig_->numChannels() < 1 or audioConfig_->numChannels() > 2)
             THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_->numChannels());
+    }
+    else if (remoteConfig_->codec() == "raw")
+    {
+        if (audioConfig_->numChannels() > 8) 
+            THROW_CRITICAL("Raw currently only accepts 8 channels or less, not " << audioConfig_->numChannels());
+    }
+    LOG_DEBUG("Creating audio sender pipeline");
+    createPipeline(pipeline);
 }
 
 
@@ -55,7 +63,7 @@ bool AudioSender::checkCaps() const
 {
     return CapsParser::getAudioCaps(remoteConfig_->codec(), 
             audioConfig_->numChannels(), 
-            playback::sampleRate()) != "";
+            pipeline_.actualSampleRate()) != "";
 }
 
 
@@ -67,32 +75,19 @@ AudioSender::~AudioSender()
     delete source_;
 }
 
-void AudioSender::init_source()
+void AudioSender::createSource(Pipeline &pipeline)
 {
-    tassert(source_ = audioConfig_->createSource());
-    source_->init();
-    //init_level();
+    tassert(source_ = audioConfig_->createSource(pipeline));
 }
 
-
-#if 0
-void AudioSender::init_level()
+void AudioSender::createCodec(Pipeline &pipeline)
 {
-    gstlinkable::link(*source_, level_);
-}
-#endif
-
-
-void AudioSender::init_codec()
-{
-    tassert(encoder_ = remoteConfig_->createAudioEncoder());
-
-    //gstlinkable::link(level_, *encoder_);
+    tassert(encoder_ = remoteConfig_->createAudioEncoder(pipeline));
     gstlinkable::link(*source_, *encoder_);
 }
 
 
-void AudioSender::init_payloader()   
+void AudioSender::createPayloader()   
 {
     tassert(payloader_ = encoder_->createPayloader());
 

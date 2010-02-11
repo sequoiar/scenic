@@ -80,7 +80,11 @@ static void setCaptureFormat(const std::string &device, v4l2_format format)
 }
 
 /// Check current standard of v4l2 device to make sure it is what we expect
-bool v4l2util::checkStandard(const std::string &expected, const std::string &device)
+// FIXME: replace with a function that just returns the actual standard
+// and then the client can compare against the expected standard
+bool v4l2util::checkStandard(const std::string &expected, 
+        std::string &actual,
+        const std::string &device)
 {
     using namespace boost::assign;
     bool result = false;
@@ -102,7 +106,10 @@ bool v4l2util::checkStandard(const std::string &expected, const std::string &dev
         std::map<std::string, unsigned long long>::const_iterator iter;
         for (iter = FORMATS.begin(); iter != FORMATS.end(); ++iter)
             if (std & (*iter).second)    // true if current format matches this iter's key
+            {
                 result = (result or (expected == (*iter).first)); // can have multiple positives, hence the or
+                actual = (*iter).first; // save the actual standard
+            }
     }
 
     close(fd);
@@ -294,6 +301,7 @@ void v4l2util::printSupportedSizes(const std::string &device)
     typedef std::pair<int, int> Size;
     typedef std::vector< Size > SizeList;
     SizeList sizes;
+    sizes.push_back(Size(924, 576));
     sizes.push_back(Size(768, 480));
     sizes.push_back(Size(720, 480));
     sizes.push_back(Size(704, 480));    // 4CIF
@@ -331,5 +339,38 @@ void v4l2util::printSupportedSizes(const std::string &device)
     v4l2_format currentFormat = getCaptureFormat(device);
     if (!formatsMatch(format, currentFormat))
         LOG_WARNING("Format " << oldWidth << "x" << oldHeight << "not reverted correctly");
+}
+
+void v4l2util::setFormatVideo(const std::string &device, int width, int height)
+{
+#define FmtWidth		(1L<<0)
+#define FmtHeight		(1L<<1)
+    unsigned int set_fmts = 0;
+    int fd = -1;
+    v4l2_format vfmt = getCaptureFormat(device);
+    vfmt.fmt.pix.width = width;
+    set_fmts |= FmtWidth;
+    vfmt.fmt.pix.height = height;
+    set_fmts |= FmtHeight;
+    struct v4l2_format in_vfmt;
+
+    in_vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
+
+    if (doioctl(fd, VIDIOC_G_FMT, &in_vfmt, "VIDIOC_G_FMT") == 0) 
+    {
+        if (set_fmts & FmtWidth)
+            in_vfmt.fmt.pix.width = vfmt.fmt.pix.width;
+        if (set_fmts & FmtHeight)
+            in_vfmt.fmt.pix.height = vfmt.fmt.pix.height;
+        doioctl(fd, VIDIOC_S_FMT, &in_vfmt, "VIDIOC_S_FMT");
+    }
+
+    close(fd);
+#undef FmtWidth
+#undef FmtHeight
 }
 

@@ -24,11 +24,11 @@
 
 #include <gst/gst.h>
 #include <cstring>
+#include <netdb.h>
 #include "rtpBin.h"
 #include "rtpPay.h"
 #include "remoteConfig.h"
 #include "pipeline.h"
-#include "playback.h"
 
 // for posting 
 #include "mapMsg.h"
@@ -45,19 +45,30 @@ bool RtpBin::destroyed_ = false;
 
 std::map<int, RtpBin*> RtpBin::sessions_;
 
-void RtpBin::init()
+RtpBin::RtpBin(Pipeline &pipeline) : 
+    pipeline_(pipeline),
+    rtcp_sender_(0), 
+    rtcp_receiver_(0), 
+    sessionId_((++sessionCount_) - 1), 
+    sessionName_(), 
+    printStats_(true)  // 0 based
 {
-    // only initialize rtpbin once per process
+    // only initialize rtpbin element once per process
     if (rtpbin_ == 0) 
     {
-        rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
-
-        // uncomment this to print stats
-        g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
-                static_cast<GSourceFunc>(printStatsCallback),
-                this);
+        rtpbin_ = pipeline_.makeElement("gstrtpbin", NULL);
+        startPrintStatsCallback();
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
+}
+
+
+void RtpBin::startPrintStatsCallback()
+{
+    // comment this to not print stats
+    g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
+            static_cast<GSourceFunc>(printStatsCallback),
+            this);
 }
 
 
@@ -89,7 +100,6 @@ void RtpBin::printStatsVal(const std::string &idStr,
 
     mapMsg["stats"] = idStr + paramStr;
     LOG_INFO(mapMsg["stats"]);
-    mapMsg.post();
 }
 
 
@@ -99,7 +109,7 @@ void RtpBin::parseSourceStats(GObject * source, RtpBin *context)
 
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
-    
+
     /* simply dump the stats structure */
     // gchar *str = gst_structure_to_string (stats);
     // LOG_DEBUG("source stats: " << str);
@@ -124,12 +134,12 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     else if (!context->printStats_)
     {
         LOG_DEBUG("Finished printing stats");
-        playback::quit();
+        context->pipeline_.quit();
         return FALSE;
     }
     else if (sessionCount_ <= 0) // no sessions to print yet
         return TRUE; 
-    else if (not Pipeline::Instance()->isPlaying())
+    else if (not context->pipeline_.isPlaying())
         return TRUE; // not playing yet
 
 
@@ -176,14 +186,14 @@ const char *RtpBin::padStr(const char *padName) const
 RtpBin::~RtpBin()
 {
     unregisterSession();
-    Pipeline::Instance()->remove(&rtcp_sender_);    // a pair for each session
-    Pipeline::Instance()->remove(&rtcp_receiver_);
+    pipeline_.remove(&rtcp_sender_);    // a pair for each session
+    pipeline_.remove(&rtcp_receiver_);
 
     --sessionCount_;
     if (sessionCount_ == 0) // destroy if no streams are present
     {
         LOG_DEBUG("No rtp sessions left, destroying rtpbin");
-        Pipeline::Instance()->remove(&rtpbin_); // one shared by all sessions
+        pipeline_.remove(&rtpbin_); // one shared by all sessions
         rtpbin_ = 0;
         destroyed_ = true;
     }
@@ -205,3 +215,120 @@ void RtpBin::unregisterSession()
     // does NOT call this->destructor (and that's a good thing)
     sessions_.erase(sessionId_); // remove session name by id
 }
+
+int RtpBin::createSinkSocket(const char *hostname, int port)
+{
+    using boost::lexical_cast;
+    using std::string;
+    int sockfd;
+    struct addrinfo hints, *servinfo, *p;
+    int rv;
+    std::string portStr(lexical_cast<string>(port));
+    LOG_DEBUG("Trying socket for host " << hostname << ", port " << portStr);
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    if ((rv = getaddrinfo(hostname, portStr.c_str(), &hints, &servinfo)) != 0) 
+        THROW_ERROR("getaddrinfo: " << gai_strerror(rv));
+
+    // loop through all the results and make a socket
+    for(p = servinfo; p != NULL; p = p->ai_next) 
+    {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                        p->ai_protocol)) == -1) 
+        {
+            perror("socket error");
+            continue;
+        }
+        else if (p->ai_family == AF_INET)
+            LOG_DEBUG("IPV4 socket");
+        else if (p->ai_family == AF_INET6)
+            LOG_DEBUG("IPV4 socket");
+        else 
+            LOG_DEBUG("Unknown address family");
+
+        break;
+    }
+
+    if (p == NULL) 
+    {
+        close(sockfd);
+        THROW_ERROR("failed to create socket");
+    }
+
+    freeaddrinfo(servinfo);
+    LOG_DEBUG("socket created successfully\n");
+    return sockfd;
+}
+
+
+int RtpBin::createSourceSocket(int port)
+{
+    using std::string;
+    using boost::lexical_cast;
+
+    int sockfd;
+    struct addrinfo hints, *servinfo, *p;
+    int rv;
+    //int reuse = 1;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE; // use my IP
+
+    string portStr(lexical_cast<string>(port));
+    LOG_DEBUG("Trying socket for port " << portStr);
+
+    if ((rv = getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo)) != 0) 
+        THROW_ERROR("getaddrinfo: " << gai_strerror(rv));
+
+    // loop through all the results and make a socket
+    for (p = servinfo; p != NULL; p = p->ai_next) 
+    {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                        p->ai_protocol)) == -1) 
+        {
+            LOG_WARNING("socket error");
+            continue;
+        }
+        else if (p->ai_family == AF_INET)
+            LOG_DEBUG("IPV4 Socket");
+        else if (p->ai_family == AF_INET6)
+            LOG_DEBUG("IPV6 Socket");
+        else 
+            LOG_DEBUG("Unknown address family");
+#if 0
+        /// GST uses this, we don't necessarily want to enable reuse
+        if ((setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse,
+                        sizeof (reuse))) < 0)
+        {
+            close(sockfd);
+            LOG_WARNING("setsockopt failed");
+            continue;
+        }
+#endif
+
+        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
+        {
+            close(sockfd);
+            LOG_WARNING("bind error");
+            continue;
+        }
+
+        break;
+    }
+
+    if (p == NULL) 
+    {
+        close(sockfd);
+        THROW_ERROR("Failed to bind socket");
+    }
+
+    freeaddrinfo(servinfo);
+    LOG_DEBUG("socket created successfully");
+    return sockfd;
+}
+

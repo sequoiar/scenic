@@ -26,12 +26,12 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
-#include "audioLevel.h"
 
 #include "noncopyable.h"
 
 #include <boost/shared_ptr.hpp>
 
+class Pipeline;
 class RtpPay;
 class Decoder;
 class AudioSink;
@@ -44,16 +44,16 @@ class AudioReceiver
     : public ReceiverBase, boost::noncopyable
 {
     public:
-        AudioReceiver(boost::shared_ptr<AudioSinkConfig> aConfig, 
-                      boost::shared_ptr<ReceiverConfig> rConfig);
+        AudioReceiver(Pipeline &pipeline,
+                boost::shared_ptr<AudioSinkConfig> aConfig, 
+                boost::shared_ptr<ReceiverConfig> rConfig);
 
         ~AudioReceiver();
 
     private:
-        void init_codec();
-        void init_depayloader();
-        void init_level();
-        void init_sink();
+        void createCodec(Pipeline &pipeline);
+        void createDepayloader();
+        void createSink(Pipeline &pipeline);
         
         void setCaps(); 
 
@@ -64,7 +64,6 @@ class AudioReceiver
         bool gotCaps_;
         RtpPay *depayloader_;
         Decoder *decoder_;
-        AudioLevel level_;
         AudioSink *sink_;
 };
 

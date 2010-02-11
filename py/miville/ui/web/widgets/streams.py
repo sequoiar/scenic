@@ -29,8 +29,14 @@ from miville.ui.web.web import Widget
 from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
+from miville.streams.conf import ConfError
+from miville.devices import devices
 
-log = log.start('info', 1, 0, 'web_strm')
+LOG_LEVEL = "info"
+# LOG_LEVEL = "debug"
+log = log.start(LOG_LEVEL, True, True, 'web_strm')
+
+CUSTOM_PROFILE_NAME = "Custom"
 
 class Streams(Widget):
     """
@@ -59,7 +65,7 @@ class Streams(Widget):
         
     def rc_update_profiles(self):
         """
-        Javascript wants to update the profiles
+        Javascript wants to update the list of profiles
         Called from the javascript widget.
         """
         self.api.list_profiles(self)
@@ -67,7 +73,7 @@ class Streams(Widget):
         
     def rc_set_profile(self, contact_name, profile_id):
         """
-        Javascript wants to modify the settings for a contact
+        Javascript wants to choose an other profile for a contact
 
         Called from the javascript client.
         :param contact_name: unicode  contact name
@@ -84,27 +90,107 @@ class Streams(Widget):
         Will update profile details for selected contact.
         :param contact_name: unicode
         """
+        DEFAULT_PROFILE = 0 # FIXME : use the one from dont-remember-where.
         contact = self.api.get_contact(contact_name)
         if contact.profile_id is None:
-            profile_id = 0 #FIXME
+            log.debug("rc_profile_details_for_contact: Contact %s has nop profile set. Using %s" % (contact.name, DEFAULT_PROFILE))
+            profile_id = DEFAULT_PROFILE
+            contact.profile_id = profile_id
         else:
             profile_id = contact.profile_id
+        try:
+            _tmp = self.api.config_db.get_profile(profile_id)
+        except ConfError, e:
+            log.error("Contact %s uses an invalid profile %s. Setting to %s" % (contact.name, profile_id, DEFAULT_PROFILE))
+            profile_id = DEFAULT_PROFILE
+            contact.profile_id = profile_id
         self._update_details(profile_id)
 
     def _update_details(self, profile_id):
         """
-        Sends profile details to Javascript widget.
+        Sends details for a given profile to the Javascript widget.
         """
         # build details for the newly selected profile.
-        details = [] # array of dict with keys "name" and "value"
-        entries = self.api.config_db.get_entries_for_profile(profile_id)
+        # ----------- all entries -----------
+        entries_details = [] # array of dict with keys "name" and "value"
+        try:
+            entries = self.api.config_db.get_entries_for_profile(profile_id)
+        except ConfError, e:
+            log.error("_update_details: Error calling db.get_entries_for_profile: %s" % (e.message))
+            return # XXX
         log.debug("entries for profile : %s" % (entries))
         for k, v in sorted(entries.items()):
             field = self.api.config_db.get_field(k)
-            log.debug("    name:%s, value:%s" % (field.desc, v))
-            details.append({"name":field.desc, "value":v})
-        self.callRemote("update_details", details)
+            #log.debug("    name:%s, value:%s" % (field.desc, v))
+            entries_details.append({"name":field.desc, "value":v})
+        # --------------
+        # get list of video devices available on this computer.
+        video_devices = devices.managers["video"].drivers["v4l2"].devices.keys()
+        log.debug("V4l2 devices: %s" % (video_devices))
+        # ------------ all sets (a profile contains one setting chosen for each set) --------
+        settings_ids = self.api.config_db.get_profile(profile_id).settings
+        sets_details = [] # array of dict with keys "set_name", "settings", "chosen_setting" and "desc". "setting" is a list of dict with keys setting_id and setting_desc.
+        sets_names = self.api.config_db.sets.keys()
+        sets_names.sort()
+        for set_name in sets_names: #TODO: sort by the_set.desc
+            the_set = self.api.config_db.sets[set_name]
+            _set_infos = {"set_name":set_name, "settings":[], "chosen_setting":0, "desc":the_set.desc}
+            for setting_id in the_set.get_all():
+                add_it = True
+                is_selected = False
+                setting = self.api.config_db.get_setting(setting_id)
+                setting_desc = setting.desc
+                if setting_id in settings_ids: # this it the chosen one in set!
+                    _set_infos["chosen_setting"] = setting_id
+                    is_selected = True
+                # if set is about choosing a video device, we must make sure the device is present on this computer.
+                if set_name == "video_source": # FIXME: hard-coded
+                    video_source = setting.entries["/send/video/source"]
+                    log.debug("Found set video_source with /send/video/source %s" % (video_source))
+                    if setting.entries["/send/video/source"] == "v4l2src":
+                        v4l2_dev = setting.entries["/send/video/v4l2/device"]
+                        log.debug("Found v4l2 setting with dev %s" % (v4l2_dev))
+                        if v4l2_dev not in video_devices:
+                            add_it = False
+                            log.debug("Discarding setting %s since we have no v4l2 device %s." % (setting_desc, v4l2_dev))
+                        else:
+                            log.debug("Found dev %s, so we keep that setting." % (v4l2_dev))
+                if add_it:
+                    _set_infos["settings"].append({"setting_id": setting_id, "setting_desc": setting_desc, "is_selected":is_selected})
+                else:
+                    log.debug("Not adding setting %s to set." % (setting_desc))
+            sets_details.append(_set_infos)
+        #log.debug("Sets details: %s" % (sets_details))
+        self.callRemote("update_details", entries_details, sets_details, profile_id)
+        # TODO: set setting value for each set:
+        #for set_name, s in db.sets.iteritems():
+        #    print("Set %s is choice between either:" % (set_name))
+        #    for setting_id in s.get_all():
+        #        print("    - %s" % (db.get_setting(setting_id).name))
         
+    def rc_set_value_of_set_for_profile(self, profile_id, set_name, setting_id, contact_name):
+        """
+        Called by javascript when the user changes the value of a profile's set setting.
+        
+        Might create a profile named "custom" if called for a profile that is not yet custom.
+        """
+        profile_id = int(profile_id)
+        setting_id = int(setting_id)
+        db = self.api.config_db
+        profile = db.get_profile(profile_id)
+        setting = db.get_setting(setting_id)
+        if profile.name.startswith(CUSTOM_PROFILE_NAME):
+            log.debug("rc_set_value_of_set_for_profile: Add setting %s:%s to profile %s:%s" % (setting.id, setting.name, profile.id, profile.name))
+            db.add_setting_to_profile(profile_id, int(setting_id))
+        else:
+            custom_name = "%s profile for %s" % (CUSTOM_PROFILE_NAME, contact_name)
+            new_profile = db.duplicate_profile(profile_id, name=custom_name)
+            log.debug("rc_set_value_of_set_for_profile: New profile %s:%s" % (new_profile.id, new_profile.name))
+            db.add_setting_to_profile(new_profile.id, setting_id)
+            log.debug("rc_set_value_of_set_for_profile: Set contact %s to use profile %s" % (contact_name, new_profile.name))
+            self.api.modify_contact(self, contact_name, profile_id=new_profile.id)
+            self.rc_update_profiles()
+
     def cb_list_profiles(self, origin, data): 
         """
         The API gives responds with the list of profiles.
@@ -114,10 +200,25 @@ class Streams(Widget):
         js_profiles = []
         profiles = data
         for profile in profiles:
-            js_profiles.append({
-                'id':profile.id, 
-                'name':profile.name
-                })
+            log.debug("cb_list_profiles: %s %s" % (profile.id, profile.name))
+            add_it = True
+            if profile.name.startswith(CUSTOM_PROFILE_NAME):
+                log.debug("cb_list_profiles: Is a CUSTOM")
+                delete = True
+                for contact in self.api.addressbook.contacts.itervalues():
+                    if contact.profile_id == profile.id:
+                        log.debug("cb_list_profiles: Not deleting it since contact %s uses it." % (contact.name))
+                        delete = False
+                if delete:
+                    add_it = False
+                    log.warning("Deleting profile %s for all users browsing the web interface !!" % (profile.name)) # FIXME
+                    self.api.config_db.delete_profile(profile.id)
+            if add_it:
+                log.debug("cb_list_profiles: appending profile %s." % (profile.name))
+                js_profiles.append({
+                    'id':profile.id, 
+                    'name':profile.name
+                    })
         self.callRemote('update_profiles', js_profiles)
 
     expose(locals())

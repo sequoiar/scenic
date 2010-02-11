@@ -3,23 +3,32 @@
 # Completed by Antoine Collet
 
 #utils
-import random, os, md5, socket
-from time import time, sleep
+import random
+import os
+import md5
+import socket
+from time import sleep
+from time import time
+import struct
 
 #twisted
-from twisted.internet import task, reactor, defer
+from twisted.internet import reactor
+from twisted.internet import defer
+from twisted.internet import task
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet.task import LoopingCall
 from twisted.internet.error import MessageLengthError
+from twisted.internet.error import CannotListenError
 
 #rtp 
-from sdp import SDP
-from formats import SDPGenerator, PT_CN, PT_xCN, PT_NTE, PT_PCMU, PT_AVP
-from packets import RTPPacket, parse_rtppacket
-from packets import NTE
+from rtpmidi.protocols.rtp.sdp import SDP
+from rtpmidi.protocols.rtp.formats import SDPGenerator, PT_CN, PT_xCN, PT_NTE, PT_PCMU, PT_AVP
+from rtpmidi.protocols.rtp.packets import RTPPacket, parse_rtppacket
+from rtpmidi.protocols.rtp.packets import NTE
+from rtpmidi.protocols.rtp import rtcp
 
 #data
-from jitter_buffer import JitterBuffer
+from rtpmidi.protocols.rtp.jitter_buffer import JitterBuffer
 from struct import unpack
 
 #Constants
@@ -39,13 +48,9 @@ class RTPProtocol(DatagramProtocol):
     """Implementation of the RTP protocol.
     Also manages a RTCP instance.
     """
-
     _stunAttempts = 0
-
     _cbDone = None
-
     dest = None
-
     Done = False
 
     def __init__(self, app, cookie, payload, jitter_buffer_time=10, session_bw=524288, verbose=0):
@@ -53,55 +58,41 @@ class RTPProtocol(DatagramProtocol):
         if verbose:
             global VERBOSE
             VERBOSE = 1
-
         #Init settings
         self.app = app
         self.cookie = cookie
         self.payload = payload
-
         #Reserved bandwidth
         self.session_bw = session_bw
-
         self._pendingDTMF = []
         self.ptdict = {}
-
         #seq num send
         self.seq = self.genRandom(bits=16)
-
         #seq num receiv
         self.jitter_buffer = JitterBuffer()
-
         #Init Random Timestamp and SSRC (<- use to send data)
         self.ts = self.genInitTS()
         self.ssrc = self.genSSRC()
-
         if VERBOSE:
             print "  SSRC: " + str(self.ssrc)
-
         #To check Silent
         self._silent = True
-
         # only for debugging -- the way to prevent the sending of RTP packets
         # onto the Net is to reopen the audio device with a None (default)
         # media sample handler instead of this RTP object as the media sample 
         #handler.
         self.sending = False
-
         #SR infos
         self.currentSentBytesTotal = 0
         self.currentSentPacketsTotal = 0
-
         #Jitter vars
         self.jitter_buffer_flag = True
         self.last_sent_time = 0
-
         #Estimation of round trip time
         self.rt_time = None
         self.rt_time_ref = None
-        
         #jitter buffer time in ms (default 10)
         self.jitter_buffer_time = jitter_buffer_time
-
 
     def createRTPSocket(self, locIP, rport=0, sport=0, needSTUN=False):
         """ Start listening on UDP ports for RTP and RTCP.
@@ -114,41 +105,29 @@ class RTPProtocol(DatagramProtocol):
         self.rport = rport
         self.sport = sport
         d = defer.Deferred()
-
         self._socketCompleteDef = d
-
         if rport != 0:
             port = rport
         else:
             port = sport
-
         rtp_port, rtcp_port = self._socketCreationAttempt(locIP, port)
-
         if sport != 0:
             if VERBOSE:
                 if sport != rtp_port :
                     print "Warning: Selected sending port could not be used, another one has been selected"
-
                 print "  Sending port:", rtp_port
-
         if rport != 0:
             if VERBOSE:
                 if rport != rtp_port :
                     print "Warning: Selected receiving port could not be used, another one has been selected"
-
                 print "  Receiving port:", rtp_port
-
         self.lastreceivetime = time()
         self.init_time = time()*1000
-        
         return d
 
     def _socketCreationAttempt(self, locIP, locPort):
         """Creating socket and determining port to be used in the session"""
-        from twisted.internet.error import CannotListenError
-        import rtcp
         self.RTCP = rtcp.RTCPProtocol(self, locIP, VERBOSE)
-
         # RTP port must be even, RTCP must be odd
         # We select a RTP port at random, and try to get a pair of ports
         # next to each other. What fun!
@@ -157,7 +136,6 @@ class RTPProtocol(DatagramProtocol):
         # but there's no way we'll get any back.
         #rtpPort = self.app.getPref('force_rtp_port')
         rtpPort = locPort
-
         if not rtpPort:
             rtpPort = 11000 + random.randint(0, 9000)
         if (rtpPort % 2) == 1:
@@ -165,23 +143,17 @@ class RTPProtocol(DatagramProtocol):
         while True:
             try:
                 self.rtpListener = reactor.listenUDP(rtpPort, self)
-
             except CannotListenError:
                 rtpPort += 2
                 continue
-
             else:
                 break
-
         rtcpPort = rtpPort + 1
-
         #else:
         #    rtcpPort = self.sport + 1
-        
         while True:
             try:
                 self.rtcpListener = reactor.listenUDP(rtcpPort, self.RTCP)
-
             except CannotListenError:
                 # Not quite right - if it fails, re-do the RTP listen
                 if self.rport > 0:
@@ -189,10 +161,8 @@ class RTPProtocol(DatagramProtocol):
                 rtpPort = rtpPort + 2
                 rtcpPort = rtpPort + 1
                 continue
-
             else:                
                 break
-
         #self.rtpListener.stopReading()
         if self.needSTUN is False:
             # The pain can stop right here
@@ -203,15 +173,12 @@ class RTPProtocol(DatagramProtocol):
             d = self._socketCompleteDef
             del self._socketCompleteDef
             d.callback(self.cookie)
-
         else:
             # If the NAT is doing port translation as well, we will just
             # have to try STUN and hope that the RTP/RTCP ports are on
             # adjacent port numbers. Please, someone make the pain stop.
             self.natMapping()
-
         return rtpPort, rtcpPort
-
 
     def getVisibleAddress(self):
         ''' returns the local IP address used for RTP (as visible from the
@@ -231,7 +198,6 @@ class RTPProtocol(DatagramProtocol):
         '''
         if VERBOSE:
             print "Nat mapping ..."
-
         # See above comment about port translation.
         # We have to do STUN for both RTP and RTCP, and hope we get a sane
         # answer.
@@ -248,10 +214,8 @@ class RTPProtocol(DatagramProtocol):
         # but this seems likely to change.
         try:
             reactor.removeSystemEventTrigger(self._shutdownHook)
-
         except:
             pass
-
         d = getMapper()
         d.addCallback(self._cb_unmap_gotMapper)
         return d
@@ -278,7 +242,6 @@ class RTPProtocol(DatagramProtocol):
         '''
         log.msg("got NAT mapping back! %r"%(results), system='rtp')
         rtpres, rtcpres = results
-
         if rtpres[0] != defer.SUCCESS or rtcpres[0] != defer.SUCCESS:
             # barf out.
             log.msg("uh oh, stun failed %r"%(results), system='rtp')
@@ -302,18 +265,15 @@ class RTPProtocol(DatagramProtocol):
                     # XXX
                     print "Giving up. Made %d attempts to get a working port" \
                         % (self._stunAttempts)
-
                 self._stunAttempts += 1
                 defer.maybeDeferred(
                             self.rtpListener.stopListening).addCallback( \
                     lambda x:self.rtcpListener.stopListening()).addCallback( \
                     lambda x:self._socketCreationAttempt())
-
             else:
                 # phew. working NAT
                 log.msg("stun: sane NAT for RTP/RTCP; rtp addr: %s" \
                             % (rtp,), system='rtp')
-
                 #Register address and port
                 self._extIP, self._extRTPPort = rtp
                 self._stunAttempts = 0
@@ -325,7 +285,6 @@ class RTPProtocol(DatagramProtocol):
         if VERBOSE:
             print "RTP got a connection refused, continuing anyway",
             print " (May be remote has close his connection...)"
-
         self.Done = True
         self.app.drop_call(self.cookie)
 
@@ -337,7 +296,6 @@ class RTPProtocol(DatagramProtocol):
         self.jitter_buffer_flag = False
         self.RTCP.send_BYE("Normal quit, ending session")
         self.RTCP.stop()
-
         #XXXSHTOOM
         #d = self.unmapRTP()
         d = defer.succeed(None)
@@ -349,29 +307,23 @@ class RTPProtocol(DatagramProtocol):
         if not self.RTCP.we_sent:
             #Updating we_sent
             self.RTCP.we_sent = True
-
             #Adding itself to senders table
             new_member =self.RTCP.member.copy()
             loc = self.getVisibleAddress()
             #new_member['addr'] = "localhost"
             #new_member['port'] = loc[1]+1
             self.RTCP.senders_table[self.ssrc] = new_member
-
         #Building packet
         packet = RTPPacket(self.ssrc, self.seq, self.ts, data, pt=pt,
                            marker=marker, xhdrtype=xhdrtype, xhdrdata=xhdrdata)
-
         self.seq += 1
 	rtp, session = self.app.currentRecordings[self.cookie] 
 	session.seq = self.seq
-
         # Note that seqno gets modulo 2^16 in RTPPacket, so it doesn't need
         # to be wrapped at 16 bits here.
         if self.seq >= 65536:
             self.seq = 1
-        
         bytes = packet.netbytes()
-
         ## For RTCP sender report.
         self.currentSentBytesTotal += len(bytes)
         self.currentSentPacketsTotal += 1
@@ -382,13 +334,10 @@ class RTPProtocol(DatagramProtocol):
                             self.RTCP.members_table[ssrc]['rtcp_port']-1)
                     if DEBUG:
                         print "send RTP to " + str(dest)
-
                     self.transport.write(bytes, dest)
-
                 except MessageLengthError, e:
                     print "Cannot write on socket ! Exception e (member: " \
                         + str(self.RTCP.members_table[ssrc])
-
                 self.last_sent_time = time()
 
     def _send_cn_packet(self, logit=False, recovery=0):
@@ -396,22 +345,17 @@ class RTPProtocol(DatagramProtocol):
         loss of packet (also usefull fro the first packet"""
         assert hasattr(self, 'dest'), "_send_cn_packet called before start %r" \
             % (self,)
-
         if logit:
             if VERBOSE:
                 print
                 print "Sending CN(%s) to seed firewall to %s:%d" % (self.payload, self.dest[0], self.dest[1])
-
         self._send_packet(self.payload, chr(127))
-
 
     def start(self, dest, fp=None):
         self.dest = dest
-
         self.jitter_buffer_flag = True
         self.Done = False
         self.sending = True
-
         # don't use udp connected mode if were sending to localhost, otherwise we won't be able
         # to receive on localhost as this sender will also listen on this port, blocking any
         # woudl be receiver from using this port
@@ -421,11 +365,9 @@ class RTPProtocol(DatagramProtocol):
         # Now send a single CN packet to seed any firewalls that might
         # need an outbound packet to let the inbound back.
         self._send_cn_packet(logit=True)
-        
         #Launching jitter buffer polling
         if self.rport > 0:
             reactor.callInThread(self._polling_jitter_buffer)
-
         #Launching RTCP
         self.RTCP.start()
 
@@ -436,14 +378,12 @@ class RTPProtocol(DatagramProtocol):
                 #Getting packets from jitter buffer
                 ref_time = time()*1000 - self.jitter_buffer_time
                 res = self.jitter_buffer.get_packets(ref_time)
-
                 #Checking seq num and silent packets
                 for packet in res:
                     ssrc = packet.header.ssrc
                     #Wrap around seq num
                     if self.RTCP.members_table[ssrc]['last_seq'] >= 65535:
                         self.RTCP.members_table[ssrc]['last_seq'] = 1
-
                     #Checking seq num
                     if self.RTCP.members_table[ssrc]['last_seq']+1 \
                             == packet.header.seq:
@@ -451,8 +391,6 @@ class RTPProtocol(DatagramProtocol):
                         self.app.incoming_rtp(self.cookie, packet.header.ts, \
                                                   packet, 0)
                         self.RTCP.members_table[ssrc]['last_seq'] += 1
-
-
                     else:
                         if self.RTCP.members_table[ssrc]['last_seq'] == 0:
                             #Call app with recovery journal
@@ -460,13 +398,11 @@ class RTPProtocol(DatagramProtocol):
                                                       packet, 0)
                             self.RTCP.members_table[ssrc]['last_seq'] \
                                 = packet.header.seq
-
                         else:
                             #recover infos
                             self.RTCP.members_table[ssrc]['lost'] += 1
                             self.RTCP.members_table[ssrc]['last_seq'] \
                                 = packet.header.seq
-
                             #logging
                             if VERBOSE:
                                 line = "Packet Num " \
@@ -475,42 +411,32 @@ class RTPProtocol(DatagramProtocol):
                                     + str(self.RTCP.members_table[ssrc]['lost']) + ")"
                                 line += " for client " \
                                     + str(self.RTCP.members_table[ssrc]['addr'])
-                                
                                 print line
-
                             #Call app with recovery journal
                             self.app.incoming_rtp(self.cookie, packet.header.ts,
                                                   packet, 1)
-
-
             sleep(0.001)
                     
-                
     def datagramReceived(self, datagram, addr, t=time):
         """Handle packets arriving"""
         if self.rport == 0:
             return
-
         if not self.checksum(datagram):
             if VERBOSE:
                 print "Warning: Packet received with wrong checksum RTP"
             return 
-
         #parse the packet
         packet = parse_rtppacket(datagram)
-
         #Checking SSRC
         ssrc = packet.header.ssrc
         if ssrc in self.RTCP.members_table:
             cname = self.RTCP.members_table[ssrc]['cname']
         else:
             cname = ""
-
         if not self.RTCP.check_ssrc(ssrc, addr, "DATA", cname):
             if VERBOSE:
                 print "Warning: Bad SSRC leaving packet on the floor" 
             return
-
         else:
             #Update last_seq and lastreceivetime
             self.RTCP.members_table[ssrc]['total_received_bytes'] += len(datagram)
@@ -518,24 +444,20 @@ class RTPProtocol(DatagramProtocol):
             self.RTCP.members_table[ssrc]['last_rtp_receive'] = time() 
 
             if self.RTCP.members_table[ssrc]['last_seq'] != 0 : 
-
                 if packet.data == "p":
                     #Silent without recovery
                     if DEBUG :
                         print "silent packet received"
                     #self.RTCP.members_table[ssrc]['last_seq'] += 1
                     return
-
                 #Testing payload type TODO erase this test
                 if packet.header.pt == self.payload:
                     if DEBUG:
                         print "payload of packet accepted"
-
                     #Getting stats
                     last_ts = self.RTCP.members_table[ssrc]['last_ts']
                     last_time = self.RTCP.members_table[ssrc]['last_time']
                     jitter = self.RTCP.members_table[ssrc]['jitter']
-
                     #Jitter calculation (rfc 3550 6.4.1)
                     #S = RTP Timestamp and R is time of arrival
                     if (last_ts == 0 and last_time == 0) \
@@ -543,39 +465,30 @@ class RTPProtocol(DatagramProtocol):
                                       - last_time) > JITTER_CALC_TIME_OUT ):
                         last_ts = packet.header.ts
                         last_time = int(time()*1000 - self.init_time)
-
                     else:
                         arrival_time = int(time()*1000 - self.init_time)
                         timestamp = packet.header.ts
                         delta = float(( arrival_time - last_time ) \
                                       - ( timestamp - last_ts ))
-
                         jitter = jitter \
                             + ( abs(delta) - jitter ) / 16
-
                         self.RTCP.members_table[ssrc]['last_ts'] = timestamp
                         last_time = self.RTCP.members_table[ssrc]['last_time'] = arrival_time
-
-                        
                         self.RTCP.members_table[ssrc]['jitter_values'].to_list(jitter)
                         self.RTCP.members_table[ssrc]['jitter'] = jitter
-
                     if self.RTCP.members_table[ssrc]['total_received_packets'] % CHECK_FREQ == 0:
                         if DEBUG:
                             print "Estimate jitter time"
-
                         jitter_average = self.RTCP.members_table[ssrc]['jitter_values'].average()
                         total_received = self.RTCP.members_table[ssrc]['total_received_packets']
                         #Lost rate estimation
                         lost = self.RTCP.members_table[ssrc]['lost']
                         lost_rate = (lost / float(total_received + lost)) * 100
-
                         #Keep this ?
                         if lost_rate > MAX_LOST_RATE :
                             if VERBOSE:
                                 line = "Loosing too much packet !!"
                                 print line
-
                         #Ajusting latency (based on round trip time/jitter)
                         #self.test_jitter()
                         #self.test_delay()
@@ -583,19 +496,15 @@ class RTPProtocol(DatagramProtocol):
                     #Adding packet to the jitter buffer
                     if DEBUG:
                         print "Adding packet to jitter buffer"
-
                     self.jitter_buffer.add([packet, time()*1000])
-            
                 else:
                     if VERBOSE:
                         print "Incompatible payload type"  
-
             else:
                 #this is the first packet
                 if VERBOSE:
                     line = "First RTP packet received from " + str(addr)
                     print line
-
                 self.RTCP.members_table[ssrc]['last_seq'] = packet.header.seq
 
 ##
@@ -603,25 +512,27 @@ class RTPProtocol(DatagramProtocol):
 ##
     def checksum(self, bytes):
         """Testing that the packet is valid"""
-        header = unpack('!BBHII', bytes[:12])
-
+        #FIXME: rename for a better name
+        try:
+            header = unpack('!BBHII', bytes[:12])
+        except struct.error, e:
+            return False
+        except IndexError, e:
+            return False
         #(version)
         version = (header[0]>>6)
         if version != 2:
-            return 0
-
+            return False
         # Payload type
         pt = header[1] & 127
         if pt != self.payload:
-            return 0
-
+            return False
         # Padding
         padding = (header[0] & 32) and 1 or 0
         if padding:
             oct_count = len(bytes) - 12
             if (oct_count % 4) != 0:
                 return 0
-        
         #Others test ??
         # Extension header present
         #ext = (hdrpieces[0] & 16) and 1 or 0
@@ -632,43 +543,32 @@ class RTPProtocol(DatagramProtocol):
         #
         #TEst : packet must be consistent with CC ? and 
         #payload type(chek midi payload)
-
-        return 1
-
-
+        return True
 
     def test_jitter(self, ):
         jbtime = self.jitter_buffer_time
         #Ajusting jitter buffer size and timestamp
         if int(jitter_average) > int(jbtime) + 3:
-            
             self.app.midi_out.latency += \
                 int(jitter_average - jbtime) \
                 + 10
-
             self.jitter_buffer_time += \
                 int(jitter_average - jbtime) \
                 + 10
-
             #Logging
             line = "Increasing jitter buffer, now set to "
             line += str(self.jitter_buffer_time)
             line += " ms, jitter estimation is "
             line += str(int(jitter_average)) + " ms"
             log.info(line)
-
-            
         elif int(jitter_average) < (int(jbtime) - 10) \
                 and (jbtime - (jbtime - jitter_average) - 3) \
                 > MIN_JITTER_BUFFER_TIME \
                 and jbtime > MIN_JITTER_BUFFER_TIME:
-            
             self.app.midi_out.latency -= \
                 int(jbtime - jitter_average) - 3
-            
             self.jitter_buffer_time -= \
                 int(jbtime - jitter_average) - 3
-                            
             #Logging
             line = "Decreasing jitter buffer, now set to "
             line += str(self.jitter_buffer_time)
@@ -682,13 +582,11 @@ class RTPProtocol(DatagramProtocol):
         if self.rt_time != None and self.rt_time_ref != None:
             rt_time = self.rt_time * 1000
             rt_time_ref = self.rt_time_ref * 1000
-
             if rt_time > rt_time_ref:
                             #latency MUST be > to the split between initial 
                             #rt_time and rt_time_ref
                 self.app.midi_out.latency += \
                     int(rt_time - rt_time_ref) + 10
-                        
                             #Logging action
                 line = "Updating latency to feet the changing delay"
                 line += ", now set to "
@@ -697,23 +595,19 @@ class RTPProtocol(DatagramProtocol):
 
                             #Update split_ts
                 self.split_ts = new_split_ts
-
             elif rt_time < (rt_time_ref - 40)  \
                     and (self.app.midi_out.latency  > MIN_LATENCY) \
                     and ((self.app.midi_out.latency  \
                               - int(rt_time_ref - rt_time) - 10)  \
                              > MIN_LATENCY):
-                            
                             #latency
                 self.app.midi_out.latency -= \
                     int(rt_time_ref - rt_time) - 10
-                        
                             #Logging action
                 line = "Updating latency to feet the changing delay"
                 line += ", now set to "
                 line += str(self.app.midi_out.latency) + " ms"
                 log.info(line)
-                
                             #Update round trip time ref
                 self.rt_time_ref = rt_time / 1000
         else:
@@ -737,11 +631,9 @@ class RTPProtocol(DatagramProtocol):
         ssrc = 0
         for n in nums: ssrc = ssrc ^ n
         ssrc = ssrc & (2**32 - 1)
-        
         return ssrc
 
     def genInitTS(self):
-        
         # Python-ish hack at RFC1889, Appendix A.6
         m = md5.new()
         m.update(str(self.genSSRC()))
@@ -767,12 +659,10 @@ class RTPProtocol(DatagramProtocol):
         return int(hex[:bits//4],16)
 
     def handle_data(self, pt, timestamp, sample, marker):
-
         if self.Done:
             if self._cbDone:
                 self._cbDone()
             return
-
         # We need to keep track of whether we were in silence mode or not -
         # when we go from silent->talking, set the marker bit. Other end
         # can use this as an excuse to adjust playout buffer.
@@ -786,8 +676,6 @@ class RTPProtocol(DatagramProtocol):
 
                 self.warnedaboutthis = True
             return
-
-
         incTS = True
         #Marker is on first packet after a silent
         if not self._silent:
@@ -798,13 +686,10 @@ class RTPProtocol(DatagramProtocol):
         else:
             marker = 1
             self._silent = False
-            
         if incTS:
             #Taking care about ts
             self.ts += int(timestamp)
-
         # Wrapping
         if self.ts >= TWO_TO_THE_32ND:
             self.ts = self.ts - TWO_TO_THE_32ND
-
         self._send_packet(pt, sample, marker=marker)

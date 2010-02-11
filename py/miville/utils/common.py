@@ -83,12 +83,12 @@ def load_modules(mods):
     # FIXME : lots of bugs due to this function !! 
     loaded_mods = []
     for mod in mods:
-        try:
+        #try:
             loaded_mod = mod.load()
             log.info('%s module loaded.' % mod.name)
-        except Exception, err:
-            log.error('Unable to load the module %s. Error: %s' % (mod.name, err))
-        else:
+        #except Exception, err:
+        #    log.error('Unable to load the module %s. Error: %s' % (mod.name, err))
+        #else:
             loaded_mods.append(loaded_mod)
     return loaded_mods
     

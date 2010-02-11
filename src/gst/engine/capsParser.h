@@ -31,7 +31,10 @@ class CapsParser {
         static std::string getCapsFromFile(const char *filename, const std::string &codec);
     public:
         /// video caps will vary depending on resolution
-        static std::string getVideoCaps(const std::string &codec, int captureWidth, int captureHeight);
+        static std::string getVideoCaps(const std::string &codec, 
+                int captureWidth, 
+                int captureHeight, 
+                const std::string &pictureAspectRatio);
         static std::string getAudioCaps(const std::string &codec, int numChannels, int sampleRate);
 };
 

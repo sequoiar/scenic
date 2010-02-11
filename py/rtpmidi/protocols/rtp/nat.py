@@ -5,7 +5,8 @@
 
 from twisted.internet import defer
 from twisted.internet.protocol import DatagramProtocol
-import random, socket
+import socket
+import random
 from twisted.python import log
 from defcache import DeferredCache
 

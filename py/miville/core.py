@@ -34,12 +34,10 @@ from twisted.internet.error import CannotListenError
 
 # App imports
 from miville import api
-#import streams
 from miville.utils import common
 from miville.utils import log
 from miville.utils.observer import Subject
 from miville import addressbook
-#from miville import settings
 from miville.protocols import com_chan
 from miville import connectors
 from miville import devices
@@ -47,7 +45,7 @@ from miville import devices
 # module variables
 core = None
 
-log = log.start('debug', True, True, 'core') # LOG TO FILE = True
+log = log.start('debug', name='core')
 
 class Core(Subject):
     """
@@ -96,15 +94,17 @@ class Core(Subject):
         for mod in self.uis:
             # interfaces = self.config.listen_to_interfaces
             interfaces = self.config.ui_network_interfaces
+            extra_kwargs = {}
             if mod.__name__.find('cli') != -1:
                 port = self.config.telnet_port + self.config.port_numbers_offset
                 mod.enable_escape_sequences = self.config.enable_escape_sequences 
             elif mod.__name__.find('web') != 1:
+                extra_kwargs["template_name"] = self.config.web_template
                 port = self.config.web_port + self.config.port_numbers_offset
             else: 
                 log.error('unknown user interface')
             try:
-                mod.start(self, port, interfaces)
+                mod.start(self, port, interfaces, **extra_kwargs)
             except CannotListenError, e:
                 log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
                 log.error("Port unavailable. There is probably an other miville running on this machine. Try with -o option.")
@@ -154,4 +154,3 @@ def _exit(app_return_val=0):
     #reactor.stop()
     #del reactor
     sys.exit(app_return_val)
-

@@ -28,6 +28,7 @@
 #include "mapMsg.h"
 
 #include "gst/engine.h"
+#include "engine/pipeline.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -37,8 +38,6 @@ namespace audiofactory
 
     static const int MSG_ID = 1;
 
-
-#ifdef __COMMAND_LINE__
     /// Convert command line options to ipcp
     static void rxOptionsToIPCP(MapMsg &options)
     {
@@ -58,40 +57,34 @@ namespace audiofactory
         options["device"] = options["audiodevice"];
         options["location"] = options["audiolocation"];
     }
-#endif // __COMMAND_LINE__
 
     static shared_ptr<AudioSender> 
-        buildAudioSender(MapMsg &msg)
+        buildAudioSender(Pipeline &pipeline, MapMsg &msg)
         {
             shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(msg));           
 
-            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID));
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, msg, MSG_ID));
 
-            shared_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
+            shared_ptr<AudioSender> tx(new AudioSender(pipeline, aConfig, rConfig));
 
             rConfig->capsOutOfBand(msg["negotiate-caps"] 
                     or !tx->capsAreCached());
 
-            tx->init();
             return tx;
         }
 
     static shared_ptr<AudioReceiver> 
-        buildAudioReceiver(MapMsg &msg)
+        buildAudioReceiver(Pipeline &pipeline, MapMsg &msg)
         {
             shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(msg));
 
             std::string caps(CapsParser::getAudioCaps(msg["codec"],
-                        msg["numchannels"], playback::sampleRate()));
+                        msg["numchannels"], pipeline.actualSampleRate()));
 
             shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID));
 
-            shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-            rx->init();
-            return rx;
+            return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));
         }
 }
 
-
 #endif // _AUDIO_FACTORY_H_
-

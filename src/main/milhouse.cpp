@@ -24,19 +24,15 @@
 #include "util.h"
 
 #include "gutil.h"
-#include "msgThreadFactory.h"
 
-#define __COMMAND_LINE__
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
-#undef __COMMAND_LINE__
+#include "playback.h"
 
 #include "milhouse.h"
 #include "milhouseLogger.h"
 #include "programOptions.h"
 
-
-int telnetServer(int, int);
 
 namespace po = boost::program_options;
 
@@ -45,29 +41,31 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     using boost::shared_ptr;
 
     LOG_DEBUG("Running as receiver");
+    Pipeline pipeline; // Pipeline will go out of scope last
+    if (options["debug"].as<std::string>() == "gst-debug")
+        pipeline.makeVerbose();
+
+    Playback playback(pipeline);
     shared_ptr<VideoReceiver> vRx;
     shared_ptr<AudioReceiver> aRx;
-
-    if (options["enable-controls"].as<bool>())
-        RtpReceiver::enableControl();
 
     if (!disableVideo)       
     {
         MapMsg ipcp(ProgramOptions::toMapMsg(options));
         videofactory::rxOptionsToIPCP(ipcp);
-        vRx = videofactory::buildVideoReceiver(ipcp);
+        vRx = videofactory::buildVideoReceiver(pipeline, ipcp);
     }
     if (!disableAudio)
     {
         MapMsg ipcp(ProgramOptions::toMapMsg(options));
         audiofactory::rxOptionsToIPCP(ipcp);
-        aRx = audiofactory::buildAudioReceiver(ipcp);
+        aRx = audiofactory::buildAudioReceiver(pipeline, ipcp);
 
         if (options["disable-jack-autoconnect"].as<bool>())
             MessageDispatcher::sendMessage("disable-jack-autoconnect");
     }
 
-    playback::start();
+    playback.start();
 
     /// These options are more like commands, they are dispatched after playback starts
     if (options.count("jitterbuffer"))
@@ -84,7 +82,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     gutil::runMainLoop(options["timeout"].as<int>());
     LOG_DEBUG("main loop has finished");
 
-    playback::stop();
+    playback.stop();
 }
 
 
@@ -93,6 +91,11 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
     using boost::shared_ptr;
 
     LOG_DEBUG("Running as sender");
+    Pipeline pipeline; // Pipeline will go out of scope last
+    if (options["debug"].as<std::string>() == "gst-debug")
+        pipeline.makeVerbose();
+
+    Playback playback(pipeline);
     shared_ptr<VideoSender> vTx;
     shared_ptr<AudioSender> aTx;
 
@@ -100,24 +103,49 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
     {
         MapMsg ipcp(ProgramOptions::toMapMsg(options));
         videofactory::txOptionsToIPCP(ipcp);
-        vTx = videofactory::buildVideoSender(ipcp);
+        vTx = videofactory::buildVideoSender(pipeline, ipcp);
     }
 
     if (!disableAudio)
     {
         MapMsg ipcp(ProgramOptions::toMapMsg(options));
         audiofactory::txOptionsToIPCP(ipcp);
-        aTx = audiofactory::buildAudioSender(ipcp);
+        aTx = audiofactory::buildAudioSender(pipeline, ipcp);
 
         if (options["disable-jack-autoconnect"].as<bool>())
             MessageDispatcher::sendMessage("disable-jack-autoconnect");
     }
 
-    playback::start();
+    playback.start();
 
     gutil::runMainLoop(options["timeout"].as<int>());
 
-    playback::stop();
+    playback.stop();
+}
+
+
+void Milhouse::runAsLocal(const po::variables_map &options)
+{
+    using boost::shared_ptr;
+
+    LOG_DEBUG("Running local");
+    Pipeline pipeline; // Pipeline will go out of scope last
+    if (options["debug"].as<std::string>() == "gst-debug")
+        pipeline.makeVerbose();
+
+    Playback playback(pipeline);
+    shared_ptr<LocalVideo> localVideo;
+    //shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
+
+    MapMsg ipcp(ProgramOptions::toMapMsg(options));
+    videofactory::localOptionsToIPCP(ipcp);
+    localVideo = videofactory::buildLocalVideo(pipeline, ipcp);
+
+    playback.start();
+
+    gutil::runMainLoop(options["timeout"].as<int>());
+
+    playback.stop();
 }
 
 
@@ -144,15 +172,7 @@ short Milhouse::run(int argc, char **argv)
     if (options.count("help") or argc == 1) 
         return usage(desc);
 
-    if (options.count("serverport"))
-        return telnetServer(options["sender"].as<bool>(), options["serverport"].as<int>());
-
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
-
-    // FIXME: this is actually where pipeline instance is created because it's the 
-    // first time we call Pipeline::Instance(), this is bad in its implicitness
-    if (logger.gstDebug())
-        playback::makeVerbose();
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
 
@@ -166,13 +186,26 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
+    if (options.count("display"))
+    {
+        setenv("DISPLAY", 
+                options["display"].as<std::string>().c_str(), 
+                1 /* override current value if present */);
+    }
+
     if (options["list-cameras"].as<bool>())
-            return VideoSourceConfig::listCameras();
- 
+        return VideoSourceConfig::listCameras();
+
+    if (options["localvideo"].as<bool>()) 
+    {
+        runAsLocal(options);
+        return 0;
+    }
+
     if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
-        LOG_ERROR("argument error: must be sender OR receiver."); 
+        LOG_ERROR("argument error: must be sender OR receiver OR localvideo."); 
         return 1;
     }
 
@@ -215,7 +248,8 @@ int main(int argc, char **argv)
     int ret = 0;
     atexit(onExit);
 
-    try {
+    try 
+    {
         signal_handlers::setHandlers();
         Milhouse milhouse;
         ret = milhouse.run(argc, argv);

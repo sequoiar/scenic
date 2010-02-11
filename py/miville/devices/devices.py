@@ -596,7 +596,7 @@ def modify_attribute(caller, driver_kind, driver_name, device_name, attribute_na
     #self.notify(caller, 
     # devices.get_driver(driver_name).devices[device_name].attributes[attribute_name].set_value(value)
 
-def set_video_standard(caller, value=None):
+def set_video_standard(caller, value=None, device_name=None):
     """
     Easily sets the video standard. (norm)
     
@@ -621,14 +621,16 @@ def set_video_standard(caller, value=None):
     try: 
         manager = managers[driver_kind]
     except KeyError:
-        # self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
         log.error('No such kind of driver: %s' % (driver_kind))
     else:
-        devices_list = []
-        # for every video driver.
-        for driver in manager.drivers.values():
-            for device in driver.devices.values():
-                log.debug("changing norm to %s for %s" % (value, device.name))
-                modify_attribute(caller, driver.kind, driver.name, device.name, 'norm', value)
+        if device_name is not None:
+            modify_attribute(caller, driver_kind, "v4l2", device_name, 'norm', value)
+        else:
+            # for every video driver.
+            for driver in manager.drivers.values():
+                if driver.name == "v4l2":
+                    for device in driver.devices.values():
+                        log.debug("changing norm to %s for %s" % (value, device.name))
+                        modify_attribute(caller, driver.kind, driver.name, device.name, 'norm', value)
     return value
 

@@ -38,9 +38,10 @@ class BusMsgHandler;
 class Pipeline : boost::noncopyable
 {
     public:
-        static bool isAlive() { return Instance()->pipeline_ == 0; }
-        /// This is the single point of access to the singleton instance of this pipeline
-        static Pipeline * Instance();
+        Pipeline();
+        ~Pipeline();
+
+        bool isAlive() { return pipeline_ == 0; }
         _GstElement *makeElement(const char *factoryName, const char *elementName);
         void subscribe(BusMsgHandler *obj);
         void unsubscribe(BusMsgHandler *obj);
@@ -62,6 +63,7 @@ class Pipeline : boost::noncopyable
         void makeReady();
         void stop();
         void notifyQuitted() { quitted_ = true; }
+        void quit();
         bool quitted() { return quitted_; }
         void makeVerbose();
         void postInterrupt();
@@ -69,23 +71,17 @@ class Pipeline : boost::noncopyable
     private:
         static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);
         void add(_GstElement * element);
-        static void reset();
         _GstBus* getBus() const;
         GstClock* clock() const;
 
         static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
         bool checkStateChange(GstStateChangeReturn ret) const;
 
-        Pipeline();
-
-        ~Pipeline();
-
         void updateListeners(GstMessage *msg);
 
         _GstElement *pipeline_;
         GstClockTime startTime_;
         std::vector<BusMsgHandler*> handlers_;
-        int refCount_;
         bool quitted_;
         unsigned sampleRate_;
         char *titleStr_;

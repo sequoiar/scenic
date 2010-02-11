@@ -17,11 +17,9 @@ For distribution packages::
 """
 from setuptools import find_packages
 from setuptools import setup
-__version__ = "0.3.1" # see miville.runner.__version__ as well
 
-# how I generated that list : 
-#packages = find_packages(exclude=["test", "miville.py"]),
-#print 'PACKAGES:', packages
+#FIXME: get this from configure.ac
+__version__ = "0.3.6" # see miville.runner.__version__ as well
 
 miville_packages = [
     'miville',
@@ -32,7 +30,6 @@ miville_packages = [
     'miville.protocols',
     'miville.streams',
     'miville.connectors.basic',
-    'miville.connectors.sip',
     'miville.ui.cli',
     'miville.ui.web',
     'miville.ui.web.pages',
@@ -47,8 +44,12 @@ miville_packages = [
     'miville.ui.web.templates.default.xml',
     'miville.ui.web.templates.default.img',
     'miville.ui.web.templates.default.css',
+    'rtpmidi',
+    'rtpmidi.protocols',
+    'rtpmidi.protocols.rtp',
+    'rtpmidi.engines',
+    'rtpmidi.engines.midi',
     ]
-
 
 setup(
     name = "miville",
@@ -64,7 +65,7 @@ setup(
     # in nevow, which installs it using easy_install even when the nevow ubuntu package is already installed. 
     # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
     # we removed twisted as well, since we prefer the user to install it himself.
-    scripts = ["restart_jackd.py", "mivilled"], #, "miville.py"
+    scripts = ["restart_jackd.py", "mivilled", "midistream"], #, "miville.py"
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,
@@ -74,6 +75,3 @@ setup(
         "":["*.rst", "*.png", "*.jpg", "*.css", "*.js", "*.xml", '*.txt', 'off']
     }
     )
-
-#test_suite='nose.collector',
-    

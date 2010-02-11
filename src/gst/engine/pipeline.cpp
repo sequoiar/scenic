@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include "util.h"
+#include "gutil.h"
 
 #include "dv1394.h"
 #include "busMsgHandler.h"
@@ -37,60 +38,47 @@
 // NOTES:
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
-// This class uses the Meyer Singleton pattern
 
 Pipeline::Pipeline() : pipeline_(0), startTime_(0), handlers_(), 
-    refCount_(0), quitted_(false), sampleRate_(SAMPLE_RATE)
+    quitted_(false), sampleRate_(SAMPLE_RATE)
 {
-    // thread-safe under gcc
-    if (pipeline_ == 0)
-    {
-        LOG_DEBUG("Calling gst_init");
+    LOG_DEBUG("Calling gst_init");
 
-        // FIXME: GROSSS, but we need this so that
-        // for example in jack our process shows up as milhouse
-        // and not "unknown", and gst_init only takes raw ***argv
-        static int argc = 1;
-        static const std::string title("milhouse");
-        titleStr_ = new gchar[title.length() + 1];
-        memcpy(titleStr_, title.c_str(), title.length());
-        // argv has to end with 0
-        titleStr_[title.length()] = 0;
-        gchar **argv = {&titleStr_};
+    // FIXME: GROSSS, but we need this so that
+    // for example in jack our process shows up as milhouse
+    // and not "unknown", and gst_init only takes raw ***argv
+    static int argc = 1;
+    static const std::string title("milhouse");
+    titleStr_ = new gchar[title.length() + 1];
+    memcpy(titleStr_, title.c_str(), title.length());
+    // argv has to end with 0
+    titleStr_[title.length()] = 0;
+    gchar **argv = {&titleStr_};
 
-        gst_init(&argc, &argv);
+    gst_init(&argc, &argv);
 
-        tassert(pipeline_ = gst_pipeline_new("pipeline"));
+    tassert(pipeline_ = gst_pipeline_new("pipeline"));
 
-        // this will be used as a reference for future
-        // pipeline synchronization
-        startTime_ = gst_clock_get_time(clock());
+    // this will be used as a reference for future
+    // pipeline synchronization
+    startTime_ = gst_clock_get_time(clock());
 
-        /* watch for messages on the pipeline's bus (note that this will only
-         *      work like this when a GLib main loop is running) */
-        GstBus *bus;
-        bus = getBus();
-        gst_bus_add_watch(bus, static_cast<GstBusFunc>(bus_call), static_cast<gpointer>(this));
-        gst_object_unref(bus);
-    }
+    /* watch for messages on the pipeline's bus (note that this will only
+     *      work like this when a GLib main loop is running) */
+    GstBus *bus;
+    bus = getBus();
+    gst_bus_add_watch(bus, static_cast<GstBusFunc>(bus_call), static_cast<gpointer>(this));
+    gst_object_unref(bus);
 }
 
-Pipeline * Pipeline::Instance()
-{
-    static Pipeline instance;
-    return &instance;
-}
-
-
-/// FIXME: this is never called
 Pipeline::~Pipeline()
 {
-    if (pipeline_)
-    {
-        LOG_DEBUG("Unreffing pipeline");
-        gst_object_unref(GST_OBJECT(pipeline_));
-    }
+    LOG_INFO("Unreffing pipeline");
+    gst_object_unref(GST_OBJECT(pipeline_));
+
+    Dv1394::reset();
     delete [] titleStr_;
+    titleStr_ = 0;
 }
 
 
@@ -113,14 +101,15 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
 }
 
 
-gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
+gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 {
+    Pipeline *context = static_cast<Pipeline*>(data);
     switch(GST_MESSAGE_TYPE(msg))
     {
         case GST_MESSAGE_EOS:
             {
                 LOG_DEBUG("End-of-stream");
-                Instance()->updateListeners(msg);
+                context->updateListeners(msg);
                 break;
             }
         case GST_MESSAGE_ERROR:
@@ -158,7 +147,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
             }
             // using fallthrough
         case GST_MESSAGE_ELEMENT:
-            Instance()->updateListeners(msg);
+            context->updateListeners(msg);
             break;
         case GST_MESSAGE_APPLICATION:
             /// handle interrupt
@@ -173,13 +162,13 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                 LOG_INFO("Interrupt: Stopping pipeline ...\n");
                 if (msg)
                 {
-                   // gst_message_unref(msg);
-                  //  gst_object_unref(bus);
+                    // gst_message_unref(msg);
+                    //  gst_object_unref(bus);
                 }
                 return FALSE;
             }
             else
-                Instance()->updateListeners(msg);
+                context->updateListeners(msg);
             break;
 
         case GST_MESSAGE_LATENCY:
@@ -187,7 +176,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                 LOG_DEBUG("Latency change, recalculating latency for pipeline");
                 // when pipeline latency is changed, this msg is posted on the bus. we then have
                 // to explicitly tell the pipeline to recalculate its latency
-                if (!gst_bin_recalculate_latency (GST_BIN_CAST (Instance()->pipeline_)))
+                if (!gst_bin_recalculate_latency (GST_BIN_CAST (context->pipeline_)))
                     LOG_WARNING("Could not reconfigure latency.");
                 break;
             }
@@ -197,23 +186,6 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
     }
 
     return TRUE;
-}
-
-// This can be a class method or a member method, it's a class method for the sake of 
-// looking like Instance()
-
-void Pipeline::reset()
-{
-    if (Instance()->pipeline_)
-    {
-        LOG_DEBUG("Pipeline is being reset.");
-        LOG_DEBUG("Unreffing bus");
-        gst_object_unref(Instance()->getBus());
-        LOG_DEBUG("Unreffing pipeline");
-        gst_object_unref(GST_OBJECT(Instance()->pipeline_));
-        Instance()->pipeline_ = 0;
-        delete [] Instance()->titleStr_;
-    }
 }
 
 
@@ -278,7 +250,7 @@ void Pipeline::deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec *
 
 bool Pipeline::isPlaying() const
 {
-    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_PLAYING))
+    if (GST_STATE(pipeline_) == GST_STATE_PLAYING)
         return true;
     else
         return false;
@@ -296,7 +268,7 @@ bool Pipeline::isReady() const
 
 bool Pipeline::isPaused() const
 {
-    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_PAUSED))
+    if (GST_STATE(pipeline_) == GST_STATE_PAUSED)
         return true;
     else
         return false;
@@ -305,7 +277,7 @@ bool Pipeline::isPaused() const
 
 bool Pipeline::isStopped() const
 {
-    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_NULL))
+    if (GST_STATE(pipeline_) == GST_STATE_NULL)
         return true;
     else
         return false;
@@ -376,6 +348,14 @@ void Pipeline::pause()
 }
 
 
+void Pipeline::quit()
+{
+    stop();
+    notifyQuitted();
+    gutil::killMainLoop();
+}
+
+
 void Pipeline::stop()
 {
     if (isStopped())        // only needs to be stopped once
@@ -387,35 +367,24 @@ void Pipeline::stop()
         LOG_DEBUG("Now stopped/null");
     }
     else
-        LOG_DEBUG("Pipeline == 0, can't be stopped");
+        THROW_CRITICAL("PIPELINE == 0!");
 }
 
 
 void Pipeline::add(GstElement *element)
 {
     gst_bin_add(GST_BIN(pipeline_), element);
-    ++refCount_;
 }
 
 
 void Pipeline::remove(GstElement **element) // guarantees that original pointer will be zeroed
 {                                           // and not reusable
     stop();
-    if (*element)
+    if (*element and pipeline_)
     {
         if (!gst_bin_remove(GST_BIN(pipeline_), *element))
             LOG_WARNING("Could not remove element " << GST_ELEMENT_NAME(element));
         *element = NULL;
-        --refCount_;
-
-        /// No elements left in pipeline
-        if (refCount_ <= 0)
-        {
-            if (refCount_ != 0)
-                LOG_WARNING("Somehow refcount is less than zero");
-            Dv1394::reset();
-            reset();
-        }
     }
 }
 
@@ -433,14 +402,7 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
                 if (!gst_bin_remove(GST_BIN(pipeline_), *iter))
                     LOG_WARNING("Could not remove element " << GST_ELEMENT_NAME(*iter));
                 *iter = NULL;
-                --refCount_;
             }
-        }
-        if (refCount_ <= 0)
-        {
-            if (refCount_ != 0)
-                LOG_WARNING("Somehow refcount is less than zero");
-            reset();
         }
     }
 }
@@ -477,9 +439,8 @@ GstElement *Pipeline::makeElement(const char *factoryName, const char *elementNa
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
     if(!element)
-    {
         THROW_ERROR("element not made. factoryName: " << factoryName << " elementName: " << elementName); 
-    }
+
     add(element);
     return element;
 }

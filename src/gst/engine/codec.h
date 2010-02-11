@@ -31,6 +31,7 @@ class _GstElement;
 class RtpPay;
 class Pay;
 class MapMsg;
+class Pipeline;
 
 
 /** 
@@ -40,15 +41,16 @@ class MapMsg;
 class Encoder : public GstLinkableFilter, boost::noncopyable
 {
     public:
-        Encoder();
+        Encoder(Pipeline &pipeline, const char *encoder);
+        Encoder(Pipeline &pipeline);
         virtual ~Encoder();
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual Pay* createPayloader() const = 0;
         int getBitrate() const;
-        void postBitrate();
         virtual void setBitrate(int bitrate);
 
     protected:
+        Pipeline &pipeline_;
         virtual void setBitrateInKbs(int bitrate);
         _GstElement *encoder_;
 
@@ -64,9 +66,9 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
 class Decoder : public GstLinkableFilter, boost::noncopyable
 {
     public:
-        Decoder();
+        Decoder(Pipeline &pipeline, const char *decoder);
+        Decoder(Pipeline &pipeline);
         virtual ~Decoder();
-        virtual void init () = 0;
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
         virtual void adjustJitterBuffer() {}; // buy default, do nothing
@@ -74,6 +76,7 @@ class Decoder : public GstLinkableFilter, boost::noncopyable
         virtual unsigned long long minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
         
     protected:
+        Pipeline &pipeline_;
         _GstElement *decoder_;
 
     private:
@@ -81,36 +84,11 @@ class Decoder : public GstLinkableFilter, boost::noncopyable
         _GstElement *sinkElement() { return decoder_; }
 };
 
-/// Abstract child of encoder that wraps audioconvert functionality
-
-class AudioConvertedEncoder : public Encoder
-{
-    protected:
-        AudioConvertedEncoder();
-        ~AudioConvertedEncoder();
-        _GstElement *aconv_;
-
-    private:
-        _GstElement *sinkElement() { return aconv_; }
-};
-
-
-class AudioConvertedDecoder : public Decoder
-{
-    protected: 
-        AudioConvertedDecoder();
-        ~AudioConvertedDecoder();
-        _GstElement *aconv_;
-        void init();
-
-    private:
-        _GstElement *srcElement() { return aconv_; }
-};
 
 class VideoEncoder : public Encoder 
 {
     public: 
-        VideoEncoder(GstElement *encoder, bool supportsInterlaced);
+        VideoEncoder(Pipeline &pipeline, const char *encoder, bool supportsInterlaced);
         ~VideoEncoder();
 
     protected:
@@ -129,13 +107,12 @@ class VideoEncoder : public Encoder
 class VideoDecoder : public Decoder 
 {
     public: 
-        VideoDecoder();
+        VideoDecoder(Pipeline &pipeline, const char *decoder, bool doDeinterlace);
         ~VideoDecoder();
-        void doDeinterlace() { doDeinterlace_ = true; }
-        virtual void init() = 0;
         virtual void adjustJitterBuffer();
     
     protected:
+        void addDeinterlace();
         bool doDeinterlace_;
         _GstElement *colorspc_;
         _GstElement *deinterlace_;
@@ -159,7 +136,7 @@ class VideoDecoder : public Decoder
 class H264Encoder : public VideoEncoder
 {
     public: 
-        H264Encoder(MapMsg &settings);
+        H264Encoder(Pipeline &pipeline, MapMsg &settings);
         void setBitrate(int bitrate);
 
     private:
@@ -169,10 +146,10 @@ class H264Encoder : public VideoEncoder
 };
 
 /// Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
-class H264Decoder : public VideoDecoder
-{
+class H264Decoder : public VideoDecoder {
+    public:
+        H264Decoder(Pipeline &pipeline, bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
         void adjustJitterBuffer(); 
 };
@@ -183,21 +160,21 @@ class H264Decoder : public VideoDecoder
 class H263Encoder : public VideoEncoder
 {
     public: 
-        H263Encoder(MapMsg &settings);
+        H263Encoder(Pipeline &pipeline, MapMsg &settings);
 
     private:
         int bitrate_;
         ~H263Encoder();
 
-        
         Pay* createPayloader() const;
 };
 
 /// Decoder that decodes H.263 into raw video using the ffmpeg h263 decoder.
 class H263Decoder : public VideoDecoder
 {
+    public:
+        H263Decoder(Pipeline &pipeline, bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
 };
 
@@ -207,7 +184,7 @@ class H263Decoder : public VideoDecoder
 class Mpeg4Encoder : public VideoEncoder
 {
     public:
-        Mpeg4Encoder(MapMsg &settings);
+        Mpeg4Encoder(Pipeline &pipeline, MapMsg &settings);
         ~Mpeg4Encoder();
 
     private:
@@ -219,8 +196,9 @@ class Mpeg4Encoder : public VideoEncoder
 /// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
 class Mpeg4Decoder: public VideoDecoder
 {
+    public:
+        Mpeg4Decoder(Pipeline &pipeline, bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
 };
 
@@ -229,7 +207,7 @@ class Mpeg4Decoder: public VideoDecoder
 class TheoraEncoder : public VideoEncoder
 {
     public:
-        TheoraEncoder(MapMsg &settings);
+        TheoraEncoder(Pipeline &pipeline, MapMsg &settings);
         ~TheoraEncoder();
         void setBitrate(int bitrate);
         void setQuality(int quality);
@@ -250,8 +228,9 @@ class TheoraEncoder : public VideoEncoder
 /// Decoder that decodes mpeg4 into raw video using the theoradec decoder.
 class TheoraDecoder: public VideoDecoder
 {
+    public:
+        TheoraDecoder(Pipeline &pipeline, bool doDeinterlace);
     private: 
-        void init();
         RtpPay* createDepayloader() const;
 };
 
@@ -260,7 +239,7 @@ class TheoraDecoder: public VideoDecoder
 class VorbisEncoder : public  Encoder
 {
     public: 
-        VorbisEncoder();
+        VorbisEncoder(Pipeline &pipeline);
 
     private:
         ~VorbisEncoder();
@@ -271,48 +250,56 @@ class VorbisEncoder : public  Encoder
 class VorbisDecoder : public Decoder
 {
     public: 
+        VorbisDecoder(Pipeline &pipeline);
         bool adjustsBufferTime() { return true; }
         unsigned long long minimumBufferTime();
     private: 
-        void init();
         RtpPay* createDepayloader() const;
         static const unsigned long long MIN_BUFFER_USEC = 100000;
 };
 
 /// Encoder that simply performs datatype conversion on raw audio.
-class RawEncoder : public AudioConvertedEncoder 
+class RawEncoder : public Encoder
 {
     public:
-        RawEncoder();
+        RawEncoder(Pipeline &pipeline);
+        ~RawEncoder();
+        _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return aconv_; }
 
     private:
+        _GstElement *aconv_;
         Pay* createPayloader() const;
 };
 
 /// Decoder that simply performs datatype conversion on raw audio.
-class RawDecoder : public AudioConvertedDecoder
+class RawDecoder : public Decoder
 {
     public:
-        RawDecoder();
+        RawDecoder(Pipeline &pipeline);
+        ~RawDecoder();
 
     private:
         RtpPay* createDepayloader() const;
+        _GstElement *aconv_;
 
         _GstElement *sinkElement() { return aconv_; }
+        _GstElement *srcElement() { return aconv_; }
 };
 
 
 /// Encoder that encodes raw audio to mpeg.
-class LameEncoder : public AudioConvertedEncoder 
+class LameEncoder : public Encoder
 {
     public:
-        LameEncoder();
+        LameEncoder(Pipeline &pipeline);
         ~LameEncoder();
 
     private:
+        _GstElement *aconv_;
         _GstElement *mp3parse_;
         Pay* createPayloader() const;
+        _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return mp3parse_; }
         
         ///No Copy Constructor
@@ -323,12 +310,14 @@ class LameEncoder : public AudioConvertedEncoder
 
 /// Decoder that decodes mpeg to raw audio.
 
-class MadDecoder : public AudioConvertedDecoder
+class MadDecoder : public Decoder
 {
     public:
-        MadDecoder();
+        MadDecoder(Pipeline &pipeline);
+        ~MadDecoder();
     private:
-        void init();
+        _GstElement *srcElement() { return aconv_; }
+        _GstElement *aconv_;
         RtpPay* createDepayloader() const;
 };
 

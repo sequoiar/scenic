@@ -103,8 +103,10 @@ def _parse_v4l2_ctl_all(lines):
         elif line.find("Video input") == 0:
             try:
                 results['input'] = line.split('(')[1].split(')')[0]
-            except KeyError, e:
+            except IndexError, e:
+                # Sometimes you don't have parentheses for Video input: x
                 log.error("_parse_v4l2_ctl_all: " + e.message)
+                results['input'] = line.split(':')[1].strip()
             # log.debug('V4L2 input: ' + results['input'])
             # TODO : possibilities are Composite0, Composite1, 
         elif line.find(":") > 0:
@@ -369,7 +371,3 @@ def start(api):
     driver.api = api
     devices.managers['video'].add_driver(driver)
     reactor.callLater(0, driver.prepare)
-
-
-    
-    

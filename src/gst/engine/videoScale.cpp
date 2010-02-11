@@ -26,11 +26,13 @@
 #include <sstream>
 #include "pipeline.h"
 
+const int VideoScale::MAX_SCALE;
 
 /** Constructor sets width and height */
-VideoScale::VideoScale(int width, int height) : 
-    videoscale_(Pipeline::Instance()->makeElement("videoscale", NULL)),
-    capsfilter_(Pipeline::Instance()->makeElement("capsfilter", NULL))
+VideoScale::VideoScale(Pipeline &pipeline, int width, int height) : 
+    pipeline_(pipeline),
+    videoscale_(pipeline_.makeElement("videoscale", NULL)),
+    capsfilter_(pipeline_.makeElement("capsfilter", NULL))
 {
     using namespace boost::assign;
     using std::string;
@@ -61,13 +63,14 @@ VideoScale::VideoScale(int width, int height) :
 
     // Don't need to unref tempCaps, this happens every time we append it
     // to videoCaps
-    gst_caps_unref(videoCaps);
+    if (videoCaps)
+        gst_caps_unref(videoCaps);
 }
 
 /// Destructor 
 VideoScale::~VideoScale()
 {
-    Pipeline::Instance()->remove(&capsfilter_);
-    Pipeline::Instance()->remove(&videoscale_);
+    pipeline_.remove(&capsfilter_);
+    pipeline_.remove(&videoscale_);
 }
 

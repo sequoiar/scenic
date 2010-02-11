@@ -40,15 +40,42 @@ class Profile(object):
     def __str__(self):
         return self.caps
 
+
 class VideoProfile(Profile):
+    PIXEL_ASPECT_RATIO_TABLE = {}
+    # PAL
+    PIXEL_ASPECT_RATIO_TABLE["720x576"] = {"4:3" :"59/54"}
+    PIXEL_ASPECT_RATIO_TABLE["704x576"] = {"4:3" : "59/54", "16:9" : "118/81"}
+    PIXEL_ASPECT_RATIO_TABLE["352x288"] = {"16:9" : "118/81"}
+
+    # NTSC
+    PIXEL_ASPECT_RATIO_TABLE["720x480"] = {"4:3" : "10/11"}
+    PIXEL_ASPECT_RATIO_TABLE["704x480"] = {"4:3" : "10/11", "16:9" : "40/33"}
+    PIXEL_ASPECT_RATIO_TABLE["352x240"] = {"16:9" : "40/33"}
+
+    # Misc. used by us
+    PIXEL_ASPECT_RATIO_TABLE["768x480"] = {"4:3" : "6/7"}
+    PIXEL_ASPECT_RATIO_TABLE["640x480"] = {"4:3" : "1/1"}
+    
+    def get_pixel_aspect_ratio(self, picture_aspect_ratio):
+        key = str(self.width) + "x" + str(self.height) 
+        if key in self.PIXEL_ASPECT_RATIO_TABLE:
+            if picture_aspect_ratio in self.PIXEL_ASPECT_RATIO_TABLE[key]:
+                return self.PIXEL_ASPECT_RATIO_TABLE[key][picture_aspect_ratio]
+            else: # default to square pixels
+                return "1/1"
+        else: # default to square pixels
+            return "1/1"
+
     """ Holds codec name, encoder names, payloader name and caps string """
-    def __init__(self, encoder, payloader, width=640, height=480):
+    def __init__(self, encoder, payloader, width=640, height=480, picture_aspect_ratio="4:3"):
         Profile.__init__(self, encoder, payloader)
         self.width = width
         self.height = height
-        self.src = "videotestsrc ! video/x-raw-yuv, width=%d, height=%d" % (self.width, self.height) 
-
-
+        self.pixel_aspect_ratio = self.get_pixel_aspect_ratio(picture_aspect_ratio)
+        # FIXME: this only works for yuv and doesn't handle other framerates
+        self.src = "videotestsrc ! video/x-raw-yuv, width=%d, height=%d, framerate=30000/1001, pixel-aspect-ratio=%s " \
+                    % (self.width, self.height, self.pixel_aspect_ratio) 
 
 class AudioProfile(Profile):
     """ Holds codec name, encoder names, payloader name, num channels and caps string """
@@ -166,10 +193,11 @@ RESOLUTIONS = (
                 (1024, 768), 
                 (1280, 960))
 
-for resolution in RESOLUTIONS:
-    for codec in ('mpeg4', 'h264', 'h263'):
-        profile_name = codec + '_%d_%d' % (resolution[0], resolution[1])
-        profiles[profile_name] = VideoProfile(encoders[codec], payloaders[codec], resolution[0], resolution[1])
+for picture_aspect_ratio in ("4:3", "16:9"):
+    for resolution in RESOLUTIONS:
+        for codec in ('mpeg4', 'h264', 'h263'):
+            profile_name = codec + '_%d_%d_%s' % (resolution[0], resolution[1], picture_aspect_ratio)
+            profiles[profile_name] = VideoProfile(encoders[codec], payloaders[codec], resolution[0], resolution[1], picture_aspect_ratio)
 
 SAMPLERATES = [16000, 22050, 32000, 44100, 48000]
 

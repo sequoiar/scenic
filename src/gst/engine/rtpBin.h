@@ -27,6 +27,7 @@
 
 #include "noncopyable.h"
 
+class Pipeline;
 class _GstElement;
 class _GstStructure;
 class _GObject;
@@ -35,16 +36,15 @@ class RtpBin : boost::noncopyable
 {
     public:
         virtual ~RtpBin();
-        void init();
 
     protected:
         /// FIXME: this sessionId is all kinds of gross
-        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0), sessionId_((++sessionCount_) - 1), sessionName_(), printStats_(true)  // 0 based
-        {}
+        explicit RtpBin(Pipeline& pipeline);
         const char *padStr(const char *padName) const;
 
         void registerSession(const std::string &codec);
         void unregisterSession();
+        Pipeline &pipeline_;
         static _GstElement *rtpbin_;
         static bool destroyed_;
         static int sessionCount_;
@@ -56,7 +56,10 @@ class RtpBin : boost::noncopyable
         void printStatsVal(const std::string &idStr, const char *key, const std::string &type, 
                 const std::string &formatStr, _GstStructure *stats);
         bool printStats_;
-
+        static int createSinkSocket(const char *hostname, int port);
+        static int createSourceSocket(int port);
+        void startPrintStatsCallback();
+    
     private:
         static const int REPORTING_PERIOD_MS = 2000;
         static int printStatsCallback(void * rtpbin);

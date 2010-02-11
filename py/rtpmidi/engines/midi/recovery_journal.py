@@ -1,19 +1,19 @@
-import sys
-sys.path.append("../")
-
 #utils
 from struct import pack
 from struct import unpack
 import time
 
 #data
-from midi_object import OldPacket
-from list_circ import  PacketCirc
+from rtpmidi.engines.midi.midi_object import OldPacket
+from rtpmidi.engines.midi.list_circ import  PacketCirc
 
 #Recovery Chapters
-from recovery_journal_chapters import ChapterP, ChapterC, ChapterW 
-from recovery_journal_chapters import ChapterN, ChapterT, ChapterA
-
+from rtpmidi.engines.midi.recovery_journal_chapters import ChapterP 
+from rtpmidi.engines.midi.recovery_journal_chapters import ChapterC 
+from rtpmidi.engines.midi.recovery_journal_chapters import ChapterW 
+from rtpmidi.engines.midi.recovery_journal_chapters import ChapterN 
+from rtpmidi.engines.midi.recovery_journal_chapters import ChapterT 
+from rtpmidi.engines.midi.recovery_journal_chapters import ChapterA 
 
 HISTORY_SIZE = 1024
 
