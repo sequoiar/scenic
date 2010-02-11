@@ -31,7 +31,7 @@ install-exec-hook:
 uninstall-hook:
 	awk '/miville/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
 	sed -i '/miville-.*egg/d' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
-	rm -rf $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/miville-*.egg
+	rm -rf $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/scenic-*.egg
 #rm -f $(DESTDIR)$(bindir)/mivilled
 #	rm -f $(DESTDIR)$(bindir)/miville
 # 	rm -f $(DESTDIR)$(bindir)/restart_jackd.py

@@ -37,7 +37,7 @@ setup(
     version = __version__,
     author = "SAT",
     author_email = "info@sat.qc.ca",
-    url = "http://www.sat.qc.ca",
+    url = "http://svn.sat.qc.ca/trac/scenic",
     description = "Scenic, interface to the milhouse streaming tool.",
     long_description = """Scenic software, a component of the PropulseART project
     Requires: twisted, simplejson.""",
