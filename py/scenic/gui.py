@@ -584,7 +584,7 @@ class Gui(object):
         # VIDEO SIZE:
         video_capture_size = _get_combobox_value(self.video_capture_size_widget)
         print ' * video_capture_size:', video_capture_size
-        self.app.config.video_catpure_size = video_capture_size
+        self.app.config.video_capture_size = video_capture_size
         # DISPLAY:
         video_display = _get_combobox_value(self.video_display_widget)
         print ' * video_display:', video_display
