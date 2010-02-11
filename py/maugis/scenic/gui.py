@@ -789,7 +789,9 @@ class Gui(object):
          * updates the input
         """
         if self._video_source_changed_by_user:
-            self.app.poll_camera_devices()
+            current_camera_name = _get_combobox_value(self.video_source_widget)
+            if current_camera_name != VIDEO_TEST_INPUT:
+                self.app.poll_camera_devices()
             self.update_v4l2_inputs_and_norm()
 
     def on_v4l2_standard_changed(self, widget):
