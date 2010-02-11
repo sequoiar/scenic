@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 INSTALL_ROOT=$(mktemp -p /var/tmp -d miville-root-XXXXXXXX)
 _PREFIX=/usr/local
@@ -20,4 +20,3 @@ make DESTDIR=$INSTALL_ROOT install
 
 PATH=$INSTALL_ROOT/$_PREFIX/bin:$PATH
 
-#miville
