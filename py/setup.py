@@ -29,7 +29,7 @@ packages = [
     "scenic.data.locale.en_US",
     "scenic.data.locale.en_US.LC_MESSAGES",
     "scenic.data.locale.fr_CA",
-    "scenic.data.locale.fr_CA.LC_MESSAGES"
+    "scenic.data.locale.fr_CA.LC_MESSAGES",
     'rtpmidi',
     'rtpmidi.protocols',
     'rtpmidi.protocols.rtp',

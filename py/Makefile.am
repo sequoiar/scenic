@@ -1,10 +1,10 @@
 include $(top_srcdir)/globals.mak 
-SUBDIRS = doc 
-DIST_SUBDIRS = doc
+SUBDIRS = doc scenic
+DIST_SUBDIRS = doc scenic
 
 # Install my_script in $(bindir) and distribute it.
 # FIXME: find out if this is uninstalled by 
-dist_bin_SCRIPTS = midistream scripts/scenic
+dist_bin_SCRIPTS = midistream scripts/scenic run
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../$(src)/main:$(PATH) trial
         

@@ -152,7 +152,10 @@ AC_CONFIG_FILES([Makefile
         src/Makefile
         py/Makefile
         py/doc/Makefile
+        py/scenic/Makefile
         py/scenic/configure.py
+        py/scenic/devices/Makefile
+        py/scenic/data/Makefile
         src/include/Makefile
         src/util/Makefile
         src/gutil/Makefile
