@@ -29,8 +29,8 @@ install-exec-hook:
 #	fi
 #	help2man --no-info --include=miville-man.txt --name="The Miville Audio/Video Streaming Software for GNU/Linux" ./mivilled > mivilled.1
 #	install -D -m 644 mivilled.1 $(DESTDIR)$(mandir)/man1/mivilled.1
-#	help2man --no-info --name="The midistream MIDI RTP Streaming Software for GNU/Linux" ./midistream > midistream.1
-#	install -D -m 644 midistream.1 $(DESTDIR)$(mandir)/man1/midistream.1
+	help2man --no-info --name="The midistream MIDI RTP Streaming Software for GNU/Linux" ./midistream > midistream.1
+	install -D -m 644 midistream.1 $(DESTDIR)$(mandir)/man1/midistream.1
 #
 
 # FIXME: find out if using dist_bin_SCRIPTS makes any of this redundant 
@@ -38,13 +38,13 @@ uninstall-hook:
 	awk '/miville/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
 	sed -i '/miville-.*egg/d' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
 	rm -rf $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/scenic-*.egg
-#rm -f $(DESTDIR)$(bindir)/mivilled
+	rm -f $(DESTDIR)$(mandir)/man1/midistream.1
+#	rm -f $(DESTDIR)$(bindir)/mivilled
 #	rm -f $(DESTDIR)$(bindir)/miville
-# 	rm -f $(DESTDIR)$(bindir)/restart_jackd.py
-# 	rm -f $(DESTDIR)$(mandir)/man1/mivilled.1
-# 	rm -f $(DESTDIR)$(mandir)/man1/midistream.1
-# 	rm -f $(DESTDIR)$(datarootdir)/applications/miville.desktop
-# 	rm -f $(DESTDIR)$(datarootdir)/pixmaps/miville.png
+#	rm -f $(DESTDIR)$(bindir)/restart_jackd.py
+#	rm -f $(DESTDIR)$(mandir)/man1/mivilled.1
+#	rm -f $(DESTDIR)$(datarootdir)/applications/miville.desktop
+#	rm -f $(DESTDIR)$(datarootdir)/pixmaps/miville.png
 
 # temporarily removed: check_ping.py
 # not much useful:
