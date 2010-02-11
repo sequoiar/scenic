@@ -583,16 +583,16 @@ class Gui(object):
         print("gathering configuration")
         # VIDEO SIZE:
         video_capture_size = _get_combobox_value(self.video_capture_size_widget)
-        print ' * video_capture_size:', video_capture_size
         self.app.config.video_capture_size = video_capture_size
+        print ' * video_capture_size:', self.app.config.video_capture_size
         # DISPLAY:
         video_display = _get_combobox_value(self.video_display_widget)
         print ' * video_display:', video_display
-        self.app.config.video_display = video_display
+        self.app.config.video_display = self.app.config.video_display
         # BITRATE:
         video_bitrate = _get_combobox_value(self.video_bitrate_widget)
-        print ' * video_bitrate:', video_bitrate
         self.app.config.video_bitrate = int(video_bitrate.split(" ")[0]) * 1000000
+        print ' * video_bitrate:', self.app.config.video_bitrate
         # VIDEO SOURCE AND DEVICE:
         video_source = _get_combobox_value(self.video_source_widget)
         if video_source == "Color bars":
@@ -600,25 +600,24 @@ class Gui(object):
         elif video_source.startswith("/dev/video"): # TODO: firewire!
             self.app.config.video_device = video_source
             self.app.config.video_source = "v4l2src"
-        print ' * videosource:', video_source
+        print ' * videosource:', self.app.config.video_source
         # VIDEO CODEC:
         video_codec = _get_combobox_value(self.video_codec_widget)
         self.app.config.video_codec = VIDEO_CODECS[video_codec]
-        print ' * video_codec:', video_codec
+        print ' * video_codec:', self.app.config.video_codec
         # VIDEO ASPECT RATIO:
         video_aspect_ratio = _get_combobox_value(self.aspect_ratio_widget)
         self.app.config.video_aspect_ratio = video_aspect_ratio
-        print ' * video_aspect_ratio:', video_aspect_ratio
+        print ' * video_aspect_ratio:', self.app.config.video_aspect_ratio
         #VIDEO FULLSCREEN
         video_fullscreen = self.video_fullscreen_widget.get_active()
         self.app.config.video_fullscreen = video_fullscreen
-        print ' * video_fullscreen:', video_fullscreen
+        print ' * video_fullscreen:', self.app.config.video_fullscreen
         #VIDEO DEINTERLACE
         video_deinterlace = self.video_deinterlace_widget.get_active()
         self.app.config.video_deinterlace = video_deinterlace
-        print ' * video_deinterlace:', video_deinterlace
+        print ' * video_deinterlace:', self.app.config.video_deinterlace
         
-
         # AUDIO:
         audio_source_readable = _get_combobox_value(self.audio_source_widget)
         audio_codec_readable = _get_combobox_value(self.audio_codec_widget)
