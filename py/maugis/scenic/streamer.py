@@ -54,6 +54,8 @@ class StreamerManager(object):
             raise RuntimeError("Cannot start streamers since they are %s." % (self.state))
             # FIXME: catch this and run ;-)
         
+        send_width, send_height = config.video_capture_size.split("x")
+        receive_width, receive_height = self.app.remote_video_config["capture_size"].split("x")
         self.milhouse_recv_cmd = [
             "milhouse",
             '--receiver', 
@@ -61,6 +63,8 @@ class StreamerManager(object):
             '--videosink', config.video_sink,
             '--videocodec', config.video_codec,
             '--videoport', str(self.app.recv_video_port),
+            '--width', str(receive_width),
+            '--height', str(receive_height),
             '--aspect-ratio', str(self.app.remote_video_config["aspect_ratio"]),
             '--audiosink', config.audio_sink,
             '--numchannels', str(config.audio_channels),
@@ -79,6 +83,8 @@ class StreamerManager(object):
             '--videocodec', self.app.remote_video_config["codec"],
             '--videobitrate', str(self.app.remote_video_config["bitrate"]),
             '--videoport', str(self.app.remote_video_config["port"]),
+            '--width', str(send_width),
+            '--height', str(send_height),
             '--aspect-ratio', str(self.app.config.video_aspect_ratio),
             '--audiosource', config.audio_source,
             '--numchannels', str(self.app.remote_audio_config["numchannels"]),

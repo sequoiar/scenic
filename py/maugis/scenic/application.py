@@ -74,8 +74,8 @@ class Config(saving.ConfigStateSaving):
     video_display = ":0.0"
     video_fullscreen = False
     video_bitrate = 3000000
-    video_width = 640 # we use separate entries for width and height
-    video_height = 480 # but in the GUI, it's a single combobox menu
+    video_capture_size = "640x480"
+    #video_window_size = "640x480"
     video_aspect_ratio = "4:3" 
     confirm_quit = False
     theme = "Darklooks"
@@ -402,7 +402,8 @@ class Application(object):
                 "codec": self.config.video_codec,
                 "bitrate": self.config.video_bitrate,
                 "port": self.recv_video_port,
-                "aspect_ratio": self.config.video_aspect_ratio 
+                "aspect_ratio": self.config.video_aspect_ratio, 
+                "capture_size": self.config.video_capture_size 
                 },
             "audio": {
                 "codec": self.config.audio_codec,

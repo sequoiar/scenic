@@ -209,7 +209,7 @@ class Gui(object):
         self.selected_contact_row = None
         self.select_contact_index = None
         # video
-        self.video_size_widget = self.widgets.get_widget("video_size")
+        self.video_capture_size_widget = self.widgets.get_widget("video_capture_size")
         self.video_display_widget = self.widgets.get_widget("video_display")
         self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
         self.video_source_widget = self.widgets.get_widget("video_source")
@@ -579,10 +579,9 @@ class Gui(object):
         """
         print("gathering configuration")
         # VIDEO SIZE:
-        video_size = _get_combobox_value(self.video_size_widget)
-        print ' * video_size:', video_size
-        self.app.config.video_width = int(video_size.split("x")[0])
-        self.app.config.video_height = int(video_size.split("x")[1])
+        video_capture_size = _get_combobox_value(self.video_capture_size_widget)
+        print ' * video_capture_size:', video_capture_size
+        self.app.config.video_catpure_size = video_capture_size
         # DISPLAY:
         video_display = _get_combobox_value(self.video_display_widget)
         print ' * video_display:', video_display
@@ -640,10 +639,10 @@ class Gui(object):
         It could be called again, once another config file has been read.
         """
         print("Changing widgets value according to configuration.")
-        # VIDEO SIZE:
-        video_size = "%sx%s" % (self.app.config.video_width, self.app.config.video_height)
-        _set_combobox_value(self.video_size_widget, video_size)
-        print ' * video_size:', video_size
+        # VIDEO CAPTURE SIZE:
+        video_capture_size = self.app.config.video_capture_size
+        _set_combobox_value(self.video_capture_size_widget, video_capture_size)
+        print ' * video_capture_size:', video_capture_size
         # DISPLAY:
         video_display = self.app.config.video_display
         _set_combobox_value(self.video_display_widget, video_display)
