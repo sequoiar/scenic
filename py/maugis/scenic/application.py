@@ -170,10 +170,7 @@ class Application(object):
         """
         deferred = cameras.list_cameras()
         def _callback(cameras):
-            cameras_dict = {}
-            for camera in cameras:
-                cameras_dict[camera["name"]] = camera
-            self.devices["cameras"] = cameras_dict
+            self.devices["cameras"] = cameras
             print("displays: %s" % (cameras))
             self.gui.update_camera_devices()
         deferred.addCallback(_callback)

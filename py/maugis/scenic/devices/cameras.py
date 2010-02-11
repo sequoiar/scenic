@@ -31,19 +31,21 @@ from twisted.internet import reactor
 def _parse_milhouse_list_cameras(text):
     """
     Parses the output of `milhouse --list-cameras`
-    Returns a list of dict with keys "name", "size", "standard", "is_interlaced", "input", "inputs", "supported_sizes"
+    Returns a dict of dict with keys "name", "size", "standard", "is_interlaced", "input", "inputs", "supported_sizes"
     For now, considers only V4L2 cameras.
     @rettype: list
     """
-    v4l2_devices = []
+    v4l2_devices = {}
     currently_parsed_is_v4l2 = False
+    current_v4l2_device = None
     for line in text.splitlines():
         line = line.strip()
         #print(line)
         if line.startswith('Video4Linux Camera'):
             name = line.split()[2].split(":")[0]
+            current_v4l2_device = name
             #print "  name", name
-            v4l2_devices.append({
+            v4l2_devices[name] = {
                 "name": name,
                 "size": None,
                 "standard": None,
@@ -52,7 +54,7 @@ def _parse_milhouse_list_cameras(text):
                 "card": "",
                 "inputs": [],
                 "supported_sizes": []
-                })
+                }
             currently_parsed_is_v4l2 = True
         elif line.startswith("DC1394 Camera"):
             currently_parsed_is_v4l2 = False
@@ -70,23 +72,23 @@ def _parse_milhouse_list_cameras(text):
                 else:
                     if standard == '':
                         standard = None
-                    v4l2_devices[-1]["standard"] = standard
+                    v4l2_devices[current_v4l2_device]["standard"] = standard
                     #print "  standard:", standard
             elif line.startswith("Width/Height"):
                 size = value
-                v4l2_devices[-1]["size"] = size
+                v4l2_devices[current_v4l2_device]["size"] = size
                 #print "  size:", size
             elif line.startswith("Format"):
                 size = line.split(" ")[1]
-                v4l2_devices[-1]["supported_sizes"].append(size)
+                v4l2_devices[current_v4l2_device]["supported_sizes"].append(size)
                 #print "  adding supported_size:", size
             elif line.startswith("Field"):
                 is_interlaced = value == "Interlaced"
-                v4l2_devices[-1]["is_interlaced"] = is_interlaced
+                v4l2_devices[current_v4l2_device]["is_interlaced"] = is_interlaced
                 #print "  interlaced:", is_interlaced
             elif line.startswith("Card type"):
                 card = value
-                v4l2_devices[-1]["card"] = card
+                v4l2_devices[current_v4l2_device]["card"] = card
                 #print "  card:", card
             elif line.startswith("Video input"):
                 try:
@@ -106,7 +108,7 @@ def _parse_milhouse_list_cameras(text):
                         input = None
                     else:
                         #print "  input", input
-                        v4l2_devices[-1]["input"] = input
+                        v4l2_devices[current_v4l2_device]["input"] = input
             elif line.startswith("All inputs"):
                 for each in value.split(","):
                     tokens = each.strip().split(" ")
@@ -117,13 +119,13 @@ def _parse_milhouse_list_cameras(text):
                         pass
                     else:
                         # actually, we assume their number is sequential, starting at 0
-                        v4l2_devices[-1]["inputs"].append(name)
+                        v4l2_devices[current_v4l2_device]["inputs"].append(name)
     #print v4l2_devices
     return v4l2_devices
 
 def list_cameras():
     """
-    Calls the Deferred with the list of device names as argument. 
+    Calls the Deferred with the dict of devices as argument. 
     
     @rettype: Deferred
     """
