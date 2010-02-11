@@ -67,7 +67,10 @@ def _get_combobox_value(widget):
     """
     index = widget.get_active()
     tree_model = widget.get_model()
-    tree_model_row = tree_model[index]
+    try:
+        tree_model_row = tree_model[index]
+    except IndexError, e:
+        raise RuntimeError("ComboBox widget %s doesn't have value with index %s." % (widget, index))
     return tree_model_row[0] 
 
 def _set_combobox_choices(widget, choices=[]):
