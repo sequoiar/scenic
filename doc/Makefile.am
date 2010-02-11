@@ -1,4 +1,7 @@
-SUBDIRS = notes test figures figures/test sequences
+SUBDIRS = notes test figures figures/test sequences network texts
+DIST_SUBDIRS = notes test figures figures/test sequences network texts
+
+dist_pkgdata_DATA=footer.html header.html doxygen.css Doxyfile
 
 all: 
 	@for i in $(SUBDIRS); do \

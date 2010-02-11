@@ -1,7 +1,0 @@
-style "window"
-{
-    bg_pixmap[NORMAL] = "../../doc/figures/Milhouse.PNG"
-}
-
-widget_class "GtkWindow" style "window"
-

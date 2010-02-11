@@ -24,7 +24,7 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   audioLevel.h glVideoSink.h $(inc)/playback.h dv1394.h v4l2util.h \
 				   fileSource.h sharedVideoSink.h capsParser.h \
 				   dc1394.cpp dc1394.h videoScale.h localVideo.h \
-				   noncopyable.h videoFlip.h
+				   noncopyable.h videoFlip.h ../videoFactory.h ../audioFactory.h ../engine.h
 
 BUILT_SOURCES = caps.cpp
 
@@ -35,5 +35,3 @@ clean-local:
 	rm -f caps.cpp
 		
 libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) $(DC1394_CFLAGS)
-
-#CXXFLAGS += -O3

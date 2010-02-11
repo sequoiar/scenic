@@ -6,6 +6,7 @@ TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/main:$(PATH) trial
 TESTS = test/test_milhouse.py
 
 bin_PROGRAMS = milhouse
+dist_pkgdata_DATA = milhouse-man.txt
 
 milhouse_SOURCES = milhouse.cpp milhouseLogger.cpp milhouseLogger.h ConcurrentQueue.h milhouse.h
 if SVN

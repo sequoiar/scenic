@@ -4,7 +4,7 @@ DIST_SUBDIRS = doc scenic
 
 # Install my_script in $(bindir) and distribute it.
 # FIXME: find out if this is uninstalled by 
-dist_bin_SCRIPTS = midistream scripts/scenic run
+dist_bin_SCRIPTS = midistream scripts/scenic run setup.py
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../$(src)/main:$(PATH) trial
         
