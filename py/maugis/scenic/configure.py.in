@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 APPNAME = "scenic"
-VERSION = "0.3.6"
+VERSION = '''@PACKAGE_VERSION@'''
 
 import os
 from scenic import data # TODO: change package data to configure.ac variable

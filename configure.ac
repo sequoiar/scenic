@@ -154,6 +154,7 @@ AC_CONFIG_FILES([Makefile
         py/Makefile
         py/docs/Makefile
         py/maugis/Makefile
+        py/maugis/scenic/configure.py
         src/include/Makefile
         src/util/Makefile
         src/gutil/Makefile
