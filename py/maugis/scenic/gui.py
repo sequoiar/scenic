@@ -357,7 +357,7 @@ class Gui(object):
             self.invite_contact_widget.grab_default()
         elif tab_name == "video_tab_contents":
             self.app.poll_x11_devices()
-            #TODO
+            self.app.poll_camera_devices()
         elif tab_name == "audio_tab_contents":
             pass
         elif tab_name == "system_tab_contents":
@@ -719,6 +719,16 @@ class Gui(object):
         x11_displays = [display["name"] for display in self.app.devices["x11_displays"]]
         print("Updating X11 displays with values %s" % (x11_displays))
         _set_combobox_choices(self.video_display_widget, x11_displays)
+
+
+    def update_camera_devices(self):
+        """
+        Called once Application.poll_camera_devices has been run
+        """
+        cameras = [cam["name"] for cam in self.app.devices["cameras"]]
+        cameras.insert(0, "Color bars")
+        print("Updating cameras displays with values %s" % (cameras))
+        _set_combobox_choices(self.video_source_widget, cameras)
 
     # -------------------------- menu items -----------------
     

@@ -6,6 +6,8 @@ Unit tests for the X11 function.
 from twisted.trial import unittest
 from scenic.devices import cameras
 
+#TODO: this test could test more
+
 class Test_Cameras(unittest.TestCase):
     def test_list_cameras(self):
         def _cb(result):

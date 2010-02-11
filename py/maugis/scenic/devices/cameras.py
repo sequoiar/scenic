@@ -49,6 +49,7 @@ def _parse_milhouse_list_cameras(text):
                 "standard": None,
                 "is_interlaced": False,
                 "input": None,
+                "card": "",
                 "inputs": [],
                 "supported_sizes": []
                 })
@@ -76,13 +77,17 @@ def _parse_milhouse_list_cameras(text):
                 v4l2_devices[-1]["size"] = size
                 #print "  size:", size
             elif line.startswith("Format"):
-                size = value
+                size = line.split(" ")[1]
                 v4l2_devices[-1]["supported_sizes"].append(size)
                 #print "  adding supported_size:", size
             elif line.startswith("Field"):
                 is_interlaced = value == "Interlaced"
                 v4l2_devices[-1]["is_interlaced"] = is_interlaced
                 #print "  interlaced:", is_interlaced
+            elif line.startswith("Card type"):
+                card = value
+                v4l2_devices[-1]["card"] = card
+                #print "  card:", card
             elif line.startswith("Video input"):
                 try:
                     input = value.split(" ")[0]

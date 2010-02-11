@@ -48,6 +48,7 @@ from scenic import dialogs
 from scenic import ports
 from scenic.devices import jackd
 from scenic.devices import x11
+from scenic.devices import cameras
 from scenic import gui
 _ = gui._ # gettext
 
@@ -73,8 +74,8 @@ class Config(saving.ConfigStateSaving):
     video_display = ":0.0"
     video_fullscreen = False
     video_bitrate = 3000000
-    video_width = 640
-    video_height = 480
+    video_width = 640 # we use separate entries for width and height
+    video_height = 480 # but in the GUI, it's a single combobox menu
     video_aspect_ratio = "4:3" 
     confirm_quit = False
     theme = "Darklooks"
@@ -110,7 +111,7 @@ class Application(object):
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
         self.devices = {
             "x11_displays": [], # list of dicts
-            #"v4l2_devices": [], # list of dicts
+            "cameras": [], # list of dicts (only V4L2 cameras for now)
             #"dc_cameras": [], # list of dicts
             "xvideo_is_present": False, # bool
             "jackd_is_running": False 
@@ -140,7 +141,8 @@ class Application(object):
             self.gui.update_widgets_with_saved_config()
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
-            self.poll_xvideo_extension()
+            self.poll_xvideo_extension(),
+            self.poll_camera_devices()
             ])
         deferred_list.addCallback(_callback)
 
@@ -155,6 +157,22 @@ class Application(object):
             self.devices["x11_displays"] = x11_displays
             print("displays: %s" % (x11_displays))
             self.gui.update_x11_devices()
+        deferred.addCallback(_callback)
+        return deferred
+
+
+    def poll_camera_devices(self):
+        """
+        Called once at startup, and then the GUI can call it.
+        Calls gui.update_camera_devices.
+        For now, we only take into account V4L2 cameras.
+        @rettype: Deferred
+        """
+        deferred = cameras.list_cameras()
+        def _callback(cameras):
+            self.devices["cameras"] = cameras
+            print("displays: %s" % (cameras))
+            self.gui.update_camera_devices()
         deferred.addCallback(_callback)
         return deferred
 
