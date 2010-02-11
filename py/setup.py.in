@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Miville Installation script
+MidiStream Installation script
 -------------------
 
 Usage::
@@ -21,29 +21,7 @@ from setuptools import setup
 # this comes from autoconf
 __version__ = '''@PACKAGE_VERSION@'''
 
-miville_packages = [
-    'miville',
-    'miville.connectors',
-    'miville.utils',
-    'miville.ui',
-    'miville.devices',
-    'miville.protocols',
-    'miville.streams',
-    'miville.connectors.basic',
-    'miville.ui.cli',
-    'miville.ui.web',
-    'miville.ui.web.pages',
-    'miville.ui.web.templates',
-    'miville.ui.web.js',
-    'miville.ui.web.img',
-    'miville.ui.web.css',
-    'miville.ui.web.widgets',
-    'miville.ui.web.templates.default',
-    'miville.ui.web.widgets.medias',
-    'miville.ui.web.templates.default.js',
-    'miville.ui.web.templates.default.xml',
-    'miville.ui.web.templates.default.img',
-    'miville.ui.web.templates.default.css',
+scenic_packages = [
     'rtpmidi',
     'rtpmidi.protocols',
     'rtpmidi.protocols.rtp',
@@ -52,25 +30,25 @@ miville_packages = [
     ]
 
 setup(
-    name = "miville",
+    name = "scenic",
     version = __version__,
     author = "SAT",
     author_email = "info@sat.qc.ca",
     url = "http://www.sat.qc.ca",
-    description = "Miville, interface to the milhouse streaming tool.",
-    long_description = """Miville software, a component of the PropulseART project
-    Requires: twisted, nevow.""",
-    install_requires = [], #'twisted'], # , 'nevow']
+    description = "MidiStream",
+    long_description = """MidiStream software, a component of the Scenic project
+    Requires: twisted.""",
+    install_requires = [], 
     # The dependency to the 'nevow' package is not specified here, since there is a bug 
     # in nevow, which installs it using easy_install even when the nevow ubuntu package is already installed. 
     # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
     # we removed twisted as well, since we prefer the user to install it himself.
-    scripts = ["restart_jackd.py", "mivilled", "midistream"], #, "miville.py"
+    scripts = ["midistream"],
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,
-    #packages = ['miville'],
-    packages = miville_packages,
+    packages = scenic_packages,
+    # FIXME: don't need all these filename extensions
     package_data = {
         "":["*.rst", "*.png", "*.jpg", "*.css", "*.js", "*.xml", '*.txt', 'off']
     }

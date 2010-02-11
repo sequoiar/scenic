@@ -20,4 +20,4 @@ make DESTDIR=$INSTALL_ROOT install
 
 PATH=$INSTALL_ROOT/$_PREFIX/bin:$PATH
 
-miville
+#miville

@@ -12,8 +12,6 @@ AM_INIT_AUTOMAKE([-Wno-portability])
 #AM_CONFIG_HEADER(config.h)
 # Check for C and C++ compilers
 AC_PROG_CXX
-
-
 AC_PROG_CC
 
 # Checks for header files.
@@ -107,7 +105,6 @@ AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_ASIO
 AX_BOOST_DATE_TIME
 AX_BOOST_FILESYSTEM
-AX_BOOST_UNIT_TEST_FRAMEWORK
 
 AX_CHECK_GL
 AX_CHECK_GLU
@@ -140,60 +137,46 @@ else
 AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
 AC_MSG_NOTICE([define CONFIG_IEEE1394])
 fi
+
 AC_CONFIG_FILES([Makefile
-         py/miville/runner.py
-         py/setup.py
-		 doc/Makefile
-		 doc/notes/Makefile
-		 doc/test/Makefile
-		 doc/network/Makefile
-		 doc/texts/Makefile
-		 doc/figures/Makefile
-		 doc/figures/test/Makefile
-		 doc/sequences/Makefile
-                 utils/Makefile
-                 utils/dc-ctl/Makefile
-                 src/Makefile
-                 py/Makefile
-                 py/docs/Makefile
-                 py/maugis/Makefile
-                 py/prism/Makefile
-                 py/miville/Makefile
-                 py/miville/connectors/Makefile
-                 py/miville/connectors/basic/Makefile
-                 py/miville/devices/Makefile
-                 py/miville/protocols/Makefile
-                 py/miville/streams/Makefile
-                 py/miville/ui/Makefile
-                 py/miville/utils/Makefile
-                 src/include/Makefile
-                 src/util/Makefile
-                 src/gutil/Makefile
-                 src/shared_video/Makefile
-                 src/tcp/Makefile
-                 src/gst/Makefile
-                 src/gst/engine/Makefile
-                 src/devices/Makefile
-                 src/main/Makefile
-                 ])
+        py/setup.py
+        doc/Makefile
+        doc/notes/Makefile
+        doc/test/Makefile
+        doc/network/Makefile
+        doc/texts/Makefile
+        doc/figures/Makefile
+        doc/figures/test/Makefile
+        doc/sequences/Makefile
+        utils/Makefile
+        utils/dc-ctl/Makefile
+        src/Makefile
+        py/Makefile
+        py/docs/Makefile
+        py/maugis/Makefile
+        src/include/Makefile
+        src/util/Makefile
+        src/gutil/Makefile
+        src/shared_video/Makefile
+        src/tcp/Makefile
+        src/gst/Makefile
+        src/gst/engine/Makefile
+        src/devices/Makefile
+        src/main/Makefile])
 
 AC_CONFIG_FILES([
-                 src/gst/engine/test/Makefile
-                 ])
+        src/gst/engine/test/Makefile
+        ])
 
 
 AC_OUTPUT
 echo
 
-if test  "$ac_cv_boost_python" == "yes"   ; then
-AC_MSG_NOTICE([Building python module])
-fi
-
-if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
+    if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([Not building 1394 support])
-fi
+    fi
 
-if test "x${no_glu}" = "xyes" ; then
+    if test "x${no_glu}" = "xyes" ; then
 AC_MSG_NOTICE([Not building OpenGL support])
-fi
+    fi
 
