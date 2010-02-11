@@ -81,17 +81,4 @@ def list_v4l2_inputs(device_name="/dev/video0"):
     d.addErrback(_eb, deferred)
     return deferred
     
-def set_v4l2_video_standard(device_name="/dev/video0", norm="ntsc"):
-    """
-    Sets norm for a V4L2 device.
-    @rettype: Deferred
-    """
-    command_name = "v4l2-ctl"
-    args = ['--set-standard=%s' % (norm), '-d', device_name]
-    try:
-        executable = procutils.which(command_name)[0]
-    except IndexError:
-        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
-    deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
-    return deferred
 

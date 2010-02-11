@@ -249,6 +249,22 @@ def set_v4l2_input_number(device_name="/dev/video0", input_number=0):
     deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
     return deferred
 
+
+def set_v4l2_video_standard(device_name="/dev/video0", standard="ntsc"):
+    """
+    Sets norm for a V4L2 device.
+    @rettype: Deferred
+    """
+    command_name = "milhouse"
+    args = ['--v4l2-standard', standard, '--videodevice', device_name]
+    try:
+        executable = procutils.which(command_name)[0]
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
+    return deferred
+
+
 if __name__ == "__main__":
     pprint.pprint(_parse_milhouse_list_cameras(TESTDATA))
 

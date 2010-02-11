@@ -1185,7 +1185,7 @@ PAL</property>
                                             <child>
                                               <widget class="GtkComboBox" id="v4l2_input">
                                                 <property name="visible">True</property>
-                                                <property name="items" translatable="yes"> </property>
+                                                <property name="items" translatable="yes">Default</property>
                                                 <signal name="changed" handler="on_v4l2_input_changed"/>
                                               </widget>
                                             </child>
