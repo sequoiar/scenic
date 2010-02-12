@@ -31,14 +31,14 @@ from twisted.internet import error
 from twisted.python import log
 
 from scenic import application
-from scenic import version
+from scenic import configure
 
 def start_logging_to_stdout():
     log.startLogging(sys.stdout)
 
 def run():
     # command line parsing
-    parser = OptionParser(usage="%prog", version=str(version.__version__))
+    parser = OptionParser(usage="%prog", version=str(configure.VERSION))
     parser.add_option("-k", "--kiosk", action="store_true", help="Run in kiosk mode")
     parser.add_option("-f", "--fullscreen", action="store_true", help="Run in fullscreen mode")
     (options, args) = parser.parse_args()
