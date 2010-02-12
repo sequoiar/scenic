@@ -56,35 +56,35 @@ class Config(saving.ConfigStateSaving):
     """
     Class attributes are default.
     """
-    # Default values
-    negotiation_port = 17446 # receiving TCP (SIC) messages on it.
-    smtpserver = "smtp.sat.qc.ca"
-    email_info = "scenic@sat.qc.ca"
-    audio_source = "jackaudiosrc"
-    audio_sink = "jackaudiosink"
-    audio_codec = "raw"
-    audio_channels = 2
-    video_source = "v4l2src"
-    video_device = "/dev/video0"
-    video_deinterlace = False
-    video_input = 0
-    video_standard = "ntsc"
-    video_sink = "xvimagesink"
-    video_codec = "mpeg4"
-    video_display = ":0.0"
-    video_fullscreen = False
-    video_capture_size = "640x480"
-    #video_window_size = "640x480"
-    video_aspect_ratio = "4:3" 
-    confirm_quit = True
-    theme = "Darklooks"
-    #video_bitrate = 3000000
-    video_bitrate = 3.0
-    video_jitterbuffer = 75
 
     def __init__(self):
-        config_file = 'scenic.cfg'
-        config_dir = os.environ['HOME'] + '/.scenic'
+        # Default values
+        self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
+        self.smtpserver = "smtp.sat.qc.ca"
+        self.email_info = "scenic@sat.qc.ca"
+        self.audio_source = "jackaudiosrc"
+        self.audio_sink = "jackaudiosink"
+        self.audio_codec = "raw"
+        self.audio_channels = 2
+        self.video_source = "v4l2src"
+        self.video_device = "/dev/video0"
+        self.video_deinterlace = False
+        self.video_input = 0
+        self.video_standard = "ntsc"
+        self.video_sink = "xvimagesink"
+        self.video_codec = "mpeg4"
+        self.video_display = ":0.0"
+        self.video_fullscreen = False
+        self.video_capture_size = "640x480"
+        #video_window_size = "640x480"
+        self.video_aspect_ratio = "4:3" 
+        self.confirm_quit = True
+        self.theme = "Darklooks"
+        self.video_bitrate = 3.0
+        self.video_jitterbuffer = 75
+        
+        config_file = 'configuration.json'
+        config_dir = os.path.expanduser("~/.scenic")
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
 

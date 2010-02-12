@@ -21,7 +21,7 @@
 """
 Custom state saving tools for Scenic.
 """
-
+from scenic import configure
 import os
 
 # JSON import:
@@ -101,7 +101,11 @@ class ConfigStateSaving(object):
         The attributes of this object.
         """
         exclude_list = ["_config_path"] # some attributes not to save
-        data = {"configuration": {}}
+        data = {
+            "configuration": {}, 
+            "appname": configure.APPNAME, 
+            "version": configure.VERSION
+            }
         print("Saving config to %s" % (self._config_path))
         for key in sorted(self.__dict__.keys()): 
             value = self.__dict__[key]
