@@ -137,6 +137,8 @@ AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 CONFIGURED_PYTHONPATH=$PYTHONPATH
 AC_SUBST(CONFIGURED_PYTHONPATH)
 
+AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
+
 AC_OUTPUT([Makefile
         doc/Makefile
         doc/notes/Makefile
@@ -156,7 +158,6 @@ AC_OUTPUT([Makefile
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
         py/scripts/Makefile
-        py/scripts/scenic
         py/scenic/test/Makefile
         src/include/Makefile
         src/util/Makefile
