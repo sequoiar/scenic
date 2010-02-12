@@ -157,6 +157,8 @@ AC_OUTPUT([Makefile
         py/scenic/configure.py
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
+        py/scenic/data/themes/Makefile
+        py/scenic/data/themes/Darklooks/Makefile
         py/scripts/Makefile
         py/scenic/test/Makefile
         src/include/Makefile
