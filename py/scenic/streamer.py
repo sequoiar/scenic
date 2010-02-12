@@ -62,10 +62,11 @@ class StreamerManager(object):
             '--address', str(host),
             '--videosink', config.video_sink,
             '--videocodec', config.video_codec,
-            '--videoport', str(self.app.recv_video_port),
+            '--videoport', str(self.app.recv_video_port), # attribute of self.app, not self.app.config
+            '--jitterbuffer', str(config.video_jitterbuffer),
             '--width', str(receive_width),
             '--height', str(receive_height),
-            '--aspect-ratio', str(self.app.remote_video_config["aspect_ratio"]),
+            '--aspect-ratio', str(self.app.remote_video_config["aspect_ratio"]),# attribute of self.app, not self.app.config
             '--audiosink', config.audio_sink,
             '--numchannels', str(config.audio_channels),
             '--audiocodec', config.audio_codec,
@@ -81,7 +82,7 @@ class StreamerManager(object):
             '--address', str(host),
             '--videosource', config.video_source,
             '--videocodec', self.app.remote_video_config["codec"],
-            '--videobitrate', str(self.app.remote_video_config["bitrate"]),
+            '--videobitrate', str(int(self.app.remote_video_config["bitrate"] * 1000000)),
             '--videoport', str(self.app.remote_video_config["port"]),
             '--width', str(send_width),
             '--height', str(send_height),

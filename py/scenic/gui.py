@@ -239,6 +239,9 @@ class Gui(object):
         self.aspect_ratio_widget = self.widgets.get_widget("aspect_ratio")
         self.v4l2_input_widget = self.widgets.get_widget("v4l2_input")
         self.v4l2_standard_widget = self.widgets.get_widget("v4l2_standard")
+        self.video_jitterbuffer_widget = self.widgets.get_widget("video_jitterbuffer")
+        self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
+        
         # about 
         self.about_label_widget = self.widgets.get_widget("about_label")
         self.about_text_view_widget = self.widgets.get_widget("about_text_view")
@@ -477,7 +480,7 @@ class Gui(object):
             contact_markup = format_contact_markup(contact)
             if self.app.address_book.current_contact_is_new:
                 self.contact_tree.append([contact_markup]) # add it to the tree list
-                self.app.address_book.contact_list.append([contact_markup]) # and the internal address book
+                self.app.address_book.contact_list.append(contact) # and the internal address book
                 self.selection.select_path(len(self.app.address_book.contact_list) - 1) # select it ...?
                 self.app.address_book.selected_contact = self.app.address_book.contact_list[len(self.app.address_book.contact_list) - 1] #FIXME: we should not copy a dict like that
                 self.app.address_book.current_contact_is_new = False # FIXME: what does that mean?
@@ -605,10 +608,6 @@ class Gui(object):
         video_display = _get_combobox_value(self.video_display_widget)
         print ' * video_display:', video_display
         self.app.config.video_display = self.app.config.video_display
-        # BITRATE:
-        video_bitrate = _get_combobox_value(self.video_bitrate_widget)
-        self.app.config.video_bitrate = int(video_bitrate.split(" ")[0]) * 1000000
-        print ' * video_bitrate:', self.app.config.video_bitrate
         # VIDEO SOURCE AND DEVICE:
         video_source = _get_combobox_value(self.video_source_widget)
         if video_source == "Color bars":
@@ -633,6 +632,14 @@ class Gui(object):
         video_deinterlace = self.video_deinterlace_widget.get_active()
         self.app.config.video_deinterlace = video_deinterlace
         print ' * video_deinterlace:', self.app.config.video_deinterlace
+        # VIDEO JITTERBUFFER
+        video_jitterbuffer = self.video_jitterbuffer_widget.get_value_as_int() # spinbutton
+        self.app.config.video_jitterbuffer = video_jitterbuffer
+        print ' * video_jitterbuffer:', self.app.config.video_jitterbuffer
+        # VIDEO BITRATE
+        video_bitrate = self.video_bitrate_widget.get_value() # spinbutton (float)
+        self.app.config.video_bitrate = video_bitrate
+        print ' * video_bitrate:', self.app.config.video_bitrate
         
         # AUDIO:
         audio_source_readable = _get_combobox_value(self.audio_source_widget)
@@ -665,10 +672,6 @@ class Gui(object):
         video_display = self.app.config.video_display
         _set_combobox_value(self.video_display_widget, video_display)
         print ' * video_display:', video_display
-        # BITRATE:
-        video_bitrate = "%s Mbps" % (self.app.config.video_bitrate / 1000000)
-        _set_combobox_value(self.video_bitrate_widget, video_bitrate)
-        print ' * video_bitrate:', video_bitrate
         # VIDEO SOURCE AND DEVICE:
         if self.app.config.video_source == "videotestsrc":
             video_source = "Color bars"
@@ -692,6 +695,15 @@ class Gui(object):
         video_deinterlace = self.app.config.video_deinterlace
         self.video_deinterlace_widget.set_active(video_deinterlace)
         print ' * video_deinterlace:', video_deinterlace
+        # VIDEO JITTERBUFFER
+        video_jitterbuffer = self.app.config.video_jitterbuffer
+        self.video_jitterbuffer_widget.set_value(video_jitterbuffer) # spinbutton
+        print ' * video_jitterbuffer:', video_jitterbuffer
+        # VIDEO BITRATE
+        video_bitrate = self.app.config.video_bitrate
+        self.video_bitrate_widget.set_value(video_bitrate) # spinbutton
+        print ' * video_bitrate:', video_bitrate
+        
         # ADDRESSBOOK:
         # Init addressbook contact list:
         self.app.address_book.selected_contact = None

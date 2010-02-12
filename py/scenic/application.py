@@ -73,12 +73,14 @@ class Config(saving.ConfigStateSaving):
     video_codec = "mpeg4"
     video_display = ":0.0"
     video_fullscreen = False
-    video_bitrate = 3000000
     video_capture_size = "640x480"
     #video_window_size = "640x480"
     video_aspect_ratio = "4:3" 
     confirm_quit = True
     theme = "Darklooks"
+    #video_bitrate = 3000000
+    video_bitrate = 3.0
+    video_jitterbuffer = 75
 
     def __init__(self):
         config_file = 'scenic.cfg'
@@ -400,7 +402,7 @@ class Application(object):
         return {
             "video": {
                 "codec": self.config.video_codec,
-                "bitrate": self.config.video_bitrate,
+                "bitrate": self.config.video_bitrate, # float Mbps
                 "port": self.recv_video_port,
                 "aspect_ratio": self.config.video_aspect_ratio, 
                 "capture_size": self.config.video_capture_size 

@@ -127,7 +127,8 @@ class AddressBook(object):
                                 v = str(v) # FIXME
                         self.contact_list.append(d)
                     except Exception, e:
-                        print str(e)
+                        print "ERROR in addresbook:", str(e)
+                        raise
             ad_book_file.close()
 
     def save(self):
