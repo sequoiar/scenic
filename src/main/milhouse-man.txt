@@ -7,6 +7,7 @@ milhouse [--sender|--receiver] --address address [options]
 By default, milhouse uses videotestsrc as a video test source and jackaudiosrc for audio input.
 
 [EXAMPLES]
+Here is how to start a receiver and a sender to stream audio and video. 
 
 On local_ip_address:
 .TP
@@ -16,14 +17,28 @@ On remote_ip_address:
 .TP
 milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030  --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2 --audioport 10000
 
+The milhouse command can also be used to change some properties of a V4L2 video device, such as the size and the video standard. The milhouse command should exit immediately once done. 
+
+To change the video standard to either NTSC or PAL:
+.TP
+milhouse --v4l2-standard NTSC
+
+To list cameras: 
+.TP
+milhouse --list-cameras
+
+To choose an input for a V4L2 device:
+.TP 
+milhouse --v4l2-input 1
+
 [AUTHOR]
 Society for Arts and Technology
 
 [REPORTING BUGS]
-http://svn.sat.qc.ca/trac/miville
+http://svn.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
-Miville
+Scenic
 Copyright (C) 2008 Society for Arts and Technology (SAT)
 http://www.sat.qc.ca
 All rights reserved. 
@@ -33,10 +48,10 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 2 of the License, or
 (at your option) any later version.
 
-Miville is distributed in the hope that it will be useful,
+Scenic is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Miville.  If not, see <http://www.gnu.org/licenses/>.
+along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
