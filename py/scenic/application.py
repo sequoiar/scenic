@@ -218,6 +218,8 @@ class Application(object):
                 is_running = False
             else:
                 is_running = True
+        if self.devices["jackd_is_running"] != is_running:
+            print("Jackd server changed state: %s" % (jack_servers))
         self.devices["jackd_is_running"] = is_running
         self.devices["jackd_is_zombie"] = is_zombie
         self.devices["jack_servers"] = jack_servers

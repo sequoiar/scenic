@@ -82,7 +82,6 @@ class StreamerManager(object):
             '--address', str(host),
             '--videosource', config.video_source,
             '--videocodec', self.app.remote_video_config["codec"],
-            '--videobitrate', str(int(self.app.remote_video_config["bitrate"] * 1000000)),
             '--videoport', str(self.app.remote_video_config["port"]),
             '--width', str(send_width),
             '--height', str(send_height),
@@ -93,6 +92,8 @@ class StreamerManager(object):
             '--audioport', str(self.app.remote_audio_config["port"])]
         if config.video_source == "v4l2src":
             self.milhouse_send_cmd.extend(["--videodevice", config.video_device])
+        if self.app.remote_video_config["codec"] != "vorbis":
+            self.milhouse_send_cmd.extend(['--videobitrate', str(int(self.app.remote_video_config["bitrate"] * 1000000))])
         # setting up
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")

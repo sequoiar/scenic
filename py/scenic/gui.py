@@ -102,9 +102,11 @@ def _set_combobox_value(widget, value=None):
     else:
         widget.set_active(index)
 
-# GUI legible value to milhouse value mapping:
 
+#videotestsrc legible name:
 VIDEO_TEST_INPUT = "Color bars"
+
+# GUI legible value to milhouse value mapping:
 VIDEO_CODECS = {
     "h.264": "h264",
     "h.263": "h263",
@@ -120,6 +122,13 @@ AUDIO_SOURCES = {
     "JACK": "jackaudiosrc",
     "Test sound": "audiotestsrc"
     }
+# min/max:
+VIDEO_BITRATE_MIN_MAX = {
+    "h.264": [2.0, 16.0],
+    "MPEG4": [0.5, 4.0],
+    "h.263": [0.5, 4.0],
+    }
+# standards:
 VIDEO_STANDARDS = ["NTSC", "PAL"]
 
 def format_contact_markup(contact):
@@ -337,8 +346,10 @@ class Gui(object):
         print 'video_view_preview toggled', widget.get_active()
         if widget.get_active():
             self.app.save_configuration() #gathers and saves
-            command = "milhouse --videosource %s --videodevice %s --localvideo --window-title preview" % (self.app.config.video_source, self.app.config.video_device)
-            print "spawning", command
+            command = "milhouse --videosource %s --localvideo --window-title preview" % (self.app.config.video_source)
+            if self.app.config.video_source != "videotestsrc":
+                command += " --videodevice %s" % (self.app.config.video_device)
+            print "spawning $%s" % (command)
             process.run_once(*command.split())
             dialogs.ErrorDialog.create("You must manually close the preview window.", parent=self.main_window)
         else:
@@ -714,6 +725,18 @@ class Gui(object):
         # update range and clamp numchannels to new range 
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
+
+    def on_video_codec_changed(self, widget):
+        old_bitrate = self.video_bitrate_widget.get_value()
+        codec = _get_combobox_value(self.video_codec_widget)
+        if codec in VIDEO_BITRATE_MIN_MAX.keys():
+            self.video_bitrate_widget.set_sensitive(True)
+            mini = VIDEO_BITRATE_MIN_MAX[codec][0]
+            maxi = VIDEO_BITRATE_MIN_MAX[codec][1]
+            self.video_bitrate_widget.set_range(mini, maxi)
+            self.video_bitrate_widget.set_value(min(maxi, max(old_bitrate, mini)))
+        else:
+            self.video_bitrate_widget.set_sensitive(False)
         
     def update_x11_devices(self):
         """
