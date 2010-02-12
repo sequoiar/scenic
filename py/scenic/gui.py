@@ -467,6 +467,7 @@ class Gui(object):
                 self.app.address_book.current_contact_is_new = False # FIXME: what does that mean?
             else:
                 self.contact_tree.set_value(self.selected_contact_row, 0, contact_markup)
+                self.app.address_book.contact_list[self.selected_contact_index] = contact # FIXME: this is flaky. make some functions to handle this
             self.app.address_book.selected_contact = contact
             self.edit_contact_window.hide()
 

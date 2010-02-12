@@ -155,4 +155,5 @@ class AddressBook(object):
             "selected": self.selected,
             "contact_list": self.contact_list
             }
+        print "saving addressbook to %s" % (self.file_name)
         _save(self.file_name, data)
