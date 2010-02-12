@@ -118,7 +118,9 @@ class Application(object):
             "cameras": {}, # dict of dicts (only V4L2 cameras for now)
             #"dc_cameras": [], # list of dicts
             "xvideo_is_present": False, # bool
-            "jackd_is_running": False 
+            "jackd_is_running": False,
+            "jackd_is_zombie": False,
+            "jack_servers": [] # list of dicts
             }
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         reactor.callLater(0, self._start_the_application)
@@ -203,7 +205,7 @@ class Application(object):
         is_running = False
         is_zombie = False
         try:
-            jack_servers = jackd.jackd_get_infos() # returns a list a dict such as :
+            jack_servers = jackd.jackd_get_infos() # returns a list of dicts
         except jackd.JackFrozenError, e:
             print e 
             msg = _("The JACK audio server seems frozen ! \n%s") % (e)
@@ -217,7 +219,9 @@ class Application(object):
             else:
                 is_running = True
         self.devices["jackd_is_running"] = is_running
-        self.gui.update_jackd_status(is_running, is_zombie)
+        self.devices["jackd_is_zombie"] = is_zombie
+        self.devices["jack_servers"] = jack_servers
+        self.gui.update_jackd_status()
     
     def before_shutdown(self):
         """

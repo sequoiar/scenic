@@ -251,6 +251,9 @@ class Gui(object):
         self.audio_jack_icon_widget = self.widgets.get_widget("audio_jack_icon")
         self.audio_jack_state_widget = self.widgets.get_widget("audio_jack_state")
         self.audio_numchannels_widget = self.widgets.get_widget("audio_numchannels")
+
+        self.jack_latency_widget = self.widgets.get_widget("jack_latency")
+        self.jack_sampling_rate_widget = self.widgets.get_widget("jack_sampling_rate")
         # system tab contents:
         self.network_admin_widget = self.widgets.get_widget("network_admin")
             
@@ -1017,7 +1020,10 @@ class Gui(object):
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
-    def update_jackd_status(self, is_running=False, is_zombie=False):
+    def update_jackd_status(self):
+        is_zombie = self.app.devices["jackd_is_zombie"]
+        is_running = self.app.devices["jackd_is_running"]
+        fill_stats = False
         if is_zombie:
                 self.audio_jack_state_widget.set_markup("<b>Zombie</b>")
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_DIALOG_WARNING, 4)
@@ -1025,9 +1031,18 @@ class Gui(object):
             if is_running:
                 self.audio_jack_state_widget.set_markup("<b>Running</b>")
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_YES, 4)
+                fill_stats = True
             else:
                 self.audio_jack_state_widget.set_markup("<b>Stopped</b>")
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
+        if fill_stats:
+            j = self.app.devices["jack_servers"][0] 
+            latency = (j["period"] * j["nperiods"] / float(j["rate"])) * 1000 # ms
+            self.jack_latency_widget.set_text("%4.2f ms" % (latency))
+            self.jack_sampling_rate_widget.set_text("%d Hz" % (j["rate"]))
+        else:
+            self.jack_latency_widget.set_text("")
+            self.jack_sampling_rate_widget.set_text("")
             
 class About(object):
     """
