@@ -140,7 +140,7 @@ AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
 AC_MSG_NOTICE([define CONFIG_IEEE1394])
 fi
 
-AC_CONFIG_FILES([Makefile
+AC_OUTPUT([Makefile
         doc/Makefile
         doc/notes/Makefile
         doc/test/Makefile
@@ -158,6 +158,7 @@ AC_CONFIG_FILES([Makefile
         py/scenic/configure.py
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
+        py/scripts/Makefile
         py/scenic/test/Makefile
         src/include/Makefile
         src/util/Makefile
@@ -169,7 +170,7 @@ AC_CONFIG_FILES([Makefile
         src/devices/Makefile
         src/main/Makefile])
 
-AC_CONFIG_FILES([
+AC_OUTPUT([
         src/gst/engine/test/Makefile
         ])
 

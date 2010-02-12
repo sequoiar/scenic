@@ -1,9 +1,5 @@
 include $(top_srcdir)/globals.mak 
-SUBDIRS = doc scenic
-
-# Install my_script in $(bindir) and distribute it.
-# FIXME: find out if this is uninstalled by 
-dist_bin_SCRIPTS = scripts/scenic run #setup.py
+SUBDIRS = doc scenic scripts
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../$(src)/main:$(PATH) trial
         
