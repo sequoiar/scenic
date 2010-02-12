@@ -131,34 +131,6 @@ def format_contact_markup(contact):
     """
     return "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
 
-# Unused when about tab is hidden
-ABOUT_LABEL = """<b><big>Scenic</big></b>
-Version: %s
-Copyright: SAT
-Authors: Etienne Desautels, Alexandre Quessy, Tristan Matthews, Simon Piette
-Web site: http://svn.sat.qc.ca/trac/scenic""" % (__version__)
-
-ABOUT_TEXT_VIEW = """Scenic is a high-quality audio/video streamer for GNU/Linux."""
-#Each peer decides what to receive from the other peer. Next, one peer can invite an other one to stream high-quality audio and video.
-
-__license__ = """Scenic
-Copyright (C) 2009 Society for Arts and Technology (SAT)
-http://www.sat.qc.ca
-All rights reserved.
-
-This file is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-Scenic is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Scenic.  If not, see <http://www.gnu.org/licenses/>."""
-
 class Gui(object):
     """
     Graphical User Interface
@@ -242,9 +214,6 @@ class Gui(object):
         self.video_jitterbuffer_widget = self.widgets.get_widget("video_jitterbuffer")
         self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
         
-        # about 
-        self.about_label_widget = self.widgets.get_widget("about_label")
-        self.about_text_view_widget = self.widgets.get_widget("about_text_view")
         # audio
         self.audio_source_widget = self.widgets.get_widget("audio_source")
         self.audio_codec_widget = self.widgets.get_widget("audio_codec")
@@ -396,8 +365,6 @@ class Gui(object):
             pass
         elif tab_name == "system_tab_contents":
             self.network_admin_widget.grab_default()
-        elif tab_name == "about_tab_contents":
-            pass
 
     def on_contact_list_changed(self, *args):
         tree_list, self.selected_contact_row = args[0].get_selected()
@@ -720,11 +687,6 @@ class Gui(object):
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
-        # ABOUT TAB CONTENTS:
-        self.about_label_widget.set_markup(ABOUT_LABEL)
-        about_text_buffer = gtk.TextBuffer()
-        about_text_buffer.set_text(ABOUT_TEXT_VIEW)
-        self.about_text_view_widget.set_buffer(about_text_buffer)
         # AUDIO:
         audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
@@ -1049,16 +1011,11 @@ class About(object):
         self.about_dialog.set_name(configure.APPNAME)
         self.about_dialog.set_role('about')
         self.about_dialog.set_version(__version__)
-        commentlabel = ABOUT_TEXT_VIEW 
+        commentlabel = configure.ONE_LINE_DESCRIPTION 
         self.about_dialog.set_comments(commentlabel)
-        self.about_dialog.set_copyright("Copyright 2009-2010 Society for Arts and Technology")
-        self.about_dialog.set_license(__license__)
-        self.about_dialog.set_authors([
-            u'Étienne Désautels <etienne@teknozen.net>', 
-            'Alexandre Quessy <alexandre@quessy.net>', 
-            'Tristan Matthews <tristan@sat.qc.ca>', 
-            'Simon Piette <simonp@sat.qc.ca>'
-            ])
+        self.about_dialog.set_copyright(configure.COPYRIGHT_SHORT) 
+        self.about_dialog.set_license(configure.LICENSE_TEXT)
+        self.about_dialog.set_authors(configure.AUTHORS_LIST)
         #self.about_dialog.set_artists(['Public domain'])
         gtk.about_dialog_set_url_hook(self.show_website)
         self.about_dialog.set_website("http://svn.sat.qc.ca/trac/scenic")
