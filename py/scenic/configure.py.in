@@ -11,6 +11,7 @@ PKGDATADIR = os.path.dirname(data.__file__) #'/usr/local/share/scenic'
 # not used yet. Will contain custom icons. 
 PIXMAPDIR = os.path.dirname(data.__file__) #'/usr/local/share/pixmaps'
 IN_DEVELOPMENT_MODE = False
+ONLINE_HELP_URL = "https://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
 
 def get_icon_path():
     """

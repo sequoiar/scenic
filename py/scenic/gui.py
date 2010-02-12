@@ -912,16 +912,8 @@ class Gui(object):
         Opens a web browser to the scenic web site.
         """
         print menu_item, "chosen"
-        url = "https://svn.sat.qc.ca/trac/miville/wiki/Documentation"
+        url = configure.ONLINE_HELP_URL 
         webbrowser.open(url)
-
-    def on_save_menu_item_activated(self, menu_item):
-        """
-        Saves the addressbook and settings.
-        """
-        print menu_item, "chosen"
-        print("-- Saving addressbook and configuration. -- ")
-        self.app.save_configuration() # gathers and saves
 
     # ---------------------- invitation dialogs -------------------
 
