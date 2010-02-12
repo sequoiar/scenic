@@ -1,3 +1,4 @@
+SUBDIRS=themes
 scenicdatadir = $(libdir)/scenic/py/scenic/data
 
 scenicdata_PYTHON=__init__.py
