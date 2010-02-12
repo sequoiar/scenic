@@ -4,7 +4,8 @@ INSTALL_ROOT=$(mktemp -p /var/tmp -d miville-root-XXXXXXXX)
 _PREFIX=/usr/local
 PYTHON_LIB=$(python -E -c 'import sys; print("python%d.%d" % sys.version_info[0:2])')
 
-export PYTHONPATH=$INSTALL_ROOT/$_PREFIX/lib/$PYTHON_LIB/site-packages
+export PYTHONPATH=$INSTALL_ROOT/$_PREFIX/lib/scenic/py
+export PATH=$INSTALL_ROOT/$_PREFIX/bin:${PATH}
 
 make distclean
 if [ ! -x ./autogen.sh ]

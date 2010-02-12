@@ -97,7 +97,8 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 
 AX_PYTHON
 dnl check for python
-AS_PATH_PYTHON(2.3)
+AM_PATH_PYTHON([2.5])
+
 
 # BOOST m4 tests
 AX_BOOST_BASE([1.35])
@@ -140,6 +141,9 @@ AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
 AC_MSG_NOTICE([define CONFIG_IEEE1394])
 fi
 
+CONFIGURED_PYTHONPATH=$PYTHONPATH
+AC_SUBST(CONFIGURED_PYTHONPATH)
+
 AC_OUTPUT([Makefile
         doc/Makefile
         doc/notes/Makefile
@@ -159,6 +163,7 @@ AC_OUTPUT([Makefile
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
         py/scripts/Makefile
+        py/scripts/scenic
         py/scenic/test/Makefile
         src/include/Makefile
         src/util/Makefile
