@@ -798,6 +798,20 @@
                             <signal name="activate" handler="on_help_menu_item_activated"/>
                           </widget>
                         </child>
+                        <child>
+                          <widget class="GtkImageMenuItem" id="about_menu_item">
+                            <property name="visible">True</property>
+                            <property name="label" translatable="yes">About</property>
+                            <property name="use_underline">True</property>
+                            <signal name="activate" handler="on_about_menu_item_activate"/>
+                            <child internal-child="image">
+                              <widget class="GtkImage" id="menu-item-image1">
+                                <property name="visible">True</property>
+                                <property name="stock">gtk-about</property>
+                              </widget>
+                            </child>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                   </widget>
@@ -2443,7 +2457,6 @@ Vorbis</property>
                 </child>
                 <child>
                   <widget class="GtkVBox" id="about_tab_contents">
-                    <property name="visible">True</property>
                     <child>
                       <widget class="GtkAlignment" id="infoLabelAlgn">
                         <property name="visible">True</property>

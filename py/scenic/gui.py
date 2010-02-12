@@ -131,17 +131,33 @@ def format_contact_markup(contact):
     """
     return "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
 
+# Unused when about tab is hidden
 ABOUT_LABEL = """<b><big>Scenic</big></b>
 Version: %s
 Copyright: SAT
 Authors: Etienne Desautels, Alexandre Quessy, Tristan Matthews, Simon Piette
 Web site: http://svn.sat.qc.ca/trac/scenic""" % (__version__)
 
-ABOUT_TEXT_VIEW = """
-Scenic is the advanced user graphical interface for the Milhouse audio/video streamer for GNU/Linux. 
+ABOUT_TEXT_VIEW = """Scenic is a high-quality audio/video streamer for GNU/Linux."""
+#Each peer decides what to receive from the other peer. Next, one peer can invite an other one to stream high-quality audio and video.
 
-Each peer decides what to receive from the other peer. Next, one peer can invite an other one to stream high-quality audio and video.
-"""
+__license__ = """Scenic
+Copyright (C) 2009 Society for Arts and Technology (SAT)
+http://www.sat.qc.ca
+All rights reserved.
+
+This file is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+Scenic is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Scenic.  If not, see <http://www.gnu.org/licenses/>."""
 
 class Gui(object):
     """
@@ -859,6 +875,9 @@ class Gui(object):
 
     # -------------------------- menu items -----------------
     
+    def on_about_menu_item_activate(self, menu_item):
+        About.create() # TODO: set parent window ?
+    
     def on_quit_menu_item_activated(self, menu_item):
         """
         Quits the application.
@@ -991,3 +1010,53 @@ class Gui(object):
                 self.audio_jack_state_widget.set_markup("<b>Stopped</b>")
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
             
+class About(object):
+    """
+    About dialog
+    """
+    def __init__(self):
+        # TODO: set parent window ?
+        self.icon_file = configure.ICON_FILE
+        self.about_dialog = gtk.AboutDialog()
+
+    def show_about_dialog(self):
+        self.about_dialog.set_name(configure.APPNAME)
+        self.about_dialog.set_role('about')
+        self.about_dialog.set_version(__version__)
+        commentlabel = ABOUT_TEXT_VIEW 
+        self.about_dialog.set_comments(commentlabel)
+        self.about_dialog.set_copyright("Copyright 2009-2010 Society for Arts and Technology")
+        self.about_dialog.set_license(__license__)
+        self.about_dialog.set_authors([
+            'Etienne Desautels', 
+            'Alexandre Quessy <alexandre@quessy.net>', 
+            'Tristan Matthews <tristan@sat.qc.ca>', 
+            'Simon Piette <simonp@sat.qc.ca>'
+            ])
+        self.about_dialog.set_artists(['Public domain'])
+        gtk.about_dialog_set_url_hook(self.show_website)
+        self.about_dialog.set_website("http://svn.sat.qc.ca/trac/scenic")
+        if not os.path.exists(self.icon_file):
+            print("Could not find icon file %s." % (self.icon_file))
+        else:
+            large_icon = gtk.gdk.pixbuf_new_from_file(self.icon_file)
+            self.about_dialog.set_logo(large_icon)
+        # Connect to callbacks
+        self.about_dialog.connect('response', self.destroy_about)
+        self.about_dialog.connect('delete_event', self.destroy_about)
+        self.about_dialog.connect("delete-event", self.destroy_about)
+        self.about_dialog.show_all()
+
+    @staticmethod
+    def create():
+        """
+        @rettype: None
+        """
+        dialog = About()
+        return dialog.show_about_dialog()
+     
+    def show_website(self, widget, data):
+        webbrowser.open(data)
+
+    def destroy_about(self, *args):
+        self.about_dialog.destroy()
