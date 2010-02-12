@@ -755,10 +755,10 @@ class Gui(object):
         cameras.insert(0, VIDEO_TEST_INPUT)
         print("Updating video sources with values %s" % (cameras))
         _set_combobox_choices(self.video_source_widget, cameras)
-        self.update_v4l2_inputs_and_norm()
+        self.update_v4l2_inputs_size_and_norm()
         self._video_source_changed_by_user = True
 
-    def update_v4l2_inputs_and_norm(self):
+    def update_v4l2_inputs_size_and_norm(self):
         """
         Called when : 
          * user chooses a different video source.
@@ -767,12 +767,16 @@ class Gui(object):
         value = _get_combobox_value(self.video_source_widget)
         self._v4l2_input_changed_by_user = False
         self._v4l2_standard_changed_by_user = False
+        # change choices and value:
         if value == VIDEO_TEST_INPUT:
+            # INPUTS:
             self.v4l2_input_widget.set_sensitive(False)
             self.v4l2_input_widget.set_active(-1)
-            #_set_combobox_choices(self.v4l2_input_widget, [" "]) # TODO: set to None, or so
+            # STANDARD:
             self.v4l2_standard_widget.set_sensitive(False)
             self.v4l2_standard_widget.set_active(-1)
+            # SIZE:
+            _set_combobox_choices(self.video_capture_size_widget, ["320x240", "640x480", "720x480"]) # TODO: more test sizes
         else:
             # INPUTS:
             current_camera_name = _get_combobox_value(self.video_source_widget)
@@ -785,7 +789,6 @@ class Gui(object):
             else:
                 self.v4l2_input_widget.set_sensitive(False)
                 self.v4l2_input_widget.set_active(-1)
-                #_set_combobox_choices(self.v4l2_input_widget, [" "]) # TODO: set to None, or so
                 
             # STANDARD: 
             current_standard = cam["standard"]
@@ -797,6 +800,10 @@ class Gui(object):
                 self.v4l2_standard_widget.set_sensitive(False)
                 self.v4l2_standard_widget.set_active(-1)
             #self.v4l2_standard_widget.set_sensitive(True)
+            # SIZE:
+            print "supported sizes: ", cam["supported_sizes"]
+            _set_combobox_choices(self.video_capture_size_widget, cam["supported_sizes"]) # TODO: more test sizes
+        # once done:
         self._v4l2_input_changed_by_user = True
         self._v4l2_standard_changed_by_user = True
             
@@ -809,7 +816,7 @@ class Gui(object):
             current_camera_name = _get_combobox_value(self.video_source_widget)
             if current_camera_name != VIDEO_TEST_INPUT:
                 self.app.poll_camera_devices()
-            self.update_v4l2_inputs_and_norm()
+            self.update_v4l2_inputs_size_and_norm()
 
     def on_v4l2_standard_changed(self, widget):
         """
