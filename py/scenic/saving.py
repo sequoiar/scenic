@@ -115,6 +115,12 @@ class ConfigStateSaving(object):
                 data["configuration"][key] = value
         _save(self._config_path, data)
 
+    def save_as(self, file_name):
+        _former_file_name = self._config_path
+        self._config_path = file_name
+        self.save()
+        self._config_path = _former_file_name
+
     def _load(self):
         data = _load(self._config_path)
         for k in data["configuration"].keys():

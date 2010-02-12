@@ -94,8 +94,9 @@ class Application(object):
 
     The devices attributes is a very interesting dict. See the source code.
     """
-    def __init__(self, kiosk_mode=False, fullscreen=False):
+    def __init__(self, kiosk_mode=False, fullscreen=False, log_file_name=None):
         self.config = Config()
+        self.log_file_name = log_file_name
         self.recv_video_port = None
         self.recv_audio_port = None
         self.remote_audio_config = {} # dict
@@ -262,6 +263,7 @@ class Application(object):
         self.gui._gather_configuration() # need to get the value of the configuration widgets.
         self.config.save()
         self.address_book.save() # addressbook values are already stored.
+
     # --------------------------- network receives ------------
 
     def _check_protocol_version(self, message):
@@ -443,8 +445,7 @@ class Application(object):
             dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.gui.main_window)
         else:
             # UPDATE when initiating session
-            self.gui._gather_configuration()
-            self.save_configuration()
+            self.save_configuration() # gathers and save
         msg = {
             "msg":"INVITE",
             "protocol": self.protocol_version,
@@ -473,7 +474,6 @@ class Application(object):
     
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
-        self.gui._gather_configuration()
         self.save_configuration()
         self.allocate_ports()
         msg = {

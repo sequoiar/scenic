@@ -364,8 +364,7 @@ class Gui(object):
         # It can be the user that pushed the button, or it can be toggled by the software.
         print 'video_view_preview toggled', widget.get_active()
         if widget.get_active():
-            self._gather_configuration()
-            self.app.save_configuration()
+            self.app.save_configuration() #gathers and saves
             command = "milhouse --videosource %s --videodevice %s --localvideo --window-title preview" % (self.app.config.video_source, self.app.config.video_device)
             print "spawning", command
             process.run_once(*command.split())
@@ -919,7 +918,7 @@ class Gui(object):
         """
         print menu_item, "chosen"
         print("-- Saving addressbook and configuration. -- ")
-        self.app.save_configuration()
+        self.app.save_configuration() # gathers and saves
 
     # ---------------------- invitation dialogs -------------------
 
