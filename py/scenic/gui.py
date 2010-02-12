@@ -288,7 +288,7 @@ class Gui(object):
     # ------------------ window events and actions --------------------
 
     def load_gtk_theme(self, name="Darklooks"):
-        file_name = os.path.join(PACKAGE_DATA, "themes/%s/gtk-2.0/gtkrc" % (name))
+        file_name = os.path.join(PACKAGE_DATA, "themes/%s/gtkrc" % (name))
         #if file_name is None:
         #    file_name = os.path.join(PACKAGE_DATA, "themes/Darklooks/gtk-2.0/gtkrc")
         # FIXME: not able to reload themes dynamically.
