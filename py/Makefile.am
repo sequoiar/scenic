@@ -1,5 +1,5 @@
 include $(top_srcdir)/globals.mak 
-SUBDIRS = doc scenic scripts
+SUBDIRS = doc scenic scripts rtpmidi
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../$(src)/main:$(PATH) trial
         
@@ -29,7 +29,6 @@ all:
 #	help2man --no-info --name="The midistream MIDI RTP Streaming Software for GNU/Linux" ./midistream > midistream.1
 #	install -D -m 644 midistream.1 $(DESTDIR)$(mandir)/man1/midistream.1
 
-# FIXME: find out if using dist_bin_SCRIPTS makes any of this redundant 
 uninstall-hook:
 	rm -f $(DESTDIR)$(mandir)/man1/midistream.1
 	rm -f $(DESTDIR)$(bindir)/scenic

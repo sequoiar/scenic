@@ -138,6 +138,7 @@ CONFIGURED_PYTHONPATH=$PYTHONPATH
 AC_SUBST(CONFIGURED_PYTHONPATH)
 
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
+AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
 AC_OUTPUT([Makefile
         doc/Makefile
@@ -153,14 +154,19 @@ AC_OUTPUT([Makefile
         src/Makefile
         py/Makefile
         py/doc/Makefile
+        py/rtpmidi/Makefile
+        py/rtpmidi/engines/Makefile
+        py/rtpmidi/engines/midi/Makefile
+        py/rtpmidi/protocols/Makefile
+        py/rtpmidi/protocols/rtp/Makefile
         py/scenic/Makefile
         py/scenic/configure.py
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
         py/scenic/data/themes/Makefile
         py/scenic/data/themes/Darklooks/Makefile
-        py/scripts/Makefile
         py/scenic/test/Makefile
+        py/scripts/Makefile
         src/include/Makefile
         src/util/Makefile
         src/gutil/Makefile

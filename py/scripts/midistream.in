@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Miville
+# 
+# Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -11,14 +11,19 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Miville is distributed in the hope that it will be useful,
+# Scenic is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Miville.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Scenic. If not, see <http://www.gnu.org/licenses/>.
+"""
+Executable script which calls scenic.runner.run()
+"""
 
+import os
+import sys
 import signal
 import re
 import sys
@@ -32,6 +37,9 @@ import getopt # FIXME: change for optparse?
 
 global rtp_control
 global midi_session_c
+
+SCRIPTS_DIR = "scripts"
+CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@"""
 
 options = [("-h", "--help", "Display help of midi_stream"),
            ("-a", "--address", "Specify the address of the client (mandatory)"),
@@ -267,6 +275,19 @@ def handler(signum, frame):
     RTPControl().stop()
     reactor.stop()
 
+def _is_in_devel():
+    d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[1]
+    return d == SCRIPTS_DIR
+
 if __name__ == "__main__":
+    if _is_in_devel():
+        d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
+        sys.path.insert(0, d)
+        os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
+        from scenic import configure
+        configure.IN_DEVELOPMENT_MODE = True
+    else:
+        sys.path.append(CONFIGURED_PYTHONPATH)
+
     signal.signal(signal.SIGINT, handler)
     parse_arg()
