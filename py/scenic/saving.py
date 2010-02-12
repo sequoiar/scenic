@@ -37,6 +37,51 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
+def _create_directory_if_it_does_not_exist(dir_path):
+    try:
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+            print('mkdir %s' % (dir_path))
+    except OSError, e:
+        msg = 'Error creating directories' % (dir_path, e.message)
+        print(msg)
+        raise RuntimeError(msg)
+
+def _save(file_name, data):
+    """
+    State saving using JSON
+
+    The data attribute is a dict of basic types.
+    (``str``, ``unicode``, ``int``, ``long``, ``float``, ``bool``, ``None``)
+    It can contain dicts and lists as well.
+    """
+    dir_name = os.path.dirname(file_name)
+    _create_directory_if_it_does_not_exist(dir_name)
+    f = None
+    try:
+        f = open(file_name, "w")
+    except IOError, e:
+        raise RuntimeError(e.message)
+    else:
+        json.dump(data, f, indent=4)
+    if f is not None:
+        f.close()
+
+def _load(file_name):
+    f = None
+    try:
+        f = open(file_name, "r")
+    except IOError, e:
+        raise RuntimeError(e.message)
+    else:
+        try:
+            data = json.load(f)
+        except ValueError, e:
+            raise RuntimeError("Error in JSON formatting: %s" % (e.message))
+    if f is not None:
+        f.close()
+    return data
+
 class ConfigStateSaving(object):
     """
     Loads/saves configuration options to a file.
@@ -47,50 +92,30 @@ class ConfigStateSaving(object):
             self._load()
         else:
             dir_name = os.path.dirname(config_file_path)
-            if not os.path.isdir(dir_name):
-                os.makedirs(dir_name)
+            _create_directory_if_it_does_not_exist(dir_name)
             self.save()
 
     def save(self):
         """
         Saves the configuration options to a file.
+        The attributes of this object.
         """
-        # TODO: Comments out the options that have not been changed from default.
-        config_str = "# Configuration written by scenic" # %(app)s %(version)s\n" % {'app': APP_NAME, 'version': __version__}
-        for c in dir(self): # FIXME: use smart var names
-            if c[0] != '_' and c != 'save': # FIXME: do not save methods !
-                inst_attr = getattr(self, c)
-                config_str += "\n" + c + "=" + str(inst_attr)
-        config_file = file(self._config_path, "w")
-        config_file.write(config_str)
-        config_file.close()
+        exclude_list = ["_config_path"] # some attributes not to save
+        data = {"configuration": {}}
+        print("Saving config to %s" % (self._config_path))
+        for key in sorted(self.__dict__.keys()): 
+            value = self.__dict__[key]
+            if key in exclude_list:
+                print("Excluding attribute %s since it is in the exclude list." % (key))
+            else:
+                data["configuration"][key] = value
+        _save(self._config_path, data)
 
     def _load(self):
-        # FIXME: use JSON, please.
-        print "Loading configuration file %s" % (self._config_path)
-        config_file  = file(self._config_path, "r")
-        for line in config_file:
-            line = line.strip()
-            if line and line[0] != "#" and len(line) > 2:
-                try:
-                    tokens = line.split("=")
-                    k = tokens[0].strip()
-                    if not hasattr(self, k):
-                        print "Unknown configuration attribute: %s" % (k)
-                    else:
-                        cast = type(getattr(self, k))
-                        v = tokens[1].strip()
-                        if v.isdigit():
-                            v = int(v)
-                        elif cast == bool:
-                            v = v == 'True' # FIXME
-                        else:
-                            v = cast(v)
-                        setattr(self, k, v)
-                        print("Config: %s = %s (%s)" % (k, v, type(v).__name__))
-                except Exception, e:
-                    print str(e)
-        config_file.close()
+        data = _load(self._config_path)
+        for k in data["configuration"].keys():
+            cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
+            setattr(self, k, cast(data["configuration"][k]))
 
 class AddressBook(object):
     """
@@ -98,47 +123,26 @@ class AddressBook(object):
     """
     def __init__(self):
         self.current_contact_is_new = False
-        self.contact_list = []
-        self.selected = 0
-        #FIXME: do not hard code
-        self.contacts_file_name = os.path.join(os.environ['HOME'], '.scenic/contacts.json')
-        self.SELECTED_KEYNAME = "selected:" # FIXME
+        self.contact_list = [] # list of dicts with keys "name", "address", "auto_accept", "port"
+        self.selected = 0 # index of the selected contact
+        self.file_name = os.path.expanduser("~/.scenic/contacts.json")
         self.load()
 
     def load(self):
-        print("Loading addressbook.")
-        if os.path.isfile(self.contacts_file_name):
-            self.contact_list = []
-            ad_book_file = file(self.contacts_file_name, "r")
-            kw_len = len(self.SELECTED_KEYNAME)
-            for line in ad_book_file:
-                if line[:kw_len] == self.SELECTED_KEYNAME:
-                    self.selected = int(line[kw_len:].strip())
-                    print("Loading selected contact: %s" % (self.selected))
-                else:
-                    try:
-                        print("Loading contact %s" % (line.strip()))
-                        d = json.loads(line)
-                        for k in ['address', 'port', 'name']:
-                            if not d.has_key(k):
-                                raise RuntimeError("The contacts in %s have a wrong format! The key %s is needed." % (self.contacts_file_name, k))
-                        for k, v in d.iteritems():
-                            if type(v) is unicode:
-                                v = str(v) # FIXME
-                        self.contact_list.append(d)
-                    except Exception, e:
-                        print "ERROR in addresbook:", str(e)
-                        raise
-            ad_book_file.close()
+        """
+        Loads the data from the addressbook file and populate the "contact_list" and "selected" attributes.
+        """
+        if os.path.isfile(self.file_name):
+            print("Loading addressbook.")
+            data = _load(self.file_name)
+            self.selected = data["selected"]
+            self.contact_list = data["contact_list"]
+        else:
+            print("No addressbook found.")
 
     def save(self):
-        if ((os.path.isfile(self.contacts_file_name)) or (len(self.contact_list) > 0)):
-            try:
-                ad_book_file = file(self.contacts_file_name, "w")
-                for contact in self.contact_list:
-                    ad_book_file.write(json.dumps(contact) + "\n")
-                if self.selected:
-                    ad_book_file.write(self.SELECTED_KEYNAME + str(self.selected) + "\n")
-                ad_book_file.close()
-            except Exception, e:
-                print "Cannot write Address Book file. %s" % (e)
+        data = {
+            "selected": self.selected,
+            "contact_list": self.contact_list
+            }
+        _save(self.file_name, data)
