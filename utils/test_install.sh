@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTALL_ROOT=$(mktemp -p /var/tmp -d miville-root-XXXXXXXX)
+INSTALL_ROOT=$(mktemp -p /var/tmp -d scenic-root-XXXXXXXX)
 _PREFIX=/usr/local
 PYTHON_LIB=$(python -E -c 'import sys; print("python%d.%d" % sys.version_info[0:2])')
 
