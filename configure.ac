@@ -134,13 +134,6 @@ CXXFLAGS+=" -fPIC "
 
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
-if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
-AC_MSG_NOTICE([undef CONFIG_IEEE1394])
-else
-AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
-AC_MSG_NOTICE([define CONFIG_IEEE1394])
-fi
-
 CONFIGURED_PYTHONPATH=$PYTHONPATH
 AC_SUBST(CONFIGURED_PYTHONPATH)
 
@@ -173,21 +166,10 @@ AC_OUTPUT([Makefile
         src/gst/Makefile
         src/gst/engine/Makefile
         src/devices/Makefile
-        src/main/Makefile])
-
-AC_OUTPUT([
+        src/main/Makefile
         src/gst/engine/test/Makefile
         ])
 
-
 AC_OUTPUT
 echo
-
-    if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
-AC_MSG_NOTICE([Not building 1394 support])
-    fi
-
-    if test "x${no_glu}" = "xyes" ; then
-AC_MSG_NOTICE([Not building OpenGL support])
-    fi
 
