@@ -35,5 +35,7 @@ if __name__ == "__main__":
         d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
         sys.path.insert(0, d)
         os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
+        from scenic import configure
+        configure.IN_DEVELOPMENT_MODE = True
     from scenic import runner
     runner.run()

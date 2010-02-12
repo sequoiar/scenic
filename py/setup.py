@@ -44,15 +44,14 @@ setup(
     author_email = "info@sat.qc.ca",
     url = "http://svn.sat.qc.ca/trac/scenic",
     description = "Scenic audio/video streaming tool for GNU/Linux.",
-    long_description = """Scenic software, a component of the PropulseART project
-    Requires: twisted, simplejson.""",
-    install_requires = [], #'twisted'], 
+    long_description = """Scenic is a graphical user interface for the milhouse streaming tool software. It is a component of the PropulseART project initiated from by the Society for Arts and Technology. (SAT)""",
+    install_requires = [], # twisted, simplejson 
     scripts = ["scripts/scenic", "midistream"],
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,
     packages = packages,
     package_data = {
-        "":["*.png", "*.jpg", '*.txt', '*.glade', '*.pot', '*.h', '*.po', '*.mo']
-    }
+        "": ["*.png", "*.jpg", '*.txt', '*.glade', '*.pot', '*.h', '*.po', '*.mo']
+        }
     )

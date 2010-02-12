@@ -319,7 +319,7 @@ class Gui(object):
         # you don't want the window to be destroyed.
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
-        if self.app.config.confirm_quit:
+        if self.app.config.confirm_quit and not configure.IN_DEVELOPMENT_MODE:
             d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.\nMake sure to save your settings if desired.", parent=self.main_window)
             d.addCallback(_cb)
             return True

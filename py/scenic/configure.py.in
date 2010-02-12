@@ -10,3 +10,4 @@ from scenic import data # TODO: change package data to configure.ac variable
 PKGDATADIR = os.path.dirname(data.__file__) #'/usr/local/share/scenic'
 # not used yet. Will contain custom icons. 
 PIXMAPDIR = os.path.dirname(data.__file__) #'/usr/local/share/pixmaps'
+IN_DEVELOPMENT_MODE = False

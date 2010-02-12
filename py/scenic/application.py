@@ -77,7 +77,7 @@ class Config(saving.ConfigStateSaving):
     video_capture_size = "640x480"
     #video_window_size = "640x480"
     video_aspect_ratio = "4:3" 
-    confirm_quit = False
+    confirm_quit = True
     theme = "Darklooks"
 
     def __init__(self):
