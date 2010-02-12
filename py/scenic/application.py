@@ -108,6 +108,7 @@ class Application(object):
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = communication.Client(self.on_connection_error) # XXX
+        self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
@@ -260,8 +261,23 @@ class Application(object):
         self.config.save()
         self.address_book.save() # addressbook values are already stored.
     # --------------------------- network receives ------------
+
+    def _check_protocol_version(self, message):
+        """
+        Checks if the remote peer's SIC protocol matches.
+        @param message: dict messages received in an INVITE or ACCEPT SIC message. 
+        @rettype: bool
+        """
+        # TODO: break if not compatible in a next release.
+        if message["protocol"] != self.protocol_version:
+            print("WARNING: Remote peer uses %s and we use %s." % (message["protocol"], self.protocol_version))
+            return False
+        else:
+            return True
+
     def handle_invite(self, message, addr):
         self.got_bye = False
+        self._check_protocol_version(message)
         
         def _on_contact_request_dialog_response(response):
             """
@@ -298,6 +314,7 @@ class Application(object):
         dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
+        self._check_protocol_version(message)
         self.gui._unschedule_offerer_invite_timeout()
         self.got_bye = False
         # TODO: Use session to contain settings and ports
@@ -427,6 +444,7 @@ class Application(object):
             self.gui._gather_configuration()
         msg = {
             "msg":"INVITE",
+            "protocol": self.protocol_version,
             "sid":0, 
             "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
             }
@@ -456,6 +474,7 @@ class Application(object):
         self.allocate_ports()
         msg = {
             "msg":"ACCEPT", 
+            "protocol": self.protocol_version,
             "sid":0,
             }
         msg.update(self._get_local_config_message_items())
