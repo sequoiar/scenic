@@ -31,9 +31,6 @@ all:
 
 # FIXME: find out if using dist_bin_SCRIPTS makes any of this redundant 
 uninstall-hook:
-	awk '/scenic/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
-	sed -i '/scenic-.*egg/d' $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/easy-install.pth 
-	rm -rf $(DESTDIR)$(prefix)/lib/$(PYTHON_LIB)/site-packages/scenic-*.egg
 	rm -f $(DESTDIR)$(mandir)/man1/midistream.1
 	rm -f $(DESTDIR)$(bindir)/scenic
 	rm -f $(DESTDIR)$(mandir)/man1/scenic.1
