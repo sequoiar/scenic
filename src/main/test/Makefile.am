@@ -1,0 +1,1 @@
+noinst_PYTHON=test_milhouse.py

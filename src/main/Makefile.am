@@ -1,7 +1,7 @@
 include $(top_srcdir)/globals.mak
+SUBDIRS = test
 
-
-TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=$(top_srcdir)/main:$(PATH) trial
+TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../:$(PATH) trial
 
 TESTS = test/test_milhouse.py
 
