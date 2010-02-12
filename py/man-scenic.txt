@@ -1,0 +1,40 @@
+[DESCRIPTION]
+Scenic is software suite for transmission and reception of your fine audio-visual content. It is an interface to the milhouse command-line Gstreamer-based software.
+
+[SYNOPSIS]
+scenic [options]
+.TP
+Most options are set with the graphical user interface.
+
+[STATE SAVING]
+The configuration is saved in the user's ~/.scenic directory, where "~" is the path to your home directory. 
+
+[EXAMPLES]
+Here is how to start scenic in the kiosk mode: 
+.TP
+scenic --kiosk
+
+[AUTHOR]
+Society for Arts and Technology
+
+[REPORTING BUGS]
+http://svn.sat.qc.ca/trac/scenic
+
+[COPYRIGHT]
+Scenic
+Copyright (C) 2008 Society for Arts and Technology (SAT)
+http://www.sat.qc.ca
+All rights reserved. 
+
+This file is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+Scenic is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
