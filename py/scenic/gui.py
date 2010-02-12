@@ -365,6 +365,7 @@ class Gui(object):
         print 'video_view_preview toggled', widget.get_active()
         if widget.get_active():
             self._gather_configuration()
+            self.app.save_configuration()
             command = "milhouse --videosource %s --videodevice %s --localvideo --window-title preview" % (self.app.config.video_source, self.app.config.video_device)
             print "spawning", command
             process.run_once(*command.split())

@@ -224,6 +224,7 @@ class Application(object):
         """
         print("The application is shutting down.")
         # TODO: stop streamers
+        self.save_configuration()
         if self.client.is_connected():
             if not self.got_bye:
                 self.send_bye()
@@ -231,6 +232,7 @@ class Application(object):
             self.disconnect_client()
         print('stopping server')
         self.server.close()
+        
     # ------------------------- session occuring -------------
     def has_session(self):
         """
@@ -442,6 +444,7 @@ class Application(object):
         else:
             # UPDATE when initiating session
             self.gui._gather_configuration()
+            self.save_configuration()
         msg = {
             "msg":"INVITE",
             "protocol": self.protocol_version,
@@ -471,6 +474,7 @@ class Application(object):
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
         self.gui._gather_configuration()
+        self.save_configuration()
         self.allocate_ports()
         msg = {
             "msg":"ACCEPT", 
