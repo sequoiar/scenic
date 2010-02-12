@@ -1054,12 +1054,12 @@ class About(object):
         self.about_dialog.set_copyright("Copyright 2009-2010 Society for Arts and Technology")
         self.about_dialog.set_license(__license__)
         self.about_dialog.set_authors([
-            'Etienne Desautels', 
+            u'Étienne Désautels <etienne@teknozen.net>', 
             'Alexandre Quessy <alexandre@quessy.net>', 
             'Tristan Matthews <tristan@sat.qc.ca>', 
             'Simon Piette <simonp@sat.qc.ca>'
             ])
-        self.about_dialog.set_artists(['Public domain'])
+        #self.about_dialog.set_artists(['Public domain'])
         gtk.about_dialog_set_url_hook(self.show_website)
         self.about_dialog.set_website("http://svn.sat.qc.ca/trac/scenic")
         if not os.path.exists(self.icon_file):

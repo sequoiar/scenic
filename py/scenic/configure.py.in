@@ -17,5 +17,4 @@ def get_icon_path():
     """
     @rettype: str
     """
-    return os.path.join(PIXMAPDIR, 'scenic.png')
-    
+    return os.path.join(PIXMAPDIR, 'scenic.png') # 48x48
