@@ -25,6 +25,7 @@ import os
 import sys
 
 SCRIPTS_DIR = "scripts"
+CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@"""
 
 def _is_in_devel():
     d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[1]
@@ -37,5 +38,8 @@ if __name__ == "__main__":
         os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
         from scenic import configure
         configure.IN_DEVELOPMENT_MODE = True
+    else:
+        sys.path.append(CONFIGURED_PYTHONPATH)
+        
     from scenic import runner
     runner.run()

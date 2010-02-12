@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 APPNAME = "scenic"
-VERSION = '''@PACKAGE_VERSION@'''
+VERSION = """@PACKAGE_VERSION@"""
 
 import os
 from scenic import data # TODO: change package data to configure.ac variable
@@ -10,5 +10,11 @@ from scenic import data # TODO: change package data to configure.ac variable
 PKGDATADIR = os.path.dirname(data.__file__) #'/usr/local/share/scenic'
 # not used yet. Will contain custom icons. 
 PIXMAPDIR = os.path.dirname(data.__file__) #'/usr/local/share/pixmaps'
-ICON_FILE = os.path.join(PIXMAPDIR, 'scenic.png')
 IN_DEVELOPMENT_MODE = False
+
+def get_icon_path():
+    """
+    @rettype: str
+    """
+    return os.path.join(PIXMAPDIR, 'scenic.png')
+    

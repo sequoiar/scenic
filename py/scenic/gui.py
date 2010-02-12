@@ -1035,7 +1035,7 @@ class About(object):
     """
     def __init__(self):
         # TODO: set parent window ?
-        self.icon_file = configure.ICON_FILE
+        self.icon_file = configure.get_icon_path()
         self.about_dialog = gtk.AboutDialog()
 
     def show_about_dialog(self):
