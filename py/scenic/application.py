@@ -104,7 +104,6 @@ class Application(object):
         self.ports_allocator = ports.PortsAllocator()
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
-        self._has_session = False
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
@@ -245,7 +244,7 @@ class Application(object):
         """
         @rettype: bool
         """
-        return self._has_session
+        return self.streamer_manager.is_busy()
     # -------------------- streamer ports -----------------
 
     def allocate_ports(self):
@@ -403,23 +402,23 @@ class Application(object):
         elif msg == "OK":
             self.handle_ok()
         else:
-            print ('WARNING: Unexpected message %s' % (msg))
+            print('WARNING: Unexpected message %s' % (msg))
 
     # -------------------------- actions on streamer manager --------
 
     def start_streamers(self, addr):
-        self._has_session = True
         self.streamer_manager.start(addr, self.config)
+        self.gui.update_invite_button()
 
     def stop_streamers(self):
         self.streamer_manager.stop()
+        self.gui.update_invite_button()
 
     def on_streamers_stopped(self, addr):
         """
         We call this when all streamers are stopped.
         """
         print("on_streamers_stopped got called")
-        self._has_session = False
         self.free_ports()
 
     # ---------------------- sending messages -----------
@@ -430,6 +429,7 @@ class Application(object):
         @rettype: L{Deferred}
         """
         def _cb(result, d1):
+            self.gui.update_invite_button() #XXX ?? 
             d1.callback(True)
         def _cl(d1):
             if self.client.is_connected():
@@ -437,6 +437,7 @@ class Application(object):
                 d2.addCallback(_cb, d1)
             else:
                 d1.callback(True)
+        # not sure why to do it in a call later.
         if self.client.is_connected():
             d = defer.Deferred()
             reactor.callLater(0, _cl, d)

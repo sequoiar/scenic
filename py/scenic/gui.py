@@ -195,17 +195,25 @@ class Gui(object):
         self.invited_dialog.set_transient_for(self.main_window)
         self.invited_dialog.connect('delete-event', self.invited_dialog.hide_on_delete)
         self.invited_dialog_label_widget = self.widgets.get_widget("invited_dialog_label")
+
+        # invite button:
+        self.invite_label_widget = self.widgets.get_widget("invite_label")
+        self.invite_icon_widget = self.widgets.get_widget("invite_icon")
+        
         # edit_contact_window:
         self.edit_contact_window = self.widgets.get_widget("edit_contact_window")
         self.edit_contact_window.set_transient_for(self.main_window) # child of main window
         self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
+        # fields in the edit contact window:
         self.contact_name_widget = self.widgets.get_widget("contact_name")
         self.contact_addr_widget = self.widgets.get_widget("contact_addr")
         self.contact_auto_accept_widget = self.widgets.get_widget("contact_auto_accept")
-        # address book buttons and list:
+        # addressbook buttons:
         self.edit_contact_widget = self.widgets.get_widget("edit_contact")
+        self.add_contact_widget = self.widgets.get_widget("add_contact")
         self.remove_contact_widget = self.widgets.get_widget("remove_contact")
         self.invite_contact_widget = self.widgets.get_widget("invite_contact")
+        # treeview:
         self.contact_list_widget = self.widgets.get_widget("contact_list")
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
@@ -535,6 +543,7 @@ class Gui(object):
          * kernel version
          * Loaded kernel modules
         """
+        # TODO: move this to an other file.
         def _on_confirm_result(result):
             milhouse_version = "unknown"
             if result:
@@ -711,6 +720,29 @@ class Gui(object):
         self.audio_numchannels_widget.set_value(audio_numchannels) # spinbutton
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         _set_combobox_value(self.audio_codec_widget, audio_codec)
+
+    def update_invite_button(self):
+        """
+        Changes the invite button according to if we are streaming or not.
+         * the icon
+         * the label
+        Makes the contact list sensitive or not.
+        """
+        # XXX
+        if self.app.has_session():
+            text = _("Stop streaming")
+            icon = gtk.STOCK_DISCONNECT
+            sensitive = False
+        else:
+            text = _("Invite this contact")
+            icon = gtk.STOCK_CONNECT
+            sensitive = True
+        self.invite_label_widget.set_text(text)
+        self.invite_icon_widget.set_from_stock(icon, 4)
+        self.contact_list_widget.set_sensitive(sensitive)
+        self.add_contact_widget.set_sensitive(sensitive)
+        self.remove_contact_widget.set_sensitive(sensitive)
+        self.edit_contact_widget.set_sensitive(sensitive)
 
     def on_audio_codec_changed(self, widget):
         """
@@ -909,7 +941,10 @@ class Gui(object):
         """
         Sends an INVITE to the remote peer.
         """
-        self.app.send_invite()
+        if self.app.has_session():
+            self.app.stop_streamers()
+        else:
+            self.app.send_invite()
     
     def on_invite_contact_cancelled(self, *args):
         """
