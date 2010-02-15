@@ -1,5 +1,5 @@
 include $(top_srcdir)/globals.mak
-SUBDIRS = man src py doc utils
+SUBDIRS = src py doc utils man 
 ACLOCAL_AMFLAGS = -I m4
 
 install-exec-hook:

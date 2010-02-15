@@ -9,7 +9,13 @@ TESTS = scenic/test/test_communication.py \
 		scenic/test/test_cameras.py \
 		scenic/test/test_signals.py
 
-EXTRA_DIST=scenic.svg
+EXTRA_DIST = scenic.desktop scenic.svg
+CLEANFILES = scenic.png
+
+all-local: scenic.png
+
+scenic.png: scenic.svg
+	convert -geometry 48x48 -background none $< $@
 
 clean-local:
 	rm -rf _trial_temp
