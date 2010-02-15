@@ -408,11 +408,9 @@ class Application(object):
 
     def start_streamers(self, addr):
         self.streamer_manager.start(addr, self.config)
-        self.gui.update_invite_button()
 
     def stop_streamers(self):
         self.streamer_manager.stop()
-        self.gui.update_invite_button()
 
     def on_streamers_stopped(self, addr):
         """
@@ -429,7 +427,6 @@ class Application(object):
         @rettype: L{Deferred}
         """
         def _cb(result, d1):
-            self.gui.update_invite_button() #XXX ?? 
             d1.callback(True)
         def _cl(d1):
             if self.client.is_connected():
@@ -496,7 +493,7 @@ class Application(object):
             self.gui.calling_dialog.hide()
             return None
            
-        print ("sending %s to %s:%s" % (msg, ip, port))
+        print("sending %s to %s:%s" % (msg, ip, port))
         deferred = self.client.connect(ip, port)
         deferred.addCallback(_on_connected).addErrback(_on_error)
         self.gui.calling_dialog.show()

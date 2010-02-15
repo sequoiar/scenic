@@ -41,6 +41,7 @@ import gtk.glade
 import webbrowser
 import gettext
 from twisted.internet import reactor
+from twisted.internet import task
 from twisted.python.reflect import prefixedMethods
 from scenic import process # just for constants
 from scenic import dialogs
@@ -269,6 +270,9 @@ class Gui(object):
         self._v4l2_standard_changed_by_user = True
         self._video_source_changed_by_user = True
         self.main_window.show()
+
+        self._addressbook_state_check_task = task.LoopingCall(self.update_addressbook_state)
+        self._addressbook_state_check_task.start(1.0, now=False)
         # The main app must call init_widgets_value
    
     #TODO: for the preview in the drawing area   
@@ -721,7 +725,7 @@ class Gui(object):
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         _set_combobox_value(self.audio_codec_widget, audio_codec)
 
-    def update_invite_button(self):
+    def update_addressbook_state(self):
         """
         Changes the invite button according to if we are streaming or not.
          * the icon
@@ -729,20 +733,24 @@ class Gui(object):
         Makes the contact list sensitive or not.
         """
         # XXX
-        if self.app.has_session():
-            text = _("Stop streaming")
-            icon = gtk.STOCK_DISCONNECT
-            sensitive = False
-        else:
-            text = _("Invite this contact")
-            icon = gtk.STOCK_CONNECT
-            sensitive = True
-        self.invite_label_widget.set_text(text)
-        self.invite_icon_widget.set_from_stock(icon, 4)
-        self.contact_list_widget.set_sensitive(sensitive)
-        self.add_contact_widget.set_sensitive(sensitive)
-        self.remove_contact_widget.set_sensitive(sensitive)
-        self.edit_contact_widget.set_sensitive(sensitive)
+        streaming = self.app.has_session()
+        currently_sensitive = self.contact_list_widget.get_property("sensitive")
+        if streaming == currently_sensitive:
+            print 'Got to change the addressbook sensitivity to', not currently_sensitive
+            if streaming:
+                text = _("Stop streaming")
+                icon = gtk.STOCK_CONNECT
+                sensitive = False
+            else:
+                text = _("Invite this contact")
+                icon = gtk.STOCK_DISCONNECT
+                sensitive = True
+            self.invite_label_widget.set_text(text)
+            self.invite_icon_widget.set_from_stock(icon, 4)
+            self.contact_list_widget.set_sensitive(sensitive)
+            self.add_contact_widget.set_sensitive(sensitive)
+            self.remove_contact_widget.set_sensitive(sensitive)
+            self.edit_contact_widget.set_sensitive(sensitive)
 
     def on_audio_codec_changed(self, widget):
         """
