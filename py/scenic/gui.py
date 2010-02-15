@@ -102,7 +102,6 @@ def _set_combobox_value(widget, value=None):
     else:
         widget.set_active(index)
 
-
 #videotestsrc legible name:
 VIDEO_TEST_INPUT = "Color bars"
 
@@ -138,7 +137,10 @@ def format_contact_markup(contact):
     @rettype: str
     @return: Pango markup for the TreeView widget.
     """
-    return "<b>%s</b>\n  IP: %s" % (contact["name"], contact["address"])
+    auto_accept = ""
+    if contact.has_key("auto_accept") and contact["auto_accept"]:# FIXME: remove the has_key check
+        auto_accept = "\n  " + _("Automatically accept invitations")
+    return "<b>%s</b>\n  IP: %s%s" % (contact["name"], contact["address"], auto_accept) 
 
 class Gui(object):
     """
@@ -199,6 +201,7 @@ class Gui(object):
         self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
         self.contact_name_widget = self.widgets.get_widget("contact_name")
         self.contact_addr_widget = self.widgets.get_widget("contact_addr")
+        self.contact_auto_accept_widget = self.widgets.get_widget("contact_auto_accept")
         # address book buttons and list:
         self.edit_contact_widget = self.widgets.get_widget("edit_contact")
         self.remove_contact_widget = self.widgets.get_widget("remove_contact")
@@ -379,16 +382,20 @@ class Gui(object):
     def on_contact_list_changed(self, *args):
         tree_list, self.selected_contact_row = args[0].get_selected()
         if self.selected_contact_row:
+            # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(True)
             self.remove_contact_widget.set_sensitive(True)
             self.invite_contact_widget.set_sensitive(True)
-            self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0]
-            self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index]
+            # get selected contact
+            self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0] # FIXME: this var should be deprecated
+            self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index] # FIXME: deprecate this!
             self.app.address_book.selected_index = self.selected_contact_index
         else:
+            # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
+            # no contact is selected
             self.app.address_book.selected_contact = None
 
     # ---------------------- slots for addressbook widgets events --------
@@ -410,6 +417,7 @@ class Gui(object):
         # Update the text in the edit/new contact dialog:
         self.contact_name_widget.set_text("")
         self.contact_addr_widget.set_text("")
+        self.contact_auto_accept_widget.set_active(False)
         self.edit_contact_window.show()
 
     def on_remove_contact_clicked(self, *args):
@@ -432,8 +440,13 @@ class Gui(object):
         """
         Shows the edit contact dialog.
         """
-        self.contact_name_widget.set_text(self.app.address_book.selected_contact["name"])
-        self.contact_addr_widget.set_text(self.app.address_book.selected_contact["address"])
+        contact = self.app.address_book.selected_contact
+        self.contact_name_widget.set_text(contact["name"])
+        self.contact_addr_widget.set_text(contact["address"])
+        auto_accept = False
+        if contact.has_key("auto_acccept") and contact["auto_accept"]:
+            auto_accept = True
+        self.contact_auto_accept_widget.set_active(auto_accept)
         self.edit_contact_window.show() # addr
 
     def on_edit_contact_cancel_clicked(self, *args):
@@ -449,10 +462,13 @@ class Gui(object):
         Hides the edit_contact window and saves the changes. (new or modified contact)
         """
         def _when_valid_save():
-            """ Saves contact info after it's been validated and then closes the window"""
+            # Saves contact info after it's been validated and then closes the window
+            # THIS IS WHERE WE CREATE THE CONTACTS IN THE ADDRESSBOOK
+            # TODO: move to a dedicated function in save.py or so.
             contact = {
                 "name": self.contact_name_widget.get_text(),
-                "address": addr 
+                "address": addr,
+                "auto_accept": self.contact_auto_accept_widget.get_active(),
                 }
             contact_markup = format_contact_markup(contact)
             if self.app.address_book.current_contact_is_new:

@@ -131,7 +131,6 @@ class Client(object):
             print msg, "!!!!!!!!!!!!!!!"
             #TODO: return failure?
             return defer.succeed(True) # FIXME
-   
  
     def send(self, msg):
         """

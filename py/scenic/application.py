@@ -301,6 +301,11 @@ class Application(object):
             else:
                 pass
             return True
+        # check if the contact is in the addressbook
+        contact = self._get_contact_by_addr(addr)
+        invited_by = addr
+        if contact is not None:
+            invited_by = contact["name"]
 
         if self.streamer_manager.is_busy():
             send_to_port = message["please_send_to_port"]
@@ -313,11 +318,29 @@ class Application(object):
         else:
             self.remote_audio_config = message["audio"]
             self.remote_video_config = message["video"]
-            self.client.connect(addr, message["please_send_to_port"])
-            # TODO: if a contact in the addressbook has this address, displays it!
-            text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % addr)
+            connected_deferred = self.client.connect(addr, message["please_send_to_port"])
+            if contact is not None:
+                if contact.has_key("auto_accept") and contact["auto_accept"]:
+                    print("Contact %s is on auto_accept. Accepting." % (invited_by))
+                    def _connected_cb(proto):
+                        self.send_accept(addr)
+                    connected_deferred.addCallback(_connected_cb)
+                    # TODO: show a dialog or change the state of the GUI to say we are connected.
+                    return # important
+            text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % (invited_by))
             self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
-
+    
+    def _get_contact_by_addr(self, addr):
+        """
+        Returns a contact dict or None if not in the addressbook.
+        """
+        ret = None
+        for contact in self.address_book.contact_list:
+            if contact["address"] == addr:
+                ret = contact
+                break
+        return ret
+    
     def handle_cancel(self):
         self.client.disconnect()
         self.gui.invited_dialog.hide()
