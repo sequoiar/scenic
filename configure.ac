@@ -145,7 +145,10 @@ AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 CONFIGURED_PYTHONPATH=$PYTHONPATH
 AC_SUBST(CONFIGURED_PYTHONPATH)
 
-PYTHON_LIB_PATH=${libdir}/scenic/py
+AS_AC_EXPAND(LIBDIR, $libdir)
+AC_MSG_NOTICE(Storing library files in $LIBDIR)
+
+PYTHON_LIB_PATH=$LIBDIR/scenic/py
 AC_SUBST(PYTHON_LIB_PATH)
 
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
