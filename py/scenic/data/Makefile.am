@@ -1,7 +1,7 @@
 SUBDIRS=themes
-scenicdatadir = $(libdir)/scenic/py/scenic/data
+assetsdir = $(libdir)/scenic/py/scenic/data
 
-scenicdata_PYTHON=__init__.py
-scenicdata_DATA=audio.png scenic.glade scenic.png themes video.svg audio.svg scenic.glade.h video.png scenic.pot messages.pot
-dist_scenicdata_DATA=audio.png scenic.glade scenic.png themes video.svg audio.svg scenic.glade.h video.png scenic.pot messages.pot
+assets_PYTHON=__init__.py
+EXTRA_DIST=audio.png scenic.glade scenic.png video.svg audio.svg scenic.glade.h \
+				 video.png scenic.pot messages.pot stock_line_in.png
 

@@ -9,7 +9,12 @@ TESTS = scenic/test/test_communication.py \
 		scenic/test/test_cameras.py \
 		scenic/test/test_signals.py
 
-all: 
+EXTRA_DIST=scenic.svg
+
+clean-local:
+	rm -rf _trial_temp
+
+#all: 
 #	epydoc scenic
 #	convert -geometry 48x48 -background none scenic.svg scenic.png
 

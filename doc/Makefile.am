@@ -1,5 +1,4 @@
 SUBDIRS = notes test figures figures/test sequences network texts
-DIST_SUBDIRS = notes test figures figures/test sequences network texts
 
 dist_pkgdata_DATA=footer.html header.html doxygen.css Doxyfile
 
@@ -39,7 +38,3 @@ moreclean:
 	@for i in $(SUBDIRS); do \
         echo "Clearing in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) moreclean); done
-
-distclean: clean
-
-#.PHONY: all html doxygen install check clean moreclean distclean

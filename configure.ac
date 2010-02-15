@@ -95,8 +95,7 @@ fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 
-AX_PYTHON
-dnl check for python
+dnl check for python, FIXME are we checking for python twice?
 AM_PATH_PYTHON([2.5])
 
 
@@ -140,7 +139,8 @@ AC_SUBST(CONFIGURED_PYTHONPATH)
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
-AC_OUTPUT([Makefile
+AC_CONFIG_FILES([
+        Makefile
         doc/Makefile
         doc/notes/Makefile
         doc/test/Makefile
@@ -180,5 +180,3 @@ AC_OUTPUT([Makefile
         ])
 
 AC_OUTPUT
-echo
-
