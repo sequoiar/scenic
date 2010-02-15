@@ -9,4 +9,4 @@ common_mandeps = $(top_srcdir)/configure.ac
 # binary when any source file changes, only the main one.
 # Use -o so that the `missing' program can infer the output file.
 milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOptions.cpp $(common_mandeps)
-	$(HELP2MAN) --include=milhouse-man.txt --name="Milhouse" --no-info ../src/main/milhouse -o $@
+	$(HELP2MAN) --include=milhouse-man.txt --name="milhouse is a Gstreamer application for audio and video over RTP" --no-info ../src/main/milhouse -o $@
