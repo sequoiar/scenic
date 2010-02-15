@@ -40,7 +40,7 @@ global midi_session_c
 
 SCRIPTS_DIR = "scripts"
 CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@""" 
-PYTHON_LIB_PATH = """@PYTHON_LIB_PATH"""# path to where the module is installed
+PYTHON_LIB_PATH = """@PYTHON_LIB_PATH@"""# path to where the module is installed
 
 options = [("-h", "--help", "Display help of midi_stream"),
            ("-a", "--address", "Specify the address of the client (mandatory)"),

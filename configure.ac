@@ -145,6 +145,9 @@ AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 CONFIGURED_PYTHONPATH=$PYTHONPATH
 AC_SUBST(CONFIGURED_PYTHONPATH)
 
+PYTHON_LIB_PATH=$libdir/scenic/py
+AC_SUBST(PYTHON_LIB_PATH)
+
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
