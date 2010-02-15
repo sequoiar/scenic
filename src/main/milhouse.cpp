@@ -250,14 +250,9 @@ short Milhouse::run(int argc, char **argv)
     return 0;
 }
 
-void onExit()
-{}
-
-
 int main(int argc, char **argv)
 {
     int ret = 0;
-    atexit(onExit);
 
     try 
     {
