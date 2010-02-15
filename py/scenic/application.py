@@ -460,7 +460,7 @@ class Application(object):
             }
         msg.update(self._get_local_config_message_items())
         contact = self.address_book.selected_contact
-        port = contact["port"]
+        port = self.config.negotiation_port
         ip = contact["address"]
 
         def _on_connected(proto):
