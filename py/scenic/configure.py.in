@@ -11,7 +11,7 @@ PKGDATADIR = os.path.dirname(data.__file__) #'/usr/local/share/scenic'
 # not used yet. Will contain custom icons. 
 PIXMAPDIR = os.path.dirname(data.__file__) #'/usr/local/share/pixmaps'
 IN_DEVELOPMENT_MODE = False
-ONLINE_HELP_URL = "https://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
+ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
 ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
 
 def get_icon_path():

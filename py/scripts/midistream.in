@@ -39,7 +39,6 @@ global rtp_control
 global midi_session_c
 
 SCRIPTS_DIR = "scripts"
-CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@"""
 
 options = [("-h", "--help", "Display help of midi_stream"),
            ("-a", "--address", "Specify the address of the client (mandatory)"),
