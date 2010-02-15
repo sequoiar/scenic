@@ -145,7 +145,10 @@ class AddressBook(object):
         if os.path.isfile(self.file_name):
             print("Loading addressbook.")
             data = _load(self.file_name)
-            self.selected = data["selected"]
+            try:
+                self.selected = data["selected"]
+            except KeyError:
+                self.selected = None
             self.contact_list = data["contact_list"]
         else:
             print("No addressbook found.")
