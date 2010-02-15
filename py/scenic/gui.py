@@ -134,11 +134,11 @@ VIDEO_STANDARDS = ["NTSC", "PAL"]
 def format_contact_markup(contact):
     """
     Formats a contact for the Adressbook GTK widget.
-    @param contact: A dict with keys "name", "address" and "port"
+    @param contact: A dict with keys "name" and "address"
     @rettype: str
     @return: Pango markup for the TreeView widget.
     """
-    return "<b>%s</b>\n  IP: %s\n  Port: %s" % (contact["name"], contact["address"], contact["port"])
+    return "<b>%s</b>\n  IP: %s" % (contact["name"], contact["address"])
 
 class Gui(object):
     """
@@ -199,7 +199,6 @@ class Gui(object):
         self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
         self.contact_name_widget = self.widgets.get_widget("contact_name")
         self.contact_addr_widget = self.widgets.get_widget("contact_addr")
-        self.contact_port_widget = self.widgets.get_widget("contact_port")
         # address book buttons and list:
         self.edit_contact_widget = self.widgets.get_widget("edit_contact")
         self.remove_contact_widget = self.widgets.get_widget("remove_contact")
@@ -411,7 +410,6 @@ class Gui(object):
         # Update the text in the edit/new contact dialog:
         self.contact_name_widget.set_text("")
         self.contact_addr_widget.set_text("")
-        self.contact_port_widget.set_text("")
         self.edit_contact_window.show()
 
     def on_remove_contact_clicked(self, *args):
@@ -436,7 +434,6 @@ class Gui(object):
         """
         self.contact_name_widget.set_text(self.app.address_book.selected_contact["name"])
         self.contact_addr_widget.set_text(self.app.address_book.selected_contact["address"])
-        self.contact_port_widget.set_text(str(self.app.address_book.selected_contact["port"]))
         self.edit_contact_window.show() # addr
 
     def on_edit_contact_cancel_clicked(self, *args):
@@ -455,8 +452,7 @@ class Gui(object):
             """ Saves contact info after it's been validated and then closes the window"""
             contact = {
                 "name": self.contact_name_widget.get_text(),
-                "address": addr, 
-                "port": int(port)
+                "address": addr 
                 }
             contact_markup = format_contact_markup(contact)
             if self.app.address_book.current_contact_is_new:
@@ -471,21 +467,11 @@ class Gui(object):
             self.app.address_book.selected_contact = contact
             self.edit_contact_window.hide()
 
-        # Validate the port number
-        port = self.contact_port_widget.get_text()
-        if port == "":
-            port = str(self.app.config.negotiation_port) # set port to default
-        elif not port.isdigit():
-            dialogs.ErrorDialog.create("The port number must be an integer", parent=self.main_window)
-            return
-        elif int(port) not in range(10000, 65535):
-            dialogs.ErrorDialog.create("The port number must be in the range of 10000-65535", parent=self.main_window)
-            return
         # Validate the address
         addr = self.contact_addr_widget.get_text()
         if len(addr) < 7:
             dialogs.ErrorDialog.create("The address is not valid\n\nEnter a valid address\n" +
-                    "Example: 168.123.45.32 or example.org", parent=self.main_window)
+                    "Example: 192.0.32.10 or example.org", parent=self.main_window)
             return
         # save it.
         _when_valid_save()
