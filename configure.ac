@@ -111,7 +111,16 @@ AX_BOOST_FILESYSTEM
 AX_CHECK_GL
 AX_CHECK_GLU
 
-AC_PROG_HELP2MAN
+# GNU help2man creates man pages from --help output; in many cases, this
+# is sufficient, and obviates the need to maintain man pages separately.
+# However, this means invoking executables, which we generally cannot do
+# when cross-compiling, so we test to avoid that (the variable
+# "cross_compiling" is set by AC_PROG_CC).
+if test $cross_compiling = no; then
+  AM_MISSING_PROG(HELP2MAN, help2man)
+else
+  HELP2MAN=:
+fi
 
 if test "x${no_gl}" = "xyes" ; then
     AC_MSG_WARN([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
@@ -149,6 +158,7 @@ AC_CONFIG_FILES([
         doc/figures/Makefile
         doc/figures/test/Makefile
         doc/sequences/Makefile
+        man/Makefile
         utils/Makefile
         utils/dc-ctl/Makefile
         src/Makefile
