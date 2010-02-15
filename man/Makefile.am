@@ -1,4 +1,4 @@
-man_MANS = milhouse.1
+man_MANS = milhouse.1 scenic.1
 EXTRA_DIST = $(man_MANS)
 MAINTAINERCLEANFILES = $(man_MANS)
 
@@ -10,3 +10,6 @@ common_mandeps = $(top_srcdir)/configure.ac
 # Use -o so that the `missing' program can infer the output file.
 milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOptions.cpp $(common_mandeps)
 	$(HELP2MAN) --include=milhouse-man.txt --name="milhouse is a Gstreamer application for audio and video over RTP" --no-info ../src/main/milhouse -o $@
+
+scenic.1: $(top_srcdir)/py/scenic/runner.py $(common_mandeps)
+	$(HELP2MAN) --include=scenic-man.txt --name="The Scenic Audio/Video Streaming Software for GNU/Linux" --no-info ../py/scripts/scenic -o $@
