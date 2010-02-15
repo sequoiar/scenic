@@ -25,7 +25,8 @@ import os
 import sys
 
 SCRIPTS_DIR = "scripts"
-CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@"""
+CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@""" # useless
+PYTHON_LIB_PATH = """@PYTHON_LIB_PATH"""
 
 def _is_in_devel():
     d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[1]
@@ -39,7 +40,7 @@ if __name__ == "__main__":
         from scenic import configure
         configure.IN_DEVELOPMENT_MODE = True
     else:
-        sys.path.append(CONFIGURED_PYTHONPATH)
+        sys.path.append(PYTHON_LIB_PATH)
         
     from scenic import runner
     runner.run()
