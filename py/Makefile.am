@@ -9,13 +9,10 @@ TESTS = scenic/test/test_communication.py \
 		scenic/test/test_cameras.py \
 		scenic/test/test_signals.py
 
-EXTRA_DIST = scenic.desktop scenic.svg
-CLEANFILES = scenic.png
+desktopdir = $(datadir)/applications
+desktop_DATA = scenic.desktop
 
-all-local: scenic.png
-
-scenic.png: scenic.svg
-	convert -geometry 48x48 -background none $< $@
+EXTRA_DIST = $(desktop_DATA) scenic.svg
 
 clean-local:
 	rm -rf _trial_temp
@@ -40,9 +37,3 @@ clean-local:
 #	help2man --no-info --name="The midistream MIDI RTP Streaming Software for GNU/Linux" ./midistream > midistream.1
 #	install -D -m 644 midistream.1 $(DESTDIR)$(mandir)/man1/midistream.1
 
-uninstall-hook:
-	rm -f $(DESTDIR)$(mandir)/man1/midistream.1
-	rm -f $(DESTDIR)$(bindir)/scenic
-	rm -f $(DESTDIR)$(mandir)/man1/scenic.1
-	rm -f $(DESTDIR)$(datarootdir)/applications/scenic.desktop
-	rm -f $(DESTDIR)$(datarootdir)/pixmaps/scenic.png
