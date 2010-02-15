@@ -25,6 +25,7 @@
 #include "mapMsg.h"
 
 #include <fstream>
+#include <boost/filesystem/operations.hpp>
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
@@ -119,14 +120,14 @@ bool VideoSourceConfig::forceGrayscale() const
 
 bool VideoSourceConfig::locationExists() const
 {
-    return fileExists(location_);
+    return boost::filesystem::exists(location_);
 }
 
 
 
 bool VideoSourceConfig::deviceExists() const
 {
-    return fileExists(deviceName_);
+    return boost::filesystem::exists(deviceName_);
 }
 
 

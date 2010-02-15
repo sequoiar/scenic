@@ -33,10 +33,8 @@
 #include <boost/assign.hpp>
 
 // for filesystem ops
-#ifdef HAVE_BOOST_FILESYSTEM
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#endif
 
 #include "util.h"
 #include "v4l2util.h"
@@ -332,23 +330,15 @@ DeviceList getDevices()
 
 void v4l2util::listCameras()
 {
-#ifdef HAVE_BOOST_FILESYSTEM
     DeviceList names(getDevices());
-#else
-    LOG_WARNING("Boost filesystem not installed, just guessing what video devices are present");
-    DeviceList names;
-    names.push_back("/dev/video0");
-    names.push_back("/dev/video1");
-#endif
 
     for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
-        if (fileExists(*deviceName))
-            printCaptureFormat(*deviceName);
+        printCaptureFormat(*deviceName);
 }
 
 bool v4l2util::isInterlaced(const std::string &device)
 {
-    if (fileExists(device))
+    if (boost::filesystem::exists(device))
     {
         int fd = -1;
         if ((fd = open(device.c_str(), O_RDONLY)) < 0) 

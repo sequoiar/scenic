@@ -25,7 +25,6 @@
 
 #include "lassert.h"
 #include "util/logWriter.h"
-#include "util/fileUtil.h"
 #include "util/sigint.h"
 
 #endif

@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include <boost/filesystem.hpp>
 #include "mapMsg.h"
 
 #include "audioConfig.h"
@@ -105,7 +106,7 @@ const char* AudioSourceConfig::deviceName() const
 /// Returns true if location indicates an existing, readable file/device. 
 bool AudioSourceConfig::locationExists() const
 {
-    return fileExists(location_);
+    return boost::filesystem::exists(location_);
 }
 
 
