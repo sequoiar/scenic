@@ -1,4 +1,4 @@
-SUBDIRS = notes test figures figures/test sequences network texts
+SUBDIRS = figures network
 
 dist_pkgdata_DATA=footer.html header.html doxygen.css Doxyfile
 

@@ -157,13 +157,9 @@ AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 AC_CONFIG_FILES([
         Makefile
         doc/Makefile
-        doc/notes/Makefile
-        doc/test/Makefile
         doc/network/Makefile
         doc/texts/Makefile
         doc/figures/Makefile
-        doc/figures/test/Makefile
-        doc/sequences/Makefile
         man/Makefile
         utils/Makefile
         utils/dc-ctl/Makefile
