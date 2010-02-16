@@ -228,7 +228,6 @@ class Gui(object):
         self.video_fullscreen_widget = self.widgets.get_widget("video_fullscreen")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
         self.video_deinterlace_widget = self.widgets.get_widget("video_deinterlace")
-        self.video_deinterlace_widget.set_sensitive(False)
         self.aspect_ratio_widget = self.widgets.get_widget("aspect_ratio")
         self.v4l2_input_widget = self.widgets.get_widget("v4l2_input")
         self.v4l2_standard_widget = self.widgets.get_widget("v4l2_standard")
