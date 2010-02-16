@@ -139,7 +139,7 @@ def format_contact_markup(contact):
     @return: Pango markup for the TreeView widget.
     """
     auto_accept = ""
-    if contact.has_key("auto_accept") and contact["auto_accept"]:# FIXME: remove the has_key check
+    if contact["auto_accept"]:
         auto_accept = "\n  " + _("Automatically accept invitations")
     return "<b>%s</b>\n  IP: %s%s" % (contact["name"], contact["address"], auto_accept) 
 
@@ -456,8 +456,9 @@ class Gui(object):
         self.contact_name_widget.set_text(contact["name"])
         self.contact_addr_widget.set_text(contact["address"])
         auto_accept = False
-        if contact.has_key("auto_acccept") and contact["auto_accept"]:
+        if contact["auto_accept"]:
             auto_accept = True
+            print('auto accept should be true')
         self.contact_auto_accept_widget.set_active(auto_accept)
         self.edit_contact_window.show() # addr
 

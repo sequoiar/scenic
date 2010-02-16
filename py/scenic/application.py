@@ -327,7 +327,7 @@ class Application(object):
             self.remote_video_config = message["video"]
             connected_deferred = self.client.connect(addr, message["please_send_to_port"])
             if contact is not None:
-                if contact.has_key("auto_accept") and contact["auto_accept"]:
+                if contact["auto_accept"]:
                     print("Contact %s is on auto_accept. Accepting." % (invited_by))
                     def _connected_cb(proto):
                         self.send_accept(addr)
