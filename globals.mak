@@ -2,7 +2,6 @@ src = $(top_srcdir)/src
 inc = $(src)/include
 INCLUDES = -I$(inc) -I$(src) -I..
 AM_CPPFLAGS = $(GLIB_CFLAGS)  
-LIBUTIL = $(top_builddir)/src/util/libutil.la
 
 uncrustify:
 	-uncrustify -c $(top_srcdir)/utils/uncrustify.cfg -q --no-backup *.cpp
