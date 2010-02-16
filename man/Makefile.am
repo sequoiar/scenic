@@ -14,5 +14,5 @@ milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOp
 scenic.1: $(top_srcdir)/py/scenic/runner.py $(common_mandeps)
 	$(HELP2MAN) --include=scenic-man.txt --name="Scenic Audio/Video Streaming Software for GNU/Linux" --no-info ../py/scripts/scenic -o $@
 
-midistream.1: $(top_srcdir)/py/scripts/midistream $(common_mandeps)
+midistream.1: $(top_srcdir)/py/scripts/midistream.in $(common_mandeps)
 	PYTHONPATH=../py:$(PYTHONPATH) $(HELP2MAN) --name="MIDI RTP Streaming Software" --no-info ../py/scripts/midistream -o $@
