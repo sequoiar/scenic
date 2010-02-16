@@ -179,6 +179,11 @@ AC_CONFIG_FILES([
         py/scenic/configure.py
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
+        py/scenic/data/locale/Makefile
+        py/scenic/data/locale/en_US/Makefile
+        py/scenic/data/locale/en_US/LC_MESSAGES/Makefile
+        py/scenic/data/locale/fr_CA/Makefile
+        py/scenic/data/locale/fr_CA/LC_MESSAGES/Makefile
         py/scenic/data/themes/Makefile
         py/scenic/data/themes/Darklooks/Makefile
         py/scenic/test/Makefile
