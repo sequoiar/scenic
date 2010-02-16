@@ -751,6 +751,7 @@ class Gui(object):
             self.add_contact_widget.set_sensitive(sensitive)
             self.remove_contact_widget.set_sensitive(sensitive)
             self.edit_contact_widget.set_sensitive(sensitive)
+            self.video_view_preview_widget.set_sensitive(sensitive)
 
     def on_audio_codec_changed(self, widget):
         """
