@@ -34,10 +34,12 @@ global rtp_control
 global midi_session_c
 
 SCRIPTS_DIR = "scripts"
+VERSION = """@PACKAGE_VERSION@"""
 CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@""" 
 PYTHON_LIB_PATH = """@PYTHON_LIB_PATH@"""# path to where the module is installed
 
 options = [("-h", "--help", "Display help of midi_stream"),
+           ("-v", "--version", "Display version of midi_stream"),
            ("-a", "--address", "Specify the address of the client (mandatory)"),
            ("-d", "--devices-list", "Show a complete list of midi devices"),
            ("-r", "--receiving-port", 
@@ -56,7 +58,7 @@ options = [("-h", "--help", "Display help of midi_stream"),
             "DISABLE recovery journal (journal provide note recovery when a packet is lost, so at your own risks!)"),
            ("-f", "--follow-standard", 
             "Take care of MIDI standard (ex: omni on) in recovery journal (experimental)"),
-           ("-v", "--verbose", "Make midi stream talk")]
+           ("-V", "--verbose", "Make midi stream talk")]
 
 def usage():
     exec_name = "midistream" #sys.argv[0]
@@ -110,7 +112,6 @@ def main(args):
     if sending_port != 0 and receiving_port != 0:
         if sending_port != receiving_port:
             print "Error: receiving port and sending port must be equal."
-            usage()
             sys.exit(2)
     midi_session_c = RTPControl().add_session(MidiSession(address, 
                                                        sport=sending_port, 
@@ -138,22 +139,24 @@ def parse_arg():
     """
     Parses the arguments and runs the app.
     """
-    # TODO: use optparse
+    # FIXME: use optparse
     address = sending_port = receiving_port = device_in = device_out = latency = jitter_buffer_size = safe_keyboard = journal = standard = verbose = -1
     try:                                
-        (optis, args) = getopt.getopt(sys.argv[1:], "hda:s:i:r:o:l:b:kjfv", 
-                                      ["help", "devices-list", "sending-port", 
+        (optis, args) = getopt.getopt(sys.argv[1:], "hvda:s:i:r:o:l:b:kjfV", 
+                                      ["help", "version", "devices-list", "sending-port", 
                                        "device-in", "receiving-port", "device-out", 
                                        "latency", "buffer-size", "safe-keyboard", 
                                        "journal", "follow-standard", "verbose"])
-    except getopt.GetoptError:           
-        usage()                          
+    except getopt.GetoptError, e:           
         sys.exit(2)
     opts = {}
     for o, a in optis:
         opts[o] = a
     if opts.has_key('-h') or opts.has_key('--help'):
         usage()
+        sys.exit(0)
+    if opts.has_key('-v') or opts.has_key('--version'):
+        print VERSION
         sys.exit(0)
     #Midi Stream
     from rtpmidi.engines.midi.midi_session import MidiSession
@@ -241,7 +244,7 @@ def parse_arg():
     if check_param_logic(params):
         main(params)
     else:
-        usage()
+        print "logic error"
         sys.exit(2)
 
 def check_param_logic(params):
