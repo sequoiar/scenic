@@ -28,9 +28,6 @@ import signal
 import re
 from twisted.internet import reactor
 
-#Midi Stream
-from rtpmidi.engines.midi.midi_session import MidiSession
-from rtpmidi.protocols.rtp.rtp_control import RTPControl
 import getopt # FIXME: change for optparse?
 
 global rtp_control
@@ -158,6 +155,9 @@ def parse_arg():
     if opts.has_key('-h') or opts.has_key('--help'):
         usage()
         sys.exit(0)
+    #Midi Stream
+    from rtpmidi.engines.midi.midi_session import MidiSession
+    from rtpmidi.protocols.rtp.rtp_control import RTPControl
     if opts.has_key('-v') or opts.has_key('--verbose'):
         verbose = 1
     else:
