@@ -158,7 +158,6 @@ AC_CONFIG_FILES([
         Makefile
         doc/Makefile
         doc/network/Makefile
-        doc/texts/Makefile
         doc/figures/Makefile
         man/Makefile
         utils/Makefile
