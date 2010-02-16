@@ -31,6 +31,7 @@ from scenic import configure
 __version__ = configure.VERSION
 APP_NAME = configure.APPNAME
 PACKAGE_DATA = configure.PKGDATADIR
+INVITE_TIMEOUT = 10
 
 ### MODULES IMPORTS  ###
 
@@ -1041,7 +1042,7 @@ class Gui(object):
             return False
 
         if self._offerer_invite_timeout is None or not self._offerer_invite_timeout.active():
-            self._offerer_invite_timeout = reactor.callLater(5, _cl_offerer_invite_timed_out)
+            self._offerer_invite_timeout = reactor.callLater(INVITE_TIMEOUT, _cl_offerer_invite_timed_out)
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
