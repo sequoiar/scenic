@@ -39,9 +39,9 @@ You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>."""
 
 AUTHORS_LIST = [
-    u'Étienne Désautels <etienne@teknozen.net>', 
     'Alexandre Quessy <alexandre@quessy.net>', 
     'Tristan Matthews <tristan@sat.qc.ca>', 
-    'Simon Piette <simonp@sat.qc.ca>'
+    'Simon Piette <simonp@sat.qc.ca>',
+    u'Étienne Désautels <etienne@teknozen.net>', 
     ]
 COPYRIGHT_SHORT = "Copyright 2009-2010 Society for Arts and Technology"
