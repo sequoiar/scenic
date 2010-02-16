@@ -228,6 +228,7 @@ class Gui(object):
         self.video_fullscreen_widget = self.widgets.get_widget("video_fullscreen")
         self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
         self.video_deinterlace_widget = self.widgets.get_widget("video_deinterlace")
+        self.video_deinterlace_widget.set_sensitive(False)
         self.aspect_ratio_widget = self.widgets.get_widget("aspect_ratio")
         self.v4l2_input_widget = self.widgets.get_widget("v4l2_input")
         self.v4l2_standard_widget = self.widgets.get_widget("v4l2_standard")
@@ -333,8 +334,8 @@ class Gui(object):
         # you don't want the window to be destroyed.
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
-        if self.app.config.confirm_quit and not configure.IN_DEVELOPMENT_MODE:
-            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.\nMake sure to save your settings if desired.", parent=self.main_window)
+        if self.app.config.confirm_quit and not configure.IN_DEVELOPMENT_MODE and self.app.has_session():
+            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.", parent=self.main_window)
             d.addCallback(_cb)
             return True
         else:
