@@ -44,11 +44,6 @@ ALL_SUPPORTED_SIZE = [
     "176x120"
     ]
 
-
-
-
- 
-
 ### MODULES IMPORTS  ###
 
 import sys
