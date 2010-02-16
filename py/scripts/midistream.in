@@ -26,13 +26,11 @@ import os
 import sys
 import signal
 import re
-import sys
 from twisted.internet import reactor
 
 #Midi Stream
 from rtpmidi.engines.midi.midi_session import MidiSession
 from rtpmidi.protocols.rtp.rtp_control import RTPControl
-import logging
 import getopt # FIXME: change for optparse?
 
 global rtp_control
