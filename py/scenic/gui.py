@@ -361,7 +361,8 @@ class Gui(object):
         print 'video_view_preview toggled', widget.get_active()
         if widget.get_active():
             self.app.save_configuration() #gathers and saves
-            command = "milhouse --videosource %s --localvideo --window-title preview" % (self.app.config.video_source)
+            width, height = self.app.config.video_capture_size.split("x")
+            command = "milhouse --videosource %s --localvideo --window-title preview --width %s --height %s" % (self.app.config.video_source, width, height)
             if self.app.config.video_source != "videotestsrc":
                 command += " --videodevice %s" % (self.app.config.video_device)
             print "spawning $%s" % (command)
