@@ -228,16 +228,24 @@ class Application(object):
         """
         Last things done before quitting.
         """
+        deferred = defer.Deferred()
         print("The application is shutting down.")
         # TODO: stop streamers
         self.save_configuration()
         if self.client.is_connected():
             if not self.got_bye:
-                self.send_bye()
-                self.stop_streamers()
-            self.disconnect_client()
-        print('stopping server')
-        self.server.close()
+                self.send_bye() # returns None
+                self.stop_streamers() # returns None
+        def _cb(result):
+            print "done quitting."
+            deferred.callback(True)
+        def _later():
+            d2 = self.disconnect_client()
+            d2.addCallback(_cb)
+            print('stopping server')
+        reactor.callLater(0.1, _later)
+        d1 = self.server.close()
+        return defer.DeferredList([deferred, d1])
         
     # ------------------------- session occuring -------------
     def has_session(self):
@@ -410,6 +418,7 @@ class Application(object):
         self.streamer_manager.start(addr, self.config)
 
     def stop_streamers(self):
+        # TODO: return a deferred. 
         self.streamer_manager.stop()
 
     def on_streamers_stopped(self, addr):

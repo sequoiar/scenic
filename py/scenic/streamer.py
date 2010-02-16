@@ -159,6 +159,7 @@ class StreamerManager(object):
         Stops the sender and receiver processes.
         Does not send any message to the remote peer ! This must be done somewhere else.
         """
+        #TODO: return a deferred
         # stopping
         if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
             self._set_state(process.STATE_STOPPING)
