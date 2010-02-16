@@ -393,6 +393,7 @@ class Gui(object):
             self.network_admin_widget.grab_default()
 
     def on_contact_list_changed(self, *args):
+        # FIXME: what is args?
         tree_list, self.selected_contact_row = args[0].get_selected()
         if self.selected_contact_row:
             # make the edit, remove, invite buttons sensitive:
@@ -402,7 +403,7 @@ class Gui(object):
             # get selected contact
             self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0] # FIXME: this var should be deprecated
             self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index] # FIXME: deprecate this!
-            self.app.address_book.selected_index = self.selected_contact_index
+            self.app.address_book.selected = self.selected_contact_index
         else:
             # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(False)
