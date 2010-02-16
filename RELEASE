@@ -1,0 +1,60 @@
+Release notes for Scenic 0.3.7
+
+Milhouse:
+This release fixes a big regression in caps transmission which broke Vorbis and Theora support in 0.3.6.
+New features include better v4l2 controls, the ability to restart a sender without restarting a receiver, rtpjitterbuffer
+control embedded in our output window, as well as a lot of cleanup and output fixes.
+
+Scenic:
+Moved the graphical user interface to GTK+ for faster development.
+The Scenic software now polls devices using the Milhouse streamer. 
+We implemented SIC, the SIP Spelled Incorrectly protocol, which mimics SIP 
+to negotiate the streaming session using JSON over TCP/IP.
+Moved Miville code out of trunk. 
+Superseded Miville features within a three week code sprint in GTK+!
+
+
+* Fixed #181 Man page of midistream has each command twice
+* Fixed #182 midistream port range needs to be documented
+* Fixed #92 Separate Integrator Manual from User Manual
+* Fixed #261 Capture size not in state saving
+* Fixed #260 Preview does not use capture setting size
+* Fixed #255 Increase timeout for invited
+* Fixed #218 auto accept
+* Fixed #231 Selected contact should be saved
+* Fixed #259 editing a contact removes its auto_accept flag
+* Fixed #242 invited dialog should display contact name if present in addressbook
+* Fixed #233 Send BYE at shutdown time
+* Fixed #140 make distcheck still fails
+* Fixed #198 make check fails on buildbot because PATH variable is broken
+* Fixed #249 use python_PYTHON instead of dist_bin_SCRIPTS for most python files
+* Fixed #257 Package data is not installed
+* Fixed #248 Show all supported capture sizes to the user
+* Fixed #245 Modernize state saving
+* Fixed #212 Detect v4l2 devices
+* Fixed #211 User source/sink configuration
+* Fixed #217 Implement video deinterlace option
+* Fixed #215 video device configuration
+* Fixed #214 user source configuration
+* Fixed #241 Cleanup in trac components
+* Fixed #243 exit on start up if we can't bind to the negotiation port
+* Fixed #210 Session media description in JSON
+* Fixed #227 don't allow join contact if jack is not running
+* Fixed #239 implement --set-standard and --set-input in milhouse
+* Fixed #216 media format configuration
+* Fixed #226 send_bye doesn't happen when session is stopped
+* Fixed #237 Add more infos in milhouse --list-cameras
+* Fixed #234 dc-ctl should be able to show values, not only save in a file
+* Fixed #199 put rtpjitterbuffer control in xvimagesink window
+* Fixed #235 dc-ctl should be able to get a specific value
+* Fixed #223 Generate about text on the fly
+* Fixed #206 trac needs a category for scenic (gtk-interface)
+* Fixed #213 Support cancel invitation
+* Fixed #225 if no dc camera is plugged in, using videosource=dc1394src will segfault
+* Fixed #224 request pads should be unreffed in rtpreceiver/sender's destructor
+* Fixed #222 receiver should handle new senders
+* Fixed #221 Use ports allocator
+* Fixed #205 closing dialogs has permanent side effects in maugis
+* Fixed #208 rename gtk widgets (dialogs)
+* Fixed #209 Pango markup setlabel bug in scenic
+* Fixed #207 closing video window is broken
