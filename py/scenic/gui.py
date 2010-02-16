@@ -32,6 +32,22 @@ __version__ = configure.VERSION
 APP_NAME = configure.APPNAME
 PACKAGE_DATA = configure.PKGDATADIR
 INVITE_TIMEOUT = 10
+ALL_SUPPORTED_SIZE = [
+    "924x576",
+    "768x480",
+    "720x480",
+    "704x480",
+    "704x240",
+    "640x480",
+    "352x240",
+    "320x240",
+    "176x120"
+    ]
+
+
+
+
+ 
 
 ### MODULES IMPORTS  ###
 
@@ -667,6 +683,7 @@ class Gui(object):
         print("Changing widgets value according to configuration.")
         # VIDEO CAPTURE SIZE:
         video_capture_size = self.app.config.video_capture_size
+        _set_combobox_choices(self.video_capture_size_widget, ALL_SUPPORTED_SIZE)
         _set_combobox_value(self.video_capture_size_widget, video_capture_size)
         print ' * video_capture_size:', video_capture_size
         # DISPLAY:
@@ -824,7 +841,7 @@ class Gui(object):
             self.v4l2_standard_widget.set_sensitive(False)
             self.v4l2_standard_widget.set_active(-1)
             # SIZE:
-            _set_combobox_choices(self.video_capture_size_widget, ["320x240", "640x480", "720x480"]) # TODO: more test sizes
+            _set_combobox_choices(self.video_capture_size_widget, ALL_SUPPORTED_SIZE)
         else:
             # INPUTS:
             current_camera_name = _get_combobox_value(self.video_source_widget)
