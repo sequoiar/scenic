@@ -1,2 +1,2 @@
 include $(top_srcdir)/globals.mak
-SUBDIRS = include util gst gutil shared_video tcp main devices
+SUBDIRS = include util gst gutil shared_video tcp main firereset

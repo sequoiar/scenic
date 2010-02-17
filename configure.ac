@@ -184,7 +184,7 @@ AC_CONFIG_FILES([
         src/tcp/Makefile
         src/gst/Makefile
         src/gst/engine/Makefile
-        src/devices/Makefile
+        src/firereset/Makefile
         src/main/Makefile
         src/main/test/Makefile
         ])
