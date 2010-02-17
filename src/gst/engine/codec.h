@@ -128,7 +128,7 @@ class VideoDecoder : public Decoder
             if (!doDeinterlace_)
                 return decoder_;
             else 
-                return deinterlace_;
+                return colorspc_;
         }
 };
 

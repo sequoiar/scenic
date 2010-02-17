@@ -25,7 +25,6 @@ import os
 import sys
 
 SCRIPTS_DIR = "scripts"
-CONFIGURED_PYTHONPATH = """@CONFIGURED_PYTHONPATH@""" # useless
 PYTHON_LIB_PATH = """@PYTHON_LIB_PATH@"""
 
 def _is_in_devel():
