@@ -20,8 +20,8 @@
  *
  */
 
+#include <glib.h>
 #include "util.h"
-
 #include "gutil.h"
     
 // extend namespace gutil
@@ -33,7 +33,7 @@ namespace gutil {
 
 int gutil::killMainLoop(gpointer /*data*/)
 {
-    if (loop_)
+    if (loop_ != 0)
         g_main_loop_quit(loop_);
 
     LOG_DEBUG("Quitting...");
@@ -54,12 +54,13 @@ int gutil::checkSignal(gpointer /*data*/)
 /// ms to run - 0 is forever
 void gutil::runMainLoop(int ms)
 {
-    loop_ = g_main_loop_new (NULL, FALSE);                       
-    if(ms)
-        g_timeout_add(ms, static_cast<GSourceFunc>(gutil::killMainLoop),
-                NULL);
+    loop_ = g_main_loop_new (NULL, FALSE);
+    /// the gtk main loop will die after ms has elapsed
+    if (ms != 0)
+        g_timeout_add(ms, static_cast<GSourceFunc>(gutil::killMainLoop), NULL);
 
-    g_timeout_add(500 /*ms*/,  // poll signal status every half second
+    // poll signal status every half second
+    g_timeout_add(500 /*ms*/,
             static_cast<GSourceFunc>(gutil::checkSignal),
             NULL);
 
