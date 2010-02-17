@@ -61,9 +61,9 @@ from scenic.devices import cameras
 
 ### MULTILINGUAL SUPPORT ###
 _ = gettext.gettext
-gettext.bindtextdomain(APP_NAME, os.path.join(PACKAGE_DATA, "locale"))
+gettext.bindtextdomain(APP_NAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
 gettext.textdomain(APP_NAME)
-gtk.glade.bindtextdomain(APP_NAME, os.path.join(PACKAGE_DATA, "locale"))
+gtk.glade.bindtextdomain(APP_NAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
 gtk.glade.textdomain(APP_NAME)
 
 def _get_key_for_value(dictionnary, value):

@@ -1,4 +1,4 @@
-SUBDIRS = themes locale
+SUBDIRS = themes
 
 icondir = $(datadir)/pixmaps
 icon_DATA = scenic.png

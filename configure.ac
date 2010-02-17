@@ -145,6 +145,10 @@ AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 CONFIGURED_PYTHONPATH=$PYTHONPATH
 AC_SUBST(CONFIGURED_PYTHONPATH)
 
+# FIXME
+SCENIC_LOCALE_DIR=po
+AC_SUBST(SCENIC_LOCALE_DIR)
+
 AS_AC_EXPAND(LIBDIR, $libdir)
 AC_MSG_NOTICE(Storing library files in $LIBDIR)
 
@@ -174,11 +178,11 @@ AC_CONFIG_FILES([
         py/scenic/configure.py
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
-        py/scenic/data/locale/Makefile
-        py/scenic/data/locale/en_US/Makefile
-        py/scenic/data/locale/en_US/LC_MESSAGES/Makefile
-        py/scenic/data/locale/fr_CA/Makefile
-        py/scenic/data/locale/fr_CA/LC_MESSAGES/Makefile
+        po/Makefile
+        po/en_US/Makefile
+        po/en_US/LC_MESSAGES/Makefile
+        po/fr_CA/Makefile
+        po/fr_CA/LC_MESSAGES/Makefile
         py/scenic/data/themes/Makefile
         py/scenic/data/themes/Darklooks/Makefile
         py/scenic/test/Makefile

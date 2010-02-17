@@ -13,6 +13,7 @@ PIXMAPDIR = os.path.dirname(data.__file__) #'/usr/local/share/pixmaps'
 IN_DEVELOPMENT_MODE = False
 ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
 ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
+SCENIC_LOCALE_DIR = """@SCENIC_LOCALE_DIR@""" # FIXME: overriden when in development mode. See in py/scripts/scenic.in
 
 def get_icon_path():
     """
