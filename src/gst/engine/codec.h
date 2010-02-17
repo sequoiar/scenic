@@ -124,11 +124,10 @@ class VideoDecoder : public Decoder
         
         _GstElement *srcElement() 
         { 
-            // return queue_;
             if (!doDeinterlace_)
                 return decoder_;
             else 
-                return colorspc_;
+                return deinterlace_;
         }
 };
 

@@ -148,8 +148,8 @@ void VideoDecoder::addDeinterlace()
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = pipeline_.makeElement("deinterlace", NULL);
         g_object_set(deinterlace_, "fields", TOP, NULL);
-        gstlinkable::link(decoder_, deinterlace_);
-        gstlinkable::link(deinterlace_, colorspc_);
+        gstlinkable::link(decoder_, colorspc_);
+        gstlinkable::link(colorspc_, deinterlace_);
     }
 }
 

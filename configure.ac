@@ -9,7 +9,6 @@ AC_PROG_LIBTOOL
 
 AM_INIT_AUTOMAKE([-Wno-portability])
 
-#AM_CONFIG_HEADER(config.h)
 # Check for C and C++ compilers
 AC_PROG_CXX
 AC_PROG_CC
@@ -30,9 +29,6 @@ AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
-
-AC_ARG_ENABLE([millisecwait], [ --enable-millisecwait=(millisecs) thread sleep time],,enable_millisecwait=10)
-AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
 AC_ARG_ENABLE([svn-revision], [ --enable-svn-revision ],,enable_svn_revision=no)
 AM_CONDITIONAL([SVN],test "x${enable_svn_revision}" = "xyes")
@@ -107,9 +103,6 @@ AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_ASIO
 AX_BOOST_DATE_TIME
 AX_BOOST_FILESYSTEM
-
-AX_CHECK_GL
-AX_CHECK_GLU
 
 # GNU help2man creates man pages from --help output; in many cases, this
 # is sufficient, and obviates the need to maintain man pages separately.
