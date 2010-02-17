@@ -5,44 +5,27 @@ APPNAME = "scenic"
 VERSION = """@PACKAGE_VERSION@"""
 
 import os
-from scenic import data # TODO: change package data to configure.ac variable
-# contains the glade, gtkrc and locale files.
-PKGDATADIR = os.path.dirname(data.__file__) #'/usr/local/share/scenic'
+from scenic import data
+# contains the glade files and pixmaps
+# TODO: change this for a autoconf variable
+PKGDATADIR = os.path.dirname(data.__file__) # Typically /usr/local/share/scenic
 # not used yet. Will contain custom icons. 
-PIXMAPDIR = os.path.dirname(data.__file__) #'/usr/local/share/pixmaps'
-IN_DEVELOPMENT_MODE = False
-ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
-ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
-SCENIC_LOCALE_DIR = """@SCENIC_LOCALE_DIR@""" # FIXME: overriden when in development mode. See in py/scripts/scenic.in
+SCENIC_LOCALE_DIR = """@SCENIC_LOCALE_DIR@""" # Typically /usr/local/share/po
+PACKAGE_NAME = """@PACKAGE_NAME@""" # scenic
+# contains the gtkrc themes:
+# TODO: change this for a autoconf variable
+THEMES_DIR = PKGDATADIR 
 
-def get_icon_path():
+def replace_install_paths_with_devel_paths():
     """
-    @rettype: str
+    If the application is not installed, overrides the constants in this file with the uninstalled location of these directories.
+    Called from the main executable.
     """
-    return os.path.join(PIXMAPDIR, 'scenic.png') # 48x48
-
-LICENSE_TEXT = """Scenic
-Copyright (C) 2009 Society for Arts and Technology (SAT)
-http://www.sat.qc.ca
-All rights reserved.
-
-This file is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-Scenic is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Scenic.  If not, see <http://www.gnu.org/licenses/>."""
-
-AUTHORS_LIST = [
-    'Alexandre Quessy <alexandre@quessy.net>', 
-    'Tristan Matthews <tristan@sat.qc.ca>', 
-    'Simon Piette <simonp@sat.qc.ca>',
-    u'Étienne Désautels <etienne@teknozen.net>', 
-    ]
-COPYRIGHT_SHORT = "Copyright 2009-2010 Society for Arts and Technology"
+    # if in development mode, override the path to gettext i18n files.
+    this_dir = os.path.dirname(os.path.abspath(__file__)) # trunk/py/scenic/
+    root = os.path.split(os.path.split(this_dir)[0])[0] # trunk
+    py_scenic_data_dir = os.path.join(this_dir, 'data') # trunk/py/scenic/data
+    # not, override the constants:
+    SCENIC_LOCALE_DIR = os.path.join(root, "po") # trunk/po
+    PKGDATADIR = py_scenic_data_dir 
+    THEMES_DIR = PKGDATADIR

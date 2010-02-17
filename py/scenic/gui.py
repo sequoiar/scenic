@@ -28,11 +28,11 @@ Former Notes
 """
 ### CONSTANTS ###
 from scenic import configure
-__version__ = configure.VERSION
-APP_NAME = configure.APPNAME
-PACKAGE_DATA = configure.PKGDATADIR
+
 INVITE_TIMEOUT = 10
-ALL_SUPPORTED_SIZE = [
+ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
+ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
+ALL_SUPPORTED_SIZE = [ # by milhouse video
     "924x576",
     "768x480",
     "720x480",
@@ -61,10 +61,37 @@ from scenic.devices import cameras
 
 ### MULTILINGUAL SUPPORT ###
 _ = gettext.gettext
-gettext.bindtextdomain(APP_NAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
-gettext.textdomain(APP_NAME)
-gtk.glade.bindtextdomain(APP_NAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
-gtk.glade.textdomain(APP_NAME)
+gettext.bindtextdomain(configure.APPNAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
+gettext.textdomain(configure.APPNAME)
+gtk.glade.bindtextdomain(configure.APPNAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
+gtk.glade.textdomain(configure.APPNAME)
+
+LICENSE_TEXT = _("""Scenic
+Copyright (C) 2009 Society for Arts and Technology (SAT)
+http://www.sat.qc.ca
+All rights reserved.
+
+This file is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+Scenic is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Scenic.  If not, see <http://www.gnu.org/licenses/>.""")
+
+AUTHORS_LIST = [
+    'Alexandre Quessy <alexandre@quessy.net>',
+    'Tristan Matthews <tristan@sat.qc.ca>',
+    'Simon Piette <simonp@sat.qc.ca>',
+    u'Étienne Désautels <etienne@teknozen.net>',
+    ]
+
+COPYRIGHT_SHORT = _("Copyright 2009-2010 Society for Arts and Technology")
 
 def _get_key_for_value(dictionnary, value):
     """
@@ -167,14 +194,14 @@ class Gui(object):
         self.kiosk_mode_on = kiosk_mode
         self._offerer_invite_timeout = None
         # Set the Glade file
-        glade_file = os.path.join(PACKAGE_DATA, 'scenic.glade')
+        glade_file = os.path.join(configure.PKGDATADIR, 'scenic.glade')
         if os.path.isfile(glade_file):
             glade_path = glade_file
         else:
             text = _("Error : Could not find the Glade file %s. Exitting.") % (glade_file)
             print(text)
             sys.exit()
-        self.widgets = gtk.glade.XML(glade_path, domain=APP_NAME)
+        self.widgets = gtk.glade.XML(glade_path, domain=configure.APPNAME)
         
         # connects callbacks to widgets automatically
         glade_signal_slots = {}
@@ -185,7 +212,7 @@ class Gui(object):
         # Get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
         self.main_window.connect('delete-event', self.on_main_window_deleted)
-        self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
+        self.main_window.set_icon_from_file(os.path.join(configure.PKGDATADIR, 'scenic.png'))
         self.main_tabs_widget = self.widgets.get_widget("mainTabs")
         self.system_tab_contents_widget = self.widgets.get_widget("system_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
@@ -295,9 +322,7 @@ class Gui(object):
     # ------------------ window events and actions --------------------
 
     def load_gtk_theme(self, name="Darklooks"):
-        file_name = os.path.join(PACKAGE_DATA, "themes/%s/gtkrc" % (name))
-        #if file_name is None:
-        #    file_name = os.path.join(PACKAGE_DATA, "themes/Darklooks/gtk-2.0/gtkrc")
+        file_name = os.path.join(configure.THEMES_DIR, "themes/%s/gtkrc" % (name))
         # FIXME: not able to reload themes dynamically.
         if os.path.exists(file_name):
             #os.environ["GTK2_RC_FILES"] = file_name
@@ -345,7 +370,7 @@ class Gui(object):
         # you don't want the window to be destroyed.
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
-        if self.app.config.confirm_quit and not configure.IN_DEVELOPMENT_MODE and self.app.has_session():
+        if self.app.config.confirm_quit and self.app.has_session():
             d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.", parent=self.main_window)
             d.addCallback(_cb)
             return True
@@ -957,7 +982,7 @@ class Gui(object):
         Opens a web browser to the scenic web site.
         """
         print menu_item, "chosen"
-        url = configure.ONLINE_HELP_URL 
+        url = ONLINE_HELP_URL 
         webbrowser.open(url)
 
     # ---------------------- invitation dialogs -------------------
@@ -1065,15 +1090,15 @@ class Gui(object):
         is_running = self.app.devices["jackd_is_running"]
         fill_stats = False
         if is_zombie:
-                self.audio_jack_state_widget.set_markup("<b>Zombie</b>")
+                self.audio_jack_state_widget.set_markup(_("<b>Zombie</b>"))
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_DIALOG_WARNING, 4)
         else:
             if is_running:
-                self.audio_jack_state_widget.set_markup("<b>Running</b>")
+                self.audio_jack_state_widget.set_markup(_("<b>Running</b>"))
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_YES, 4)
                 fill_stats = True
             else:
-                self.audio_jack_state_widget.set_markup("<b>Stopped</b>")
+                self.audio_jack_state_widget.set_markup(_("<b>Not running</b>"))
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
         if fill_stats:
             j = self.app.devices["jack_servers"][0] 
@@ -1084,27 +1109,29 @@ class Gui(object):
             self.jack_latency_widget.set_text("")
             self.jack_sampling_rate_widget.set_text("")
             
+PROJECT_WEBSITE = "http://svn.sat.qc.ca/trac/scenic"
+
 class About(object):
     """
     About dialog
     """
     def __init__(self):
         # TODO: set parent window ?
-        self.icon_file = configure.get_icon_path()
+        self.icon_file = os.path.append(configure.PKGDATADIR, 'scenic.png')
         self.about_dialog = gtk.AboutDialog()
 
     def show_about_dialog(self):
         self.about_dialog.set_name(configure.APPNAME)
         self.about_dialog.set_role('about')
-        self.about_dialog.set_version(__version__)
-        commentlabel = configure.ONE_LINE_DESCRIPTION 
+        self.about_dialog.set_version(configure.VERSION)
+        commentlabel = ONE_LINE_DESCRIPTION 
         self.about_dialog.set_comments(commentlabel)
-        self.about_dialog.set_copyright(configure.COPYRIGHT_SHORT) 
-        self.about_dialog.set_license(configure.LICENSE_TEXT)
-        self.about_dialog.set_authors(configure.AUTHORS_LIST)
+        self.about_dialog.set_copyright(COPYRIGHT_SHORT) 
+        self.about_dialog.set_license(LICENSE_TEXT)
+        self.about_dialog.set_authors(AUTHORS_LIST)
         #self.about_dialog.set_artists(['Public domain'])
         gtk.about_dialog_set_url_hook(self.show_website)
-        self.about_dialog.set_website("http://svn.sat.qc.ca/trac/scenic")
+        self.about_dialog.set_website(PROJECT_WEBSITE)
         if not os.path.exists(self.icon_file):
             print("Could not find icon file %s." % (self.icon_file))
         else:

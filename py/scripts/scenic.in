@@ -37,9 +37,7 @@ if __name__ == "__main__":
         sys.path.insert(0, d)
         os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
         from scenic import configure
-        configure.IN_DEVELOPMENT_MODE = True
-        # if in development mode, override the path to gettext i18n files.
-        configure.LOCALE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../po")
+        configure.replace_install_paths_with_devel_paths()
     else:
         sys.path.append(PYTHON_LIB_PATH)
         
