@@ -13,3 +13,4 @@ LDADD = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(LIBDC1394_LIBS)
 
 clean-local:
 	rm -rf _trial_temp
+	rm -rf test/*.pyc
