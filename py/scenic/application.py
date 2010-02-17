@@ -561,5 +561,5 @@ class Application(object):
     def on_connection_error(self, err, msg):
         # XXX
         self.gui.hide_calling_dialog(msg)
-        text = _("%s: %s") % (str(err), str(msg))
+        text = _("Connection error: %(message)s\n%(error)s") % {"error": err, "message": msg}
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)

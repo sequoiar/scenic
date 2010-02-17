@@ -899,7 +899,7 @@ class Gui(object):
                     else:
                         actual_standard = cam["standard"]
                         if actual_standard != standard_name:
-                            msg = _("Could not change V4L2 standard from %s to %s for device %s.") % (actual_standard, standard_name, current_camera_name)
+                            msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             print(msg)
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
@@ -930,7 +930,7 @@ class Gui(object):
                     else:
                         actual_input = cam["input"]
                         if actual_input != input_number:
-                            msg = _("Could not change V4L2 input from %s to %s for device %s.") % (actual_input, input_number, current_camera_name)
+                            msg = _("Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s.") % {"current_input": actual_input, "desired_input": input_number, "device_name": current_camera_name}
                             print(msg)
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
