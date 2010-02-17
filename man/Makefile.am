@@ -9,10 +9,10 @@ common_mandeps = $(top_srcdir)/configure.ac
 # binary when any source file changes, only the main one.
 # Use -o so that the `missing' program can infer the output file.
 milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOptions.cpp $(common_mandeps)
-	$(HELP2MAN) --include=milhouse-man.txt --name="Milhouse is a Gstreamer application for audio and video over RTP" --no-info ../src/main/milhouse -o $@
+	$(HELP2MAN) --include=milhouse-man.txt --name="Milhouse is a Gstreamer application for audio and video over RTP" --no-info $(top_builddir)/src/main/milhouse -o $@
 
 scenic.1: $(top_srcdir)/py/scenic/runner.py $(common_mandeps)
-	$(HELP2MAN) --include=scenic-man.txt --name="Scenic Audio/Video Streaming Software for GNU/Linux" --no-info ../py/scripts/scenic -o $@
+	$(HELP2MAN) --include=scenic-man.txt --name="Scenic Audio/Video Streaming Software for GNU/Linux" --no-info $(top_builddir)/py/scripts/scenic -o $@
 
 midistream.1: $(top_srcdir)/py/scripts/midistream.in $(common_mandeps)
-	$(HELP2MAN) --name="MIDI RTP Streaming Software" --no-info ../py/scripts/midistream -o $@
+	$(HELP2MAN) --name="MIDI RTP Streaming Software" --no-info $(top_builddir)/py/scripts/midistream -o $@

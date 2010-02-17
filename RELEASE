@@ -1,4 +1,4 @@
-Release notes for Scenic 0.3.7
+Release notes for Scenic 0.4
 
 Milhouse:
 This release fixes a big regression in caps transmission which broke Vorbis and Theora support in 0.3.6.
