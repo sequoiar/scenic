@@ -61,9 +61,9 @@ from scenic.devices import cameras
 
 ### MULTILINGUAL SUPPORT ###
 _ = gettext.gettext
-gettext.bindtextdomain(configure.APPNAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
+gettext.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
 gettext.textdomain(configure.APPNAME)
-gtk.glade.bindtextdomain(configure.APPNAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
+gtk.glade.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
 gtk.glade.textdomain(configure.APPNAME)
 
 LICENSE_TEXT = _("""Scenic
@@ -194,7 +194,7 @@ class Gui(object):
         self.kiosk_mode_on = kiosk_mode
         self._offerer_invite_timeout = None
         # Set the Glade file
-        glade_file = os.path.join(configure.PKGDATADIR, 'scenic.glade')
+        glade_file = os.path.join(configure.GLADE_DIR, 'scenic.glade')
         if os.path.isfile(glade_file):
             glade_path = glade_file
         else:
@@ -212,7 +212,7 @@ class Gui(object):
         # Get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
         self.main_window.connect('delete-event', self.on_main_window_deleted)
-        self.main_window.set_icon_from_file(os.path.join(configure.PKGDATADIR, 'scenic.png'))
+        self.main_window.set_icon_from_file(os.path.join(configure.PIXMAPS_DIR, 'scenic.png'))
         self.main_tabs_widget = self.widgets.get_widget("mainTabs")
         self.system_tab_contents_widget = self.widgets.get_widget("system_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
@@ -322,7 +322,7 @@ class Gui(object):
     # ------------------ window events and actions --------------------
 
     def load_gtk_theme(self, name="Darklooks"):
-        file_name = os.path.join(configure.THEMES_DIR, "themes/%s/gtkrc" % (name))
+        file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
         # FIXME: not able to reload themes dynamically.
         if os.path.exists(file_name):
             #os.environ["GTK2_RC_FILES"] = file_name
@@ -1117,7 +1117,7 @@ class About(object):
     """
     def __init__(self):
         # TODO: set parent window ?
-        self.icon_file = os.path.append(configure.PKGDATADIR, 'scenic.png')
+        self.icon_file = os.path.append(configure.PIXMAPS_DIR, 'scenic.png')
         self.about_dialog = gtk.AboutDialog()
 
     def show_about_dialog(self):

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(SCENIC, 0.4.0)
+AC_INIT(SCENIC, 0.4.1)  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -142,6 +142,9 @@ AC_SUBST(SCENIC_LOCALE_DIR)
 AS_AC_EXPAND(LIBDIR, $libdir)
 AC_MSG_NOTICE(Storing library files in $LIBDIR)
 
+AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
+AC_MSG_NOTICE(Storing package files in $PKGLIBDIR)
+
 PYTHON_LIB_PATH=$LIBDIR/scenic/py
 AC_SUBST(PYTHON_LIB_PATH)
 
@@ -150,6 +153,11 @@ AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
 AC_CONFIG_FILES([
         Makefile
+        data/Makefile
+        data/glade/Makefile
+        data/pixmaps/Makefile
+        data/themes/Makefile
+        data/themes/Darklooks/Makefile
         doc/Makefile
         doc/network/Makefile
         doc/figures/Makefile
@@ -167,14 +175,11 @@ AC_CONFIG_FILES([
         py/scenic/Makefile
         py/scenic/configure.py
         py/scenic/devices/Makefile
-        py/scenic/data/Makefile
         locale/Makefile
         locale/en_US/Makefile
         locale/en_US/LC_MESSAGES/Makefile
         locale/fr_CA/Makefile
         locale/fr_CA/LC_MESSAGES/Makefile
-        py/scenic/data/themes/Makefile
-        py/scenic/data/themes/Darklooks/Makefile
         py/scenic/test/Makefile
         py/scripts/Makefile
         src/include/Makefile

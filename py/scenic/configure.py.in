@@ -1,31 +1,49 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+The project directories look as follow:
+trunk/
+ * locale/ : translations
+ * data/
+   * glade : glade files and some images
+   * themes : gtkrc files.
+   * pixmaps : only the application icon for now (not the desktop's file icon)
+
+Once installed, they look like this:
+/usr/local/share/scenic
+ * locale/
+ * pixmaps/
+ * glade/
+ * themes/
+"""
+import os
 
 APPNAME = "scenic"
-VERSION = """@PACKAGE_VERSION@"""
-
-import os
-from scenic import data
-# contains the glade files and pixmaps
-# TODO: change this for a autoconf variable
-PKGDATADIR = os.path.dirname(data.__file__) # Typically /usr/local/share/scenic
-# not used yet. Will contain custom icons. 
-SCENIC_LOCALE_DIR = """@SCENIC_LOCALE_DIR@""" # Typically /usr/local/share/po
-PACKAGE_NAME = """@PACKAGE_NAME@""" # scenic
-# contains the gtkrc themes:
-# TODO: change this for a autoconf variable
-THEMES_DIR = PKGDATADIR 
+VERSION = "@PACKAGE_VERSION@"
+PACKAGE_NAME = """@PACKAGE_NAME@"""
+# paths:
+LOCALE_DIR = os.path.join("@LIBDIR@", 'scenic', "@LOCALE_DIR@")
+GLADE_DIR = os.path.join("@LIBDIR@", 'scenic', 'glade')
+PIXMAPS_DIR = os.path.join("@LIBDIR@", 'scenic', 'pixmaps')
+THEMES_DIR = os.path.join("@LIBDIR@", 'scenic', "themes")
 
 def replace_install_paths_with_devel_paths():
     """
     If the application is not installed, overrides the constants in this file with the uninstalled location of these directories.
     Called from the main executable.
     """
+    global THEMES_DIR
+    global LOCALE_DIR
+    global PIXMAPS_DIR
+    global GLADE_DIR
     # if in development mode, override the path to gettext i18n files.
     this_dir = os.path.dirname(os.path.abspath(__file__)) # trunk/py/scenic/
-    root = os.path.split(os.path.split(this_dir)[0])[0] # trunk
-    py_scenic_data_dir = os.path.join(this_dir, 'data') # trunk/py/scenic/data
-    # not, override the constants:
-    SCENIC_LOCALE_DIR = os.path.join(root, "po") # trunk/po
-    PKGDATADIR = py_scenic_data_dir 
-    THEMES_DIR = PKGDATADIR
+    py_dir = os.path.split(this_dir)[0] # trunk/py
+    root_dir = os.path.split(py_dir)[0] # trunk
+    print("Changing paths so that project dir is set to %s" % (root_dir))
+    # Now, override the constants:
+    GLADE_DIR = os.path.join(root_dir, 'data', 'glade')
+    PIXMAPS_DIR = os.path.join(root_dir, 'data', 'pixmaps')
+    THEMES_DIR = os.path.join(root_dir, 'data', 'themes')
+    LOCALE_DIR = os.path.join(root_dir, "locale")
+    print("Changed paths to %s %s %s %s" % (GLADE_DIR, PIXMAPS_DIR, THEMES_DIR, LOCALE_DIR))

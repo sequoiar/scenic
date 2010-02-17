@@ -29,13 +29,18 @@ PYTHON_LIB_PATH = """@PYTHON_LIB_PATH@"""
 
 def _is_in_devel():
     d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[1]
+    print d
     return d == SCRIPTS_DIR
 
 if __name__ == "__main__":
     if _is_in_devel():
+        print(">>>>>>>>>>>>>>>>>>> SCENIC DEVEL MODE <<<<<<<<<<<<<<<<<<<")
         d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
         sys.path.insert(0, d)
-        os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
+        print("Added %s to Python sys.path." % (d))
+        scripts_dir_full_path = os.path.join(d, SCRIPTS_DIR)
+        os.environ["PATH"] += ":%s" % (scripts_dir_full_path)
+        print("Added %s to $PATH." % (scripts_dir_full_path))
         from scenic import configure
         configure.replace_install_paths_with_devel_paths()
     else:

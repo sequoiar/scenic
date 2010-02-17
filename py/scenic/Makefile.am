@@ -1,4 +1,4 @@
-SUBDIRS = devices data test
+SUBDIRS = devices test
 
 scenicdir = $(libdir)/scenic/py/scenic
 
