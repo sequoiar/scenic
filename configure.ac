@@ -136,7 +136,7 @@ CXXFLAGS+=" -fPIC "
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 # FIXME
-SCENIC_LOCALE_DIR=po
+SCENIC_LOCALE_DIR=locale
 AC_SUBST(SCENIC_LOCALE_DIR)
 
 AS_AC_EXPAND(LIBDIR, $libdir)
@@ -168,11 +168,11 @@ AC_CONFIG_FILES([
         py/scenic/configure.py
         py/scenic/devices/Makefile
         py/scenic/data/Makefile
-        po/Makefile
-        po/en_US/Makefile
-        po/en_US/LC_MESSAGES/Makefile
-        po/fr_CA/Makefile
-        po/fr_CA/LC_MESSAGES/Makefile
+        locale/Makefile
+        locale/en_US/Makefile
+        locale/en_US/LC_MESSAGES/Makefile
+        locale/fr_CA/Makefile
+        locale/fr_CA/LC_MESSAGES/Makefile
         py/scenic/data/themes/Makefile
         py/scenic/data/themes/Darklooks/Makefile
         py/scenic/test/Makefile
