@@ -1555,7 +1555,7 @@ Theora</property>
                                     <child>
                                       <widget class="GtkLabel" id="label13">
                                         <property name="visible">True</property>
-                                        <property name="sensitive">False</property>
+                                        <property name="sensitive">True</property>
                                         <property name="xalign">1</property>
                                         <property name="xpad">5</property>
                                         <property name="label" translatable="yes">Deinterlace</property>
