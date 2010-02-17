@@ -142,6 +142,9 @@ AC_SUBST(SCENIC_LOCALE_DIR)
 AS_AC_EXPAND(LIBDIR, $libdir)
 AC_MSG_NOTICE(Storing library files in $LIBDIR)
 
+AS_AC_EXPAND(DATADIR, $datadir)
+AC_MSG_NOTICE(Storing library files in $LIBDIR)
+
 AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
 AC_MSG_NOTICE(Storing package files in $PKGLIBDIR)
 
