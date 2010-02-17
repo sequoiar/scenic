@@ -1117,7 +1117,7 @@ class About(object):
     """
     def __init__(self):
         # TODO: set parent window ?
-        self.icon_file = os.path.append(configure.PIXMAPS_DIR, 'scenic.png')
+        self.icon_file = os.path.join(configure.PIXMAPS_DIR, 'scenic.png')
         self.about_dialog = gtk.AboutDialog()
 
     def show_about_dialog(self):
