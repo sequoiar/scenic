@@ -183,7 +183,6 @@ AC_CONFIG_FILES([
         src/shared_video/Makefile
         src/tcp/Makefile
         src/gst/Makefile
-        src/gst/engine/Makefile
         src/firereset/Makefile
         src/main/Makefile
         src/main/test/Makefile

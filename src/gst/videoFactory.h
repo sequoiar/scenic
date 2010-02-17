@@ -27,7 +27,12 @@
 #include "util.h"
 #include "mapMsg.h"
 
-#include "gst/engine.h"
+#include "videoConfig.h"
+#include "videoSender.h"
+#include "videoReceiver.h"
+#include "remoteConfig.h"
+#include "capsParser.h"
+#include "localVideo.h"
 
 #include <boost/shared_ptr.hpp>
 
