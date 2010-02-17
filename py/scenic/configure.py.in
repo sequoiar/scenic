@@ -23,9 +23,9 @@ VERSION = "@PACKAGE_VERSION@"
 PACKAGE_NAME = """@PACKAGE_NAME@"""
 # paths:
 LOCALE_DIR = os.path.join("@LIBDIR@", 'scenic', "@LOCALE_DIR@")
-GLADE_DIR = os.path.join("@LIBDIR@", 'scenic', 'glade')
-PIXMAPS_DIR = os.path.join("@LIBDIR@", 'scenic', 'pixmaps')
-THEMES_DIR = os.path.join("@LIBDIR@", 'scenic', "themes")
+GLADE_DIR = os.path.join("@DATADIR@", 'scenic', 'glade')
+PIXMAPS_DIR = os.path.join("@DATADIR@", 'scenic', 'pixmaps')
+THEMES_DIR = os.path.join("@DATADIR@", 'scenic', "themes")
 
 def replace_install_paths_with_devel_paths():
     """
