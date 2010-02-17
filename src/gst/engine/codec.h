@@ -114,20 +114,18 @@ class VideoDecoder : public Decoder
     protected:
         void addDeinterlace();
         bool doDeinterlace_;
-        _GstElement *colorspc_;
+        _GstElement *colorspace1_;
+        _GstElement *colorspace2_;
         _GstElement *deinterlace_;
-        //_GstElement *queue_;
         static const unsigned long long LONGER_JITTER_BUFFER_MS = 60;
 
     private:
-        const static int MAX_QUEUE_BUFFERS = 3;
-        
         _GstElement *srcElement() 
         { 
             if (!doDeinterlace_)
                 return decoder_;
             else 
-                return deinterlace_;
+                return colorspace2_;
         }
 };
 

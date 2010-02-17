@@ -122,7 +122,8 @@ VideoEncoder::~VideoEncoder()
 VideoDecoder::VideoDecoder(Pipeline &pipeline, const char *decoder, bool doDeinterlace) : 
     Decoder(pipeline, decoder),
     doDeinterlace_(doDeinterlace), 
-    colorspc_(0), 
+    colorspace1_(0), 
+    colorspace2_(0), 
     deinterlace_(0)
 {}
 
@@ -130,12 +131,13 @@ VideoDecoder::VideoDecoder(Pipeline &pipeline, const char *decoder, bool doDeint
 /// Destructor 
 VideoDecoder::~VideoDecoder()
 {
-    pipeline_.remove(&colorspc_);
+    pipeline_.remove(&colorspace1_);
+    pipeline_.remove(&colorspace2_);
     pipeline_.remove(&deinterlace_);
 }
 
 
-/// Sets up either decoder->queue->colorspace->deinterlace
+/// Sets up either decoder->colorspace->deinterlace
 void VideoDecoder::addDeinterlace()
 {
     // FIXME: should maybe be settable
@@ -144,12 +146,14 @@ void VideoDecoder::addDeinterlace()
     tassert(decoder_ != 0);
     if (doDeinterlace_)
     {
-        colorspc_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
+        colorspace1_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
+        colorspace2_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = pipeline_.makeElement("deinterlace", NULL);
         g_object_set(deinterlace_, "fields", TOP, NULL);
-        gstlinkable::link(decoder_, colorspc_);
-        gstlinkable::link(colorspc_, deinterlace_);
+        gstlinkable::link(decoder_, colorspace1_);
+        gstlinkable::link(colorspace1_, deinterlace_);
+        gstlinkable::link(deinterlace_, colorspace2_);
     }
 }
 
