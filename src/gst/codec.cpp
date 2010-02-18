@@ -103,27 +103,26 @@ Decoder::~Decoder()
 
 VideoEncoder::VideoEncoder(Pipeline &pipeline, const char *encoder, bool supportsInterlaced) :
     Encoder(pipeline, encoder),
-    colorspc_(pipeline_.makeElement("ffmpegcolorspace", NULL)), 
+    colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)), 
     supportsInterlaced_(supportsInterlaced)  // most codecs don't have this property
 {
     tassert(encoder_);
     if (supportsInterlaced_)  // not all encoders have this property
         g_object_set(encoder_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
-    gstlinkable::link(colorspc_, encoder_);
+    gstlinkable::link(colorspace_, encoder_);
 }
 
 /// Destructor 
 VideoEncoder::~VideoEncoder()
 {
-    pipeline_.remove(&colorspc_);
+    pipeline_.remove(&colorspace_);
 }
 
 VideoDecoder::VideoDecoder(Pipeline &pipeline, const char *decoder, bool doDeinterlace) : 
     Decoder(pipeline, decoder),
     doDeinterlace_(doDeinterlace), 
-    colorspace1_(0), 
-    colorspace2_(0), 
+    colorspace_(0), 
     deinterlace_(0)
 {}
 
@@ -131,8 +130,7 @@ VideoDecoder::VideoDecoder(Pipeline &pipeline, const char *decoder, bool doDeint
 /// Destructor 
 VideoDecoder::~VideoDecoder()
 {
-    pipeline_.remove(&colorspace1_);
-    pipeline_.remove(&colorspace2_);
+    pipeline_.remove(&colorspace_);
     pipeline_.remove(&deinterlace_);
 }
 
@@ -146,14 +144,12 @@ void VideoDecoder::addDeinterlace()
     tassert(decoder_ != 0);
     if (doDeinterlace_)
     {
-        colorspace1_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
-        colorspace2_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
+        colorspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = pipeline_.makeElement("deinterlace", NULL);
         g_object_set(deinterlace_, "fields", TOP, NULL);
-        gstlinkable::link(decoder_, colorspace1_);
-        gstlinkable::link(colorspace1_, deinterlace_);
-        gstlinkable::link(deinterlace_, colorspace2_);
+        gstlinkable::link(decoder_, colorspace_);
+        gstlinkable::link(colorspace_, deinterlace_);
     }
 }
 

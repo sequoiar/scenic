@@ -92,14 +92,14 @@ class VideoEncoder : public Encoder
         ~VideoEncoder();
 
     protected:
-        _GstElement *colorspc_;
+        _GstElement *colorspace_;
         bool supportsInterlaced_;
 
     private:
         
         _GstElement *sinkElement() 
         { 
-            return colorspc_;
+            return colorspace_;
         }
 };
 
@@ -114,8 +114,7 @@ class VideoDecoder : public Decoder
     protected:
         void addDeinterlace();
         bool doDeinterlace_;
-        _GstElement *colorspace1_;
-        _GstElement *colorspace2_;
+        _GstElement *colorspace_;
         _GstElement *deinterlace_;
         static const unsigned long long LONGER_JITTER_BUFFER_MS = 60;
 
@@ -125,7 +124,7 @@ class VideoDecoder : public Decoder
             if (!doDeinterlace_)
                 return decoder_;
             else 
-                return colorspace2_;
+                return deinterlace_;
         }
 };
 

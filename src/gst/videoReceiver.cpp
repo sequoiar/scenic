@@ -84,8 +84,10 @@ void VideoReceiver::createDepayloader()
 
 void VideoReceiver::createSink(Pipeline &pipeline)
 {
+    // avoid creating the videoflip as it has a colorspace converter
     tassert(videoscale_ = videoConfig_->createVideoScale(pipeline));
-    tassert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
+    if (videoConfig_->flipMethod() != "none")
+        tassert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
     tassert(sink_ = videoConfig_->createSink(pipeline));
 
     if (remoteConfig_->jitterbufferControlEnabled())
@@ -93,8 +95,13 @@ void VideoReceiver::createSink(Pipeline &pipeline)
 
 
     gstlinkable::link(*decoder_, *videoscale_);
-    gstlinkable::link(*videoscale_, *videoflip_);
-    gstlinkable::link(*videoflip_, *sink_);
+    if (videoflip_ != 0)
+    {
+        gstlinkable::link(*videoscale_, *videoflip_);
+        gstlinkable::link(*videoflip_, *sink_);
+    }
+    else
+        gstlinkable::link(*videoscale_, *sink_);
 
     setCaps();
     tassert(gotCaps_);

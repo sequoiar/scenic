@@ -59,15 +59,18 @@ int flipMethodToInt(const std::string &flipMethod)
 
 VideoFlip::VideoFlip(Pipeline &pipeline, const std::string &flipMethod) : 
     pipeline_(pipeline),
+    colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
     videoflip_(pipeline_.makeElement("videoflip", NULL))
 {
     LOG_DEBUG("using flip method " << flipMethod);
     g_object_set(G_OBJECT(videoflip_), "method", flipMethodToInt(flipMethod), NULL);
+    gstlinkable::link(colorspace_, videoflip_);    
 }
 
 /// Destructor 
 VideoFlip::~VideoFlip()
 {
     pipeline_.remove(&videoflip_);
+    pipeline_.remove(&colorspace_);
 }
 

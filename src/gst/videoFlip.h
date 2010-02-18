@@ -42,10 +42,11 @@ class VideoFlip : public GstLinkableFilter, public boost::noncopyable
         ~VideoFlip();
 
     private:
-        _GstElement *sinkElement() { return videoflip_; }
+        _GstElement *sinkElement() { return colorspace_; }
         _GstElement *srcElement() { return videoflip_; }
 
         Pipeline &pipeline_;
+        _GstElement *colorspace_;
         _GstElement *videoflip_;
 };
 

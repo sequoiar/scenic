@@ -90,6 +90,7 @@ class VideoSinkConfig
         VideoScale* createVideoScale(Pipeline &pipeline) const;
         VideoFlip* createVideoFlip(Pipeline &pipeline) const;
         bool doDeinterlace() const { return doDeinterlace_; }
+        std::string flipMethod() const { return flipMethod_; }
 
     private:
         bool resolutionIsInverted() const;
