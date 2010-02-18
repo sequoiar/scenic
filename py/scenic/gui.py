@@ -326,7 +326,9 @@ class Gui(object):
         # FIXME: not able to reload themes dynamically.
         if os.path.exists(file_name):
             #os.environ["GTK2_RC_FILES"] = file_name
+            print("Loading GTK2 theme %s" % (file_name))
             gtk.rc_parse(file_name)
+            print("Done loading GTK2 theme.")
             #gtk.rc_reset_styles(gtk.settings_get_default())
             #print "loading theme", file_name
             #gtk.rc_parse(file_name)
