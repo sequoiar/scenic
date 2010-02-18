@@ -25,7 +25,7 @@
 
 #include <string>
 #include <set>
-#include "ports.h"
+#include "portOffsets.h"
 
 #include "busMsgHandler.h"
 
