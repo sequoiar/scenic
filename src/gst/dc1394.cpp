@@ -163,7 +163,7 @@ int DC1394::capsToMode(int cameraId, int width, int height,
     dc1394_t * dc1394 = dc1394_new();
     if (dc1394 == 0)
     {
-        LOG_ERROR("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
+        LOG_ERROR("Could not get handle to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
         return 0;
     }
 
@@ -358,7 +358,7 @@ void DC1394::listCameras()
     dc1394 = dc1394_new();
     if (dc1394 == 0)
     {
-        LOG_WARNING("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
+        LOG_WARNING("Could not get handle to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
         cleanup(dc1394, camera, cameras);
         return;
     }
