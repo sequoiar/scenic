@@ -1,8 +1,9 @@
 include $(top_srcdir)/globals.mak
+gstdir = $(libdir)/scenic
 
-lib_LTLIBRARIES = libmilhouse.la
+gst_LTLIBRARIES = libgst.la
 
-libmilhouse_la_SOURCES = caps.cpp mediaBase.cpp \
+libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp \
 				   videoConfig.cpp rtpBin.cpp pipeline.cpp \
 				   rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
@@ -31,4 +32,4 @@ caps.cpp: $(top_srcdir)/utils/make_caps.py
 clean-local:
 	rm -f caps.cpp
 		
-libmilhouse_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) $(DC1394_CFLAGS)
+libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) $(DC1394_CFLAGS)

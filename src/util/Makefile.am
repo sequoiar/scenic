@@ -1,8 +1,7 @@
 include $(top_srcdir)/globals.mak
-SUBDIRS= .
-
 	
-lib_LTLIBRARIES= libutil.la
+utildir = $(libdir)/scenic
+util_LTLIBRARIES= libutil.la
 # needed by libshared_video
 include_HEADERS = $(inc)/videoSize.h
 

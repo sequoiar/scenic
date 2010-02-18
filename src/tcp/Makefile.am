@@ -1,6 +1,7 @@
 include $(top_srcdir)/globals.mak
-lib_LTLIBRARIES = libtcp.la
+asiodir = $(libdir)/scenic
+asio_LTLIBRARIES = libasio.la
 
-libtcp_la_SOURCES = asio.cpp asio.h
+libasio_la_SOURCES = asio.cpp asio.h
 
-libtcp_la_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) 
+libasio_la_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) 

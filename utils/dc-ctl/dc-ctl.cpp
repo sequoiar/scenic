@@ -265,7 +265,10 @@ int run(int argc, char *argv[])
         dc1394error_t camerr;
         dc1394 = dc1394_new();
         if (dc1394 == 0)
-            throw std::runtime_error("libdc1394 error: could not get handle to dc1394, are /dev/video1394 and /dev/raw1394 loaded?");
+        {
+            std::cout << "libdc1394 error: could not get handle to dc1394, are /dev/video1394 and /dev/raw1394 loaded?\n";
+            return 0;
+        }
         camerr = dc1394_camera_enumerate(dc1394, &cameras);
         if (camerr != DC1394_SUCCESS)
             throw std::runtime_error("libdc1394 error: this should be more verbose");
