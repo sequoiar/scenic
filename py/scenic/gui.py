@@ -811,7 +811,6 @@ class Gui(object):
         elif _get_combobox_value(self.audio_codec_widget) == "Vorbis":
             max_channels = 24 
         # update range and clamp numchannels to new range 
-        self.audio_numchannels_widget.set_page_size(0) # to fix a warning
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
 
@@ -822,7 +821,6 @@ class Gui(object):
             self.video_bitrate_widget.set_sensitive(True)
             mini = VIDEO_BITRATE_MIN_MAX[codec][0]
             maxi = VIDEO_BITRATE_MIN_MAX[codec][1]
-            self.video_bitrate_widget.set_page_size(0) # to fix a warning
             self.video_bitrate_widget.set_range(mini, maxi)
             self.video_bitrate_widget.set_value(min(maxi, max(old_bitrate, mini)))
         else:
