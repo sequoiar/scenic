@@ -266,7 +266,7 @@ int run(int argc, char *argv[])
         dc1394 = dc1394_new();
         if (dc1394 == 0)
         {
-            std::cout << "libdc1394 error: could not get handle to dc1394, are /dev/video1394 and /dev/raw1394 loaded?\n";
+            std::cout << "No dc1394 module present\n";
             return 0;
         }
         camerr = dc1394_camera_enumerate(dc1394, &cameras);

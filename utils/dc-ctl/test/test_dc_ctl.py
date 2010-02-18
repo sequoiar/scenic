@@ -19,7 +19,5 @@ class TestDcCtl(unittest.TestCase):
         # we set the brightness on it
         assert(stdout_value == 'error: libdc1394 error: no camera found on bus\n' 
                 or stdout_value.find('Allowed options') != -1
-                or stdout_value.find('could not get a handle to your IEEE1394 card') != -1)
-
-    if ('karmic' in platform.dist()):
-        test_dc_ctl_help.skip = "Skipping test because it's broken on Karmic"
+                or stdout_value.find('could not get a handle to your IEEE1394 card') != -1
+                or stdout_value.find('No dc1394 module present') != -1)
