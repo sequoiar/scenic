@@ -258,6 +258,12 @@ class Gui(object):
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_index = None
+
+        # SUmmary text view:
+        self.summary_textview_widget = self.widgets.get_widget("summary_textview")
+        self.summary_text_buffer = self.summary_textview_widget.get_buffer()
+        self.summary_text_buffer.set_text("")
+
         # video
         self.video_capture_size_widget = self.widgets.get_widget("video_capture_size")
         self.video_display_widget = self.widgets.get_widget("video_display")
@@ -796,6 +802,15 @@ class Gui(object):
             self.remove_contact_widget.set_sensitive(sensitive)
             self.edit_contact_widget.set_sensitive(sensitive)
             self.video_view_preview_widget.set_sensitive(sensitive)
+            # Now, update the summary text
+            txt = ""
+            if streaming:
+                txt += _("Streaming in progress.")
+                txt += "\n"
+                txt += ""
+            else: 
+                txt += _("Not streaming.")
+            self.summary_text_buffer.set_text(txt)
 
     def on_audio_codec_changed(self, widget):
         """

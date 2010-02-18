@@ -39,6 +39,31 @@ class StreamerManager(object):
         self.receiver = None
         self.state = process.STATE_STOPPED
         self.state_changed_signal = sig.Signal()
+        # for stats
+        #TODO:
+        #self.session_details = {
+        #    "sending": {
+        #        "address": None,
+        #        "video": {
+        #            "source": None,
+        #            "codec": None,
+        #            "port": None,
+        #            "width": None,
+        #            "height": None,
+        #            "aspect-ratio": None,
+        #            "device": None,
+        #            "bitrate": None,
+        #        },
+        #        "audio": {
+        #            "osource": None,
+        #            "numchannels": None,
+        #            "codec": None,
+        #            "port": None,
+        #        }
+        #    }
+        #    "receiving": {
+        #    }
+        #}
         
     def start(self, host, config):
         """
