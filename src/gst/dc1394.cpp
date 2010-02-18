@@ -161,6 +161,12 @@ int DC1394::capsToMode(int cameraId, int width, int height,
     dc1394video_modes_t modes;
     dc1394error_t camerr;
     dc1394_t * dc1394 = dc1394_new();
+    if (dc1394 == 0)
+    {
+        LOG_ERROR("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
+        return 0;
+    }
+
     dc1394camera_list_t *cameras = 0;
     camerr = dc1394_camera_enumerate(dc1394, &cameras);
 
@@ -350,6 +356,12 @@ void DC1394::listCameras()
         raw1394_destroy_handle(tmpHandle);
 
     dc1394 = dc1394_new();
+    if (dc1394 == 0)
+    {
+        LOG_WARNING("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
+        cleanup(dc1394, camera, cameras);
+        return;
+    }
 
     camerr = dc1394_camera_enumerate(dc1394, &cameras);
 
@@ -427,6 +439,11 @@ bool DC1394::areCamerasConnected()
     dc1394camera_t *camera = 0;
 
     dc1394 = dc1394_new();
+    if (dc1394 == 0)
+    {
+        LOG_WARNING("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
+        return false;
+    }
 
     camerr = dc1394_camera_enumerate(dc1394, &cameras);
 
@@ -458,6 +475,11 @@ int DC1394::GUIDToCameraNumber(unsigned long long GUID)
     dc1394camera_t *camera = 0;
 
     dc1394 = dc1394_new();
+    if (dc1394 == 0)
+    {
+        LOG_ERROR("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
+        return -1;
+    }
 
     camerr = dc1394_camera_enumerate(dc1394, &cameras);
 
