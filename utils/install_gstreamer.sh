@@ -29,13 +29,13 @@ else
     MAKEINSTALL=$(which makeinstall)
 fi
 
-GST_CORE=gstreamer-0.10.26
-GST_BASE=gst-plugins-base-0.10.26
-GST_GOOD=gst-plugins-good-0.10.18
+GST_CORE=gstreamer-0.10.25
+GST_BASE=gst-plugins-base-0.10.25
+GST_GOOD=gst-plugins-good-0.10.17
 GST_BAD=gst-plugins-bad-0.10.17
 GST_UGLY=gst-plugins-ugly-0.10.13
 GST_FFMPEG=gst-ffmpeg-0.10.9
-GST_PYTHON=gst-python-0.10.18
+GST_PYTHON=gst-python-0.10.17
 GST_GL=gst-plugins-gl-0.10.1
 YASM=yasm-0.8.0
 X264=x264-snapshot-20090711-2245
