@@ -33,6 +33,7 @@ try:
     _tmp = json.loads
 except AttributeError:
     import warnings
+    import sys
     warnings.warn("Use simplejson, not the old json module.")
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
