@@ -30,6 +30,8 @@ Release notes for Scenic 0.4.1
     * Don't forget to run ldconfig after installation.
     * ./utils/install_gstreamer.sh haven't been updated since 0.3.1 so there's no need
     to rerun it if you did it for more recent versions
+    * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras. Install them 
+    with aptitude.
 
     Backward compatibility:
     Each release in the 0.4 series should be interoperable between each other.
