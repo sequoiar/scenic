@@ -4,6 +4,7 @@
 AC_PREREQ(2.61)
 AC_INIT(SCENIC, 0.4.1)  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
+AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
 

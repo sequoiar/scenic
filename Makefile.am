@@ -1,4 +1,3 @@
-include $(top_srcdir)/globals.mak
 SUBDIRS = src locale data py doc utils man 
 ACLOCAL_AMFLAGS = -I m4
 

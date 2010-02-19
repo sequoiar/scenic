@@ -1,4 +1,3 @@
-include $(top_srcdir)/globals.mak
 SUBDIRS = test
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../:$(PATH) trial
@@ -17,6 +16,8 @@ LDADD = $(top_builddir)/src/gst/libgst.la $(ALL_GST_LIBS) $(JACK_LIBS) \
         $(top_builddir)/src/tcp/libasio.la \
 		$(GTK_LIBS) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(BOOST_ASIO_LIB) \
 		$(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(LIBDC1394_LIBS) $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_FILESYSTEM_LIB) $(top_builddir)/src/util/libutil.la $(top_builddir)/src/gutil/libgutil.la $(top_builddir)/src/shared_video/libshared_video.la
+
+INCLUDES = -I$(top_srcdir)/src/include -I$(top_srcdir)/src
 
 clean-local:
 	rm -rf _trial_temp

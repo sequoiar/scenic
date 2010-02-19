@@ -1,4 +1,3 @@
-include $(top_srcdir)/globals.mak 
 SUBDIRS = doc scenic scripts rtpmidi
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../../src/main:$(PATH) PYTHONPATH=../../py:$(PYTHONPATH) trial
@@ -16,6 +15,3 @@ EXTRA_DIST = $(desktop_DATA) scenic.svg
 
 clean-local:
 	rm -rf _trial_temp
-
-#all: 
-#	epydoc scenic

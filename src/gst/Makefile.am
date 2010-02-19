@@ -1,4 +1,3 @@
-include $(top_srcdir)/globals.mak
 gstdir = $(libdir)/scenic
 
 gst_LTLIBRARIES = libgst.la
@@ -13,13 +12,13 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   audioLevel.cpp glVideoSink.cpp playback.cpp dv1394.cpp v4l2util.cpp fileSource.cpp \
 				   sharedVideoSink.cpp capsParser.cpp busMsgHandler.cpp videoFlip.cpp videoScale.cpp  \
                    mediaBase.h messageDispatcher.h messageHandler.h busMsgHandler.h portOffsets.h \
-				   audioSender.h audioReceiver.h $(inc)/alsa.h caps.h \
+				   audioSender.h audioReceiver.h $(top_srcdir)/src/include/alsa.h caps.h \
 				   videoConfig.h rtpBin.h pipeline.h \
 				   rtpSender.h rtpReceiver.h audioSource.h \
-				   gstLinkable.h videoSink.h audioSink.h $(inc)/jackUtils.h \
+				   gstLinkable.h videoSink.h audioSink.h $(top_srcdir)/src/include/jackUtils.h \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
-				   audioLevel.h glVideoSink.h $(inc)/playback.h dv1394.h v4l2util.h \
+				   audioLevel.h glVideoSink.h $(top_srcdir)/src/include/playback.h dv1394.h v4l2util.h \
 				   fileSource.h sharedVideoSink.h capsParser.h \
 				   dc1394.cpp dc1394.h videoScale.h localVideo.h \
 				   noncopyable.h videoFlip.h videoFactory.h audioFactory.h
@@ -33,3 +32,4 @@ clean-local:
 	rm -f caps.cpp
 		
 libgst_la_CPPFLAGS=$(GLIB_CFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) $(DC1394_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src/include -I$(top_srcdir)/src
