@@ -321,7 +321,7 @@ class Application(object):
         elif not self.devices["jackd_is_running"]:
             send_to_port = message["please_send_to_port"]
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
-            dialogs.ErrorDialog.create("Refused invitation: jack is not running.", parent=self.gui.main_window)
+            dialogs.ErrorDialog.create(_("Refused invitation: jack is not running."), parent=self.gui.main_window)
         else:
             self.remote_audio_config = message["audio"]
             self.remote_video_config = message["video"]
@@ -334,7 +334,7 @@ class Application(object):
                     connected_deferred.addCallback(_connected_cb)
                     # TODO: show a dialog or change the state of the GUI to say we are connected.
                     return # important
-            text = _("<b><big>%s is inviting you.</big></b>\n\nDo you accept the connection?" % (invited_by))
+            text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept the connection?" % {"invited_by": invited_by})
             self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
     
     def _get_contact_by_addr(self, addr):
@@ -351,7 +351,7 @@ class Application(object):
     def handle_cancel(self):
         self.client.disconnect()
         self.gui.invited_dialog.hide()
-        dialogs.ErrorDialog.create("Remote peer cancelled invitation.", parent=self.gui.main_window)
+        dialogs.ErrorDialog.create(_("Remote peer cancelled invitation."), parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
         self._check_protocol_version(message)
@@ -362,7 +362,7 @@ class Application(object):
         self.remote_audio_config = message["audio"]
         self.remote_video_config = message["video"]
         if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create("A streaming session is already in progress.", parent=self.gui.main_window)
+            dialogs.ErrorDialog.create(_("A streaming session is already in progress."), parent=self.gui.main_window)
         else:
             print("Got ACCEPT. Starting streamers as initiator.")
             self.start_streamers(addr)
@@ -473,12 +473,12 @@ class Application(object):
 
     def send_invite(self):
         if not self.devices["jackd_is_running"]:
-            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming, jackd is not running.", parent=self.gui.main_window)
+            dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming, JACK is not running."), parent=self.gui.main_window)
             return
             
         self.allocate_ports()
         if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create("Impossible to invite a contact to start streaming. A streaming session is already in progress.", parent=self.gui.main_window)
+            dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming. A streaming session is already in progress."), parent=self.gui.main_window)
         else:
             # UPDATE when initiating session
             self.save_configuration() # gathers and save
@@ -561,5 +561,5 @@ class Application(object):
     def on_connection_error(self, err, msg):
         # XXX
         self.gui.hide_calling_dialog(msg)
-        text = _("%s: %s") % (str(err), str(msg))
+        text = _("Connection error: %(message)s\n%(error)s") % {"error": err, "message": msg}
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)

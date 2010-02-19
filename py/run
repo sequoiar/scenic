@@ -1,4 +1,5 @@
 #!/bin/bash
 # This file is not included in the distributed package, nor installed
 # It is only useful for developers to simplify launching scenic.
-./scripts/scenic $@
+cd $(dirname $0)
+PATH=../src/main:${PATH} ./scripts/scenic $@

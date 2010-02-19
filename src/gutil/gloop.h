@@ -23,12 +23,10 @@
 #ifndef __GUTIL_H__
 #define __GUTIL_H__
 
-#include <glib.h>
-
 namespace gutil {
     /// ms to run - 0 is forever
     void runMainLoop(int ms);
-    int killMainLoop(gpointer data = NULL);
+    int killMainLoop(void *data = 0);
 }
 
 #endif // __GUTIL_H__

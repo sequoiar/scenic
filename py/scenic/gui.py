@@ -28,11 +28,11 @@ Former Notes
 """
 ### CONSTANTS ###
 from scenic import configure
-__version__ = configure.VERSION
-APP_NAME = configure.APPNAME
-PACKAGE_DATA = configure.PKGDATADIR
+
 INVITE_TIMEOUT = 10
-ALL_SUPPORTED_SIZE = [
+ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
+ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
+ALL_SUPPORTED_SIZE = [ # by milhouse video
     "924x576",
     "768x480",
     "720x480",
@@ -61,10 +61,37 @@ from scenic.devices import cameras
 
 ### MULTILINGUAL SUPPORT ###
 _ = gettext.gettext
-gettext.bindtextdomain(APP_NAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
-gettext.textdomain(APP_NAME)
-gtk.glade.bindtextdomain(APP_NAME, os.path.join(configure.SCENIC_LOCALE_DIR, "po"))
-gtk.glade.textdomain(APP_NAME)
+gettext.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
+gettext.textdomain(configure.APPNAME)
+gtk.glade.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
+gtk.glade.textdomain(configure.APPNAME)
+
+LICENSE_TEXT = _("""Scenic
+Copyright (C) 2009 Society for Arts and Technology (SAT)
+http://www.sat.qc.ca
+All rights reserved.
+
+This file is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+Scenic is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Scenic.  If not, see <http://www.gnu.org/licenses/>.""")
+
+AUTHORS_LIST = [
+    'Alexandre Quessy <alexandre@quessy.net>',
+    'Tristan Matthews <tristan@sat.qc.ca>',
+    'Simon Piette <simonp@sat.qc.ca>',
+    u'Étienne Désautels <etienne@teknozen.net>',
+    ]
+
+COPYRIGHT_SHORT = _("Copyright 2009-2010 Society for Arts and Technology")
 
 def _get_key_for_value(dictionnary, value):
     """
@@ -167,14 +194,14 @@ class Gui(object):
         self.kiosk_mode_on = kiosk_mode
         self._offerer_invite_timeout = None
         # Set the Glade file
-        glade_file = os.path.join(PACKAGE_DATA, 'scenic.glade')
+        glade_file = os.path.join(configure.GLADE_DIR, 'scenic.glade')
         if os.path.isfile(glade_file):
             glade_path = glade_file
         else:
             text = _("Error : Could not find the Glade file %s. Exitting.") % (glade_file)
             print(text)
             sys.exit()
-        self.widgets = gtk.glade.XML(glade_path, domain=APP_NAME)
+        self.widgets = gtk.glade.XML(glade_path, domain=configure.APPNAME)
         
         # connects callbacks to widgets automatically
         glade_signal_slots = {}
@@ -185,7 +212,7 @@ class Gui(object):
         # Get all the widgets that we use
         self.main_window = self.widgets.get_widget("main_window")
         self.main_window.connect('delete-event', self.on_main_window_deleted)
-        self.main_window.set_icon_from_file(os.path.join(PACKAGE_DATA, 'scenic.png'))
+        self.main_window.set_icon_from_file(os.path.join(configure.PIXMAPS_DIR, 'scenic.png'))
         self.main_tabs_widget = self.widgets.get_widget("mainTabs")
         self.system_tab_contents_widget = self.widgets.get_widget("system_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
@@ -231,6 +258,12 @@ class Gui(object):
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_index = None
+
+        # SUmmary text view:
+        self.summary_textview_widget = self.widgets.get_widget("summary_textview")
+        self.summary_text_buffer = self.summary_textview_widget.get_buffer()
+        self.summary_text_buffer.set_text("")
+
         # video
         self.video_capture_size_widget = self.widgets.get_widget("video_capture_size")
         self.video_display_widget = self.widgets.get_widget("video_display")
@@ -264,11 +297,12 @@ class Gui(object):
         else:
             # Removes the sytem_tab 
             tab_num = self.main_tabs_widget.page_num(self.system_tab_contents_widget)
-            print "Removing tab #", tab_num
+            print "Removing tab number %d." % (tab_num)
             self.main_tabs_widget.remove_page(tab_num)
         
         self.is_fullscreen = False
         if fullscreen:
+            print("Making the main window fullscreen.")
             self.toggle_fullscreen()
         
         # Build the contact list view
@@ -295,13 +329,13 @@ class Gui(object):
     # ------------------ window events and actions --------------------
 
     def load_gtk_theme(self, name="Darklooks"):
-        file_name = os.path.join(PACKAGE_DATA, "themes/%s/gtkrc" % (name))
-        #if file_name is None:
-        #    file_name = os.path.join(PACKAGE_DATA, "themes/Darklooks/gtk-2.0/gtkrc")
+        file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
         # FIXME: not able to reload themes dynamically.
         if os.path.exists(file_name):
             #os.environ["GTK2_RC_FILES"] = file_name
+            print("Loading GTK2 theme %s" % (file_name))
             gtk.rc_parse(file_name)
+            print("Done loading GTK2 theme.")
             #gtk.rc_reset_styles(gtk.settings_get_default())
             #print "loading theme", file_name
             #gtk.rc_parse(file_name)
@@ -345,7 +379,7 @@ class Gui(object):
         # you don't want the window to be destroyed.
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
-        if self.app.config.confirm_quit and not configure.IN_DEVELOPMENT_MODE and self.app.has_session():
+        if self.app.config.confirm_quit and self.app.has_session():
             d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.", parent=self.main_window)
             d.addCallback(_cb)
             return True
@@ -373,7 +407,8 @@ class Gui(object):
         if widget.get_active():
             self.app.save_configuration() #gathers and saves
             width, height = self.app.config.video_capture_size.split("x")
-            command = "milhouse --videosource %s --localvideo --window-title preview --width %s --height %s" % (self.app.config.video_source, width, height)
+            aspect_ratio = self.app.config.video_aspect_ratio
+            command = "milhouse --videosource %s --localvideo --window-title preview --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, width, height, aspect_ratio)
             if self.app.config.video_source != "videotestsrc":
                 command += " --videodevice %s" % (self.app.config.video_device)
             print "spawning $%s" % (command)
@@ -768,6 +803,15 @@ class Gui(object):
             self.remove_contact_widget.set_sensitive(sensitive)
             self.edit_contact_widget.set_sensitive(sensitive)
             self.video_view_preview_widget.set_sensitive(sensitive)
+            # Now, update the summary text
+            txt = ""
+            if streaming:
+                txt += _("Streaming in progress.")
+                txt += "\n"
+                txt += ""
+            else: 
+                txt += _("Not streaming.")
+            self.summary_text_buffer.set_text(txt)
 
     def on_audio_codec_changed(self, widget):
         """
@@ -899,7 +943,7 @@ class Gui(object):
                     else:
                         actual_standard = cam["standard"]
                         if actual_standard != standard_name:
-                            msg = _("Could not change V4L2 standard from %s to %s for device %s.") % (actual_standard, standard_name, current_camera_name)
+                            msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             print(msg)
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
@@ -930,7 +974,7 @@ class Gui(object):
                     else:
                         actual_input = cam["input"]
                         if actual_input != input_number:
-                            msg = _("Could not change V4L2 input from %s to %s for device %s.") % (actual_input, input_number, current_camera_name)
+                            msg = _("Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s.") % {"current_input": actual_input, "desired_input": input_number, "device_name": current_camera_name}
                             print(msg)
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
@@ -957,7 +1001,7 @@ class Gui(object):
         Opens a web browser to the scenic web site.
         """
         print menu_item, "chosen"
-        url = configure.ONLINE_HELP_URL 
+        url = ONLINE_HELP_URL 
         webbrowser.open(url)
 
     # ---------------------- invitation dialogs -------------------
@@ -1065,15 +1109,15 @@ class Gui(object):
         is_running = self.app.devices["jackd_is_running"]
         fill_stats = False
         if is_zombie:
-                self.audio_jack_state_widget.set_markup("<b>Zombie</b>")
+                self.audio_jack_state_widget.set_markup(_("<b>Zombie</b>"))
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_DIALOG_WARNING, 4)
         else:
             if is_running:
-                self.audio_jack_state_widget.set_markup("<b>Running</b>")
+                self.audio_jack_state_widget.set_markup(_("<b>Running</b>"))
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_YES, 4)
                 fill_stats = True
             else:
-                self.audio_jack_state_widget.set_markup("<b>Stopped</b>")
+                self.audio_jack_state_widget.set_markup(_("<b>Not running</b>"))
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
         if fill_stats:
             j = self.app.devices["jack_servers"][0] 
@@ -1084,27 +1128,29 @@ class Gui(object):
             self.jack_latency_widget.set_text("")
             self.jack_sampling_rate_widget.set_text("")
             
+PROJECT_WEBSITE = "http://svn.sat.qc.ca/trac/scenic"
+
 class About(object):
     """
     About dialog
     """
     def __init__(self):
         # TODO: set parent window ?
-        self.icon_file = configure.get_icon_path()
+        self.icon_file = os.path.join(configure.PIXMAPS_DIR, 'scenic.png')
         self.about_dialog = gtk.AboutDialog()
 
     def show_about_dialog(self):
         self.about_dialog.set_name(configure.APPNAME)
         self.about_dialog.set_role('about')
-        self.about_dialog.set_version(__version__)
-        commentlabel = configure.ONE_LINE_DESCRIPTION 
+        self.about_dialog.set_version(configure.VERSION)
+        commentlabel = ONE_LINE_DESCRIPTION 
         self.about_dialog.set_comments(commentlabel)
-        self.about_dialog.set_copyright(configure.COPYRIGHT_SHORT) 
-        self.about_dialog.set_license(configure.LICENSE_TEXT)
-        self.about_dialog.set_authors(configure.AUTHORS_LIST)
+        self.about_dialog.set_copyright(COPYRIGHT_SHORT) 
+        self.about_dialog.set_license(LICENSE_TEXT)
+        self.about_dialog.set_authors(AUTHORS_LIST)
         #self.about_dialog.set_artists(['Public domain'])
         gtk.about_dialog_set_url_hook(self.show_website)
-        self.about_dialog.set_website("http://svn.sat.qc.ca/trac/scenic")
+        self.about_dialog.set_website(PROJECT_WEBSITE)
         if not os.path.exists(self.icon_file):
             print("Could not find icon file %s." % (self.icon_file))
         else:

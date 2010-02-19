@@ -1,9 +1,52 @@
+Release notes for Scenic 0.4.1
+
+    Milhouse:
+    This minor release fixes a bug with the deinterlace option. It has
+    also been enabled again in the Scenic graphical user interface. We
+    also fixed a bug that was preventing users to see a preview of a local
+    video Web camera. An other bug has also been fixed which made the
+    listing of cameras impossible on Ubuntu Karmic when the libdc1394
+    library was not found. Removed globals.mak
+
+    Scenic GUI:
+    This minor release fixes a bug with the Scenic icon which was not
+    showing up in the Gnome menu. It is now under
+    Applications/Internet/Scenic.
+
+    * Fixed #263 Fixed potential crash in case of wrong JSON library version.
+    * Fixed #264 videoflip is frail with input material
+    * Moved colorspace converter into videoflip
+    * Moved application data out of the Python package.
+    * Flattened gst file hierarchy
+    * Videoflip (and consequently deinterlace) fixed, added extra colorspace element
+    * Installation: shared librairies (except for shared_video) are installed in
+    $(prefix)/lib/scenic instead of just $(prefix)/scenic
+    * Fixed formatting of some i18n strings.
+
+    Upgrading:
+    * Be sure to uninstall your previous miville or scenic before installing scenic.
+    * In the older source directory, use "make uninstall" as root to uninstall previous
+    installations.
+    * Don't forget to run ldconfig after installation.
+    * ./utils/install_gstreamer.sh haven't been updated since 0.3.1 so there's no need
+    to rerun it if you did it for more recent versions
+    * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras. Install them 
+    with aptitude.
+
+    Backward compatibility:
+    Each release in the 0.4 series should be interoperable between each other.
+
+    Milhouse dependency for Scenic
+    Scenic always needs the same version of milhouse, eg. scenic 0.4.1 needs milhouse 0.4.1
+
 Release notes for Scenic 0.4
 
 Milhouse:
-This release fixes a big regression in caps transmission which broke Vorbis and Theora support in 0.3.6.
-New features include better v4l2 controls, the ability to restart a sender without restarting a receiver, rtpjitterbuffer
-control embedded in our output window, as well as a lot of cleanup and output fixes.
+This release fixes a big regression in caps transmission which broke Vorbis and
+Theora support in 0.3.6.
+New features include better v4l2 controls, the ability to restart a sender
+without restarting a receiver, rtpjitterbuffer control embedded in our output
+window, as well as a lot of cleanup and output fixes.
 
 Scenic:
 Moved the graphical user interface to GTK+ for faster development.

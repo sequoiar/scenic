@@ -1,0 +1,1 @@
+SUBDIRS=glade pixmaps themes

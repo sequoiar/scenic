@@ -28,7 +28,6 @@ namespace videosize
     const int HEIGHT = 480;
     const int MAX_WIDTH = 1920;
     const int MAX_HEIGHT = 1080;
-    const int FRAMERATE = 30;
 }
 
 #endif // _VIDEO_SIZE_H_
