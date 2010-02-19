@@ -407,7 +407,8 @@ class Gui(object):
         if widget.get_active():
             self.app.save_configuration() #gathers and saves
             width, height = self.app.config.video_capture_size.split("x")
-            command = "milhouse --videosource %s --localvideo --window-title preview --width %s --height %s" % (self.app.config.video_source, width, height)
+            aspect_ratio = self.app.config.video_aspect_ratio
+            command = "milhouse --videosource %s --localvideo --window-title preview --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, width, height, aspect_ratio)
             if self.app.config.video_source != "videotestsrc":
                 command += " --videodevice %s" % (self.app.config.video_device)
             print "spawning $%s" % (command)
