@@ -24,7 +24,6 @@
 #define _LOCAL_VIDEO_H_
 
 #include "videoConfig.h"
-
 #include "noncopyable.h"
 
 #include <boost/shared_ptr.hpp>

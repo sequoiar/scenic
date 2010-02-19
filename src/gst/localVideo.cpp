@@ -24,7 +24,7 @@
 
 #include "localVideo.h"
 #include <boost/shared_ptr.hpp>
-#include <pipeline.h>
+#include "pipeline.h"
 
 #include "videoSource.h"
 #include "videoScale.h"
