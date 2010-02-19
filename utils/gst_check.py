@@ -37,7 +37,7 @@ except ImportError:
 
 # Get the full path to cpp files relative to the script location
 cwd = os.path.dirname(os.path.realpath(__file__))
-cpp_files = glob.glob(os.path.realpath(cwd + "/../src/gst/engine") + "/*.cpp")
+cpp_files = glob.glob(os.path.realpath(cwd + "/../src/gst") + "/*.cpp")
 if ( len(cpp_files) == 0):
     sys.stderr.write("No cpp files found. Make sure the script is located within source directory \"utils\".")
     sys.exit(2)

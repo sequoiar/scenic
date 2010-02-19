@@ -1,1 +1,1 @@
-dist_pkgdata_DATA=classes.dia
+EXTRA_DIST=classes.dia

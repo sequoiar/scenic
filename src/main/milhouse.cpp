@@ -27,6 +27,7 @@
 
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
+#include "gst/messageDispatcher.h"
 #include "playback.h"
 
 #include "milhouse.h"

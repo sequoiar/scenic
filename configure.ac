@@ -2,14 +2,14 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(SCENIC, 0.4)
+AC_INIT(SCENIC, 0.4.1)  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
+AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
 
 AM_INIT_AUTOMAKE([-Wno-portability])
 
-#AM_CONFIG_HEADER(config.h)
 # Check for C and C++ compilers
 AC_PROG_CXX
 AC_PROG_CC
@@ -30,9 +30,6 @@ AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
-
-AC_ARG_ENABLE([millisecwait], [ --enable-millisecwait=(millisecs) thread sleep time],,enable_millisecwait=10)
-AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
 AC_ARG_ENABLE([svn-revision], [ --enable-svn-revision ],,enable_svn_revision=no)
 AM_CONDITIONAL([SVN],test "x${enable_svn_revision}" = "xyes")
@@ -108,9 +105,6 @@ AX_BOOST_ASIO
 AX_BOOST_DATE_TIME
 AX_BOOST_FILESYSTEM
 
-AX_CHECK_GL
-AX_CHECK_GLU
-
 # GNU help2man creates man pages from --help output; in many cases, this
 # is sufficient, and obviates the need to maintain man pages separately.
 # However, this means invoking executables, which we generally cannot do
@@ -142,15 +136,18 @@ CXXFLAGS+=" -fPIC "
 
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
-CONFIGURED_PYTHONPATH=$PYTHONPATH
-AC_SUBST(CONFIGURED_PYTHONPATH)
-
 # FIXME
-SCENIC_LOCALE_DIR=po
+SCENIC_LOCALE_DIR=locale
 AC_SUBST(SCENIC_LOCALE_DIR)
 
 AS_AC_EXPAND(LIBDIR, $libdir)
 AC_MSG_NOTICE(Storing library files in $LIBDIR)
+
+AS_AC_EXPAND(DATADIR, $datadir)
+AC_MSG_NOTICE(Storing library files in $LIBDIR)
+
+AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
+AC_MSG_NOTICE(Storing package files in $PKGLIBDIR)
 
 PYTHON_LIB_PATH=$LIBDIR/scenic/py
 AC_SUBST(PYTHON_LIB_PATH)
@@ -160,6 +157,11 @@ AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
 AC_CONFIG_FILES([
         Makefile
+        data/Makefile
+        data/glade/Makefile
+        data/pixmaps/Makefile
+        data/themes/Makefile
+        data/themes/Darklooks/Makefile
         doc/Makefile
         doc/network/Makefile
         doc/figures/Makefile
@@ -177,14 +179,11 @@ AC_CONFIG_FILES([
         py/scenic/Makefile
         py/scenic/configure.py
         py/scenic/devices/Makefile
-        py/scenic/data/Makefile
-        po/Makefile
-        po/en_US/Makefile
-        po/en_US/LC_MESSAGES/Makefile
-        po/fr_CA/Makefile
-        po/fr_CA/LC_MESSAGES/Makefile
-        py/scenic/data/themes/Makefile
-        py/scenic/data/themes/Darklooks/Makefile
+        locale/Makefile
+        locale/en_US/Makefile
+        locale/en_US/LC_MESSAGES/Makefile
+        locale/fr_CA/Makefile
+        locale/fr_CA/LC_MESSAGES/Makefile
         py/scenic/test/Makefile
         py/scripts/Makefile
         src/include/Makefile
@@ -193,8 +192,7 @@ AC_CONFIG_FILES([
         src/shared_video/Makefile
         src/tcp/Makefile
         src/gst/Makefile
-        src/gst/engine/Makefile
-        src/devices/Makefile
+        src/firereset/Makefile
         src/main/Makefile
         src/main/test/Makefile
         ])

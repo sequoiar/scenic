@@ -1,6 +1,5 @@
-include $(top_srcdir)/globals.mak
-
 lib_LTLIBRARIES = libshared_video.la
-include_HEADERS = $(inc)/sharedVideoBuffer.h
+include_HEADERS = $(top_srcdir)/src/include/sharedVideoBuffer.h
 
-libshared_video_la_SOURCES = sharedVideoBuffer.cpp $(inc)/sharedVideoBuffer.h
+libshared_video_la_SOURCES = sharedVideoBuffer.cpp $(top_srcdir)/src/include/sharedVideoBuffer.h
+INCLUDES = -I$(top_srcdir)/src/include

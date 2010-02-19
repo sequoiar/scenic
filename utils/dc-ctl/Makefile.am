@@ -1,5 +1,3 @@
-include $(top_srcdir)/globals.mak 
-
 #FIXME: this is a hack because trial goes into the directory first
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../:$(PATH) trial
 
@@ -13,3 +11,4 @@ LDADD = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(LIBDC1394_LIBS)
 
 clean-local:
 	rm -rf _trial_temp
+	rm -rf test/*.pyc

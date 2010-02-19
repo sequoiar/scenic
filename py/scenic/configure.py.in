@@ -1,48 +1,49 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+The project directories look as follow:
+trunk/
+ * locale/ : translations
+ * data/
+   * glade : glade files and some images
+   * themes : gtkrc files.
+   * pixmaps : only the application icon for now (not the desktop's file icon)
+
+Once installed, they look like this:
+/usr/local/share/scenic
+ * locale/
+ * pixmaps/
+ * glade/
+ * themes/
+"""
+import os
 
 APPNAME = "scenic"
-VERSION = """@PACKAGE_VERSION@"""
+VERSION = "@PACKAGE_VERSION@"
+PACKAGE_NAME = """@PACKAGE_NAME@"""
+# paths:
+LOCALE_DIR = os.path.join("@LIBDIR@", 'scenic', "@LOCALE_DIR@")
+GLADE_DIR = os.path.join("@DATADIR@", 'scenic', 'glade')
+PIXMAPS_DIR = os.path.join("@DATADIR@", 'scenic', 'pixmaps')
+THEMES_DIR = os.path.join("@DATADIR@", 'scenic', "themes")
 
-import os
-from scenic import data # TODO: change package data to configure.ac variable
-# contains the glade, gtkrc and locale files.
-PKGDATADIR = os.path.dirname(data.__file__) #'/usr/local/share/scenic'
-# not used yet. Will contain custom icons. 
-PIXMAPDIR = os.path.dirname(data.__file__) #'/usr/local/share/pixmaps'
-IN_DEVELOPMENT_MODE = False
-ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
-ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
-SCENIC_LOCALE_DIR = """@SCENIC_LOCALE_DIR@""" # FIXME: overriden when in development mode. See in py/scripts/scenic.in
-
-def get_icon_path():
+def replace_install_paths_with_devel_paths():
     """
-    @rettype: str
+    If the application is not installed, overrides the constants in this file with the uninstalled location of these directories.
+    Called from the main executable.
     """
-    return os.path.join(PIXMAPDIR, 'scenic.png') # 48x48
-
-LICENSE_TEXT = """Scenic
-Copyright (C) 2009 Society for Arts and Technology (SAT)
-http://www.sat.qc.ca
-All rights reserved.
-
-This file is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-Scenic is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Scenic.  If not, see <http://www.gnu.org/licenses/>."""
-
-AUTHORS_LIST = [
-    'Alexandre Quessy <alexandre@quessy.net>', 
-    'Tristan Matthews <tristan@sat.qc.ca>', 
-    'Simon Piette <simonp@sat.qc.ca>',
-    u'Étienne Désautels <etienne@teknozen.net>', 
-    ]
-COPYRIGHT_SHORT = "Copyright 2009-2010 Society for Arts and Technology"
+    global THEMES_DIR
+    global LOCALE_DIR
+    global PIXMAPS_DIR
+    global GLADE_DIR
+    # if in development mode, override the path to gettext i18n files.
+    this_dir = os.path.dirname(os.path.abspath(__file__)) # trunk/py/scenic/
+    py_dir = os.path.split(this_dir)[0] # trunk/py
+    root_dir = os.path.split(py_dir)[0] # trunk
+    print("Changing paths so that project dir is set to %s" % (root_dir))
+    # Now, override the constants:
+    GLADE_DIR = os.path.join(root_dir, 'data', 'glade')
+    PIXMAPS_DIR = os.path.join(root_dir, 'data', 'pixmaps')
+    THEMES_DIR = os.path.join(root_dir, 'data', 'themes')
+    LOCALE_DIR = os.path.join(root_dir, "locale")
+    print("Changed paths to %s %s %s %s" % (GLADE_DIR, PIXMAPS_DIR, THEMES_DIR, LOCALE_DIR))

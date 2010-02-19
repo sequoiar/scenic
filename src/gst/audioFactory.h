@@ -27,8 +27,12 @@
 #include "util.h"
 #include "mapMsg.h"
 
-#include "gst/engine.h"
-#include "engine/pipeline.h"
+#include "audioConfig.h"
+#include "audioSender.h"
+#include "audioReceiver.h"
+#include "remoteConfig.h"
+#include "capsParser.h"
+#include "pipeline.h"
 
 #include <boost/shared_ptr.hpp>
 
