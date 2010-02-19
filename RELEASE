@@ -1,3 +1,31 @@
+See INSTALL and UPGRADING
+
+Release note for Scenic 0.4.1
+
+    Milhouse:
+    This minor release fixes a bug with the deinterlace option. It has
+    also been enabled again in the Scenic graphical user interface. We
+    also fixed a bug that was preventing users to see a preview of a local
+    video Web camera. An other bug has also been fixed which made the
+    listing of cameras impossible on Ubuntu Karmic when the libdc1394
+    library was not found.
+
+    Scenic GUI:
+    This minor release fixes a bug with the Scenic icon which was not
+    showing up in the Gnome menu. It is now under
+    Applications/Internet/Scenic.
+
+     * Fixed #263 Fixed potential crash in case of wrong JSON library version.
+     * Fixed #264 videoflip is frail with input material
+     * Moved colorspace converter into videoflip
+     * Moved application data out of the Python package.
+     * Flattened gst file hierarchy
+     * Videoflip (and consequently deinterlace) fixed, added extra colorspace element
+     * Installation: shared librairies (except for shared_video) are installed in $(prefix)/lib/scenic instead of just $(prefix)/scenic
+     * Fixed formatting of some i18n strings.
+
+    Be sure to uninstall your 0.3.x miville before installing scenic.
+
 Release notes for Scenic 0.4
 
 Milhouse:
