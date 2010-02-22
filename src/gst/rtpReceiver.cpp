@@ -99,7 +99,8 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
     {
         /// we can't just use context->depayloader because this signal may have been called for the rtp pad
         /// of another rtpreceiver than context
-        GstPad *sinkPad = getMatchingDepayloaderSinkPad(srcPad);
+        std::string srcMediaType(getMediaType(srcPad));
+        GstPad *sinkPad = getMatchingDepayloaderSinkPad(srcMediaType);
 
         if (gst_pad_is_linked(sinkPad)) // only link once
         {
@@ -109,13 +110,9 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
             gst_object_unref(oldSrcPad);
         }
         gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
-        gchar *srcPadName;
-        srcPadName = gst_pad_get_name(srcPad);
-        /// FIXME: name by itself isn't so helpful, also sinkPad name is just sink so we ignore it
-        LOG_INFO("Made new RTP connection with source pad " << srcPadName);
-        g_free(srcPadName);
-
         gst_object_unref(sinkPad);
+    
+        LOG_INFO("New " << srcMediaType << " stream connected");
     }
 }
 
@@ -141,7 +138,7 @@ std::string RtpReceiver::getMediaType(GstPad *pad)
 }
 
 
-GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
+GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(const std::string &srcMediaType)
 {
     GstPad *sinkPad;
 
@@ -151,7 +148,6 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
     // FIXME: what if we have two video depayloaders? two audio depayloaders?
 
     std::list<GstElement *>::iterator iter = depayloaders_.begin();
-    std::string srcMediaType(getMediaType(srcPad));
 
     while (getMediaType(sinkPad) != srcMediaType
             and iter != depayloaders_.end())

@@ -213,9 +213,9 @@ RtpBin::~RtpBin()
 
 void RtpBin::registerSession(const std::string &codec)
 {
-    std::string sessionName("");
-    sessionName += codec + "_" + boost::lexical_cast<std::string>(sessionId_);
-    sessionName_ = sessionName;
+    std::string tempName;
+    tempName += codec + "_" + boost::lexical_cast<std::string>(sessionId_);
+    sessionName_ = tempName;
     sessions_[sessionId_] = this;
 }
 

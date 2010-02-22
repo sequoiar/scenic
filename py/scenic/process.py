@@ -62,12 +62,12 @@ class ProcessIO(protocol.ProcessProtocol):
     def outReceived(self, data):
         for line in data.splitlines():
             if line != "":
-                self.manager.handle_stdout_line(line)
+                self.manager.stdout_line_signal(line)
 
     def errReceived(self, data):
         for line in data.splitlines().strip():
             if line != "":
-                self.manager.handle_stderr_line(line)
+                self.manager.stderr_line_signal(line)
 
     def processEnded(self, reason):
         exit_code = reason.value.exitCode
@@ -106,6 +106,8 @@ class ProcessManager(object):
         self._delayed_kill = None # DelayedCall instance
         
         self.state_changed_signal = sig.Signal()
+        self.stdout_line_signal = sig.Signal()
+        self.stderr_line_signal = sig.Signal()
     
     def _before_shutdown(self):
         """
@@ -117,12 +119,6 @@ class ProcessManager(object):
             self.log(msg)
             self.stop()
     
-    def handle_stdout_line(self, line):
-        print "%9s stdout: %s" % (self.identifier, line)
-    
-    def handle_stderr_line(self, line):
-        print "%9s stderr: %s" % (self.identifier, line)
-
     def is_alive(self):
         """
         Checks if the child is alive.

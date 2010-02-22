@@ -42,6 +42,10 @@ class StreamerManager(object):
         # for stats
         #TODO: add ports?
         self.session_details = None # either None or a big dict
+        self.receiving_audio_from_peer = False
+        self.receiving_video_from_peer = False
+        self.sending_audio_to_peer = False
+        self.sending_video_to_peer = False
 
     def _gather_config_to_stream(self, addr):
         """
@@ -168,18 +172,92 @@ class StreamerManager(object):
             self.milhouse_recv_cmd.append('--deinterlace')
 
         # setting up
+        self.rtcp_stats = {
+            "send": {
+                "video": {
+                    "packets-lost": 0,
+                    "jitter": 0,
+                    "bitrate": 0,
+                    "connected": False
+                },
+                "audio": {
+                    "packets-lost": 0,
+                    "jitter": 0,
+                    "bitrate": 0,
+                    "connected": False
+                }
+            },
+            "receive": {
+                "video": {
+                    "connected": False
+                },
+                "audio": {
+                    "connected": False
+                }
+            }
+        }
+
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
         self.receiver.state_changed_signal.connect(self.on_process_state_changed)
+        self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
+        self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
         send_cmd = " ".join(self.milhouse_send_cmd)
         self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
         self.sender.state_changed_signal.connect(self.on_process_state_changed)
+        self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
+        self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
         # starting
         self._set_state(process.STATE_STARTING)
         print "$", send_cmd
         self.sender.start()
         print "$", recv_cmd
         self.receiver.start()
+
+    def on_receiver_stdout_line(self, line):
+        """
+        Handles a new line from our receiver process' stdout
+        """
+        if "stream connected" in line:
+            if "audio" in line:
+                self.rtcp_stats["receive"]["audio"]["connected"] = True
+            elif "video" in line:
+                self.rtcp_stats["receive"]["video"]["connected"] = True
+        else:
+            print "%9s stdout: %s" % (self.receiver.identifier, line)
+
+    def on_receiver_stderr_line(self, line):
+        """
+        Handles a new line from our receiver process' stderr
+        """
+        print "%9s stdout: %s" % (self.receiver.identifier, line)
+    
+    def on_sender_stdout_line(self, line):
+        """
+        Handles a new line from our receiver process' stdout
+        """
+        print "%9s stdout: %s" % (self.sender.identifier, line)
+        if "PACKETS-LOST" in line:
+            if "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line:
+                self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
+            elif "raw" in line or "mp3" in line or "vorbis" in line:
+                self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
+        elif "JITTER" in line:
+            if "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line:
+                self.rtcp_stats["send"]["video"]["jitter"] = int(line.split(":")[-1])
+            elif "raw" in line or "mp3" in line or "vorbis" in line:
+                self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
+        elif "connected" in line:
+            if "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line:
+                self.rtcp_stats["send"]["video"]["connected"] = True
+            elif "raw" in line or "mp3" in line or "vorbis" in line:
+                self.rtcp_stats["send"]["audio"]["connected"] = True
+
+    def on_sender_stderr_line(self, line):
+        """
+        Handles a new line from our receiver process' stderr
+        """
+        print "%9s stderr: %s" % (self.sender.identifier, line)
 
     def is_busy(self):
         """
