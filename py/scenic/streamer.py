@@ -40,87 +40,132 @@ class StreamerManager(object):
         self.state = process.STATE_STOPPED
         self.state_changed_signal = sig.Signal()
         # for stats
-        #TODO:
-        #self.session_details = {
-        #    "sending": {
-        #        "address": None,
-        #        "video": {
-        #            "source": None,
-        #            "codec": None,
-        #            "port": None,
-        #            "width": None,
-        #            "height": None,
-        #            "aspect-ratio": None,
-        #            "device": None,
-        #            "bitrate": None,
-        #        },
-        #        "audio": {
-        #            "osource": None,
-        #            "numchannels": None,
-        #            "codec": None,
-        #            "port": None,
-        #        }
-        #    }
-        #    "receiving": {
-        #    }
-        #}
-        
-    def start(self, host, config, title=None):
+        #TODO: add ports?
+        self.session_details = None # either None or a big dict
+
+    def _gather_config_to_stream(self, addr):
         """
-            self.stop_streamers()
-        Starts the sender and receiver processes.
-        @param host: str ip addr
-        @param config: gui.Config object
+        Gathers all settings in a big dict.
         
+        Useful for feedback to the user.
+        """
+        contact_name = addr
+        contact = self.app._get_contact_by_addr(addr)
+        if contact is not None:
+            contact_name = contact["name"]
+        
+        remote_config = self.app.remote_config
+        send_width, send_height = self.app.config.video_capture_size.split("x")
+        receive_width, receive_height = remote_config["video"]["capture_size"].split("x")
+        self.session_details = {
+            "peer": {
+                "address": addr,
+                "name": contact_name,
+                },
+            # ----------------- send ---------------
+            "send": {
+                "video": {
+                    "source": self.app.config.video_source,
+                    "device": self.app.config.video_device,
+                    "bitrate": self.app.config.video_bitrate,
+                    "codec": remote_config["video"]["codec"],
+                    "width": int(send_width), # int
+                    "height": int(send_height), # int
+                    "aspect-ratio": self.app.config.video_aspect_ratio,
+                    "port": self.app.remote_config["video"]["port"], 
+                },
+                "audio": {
+                    "source": self.app.config.audio_source,
+                    "numchannels": self.app.config.audio_channels,
+                    "codec": self.app.config.audio_codec,
+                    "port": self.app.remote_config["audio"]["port"], 
+                }
+            },
+            # -------------------- recv ------------
+            "receive": {
+                "video": {
+                    "sink": self.app.config.video_sink,
+                    "codec": self.app.config.video_codec,
+                    "width": int(receive_width), # int
+                    "height": int(receive_height), # int
+                    "deinterlace": self.app.config.video_deinterlace, # bool
+                    "aspect-ratio": remote_config["video"]["aspect_ratio"],
+                    "port": str(self.app.recv_video_port), #decided by the app
+                    "window-title": "\"From %s\"" % (contact_name), #TODO: i18n
+                    "jitterbuffer": self.app.config.video_jitterbuffer, 
+                    "fullscreen": self.app.config.video_fullscreen, # bool
+                    "bitrate": remote_config["video"]["bitrate"], # int
+                },
+                "audio": {
+                    "numchannels": self.app.config.audio_channels, # int
+                    "codec": self.app.config.audio_codec, 
+                    "port": self.app.recv_audio_port,
+                    "sink": self.app.config.audio_sink
+                }
+            }
+        }
+        if self.session_details["send"]["video"]["source"] != "v4l2src":
+            self.session_details["send"]["video"]["device"] = None
+        if self.session_details["send"]["video"]["codec"] == "theora":
+            self.session_details["send"]["video"]["bitrate"] = None
+        
+    def start(self, host):
+        """
+        Starts the sender and receiver processes.
+        
+        @param host: str ip addr
         Raises a RuntimeError if a sesison is already in progress.
         """
-        #FIXME: uses self.app.*_port variables to know which ports to use.
         if self.state != process.STATE_STOPPED:
-            raise RuntimeError("Cannot start streamers since they are %s." % (self.state))
-            # FIXME: catch this and run ;-)
+            raise RuntimeError("Cannot start streamers since they are %s." % (self.state)) # the programmer has done something wrong if we're here.
         
-        send_width, send_height = config.video_capture_size.split("x")
-        receive_width, receive_height = self.app.remote_video_config["capture_size"].split("x")
-        self.milhouse_recv_cmd = [
-            "milhouse",
-            '--receiver', 
-            '--address', str(host),
-            '--videosink', config.video_sink,
-            '--videocodec', config.video_codec,
-            '--videoport', str(self.app.recv_video_port), # attribute of self.app, not self.app.config
-            '--jitterbuffer', str(config.video_jitterbuffer),
-            '--width', str(receive_width),
-            '--height', str(receive_height),
-            '--aspect-ratio', str(self.app.remote_video_config["aspect_ratio"]),# attribute of self.app, not self.app.config
-            '--audiosink', config.audio_sink,
-            '--numchannels', str(config.audio_channels),
-            '--audiocodec', config.audio_codec,
-            '--audioport', str(self.app.recv_audio_port) 
-            ]
-        if title is not None:
-            self.milhouse_recv_cmd.extend(["--window-title", title])
-        if config.video_fullscreen:
-            self.milhouse_recv_cmd.append('--fullscreen')
-        if config.video_deinterlace:
-            self.milhouse_recv_cmd.append('--deinterlace')
+        self._gather_config_to_stream(host)
+        details = self.session_details
+
+        # ------------------ send ---------------
         self.milhouse_send_cmd = [
             "milhouse", 
             '--sender', 
-            '--address', str(host),
-            '--videosource', config.video_source,
-            '--videocodec', self.app.remote_video_config["codec"],
-            '--videoport', str(self.app.remote_video_config["port"]),
-            '--width', str(send_width),
-            '--height', str(send_height),
-            '--aspect-ratio', str(self.app.config.video_aspect_ratio),
-            '--audiosource', config.audio_source,
-            '--numchannels', str(self.app.remote_audio_config["numchannels"]),
-            '--audiocodec', self.app.remote_audio_config["codec"],
-            '--audioport', str(self.app.remote_audio_config["port"])]
-        if config.video_source == "v4l2src":
-            self.milhouse_send_cmd.extend(["--videodevice", config.video_device])
-        if self.app.remote_video_config["codec"] != "vorbis":
-            self.milhouse_send_cmd.extend(['--videobitrate', str(int(self.app.remote_video_config["bitrate"] * 1000000))])
+            '--address', details["peer"]["address"],
+            '--videosource', details["send"]["video"]["source"],
+            '--videocodec', details["send"]["video"]["codec"],
+            '--videoport', str(details["send"]["video"]["port"]),
+            '--width', str(details["send"]["video"]["width"]),
+            '--height', str(details["send"]["video"]["height"]),
+            '--aspect-ratio', str(details["send"]["video"]["aspect-ratio"]),
+            '--audiosource', details["send"]["audio"]["source"],
+            '--numchannels', str(details["send"]["audio"]["numchannels"]),
+            '--audiocodec', details["send"]["audio"]["codec"],
+            '--audioport', str(details["send"]["audio"]["port"]),
+            ]
+        if details["send"]["video"]["source"] == "v4l2src":
+            self.milhouse_send_cmd.extend(["--videodevice", details["send"]["video"]["device"]])
+        if details["send"]["video"]["codec"] != "theora":
+            self.milhouse_send_cmd.extend(['--videobitrate', str(int(details["send"]["video"]["bitrate"] * 1000000))])
+
+        # ------------------- recv ----------------
+        self.milhouse_recv_cmd = [
+            "milhouse",
+            '--receiver', 
+            '--address', details["peer"]["address"],
+            '--videosink', details["receive"]["video"]["sink"],
+            '--videocodec', details["receive"]["video"]["codec"],
+            '--videoport', str(details["receive"]["video"]["port"]),
+            '--jitterbuffer', str(details["receive"]["video"]["jitterbuffer"]),
+            '--width', str(details["receive"]["video"]["width"]),
+            '--height', str(details["receive"]["video"]["height"]),
+            '--aspect-ratio', details["receive"]["video"]["aspect-ratio"],
+            '--audiosink', details["receive"]["audio"]["sink"],
+            '--numchannels', str(details["receive"]["audio"]["numchannels"]),
+            '--audiocodec', details["receive"]["audio"]["codec"],
+            '--audioport', str(details["receive"]["audio"]["port"]),
+            '--window-title', details["receive"]["video"]["window-title"],
+            ]
+        if details["receive"]["video"]["fullscreen"]:
+            self.milhouse_recv_cmd.append('--fullscreen')
+        if details["receive"]["video"]["deinterlace"]:
+            self.milhouse_recv_cmd.append('--deinterlace')
+
         # setting up
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")

@@ -259,11 +259,12 @@ class Gui(object):
         self.selected_contact_row = None
         self.select_contact_index = None
 
-        # SUmmary text view:
-        self.summary_textview_widget = self.widgets.get_widget("summary_textview")
-        self.summary_text_buffer = self.summary_textview_widget.get_buffer()
-        self.summary_text_buffer.set_text("")
-        #self.info_streaming_state_widget = self.widgets.get_widget("info_streaming_state")
+        # Summary text view:
+        self.info_peer_widget = self.widgets.get_widget("info_peer")
+        self.info_send_video_widget = self.widgets.get_widget("info_send_video")
+        self.info_send_audio_widget = self.widgets.get_widget("info_send_audio")
+        self.info_receive_video_widget = self.widgets.get_widget("info_receive_video")
+        self.info_receive_audio_widget = self.widgets.get_widget("info_receive_audio")
 
         # video
         self.video_capture_size_widget = self.widgets.get_widget("video_capture_size")
@@ -808,34 +809,58 @@ class Gui(object):
             self.edit_contact_widget,
             ]
         
-        # XXX
-        streaming = self.app.has_session()
+        is_streaming = self.app.has_session()
         currently_sensitive = self.contact_list_widget.get_property("sensitive")
-        if streaming == currently_sensitive:
-            print 'Got to change the addressbook sensitivity to', not currently_sensitive
-            if streaming:
+        state_has_changed = is_streaming == currently_sensitive
+        if state_has_changed:
+            if is_streaming:
                 text = _("Stop streaming")
                 icon = gtk.STOCK_CONNECT
-                sensitive = False
             else:
                 text = _("Invite this contact")
                 icon = gtk.STOCK_DISCONNECT
-                sensitive = True
             self.invite_label_widget.set_text(text)
             self.invite_icon_widget.set_from_stock(icon, 4)
             
+            # Toggle sensitivity of many widgets:
+            print 'Got to change the sensitivity of many widgets to', not is_streaming
             for widget in _widgets_to_toggle_sensitivity:
-                widget.set_sensitive(sensitive)
+                widget.set_sensitive(not is_streaming)
+            # Update the summary:
+            if is_streaming:
+                details = self.app.streamer_manager.session_details
+                self.info_peer_widget.set_text(details["peer"]["name"])
+                self.info_send_video_widget.set_text(
+                    _("%(width)dx%(height)d %(codec)s %(bitrate)2.2f Mbits/s") % {
+                    "width": details["send"]["video"]["width"], 
+                    "height": details["send"]["video"]["height"], 
+                    "codec": details["send"]["video"]["codec"], 
+                    "bitrate": details["send"]["video"]["bitrate"] 
+                    })
+                self.info_send_audio_widget.set_text(
+                    _("%(numchannels)d-channel %(codec)s") % {
+                    "numchannels": details["send"]["audio"]["numchannels"], 
+                    "codec": details["send"]["audio"]["codec"] 
+                    })
+                self.info_receive_video_widget.set_text(
+                    _("%(width)dx%(height)d %(codec)s %(bitrate)2.2f Mbits/s") % {
+                    "width": details["receive"]["video"]["width"], 
+                    "height": details["receive"]["video"]["height"], 
+                    "codec": details["receive"]["video"]["codec"], 
+                    "bitrate": details["receive"]["video"]["bitrate"] 
+                    })
+                self.info_receive_audio_widget.set_text(
+                    _("%(numchannels)d-channel %(codec)s") % {
+                    "numchannels": details["send"]["audio"]["numchannels"], 
+                    "codec": details["send"]["audio"]["codec"] 
+                    })
+            else:
+                self.info_peer_widget.set_text("")
+                self.info_send_video_widget.set_text("")
+                self.info_send_audio_widget.set_text("")
+                self.info_receive_video_widget.set_text("")
+                self.info_receive_audio_widget.set_text("")
             
-            # Now, update the summary text
-            txt = ""
-            if streaming:
-                txt += _("Streaming in progress.")
-                txt += "\n"
-                txt += ""
-            else: 
-                txt += _("Not streaming.")
-            self.summary_text_buffer.set_text(txt)
 
     def on_audio_codec_changed(self, widget):
         """

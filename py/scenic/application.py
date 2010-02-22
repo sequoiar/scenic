@@ -99,8 +99,7 @@ class Application(object):
         self.log_file_name = log_file_name
         self.recv_video_port = None
         self.recv_audio_port = None
-        self.remote_audio_config = {} # dict
-        self.remote_video_config = {} # dict
+        self.remote_config = {} # dict
         self.ports_allocator = ports.PortsAllocator()
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
@@ -323,8 +322,10 @@ class Application(object):
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
             dialogs.ErrorDialog.create(_("Refused invitation: jack is not running."), parent=self.gui.main_window)
         else:
-            self.remote_audio_config = message["audio"]
-            self.remote_video_config = message["video"]
+            self.remote_config = {
+                "audio": message["audio"],
+                "video": message["video"]
+                }
             connected_deferred = self.client.connect(addr, message["please_send_to_port"])
             if contact is not None:
                 if contact["auto_accept"]:
@@ -359,8 +360,10 @@ class Application(object):
         self.got_bye = False
         # TODO: Use session to contain settings and ports
         self.gui.hide_calling_dialog("accept")
-        self.remote_audio_config = message["audio"]
-        self.remote_video_config = message["video"]
+        self.remote_config = {
+            "audio": message["audio"],
+            "video": message["video"]
+            }
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create(_("A streaming session is already in progress."), parent=self.gui.main_window)
         else:
@@ -415,13 +418,7 @@ class Application(object):
     # -------------------------- actions on streamer manager --------
 
     def start_streamers(self, addr):
-        streaming_with = addr
-        contact = self._get_contact_by_addr(addr)
-        if contact is not None:
-            streaming_with = contact["name"]
-        title = _("\"From %s\"") % (streaming_with)
-        print("title: " + title)
-        self.streamer_manager.start(addr, self.config, title=title)
+        self.streamer_manager.start(addr)
 
     def stop_streamers(self):
         # TODO: return a deferred. 
