@@ -233,7 +233,6 @@ VideoDecoder * ReceiverConfig::createVideoDecoder(Pipeline &pipeline, bool doDei
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
-    LOG_DEBUG("Video decoder " << codec_ << " built"); 
 }
 
 
@@ -253,7 +252,6 @@ Decoder * ReceiverConfig::createAudioDecoder(Pipeline &pipeline) const
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
-    LOG_DEBUG("Audio decoder " << codec_ << " built"); 
 }
 
 
