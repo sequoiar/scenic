@@ -94,7 +94,7 @@ class StreamerManager(object):
                     "window-title": "\"From %s\"" % (contact_name), #TODO: i18n
                     "jitterbuffer": self.app.config.video_jitterbuffer, 
                     "fullscreen": self.app.config.video_fullscreen, # bool
-                    "bitrate": remote_config["video"]["bitrate"], # int
+                    "bitrate": remote_config["video"]["bitrate"], # float
                 },
                 "audio": {
                     "numchannels": self.app.config.audio_channels, # int

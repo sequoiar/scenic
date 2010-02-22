@@ -687,7 +687,7 @@ class Gui(object):
         print ' * video_jitterbuffer:', self.app.config.video_jitterbuffer
         # VIDEO BITRATE
         video_bitrate = self.video_bitrate_widget.get_value() # spinbutton (float)
-        self.app.config.video_bitrate = video_bitrate
+        self.app.config.video_bitrate = float(video_bitrate)
         print ' * video_bitrate:', self.app.config.video_bitrate
         
         # AUDIO:
