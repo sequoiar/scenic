@@ -839,6 +839,7 @@ class Gui(object):
                     }
                 if details["send"]["video"]["bitrate"] is not None:
                      _info_send_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["send"]["video"]["bitrate"]}
+                print("info send video: " + _info_send_video)
                 self.info_send_video_widget.set_text(_info_send_video)
                 # send audio: --------------------------------
                 self.info_send_audio_widget.set_text(
@@ -854,7 +855,8 @@ class Gui(object):
                     }
                 if details["receive"]["video"]["bitrate"] is not None:
                      _info_recv_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["receive"]["video"]["bitrate"]}
-                self.info_send_video_widget.set_text(_info_recv_video)
+                print("info recv video: " + _info_recv_video)
+                self.info_receive_video_widget.set_text(_info_recv_video)
                 # recv audio: --------------------------------
                 self.info_receive_audio_widget.set_text(
                     _("%(numchannels)d-channel %(codec)s") % {
