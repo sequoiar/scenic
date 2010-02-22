@@ -144,8 +144,8 @@ def list_cameras():
         executable = procutils.which(command_name)[0] # gets the executable
     except IndexError:
         return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
-    deferred = defer.Deferred()
-    d = utils.getProcessOutput(executable, args=args, env=os.environ)
+    deferred = defer.Deferred() # errorToo puts stderr in output
+    d = utils.getProcessOutput(executable, args=args, env=os.environ, errortoo=True)
     d.addCallback(_cb, deferred)
     d.addErrback(_eb, deferred)
     return deferred
