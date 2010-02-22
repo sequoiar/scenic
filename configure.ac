@@ -116,6 +116,7 @@ else
   HELP2MAN=:
 fi
 
+AX_CHECK_GL
 if test "x${no_gl}" = "xyes" ; then
     AC_MSG_WARN([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
 fi

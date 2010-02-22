@@ -68,9 +68,6 @@ CPPFLAGS="${ax_save_CPPFLAGS}"
 
 m4_define([AX_CHECK_GLU_PROGRAM],
           [AC_LANG_PROGRAM([[
-# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
-#   include <windows.h>
-# endif
 # ifdef HAVE_GL_GLU_H
 #   include <GL/glu.h>
 # elif defined(HAVE_OPENGL_GLU_H)
