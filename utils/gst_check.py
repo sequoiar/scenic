@@ -46,6 +46,7 @@ if ( len(cpp_files) == 0):
 codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
 if (source_ == "videotestsrc")
 if (sink_ == "xvimagesink")
+*coder(pipeline, "mad")
 """
 matches = [
     re.compile(r"^.*makeElement\(\""), 
