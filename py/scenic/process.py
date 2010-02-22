@@ -62,12 +62,12 @@ class ProcessIO(protocol.ProcessProtocol):
     def outReceived(self, data):
         for line in data.splitlines():
             if line != "":
-                print "%9s stdout: %s" % (self.manager.identifier, line)
+                self.manager.handle_stdout_line(line)
 
     def errReceived(self, data):
         for line in data.splitlines().strip():
             if line != "":
-                print "%9s stderr: %s" % (self.manager.identifier, line)
+                self.manager.handle_stderr_line(line)
 
     def processEnded(self, reason):
         exit_code = reason.value.exitCode
@@ -116,6 +116,12 @@ class ProcessManager(object):
             msg = "Child still %s. Stopping it before shutdown." % (self.state)
             self.log(msg)
             self.stop()
+    
+    def handle_stdout_line(self, line):
+        print "%9s stdout: %s" % (self.identifier, line)
+    
+    def handle_stderr_line(self, line):
+        print "%9s stderr: %s" % (self.identifier, line)
 
     def is_alive(self):
         """
