@@ -46,13 +46,15 @@ using namespace boost::posix_time;
 
 using boost::asio::ip::tcp;
 static const std::string SENTINEL = "END_BUFFER";
+static const int POLL_QUIT_MS = 1;
 
+// shared_from_this gives shared_ptr to this, this way we cleanly avoid memory leaks
 class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
     public:
-        ReceiverSession(boost::asio::io_service& io_service, std::string &receiverBuffer) : 
+        ReceiverSession(boost::asio::io_service& io_service, std::string *receiverBuffer) : 
             socket_(io_service), 
             receiverBuffer_(receiverBuffer),
-            timer_(io_service, millisec(1))
+            timer_(io_service, millisec(POLL_QUIT_MS))
     {
         // periodically check if we've been quit/interrupted, every millisecond
         timer_.async_wait(boost::bind(&ReceiverSession::handle_timer, this, boost::asio::placeholders::error));
@@ -65,7 +67,6 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
 
         void start()
         {
-            // shared_from_this gives shared_ptr to this, this way we cleanly avoid memory leaks
             socket_.async_read_some(boost::asio::buffer(data_, MAX_LENGTH),
                     boost::bind(&ReceiverSession::handle_receive_from, shared_from_this(),
                         boost::asio::placeholders::error,
@@ -98,15 +99,15 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
                 std::ostringstream os;
                 os.write(data_.data(), bytes_transferred);
 
-                receiverBuffer_ += os.str();
+                *receiverBuffer_ += os.str();
 
                 // LOG_DEBUG("receiver buffer looks like " << receiverBuffer_);
                 // Got the quit message, now stop the service
-                std::string::size_type sentinelPos = receiverBuffer_.find(SENTINEL);
+                std::string::size_type sentinelPos = receiverBuffer_->find(SENTINEL);
                 if (sentinelPos != std::string::npos)   // end of message
                 {
                     LOG_DEBUG("Got " << SENTINEL);
-                    receiverBuffer_.resize(sentinelPos);    // strip quit from caps
+                    receiverBuffer_->resize(sentinelPos);    // strip quit from caps
                     socket_.get_io_service().stop();
                 }
                 else
@@ -126,7 +127,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
         // FIXME: is this the best way of having a buffer? see boost/asio/examples/reference_counted.cpp
         enum { MAX_LENGTH = 8000 };
         boost::array<char, MAX_LENGTH> data_;
-        std::string &receiverBuffer_;
+        std::string *receiverBuffer_;
         boost::asio::deadline_timer timer_;
 };
 
@@ -135,7 +136,7 @@ class TcpReceiver {
     typedef boost::shared_ptr<ReceiverSession> session_ptr;
 
     public:
-    TcpReceiver(boost::asio::io_service& io_service, int port, std::string &buffer) : 
+    TcpReceiver(boost::asio::io_service& io_service, int port, std::string *buffer) : 
         io_service_(io_service),
         acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
         buffer_(buffer)
@@ -164,7 +165,7 @@ class TcpReceiver {
     private:
     boost::asio::io_service& io_service_;
     tcp::acceptor acceptor_;
-    std::string &buffer_;
+    std::string *buffer_;
 };
 
 
@@ -173,7 +174,7 @@ std::string asio::tcpGetBuffer(int port, int &/*id*/)
     std::string buffer;
     boost::asio::io_service io_service;
 
-    TcpReceiver receiver(io_service, port, buffer);
+    TcpReceiver receiver(io_service, port, &buffer);
     LOG_DEBUG("Waiting for msg on port " << port);
 
     io_service.run();
@@ -183,7 +184,7 @@ std::string asio::tcpGetBuffer(int port, int &/*id*/)
 }
 
 
-bool asio::tcpSendBuffer(const std::string &ip, int port, int /*id*/, std::string caps)
+bool asio::tcpSendBuffer(const std::string &ip, int port, int /*id*/, const std::string &caps)
 {
     using boost::lexical_cast;
 
