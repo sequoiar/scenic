@@ -317,8 +317,8 @@ class Gui(object):
         self._video_source_changed_by_user = True
         self.main_window.show()
 
-        self._addressbook_state_check_task = task.LoopingCall(self.update_addressbook_state)
-        self._addressbook_state_check_task.start(1.0, now=False)
+        self._streaming_state_check_task = task.LoopingCall(self.update_streaming_state)
+        self._streaming_state_check_task.start(1.0, now=False)
         # The main app must call init_widgets_value
    
     #TODO: for the preview in the drawing area   
@@ -776,13 +776,37 @@ class Gui(object):
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         _set_combobox_value(self.audio_codec_widget, audio_codec)
 
-    def update_addressbook_state(self):
+    def update_streaming_state(self):
         """
-        Changes the invite button according to if we are streaming or not.
+        Changes the sensitivity and state of many widgets according to if we are streaming or not.
+        
+        Makes most of the audio/video buttons and widgets sensitive or not.
+        Changes the invite button:
          * the icon
          * the label
         Makes the contact list sensitive or not.
         """
+        _widgets_to_toggle_sensitivity = [
+            self.video_capture_size_widget,
+            self.video_display_widget,
+            self.video_bitrate_widget,
+            self.video_source_widget,
+            self.video_codec_widget,
+            self.video_fullscreen_widget,
+            self.video_view_preview_widget,
+            self.video_deinterlace_widget,
+            self.aspect_ratio_widget,
+            self.video_jitterbuffer_widget,
+            self.video_bitrate_widget,
+            self.audio_source_widget,
+            self.audio_codec_widget,
+            self.audio_numchannels_widget,
+            self.contact_list_widget,
+            self.add_contact_widget,
+            self.remove_contact_widget,
+            self.edit_contact_widget,
+            ]
+        
         # XXX
         streaming = self.app.has_session()
         currently_sensitive = self.contact_list_widget.get_property("sensitive")
@@ -798,11 +822,10 @@ class Gui(object):
                 sensitive = True
             self.invite_label_widget.set_text(text)
             self.invite_icon_widget.set_from_stock(icon, 4)
-            self.contact_list_widget.set_sensitive(sensitive)
-            self.add_contact_widget.set_sensitive(sensitive)
-            self.remove_contact_widget.set_sensitive(sensitive)
-            self.edit_contact_widget.set_sensitive(sensitive)
-            self.video_view_preview_widget.set_sensitive(sensitive)
+            
+            for widget in _widgets_to_toggle_sensitivity:
+                widget.set_sensitive(sensitive)
+            
             # Now, update the summary text
             txt = ""
             if streaming:
