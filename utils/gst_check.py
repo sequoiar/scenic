@@ -52,6 +52,7 @@ matches = [
     re.compile(r"^.*makeElement\(\""), 
     re.compile(r"^.*source_ == \""),
     re.compile(r"^.*sink_ == \""),
+    re.compile(r"^.*coder\(pipeline, \""),
 ]
 
 end = re.compile(r"\".*$")
