@@ -279,7 +279,6 @@ class Gui(object):
         self.v4l2_input_widget = self.widgets.get_widget("v4l2_input")
         self.v4l2_standard_widget = self.widgets.get_widget("v4l2_standard")
         self.video_jitterbuffer_widget = self.widgets.get_widget("video_jitterbuffer")
-        self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
         
         # audio
         self.audio_source_widget = self.widgets.get_widget("audio_source")
@@ -791,23 +790,26 @@ class Gui(object):
         _widgets_to_toggle_sensitivity = [
             self.video_capture_size_widget,
             self.video_display_widget,
-            self.video_bitrate_widget,
             self.video_source_widget,
             self.video_codec_widget,
             self.video_fullscreen_widget,
             self.video_view_preview_widget,
             self.video_deinterlace_widget,
-            self.aspect_ratio_widget,
             self.video_jitterbuffer_widget,
-            self.video_bitrate_widget,
+            self.aspect_ratio_widget,
+            
             self.audio_source_widget,
             self.audio_codec_widget,
             self.audio_numchannels_widget,
+            
             self.contact_list_widget,
             self.add_contact_widget,
             self.remove_contact_widget,
             self.edit_contact_widget,
             ]
+        
+        
+        self.update_bitrate_and_codec()
         
         is_streaming = self.app.has_session()
         currently_sensitive = self.contact_list_widget.get_property("sensitive")
@@ -887,17 +889,24 @@ class Gui(object):
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
 
-    def on_video_codec_changed(self, widget):
+    def update_bitrate_and_codec(self):
         old_bitrate = self.video_bitrate_widget.get_value()
         codec = _get_combobox_value(self.video_codec_widget)
+        is_streaming = self.app.has_session()
         if codec in VIDEO_BITRATE_MIN_MAX.keys():
-            self.video_bitrate_widget.set_sensitive(True)
+            if is_streaming:
+                self.video_bitrate_widget.set_sensitive(False)
+            else:
+                self.video_bitrate_widget.set_sensitive(True)
             mini = VIDEO_BITRATE_MIN_MAX[codec][0]
             maxi = VIDEO_BITRATE_MIN_MAX[codec][1]
             self.video_bitrate_widget.set_range(mini, maxi)
             self.video_bitrate_widget.set_value(min(maxi, max(old_bitrate, mini)))
         else:
             self.video_bitrate_widget.set_sensitive(False)
+    
+    def on_video_codec_changed(self, widget):
+        self.update_bitrate_and_codec()
         
     def update_x11_devices(self):
         """
