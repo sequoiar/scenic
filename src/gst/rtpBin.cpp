@@ -97,6 +97,14 @@ void RtpBin::printStatsVal(const std::string &idStr,
             paramStr += formatStr + boost::lexical_cast<std::string>(val);
         }
     }
+    else if (type == "boolean")
+    {
+        if (G_VALUE_HOLDS_BOOLEAN(gst_structure_get_value(stats, key)))
+        {
+            gboolean val = g_value_get_boolean(gst_structure_get_value(stats, key));
+            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+        }
+    }
     else
         THROW_ERROR("Unexpected type");
 

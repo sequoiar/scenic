@@ -73,7 +73,6 @@ void RtpReceiver::setLatency(int latency)
 }
 
 
-
 void RtpReceiver::setCaps(const char *capsStr)
 {
     GstCaps *caps;
