@@ -108,6 +108,7 @@ class StreamerManager(object):
             self.session_details["send"]["video"]["device"] = None
         if self.session_details["send"]["video"]["codec"] == "theora":
             self.session_details["send"]["video"]["bitrate"] = None
+        print(str(self.session_details))
         
     def start(self, host):
         """

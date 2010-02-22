@@ -829,26 +829,33 @@ class Gui(object):
             # Update the summary:
             if is_streaming:
                 details = self.app.streamer_manager.session_details
+                # peer: --------------------------------
                 self.info_peer_widget.set_text(details["peer"]["name"])
-                self.info_send_video_widget.set_text(
-                    _("%(width)dx%(height)d %(codec)s %(bitrate)2.2f Mbits/s") % {
+                # send video: --------------------------------
+                _info_send_video = _("%(width)dx%(height)d %(codec)s") % {
                     "width": details["send"]["video"]["width"], 
                     "height": details["send"]["video"]["height"], 
                     "codec": details["send"]["video"]["codec"], 
-                    "bitrate": details["send"]["video"]["bitrate"] 
-                    })
+                    }
+                if details["send"]["video"]["bitrate"] is not None:
+                     _info_send_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["send"]["video"]["bitrate"]}
+                self.info_send_video_widget.set_text(_info_send_video)
+                # send audio: --------------------------------
                 self.info_send_audio_widget.set_text(
                     _("%(numchannels)d-channel %(codec)s") % {
                     "numchannels": details["send"]["audio"]["numchannels"], 
                     "codec": details["send"]["audio"]["codec"] 
                     })
-                self.info_receive_video_widget.set_text(
-                    _("%(width)dx%(height)d %(codec)s %(bitrate)2.2f Mbits/s") % {
+                # recv video: --------------------------------
+                _info_recv_video = _("%(width)dx%(height)d %(codec)s") % {
                     "width": details["receive"]["video"]["width"], 
                     "height": details["receive"]["video"]["height"], 
                     "codec": details["receive"]["video"]["codec"], 
-                    "bitrate": details["receive"]["video"]["bitrate"] 
-                    })
+                    }
+                if details["receive"]["video"]["bitrate"] is not None:
+                     _info_recv_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["receive"]["video"]["bitrate"]}
+                self.info_send_video_widget.set_text(_info_recv_video)
+                # recv audio: --------------------------------
                 self.info_receive_audio_widget.set_text(
                     _("%(numchannels)d-channel %(codec)s") % {
                     "numchannels": details["send"]["audio"]["numchannels"], 
@@ -860,7 +867,6 @@ class Gui(object):
                 self.info_send_audio_widget.set_text("")
                 self.info_receive_video_widget.set_text("")
                 self.info_receive_audio_widget.set_text("")
-            
 
     def on_audio_codec_changed(self, widget):
         """
