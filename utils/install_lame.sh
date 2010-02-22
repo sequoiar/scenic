@@ -5,7 +5,7 @@
 #
 
 which lsb_release >/dev/null
-if [ $? -eq 1 ]; then
+if [ $? -eq 0 ]; then
     LSB_RELEASE="lsb_release"
 else
     echo "No lsb_release command found"
