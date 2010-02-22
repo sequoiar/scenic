@@ -263,6 +263,7 @@ class Gui(object):
         self.summary_textview_widget = self.widgets.get_widget("summary_textview")
         self.summary_text_buffer = self.summary_textview_widget.get_buffer()
         self.summary_text_buffer.set_text("")
+        #self.info_streaming_state_widget = self.widgets.get_widget("info_streaming_state")
 
         # video
         self.video_capture_size_widget = self.widgets.get_widget("video_capture_size")

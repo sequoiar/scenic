@@ -65,7 +65,7 @@ class StreamerManager(object):
         #    }
         #}
         
-    def start(self, host, config):
+    def start(self, host, config, title=None):
         """
             self.stop_streamers()
         Starts the sender and receiver processes.
@@ -97,6 +97,8 @@ class StreamerManager(object):
             '--audiocodec', config.audio_codec,
             '--audioport', str(self.app.recv_audio_port) 
             ]
+        if title is not None:
+            self.milhouse_recv_cmd.extend(["--window-title", title])
         if config.video_fullscreen:
             self.milhouse_recv_cmd.append('--fullscreen')
         if config.video_deinterlace:

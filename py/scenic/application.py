@@ -415,7 +415,13 @@ class Application(object):
     # -------------------------- actions on streamer manager --------
 
     def start_streamers(self, addr):
-        self.streamer_manager.start(addr, self.config)
+        streaming_with = addr
+        contact = self._get_contact_by_addr(addr)
+        if contact is not None:
+            streaming_with = contact["name"]
+        title = _("\"From %s\"") % (streaming_with)
+        print("title: " + title)
+        self.streamer_manager.start(addr, self.config, title=title)
 
     def stop_streamers(self):
         # TODO: return a deferred. 
