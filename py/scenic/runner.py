@@ -55,6 +55,36 @@ def start_file_logging(full_path="/var/tmp/scenic/scenic.log"):
 
 LOG_FILE_NAME = "~/.scenic/scenic.log"
 
+def moo():
+    """
+    This image is:
+    Copyright (C) 2003, Vijay Kumar
+    Permission is granted to copy, distribute and/or modify this image under the terms either:
+    
+    * the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version, or
+    * the GNU Free Documentation License, Version 1.1 or any later version published by the Free Software Foundation; with the no Invariant Sections, with no Front-Cover Texts and with no Back-Cover Texts.
+    """
+    print("""
+    _-`````-,           ,- '- .    
+  .'   .- - |          | - .   `.  
+ /.'  /                     `.   \ 
+:/   :      _...   ..._      ``   :
+::   :     /._ .`:'_.._\.    ||   :
+::    `._ ./  ,`  :    \ . _.''   .
+`:.      |   |  -.  \-. \|_       / 
+  \:._ _/  ..'  .@)  \@) ` `\ ,.'  
+     _/,--'       .- .\,-.`--`.    
+       ,'/''     (( \ `  )     
+        /'/'  \    `-'  (      
+         '/''  `._,-----'      
+          ''/'    .,---'       
+           ''/'      ;:            
+             ''/''  ''/        
+               ''/''/''        
+                 '/'/'         
+                  `;               
+    """)
+
 def run():
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(configure.VERSION))
@@ -62,8 +92,13 @@ def run():
     parser.add_option("-l", "--enable-logging", action="store_true", help="Enables logging to file.")
     parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s" % (LOG_FILE_NAME), default=LOG_FILE_NAME)
     parser.add_option("-f", "--fullscreen", action="store_true", help="Run in fullscreen mode")
+    parser.add_option("-M", "--moo", action="store_true", \
+        help="There is no easter egg in this program.")
     (options, args) = parser.parse_args()
     kwargs = {}
+    if options.moo:
+        moo()
+        sys.exit(0)
     if options.enable_logging:
         start_file_logging(os.path.expanduser(options.log_file_name))
         kwargs["log_file_name"] = options.log_file_name
@@ -79,3 +114,4 @@ def run():
             reactor.run()
         except KeyboardInterrupt:
             pass
+            sys.exit(0)
