@@ -34,7 +34,9 @@ def _parse_ifconfig(text):
         if "inet" in line and not "inet6" in line:
             ip = line.strip().split(" ")[1].split(":")[1]
             valid = True
-            if ip == "127.0.0.1":
+            if ip.startswith("127."): # loopback or local hostname
+                valid = False
+            elif ip.startswith("169.254."): # zeroconf address
                 valid = False
             # TODO: check IP class
             if valid:
