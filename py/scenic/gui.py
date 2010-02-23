@@ -812,6 +812,8 @@ class Gui(object):
         self.update_bitrate_and_codec()
         
         is_streaming = self.app.has_session()
+        if is_streaming:
+            details = self.app.streamer_manager.session_details
         currently_sensitive = self.contact_list_widget.get_property("sensitive")
         state_has_changed = is_streaming == currently_sensitive
         if state_has_changed:
@@ -828,49 +830,74 @@ class Gui(object):
             print 'Got to change the sensitivity of many widgets to', not is_streaming
             for widget in _widgets_to_toggle_sensitivity:
                 widget.set_sensitive(not is_streaming)
-            # Update the summary:
+            # Update the summary: 
+            # peer: --------------------------------
             if is_streaming:
-                details = self.app.streamer_manager.session_details
-                # peer: --------------------------------
                 self.info_peer_widget.set_text(details["peer"]["name"])
-                # send video: --------------------------------
-                _info_send_video = _("%(width)dx%(height)d %(codec)s") % {
-                    "width": details["send"]["video"]["width"], 
-                    "height": details["send"]["video"]["height"], 
-                    "codec": details["send"]["video"]["codec"], 
-                    }
-                if details["send"]["video"]["bitrate"] is not None:
-                     _info_send_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["send"]["video"]["bitrate"]}
-                print("info send video: " + _info_send_video)
-                self.info_send_video_widget.set_text(_info_send_video)
-                # send audio: --------------------------------
-                self.info_send_audio_widget.set_text(
-                    _("%(numchannels)d-channel %(codec)s") % {
-                    "numchannels": details["send"]["audio"]["numchannels"], 
-                    "codec": details["send"]["audio"]["codec"] 
-                    })
-                # recv video: --------------------------------
-                _info_recv_video = _("%(width)dx%(height)d %(codec)s") % {
-                    "width": details["receive"]["video"]["width"], 
-                    "height": details["receive"]["video"]["height"], 
-                    "codec": details["receive"]["video"]["codec"], 
-                    }
-                if details["receive"]["video"]["bitrate"] is not None:
-                     _info_recv_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["receive"]["video"]["bitrate"]}
-                print("info recv video: " + _info_recv_video)
-                self.info_receive_video_widget.set_text(_info_recv_video)
-                # recv audio: --------------------------------
-                self.info_receive_audio_widget.set_text(
-                    _("%(numchannels)d-channel %(codec)s") % {
-                    "numchannels": details["send"]["audio"]["numchannels"], 
-                    "codec": details["send"]["audio"]["codec"] 
-                    })
             else:
                 self.info_peer_widget.set_text("")
-                self.info_send_video_widget.set_text("")
-                self.info_send_audio_widget.set_text("")
-                self.info_receive_video_widget.set_text("")
-                self.info_receive_audio_widget.set_text("")
+
+        # update the audio and video summary:(even if the state has not just changed)
+        if is_streaming:
+            # send video: --------------------------------
+            _info_send_video = _("%(width)dx%(height)d %(codec)s") % {
+                "width": details["send"]["video"]["width"], 
+                "height": details["send"]["video"]["height"], 
+                "codec": details["send"]["video"]["codec"], 
+                }
+            if details["send"]["video"]["bitrate"] is not None:
+                 _info_send_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["send"]["video"]["bitrate"]}
+            _info_send_video += "\n"
+            try:
+                _video_packetloss = self.app.streamer_manager.rtcp_stats["send"]["video"]["packets-lost"] / float(self.app.streamer_manager.rtcp_stats["send"]["video"]["packets-sent"]) * 100
+            except ZeroDivisionError:
+                _video_packetloss = 0.0
+            _info_send_video += _("Jitter: %(jitter)d ns. Packet lost: %(packetloss)2.2f%%.") % {# % is escaped with an other %
+                "jitter": self.app.streamer_manager.rtcp_stats["send"]["video"]["jitter"],
+                "packetloss": _video_packetloss
+                #TODO: Bitrate: %(bitrate)f Mbps/s. 
+                }
+            print("info send video: " + _info_send_video)
+            self.info_send_video_widget.set_text(_info_send_video)
+            # send audio: --------------------------------
+            _info_send_audio = _("%(numchannels)d-channel %(codec)s") % {
+                "numchannels": details["send"]["audio"]["numchannels"], 
+                "codec": details["send"]["audio"]["codec"] 
+                }
+            _info_send_audio += "\n"
+            try:
+                _audio_packetloss = self.app.streamer_manager.rtcp_stats["send"]["audio"]["packets-lost"] / float(self.app.streamer_manager.rtcp_stats["send"]["audio"]["packets-sent"]) * 100
+            except ZeroDivisionError:
+                _audio_packetloss = 0.0
+            _info_send_audio += _("Jitter: %(jitter)d ns. Packet lost: %(packetloss)2.2f%%.") % { # % is escaped with an other %
+                "jitter": self.app.streamer_manager.rtcp_stats["send"]["audio"]["jitter"],
+                "packetloss": _audio_packetloss  
+                #TODO: Bitrate: %(bitrate)f Mbps/s. 
+                }
+            print("info send audio: " + _info_send_audio)
+            self.info_send_audio_widget.set_text(_info_send_audio)
+            # recv video: --------------------------------
+            _info_recv_video = _("%(width)dx%(height)d %(codec)s") % {
+                "width": details["receive"]["video"]["width"], 
+                "height": details["receive"]["video"]["height"], 
+                "codec": details["receive"]["video"]["codec"], 
+                }
+            if details["receive"]["video"]["bitrate"] is not None:
+                 _info_recv_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["receive"]["video"]["bitrate"]}
+            print("info recv video: " + _info_recv_video)
+            self.info_receive_video_widget.set_text(_info_recv_video)
+            # recv audio: --------------------------------
+            self.info_receive_audio_widget.set_text(
+                _("%(numchannels)d-channel %(codec)s") % {
+                "numchannels": details["send"]["audio"]["numchannels"], 
+                "codec": details["send"]["audio"]["codec"] 
+                })
+        else:
+            self.info_send_video_widget.set_text("")
+            self.info_send_audio_widget.set_text("")
+            self.info_receive_video_widget.set_text("")
+            self.info_receive_audio_widget.set_text("")
+        
 
     def on_audio_codec_changed(self, widget):
         """

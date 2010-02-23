@@ -40,12 +40,8 @@ class StreamerManager(object):
         self.state = process.STATE_STOPPED
         self.state_changed_signal = sig.Signal()
         # for stats
-        #TODO: add ports?
         self.session_details = None # either None or a big dict
-        self.receiving_audio_from_peer = False
-        self.receiving_video_from_peer = False
-        self.sending_audio_to_peer = False
-        self.sending_video_to_peer = False
+        self.rtcp_stats = None # either None or a big dict
 
     def _gather_config_to_stream(self, addr):
         """
@@ -176,12 +172,14 @@ class StreamerManager(object):
             "send": {
                 "video": {
                     "packets-lost": 0,
+                    "packets-sent": 0,
                     "jitter": 0,
                     "bitrate": 0,
                     "connected": False
                 },
                 "audio": {
                     "packets-lost": 0,
+                    "packets-sent": 0,
                     "jitter": 0,
                     "bitrate": 0,
                     "connected": False
@@ -236,21 +234,31 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
+        def _line_contains_a_video_codec(line):
+            return "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line
+        def _line_contains_an_audio_codec(line):
+            return "raw" in line or "mp3" in line or "vorbis" in line
+            
         print "%9s stdout: %s" % (self.sender.identifier, line)
         if "PACKETS-LOST" in line:
-            if "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line:
+            if _line_contains_a_video_codec(line):
                 self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
-            elif "raw" in line or "mp3" in line or "vorbis" in line:
+            elif _line_contains_an_audio_codec(line):
                 self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
+        if "PACKETS-SENT" in line:
+            if _line_contains_a_video_codec(line):
+                self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
+            elif _line_contains_an_audio_codec(line):
+                self.rtcp_stats["send"]["audio"]["packets-sent"] = int(line.split(":")[-1])
         elif "JITTER" in line:
-            if "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line:
+            if _line_contains_a_video_codec(line):
                 self.rtcp_stats["send"]["video"]["jitter"] = int(line.split(":")[-1])
-            elif "raw" in line or "mp3" in line or "vorbis" in line:
+            elif _line_contains_an_audio_codec(line):
                 self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
         elif "connected" in line:
-            if "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line:
+            if _line_contains_a_video_codec(line):
                 self.rtcp_stats["send"]["video"]["connected"] = True
-            elif "raw" in line or "mp3" in line or "vorbis" in line:
+            elif _line_contains_an_audio_codec(line):
                 self.rtcp_stats["send"]["audio"]["connected"] = True
 
     def on_sender_stderr_line(self, line):
