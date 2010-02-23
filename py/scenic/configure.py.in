@@ -40,10 +40,10 @@ def replace_install_paths_with_devel_paths():
     this_dir = os.path.dirname(os.path.abspath(__file__)) # trunk/py/scenic/
     py_dir = os.path.split(this_dir)[0] # trunk/py
     root_dir = os.path.split(py_dir)[0] # trunk
-    print("Changing paths so that project dir is set to %s" % (root_dir))
+    #print("Changing paths so that project dir is set to %s" % (root_dir))
     # Now, override the constants:
     GLADE_DIR = os.path.join(root_dir, 'data', 'glade')
     PIXMAPS_DIR = os.path.join(root_dir, 'data', 'pixmaps')
     THEMES_DIR = os.path.join(root_dir, 'data', 'themes')
     LOCALE_DIR = os.path.join(root_dir, "locale")
-    print("Changed paths to %s %s %s %s" % (GLADE_DIR, PIXMAPS_DIR, THEMES_DIR, LOCALE_DIR))
+    #print("Changed paths to %s %s %s %s" % (GLADE_DIR, PIXMAPS_DIR, THEMES_DIR, LOCALE_DIR))
