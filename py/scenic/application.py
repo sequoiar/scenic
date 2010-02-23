@@ -138,8 +138,8 @@ class Application(object):
             deferred = dialogs.ErrorDialog.create("Is another Scenic running? Cannot bind to port %d" % (self.config.negotiation_port), parent=self.gui.main_window)
             deferred.addCallback(_cb)
             return
-        # Devices: JACKD
-        self._jackd_watch_task.start(10, now=True)
+        # Devices: JACKD (every 5 seconds)
+        self._jackd_watch_task.start(5, now=True)
         # Devices: X11 and XV
         def _callback(result):
             self.gui.update_widgets_with_saved_config()
