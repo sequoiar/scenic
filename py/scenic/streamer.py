@@ -234,31 +234,26 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
-        def _line_contains_a_video_codec(line):
-            return "mpeg4" in line or "theora" in line or "h263" in line or "h264" in line
-        def _line_contains_an_audio_codec(line):
-            return "raw" in line or "mp3" in line or "vorbis" in line
-            
         print "%9s stdout: %s" % (self.sender.identifier, line)
         if "PACKETS-LOST" in line:
-            if _line_contains_a_video_codec(line):
+            if "video" in line:
                 self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
-            elif _line_contains_an_audio_codec(line):
+            elif "audio" in line:
                 self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
         if "PACKETS-SENT" in line:
-            if _line_contains_a_video_codec(line):
+            if "video" in line:
                 self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
-            elif _line_contains_an_audio_codec(line):
+            elif "audio" in line:
                 self.rtcp_stats["send"]["audio"]["packets-sent"] = int(line.split(":")[-1])
         elif "JITTER" in line:
-            if _line_contains_a_video_codec(line):
+            if "video" in line:
                 self.rtcp_stats["send"]["video"]["jitter"] = int(line.split(":")[-1])
-            elif _line_contains_an_audio_codec(line):
+            elif "audio" in line:
                 self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
         elif "connected" in line:
-            if _line_contains_a_video_codec(line):
+            if "video" in line:
                 self.rtcp_stats["send"]["video"]["connected"] = True
-            elif _line_contains_an_audio_codec(line):
+            elif "audio" in line:
                 self.rtcp_stats["send"]["audio"]["connected"] = True
 
     def on_sender_stderr_line(self, line):

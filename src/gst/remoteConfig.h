@@ -58,6 +58,7 @@ class RemoteConfig
         std::string codec() const { return codec_; }
         void checkPorts() const;
         void cleanupPorts() const;
+        std::string identifier() const;
 
     protected:
 
@@ -70,6 +71,7 @@ class RemoteConfig
         static std::set<int> usedPorts_;
 
     private:
+        std::string codecMediaType() const;
         RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
 };
 

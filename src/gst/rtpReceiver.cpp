@@ -163,7 +163,7 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(const std::string &srcMediaTy
 
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
-    registerSession(config.codec());
+    registerSession(config.identifier());
 
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
     // rule of thumb: 2-3 times the maximum network jitter

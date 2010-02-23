@@ -78,7 +78,7 @@ void RtpSender::onNewSSRC(GstElement * /*rtpbin*/, guint session, guint ssrc, gp
 
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
-    registerSession(config.codec());
+    registerSession(config.identifier());
 
     GstPad *send_rtp_src;
     GstPad *payloadSrc;

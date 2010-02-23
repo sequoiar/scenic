@@ -181,16 +181,36 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
     return false;           // this wasn't our msg, someone else should handle it
 }
 
+static const std::vector<std::string> AUDIO_CODECS = 
+    boost::assign::list_of<std::string>("raw")("mp3")("vorbis");
+static const std::vector<std::string> VIDEO_CODECS = 
+    boost::assign::list_of<std::string>("mpeg4")("h264")("h263")("theora");
+
+/// FIXME: this method and the one below it need a list of codecs, should only have one
+std::string RemoteConfig::codecMediaType() const
+{
+    using std::string;
+    string result;
+
+    if (std::find(AUDIO_CODECS.begin(), AUDIO_CODECS.end(), codec_) != AUDIO_CODECS.end())
+        result = "audio";
+    else if (std::find(VIDEO_CODECS.begin(), VIDEO_CODECS.end(), codec_) != VIDEO_CODECS.end())
+        result = "video";
+    else
+        LOG_ERROR("Unknown codec " << codec_);
+    return result;
+}
+
+std::string RemoteConfig::identifier() const
+{
+    return codecMediaType() + "_" + codec_;  
+}
+
 
 bool ReceiverConfig::isSupportedCodec(const std::string &codec)
 {
-    using namespace boost::assign;
-    using std::string;
-    
-    static const std::vector<string> CODECS = 
-        list_of<string>("mpeg4")("theora")("vorbis")("raw")("h264")("h263")("mp3");
-
-    bool result = std::find(CODECS.begin(), CODECS.end(), codec) != CODECS.end();
+    bool result = std::find(AUDIO_CODECS.begin(), AUDIO_CODECS.end(), codec) != AUDIO_CODECS.end()
+    or std::find(VIDEO_CODECS.begin(), VIDEO_CODECS.end(), codec) != VIDEO_CODECS.end();
     return result;
 }
 
