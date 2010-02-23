@@ -852,9 +852,12 @@ class Gui(object):
             # Update the summary: 
             # peer: --------------------------------
             if is_streaming:
-                self.info_peer_widget.set_text(details["peer"]["name"])
+                peer_name = details["peer"]["name"]
+                if details["peer"]["name"] != details["peer"]["address"]:
+                    peer_name += " (%s)" % (details["peer"]["address"])
+                self.info_peer_widget.set_text(peer_name)
             else:
-                self.info_peer_widget.set_text("")
+                self.info_peer_widget.set_text(_("Not connected"))
 
         # update the audio and video summary:(even if the state has not just changed)
         if is_streaming:
