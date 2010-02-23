@@ -71,8 +71,6 @@ namespace Log
     class Subscriber
     {
         public:
-            void enable();
-            void hold();
             Subscriber();
             virtual void operator()(LogLevel&, std::string &){}
             virtual void setLevel(int){}

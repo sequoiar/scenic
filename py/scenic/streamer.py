@@ -25,6 +25,7 @@ Manages local streamer processes.
 
 from scenic import process
 from scenic import sig
+from scenic import dialogs
 
 class StreamerManager(object):
     """
@@ -272,11 +273,17 @@ class StreamerManager(object):
         else:
             print "%9s stdout: %s" % (self.receiver.identifier, line)
 
+    def show_error(self, msg):
+        """ Simplified method for showing error dialogs """
+        dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window)
+
     def on_receiver_stderr_line(self, line):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stdout: %s" % (self.receiver.identifier, line)
+        print "%9s stderr: %s" % (self.receiver.identifier, line)
+        if "CRITICAL" in line or "ERROR" in line:
+            self.show_error("Error from %s:\n%s" % (self.receiver.identifier, line))
     
     def on_sender_stdout_line(self, line):
         """
@@ -316,6 +323,8 @@ class StreamerManager(object):
         Handles a new line from our receiver process' stderr
         """
         print "%9s stderr: %s" % (self.sender.identifier, line)
+        if "CRITICAL" in line or "ERROR" in line:
+            self.show_error("Error from %s:\n%s" % (self.sender.identifier, line))
 
     def is_busy(self):
         """
