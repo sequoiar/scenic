@@ -31,7 +31,7 @@ class Preview(object):
         """
         width, height = self.app.config.video_capture_size.split("x")
         aspect_ratio = self.app.config.video_aspect_ratio
-        command = "milhouse --videosource %s --localvideo --window-title preview --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, width, height, aspect_ratio)
+        command = "milhouse --videosource %s --localvideo --window-title \"Local preview\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, width, height, aspect_ratio)
         if self.app.config.video_source != "videotestsrc":
             command += " --videodevice %s" % (self.app.config.video_device)
         return command

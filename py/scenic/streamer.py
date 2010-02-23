@@ -285,7 +285,7 @@ class StreamerManager(object):
         """
         print "%9s stderr: %s" % (self.receiver.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
-            self.show_error("Error from %s:\n%s" % (self.receiver.identifier, line))
+            self.show_error("Error from the local %s:\n%s" % (self.receiver.identifier, line))
     
     def on_sender_stdout_line(self, line):
         """
@@ -326,7 +326,7 @@ class StreamerManager(object):
         """
         print "%9s stderr: %s" % (self.sender.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
-            self.show_error("Error from %s:\n%s" % (self.sender.identifier, line))
+            self.show_error("Error from the local %s:\n%s" % (self.sender.identifier, line))
 
     def is_busy(self):
         """
