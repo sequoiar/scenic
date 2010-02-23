@@ -58,6 +58,7 @@ from twisted.python.reflect import prefixedMethods
 from scenic import process # just for constants
 from scenic import dialogs
 from scenic.devices import cameras
+from scenic.devices import networkinterfaces
 
 ### MULTILINGUAL SUPPORT ###
 _ = gettext.gettext
@@ -265,6 +266,7 @@ class Gui(object):
         self.info_send_audio_widget = self.widgets.get_widget("info_send_audio")
         self.info_receive_video_widget = self.widgets.get_widget("info_receive_video")
         self.info_receive_audio_widget = self.widgets.get_widget("info_receive_audio")
+        self.info_ip_widget = self.widgets.get_widget("info_ip")
 
         # video
         self.video_capture_size_widget = self.widgets.get_widget("video_capture_size")
@@ -320,6 +322,10 @@ class Gui(object):
 
         self._streaming_state_check_task = task.LoopingCall(self.update_streaming_state)
         self._streaming_state_check_task.start(1.0, now=False)
+        self._update_id_task = task.LoopingCall(self.update_local_ip)
+        def _start_update_id():
+            self._update_id_task.start(10.0, now=True)
+        reactor.callLater(0, _start_update_id)
         # The main app must call init_widgets_value
    
     #TODO: for the preview in the drawing area   
@@ -898,7 +904,26 @@ class Gui(object):
             self.info_receive_video_widget.set_text("")
             self.info_receive_audio_widget.set_text("")
         
-
+    def update_local_ip(self):
+        """
+        Updates the local IP addresses widgets.
+        Called every n seconds.
+        """
+        def _cb(result):
+            """
+            @param result: list of ipv4 addresses
+            """
+            num = len(result)
+            txt = ""
+            for i in range(len(result)):
+                ip = result[i]
+                txt += ip
+                if i != num - 1:
+                    txt += "\n"
+            self.info_ip_widget.set_text(txt)
+        deferred = networkinterfaces.list_network_interfaces_addresses()
+        deferred.addCallback(_cb)
+        
     def on_audio_codec_changed(self, widget):
         """
         Called when the user selects a different audio codec, updates
