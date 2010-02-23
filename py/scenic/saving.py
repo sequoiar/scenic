@@ -64,6 +64,8 @@ def _save(file_name, data):
     except IOError, e:
         raise RuntimeError(e.message)
     else:
+        print("Writing data in JSON to %s" % (file_name))
+        print("%s" % (data))
         json.dump(data, f, indent=4)
     if f is not None:
         f.close()
@@ -123,7 +125,9 @@ class ConfigStateSaving(object):
         self._config_path = _former_file_name
 
     def _load(self):
+        print("Loading configuration from %s" % (self._config_path))
         data = _load(self._config_path)
+        print(str(data))
         for k in data["configuration"].keys():
             cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
             setattr(self, k, cast(data["configuration"][k]))

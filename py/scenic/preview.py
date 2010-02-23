@@ -25,6 +25,8 @@ class Preview(object):
     def _create_command(self):
         """
         Looks in the settings, and returns a bash command to run for the preview.
+        Note that the preview doesn't use the display option, which sets the X11 DISPLAY.
+        The preview is only for video, no sound.
         @rettype: str
         """
         width, height = self.app.config.video_capture_size.split("x")

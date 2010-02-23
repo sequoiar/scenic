@@ -664,21 +664,21 @@ class Gui(object):
         """
         Updates the configuration with the value of each widget.
         """
-        print("gathering configuration")
+        print("Gathering configuration from the GUI widgets.")
         # VIDEO SIZE:
         video_capture_size = _get_combobox_value(self.video_capture_size_widget)
         self.app.config.video_capture_size = video_capture_size
         print ' * video_capture_size:', self.app.config.video_capture_size
         # DISPLAY:
         video_display = _get_combobox_value(self.video_display_widget)
-        print ' * video_display:', video_display
-        self.app.config.video_display = self.app.config.video_display
+        self.app.config.video_display = video_display
+        print ' * video_display:', self.app.config.video_display
         # VIDEO SOURCE AND DEVICE:
         video_source = _get_combobox_value(self.video_source_widget)
         if video_source == "Color bars":
             self.app.config.video_source = "videotestsrc"
         elif video_source.startswith("/dev/video"): # TODO: firewire!
-            self.app.config.video_device = video_source
+            self.app.config.video_device = video_source # this is subtle
             self.app.config.video_source = "v4l2src"
         print ' * videosource:', self.app.config.video_source
         # VIDEO CODEC:
@@ -720,6 +720,7 @@ class Gui(object):
             dialogs.ErrorDialog.create("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels.")
             audio_numchannels = 2
         self.app.config.audio_channels = audio_numchannels
+        print " * audio_numchannels", self.app.config.audio_channels
 
     def update_widgets_with_saved_config(self):
         """
@@ -729,6 +730,7 @@ class Gui(object):
         It could be called again, once another config file has been read.
         """
         print("Changing widgets value according to configuration.")
+        print(self.app.config.__dict__)
         # VIDEO CAPTURE SIZE:
         video_capture_size = self.app.config.video_capture_size
         _set_combobox_choices(self.video_capture_size_widget, ALL_SUPPORTED_SIZE)

@@ -134,6 +134,7 @@ class StreamerManager(object):
                     "jitterbuffer": self.app.config.video_jitterbuffer, 
                     "fullscreen": self.app.config.video_fullscreen, # bool
                     "bitrate": remote_config["video"]["bitrate"], # float
+                    "display": self.app.config.video_display,
                 },
                 "audio": {
                     "numchannels": self.app.config.audio_channels, # int
@@ -200,6 +201,7 @@ class StreamerManager(object):
             '--audiocodec', details["receive"]["audio"]["codec"],
             '--audioport', str(details["receive"]["audio"]["port"]),
             '--window-title', details["receive"]["video"]["window-title"],
+            '--display', details["receive"]["video"]["display"],
             ]
         if details["receive"]["video"]["fullscreen"]:
             self.milhouse_recv_cmd.append('--fullscreen')
