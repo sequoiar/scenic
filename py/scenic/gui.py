@@ -858,6 +858,9 @@ class Gui(object):
                 _video_packetloss = self.app.streamer_manager.rtcp_stats["send"]["video"]["packets-lost"] / float(self.app.streamer_manager.rtcp_stats["send"]["video"]["packets-sent"]) * 100
             except ZeroDivisionError:
                 _video_packetloss = 0.0
+                print("no packets sent")
+            else:
+                print("packet loss" + str(_video_packetloss))
             _info_send_video += _("Jitter: %(jitter)d ns. Packet lost: %(packetloss)2.2f%%.") % {# % is escaped with an other %
                 "jitter": self.app.streamer_manager.rtcp_stats["send"]["video"]["jitter"],
                 "packetloss": _video_packetloss
