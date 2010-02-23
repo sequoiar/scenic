@@ -253,13 +253,20 @@ class Application(object):
         """
         return self.streamer_manager.is_busy()
     # -------------------- streamer ports -----------------
-
-    def allocate_ports(self):
+    def prepare_before_rtp_stream(self):
+        self.gui.close_preview_if_running()
+        self.save_configuration()
+        self._allocate_ports()
+        
+    def cleanup_after_rtp_stream(self):
+        self._free_ports()
+    
+    def _allocate_ports(self):
         # TODO: start_session
         self.recv_video_port = self.ports_allocator.allocate()
         self.recv_audio_port = self.ports_allocator.allocate()
 
-    def free_ports(self):
+    def _free_ports(self):
         # TODO: stop_session
         for port in [self.recv_video_port, self.recv_audio_port]:
             try:
@@ -373,7 +380,7 @@ class Application(object):
 
     def handle_refuse(self):
         self.gui._unschedule_offerer_invite_timeout()
-        self.free_ports()
+        self.cleanup_after_rtp_stream()
         self.gui.hide_calling_dialog("refuse")
 
     def handle_ack(self, addr):
@@ -429,7 +436,7 @@ class Application(object):
         We call this when all streamers are stopped.
         """
         print("on_streamers_stopped got called")
-        self.free_ports()
+        self.cleanup_after_rtp_stream()
 
     # ---------------------- sending messages -----------
         
@@ -479,42 +486,39 @@ class Application(object):
             dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming, JACK is not running."), parent=self.gui.main_window)
             return
             
-        self.allocate_ports()
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming. A streaming session is already in progress."), parent=self.gui.main_window)
         else:
-            # UPDATE when initiating session
-            self.save_configuration() # gathers and save
-        msg = {
-            "msg":"INVITE",
-            "protocol": self.protocol_version,
-            "sid":0, 
-            "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
-            }
-        msg.update(self._get_local_config_message_items())
-        contact = self.address_book.selected_contact
-        port = self.config.negotiation_port
-        ip = contact["address"]
+            self.prepare_before_rtp_stream()
+            msg = {
+                "msg":"INVITE",
+                "protocol": self.protocol_version,
+                "sid":0, 
+                "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
+                }
+            msg.update(self._get_local_config_message_items())
+            contact = self.address_book.selected_contact
+            port = self.config.negotiation_port
+            ip = contact["address"]
 
-        def _on_connected(proto):
-            self.gui._schedule_offerer_invite_timeout()
-            self.client.send(msg)
-            return proto
-        def _on_error(reason):
-            print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
-            self.gui.calling_dialog.hide()
-            return None
-           
-        print("sending %s to %s:%s" % (msg, ip, port))
-        deferred = self.client.connect(ip, port)
-        deferred.addCallback(_on_connected).addErrback(_on_error)
-        self.gui.calling_dialog.show()
-        # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
+            def _on_connected(proto):
+                self.gui._schedule_offerer_invite_timeout()
+                self.client.send(msg)
+                return proto
+            def _on_error(reason):
+                print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
+                self.gui.calling_dialog.hide()
+                return None
+               
+            print("sending %s to %s:%s" % (msg, ip, port))
+            deferred = self.client.connect(ip, port)
+            deferred.addCallback(_on_connected).addErrback(_on_error)
+            self.gui.calling_dialog.show()
+            # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
     
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
-        self.save_configuration()
-        self.allocate_ports()
+        self.prepare_before_rtp_stream()
         msg = {
             "msg":"ACCEPT", 
             "protocol": self.protocol_version,

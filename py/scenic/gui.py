@@ -57,6 +57,7 @@ from twisted.internet import task
 from twisted.python.reflect import prefixedMethods
 from scenic import process # just for constants
 from scenic import dialogs
+from scenic import preview
 from scenic.devices import cameras
 from scenic.devices import networkinterfaces
 
@@ -318,6 +319,9 @@ class Gui(object):
         self._v4l2_input_changed_by_user = True # if False, the software is changing those drop-down values itself.
         self._v4l2_standard_changed_by_user = True
         self._video_source_changed_by_user = True
+        self._video_view_preview_toggled_by_user = True
+        self.preview_manager = preview.Preview(self.app)
+        self.preview_manager.state_changed_signal.connect(self.on_preview_manager_state_changed)
         self.main_window.show()
 
         self._streaming_state_check_task = task.LoopingCall(self.update_streaming_state)
@@ -402,6 +406,19 @@ class Gui(object):
 
     # --------------- slots for some widget events ------------
 
+    def on_preview_manager_state_changed(self, manager, new_state):
+        if new_state == process.STATE_STOPPED:
+            print("Making the preview button to False since the preview process died.")
+            self._video_view_preview_toggled_by_user = False
+            self.video_view_preview_widget.set_active(False)
+            self._video_view_preview_toggled_by_user = True
+            if self.preview_manager.is_busy():
+                self.preview_manager.stop()
+
+    def close_preview_if_running(self):
+        if self.preview_manager.is_busy():
+            self.preview_manager.stop()
+        
     def on_video_view_preview_toggled(self, widget):
         """
         Shows a preview of the video input.
@@ -411,18 +428,12 @@ class Gui(object):
         #TODO: stop it when button is toggled to false.
         # It can be the user that pushed the button, or it can be toggled by the software.
         print 'video_view_preview toggled', widget.get_active()
-        if widget.get_active():
-            self.app.save_configuration() #gathers and saves
-            width, height = self.app.config.video_capture_size.split("x")
-            aspect_ratio = self.app.config.video_aspect_ratio
-            command = "milhouse --videosource %s --localvideo --window-title preview --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, width, height, aspect_ratio)
-            if self.app.config.video_source != "videotestsrc":
-                command += " --videodevice %s" % (self.app.config.video_device)
-            print "spawning $%s" % (command)
-            process.run_once(*command.split())
-            dialogs.ErrorDialog.create("You must manually close the preview window.", parent=self.main_window)
-        else:
-            print "should be stopping preview"
+        if self._video_view_preview_toggled_by_user:
+            if widget.get_active():
+                self.app.save_configuration() #gathers and saves
+                self.preview_manager.start()
+            else:
+                self.preview_manager.stop()
 
     def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
         """
