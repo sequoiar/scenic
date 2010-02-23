@@ -25,16 +25,10 @@
 #include "messageHandler.h"
 #include <algorithm>
 
-MessageDispatcher *MessageDispatcher::instance_ = 0;
-
-
 MessageDispatcher * MessageDispatcher::getInstance()
 {
-    if (instance_ == 0) 
-    {
-        instance_ = new MessageDispatcher();
-    }
-    return instance_;
+    static MessageDispatcher instance;
+    return &instance;
 }
 
 
