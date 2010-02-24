@@ -95,15 +95,32 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 dnl check for python, FIXME are we checking for python twice?
 AM_PATH_PYTHON([2.5])
 
-
 # BOOST m4 tests
-AX_BOOST_BASE([1.35])
+AX_BOOST_BASE([1.35], [], [echo "libboost-1.35 or greater required"; exit -1])
 AX_BOOST_THREAD
+if test "x${have_libboost-thread-dev}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libboost-thread-dev])
+fi
 AX_BOOST_SYSTEM
+if test "x${have_libboost-system-dev}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libboost-system-dev])
+fi
 AX_BOOST_PROGRAM_OPTIONS
+if test "x${have_libboost-program-options-dev}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libboost-program-options-dev])
+fi
 AX_BOOST_ASIO
+if test "x${have_libboost-asio-dev}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libboost-asio-dev])
+fi
 AX_BOOST_DATE_TIME
+if test "x${have_libboost-date-time-dev}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libboost-date-time-dev])
+fi
 AX_BOOST_FILESYSTEM
+if test "x${have_libboost-filesystem-dev}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libboost-filesystem-dev])
+fi
 
 # GNU help2man creates man pages from --help output; in many cases, this
 # is sufficient, and obviates the need to maintain man pages separately.
@@ -111,9 +128,9 @@ AX_BOOST_FILESYSTEM
 # when cross-compiling, so we test to avoid that (the variable
 # "cross_compiling" is set by AC_PROG_CC).
 if test $cross_compiling = no; then
-  AM_MISSING_PROG(HELP2MAN, help2man)
+    AM_MISSING_PROG(HELP2MAN, help2man)
 else
-  HELP2MAN=:
+    HELP2MAN=:
 fi
 
 AX_CHECK_GL
@@ -157,45 +174,45 @@ AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
 AC_CONFIG_FILES([
-        Makefile
-        data/Makefile
-        data/glade/Makefile
-        data/pixmaps/Makefile
-        data/themes/Makefile
-        data/themes/Darklooks/Makefile
-        doc/Makefile
-        doc/network/Makefile
-        doc/figures/Makefile
-        man/Makefile
-        utils/Makefile
-        utils/dc-ctl/Makefile
-        src/Makefile
-        py/Makefile
-        py/doc/Makefile
-        py/rtpmidi/Makefile
-        py/rtpmidi/engines/Makefile
-        py/rtpmidi/engines/midi/Makefile
-        py/rtpmidi/protocols/Makefile
-        py/rtpmidi/protocols/rtp/Makefile
-        py/scenic/Makefile
-        py/scenic/configure.py
-        py/scenic/devices/Makefile
-        locale/Makefile
-        locale/en_US/Makefile
-        locale/en_US/LC_MESSAGES/Makefile
-        locale/fr_CA/Makefile
-        locale/fr_CA/LC_MESSAGES/Makefile
-        py/scenic/test/Makefile
-        py/scripts/Makefile
-        src/include/Makefile
-        src/util/Makefile
-        src/gutil/Makefile
-        src/shared_video/Makefile
-        src/tcp/Makefile
-        src/gst/Makefile
-        src/firereset/Makefile
-        src/main/Makefile
-        src/main/test/Makefile
-        ])
+Makefile
+data/Makefile
+data/glade/Makefile
+data/pixmaps/Makefile
+data/themes/Makefile
+data/themes/Darklooks/Makefile
+doc/Makefile
+doc/network/Makefile
+doc/figures/Makefile
+man/Makefile
+utils/Makefile
+utils/dc-ctl/Makefile
+src/Makefile
+py/Makefile
+py/doc/Makefile
+py/rtpmidi/Makefile
+py/rtpmidi/engines/Makefile
+py/rtpmidi/engines/midi/Makefile
+py/rtpmidi/protocols/Makefile
+py/rtpmidi/protocols/rtp/Makefile
+py/scenic/Makefile
+py/scenic/configure.py
+py/scenic/devices/Makefile
+locale/Makefile
+locale/en_US/Makefile
+locale/en_US/LC_MESSAGES/Makefile
+locale/fr_CA/Makefile
+locale/fr_CA/LC_MESSAGES/Makefile
+py/scenic/test/Makefile
+py/scripts/Makefile
+src/include/Makefile
+src/util/Makefile
+src/gutil/Makefile
+src/shared_video/Makefile
+src/tcp/Makefile
+src/gst/Makefile
+src/firereset/Makefile
+src/main/Makefile
+src/main/test/Makefile
+])
 
 AC_OUTPUT
