@@ -79,7 +79,7 @@ class Config(saving.ConfigStateSaving):
         #video_window_size = "640x480"
         self.video_aspect_ratio = "4:3" 
         self.confirm_quit = True
-        self.theme = "Darklooks"
+        #self.theme = "Darklooks"
         self.video_bitrate = 3.0
         self.video_jitterbuffer = 75
         

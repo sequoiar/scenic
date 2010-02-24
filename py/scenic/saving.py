@@ -129,8 +129,11 @@ class ConfigStateSaving(object):
         data = _load(self._config_path)
         print(str(data))
         for k in data["configuration"].keys():
-            cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
-            setattr(self, k, cast(data["configuration"][k]))
+            if hasattr(self, k):
+                cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
+                setattr(self, k, cast(data["configuration"][k]))
+            else:
+                print("Found configuration key %s but there is no such key anymore." % (k))
 
 class AddressBook(object):
     """
