@@ -192,8 +192,6 @@ class Gui(object):
     """
     def __init__(self, app, kiosk_mode=False, fullscreen=False):
         self.app = app
-        if self.app.config.theme is not None:
-            self.load_gtk_theme(self.app.config.theme)
         self.kiosk_mode_on = kiosk_mode
         self._offerer_invite_timeout = None
         # Set the Glade file
@@ -339,22 +337,6 @@ class Gui(object):
     #    return False
 
     # ------------------ window events and actions --------------------
-
-    def load_gtk_theme(self, name="Darklooks"):
-        file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
-        # FIXME: not able to reload themes dynamically.
-        if os.path.exists(file_name):
-            #os.environ["GTK2_RC_FILES"] = file_name
-            print("Loading GTK2 theme %s" % (file_name))
-            gtk.rc_parse(file_name)
-            print("Done loading GTK2 theme.")
-            #gtk.rc_reset_styles(gtk.settings_get_default())
-            #print "loading theme", file_name
-            #gtk.rc_parse(file_name)
-            #gtk.rc_reparse_all()
-        else:
-            print("File name not found: %s" % (file_name))
-     
     def toggle_fullscreen(self):
         """
         Toggles the fullscreen mode on/off.
