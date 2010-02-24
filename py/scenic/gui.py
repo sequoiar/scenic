@@ -192,7 +192,8 @@ class Gui(object):
     """
     def __init__(self, app, kiosk_mode=False, fullscreen=False):
         self.app = app
-        self.load_gtk_theme(self.app.config.theme)
+        if self.app.config.theme is not None:
+            self.load_gtk_theme(self.app.config.theme)
         self.kiosk_mode_on = kiosk_mode
         self._offerer_invite_timeout = None
         # Set the Glade file
