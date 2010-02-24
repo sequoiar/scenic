@@ -189,7 +189,7 @@ class Application(object):
         def _callback(xvideo_is_present):
             self.devices["xvideo_is_present"] = xvideo_is_present
             if not xvideo_is_present:
-                msg = _("It seems like the xvideo extension is not present our your X11 display ! It is likely to be impossible to receive a video stream.")
+                msg = _("It seems like the xvideo extension is not present. Video display is not possible.")
                 print(msg)
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
         deferred.addCallback(_callback)
