@@ -57,37 +57,37 @@ fi
 #Trying to set GSTAUDIO using pkg-config
 PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
 if test "x${have_gstreamer_audio}" = "xfalse" ; then
-    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
 fi
 
 #Trying to set GSTAPP using pkg-config
 PKG_CHECK_MODULES(GSTAPP, gstreamer-app-0.10, have_gstreamer_app=true, have_gstreamer_app=false)
 if test "x${have_gstreamer_app}" = "xfalse" ; then
-    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
 fi
 
 #Trying to set JACK using pkg-config
 PKG_CHECK_MODULES(JACK, jack >= 0.99.10, have_jack=true, have_jack=false)
 if test "x${have_jack}" = "xfalse" ; then
-    AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
+    AC_MSG_ERROR([missing package:  libjack0 and/or libjack-dev])
 fi
 
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
 if test "x${have_libavc1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libavc1394-dev ])
+	AC_MSG_ERROR([missing package: libavc1394-dev ])
 fi
 
 #Trying to set LIBRAW1394 using pkg-config
 PKG_CHECK_MODULES(LIBRAW1394, [libraw1394], have_libraw1394=true, have_libraw1394=false)
 if test "x${have_libraw1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libraw1394-dev ])
+	AC_MSG_ERROR([missing package: libraw1394-dev ])
 fi
 
 #Trying to set LIBDC1394 using pkg-config
 PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394=true, have_libdc1394=false)
 if test "x${have_libdc1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libdc1394-2])
+	AC_MSG_ERROR([missing package: libdc1394-2])
 fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
@@ -98,28 +98,29 @@ AM_PATH_PYTHON([2.5])
 # BOOST m4 tests
 AX_BOOST_BASE([1.35], [], [echo "libboost-1.35 or greater required"; exit -1])
 AX_BOOST_THREAD
-if test "x${have_libboost-thread-dev}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libboost-thread-dev])
+if test "x${ax_cv_boost_thread}" = "xno" ; then
+    AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 AX_BOOST_SYSTEM
-if test "x${have_libboost-system-dev}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libboost-system-dev])
+dnl AC_MSG_NOTICE(["boost system var is " ${ax_cv_boost_system} ])
+if test "x${ax_cv_boost_system}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-system-dev])
 fi
 AX_BOOST_PROGRAM_OPTIONS
-if test "x${have_libboost-program-options-dev}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libboost-program-options-dev])
+if test "x${ax_cv_boost_program_options}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-program-options-dev])
 fi
 AX_BOOST_ASIO
-if test "x${have_libboost-asio-dev}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libboost-asio-dev])
+if test "x${ax_cv_boost_asio}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-asio-dev])
 fi
 AX_BOOST_DATE_TIME
-if test "x${have_libboost-date-time-dev}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libboost-date-time-dev])
+if test "x${ax_cv_boost_date_time}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-date-time-dev])
 fi
 AX_BOOST_FILESYSTEM
-if test "x${have_libboost-filesystem-dev}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libboost-filesystem-dev])
+if test "x${ax_cv_boost_filesystem}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-filesystem-dev])
 fi
 
 # GNU help2man creates man pages from --help output; in many cases, this
