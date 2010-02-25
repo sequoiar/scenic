@@ -183,7 +183,7 @@ def get_widgets_tree():
     if os.path.isfile(glade_file):
         glade_path = glade_file
     else:
-        text = _("Error : Could not find the Glade file %s. Exitting.") % (glade_file)
+        text = _("Error : Could not find the Glade file %(filename)s. Exitting.") % {"filename": glade_file}
         print(text)
         def _exit_cb(result):
             print("Exiting")
@@ -224,7 +224,8 @@ class Gui(object):
         self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
         self.confirm_dialog.set_transient_for(self.main_window)
         self.confirm_label = widgets_tree.get_widget("confirm_label")
-        # calling_dialog:
+
+        # calling_dialog: (this widget is created and destroyed really often !!
         self.calling_dialog = widgets_tree.get_widget("calling_dialog")
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         
@@ -1174,10 +1175,21 @@ class Gui(object):
         slot1 = dialog.connect('response', _response_cb, callback)
         dialog.show()
 
-    def hide_calling_dialog(self, msg="", err=""):
+    def show_calling_dialog(self):
+        """
+        Creates a new widget and show it.
+        """
+        self.calling_dialog = None
+        widgets_tree = get_widgets_tree()
+        self.calling_dialog = widgets_tree.get_widget("calling_dialog")
+        self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
+        self.calling_dialog.show()
+
+    def hide_calling_dialog(self, msg=None, err=""):
         """
         Hides the "calling_dialog" dialog.
         Shows an error dialog if the argument msg is set to "err", "timeout", "answTimeout", "send", "refuse" or "badAnsw".
+        If msg is "err", the err argument is going to be used as an error message text.
         """
         self.calling_dialog.hide()
         text = None
@@ -1191,6 +1203,8 @@ class Gui(object):
             text = _("Connection refused.\n\nThe contact refused the connection.")
         elif msg == "badAnsw":
             text = _("Invalid answer.\n\nThe answer was not valid.")
+        elif msg is None:
+            pass
         if text is not None:
             dialogs.ErrorDialog.create(text, parent=self.main_window)
 

@@ -510,13 +510,13 @@ class Application(object):
                 return proto
             def _on_error(reason):
                 print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
-                self.gui.calling_dialog.hide()
+                self.gui.hide_calling_dialog()# "err", str(reason))
                 return None
                
             print("sending %s to %s:%s" % (msg, ip, port))
             deferred = self.client.connect(ip, port)
             deferred.addCallback(_on_connected).addErrback(_on_error)
-            self.gui.calling_dialog.show()
+            self.gui.show_calling_dialog()
             # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
     
     def send_accept(self, addr):
