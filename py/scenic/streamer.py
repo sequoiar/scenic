@@ -43,6 +43,7 @@ class StreamerManager(object):
         # for stats
         self.session_details = None # either None or a big dict
         self.rtcp_stats = None # either None or a big dict
+        self.error_messages = None # either None or a big dict
 
     def _calculate_packet_loss(self):
         """
@@ -258,6 +259,10 @@ class StreamerManager(object):
                 }
             }
         }
+        self.error_messages = {
+            "send": [], # list of strings
+            "receive": [], # list of strings
+            }
         # every element in the lists must be strings since we join them 
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
@@ -288,9 +293,6 @@ class StreamerManager(object):
         else:
             print "%9s stdout: %s" % (self.receiver.identifier, line)
 
-    def show_error(self, msg):
-        """ Simplified method for showing error dialogs """
-        dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window)
 
     def on_receiver_stderr_line(self, line):
         """
@@ -298,7 +300,7 @@ class StreamerManager(object):
         """
         print "%9s stderr: %s" % (self.receiver.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
-            self.show_error("Error from the local %s:\n%s" % (self.receiver.identifier, line))
+            self.error_messages["receive"].append(line)
     
     def on_sender_stdout_line(self, line):
         """
@@ -341,7 +343,7 @@ class StreamerManager(object):
         """
         print "%9s stderr: %s" % (self.sender.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
-            self.show_error("Error from the local %s:\n%s" % (self.sender.identifier, line))
+            self.error_messages["send"].append(line)
 
     def is_busy(self):
         """
@@ -378,6 +380,31 @@ class StreamerManager(object):
                 if not one_is_left:
                     print "Setting streamers manager to STOPPED"
                     self._set_state(process.STATE_STOPPED)
+
+    def on_stopped(self):
+        """
+        When the state changes to stopped, 
+         * check for errors and display them to the user.
+        """
+        msg = ""
+        details = ""
+        show_error_dialog = False
+        #TODO: internationalize
+        print("All streamers are stopped.")
+        print("Error messages for this session: %s" % (self.error_messages))
+        if len(self.error_messages["send"]) != 0:
+            details += "Errors from local sender:" + "\n"
+            for line in self.error_messages["send"]:
+                details += " * " + line + "\n"
+            show_error_dialog = True
+        if len(self.error_messages["receive"]) != 0:
+            details += "Errors from local receiver:" + "\n"
+            for line in self.error_messages["receive"]:
+                details += " * " + line + "\n"
+            show_error_dialog = True
+        if show_error_dialog:
+            msg = "Some errors occured during the audio/video streaming session."
+            dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window, details=details)
     
     def _set_state(self, new_state):
         """
@@ -386,6 +413,8 @@ class StreamerManager(object):
         if self.state != new_state:
             self.state_changed_signal(self, new_state)
             self.state = new_state
+            if new_state == process.STATE_STOPPED:
+                self.on_stopped()
         else:
             raise RuntimeError("Setting state to %s, which is already the current state." % (self.state))
             
