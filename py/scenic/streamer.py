@@ -110,14 +110,17 @@ class StreamerManager(object):
                     "width": int(send_width), # int
                     "height": int(send_height), # int
                     "aspect-ratio": self.app.config.video_aspect_ratio,
+                    
                     # Decided by remote peer:
                     "port": remote_config["video"]["port"], 
                     "bitrate": remote_config["video"]["bitrate"], 
                     "codec": remote_config["video"]["codec"], 
                 },
+                
                 "audio": {
                     # decided locally:
                     "source": self.app.config.audio_source,
+
                     # Decided by remote peer:
                     "numchannels": remote_config["audio"]["numchannels"],
                     "codec": remote_config["audio"]["codec"],
@@ -136,9 +139,10 @@ class StreamerManager(object):
                     "jitterbuffer": self.app.config.video_jitterbuffer, 
                     "fullscreen": self.app.config.video_fullscreen, # bool
                     "display": self.app.config.video_display,
+                    "bitrate": self.app.config.video_bitrate, # float
+                    
                     # Decided by remote peer:
                     "aspect-ratio": remote_config["video"]["aspect_ratio"],
-                    "bitrate": remote_config["video"]["bitrate"], # float
                     "width": int(receive_width), # int
                     "height": int(receive_height), # int
                 },
@@ -301,33 +305,35 @@ class StreamerManager(object):
         Handles a new line from our receiver process' stdout
         """
         print "%9s stdout: %s" % (self.sender.identifier, line)
-        if "PACKETS-LOST" in line:
-            if "video" in line:
-                self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
-                self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = True
-            elif "audio" in line:
-                self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
-                self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = True
-            self._calculate_packet_loss()
-        if "PACKETS-SENT" in line:
-            if "video" in line:
-                self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
-                self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = True
-            elif "audio" in line:
-                self.rtcp_stats["send"]["audio"]["packets-sent"] = int(line.split(":")[-1])
-                self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = True
-            self._calculate_packet_loss()
-        elif "JITTER" in line:
-            if "video" in line:
-                self.rtcp_stats["send"]["video"]["jitter"] = int(line.split(":")[-1])
-            elif "audio" in line:
-                self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
-        elif "connected" in line:
-            if "video" in line:
-                self.rtcp_stats["send"]["video"]["connected"] = True
-            elif "audio" in line:
-                self.rtcp_stats["send"]["audio"]["connected"] = True
-    
+        try:
+            if "PACKETS-LOST" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = True
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = True
+                self._calculate_packet_loss()
+            if "PACKETS-SENT" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = True
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["packets-sent"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = True
+                self._calculate_packet_loss()
+            elif "JITTER" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["jitter"] = int(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
+            elif "connected" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["connected"] = True
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["connected"] = True
+        except ValueError, e:
+            print(e)
 
     def on_sender_stderr_line(self, line):
         """
