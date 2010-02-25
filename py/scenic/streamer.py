@@ -104,39 +104,46 @@ class StreamerManager(object):
             # ----------------- send ---------------
             "send": {
                 "video": {
+                    # Decided locally:
                     "source": self.app.config.video_source,
                     "device": self.app.config.video_device,
-                    "bitrate": self.app.config.video_bitrate,
-                    "codec": remote_config["video"]["codec"],
                     "width": int(send_width), # int
                     "height": int(send_height), # int
                     "aspect-ratio": self.app.config.video_aspect_ratio,
-                    "port": self.app.remote_config["video"]["port"], 
+                    # Decided by remote peer:
+                    "port": remote_config["video"]["port"], 
+                    "bitrate": remote_config["video"]["bitrate"], 
+                    "codec": remote_config["video"]["codec"], 
                 },
                 "audio": {
+                    # decided locally:
                     "source": self.app.config.audio_source,
-                    "numchannels": self.app.config.audio_channels,
-                    "codec": self.app.config.audio_codec,
-                    "port": self.app.remote_config["audio"]["port"], 
+                    # Decided by remote peer:
+                    "numchannels": remote_config["audio"]["numchannels"],
+                    "codec": remote_config["audio"]["codec"],
+                    "port": remote_config["audio"]["port"], 
                 }
             },
             # -------------------- recv ------------
             "receive": {
                 "video": {
+                    # decided locally:
                     "sink": self.app.config.video_sink,
-                    "codec": self.app.config.video_codec,
-                    "width": int(receive_width), # int
-                    "height": int(receive_height), # int
-                    "deinterlace": self.app.config.video_deinterlace, # bool
-                    "aspect-ratio": remote_config["video"]["aspect_ratio"],
                     "port": str(self.app.recv_video_port), #decided by the app
+                    "codec": self.app.config.video_codec,
+                    "deinterlace": self.app.config.video_deinterlace, # bool
                     "window-title": "\"From %s\"" % (contact_name), #TODO: i18n
                     "jitterbuffer": self.app.config.video_jitterbuffer, 
                     "fullscreen": self.app.config.video_fullscreen, # bool
-                    "bitrate": remote_config["video"]["bitrate"], # float
                     "display": self.app.config.video_display,
+                    # Decided by remote peer:
+                    "aspect-ratio": remote_config["video"]["aspect_ratio"],
+                    "bitrate": remote_config["video"]["bitrate"], # float
+                    "width": int(receive_width), # int
+                    "height": int(receive_height), # int
                 },
                 "audio": {
+                    # decided locally:
                     "numchannels": self.app.config.audio_channels, # int
                     "codec": self.app.config.audio_codec, 
                     "port": self.app.recv_audio_port,
@@ -164,6 +171,8 @@ class StreamerManager(object):
         details = self.session_details
 
         # ------------------ send ---------------
+        # every element in the lists must be strings since we join them .
+        # int elements are converted to str.
         self.milhouse_send_cmd = [
             "milhouse", 
             '--sender', 
@@ -171,7 +180,7 @@ class StreamerManager(object):
             '--videosource', details["send"]["video"]["source"],
             '--videocodec', details["send"]["video"]["codec"],
             '--videoport', str(details["send"]["video"]["port"]),
-            '--width', str(details["send"]["video"]["width"]),
+            '--width', str(details["send"]["video"]["width"]), 
             '--height', str(details["send"]["video"]["height"]),
             '--aspect-ratio', str(details["send"]["video"]["aspect-ratio"]),
             '--audiosource', details["send"]["audio"]["source"],
@@ -245,7 +254,7 @@ class StreamerManager(object):
                 }
             }
         }
-
+        # every element in the lists must be strings since we join them 
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
         self.receiver.state_changed_signal.connect(self.on_process_state_changed)
