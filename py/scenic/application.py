@@ -50,7 +50,8 @@ from scenic.devices import jackd
 from scenic.devices import x11
 from scenic.devices import cameras
 from scenic import gui
-_ = gui._ # gettext
+from scenic import internationalization
+_ = internationalization._
 
 class Config(saving.ConfigStateSaving):
     """
@@ -110,6 +111,7 @@ class Application(object):
         self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
+        internationalization.setup_i18n()
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
         self.devices = {
             "x11_displays": [], # list of dicts
@@ -135,7 +137,7 @@ class Application(object):
             def _cb(result):
                 reactor.stop()
             print("Cannot start SIC server. %s" % (e))
-            deferred = dialogs.ErrorDialog.create("Is another Scenic running? Cannot bind to port %d" % (self.config.negotiation_port), parent=self.gui.main_window)
+            deferred = dialogs.ErrorDialog.create(_("Is another Scenic running? Cannot bind to port %(port)d") % {"port": self.config.negotiation_port}, parent=self.gui.main_window)
             deferred.addCallback(_cb)
             return
         # Devices: JACKD (every 5 seconds)
@@ -372,7 +374,8 @@ class Application(object):
             "video": message["video"]
             }
         if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create(_("A streaming session is already in progress."), parent=self.gui.main_window)
+            print("Got ACCEPT but we are busy. This is very strange")
+            dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
         else:
             print("Got ACCEPT. Starting streamers as initiator.")
             self.start_streamers(addr)

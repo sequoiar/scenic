@@ -113,7 +113,7 @@ class ConfigStateSaving(object):
         for key in sorted(self.__dict__.keys()): 
             value = self.__dict__[key]
             if key in exclude_list:
-                print("Excluding attribute %s since it is in the exclude list." % (key))
+                pass #print("Excluding attribute %s since it is in the exclude list." % (key))
             else:
                 data["configuration"][key] = value
         _save(self._config_path, data)

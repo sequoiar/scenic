@@ -51,7 +51,6 @@ import os
 import smtplib
 import gtk.glade
 import webbrowser
-import gettext
 from twisted.internet import reactor
 from twisted.internet import task
 from twisted.python.reflect import prefixedMethods
@@ -60,13 +59,7 @@ from scenic import dialogs
 from scenic import preview
 from scenic.devices import cameras
 from scenic.devices import networkinterfaces
-
-### MULTILINGUAL SUPPORT ###
-_ = gettext.gettext
-gettext.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
-gettext.textdomain(configure.APPNAME)
-gtk.glade.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
-gtk.glade.textdomain(configure.APPNAME)
+from scenic.internationalization import _
 
 LICENSE_TEXT = _("""Scenic
 Copyright (C) 2009 Society for Arts and Technology (SAT)
@@ -374,7 +367,7 @@ class Gui(object):
         # This is useful for popping up 'are you sure you want to quit?'
         # type dialogs. 
         if self.app.config.confirm_quit and self.app.has_session():
-            d = dialogs.YesNoDialog.create("Really quit ?\nAll streaming processes will quit as well.", parent=self.main_window)
+            d = dialogs.YesNoDialog.create(_("Really quit ?\nAll streaming processes will quit as well."), parent=self.main_window)
             d.addCallback(_cb)
             return True
         else:

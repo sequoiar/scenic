@@ -5,6 +5,7 @@ Preview Process management.
 """
 from scenic import sig
 from scenic import process
+from scenic.internationalization import _
 
 class Preview(object):
     """
@@ -31,7 +32,8 @@ class Preview(object):
         """
         width, height = self.app.config.video_capture_size.split("x")
         aspect_ratio = self.app.config.video_aspect_ratio
-        command = "milhouse --videosource %s --localvideo --window-title \"Local preview\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, width, height, aspect_ratio)
+        window_title = _("Local preview")
+        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio)
         if self.app.config.video_source != "videotestsrc":
             command += " --videodevice %s" % (self.app.config.video_device)
         return command

@@ -26,6 +26,7 @@ Manages local streamer processes.
 from scenic import process
 from scenic import sig
 from scenic import dialogs
+from scenic.internationalization import _
 
 class StreamerManager(object):
     """
@@ -393,17 +394,17 @@ class StreamerManager(object):
         print("All streamers are stopped.")
         print("Error messages for this session: %s" % (self.error_messages))
         if len(self.error_messages["send"]) != 0:
-            details += "Errors from local sender:" + "\n"
+            details += _("Errors from local sender:") + "\n"
             for line in self.error_messages["send"]:
                 details += " * " + line + "\n"
             show_error_dialog = True
         if len(self.error_messages["receive"]) != 0:
-            details += "Errors from local receiver:" + "\n"
+            details += _("Errors from local receiver:") + "\n"
             for line in self.error_messages["receive"]:
                 details += " * " + line + "\n"
             show_error_dialog = True
         if show_error_dialog:
-            msg = "Some errors occured during the audio/video streaming session."
+            msg = _("Some errors occured during the audio/video streaming session.")
             dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window, details=details)
     
     def _set_state(self, new_state):
