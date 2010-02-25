@@ -238,13 +238,36 @@ void RtpReceiver::updateLatencyCb(GtkWidget *scale)
 
 void RtpReceiver::subParseSourceStats(GstStructure *stats)
 {
+
     const GValue *val = gst_structure_get_value(stats, "internal");
     if (g_value_get_boolean(val))   // is-internal
         return;
 
     printStatsVal(sessionName_, "octets-received", "guint64", ":OCTETS-RECEIVED:", stats);
     printStatsVal(sessionName_, "packets-received", "guint64", ":PACKETS-RECEIVED:", stats);
-    printStatsVal(sessionName_, "sr-ntptime", "guint64", ":NTP-TIME:", stats);
-    printStatsVal(sessionName_, "sr-rtptime", "guint32", ":RTP-TIME:", stats);
+
+    GTimeVal currentTime;
+    g_get_current_time (&currentTime);
+    static GTimeVal previousTime = currentTime;
+    guint64 elapsed = currentTime.tv_sec - previousTime.tv_sec;
+
+    if (elapsed > 0)
+    {
+        // in case we're not getting this in our receiver reports for a while (i.e. sender died)
+        if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, "octets-received")))
+        {
+            guint octets = g_value_get_uint64(gst_structure_get_value(stats, "octets-received"));
+            static guint previousOctets = octets;
+            guint diffOctets = octets - previousOctets;
+            //LOG_INFO("Diff octets " << diffOctets);
+
+            enum {BITS_PER_BYTE = 8};
+            guint64 bitrate = BITS_PER_BYTE * (diffOctets / elapsed);
+
+            LOG_INFO(sessionName_ << ":BITRATE:" << bitrate);
+            previousOctets = octets;
+        }
+    }
+    previousTime = currentTime;
 }
 

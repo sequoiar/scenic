@@ -85,8 +85,8 @@ void RtpBin::printStatsVal(const std::string &idStr,
     {
         if (G_VALUE_HOLDS_UINT(gst_structure_get_value(stats, key)))
         {
-        guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
-        paramStr += formatStr + boost::lexical_cast<std::string>(val);
+            guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
+            paramStr += formatStr + boost::lexical_cast<std::string>(val);
         }
     }
     else if (type == "gint32")
