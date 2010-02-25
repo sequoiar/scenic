@@ -177,6 +177,11 @@ def format_contact_markup(contact):
 def get_widgets_tree():
     """
     Returns a L{gtk.glade.XML} object.
+    
+    Keep in mind that gtk.glade automatically caches XML trees. So don't try
+    any complex tricks to reuse XML trees if you have to create the same UI
+    multiple times. The correct thing to do is simply to instantiate the XML
+    multiple times with the same parameters. 
     """
     # Set the Glade file
     glade_file = os.path.join(configure.GLADE_DIR, 'scenic.glade')
