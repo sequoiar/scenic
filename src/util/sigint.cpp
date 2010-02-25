@@ -55,8 +55,20 @@ static std::string sigToString(int sig)
 
 static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
 {
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
     LOG_INFO("Got signal " << sigToString(sig) << ", going down!");
-    signal_flag = true;
+    if (signal_flag)
+    {
+        static bool killedHard = false;
+        if (not killedHard)
+        {
+            killedHard = true;
+            THROW_ERROR("Already got " << sigToString(sig) << ", exitting rudely");
+        }
+    }
+    else
+        signal_flag = true;
 }
 
 void signal_handlers::setHandlers()

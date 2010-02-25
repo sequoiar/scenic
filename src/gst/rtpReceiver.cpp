@@ -244,5 +244,7 @@ void RtpReceiver::subParseSourceStats(GstStructure *stats)
 
     printStatsVal(sessionName_, "octets-received", "guint64", ":OCTETS-RECEIVED:", stats);
     printStatsVal(sessionName_, "packets-received", "guint64", ":PACKETS-RECEIVED:", stats);
+    printStatsVal(sessionName_, "sr-ntptime", "guint64", ":NTP-TIME:", stats);
+    printStatsVal(sessionName_, "sr-rtptime", "guint32", ":RTP-TIME:", stats);
 }
 
