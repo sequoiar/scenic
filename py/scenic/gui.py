@@ -26,8 +26,22 @@ Former Notes
 ------------
  * bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
-### CONSTANTS ###
+
+import sys
+import os
+import smtplib
+import gtk.glade
+import webbrowser
+from twisted.internet import reactor
+from twisted.internet import task
+from twisted.python.reflect import prefixedMethods
 from scenic import configure
+from scenic import process # just for constants
+from scenic import dialogs
+from scenic import preview
+from scenic.devices import cameras
+from scenic.devices import networkinterfaces
+from scenic.internationalization import _
 
 INVITE_TIMEOUT = 10
 ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
@@ -43,23 +57,6 @@ ALL_SUPPORTED_SIZE = [ # by milhouse video
     "320x240",
     "176x120"
     ]
-
-### MODULES IMPORTS  ###
-
-import sys
-import os
-import smtplib
-import gtk.glade
-import webbrowser
-from twisted.internet import reactor
-from twisted.internet import task
-from twisted.python.reflect import prefixedMethods
-from scenic import process # just for constants
-from scenic import dialogs
-from scenic import preview
-from scenic.devices import cameras
-from scenic.devices import networkinterfaces
-from scenic.internationalization import _
 
 LICENSE_TEXT = _("""Scenic
 Copyright (C) 2009 Society for Arts and Technology (SAT)
@@ -177,6 +174,26 @@ def format_contact_markup(contact):
         auto_accept = "\n  " + _("Automatically accept invitations")
     return "<b>%s</b>\n  IP: %s%s" % (contact["name"], contact["address"], auto_accept) 
 
+def get_widgets_tree():
+    """
+    Returns a L{gtk.glade.XML} object.
+    """
+    # Set the Glade file
+    glade_file = os.path.join(configure.GLADE_DIR, 'scenic.glade')
+    if os.path.isfile(glade_file):
+        glade_path = glade_file
+    else:
+        text = _("Error : Could not find the Glade file %s. Exitting.") % (glade_file)
+        print(text)
+        def _exit_cb(result):
+            print("Exiting")
+            if reactor.running:
+                reactor.stop()
+        dialogs.ErrorDialog.create(text, parent=None).addCallback(_exit_cb)
+        # FIXME: raise error or what? Exitting for now
+        sys.exit(1)
+    return gtk.glade.XML(glade_path, domain=configure.APPNAME)
+
 class Gui(object):
     """
     Graphical User Interface
@@ -187,105 +204,94 @@ class Gui(object):
         self.app = app
         self.kiosk_mode_on = kiosk_mode
         self._offerer_invite_timeout = None
-        # Set the Glade file
-        glade_file = os.path.join(configure.GLADE_DIR, 'scenic.glade')
-        if os.path.isfile(glade_file):
-            glade_path = glade_file
-        else:
-            text = _("Error : Could not find the Glade file %s. Exitting.") % (glade_file)
-            print(text)
-            sys.exit()
-        self.widgets = gtk.glade.XML(glade_path, domain=configure.APPNAME)
+        widgets_tree = get_widgets_tree()
         
         # connects callbacks to widgets automatically
         glade_signal_slots = {}
         for method in prefixedMethods(self, "on_"):
             glade_signal_slots[method.__name__] = method
-        self.widgets.signal_autoconnect(glade_signal_slots)
+        widgets_tree.signal_autoconnect(glade_signal_slots)
         
         # Get all the widgets that we use
-        self.main_window = self.widgets.get_widget("main_window")
+        self.main_window = widgets_tree.get_widget("main_window")
         self.main_window.connect('delete-event', self.on_main_window_deleted)
         self.main_window.set_icon_from_file(os.path.join(configure.PIXMAPS_DIR, 'scenic.png'))
-        self.main_tabs_widget = self.widgets.get_widget("mainTabs")
-        self.system_tab_contents_widget = self.widgets.get_widget("system_tab_contents")
+        self.main_tabs_widget = widgets_tree.get_widget("mainTabs")
+        self.system_tab_contents_widget = widgets_tree.get_widget("system_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
         # confirm_dialog:
-        self.confirm_dialog = self.widgets.get_widget("confirm_dialog")
+        self.confirm_dialog = widgets_tree.get_widget("confirm_dialog")
         self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
         self.confirm_dialog.set_transient_for(self.main_window)
-        self.confirm_label = self.widgets.get_widget("confirm_label")
+        self.confirm_label = widgets_tree.get_widget("confirm_label")
         # calling_dialog:
-        self.calling_dialog = self.widgets.get_widget("calling_dialog")
+        self.calling_dialog = widgets_tree.get_widget("calling_dialog")
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
-        # error_dialog:
-        self.error_dialog = self.widgets.get_widget("error_dialog")
-        self.error_dialog.connect('delete-event', self.error_dialog.hide_on_delete)
-        self.error_dialog.set_transient_for(self.main_window)
+        
         # Could not connect:
-        self.error_label_widget = self.widgets.get_widget("error_dialog_label")
+        self.error_label_widget = widgets_tree.get_widget("error_dialog_label")
         # invited_dialog:
-        self.invited_dialog = self.widgets.get_widget("invited_dialog")
+        self.invited_dialog = widgets_tree.get_widget("invited_dialog")
         self.invited_dialog.set_transient_for(self.main_window)
         self.invited_dialog.connect('delete-event', self.invited_dialog.hide_on_delete)
-        self.invited_dialog_label_widget = self.widgets.get_widget("invited_dialog_label")
+        self.invited_dialog_label_widget = widgets_tree.get_widget("invited_dialog_label")
 
         # invite button:
-        self.invite_label_widget = self.widgets.get_widget("invite_label")
-        self.invite_icon_widget = self.widgets.get_widget("invite_icon")
+        self.invite_label_widget = widgets_tree.get_widget("invite_label")
+        self.invite_icon_widget = widgets_tree.get_widget("invite_icon")
         
         # edit_contact_window:
-        self.edit_contact_window = self.widgets.get_widget("edit_contact_window")
+        self.edit_contact_window = widgets_tree.get_widget("edit_contact_window")
         self.edit_contact_window.set_transient_for(self.main_window) # child of main window
         self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
         # fields in the edit contact window:
-        self.contact_name_widget = self.widgets.get_widget("contact_name")
-        self.contact_addr_widget = self.widgets.get_widget("contact_addr")
-        self.contact_auto_accept_widget = self.widgets.get_widget("contact_auto_accept")
+        self.contact_name_widget = widgets_tree.get_widget("contact_name")
+        self.contact_addr_widget = widgets_tree.get_widget("contact_addr")
+        self.contact_auto_accept_widget = widgets_tree.get_widget("contact_auto_accept")
         # addressbook buttons:
-        self.edit_contact_widget = self.widgets.get_widget("edit_contact")
-        self.add_contact_widget = self.widgets.get_widget("add_contact")
-        self.remove_contact_widget = self.widgets.get_widget("remove_contact")
-        self.invite_contact_widget = self.widgets.get_widget("invite_contact")
+        self.edit_contact_widget = widgets_tree.get_widget("edit_contact")
+        self.add_contact_widget = widgets_tree.get_widget("add_contact")
+        self.remove_contact_widget = widgets_tree.get_widget("remove_contact")
+        self.invite_contact_widget = widgets_tree.get_widget("invite_contact")
         # treeview:
-        self.contact_list_widget = self.widgets.get_widget("contact_list")
+        self.contact_list_widget = widgets_tree.get_widget("contact_list")
         # position of currently selected contact in list of contact:
         self.selected_contact_row = None
         self.select_contact_index = None
 
         # Summary text view:
-        self.info_peer_widget = self.widgets.get_widget("info_peer")
-        self.info_send_video_widget = self.widgets.get_widget("info_send_video")
-        self.info_send_audio_widget = self.widgets.get_widget("info_send_audio")
-        self.info_receive_video_widget = self.widgets.get_widget("info_receive_video")
-        self.info_receive_audio_widget = self.widgets.get_widget("info_receive_audio")
-        self.info_ip_widget = self.widgets.get_widget("info_ip")
+        self.info_peer_widget = widgets_tree.get_widget("info_peer")
+        self.info_send_video_widget = widgets_tree.get_widget("info_send_video")
+        self.info_send_audio_widget = widgets_tree.get_widget("info_send_audio")
+        self.info_receive_video_widget = widgets_tree.get_widget("info_receive_video")
+        self.info_receive_audio_widget = widgets_tree.get_widget("info_receive_audio")
+        self.info_ip_widget = widgets_tree.get_widget("info_ip")
 
         # video
-        self.video_capture_size_widget = self.widgets.get_widget("video_capture_size")
-        self.video_display_widget = self.widgets.get_widget("video_display")
-        self.video_bitrate_widget = self.widgets.get_widget("video_bitrate")
-        self.video_source_widget = self.widgets.get_widget("video_source")
-        self.video_codec_widget = self.widgets.get_widget("video_codec")
-        self.video_fullscreen_widget = self.widgets.get_widget("video_fullscreen")
-        self.video_view_preview_widget = self.widgets.get_widget("video_view_preview")
-        self.video_deinterlace_widget = self.widgets.get_widget("video_deinterlace")
-        self.aspect_ratio_widget = self.widgets.get_widget("aspect_ratio")
-        self.v4l2_input_widget = self.widgets.get_widget("v4l2_input")
-        self.v4l2_standard_widget = self.widgets.get_widget("v4l2_standard")
-        self.video_jitterbuffer_widget = self.widgets.get_widget("video_jitterbuffer")
+        self.video_capture_size_widget = widgets_tree.get_widget("video_capture_size")
+        self.video_display_widget = widgets_tree.get_widget("video_display")
+        self.video_bitrate_widget = widgets_tree.get_widget("video_bitrate")
+        self.video_source_widget = widgets_tree.get_widget("video_source")
+        self.video_codec_widget = widgets_tree.get_widget("video_codec")
+        self.video_fullscreen_widget = widgets_tree.get_widget("video_fullscreen")
+        self.video_view_preview_widget = widgets_tree.get_widget("video_view_preview")
+        self.video_deinterlace_widget = widgets_tree.get_widget("video_deinterlace")
+        self.aspect_ratio_widget = widgets_tree.get_widget("aspect_ratio")
+        self.v4l2_input_widget = widgets_tree.get_widget("v4l2_input")
+        self.v4l2_standard_widget = widgets_tree.get_widget("v4l2_standard")
+        self.video_jitterbuffer_widget = widgets_tree.get_widget("video_jitterbuffer")
         
         # audio
-        self.audio_source_widget = self.widgets.get_widget("audio_source")
-        self.audio_codec_widget = self.widgets.get_widget("audio_codec")
-        self.audio_jack_icon_widget = self.widgets.get_widget("audio_jack_icon")
-        self.audio_jack_state_widget = self.widgets.get_widget("audio_jack_state")
-        self.audio_numchannels_widget = self.widgets.get_widget("audio_numchannels")
+        self.audio_source_widget = widgets_tree.get_widget("audio_source")
+        self.audio_codec_widget = widgets_tree.get_widget("audio_codec")
+        self.audio_jack_icon_widget = widgets_tree.get_widget("audio_jack_icon")
+        self.audio_jack_state_widget = widgets_tree.get_widget("audio_jack_state")
+        self.audio_numchannels_widget = widgets_tree.get_widget("audio_numchannels")
 
-        self.jack_latency_widget = self.widgets.get_widget("jack_latency")
-        self.jack_sampling_rate_widget = self.widgets.get_widget("jack_sampling_rate")
+        self.jack_latency_widget = widgets_tree.get_widget("jack_latency")
+        self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
         # system tab contents:
-        self.network_admin_widget = self.widgets.get_widget("network_admin")
+        self.network_admin_widget = widgets_tree.get_widget("network_admin")
             
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
