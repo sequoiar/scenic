@@ -542,8 +542,7 @@ class Gui(object):
         # Validate the address
         addr = self.contact_addr_widget.get_text()
         if len(addr) < 7:
-            dialogs.ErrorDialog.create("The address is not valid\n\nEnter a valid address\n" +
-                    "Example: 192.0.32.10 or example.org", parent=self.main_window)
+            dialogs.ErrorDialog.create(_("The address is not valid\n\nEnter a valid address\nExample: 192.0.32.10 or example.org"), parent=self.main_window)
             return
         # save it.
         _when_valid_save()
@@ -628,7 +627,7 @@ class Gui(object):
                 try:
                     server.sendmail(fromaddr, toaddrs, msg)
                 except:
-                    dialogs.ErrorDialog.create("Could not send info.\n\nCheck your internet connection.", parent=self.main_window)
+                    dialogs.ErrorDialog.create(_("Could not send info.\nCheck your internet connection."), parent=self.main_window)
                 server.quit()
         
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
@@ -693,7 +692,9 @@ class Gui(object):
         self.app.config.audio_codec = AUDIO_CODECS[audio_codec_readable]
         # FIXME: the interface should already prevent this case from happening
         if audio_numchannels > 2 and self.app.config.audio_codec == "mp3":
-            dialogs.ErrorDialog.create("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels.")
+            print("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels.")
+            print("This should have been prevented by the widgets logic iteself. Not likely to occur.")
+            dialogs.ErrorDialog.create(_("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels."))
             audio_numchannels = 2
         self.app.config.audio_channels = audio_numchannels
         print " * audio_numchannels", self.app.config.audio_channels
