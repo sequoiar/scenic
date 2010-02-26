@@ -235,7 +235,7 @@ class StreamerManager(object):
                     "packets-sent-got-new": False,
                     "packets-loss-percent": 0.0,
                     "jitter": 0,
-                    "bitrate": 0.0,
+                    "bitrate": None,
                     "connected": False
                 },
                 "audio": {
@@ -247,18 +247,18 @@ class StreamerManager(object):
                     "packets-sent-got-new": False,
                     "packets-loss-percent": 0.0,
                     "jitter": 0,
-                    "bitrate": 0.0,
+                    "bitrate": None,
                     "connected": False
                 }
             },
             "receive": {
                 "video": {
                     "connected": False,
-                    "bitrate": 0.0
+                    "bitrate": None 
                 },
                 "audio": {
                     "connected": False,
-                    "bitrate": 0.0
+                    "bitrate": None 
                 }
             }
         }
