@@ -245,7 +245,9 @@ void RtpReceiver::subParseSourceStats(GstStructure *stats)
 
     printStatsVal(sessionName_, "octets-received", "guint64", ":OCTETS-RECEIVED:", stats);
     printStatsVal(sessionName_, "packets-received", "guint64", ":PACKETS-RECEIVED:", stats);
+    printStatsVal(sessionName_, "bitrate", "guint64", ":BITRATE:", stats);
 
+#if 0
     GTimeVal currentTime;
     g_get_current_time (&currentTime);
     static GTimeVal previousTime = currentTime;
@@ -269,5 +271,6 @@ void RtpReceiver::subParseSourceStats(GstStructure *stats)
         }
     }
     previousTime = currentTime;
+#endif
 }
 

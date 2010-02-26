@@ -1,0 +1,32 @@
+256a257
+>           "bitrate", G_TYPE_UINT64, src->bitrate,
+976a978
+>   guint64 elapsed;
+1057a1060,1086
+>   if (src->prev_ntpnstime) {
+>     elapsed = arrival->ntpnstime - src->prev_ntpnstime;
+> 
+>     if (elapsed > (G_GINT64_CONSTANT (1) << 31)) {
+>       guint64 rate;
+> 
+>       rate =
+>           gst_util_uint64_scale (src->stats.bytes_received, elapsed,
+>           (G_GINT64_CONSTANT (1) << 29));
+> 
+>       GST_LOG ("Elapsed %" G_GUINT64_FORMAT ", bytes %" G_GUINT64_FORMAT
+>           ", rate %" G_GUINT64_FORMAT, elapsed, src->stats.bytes_received, rate);
+> 
+>       if (src->bitrate == 0)
+>         src->bitrate = rate;
+>       else
+>         src->bitrate = ((src->bitrate * 3) + rate) / 4;
+> 
+>       src->prev_ntpnstime = arrival->ntpnstime;
+>       src->stats.bytes_received = 0;
+>     }
+>   } else {
+>     GST_LOG ("Reset bitrate measurement");
+>     src->prev_ntpnstime = arrival->ntpnstime;
+>     src->bitrate = 0;
+>   }  
+> 
