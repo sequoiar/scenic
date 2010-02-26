@@ -39,6 +39,7 @@ from scenic import configure
 from scenic import process # just for constants
 from scenic import dialogs
 from scenic import preview
+from scenic import network
 from scenic.devices import cameras
 from scenic.devices import networkinterfaces
 from scenic.internationalization import _
@@ -361,7 +362,7 @@ class Gui(object):
     
     def on_main_window_deleted(self, *args):
         """
-        Destroy method causes appliaction to exit
+        Destroy method causes application to exit
         when main window closed
         """
         return self._confirm_and_quit()
@@ -553,7 +554,7 @@ class Gui(object):
 
         # Validate the address
         addr = self.contact_addr_widget.get_text()
-        if len(addr) < 7:
+        if not network.validate_address(addr):
             dialogs.ErrorDialog.create(_("The address is not valid\n\nEnter a valid address\nExample: 192.0.32.10 or example.org"), parent=self.main_window)
             return
         # save it.

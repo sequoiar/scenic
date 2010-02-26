@@ -89,6 +89,7 @@ class Config(saving.ConfigStateSaving):
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
 
+
 class Application(object):
     """
     Main class of the application.
