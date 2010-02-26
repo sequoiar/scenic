@@ -165,6 +165,9 @@ AC_MSG_NOTICE(Storing library files in $LIBDIR)
 AS_AC_EXPAND(DATADIR, $datadir)
 AC_MSG_NOTICE(Storing library files in $LIBDIR)
 
+PIXMAPS_DIR=$DATADIR/scenic/pixmaps
+AC_SUBST(PIXMAPS_DIR)
+
 AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
 AC_MSG_NOTICE(Storing package files in $PKGLIBDIR)
 
