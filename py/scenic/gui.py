@@ -850,6 +850,7 @@ class Gui(object):
 
         # update the audio and video summary:(even if the state has not just changed)
         if is_streaming:
+            rtcp_stats = self.app.streamer_manager.rtcp_stats
             # send video: --------------------------------
             _info_send_video = _("%(width)dx%(height)d %(codec)s") % {
                 "width": details["send"]["video"]["width"], 
@@ -857,11 +858,11 @@ class Gui(object):
                 "codec": details["send"]["video"]["codec"], 
                 }
             if details["send"]["video"]["bitrate"] is not None:
-                 _info_send_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["send"]["video"]["bitrate"]}
+                 _info_send_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": rtcp_stats["send"]["video"]["bitrate"]}
             _info_send_video += "\n"
-            _video_packetloss = self.app.streamer_manager.rtcp_stats["send"]["video"]["packets-loss-percent"]
+            _video_packetloss = rtcp_stats["send"]["video"]["packets-loss-percent"]
             _info_send_video += _("Jitter: %(jitter)d ns. Packet lost: %(packetloss)2.2f%%.") % {# % is escaped with an other %
-                "jitter": self.app.streamer_manager.rtcp_stats["send"]["video"]["jitter"],
+                "jitter": rtcp_stats["send"]["video"]["jitter"],
                 "packetloss": _video_packetloss
                 #TODO: Bitrate: %(bitrate)f Mbps/s. 
                 }
@@ -872,10 +873,12 @@ class Gui(object):
                 "numchannels": details["send"]["audio"]["numchannels"], 
                 "codec": details["send"]["audio"]["codec"] 
                 }
+            if rtcp_stats["send"]["audio"]["bitrate"] is not None:
+                 _info_send_audio += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": rtcp_stats["send"]["audio"]["bitrate"]}
             _info_send_audio += "\n"
-            _audio_packetloss = self.app.streamer_manager.rtcp_stats["send"]["audio"]["packets-loss-percent"]
+            _audio_packetloss = rtcp_stats["send"]["audio"]["packets-loss-percent"]
             _info_send_audio += _("Jitter: %(jitter)d ns. Packet lost: %(packetloss)2.2f%%.") % { # % is escaped with an other %
-                "jitter": self.app.streamer_manager.rtcp_stats["send"]["audio"]["jitter"],
+                "jitter": rtcp_stats["send"]["audio"]["jitter"],
                 "packetloss": _audio_packetloss  
                 #TODO: Bitrate: %(bitrate)f Mbps/s. 
                 }
@@ -887,16 +890,18 @@ class Gui(object):
                 "height": details["receive"]["video"]["height"], 
                 "codec": details["receive"]["video"]["codec"], 
                 }
-            if details["receive"]["video"]["bitrate"] is not None:
-                 _info_recv_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": details["receive"]["video"]["bitrate"]}
+            if rtcp_stats["receive"]["video"]["bitrate"] is not None:
+                 _info_recv_video += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": rtcp_stats["receive"]["video"]["bitrate"]}
             print("info recv video: " + _info_recv_video)
             self.info_receive_video_widget.set_text(_info_recv_video)
             # recv audio: --------------------------------
-            self.info_receive_audio_widget.set_text(
-                _("%(numchannels)d-channel %(codec)s") % {
-                "numchannels": details["send"]["audio"]["numchannels"], 
-                "codec": details["send"]["audio"]["codec"] 
-                })
+            _info_recv_audio = _("%(numchannels)d-channel %(codec)s") % {
+                "numchannels": details["receive"]["audio"]["numchannels"], 
+                "codec": details["receive"]["audio"]["codec"] 
+                }
+            if rtcp_stats["receive"]["audio"]["bitrate"] is not None:
+                 _info_recv_audio += " " + _("%(bitrate)2.2f Mbits/s") % {"bitrate": rtcp_stats["receive"]["audio"]["bitrate"]}
+            self.info_receive_audio_widget.set_text(_info_recv_audio)
         else:
             self.info_send_video_widget.set_text("")
             self.info_send_audio_widget.set_text("")

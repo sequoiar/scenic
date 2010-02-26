@@ -28,6 +28,8 @@ from scenic import sig
 from scenic import dialogs
 from scenic.internationalization import _
 
+BITS_PER_MBIT = 1000000.0
+
 class StreamerManager(object):
     """
     Manages local streamer processes.
@@ -235,7 +237,7 @@ class StreamerManager(object):
                     "packets-sent-got-new": False,
                     "packets-loss-percent": 0.0,
                     "jitter": 0,
-                    "bitrate": 0,
+                    "bitrate": 0.0,
                     "connected": False
                 },
                 "audio": {
@@ -247,18 +249,18 @@ class StreamerManager(object):
                     "packets-sent-got-new": False,
                     "packets-loss-percent": 0.0,
                     "jitter": 0,
-                    "bitrate": 0,
+                    "bitrate": 0.0,
                     "connected": False
                 }
             },
             "receive": {
                 "video": {
                     "connected": False,
-                    "bitrate": 0
+                    "bitrate": 0.0
                 },
                 "audio": {
                     "connected": False,
-                    "bitrate": 0
+                    "bitrate": 0.0
                 }
             }
         }
@@ -295,9 +297,9 @@ class StreamerManager(object):
                 self.rtcp_stats["receive"]["video"]["connected"] = True
         elif "BITRATE" in line:
             if "video" in line:
-                self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
+                self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1]) / BITS_PER_MBIT
             elif "audio" in line:
-                self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
+                self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1]) / BITS_PER_MBIT
         else:
             print "%9s stdout: %s" % (self.receiver.identifier, line)
 
@@ -339,9 +341,9 @@ class StreamerManager(object):
                     self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
             elif "BITRATE" in line:
                 if "video" in line:
-                    self.rtcp_stats["send"]["video"]["bitrate"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["video"]["bitrate"] = int(line.split(":")[-1]) / BITS_PER_MBIT
                 elif "audio" in line:
-                    self.rtcp_stats["send"]["audio"]["bitrate"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["audio"]["bitrate"] = int(line.split(":")[-1]) / BITS_PER_MBIT
             elif "connected" in line:
                 if "video" in line:
                     self.rtcp_stats["send"]["video"]["connected"] = True
