@@ -61,10 +61,11 @@ static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
     if (signal_flag)
     {
         static bool killedHard = false;
+        const static std::string lastSignal(sigToString(sig));
         if (not killedHard)
         {
             killedHard = true;
-            THROW_ERROR("Already got " << sigToString(sig) << ", exitting rudely");
+            THROW_ERROR("Already got " << lastSignal << ", exitting rudely");
         }
     }
     else
