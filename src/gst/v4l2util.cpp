@@ -60,13 +60,20 @@ static v4l2_format getCaptureFormat(int fd)
     return vfmt;
 }
 
-static std::string getDriverInfo(int fd)
+static std::string getDriverInfo(int fd, const std::string &device)
 {
     std::string result;
 	struct v4l2_capability vcap;	/* list_cap */
 	memset(&vcap, 0, sizeof(vcap));
 
-    doioctl(fd, VIDIOC_QUERYCAP, &vcap, "VIDIOC_QUERYCAP");
+    if (doioctl(fd, VIDIOC_QUERYCAP, &vcap, "VIDIOC_QUERYCAP") < 0)
+    {
+        LOG_PRINT("\n");
+        LOG_WARNING("Cannot get capabilities for device " << device 
+                << ",\n    it isn't a v4l2 driver. Check if it is a v4l1 driver.");
+        return "";
+    }
+
     result += "    Driver name   : " +  boost::lexical_cast<std::string>(vcap.driver) + "\n";
     result += "    Card type     : " + boost::lexical_cast<std::string>(vcap.card) + "\n";
     result += "    Bus info      : " + boost::lexical_cast<std::string>(vcap.bus_info) + "\n";
@@ -229,19 +236,24 @@ void v4l2util::printCaptureFormat(const std::string &device)
         THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
     v4l2_format vfmt = getCaptureFormat(fd);
 
-    LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
-    LOG_PRINT(getDriverInfo(fd));
-    LOG_PRINT("    Video input   : " << getInputName(fd) << "\n");
-    LOG_PRINT("    All inputs    : " << inputsPerDevice(fd) << "\n");
-    LOG_PRINT("    Standard      : " << getStandard(fd) << "\n");
-    LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "x" << vfmt.fmt.pix.height << "\n");
-    LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
-    LOG_PRINT("    Capture Type  : " << vfmt.type << "\n");
-    LOG_PRINT("    Field         : " << field2s(vfmt.fmt.pix.field) << "\n");
-    LOG_PRINT("    Bytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
-    LOG_PRINT("    Size Image    : " << vfmt.fmt.pix.sizeimage << "\n");
-    LOG_PRINT("    Colorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
-    printSupportedSizes(fd);
+    // this will be empty if we're dealing with a non v4l2 device
+    std::string driverInfo(getDriverInfo(fd, device));
+    if (not driverInfo.empty())
+    {
+        LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
+        LOG_PRINT(driverInfo);
+        LOG_PRINT("    Video input   : " << getInputName(fd) << "\n");
+        LOG_PRINT("    All inputs    : " << inputsPerDevice(fd) << "\n");
+        LOG_PRINT("    Standard      : " << getStandard(fd) << "\n");
+        LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "x" << vfmt.fmt.pix.height << "\n");
+        LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
+        LOG_PRINT("    Capture Type  : " << vfmt.type << "\n");
+        LOG_PRINT("    Field         : " << field2s(vfmt.fmt.pix.field) << "\n");
+        LOG_PRINT("    Bytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
+        LOG_PRINT("    Size Image    : " << vfmt.fmt.pix.sizeimage << "\n");
+        LOG_PRINT("    Colorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
+        printSupportedSizes(fd);
+    }
     close(fd);
 }
 
