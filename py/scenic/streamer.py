@@ -253,10 +253,12 @@ class StreamerManager(object):
             },
             "receive": {
                 "video": {
-                    "connected": False
+                    "connected": False,
+                    "bitrate": 0
                 },
                 "audio": {
-                    "connected": False
+                    "connected": False,
+                    "bitrate": 0
                 }
             }
         }
@@ -291,6 +293,11 @@ class StreamerManager(object):
                 self.rtcp_stats["receive"]["audio"]["connected"] = True
             elif "video" in line:
                 self.rtcp_stats["receive"]["video"]["connected"] = True
+        elif "BITRATE" in line:
+            if "video" in line:
+                self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
+            elif "audio" in line:
+                self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
         else:
             print "%9s stdout: %s" % (self.receiver.identifier, line)
 
@@ -330,6 +337,11 @@ class StreamerManager(object):
                     self.rtcp_stats["send"]["video"]["jitter"] = int(line.split(":")[-1])
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
+            elif "BITRATE" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["bitrate"] = int(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["bitrate"] = int(line.split(":")[-1])
             elif "connected" in line:
                 if "video" in line:
                     self.rtcp_stats["send"]["video"]["connected"] = True
