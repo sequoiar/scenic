@@ -875,13 +875,15 @@ class Gui(object):
                 }
             _info_send_video += _bitrate_string(rtcp_stats["send"]["video"]["bitrate"])
             _info_send_video += "\n"
-            _video_packetloss = rtcp_stats["send"]["video"]["packets-loss-percent"]
-            _info_send_video += _("Jitter: %(jitter)d ns. Packet loss: %(packetloss)2.2f%%.") % {# % is escaped with an other %
-                "jitter": rtcp_stats["send"]["video"]["jitter"],
-                "packetloss": _video_packetloss
-                #TODO: Bitrate: %(bitrate)f Mbps/s. 
+            #_video_packetloss = rtcp_stats["send"]["video"]["packets-loss-percent"]
+            _info_send_video += _("Jitter: %(jitter)d ns") % {# % is escaped with an other %
+                "jitter": rtcp_stats["send"]["video"]["jitter"]
                 }
-            print("info send video: " + _info_send_video)
+            #_info_send_video += _("jitter: %(jitter)d ns. packet loss: %(packetloss)2.2f%%.") % {# % is escaped with an other %
+            #    "jitter": rtcp_stats["send"]["video"]["jitter"],
+            #    "packetloss": _video_packetloss
+            #    }
+            #print("info send video: " + _info_send_video)
             self.info_send_video_widget.set_text(_info_send_video)
             # send audio: --------------------------------
             _info_send_audio = _("%(numchannels)d-channel %(codec)s") % {
@@ -890,13 +892,11 @@ class Gui(object):
                 }
             _info_send_audio += _bitrate_string(rtcp_stats["send"]["audio"]["bitrate"])
             _info_send_audio += "\n"
-            _audio_packetloss = rtcp_stats["send"]["audio"]["packets-loss-percent"]
-            _info_send_audio += _("Jitter: %(jitter)d ns. Packet loss: %(packetloss)2.2f%%.") % { # % is escaped with an other %
-                "jitter": rtcp_stats["send"]["audio"]["jitter"],
-                "packetloss": _audio_packetloss  
-                #TODO: Bitrate: %(bitrate)f Mbps/s. 
+            #_audio_packetloss = rtcp_stats["send"]["audio"]["packets-loss-percent"]
+            _info_send_audio += _("Jitter: %(jitter)d ns") % { # % is escaped with an other %
+                "jitter": rtcp_stats["send"]["audio"]["jitter"]
                 }
-            print("info send audio: " + _info_send_audio)
+            #print("info send audio: " + _info_send_audio)
             self.info_send_audio_widget.set_text(_info_send_audio)
             # recv video: --------------------------------
             _info_recv_video = _("%(width)dx%(height)d %(codec)s") % {
@@ -905,7 +905,7 @@ class Gui(object):
                 "codec": details["receive"]["video"]["codec"], 
                 }
             _info_recv_video += _bitrate_string(rtcp_stats["receive"]["video"]["bitrate"])
-            print("info recv video: " + _info_recv_video)
+            #print("info recv video: " + _info_recv_video)
             self.info_receive_video_widget.set_text(_info_recv_video)
             # recv audio: --------------------------------
             _info_recv_audio = _("%(numchannels)d-channel %(codec)s") % {
