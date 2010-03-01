@@ -1268,9 +1268,13 @@ class Gui(object):
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
         if fill_stats:
             j = self.app.devices["jack_servers"][0] 
-            latency = (j["period"] * j["nperiods"] / float(j["rate"])) * 1000 # ms
-            self.jack_latency_widget.set_text("%4.2f ms" % (latency))
-            self.jack_sampling_rate_widget.set_text("%d Hz" % (j["rate"]))
+            try:
+                latency = (j["period"] * j["nperiods"] / float(j["rate"])) * 1000 # ms
+            except KeyError, e:
+                print 'Key %s is missing for the jack server process' % (e)
+            else:
+                self.jack_latency_widget.set_text("%4.2f ms" % (latency))
+                self.jack_sampling_rate_widget.set_text("%d Hz" % (j["rate"]))
         else:
             self.jack_latency_widget.set_text("")
             self.jack_sampling_rate_widget.set_text("")
