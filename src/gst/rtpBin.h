@@ -36,6 +36,7 @@ class RtpBin : boost::noncopyable
 {
     public:
         virtual ~RtpBin();
+        std::string sessionName() { return sessionName_; }
 
     protected:
         /// FIXME: this sessionId is all kinds of gross

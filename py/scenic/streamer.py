@@ -25,6 +25,8 @@ Manages local streamer processes.
 
 from scenic import process
 from scenic import sig
+from scenic import dialogs
+from scenic.internationalization import _
 
 class StreamerManager(object):
     """
@@ -40,98 +42,325 @@ class StreamerManager(object):
         self.state = process.STATE_STOPPED
         self.state_changed_signal = sig.Signal()
         # for stats
-        #TODO:
-        #self.session_details = {
-        #    "sending": {
-        #        "address": None,
-        #        "video": {
-        #            "source": None,
-        #            "codec": None,
-        #            "port": None,
-        #            "width": None,
-        #            "height": None,
-        #            "aspect-ratio": None,
-        #            "device": None,
-        #            "bitrate": None,
-        #        },
-        #        "audio": {
-        #            "osource": None,
-        #            "numchannels": None,
-        #            "codec": None,
-        #            "port": None,
-        #        }
-        #    }
-        #    "receiving": {
-        #    }
-        #}
-        
-    def start(self, host, config):
+        self.session_details = None # either None or a big dict
+        self.rtcp_stats = None # either None or a big dict
+        self.error_messages = None # either None or a big dict
+
+    def _calculate_packet_loss(self):
         """
-            self.stop_streamers()
-        Starts the sender and receiver processes.
-        @param host: str ip addr
-        @param config: gui.Config object
+        Takes the last value and the current for packets lost and total packets.
+        Calculates the percent of packet loss : 
+
+        delta loss / delta sent
         
+        Multiplied by 100 to get a percentage.
+        """
+        #TODO:
+        video_lost = self.rtcp_stats["send"]["video"]["packets-lost"]
+        video_sent = self.rtcp_stats["send"]["video"]["packets-sent"]
+        audio_lost = self.rtcp_stats["send"]["audio"]["packets-lost"]
+        audio_sent = self.rtcp_stats["send"]["audio"]["packets-sent"]
+        video_lost_previous = self.rtcp_stats["send"]["video"]["packets-lost-previous"]
+        video_sent_previous = self.rtcp_stats["send"]["video"]["packets-sent-previous"]
+        audio_lost_previous = self.rtcp_stats["send"]["audio"]["packets-lost-previous"]
+        audio_sent_previous = self.rtcp_stats["send"]["audio"]["packets-sent-previous"]
+        
+        if self.rtcp_stats["send"]["video"]["packets-lost-got-new"] and self.rtcp_stats["send"]["video"]["packets-sent-got-new"]:
+            self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = False
+            self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = False
+            diff_video_sent = float(video_sent - video_sent_previous)
+            if diff_video_sent != 0: # avoid division by zero
+                video_packets_loss = float(video_lost - video_lost_previous) / diff_video_sent * 100
+                if video_packets_loss >= 0.0:   # FIXME: temporary fix to avoid occasional bogus percentages
+                    self.rtcp_stats["send"]["video"]["packets-loss-percent"] =  video_packets_loss
+                    print("Video packet loss : %s" % (video_packets_loss))
+            self.rtcp_stats["send"]["video"]["packets-lost-previous"] = video_lost
+            self.rtcp_stats["send"]["video"]["packets-sent-previous"] = video_sent
+        if self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] and self.rtcp_stats["send"]["audio"]["packets-sent-got-new"]:
+            self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = False
+            self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = False
+            diff_audio_sent = float(audio_sent - audio_sent_previous)
+            if diff_audio_sent != 0: # avoid division by zero
+                audio_packets_loss = float(audio_lost - audio_lost_previous) / diff_audio_sent * 100
+                if audio_packets_loss >= 0.0:   # FIXME: temporary fix to avoid occasional bogus percentages
+                    self.rtcp_stats["send"]["audio"]["packets-loss-percent"] = audio_packets_loss
+                    print("Audio packet loss : %s" % (audio_packets_loss))
+            self.rtcp_stats["send"]["audio"]["packets-lost-previous"] = audio_lost
+            self.rtcp_stats["send"]["audio"]["packets-sent-previous"] = audio_sent
+
+    def _gather_config_to_stream(self, addr):
+        """
+        Gathers all settings in a big dict.
+        
+        Useful for feedback to the user.
+        """
+        contact_name = addr
+        contact = self.app._get_contact_by_addr(addr)
+        if contact is not None:
+            contact_name = contact["name"]
+        
+        remote_config = self.app.remote_config
+        send_width, send_height = self.app.config.video_capture_size.split("x")
+        receive_width, receive_height = remote_config["video"]["capture_size"].split("x")
+        self.session_details = {
+            "peer": {
+                "address": addr,
+                "name": contact_name,
+                },
+            # ----------------- send ---------------
+            "send": {
+                "video": {
+                    # Decided locally:
+                    "source": self.app.config.video_source,
+                    "device": self.app.config.video_device,
+                    "width": int(send_width), # int
+                    "height": int(send_height), # int
+                    "aspect-ratio": self.app.config.video_aspect_ratio,
+                    
+                    # Decided by remote peer:
+                    "port": remote_config["video"]["port"], 
+                    "bitrate": remote_config["video"]["bitrate"], 
+                    "codec": remote_config["video"]["codec"], 
+                },
+                
+                "audio": {
+                    # decided locally:
+                    "source": self.app.config.audio_source,
+
+                    # Decided by remote peer:
+                    "numchannels": remote_config["audio"]["numchannels"],
+                    "codec": remote_config["audio"]["codec"],
+                    "port": remote_config["audio"]["port"], 
+                }
+            },
+            # -------------------- recv ------------
+            "receive": {
+                "video": {
+                    # decided locally:
+                    "sink": self.app.config.video_sink,
+                    "port": str(self.app.recv_video_port), #decided by the app
+                    "codec": self.app.config.video_codec,
+                    "deinterlace": self.app.config.video_deinterlace, # bool
+                    "window-title": "\"From %s\"" % (contact_name), #TODO: i18n
+                    "jitterbuffer": self.app.config.video_jitterbuffer, 
+                    "fullscreen": self.app.config.video_fullscreen, # bool
+                    "display": self.app.config.video_display,
+                    "bitrate": self.app.config.video_bitrate, # float
+                    
+                    # Decided by remote peer:
+                    "aspect-ratio": remote_config["video"]["aspect_ratio"],
+                    "width": int(receive_width), # int
+                    "height": int(receive_height), # int
+                },
+                "audio": {
+                    # decided locally:
+                    "numchannels": self.app.config.audio_channels, # int
+                    "codec": self.app.config.audio_codec, 
+                    "port": self.app.recv_audio_port,
+                    "sink": self.app.config.audio_sink
+                }
+            }
+        }
+        if self.session_details["send"]["video"]["source"] != "v4l2src":
+            self.session_details["send"]["video"]["device"] = None
+        if self.session_details["send"]["video"]["codec"] == "theora":
+            self.session_details["send"]["video"]["bitrate"] = None
+        print(str(self.session_details))
+        
+    def start(self, host):
+        """
+        Starts the sender and receiver processes.
+        
+        @param host: str ip addr
         Raises a RuntimeError if a sesison is already in progress.
         """
-        #FIXME: uses self.app.*_port variables to know which ports to use.
         if self.state != process.STATE_STOPPED:
-            raise RuntimeError("Cannot start streamers since they are %s." % (self.state))
-            # FIXME: catch this and run ;-)
+            raise RuntimeError("Cannot start streamers since they are %s." % (self.state)) # the programmer has done something wrong if we're here.
         
-        send_width, send_height = config.video_capture_size.split("x")
-        receive_width, receive_height = self.app.remote_video_config["capture_size"].split("x")
-        self.milhouse_recv_cmd = [
-            "milhouse",
-            '--receiver', 
-            '--address', str(host),
-            '--videosink', config.video_sink,
-            '--videocodec', config.video_codec,
-            '--videoport', str(self.app.recv_video_port), # attribute of self.app, not self.app.config
-            '--jitterbuffer', str(config.video_jitterbuffer),
-            '--width', str(receive_width),
-            '--height', str(receive_height),
-            '--aspect-ratio', str(self.app.remote_video_config["aspect_ratio"]),# attribute of self.app, not self.app.config
-            '--audiosink', config.audio_sink,
-            '--numchannels', str(config.audio_channels),
-            '--audiocodec', config.audio_codec,
-            '--audioport', str(self.app.recv_audio_port) 
-            ]
-        if config.video_fullscreen:
-            self.milhouse_recv_cmd.append('--fullscreen')
-        if config.video_deinterlace:
-            self.milhouse_recv_cmd.append('--deinterlace')
+        self._gather_config_to_stream(host)
+        details = self.session_details
+
+        # ------------------ send ---------------
+        # every element in the lists must be strings since we join them .
+        # int elements are converted to str.
         self.milhouse_send_cmd = [
             "milhouse", 
             '--sender', 
-            '--address', str(host),
-            '--videosource', config.video_source,
-            '--videocodec', self.app.remote_video_config["codec"],
-            '--videoport', str(self.app.remote_video_config["port"]),
-            '--width', str(send_width),
-            '--height', str(send_height),
-            '--aspect-ratio', str(self.app.config.video_aspect_ratio),
-            '--audiosource', config.audio_source,
-            '--numchannels', str(self.app.remote_audio_config["numchannels"]),
-            '--audiocodec', self.app.remote_audio_config["codec"],
-            '--audioport', str(self.app.remote_audio_config["port"])]
-        if config.video_source == "v4l2src":
-            self.milhouse_send_cmd.extend(["--videodevice", config.video_device])
-        if self.app.remote_video_config["codec"] != "vorbis":
-            self.milhouse_send_cmd.extend(['--videobitrate', str(int(self.app.remote_video_config["bitrate"] * 1000000))])
+            '--address', details["peer"]["address"],
+            '--videosource', details["send"]["video"]["source"],
+            '--videocodec', details["send"]["video"]["codec"],
+            '--videoport', str(details["send"]["video"]["port"]),
+            '--width', str(details["send"]["video"]["width"]), 
+            '--height', str(details["send"]["video"]["height"]),
+            '--aspect-ratio', str(details["send"]["video"]["aspect-ratio"]),
+            '--audiosource', details["send"]["audio"]["source"],
+            '--numchannels', str(details["send"]["audio"]["numchannels"]),
+            '--audiocodec', details["send"]["audio"]["codec"],
+            '--audioport', str(details["send"]["audio"]["port"]),
+            ]
+        if details["send"]["video"]["source"] == "v4l2src":
+            self.milhouse_send_cmd.extend(["--videodevice", details["send"]["video"]["device"]])
+        if details["send"]["video"]["codec"] != "theora":
+            self.milhouse_send_cmd.extend(['--videobitrate', str(int(details["send"]["video"]["bitrate"] * 1000000))])
+
+        # ------------------- recv ----------------
+        self.milhouse_recv_cmd = [
+            "milhouse",
+            '--receiver', 
+            '--address', details["peer"]["address"],
+            '--videosink', details["receive"]["video"]["sink"],
+            '--videocodec', details["receive"]["video"]["codec"],
+            '--videoport', str(details["receive"]["video"]["port"]),
+            '--jitterbuffer', str(details["receive"]["video"]["jitterbuffer"]),
+            '--width', str(details["receive"]["video"]["width"]),
+            '--height', str(details["receive"]["video"]["height"]),
+            '--aspect-ratio', details["receive"]["video"]["aspect-ratio"],
+            '--audiosink', details["receive"]["audio"]["sink"],
+            '--numchannels', str(details["receive"]["audio"]["numchannels"]),
+            '--audiocodec', details["receive"]["audio"]["codec"],
+            '--audioport', str(details["receive"]["audio"]["port"]),
+            '--window-title', details["receive"]["video"]["window-title"],
+            '--display', details["receive"]["video"]["display"],
+            ]
+        if details["receive"]["video"]["fullscreen"]:
+            self.milhouse_recv_cmd.append('--fullscreen')
+        if details["receive"]["video"]["deinterlace"]:
+            self.milhouse_recv_cmd.append('--deinterlace')
+
         # setting up
+        self.rtcp_stats = {
+            "send": {
+                "video": {
+                    "packets-lost": 0,
+                    "packets-sent": 0,
+                    "packets-lost-previous": 0,
+                    "packets-sent-previous": 0,
+                    "packets-lost-got-new": False,
+                    "packets-sent-got-new": False,
+                    "packets-loss-percent": 0.0,
+                    "jitter": 0,
+                    "bitrate": None,
+                    "connected": False
+                },
+                "audio": {
+                    "packets-lost": 0,
+                    "packets-sent": 0,
+                    "packets-lost-previous": 0,
+                    "packets-sent-previous": 0,
+                    "packets-lost-got-new": False,
+                    "packets-sent-got-new": False,
+                    "packets-loss-percent": 0.0,
+                    "jitter": 0,
+                    "bitrate": None,
+                    "connected": False
+                }
+            },
+            "receive": {
+                "video": {
+                    "connected": False,
+                    "bitrate": None 
+                },
+                "audio": {
+                    "connected": False,
+                    "bitrate": None 
+                }
+            }
+        }
+        self.error_messages = {
+            "send": [], # list of strings
+            "receive": [], # list of strings
+            }
+        # every element in the lists must be strings since we join them 
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
         self.receiver.state_changed_signal.connect(self.on_process_state_changed)
+        self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
+        self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
         send_cmd = " ".join(self.milhouse_send_cmd)
         self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
         self.sender.state_changed_signal.connect(self.on_process_state_changed)
+        self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
+        self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
         # starting
         self._set_state(process.STATE_STARTING)
         print "$", send_cmd
         self.sender.start()
         print "$", recv_cmd
         self.receiver.start()
+
+    def on_receiver_stdout_line(self, line):
+        """
+        Handles a new line from our receiver process' stdout
+        """
+        if "stream connected" in line:
+            if "audio" in line:
+                self.rtcp_stats["receive"]["audio"]["connected"] = True
+            elif "video" in line:
+                self.rtcp_stats["receive"]["video"]["connected"] = True
+        elif "BITRATE" in line:
+            if "video" in line:
+                self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
+            elif "audio" in line:
+                self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
+        else:
+            print "%9s stdout: %s" % (self.receiver.identifier, line)
+
+
+    def on_receiver_stderr_line(self, line):
+        """
+        Handles a new line from our receiver process' stderr
+        """
+        print "%9s stderr: %s" % (self.receiver.identifier, line)
+        if "CRITICAL" in line or "ERROR" in line:
+            self.error_messages["receive"].append(line)
+    
+    def on_sender_stdout_line(self, line):
+        """
+        Handles a new line from our receiver process' stdout
+        """
+        print "%9s stdout: %s" % (self.sender.identifier, line)
+        try:
+            if "PACKETS-LOST" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = True
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = True
+                #self._calculate_packet_loss()
+            if "PACKETS-SENT" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = True
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["packets-sent"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = True
+                #self._calculate_packet_loss()
+            elif "JITTER" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["jitter"] = int(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["jitter"] = int(line.split(":")[-1])
+            elif "BITRATE" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["bitrate"] = int(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["bitrate"] = int(line.split(":")[-1])
+            elif "connected" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["connected"] = True
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["connected"] = True
+        except ValueError, e:
+            print(e)
+
+    def on_sender_stderr_line(self, line):
+        """
+        Handles a new line from our receiver process' stderr
+        """
+        print "%9s stderr: %s" % (self.sender.identifier, line)
+        if "CRITICAL" in line or "ERROR" in line:
+            self.error_messages["send"].append(line)
 
     def is_busy(self):
         """
@@ -168,6 +397,31 @@ class StreamerManager(object):
                 if not one_is_left:
                     print "Setting streamers manager to STOPPED"
                     self._set_state(process.STATE_STOPPED)
+
+    def on_stopped(self):
+        """
+        When the state changes to stopped, 
+         * check for errors and display them to the user.
+        """
+        msg = ""
+        details = ""
+        show_error_dialog = False
+        #TODO: internationalize
+        print("All streamers are stopped.")
+        print("Error messages for this session: %s" % (self.error_messages))
+        if len(self.error_messages["send"]) != 0:
+            details += _("Errors from local sender:") + "\n"
+            for line in self.error_messages["send"]:
+                details += " * " + line + "\n"
+            show_error_dialog = True
+        if len(self.error_messages["receive"]) != 0:
+            details += _("Errors from local receiver:") + "\n"
+            for line in self.error_messages["receive"]:
+                details += " * " + line + "\n"
+            show_error_dialog = True
+        if show_error_dialog:
+            msg = _("Some errors occured during the audio/video streaming session.")
+            dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window, details=details)
     
     def _set_state(self, new_state):
         """
@@ -176,6 +430,8 @@ class StreamerManager(object):
         if self.state != new_state:
             self.state_changed_signal(self, new_state)
             self.state = new_state
+            if new_state == process.STATE_STOPPED:
+                self.on_stopped()
         else:
             raise RuntimeError("Setting state to %s, which is already the current state." % (self.state))
             

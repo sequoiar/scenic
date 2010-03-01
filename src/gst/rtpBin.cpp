@@ -85,8 +85,8 @@ void RtpBin::printStatsVal(const std::string &idStr,
     {
         if (G_VALUE_HOLDS_UINT(gst_structure_get_value(stats, key)))
         {
-        guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
-        paramStr += formatStr + boost::lexical_cast<std::string>(val);
+            guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
+            paramStr += formatStr + boost::lexical_cast<std::string>(val);
         }
     }
     else if (type == "gint32")
@@ -94,6 +94,14 @@ void RtpBin::printStatsVal(const std::string &idStr,
         if (G_VALUE_HOLDS_INT(gst_structure_get_value(stats, key)))
         {
             gint32 val = g_value_get_int(gst_structure_get_value(stats, key));
+            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+        }
+    }
+    else if (type == "boolean")
+    {
+        if (G_VALUE_HOLDS_BOOLEAN(gst_structure_get_value(stats, key)))
+        {
+            gboolean val = g_value_get_boolean(gst_structure_get_value(stats, key));
             paramStr += formatStr + boost::lexical_cast<std::string>(val);
         }
     }
@@ -203,11 +211,11 @@ RtpBin::~RtpBin()
 }
 
 
-void RtpBin::registerSession(const std::string &codec)
+void RtpBin::registerSession(const std::string &identifier)
 {
-    std::string sessionName("");
-    sessionName += codec + "_" + boost::lexical_cast<std::string>(sessionId_);
-    sessionName_ = sessionName;
+    std::string tempName;
+    tempName += identifier + "_" + boost::lexical_cast<std::string>(sessionId_);
+    sessionName_ = tempName;
     sessions_[sessionId_] = this;
 }
 

@@ -59,8 +59,9 @@ void gutil::runMainLoop(int ms)
     if (ms != 0)
         g_timeout_add(ms, static_cast<GSourceFunc>(gutil::killMainLoop), NULL);
 
-    // poll signal status every half second
-    g_timeout_add(500 /*ms*/,
+    // FIXME: this isn't very smart
+    // poll signal status every quarter second
+    g_timeout_add(250 /*ms*/,
             static_cast<GSourceFunc>(gutil::checkSignal),
             NULL);
 

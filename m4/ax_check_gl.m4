@@ -57,9 +57,8 @@ AC_REQUIRE([AC_PATH_X])dnl
 AC_REQUIRE([ACX_PTHREAD])dnl
 
 AC_LANG_PUSH([C])
-AX_LANG_COMPILER_MS
-AS_IF([test X$ax_compiler_ms = Xno],
-      [GL_CFLAGS="${PTHREAD_CFLAGS}"; GL_LIBS="${PTHREAD_LIBS} -lm"])
+GL_CFLAGS="${PTHREAD_CFLAGS}"
+GL_LIBS="${PTHREAD_LIBS} -lm"
 
 #
 # Use x_includes and x_libraries if they have been set (presumably by
@@ -76,13 +75,8 @@ CPPFLAGS="${GL_CFLAGS} ${CPPFLAGS}"
 AC_CHECK_HEADERS([GL/gl.h OpenGL/gl.h])
 CPPFLAGS="${ax_save_CPPFLAGS}"
 
-AC_CHECK_HEADERS([windows.h])
-
 m4_define([AX_CHECK_GL_PROGRAM],
           [AC_LANG_PROGRAM([[
-# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
-#   include <windows.h>
-# endif
 # ifdef HAVE_GL_GL_H
 #   include <GL/gl.h>
 # elif defined(HAVE_OPENGL_GL_H)

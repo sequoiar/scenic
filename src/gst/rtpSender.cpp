@@ -69,9 +69,16 @@ void RtpSender::sendCapsChanged(GstPad *pad, GParamSpec * /*pspec*/, RtpSender* 
 }
 
 
+void RtpSender::onNewSSRC(GstElement * /*rtpbin*/, guint session, guint ssrc, gpointer /*data*/)
+{
+    /// FIXME: make sure this is correct
+    LOG_INFO("New stream connected for session " << sessions_[session]->sessionName() << " with ssrc " << ssrc);
+}
+
+
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
-    registerSession(config.codec());
+    registerSession(config.identifier());
 
     GstPad *send_rtp_src;
     GstPad *payloadSrc;
@@ -99,6 +106,7 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     tassert(send_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));
 
     g_signal_connect(send_rtp_sink_, "notify::caps", G_CALLBACK(sendCapsChanged), this);
+    g_signal_connect(rtpbin_, "on-new-ssrc", G_CALLBACK(onNewSSRC), this);
 
     tassert(payloadSrc = gst_element_get_static_pad(newSrc->srcElement(), "src"));
     tassert(gstlinkable::link_pads(payloadSrc, send_rtp_sink_));

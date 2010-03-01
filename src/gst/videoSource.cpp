@@ -73,12 +73,6 @@ std::string VideoSource::srcCaps() const
 void VideoSource::setCapsFilter(const std::string &capsStr)
 {
     tassert(capsFilter_ != 0);
-    if (capsStr.empty())
-        THROW_ERROR("Can't set capsfilter to empty string");
-
-    if (capsStr == "ANY")   // don't bother setting caps
-        THROW_ERROR("Trying to set caps to dummy value");
-
     GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
     LOG_DEBUG("Setting caps to " << gst_caps_to_string(videoCaps));
     g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);

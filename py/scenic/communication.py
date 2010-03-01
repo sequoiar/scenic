@@ -141,7 +141,7 @@ class Client(object):
             self.sic_sender.send_message(msg)
         else:
             error = "Not connected, cannot send message " + str(msg)
-            raise AssertionError(error)
+            print(error)
     
     def is_connected(self):
         return self.sic_sender is not None

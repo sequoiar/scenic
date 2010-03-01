@@ -145,7 +145,7 @@ def list_cameras():
     except IndexError:
         return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
     deferred = defer.Deferred()
-    d = utils.getProcessOutput(executable, args=args, env=os.environ)
+    d = utils.getProcessOutput(executable, args=args, env=os.environ, errortoo=True) # errortoo puts stderr in output
     d.addCallback(_cb, deferred)
     d.addErrback(_eb, deferred)
     return deferred

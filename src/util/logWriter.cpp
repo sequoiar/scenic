@@ -23,7 +23,6 @@
 #include "logWriter.h"
 
 #include <iostream>
-#include <ctime>
 #include <sstream>
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -52,40 +51,6 @@ bool logLevelIsValid(LogLevel level)
     }
 }
 
-#ifdef COLOR_OUTPUT
-std::string logLevelStr(LogLevel level)
-{
-    std::string lstr;
-    switch (level)
-    {
-        case DEBUG:
-            lstr = "\r\x1b[19C\x1b[32mDEBUG";
-            break;
-        case INFO:
-            lstr = "\r\x1b[19C\x1b[34mINFO";
-            break;
-        case THROW:
-            lstr = "\r\x1b[19C\x1b[33mTHROW";
-            break;
-        case WARNING:
-            lstr = "\r\x1b[19C\x1b[33mWARNING";
-            break;
-        case ERROR:
-            lstr = "\r\x1b[19C\x1b[31mERROR";
-            break;
-        case CRITICAL:
-            lstr = "\r\x1b[19C\x1b[41mCRITICAL";
-            break;
-        case ASSERT_FAIL:
-            lstr = "\r\x1b[19C\x1b[41mASSERT_FAIL";
-            break;
-        default:
-            lstr = "INVALID LOG LEVEL";
-    }
-    lstr += "\x1b[0m: ";
-    return lstr;
-}
-#else
 std::string logLevelStr(LogLevel level)
 {
     std::string lstr;
@@ -117,28 +82,13 @@ std::string logLevelStr(LogLevel level)
     }
     return lstr;
 }
-#endif
 
 static Log::Subscriber emptyLogSubscriber;
 static Log::Subscriber* lf = &emptyLogSubscriber;
-static bool hold_flag = false;
-
 
 Log::Subscriber::~Subscriber()
 {
     lf = &emptyLogSubscriber;
-}
-
-
-void Log::Subscriber::hold()
-{
-    hold_flag = true;
-}
-
-
-void Log::Subscriber::enable()
-{
-    hold_flag = false;
 }
 
 Log::Subscriber::Subscriber()
@@ -155,11 +105,9 @@ bool xlogLevelMatch(LogLevel level)
 }
 
 #include<iomanip>
-#include<boost/date_time/posix_time/posix_time.hpp>
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &/*functionName*/, int lineNum)
 {
-    using namespace boost::posix_time;
     std::ostringstream logMsg;
     if (level == PRINT) // for normal printing without log formatting
     {
@@ -168,7 +116,6 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
     }
 
 #ifdef CONFIG_DEBUG_LOCAL
-    //ptime now = microsec_clock::local_time();
     if(level >= INFO and level < WARNING)
         logMsg << logLevelStr(level) << ":" << msg << std::endl;
     else
@@ -183,15 +130,14 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 
 //TODO DOCUMENT THIS
 void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
-        const std::string &functionName, int lineNum,int err)
+        const std::string &functionName, int lineNum, int err)
 {
     std::string strerr = log_(msg, level, fileName, functionName, lineNum);
 
     if(err == -1) //TODO Is this used?
         throw(Except(msg.c_str(), 0));
 
-    if (!hold_flag)//TODO check logger  
-        (*lf)(level, strerr);
+    (*lf)(level, strerr);
 
     if (level < THROW)
         return;

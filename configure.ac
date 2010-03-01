@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(SCENIC, 0.4.1)  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, 0.4.2)  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -57,37 +57,37 @@ fi
 #Trying to set GSTAUDIO using pkg-config
 PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
 if test "x${have_gstreamer_audio}" = "xfalse" ; then
-    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
 fi
 
 #Trying to set GSTAPP using pkg-config
 PKG_CHECK_MODULES(GSTAPP, gstreamer-app-0.10, have_gstreamer_app=true, have_gstreamer_app=false)
 if test "x${have_gstreamer_app}" = "xfalse" ; then
-    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
 fi
 
 #Trying to set JACK using pkg-config
 PKG_CHECK_MODULES(JACK, jack >= 0.99.10, have_jack=true, have_jack=false)
 if test "x${have_jack}" = "xfalse" ; then
-    AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
+    AC_MSG_ERROR([missing package:  libjack0 and/or libjack-dev])
 fi
 
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
 if test "x${have_libavc1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libavc1394-dev ])
+	AC_MSG_ERROR([missing package: libavc1394-dev ])
 fi
 
 #Trying to set LIBRAW1394 using pkg-config
 PKG_CHECK_MODULES(LIBRAW1394, [libraw1394], have_libraw1394=true, have_libraw1394=false)
 if test "x${have_libraw1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libraw1394-dev ])
+	AC_MSG_ERROR([missing package: libraw1394-dev ])
 fi
 
 #Trying to set LIBDC1394 using pkg-config
 PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394=true, have_libdc1394=false)
 if test "x${have_libdc1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libdc1394-2])
+	AC_MSG_ERROR([missing package: libdc1394-2])
 fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
@@ -95,15 +95,33 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 dnl check for python, FIXME are we checking for python twice?
 AM_PATH_PYTHON([2.5])
 
-
 # BOOST m4 tests
-AX_BOOST_BASE([1.35])
+AX_BOOST_BASE([1.35], [], [echo "libboost-1.35 or greater required"; exit -1])
 AX_BOOST_THREAD
+if test "x${ax_cv_boost_thread}" = "xno" ; then
+    AC_MSG_ERROR([missing package: libboost-thread-dev])
+fi
 AX_BOOST_SYSTEM
+dnl AC_MSG_NOTICE(["boost system var is " ${ax_cv_boost_system} ])
+if test "x${ax_cv_boost_system}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-system-dev])
+fi
 AX_BOOST_PROGRAM_OPTIONS
+if test "x${ax_cv_boost_program_options}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-program-options-dev])
+fi
 AX_BOOST_ASIO
+if test "x${ax_cv_boost_asio}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-asio-dev])
+fi
 AX_BOOST_DATE_TIME
+if test "x${ax_cv_boost_date_time}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-date-time-dev])
+fi
 AX_BOOST_FILESYSTEM
+if test "x${ax_cv_boost_filesystem}" = "xno" ; then
+	AC_MSG_ERROR([missing package: libboost-filesystem-dev])
+fi
 
 # GNU help2man creates man pages from --help output; in many cases, this
 # is sufficient, and obviates the need to maintain man pages separately.
@@ -111,11 +129,12 @@ AX_BOOST_FILESYSTEM
 # when cross-compiling, so we test to avoid that (the variable
 # "cross_compiling" is set by AC_PROG_CC).
 if test $cross_compiling = no; then
-  AM_MISSING_PROG(HELP2MAN, help2man)
+    AM_MISSING_PROG(HELP2MAN, help2man)
 else
-  HELP2MAN=:
+    HELP2MAN=:
 fi
 
+AX_CHECK_GL
 if test "x${no_gl}" = "xyes" ; then
     AC_MSG_WARN([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
 fi
@@ -146,6 +165,9 @@ AC_MSG_NOTICE(Storing library files in $LIBDIR)
 AS_AC_EXPAND(DATADIR, $datadir)
 AC_MSG_NOTICE(Storing library files in $LIBDIR)
 
+PIXMAPS_DIR=$DATADIR/scenic/pixmaps
+AC_SUBST(PIXMAPS_DIR)
+
 AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
 AC_MSG_NOTICE(Storing package files in $PKGLIBDIR)
 
@@ -156,45 +178,45 @@ AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
 AC_CONFIG_FILES([
-        Makefile
-        data/Makefile
-        data/glade/Makefile
-        data/pixmaps/Makefile
-        data/themes/Makefile
-        data/themes/Darklooks/Makefile
-        doc/Makefile
-        doc/network/Makefile
-        doc/figures/Makefile
-        man/Makefile
-        utils/Makefile
-        utils/dc-ctl/Makefile
-        src/Makefile
-        py/Makefile
-        py/doc/Makefile
-        py/rtpmidi/Makefile
-        py/rtpmidi/engines/Makefile
-        py/rtpmidi/engines/midi/Makefile
-        py/rtpmidi/protocols/Makefile
-        py/rtpmidi/protocols/rtp/Makefile
-        py/scenic/Makefile
-        py/scenic/configure.py
-        py/scenic/devices/Makefile
-        locale/Makefile
-        locale/en_US/Makefile
-        locale/en_US/LC_MESSAGES/Makefile
-        locale/fr_CA/Makefile
-        locale/fr_CA/LC_MESSAGES/Makefile
-        py/scenic/test/Makefile
-        py/scripts/Makefile
-        src/include/Makefile
-        src/util/Makefile
-        src/gutil/Makefile
-        src/shared_video/Makefile
-        src/tcp/Makefile
-        src/gst/Makefile
-        src/firereset/Makefile
-        src/main/Makefile
-        src/main/test/Makefile
-        ])
+Makefile
+data/Makefile
+data/glade/Makefile
+data/pixmaps/Makefile
+data/themes/Makefile
+data/themes/Darklooks/Makefile
+doc/Makefile
+doc/network/Makefile
+doc/figures/Makefile
+man/Makefile
+utils/Makefile
+utils/dc-ctl/Makefile
+src/Makefile
+py/Makefile
+py/doc/Makefile
+py/rtpmidi/Makefile
+py/rtpmidi/engines/Makefile
+py/rtpmidi/engines/midi/Makefile
+py/rtpmidi/protocols/Makefile
+py/rtpmidi/protocols/rtp/Makefile
+py/scenic/Makefile
+py/scenic/configure.py
+py/scenic/devices/Makefile
+locale/Makefile
+locale/en_US/Makefile
+locale/en_US/LC_MESSAGES/Makefile
+locale/fr_CA/Makefile
+locale/fr_CA/LC_MESSAGES/Makefile
+py/scenic/test/Makefile
+py/scripts/Makefile
+src/include/Makefile
+src/util/Makefile
+src/gutil/Makefile
+src/shared_video/Makefile
+src/tcp/Makefile
+src/gst/Makefile
+src/firereset/Makefile
+src/main/Makefile
+src/main/test/Makefile
+])
 
 AC_OUTPUT

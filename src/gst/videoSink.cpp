@@ -28,6 +28,9 @@
 #include "rtpReceiver.h"
 #include "gutil.h"
 
+// for filesystem ops
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -58,10 +61,14 @@ GtkVideoSink::GtkVideoSink(Pipeline &pipeline, int screen_num) :
 	sliderFrame_(0),
     isFullscreen_(false)
 {
+    namespace fs = boost::filesystem;
     gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(window_), hbox_);
+    fs::path iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
+    if (fs::exists(iconPath))
+        gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.string().c_str(), NULL);
     
     // add listener for window-state-event to detect fullscreenness
     g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);

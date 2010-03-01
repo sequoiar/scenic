@@ -35,10 +35,11 @@ class ErrorDialog(object):
     Error dialog. Fires the deferred given to it once done.
     Use the create static method as a factory.
     """
-    def __init__(self, deferred, message, parent=None):
+    def __init__(self, deferred, message, parent=None, details=None):
         """
         @param deferred: L{Deferred}
-        @param message: str
+        @param message: str or unicode
+        @param details: str or unicode.
         """
         self.deferredResult = deferred
         error_dialog = gtk.MessageDialog(
@@ -47,20 +48,30 @@ class ErrorDialog(object):
             type=gtk.MESSAGE_ERROR, 
             buttons=gtk.BUTTONS_CLOSE, 
             message_format=message)
+        if details is not None:
+            error_dialog.vbox.set_spacing(14)
+            # TODO: i18n !
+            expander = gtk.expander_new_with_mnemonic("Show more details")
+            expander.set_spacing(6)
+            details_label = gtk.Label()
+            details_label.set_text(details)
+            expander.add(details_label)
+            error_dialog.vbox.pack_start(expander, False, False)
+            print("Added details in the error dialog: %s" % (details))
         error_dialog.set_modal(True)
         error_dialog.connect("close", self.on_close)
         error_dialog.connect("response", self.on_response)
-        error_dialog.show()
+        error_dialog.show_all()
 
     @staticmethod
-    def create(message, parent=None):
+    def create(message, parent=None, details=None):
         """
         Returns a Deferred which will be called with a True result.
         @param message: str
         @rettype: L{Deferred}
         """
         d = defer.Deferred()
-        dialog = ErrorDialog(d, message, parent)
+        dialog = ErrorDialog(d, message, parent, details)
         return d
 
     def on_close(self, dialog, *params):

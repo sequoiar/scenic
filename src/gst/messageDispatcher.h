@@ -45,7 +45,6 @@ class MessageDispatcher
         MessageDispatcher() : handlers_() {}
 
         ~MessageDispatcher(){};
-        static MessageDispatcher *instance_;
 };
 
 #endif // _MESSAGE_DISPATCHER_H_ 

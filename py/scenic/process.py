@@ -62,12 +62,12 @@ class ProcessIO(protocol.ProcessProtocol):
     def outReceived(self, data):
         for line in data.splitlines():
             if line != "":
-                print "%9s stdout: %s" % (self.manager.identifier, line)
+                self.manager.stdout_line_signal(line)
 
     def errReceived(self, data):
-        for line in data.splitlines().strip():
+        for line in data.splitlines():
             if line != "":
-                print "%9s stderr: %s" % (self.manager.identifier, line)
+                self.manager.stderr_line_signal(line)
 
     def processEnded(self, reason):
         exit_code = reason.value.exitCode
@@ -106,6 +106,8 @@ class ProcessManager(object):
         self._delayed_kill = None # DelayedCall instance
         
         self.state_changed_signal = sig.Signal()
+        self.stdout_line_signal = sig.Signal()
+        self.stderr_line_signal = sig.Signal()
     
     def _before_shutdown(self):
         """
@@ -116,7 +118,7 @@ class ProcessManager(object):
             msg = "Child still %s. Stopping it before shutdown." % (self.state)
             self.log(msg)
             self.stop()
-
+    
     def is_alive(self):
         """
         Checks if the child is alive.
@@ -160,7 +162,7 @@ class ProcessManager(object):
         if os.path.exists("/bin/bash"):
             shell = "/bin/bash"
         self._time_child_started = time.time()
-        self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], environ, usePTY=True)
+        self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], environ)
         self.pid = self._process_transport.pid
         self.log("Spawned child %s with pid %s." % (self.identifier, self.pid))
     

@@ -25,7 +25,8 @@
 #include "sigint.h"
 #include "logWriter.h"
 
-static bool signal_flag = false;
+// FIXME: this is shared!!!!
+static volatile bool signal_flag = false;
 
 bool signal_handlers::signalFlag()
 {
@@ -55,8 +56,21 @@ static std::string sigToString(int sig)
 
 static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
 {
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
     LOG_INFO("Got signal " << sigToString(sig) << ", going down!");
-    signal_flag = true;
+    if (signal_flag)
+    {
+        static bool killedHard = false;
+        const static std::string lastSignal(sigToString(sig));
+        if (not killedHard)
+        {
+            killedHard = true;
+            THROW_ERROR("Already got " << lastSignal << ", exitting rudely");
+        }
+    }
+    else
+        signal_flag = true;
 }
 
 void signal_handlers::setHandlers()

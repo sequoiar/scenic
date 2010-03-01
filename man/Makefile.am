@@ -11,7 +11,7 @@ common_mandeps = $(top_srcdir)/configure.ac
 milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOptions.cpp $(common_mandeps)
 	$(HELP2MAN) --include=milhouse-man.txt --name="Milhouse is a Gstreamer application for audio and video over RTP" --no-info $(top_builddir)/src/main/milhouse -o $@
 
-scenic.1: $(top_srcdir)/py/scenic/runner.py $(common_mandeps)
+scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  $(top_srcdir)/py/scenic/configure.py.in $(common_mandeps)
 	$(HELP2MAN) --include=scenic-man.txt --name="Scenic Audio/Video Streaming Software for GNU/Linux" --no-info $(top_builddir)/py/scripts/scenic -o $@
 
 midistream.1: $(top_srcdir)/py/scripts/midistream.in $(common_mandeps)

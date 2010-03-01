@@ -64,6 +64,8 @@ def _save(file_name, data):
     except IOError, e:
         raise RuntimeError(e.message)
     else:
+        print("Writing data in JSON to %s" % (file_name))
+        print("%s" % (data))
         json.dump(data, f, indent=4)
     if f is not None:
         f.close()
@@ -111,7 +113,7 @@ class ConfigStateSaving(object):
         for key in sorted(self.__dict__.keys()): 
             value = self.__dict__[key]
             if key in exclude_list:
-                print("Excluding attribute %s since it is in the exclude list." % (key))
+                pass #print("Excluding attribute %s since it is in the exclude list." % (key))
             else:
                 data["configuration"][key] = value
         _save(self._config_path, data)
@@ -123,10 +125,15 @@ class ConfigStateSaving(object):
         self._config_path = _former_file_name
 
     def _load(self):
+        print("Loading configuration from %s" % (self._config_path))
         data = _load(self._config_path)
+        print(str(data))
         for k in data["configuration"].keys():
-            cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
-            setattr(self, k, cast(data["configuration"][k]))
+            if hasattr(self, k):
+                cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
+                setattr(self, k, cast(data["configuration"][k]))
+            else:
+                print("Found configuration key %s but there is no such key anymore." % (k))
 
 class AddressBook(object):
     """

@@ -50,7 +50,8 @@ from scenic.devices import jackd
 from scenic.devices import x11
 from scenic.devices import cameras
 from scenic import gui
-_ = gui._ # gettext
+from scenic import internationalization
+_ = internationalization._
 
 class Config(saving.ConfigStateSaving):
     """
@@ -79,7 +80,7 @@ class Config(saving.ConfigStateSaving):
         #video_window_size = "640x480"
         self.video_aspect_ratio = "4:3" 
         self.confirm_quit = True
-        self.theme = "Darklooks"
+        #self.theme = "Darklooks"
         self.video_bitrate = 3.0
         self.video_jitterbuffer = 75
         
@@ -87,6 +88,7 @@ class Config(saving.ConfigStateSaving):
         config_dir = os.path.expanduser("~/.scenic")
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
+
 
 class Application(object):
     """
@@ -99,8 +101,7 @@ class Application(object):
         self.log_file_name = log_file_name
         self.recv_video_port = None
         self.recv_audio_port = None
-        self.remote_audio_config = {} # dict
-        self.remote_video_config = {} # dict
+        self.remote_config = {} # dict
         self.ports_allocator = ports.PortsAllocator()
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
@@ -111,6 +112,7 @@ class Application(object):
         self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
+        internationalization.setup_i18n()
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
         self.devices = {
             "x11_displays": [], # list of dicts
@@ -136,11 +138,11 @@ class Application(object):
             def _cb(result):
                 reactor.stop()
             print("Cannot start SIC server. %s" % (e))
-            deferred = dialogs.ErrorDialog.create("Is another Scenic running? Cannot bind to port %d" % (self.config.negotiation_port), parent=self.gui.main_window)
+            deferred = dialogs.ErrorDialog.create(_("Is another Scenic running? Cannot bind to port %(port)d") % {"port": self.config.negotiation_port}, parent=self.gui.main_window)
             deferred.addCallback(_cb)
             return
-        # Devices: JACKD
-        self._jackd_watch_task.start(10, now=True)
+        # Devices: JACKD (every 5 seconds)
+        self._jackd_watch_task.start(5, now=True)
         # Devices: X11 and XV
         def _callback(result):
             self.gui.update_widgets_with_saved_config()
@@ -190,7 +192,7 @@ class Application(object):
         def _callback(xvideo_is_present):
             self.devices["xvideo_is_present"] = xvideo_is_present
             if not xvideo_is_present:
-                msg = _("It seems like the xvideo extension is not present our your X11 display ! It is likely to be impossible to receive a video stream.")
+                msg = _("It seems like the xvideo extension is not present. Video display is not possible.")
                 print(msg)
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
         deferred.addCallback(_callback)
@@ -254,13 +256,20 @@ class Application(object):
         """
         return self.streamer_manager.is_busy()
     # -------------------- streamer ports -----------------
-
-    def allocate_ports(self):
+    def prepare_before_rtp_stream(self):
+        self.gui.close_preview_if_running()
+        self.save_configuration()
+        self._allocate_ports()
+        
+    def cleanup_after_rtp_stream(self):
+        self._free_ports()
+    
+    def _allocate_ports(self):
         # TODO: start_session
         self.recv_video_port = self.ports_allocator.allocate()
         self.recv_audio_port = self.ports_allocator.allocate()
 
-    def free_ports(self):
+    def _free_ports(self):
         # TODO: stop_session
         for port in [self.recv_video_port, self.recv_audio_port]:
             try:
@@ -323,8 +332,10 @@ class Application(object):
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
             dialogs.ErrorDialog.create(_("Refused invitation: jack is not running."), parent=self.gui.main_window)
         else:
-            self.remote_audio_config = message["audio"]
-            self.remote_video_config = message["video"]
+            self.remote_config = {
+                "audio": message["audio"],
+                "video": message["video"]
+                }
             connected_deferred = self.client.connect(addr, message["please_send_to_port"])
             if contact is not None:
                 if contact["auto_accept"]:
@@ -359,10 +370,13 @@ class Application(object):
         self.got_bye = False
         # TODO: Use session to contain settings and ports
         self.gui.hide_calling_dialog("accept")
-        self.remote_audio_config = message["audio"]
-        self.remote_video_config = message["video"]
+        self.remote_config = {
+            "audio": message["audio"],
+            "video": message["video"]
+            }
         if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create(_("A streaming session is already in progress."), parent=self.gui.main_window)
+            print("Got ACCEPT but we are busy. This is very strange")
+            dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
         else:
             print("Got ACCEPT. Starting streamers as initiator.")
             self.start_streamers(addr)
@@ -370,7 +384,7 @@ class Application(object):
 
     def handle_refuse(self):
         self.gui._unschedule_offerer_invite_timeout()
-        self.free_ports()
+        self.cleanup_after_rtp_stream()
         self.gui.hide_calling_dialog("refuse")
 
     def handle_ack(self, addr):
@@ -415,7 +429,7 @@ class Application(object):
     # -------------------------- actions on streamer manager --------
 
     def start_streamers(self, addr):
-        self.streamer_manager.start(addr, self.config)
+        self.streamer_manager.start(addr)
 
     def stop_streamers(self):
         # TODO: return a deferred. 
@@ -426,7 +440,7 @@ class Application(object):
         We call this when all streamers are stopped.
         """
         print("on_streamers_stopped got called")
-        self.free_ports()
+        self.cleanup_after_rtp_stream()
 
     # ---------------------- sending messages -----------
         
@@ -476,42 +490,39 @@ class Application(object):
             dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming, JACK is not running."), parent=self.gui.main_window)
             return
             
-        self.allocate_ports()
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming. A streaming session is already in progress."), parent=self.gui.main_window)
         else:
-            # UPDATE when initiating session
-            self.save_configuration() # gathers and save
-        msg = {
-            "msg":"INVITE",
-            "protocol": self.protocol_version,
-            "sid":0, 
-            "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
-            }
-        msg.update(self._get_local_config_message_items())
-        contact = self.address_book.selected_contact
-        port = self.config.negotiation_port
-        ip = contact["address"]
+            self.prepare_before_rtp_stream()
+            msg = {
+                "msg":"INVITE",
+                "protocol": self.protocol_version,
+                "sid":0, 
+                "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
+                }
+            msg.update(self._get_local_config_message_items())
+            contact = self.address_book.selected_contact
+            port = self.config.negotiation_port
+            ip = contact["address"]
 
-        def _on_connected(proto):
-            self.gui._schedule_offerer_invite_timeout()
-            self.client.send(msg)
-            return proto
-        def _on_error(reason):
-            print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
-            self.gui.calling_dialog.hide()
-            return None
-           
-        print("sending %s to %s:%s" % (msg, ip, port))
-        deferred = self.client.connect(ip, port)
-        deferred.addCallback(_on_connected).addErrback(_on_error)
-        self.gui.calling_dialog.show()
-        # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
+            def _on_connected(proto):
+                self.gui._schedule_offerer_invite_timeout()
+                self.client.send(msg)
+                return proto
+            def _on_error(reason):
+                print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
+                self.gui.hide_calling_dialog()# "err", str(reason))
+                return None
+               
+            print("sending %s to %s:%s" % (msg, ip, port))
+            deferred = self.client.connect(ip, port)
+            deferred.addCallback(_on_connected).addErrback(_on_error)
+            self.gui.show_calling_dialog()
+            # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
     
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
-        self.save_configuration()
-        self.allocate_ports()
+        self.prepare_before_rtp_stream()
         msg = {
             "msg":"ACCEPT", 
             "protocol": self.protocol_version,

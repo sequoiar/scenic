@@ -68,9 +68,9 @@ void MilhouseLogger::operator()(LogLevel& level, std::string& msg)
 {
     if (level_ <= level)    // only push to print queue if the loglevel of this msg exceeds 
         printQueue_.push(msg);  // the logger's loglevel
-//    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 }
 
+/// This is executed in printThread_. The only shared data is printQueue_, which is thread-safe
 void MilhouseLogger::printMessages()
 {
     bool done = false;
@@ -79,8 +79,12 @@ void MilhouseLogger::printMessages()
         std::string msg;
         printQueue_.wait_and_pop(msg);
         
+        /// quit when msg starts with quit:, output error and critical msgs to cerr and other msgs to cout
         if (msg != "quit:")
-            std::cout << msg;
+            if (msg.find("ERROR") != std::string::npos or msg.find("CRITICAL") != std::string::npos)
+                std::cerr << msg;
+            else
+                std::cout << msg;
         else  // got a sentinel
             done = true;
         boost::this_thread::sleep(boost::posix_time::milliseconds(1));

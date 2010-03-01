@@ -60,7 +60,7 @@ class RtpReceiver
 
     private:
         virtual void subParseSourceStats(_GstStructure *stats);
-        static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);
+        static _GstPad *getMatchingDepayloaderSinkPad(const std::string &srcMediaType);
         static std::string getMediaType(_GstPad *pad);
         static void onPadAdded(_GstElement * rtpbin, _GstPad * srcPad, void *data);
         static void onSenderTimeout(_GstElement * /* rtpbin */, unsigned /* session */, unsigned /* ssrc */, void * /*data*/);

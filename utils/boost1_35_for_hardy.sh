@@ -9,12 +9,24 @@ then
     DOWNLOAD_DIR=$(mktemp -p /tmp -d)
 fi
 
-uname=$(uname -m)
-arch="i386"
-if [ "x$uname" == "xx86_64" ]
-then
-    arch="amd64"
+which lsb_release >/dev/null
+if [ $? -eq 1 ]; then
+    LSB_RELEASE="lsb_release"
+else
+    echo "No lsb_release command found"
+    exit 1
 fi
+
+DISTRO=$($LSB_RELEASE --short --code )
+if [ "$DISTRO" != "hardy" ]
+then
+    echo "This script is made only for Ubuntu Hardy 8.0.4"
+    echo "Other supported distros have the proper packages available"
+    exit 1
+fi
+
+arch=$(dpkg --print-architecture)
+
 baseurl=http://archive.ubuntu.com/ubuntu/pool/main/b/boost1.35/
 version=1.35
 release=8
