@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include "gutil.h"
 
 #include <list>
 #include <algorithm>
