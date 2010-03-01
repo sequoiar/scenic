@@ -1,35 +1,33 @@
-Release notes for Scenic 0.4.1
+Release notes for Scenic 0.4.2
 
     Milhouse:
-    This minor release fixes a bug with the deinterlace option. It has
-    also been enabled again in the Scenic graphical user interface. We
-    also fixed a bug that was preventing users to see a preview of a local
-    video Web camera. An other bug has also been fixed which made the
-    listing of cameras impossible on Ubuntu Karmic when the libdc1394
-    library was not found. Removed globals.mak
+    This minor release fixes some system-level bugs. Improvements to
+    RTCP stats allow for more detailed info on rtp session quality.
+    Cleaner output so that Scenic can report on errors/etc. Improvements
+    to --list-cameras.
 
     Scenic GUI:
-    This minor release fixes a bug with the Scenic icon which was not
-    showing up in the Gnome menu. It is now under
-    Applications/Internet/Scenic.
+    Lots of improvements to the UI, include more advanced state management for both
+    sessions and processes. More forwarding of info output by Milhouse (errors, rtcp, etc.)
 
-    * Fixed #263 Fixed potential crash in case of wrong JSON library version.
-    * Fixed #264 videoflip is frail with input material
-    * Moved colorspace converter into videoflip
-    * Moved application data out of the Python package.
-    * Flattened gst file hierarchy
-    * Videoflip (and consequently deinterlace) fixed, added extra colorspace element
-    * Installation: shared librairies (except for shared_video) are installed in
-    $(prefix)/lib/scenic instead of just $(prefix)/scenic
-    * Fixed formatting of some i18n strings.
+    Documentation:
+    Documentaion for installation is still accurate, but some operations (video
+    and audio testing) needs to use more Scenic new features. Documentation has
+    been updated to include Debian-specific instructions.  Testing on Debian
+    still have to be made, especially that it doesn't come with a realtime kernel.
+    Hardware support is probably different too. We'll update
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing scenic.
     * In the older source directory, use "make uninstall" as root to uninstall previous
     installations.
     * Don't forget to run ldconfig after installation.
-    * ./utils/install_gstreamer.sh haven't been updated since 0.3.1 so there's no need
-    to rerun it if you did it for more recent versions
+    * As of this release, you may want to run ./utils/install_gstreamer.sh 
+      again or simply apply the utils/rtpsource.diff patch to gst-plugins-good-0.10.17, 
+      then recompile and reinstall it. 
+      Refer to https://bugzilla.gnome.org/show_bug.cgi?id=611213
+      This fix adds receiver side bitrate estimation. Note that milhouse will function 
+      fine without it, as will scenic.
     * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras. Install them 
     with aptitude.
 
@@ -39,65 +37,39 @@ Release notes for Scenic 0.4.1
     Milhouse dependency for Scenic
     Scenic always needs the same version of milhouse, eg. scenic 0.4.1 needs milhouse 0.4.1
 
-Release notes for Scenic 0.4
+Fixes:
 
-Milhouse:
-This release fixes a big regression in caps transmission which broke Vorbis and
-Theora support in 0.3.6.
-New features include better v4l2 controls, the ability to restart a sender
-without restarting a receiver, rtpjitterbuffer control embedded in our output
-window, as well as a lot of cleanup and output fixes.
-
-Scenic:
-Moved the graphical user interface to GTK+ for faster development.
-The Scenic software now polls devices using the Milhouse streamer. 
-We implemented SIC, the SIP Spelled Incorrectly protocol, which mimics SIP 
-to negotiate the streaming session using JSON over TCP/IP.
-Moved Miville code out of trunk. 
-Superseded Miville features within a three week code sprint in GTK+!
-
-
-* Fixed #181 Man page of midistream has each command twice
-* Fixed #182 midistream port range needs to be documented
-* Fixed #92 Separate Integrator Manual from User Manual
-* Fixed #261 Capture size not in state saving
-* Fixed #260 Preview does not use capture setting size
-* Fixed #255 Increase timeout for invited
-* Fixed #218 auto accept
-* Fixed #231 Selected contact should be saved
-* Fixed #259 editing a contact removes its auto_accept flag
-* Fixed #242 invited dialog should display contact name if present in addressbook
-* Fixed #233 Send BYE at shutdown time
-* Fixed #140 make distcheck still fails
-* Fixed #198 make check fails on buildbot because PATH variable is broken
-* Fixed #249 use python_PYTHON instead of dist_bin_SCRIPTS for most python files
-* Fixed #257 Package data is not installed
-* Fixed #248 Show all supported capture sizes to the user
-* Fixed #245 Modernize state saving
-* Fixed #212 Detect v4l2 devices
-* Fixed #211 User source/sink configuration
-* Fixed #217 Implement video deinterlace option
-* Fixed #215 video device configuration
-* Fixed #214 user source configuration
-* Fixed #241 Cleanup in trac components
-* Fixed #243 exit on start up if we can't bind to the negotiation port
-* Fixed #210 Session media description in JSON
-* Fixed #227 don't allow join contact if jack is not running
-* Fixed #239 implement --set-standard and --set-input in milhouse
-* Fixed #216 media format configuration
-* Fixed #226 send_bye doesn't happen when session is stopped
-* Fixed #237 Add more infos in milhouse --list-cameras
-* Fixed #234 dc-ctl should be able to show values, not only save in a file
-* Fixed #199 put rtpjitterbuffer control in xvimagesink window
-* Fixed #235 dc-ctl should be able to get a specific value
-* Fixed #223 Generate about text on the fly
-* Fixed #206 trac needs a category for scenic (gtk-interface)
-* Fixed #213 Support cancel invitation
-* Fixed #225 if no dc camera is plugged in, using videosource=dc1394src will segfault
-* Fixed #224 request pads should be unreffed in rtpreceiver/sender's destructor
-* Fixed #222 receiver should handle new senders
-* Fixed #221 Use ports allocator
-* Fixed #205 closing dialogs has permanent side effects in maugis
-* Fixed #208 rename gtk widgets (dialogs)
-* Fixed #209 Pango markup setlabel bug in scenic
-* Fixed #207 closing video window is broken
+#283: X11 display option is not working in the GUI
+#284: X11 device setting is not saved in state saving
+#298: Sender doesn't give the audio codec that the receiver wants.
+#315: Add a window icon to milhouse
+#162: when using dc1394src, if you use the same device in another process, interrupt won't work on milhouse
+#204: test_dc_ctl segfaults on Karmic
+#240: check if the videodevice is v4l2, not v4l
+#244: Change status icons for each contact
+#253: Improve preview window behaviour
+#264: videoflip is frail with input material
+#268: Show infos when streaming
+#270: deactivate certain widgets while streaming
+#275: use rtcp stats to determine streaming status in scenic
+#276: when done streaming, video bitrate widget becomes sensitive for theora
+#278: Crash with info formatting when using theora
+#279: Add RTCP stats to GUI
+#280: Consider only the last 2 seconds for packet loss
+#281: Parse milhouse output for errors and warnings
+#296: configure detect presence or absence of libboost*dev libraries and header, but don't act accordingly
+#297: gtk theme is not loaded on karmic
+#299: Display bitrate stats in sender
+#300: Display a summary of session errors in a single error dialog
+#301: Report bitrate on receiver side.
+#307: Make sure all messages are internationalized
+#313: The IP address field for a new contact only accepts 15 characters
+#256: Some dialogs lose their contents
+#266: gtkrc theme not loaded on Karmic
+#267: GtkSpinButton setting an adjustment with non-zero page size is deprecated
+#273: Contact name in the milhouse window
+#277: Show local IP in summary
+#289: Validate domain name addresses and IP addresses
+#269: Use gtk.TextIter to create tags in the summary text view
+#271: bad folder permission for scenic-0.4.1 extracted with fileroller
+#247: --snapshot-file argument to display a snaphost in the GUI
