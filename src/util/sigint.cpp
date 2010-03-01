@@ -25,7 +25,8 @@
 #include "sigint.h"
 #include "logWriter.h"
 
-static bool signal_flag = false;
+// FIXME: this is shared!!!!
+static volatile bool signal_flag = false;
 
 bool signal_handlers::signalFlag()
 {
