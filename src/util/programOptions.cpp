@@ -95,6 +95,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("display", po::value<string>(), "set DISPLAY environment variable")
             ("v4l2-standard", po::value<string>(), "set v4l2 standard (NTSC,PAL)")
             ("v4l2-input", po::value<int>(), "set v4l2 input (0,1,2)")
+            ("x-window-id", po::value<unsigned long>()->default_value(0), "set x-window-id to display video in an existing window")
             ;
 
         descriptionInitialized = true;
@@ -114,6 +115,10 @@ MapMsg ProgramOptions::toMapMsg(const po::variables_map &options)
             msg[iter->first] =  iter->second.as<int>();
         else if (iter->second.value().type() == typeid(bool))
             msg[iter->first] =  iter->second.as<bool>();
+        else if (iter->second.value().type() == typeid(unsigned long))
+            msg[iter->first] =  static_cast<int>(iter->second.as<unsigned long>());
+        else
+            LOG_WARNING("Unexpected type");
 
     return msg;
 }

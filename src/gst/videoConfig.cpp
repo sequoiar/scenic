@@ -217,7 +217,8 @@ VideoSinkConfig::VideoSinkConfig(MapMsg &msg) :
     /// if display-resolution is not specified, default to capture-resolution
     displayWidth_(std::min(static_cast<int>(msg["display-width"] ? msg["display-width"] : msg["width"]), VideoScale::MAX_SCALE)),
     displayHeight_(std::min(static_cast<int>(msg["display-height"] ? msg["display-height"] : msg["height"]), VideoScale::MAX_SCALE)),
-    flipMethod_(msg["flip-video"])
+    flipMethod_(msg["flip-video"]),
+    xid_(static_cast<int>(msg["x-window-id"]))
 {}
 
 
@@ -248,12 +249,12 @@ int VideoSinkConfig::effectiveDisplayHeight() const
 VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
+        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_, xid_);
     else if (sink_ == "ximagesink")
         return new XImageSink(pipeline);
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
+        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_, xid_);
 #endif
     else if (sink_ == "sharedvideosink")
         return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);

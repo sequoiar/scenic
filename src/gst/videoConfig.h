@@ -103,6 +103,7 @@ class VideoSinkConfig
         const int displayWidth_;
         const int displayHeight_;
         const std::string flipMethod_;
+        const unsigned long xid_;
 };
 
 #endif // _VIDEO_CONFIG_H_

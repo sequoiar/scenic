@@ -45,7 +45,6 @@ class VideoSink : public GstLinkableSink, boost::noncopyable
 
     protected:
         virtual void destroySink();
-        void prepareSink();
         Pipeline &pipeline_;
         _GstElement *sink_;
 };
@@ -54,10 +53,15 @@ class GtkVideoSink
 : public VideoSink, public MessageHandler
 {
     public:
-        GtkVideoSink(Pipeline &pipeline, int screen_num);
+        GtkVideoSink(Pipeline &pipeline, int screen_num, unsigned long xid);
         void createControl();
         virtual ~GtkVideoSink(){};
         void showWindow();
+
+    private:     /// other member vars depend on xid
+        unsigned long xid_;
+        virtual bool handleMessage(const std::string &path, const std::string &arguments);
+        bool isFullscreen_;
 
     protected:
         void toggleFullscreen() { toggleFullscreen(window_); }
@@ -79,10 +83,7 @@ class GtkVideoSink
         void toggleFullscreen(_GtkWidget *widget);
         void hideCursor();
         void showCursor();
-
-    private:
-        virtual bool handleMessage(const std::string &path, const std::string &arguments);
-        bool isFullscreen_;
+        bool hasWindow() const;
 };
 
 
@@ -90,7 +91,7 @@ class XvImageSink
 : public GtkVideoSink, public BusMsgHandler
 {
     public:
-        XvImageSink(Pipeline &pipeline, int width, int height, int screenNum);
+        XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid);
         bool handleBusMsg(_GstMessage *msg);
 
     private:
