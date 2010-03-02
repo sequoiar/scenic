@@ -447,13 +447,7 @@ class Gui(object):
         if self._video_view_preview_toggled_by_user:
             if widget.get_active():
                 self.app.save_configuration() #gathers and saves
-                x_window_id = None
-                if not self.preview_in_window_widget.get_active():
-                    if self.preview_area_x_window_id is None:
-                        print("WARNING: XID of the preview drawing area is None !")
-                    else:
-                        x_window_id = self.preview_area_x_window_id
-                self.preview_manager.start(x_window_id)
+                self.preview_manager.start()
             else:
                 self.preview_manager.stop()
 
@@ -726,6 +720,10 @@ class Gui(object):
         video_bitrate = self.video_bitrate_widget.get_value() # spinbutton (float)
         self.app.config.video_bitrate = float(video_bitrate)
         print ' * video_bitrate:', self.app.config.video_bitrate
+        # VIDEO PREVIEW
+        preview_in_window = self.preview_in_window_widget.get_active()
+        self.app.config.preview_in_window = preview_in_window
+        print " * preview_in_window: ", preview_in_window
         
         # AUDIO:
         audio_source_readable = _get_combobox_value(self.audio_source_widget)
@@ -794,6 +792,10 @@ class Gui(object):
         video_bitrate = self.app.config.video_bitrate
         self.video_bitrate_widget.set_value(video_bitrate) # spinbutton
         print ' * video_bitrate:', video_bitrate
+        # VIDEO PREVIEW
+        preview_in_window = self.app.config.preview_in_window
+        self.preview_in_window_widget.set_active(preview_in_window)
+        print " * preview_in_window: ", preview_in_window
         
         # ADDRESSBOOK:
         # Init addressbook contact list:

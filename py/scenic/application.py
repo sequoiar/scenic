@@ -77,6 +77,7 @@ class Config(saving.ConfigStateSaving):
         self.video_display = ":0.0"
         self.video_fullscreen = False
         self.video_capture_size = "640x480"
+        self.preview_in_window = False
         #video_window_size = "640x480"
         self.video_aspect_ratio = "4:3" 
         self.confirm_quit = True
