@@ -30,6 +30,8 @@ Former Notes
 import sys
 import os
 import smtplib
+import gtk
+import gtk.gdk
 import gtk.glade
 import webbrowser
 from twisted.internet import reactor
@@ -405,6 +407,7 @@ class Gui(object):
         xid = self.preview_area_widget.window.xid
         print("Preview area X Window ID: %s" % (xid))
         self.preview_area_x_window_id = xid
+        self.preview_area_widget.window.set_background(gtk.gdk.Color(0, 0, 0)) # black
 
     def on_preview_manager_state_changed(self, manager, new_state):
         if new_state == process.STATE_STOPPED:
@@ -949,6 +952,11 @@ class Gui(object):
             self.info_send_audio_widget.set_text("")
             self.info_receive_video_widget.set_text("")
             self.info_receive_audio_widget.set_text("")
+        
+        # also clean up the preview drawing area
+        if not self.preview_manager.is_busy():
+            if self.preview_area_x_window_id is not None:
+                self.preview_area_widget.window.clear()
         
     def update_local_ip(self):
         """
