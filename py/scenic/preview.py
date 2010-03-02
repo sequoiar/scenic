@@ -23,7 +23,7 @@ class Preview(object):
         """
         return self.state != process.STATE_STOPPED
         
-    def _create_command(self):
+    def _create_command(self, x_window_id):
         """
         Looks in the settings, and returns a bash command to run for the preview.
         Note that the preview doesn't use the display option, which sets the X11 DISPLAY.
@@ -34,17 +34,19 @@ class Preview(object):
         aspect_ratio = self.app.config.video_aspect_ratio
         window_title = _("Local preview")
         command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio)
+        if x_window_id is not None:
+            command += " --x-window-id %d" % (x_window_id)
         if self.app.config.video_source != "videotestsrc":
             command += " --videodevice %s" % (self.app.config.video_device)
         return command
         
-    def start(self):
+    def start(self, x_window_id=None):
         print("Starting the preview")
         if self.state != process.STATE_STOPPED:
             raise RuntimeError("Cannot start preview since it is %s." % (self.state)) # the programmer has done something wrong if we're here.
         else:
             #self.app.save_configuration() DONE IN THE GUI
-            command = self._create_command()
+            command = self._create_command(x_window_id)
         self.process_manager = process.ProcessManager(command=command, identifier="preview")
         self.process_manager.state_changed_signal.connect(self.on_process_state_changed)
         self._set_state(process.STATE_STARTING)

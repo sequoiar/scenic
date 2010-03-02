@@ -247,7 +247,8 @@ class Application(object):
             print('stopping server')
         reactor.callLater(0.1, _later)
         d1 = self.server.close()
-        return defer.DeferredList([deferred, d1])
+        d2 = self.gui.close_preview_if_running()
+        return defer.DeferredList([deferred, d1, d2])
         
     # ------------------------- session occuring -------------
     def has_session(self):
@@ -257,7 +258,8 @@ class Application(object):
         return self.streamer_manager.is_busy()
     # -------------------- streamer ports -----------------
     def prepare_before_rtp_stream(self):
-        self.gui.close_preview_if_running()
+        #TODO: return a Deferred
+        self.gui.close_preview_if_running() # TODO: use its deferred
         self.save_configuration()
         self._allocate_ports()
         
@@ -493,6 +495,7 @@ class Application(object):
         if self.streamer_manager.is_busy():
             dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming. A streaming session is already in progress."), parent=self.gui.main_window)
         else:
+            #TODO: use the Deferred it will return
             self.prepare_before_rtp_stream()
             msg = {
                 "msg":"INVITE",
@@ -522,6 +525,7 @@ class Application(object):
     
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
+        #TODO: use the Deferred it will return
         self.prepare_before_rtp_stream()
         msg = {
             "msg":"ACCEPT", 

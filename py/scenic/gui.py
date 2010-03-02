@@ -287,6 +287,10 @@ class Gui(object):
         self.v4l2_input_widget = widgets_tree.get_widget("v4l2_input")
         self.v4l2_standard_widget = widgets_tree.get_widget("v4l2_standard")
         self.video_jitterbuffer_widget = widgets_tree.get_widget("video_jitterbuffer")
+        # video preview:
+        self.preview_area_widget = widgets_tree.get_widget("preview_area")
+        self.preview_area_x_window_id = None
+        self.preview_in_window_widget = widgets_tree.get_widget("preview_in_window")
         
         # audio
         self.audio_source_widget = widgets_tree.get_widget("audio_source")
@@ -395,6 +399,12 @@ class Gui(object):
 
     # --------------- slots for some widget events ------------
 
+    def on_preview_area_realize(self, *args):
+        # XXX        
+        xid = self.preview_area_widget.window.xid
+        print("Preview area X Window ID: %s" % (xid))
+        self.preview_area_x_window_id = xid
+
     def on_preview_manager_state_changed(self, manager, new_state):
         if new_state == process.STATE_STOPPED:
             print("Making the preview button to False since the preview process died.")
@@ -405,8 +415,21 @@ class Gui(object):
                 self.preview_manager.stop()
 
     def close_preview_if_running(self):
+        """
+        @rettype: L{Deferred}
+        """
+        def _cl(deferred):
+            if self.preview_manager.is_busy():
+                reactor.callLater(0.01, _cl, deferred)
+            else:
+                deferred.callback(None)
         if self.preview_manager.is_busy():
             self.preview_manager.stop()
+            deferred = defer.Deferred()
+            reactor.callLater(0.01, _cl, deferred)
+            return deferred
+        else:
+            return defer.succeed(None)
         
     def on_video_view_preview_toggled(self, widget):
         """
@@ -420,7 +443,13 @@ class Gui(object):
         if self._video_view_preview_toggled_by_user:
             if widget.get_active():
                 self.app.save_configuration() #gathers and saves
-                self.preview_manager.start()
+                x_window_id = None
+                if not self.preview_in_window_widget.get_active():
+                    if self.preview_area_x_window_id is None:
+                        print("WARNING: XID of the preview drawing area is None !")
+                    else:
+                        x_window_id = self.preview_area_x_window_id
+                self.preview_manager.start(x_window_id)
             else:
                 self.preview_manager.stop()
 
