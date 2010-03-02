@@ -33,6 +33,7 @@ import smtplib
 import gtk.glade
 import webbrowser
 from twisted.internet import reactor
+from twisted.internet import defer
 from twisted.internet import task
 from twisted.python.reflect import prefixedMethods
 from scenic import configure
