@@ -403,7 +403,8 @@ class Gui(object):
     # --------------- slots for some widget events ------------
 
     def on_preview_area_realize(self, *args):
-        # XXX        
+        # avoid bad xid errors
+        gtk.gdk.display_get_default().sync()
         xid = self.preview_area_widget.window.xid
         print("Preview area X Window ID: %s" % (xid))
         self.preview_area_x_window_id = xid
