@@ -834,14 +834,8 @@ class Gui(object):
         """
         _video_widgets_to_toggle_sensitivity = [
             self.video_capture_size_widget,
-            self.video_display_widget,
             self.video_source_widget,
-            self.video_codec_widget,
-            self.video_fullscreen_widget,
-            self.video_deinterlace_widget,
-            self.video_jitterbuffer_widget,
             self.aspect_ratio_widget,
-            
             self.video_view_preview_widget,
             self.preview_in_window_widget, 
             ]
@@ -854,6 +848,11 @@ class Gui(object):
             self.add_contact_widget,
             self.remove_contact_widget,
             self.edit_contact_widget,
+            self.video_fullscreen_widget,
+            self.video_deinterlace_widget,
+            self.video_jitterbuffer_widget,
+            self.video_codec_widget,
+            self.video_display_widget,
             ]
         
         self.update_bitrate_and_codec()
