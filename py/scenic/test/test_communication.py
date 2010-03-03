@@ -68,7 +68,8 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
         app = DummyApp()
         self.server = communication.Server(app, PORT)
         self.server.received_command_signal.connect(self._on_received_command)
-        self.client = communication.Client(app.on_connection_error)
+        self.client = communication.Client()
+        self.client.connection_error_signal.connect(app.on_connection_error)
         d1 = self.server.start_listening()
         d2 = self.client.connect("localhost", PORT)
         #print "starting server...."
