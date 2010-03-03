@@ -161,12 +161,14 @@ class ErrorDialog(object):
     Error dialog. Fires the deferred given to it once done.
     Use the create static method as a factory.
     """
-    def __init__(self, deferred, message, parent=None, details=None):
+    def __init__(self, deferred, message, parent=None, details=None, timeout=300): # timeout is 5 minutes
         """
         @param deferred: L{Deferred}
         @param message: str or unicode
         @param details: str or unicode.
+        @param timeout: lifetime in seconds. If set to None, disables it.
         """
+        #FIXME: error_dialog should be an attribute of this class
         self.deferredResult = deferred
         error_dialog = gtk.MessageDialog(
             parent=parent, 
@@ -184,10 +186,17 @@ class ErrorDialog(object):
             expander.add(details_label)
             error_dialog.vbox.pack_start(expander, False, False)
             print("Added details in the error dialog: %s" % (details))
+        self._delayed_id = None
+        if timeout is not None:
+            self._delayed_id = reactor.callLater(timeout, self._timeout, error_dialog)
         error_dialog.set_modal(True)
         error_dialog.connect("close", self.on_close)
         error_dialog.connect("response", self.on_response)
         error_dialog.show_all()
+
+    def _timeout(self, error_dialog):
+        print("error dialog timeout. Closing it.")
+        self.terminate(error_dialog)
 
     @staticmethod
     def create(message, parent=None, details=None):
@@ -214,6 +223,9 @@ class ErrorDialog(object):
         self.terminate(dialog)
 
     def terminate(self, dialog):
+        if self._delayed_id is not None:
+            if self._delayed_id.active():
+                self._delayed_id.cancel()
         dialog.destroy()
         self.deferredResult.callback(True)
 
