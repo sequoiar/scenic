@@ -1627,7 +1627,6 @@ PAL</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="has_tooltip">True</property>
-                                                    <property name="tooltip_text">Deinterlace makes a nicer image, but it adds latency.</property>
                                                     <property name="label" translatable="yes">In a window</property>
                                                     <property name="use_underline">True</property>
                                                     <property name="xalign">1</property>
