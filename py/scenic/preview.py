@@ -53,9 +53,17 @@ class Preview(object):
         else:
             command = self._create_command()
         self.process_manager = process.ProcessManager(command=command, identifier="preview")
+        self.process_manager.stdout_line_signal.connect(self.on_stdout_line)
+        self.process_manager.stderr_line_signal.connect(self.on_stderr_line)
         self.process_manager.state_changed_signal.connect(self.on_process_state_changed)
         self._set_state(process.STATE_STARTING)
         self.process_manager.start()
+
+    def on_stdout_line(self, line):
+        print line
+
+    def on_stderr_line(self, line):
+        print line        
         
     def on_process_state_changed(self, process_manager, process_state):
         """

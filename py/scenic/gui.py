@@ -897,15 +897,14 @@ class Gui(object):
         
         # also clean up the preview drawing area every second
         if self.preview_manager.is_busy():
-            already_what_we_want = not self.preview_in_window_widget.get_property('sensitive')
-            if not already_what_we_want:
+            if self.preview_in_window_widget.get_property('sensitive'):
                 for widget in _video_widgets_to_toggle_sensitivity:
                     if widget is not self.video_view_preview_widget:
                         widget.set_sensitive(False)
-            elif not is_streaming:
+        else:
+            if not is_streaming: # FIXME
                 for widget in _video_widgets_to_toggle_sensitivity:
                     widget.set_sensitive(True)
-        else:
             if self.preview_area_x_window_id is not None:
                 if self.preview_area_widget.window is not None:
                     self.preview_area_widget.window.clear()
