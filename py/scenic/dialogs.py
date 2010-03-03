@@ -161,7 +161,7 @@ class ErrorDialog(object):
     Error dialog. Fires the deferred given to it once done.
     Use the create static method as a factory.
     """
-    def __init__(self, deferred, message, parent=None, details=None, timeout=300): # timeout is 5 minutes
+    def __init__(self, deferred, message, parent=None, details=None, timeout=None): # timeout is 5 minutes
         """
         @param deferred: L{Deferred}
         @param message: str or unicode
