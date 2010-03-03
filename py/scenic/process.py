@@ -7,14 +7,13 @@ import os
 import time
 import logging
 import signal
-
 from twisted.internet import error
 from twisted.internet import protocol
 from twisted.internet import reactor
 from twisted.python import procutils
 from twisted.internet import utils
-
 from scenic import sig
+from scenic import configure
 
 # constants for the slave process
 STATE_STARTING = "STARTING"
@@ -40,7 +39,7 @@ def run_once(executable, *args):
         return None
     else:
         print("Calling %s %s" % (executable, list(args)))
-        d = utils.getProcessValue(executable, args, os.environ, '.', reactor)
+        d = utils.getProcessValue(executable, args, configure.environ_without_custom(), '.', reactor)
         d.addCallback(_cb)
         return d
 
@@ -154,7 +153,7 @@ class ProcessManager(object):
         self.log("Will run command %s %s" % (self.identifier, str(self.command)))
         self._child_process = ProcessIO(self)
         environ = {}
-        environ.update(os.environ)
+        environ.update(configure.environ_without_custom())
         for key, val in self.env.iteritems():
             environ[key] = val
         self.set_child_state(STATE_STARTING)
