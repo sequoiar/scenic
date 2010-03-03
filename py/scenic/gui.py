@@ -832,36 +832,40 @@ class Gui(object):
          * the label
         Makes the contact list sensitive or not.
         """
-        _widgets_to_toggle_sensitivity = [
+        _video_widgets_to_toggle_sensitivity = [
             self.video_capture_size_widget,
             self.video_display_widget,
             self.video_source_widget,
             self.video_codec_widget,
             self.video_fullscreen_widget,
-            self.video_view_preview_widget,
             self.video_deinterlace_widget,
             self.video_jitterbuffer_widget,
             self.aspect_ratio_widget,
             
+            self.video_view_preview_widget,
+            self.preview_in_window_widget, 
+            ]
+        
+        _other_widgets_to_toggle_sensitivity = [
             self.audio_source_widget,
             self.audio_codec_widget,
             self.audio_numchannels_widget,
-            
             self.contact_list_widget,
             self.add_contact_widget,
             self.remove_contact_widget,
             self.edit_contact_widget,
             ]
         
-        
         self.update_bitrate_and_codec()
         
         is_streaming = self.app.has_session()
+        is_previewing =  self.preview_manager.is_busy()
         if is_streaming:
             details = self.app.streamer_manager.session_details
-        currently_sensitive = self.contact_list_widget.get_property("sensitive")
-        state_has_changed = is_streaming == currently_sensitive
-        if state_has_changed:
+        _contact_list_currently_sensitive = self.contact_list_widget.get_property("sensitive")
+        streaming_state_has_changed = is_streaming == _contact_list_currently_sensitive
+        if streaming_state_has_changed:
+            print("straming state has changed to %s" % (is_streaming))
             if is_streaming:
                 text = _("Stop streaming")
                 icon = gtk.STOCK_CONNECT
@@ -872,9 +876,13 @@ class Gui(object):
             self.invite_icon_widget.set_from_stock(icon, 4)
             
             # Toggle sensitivity of many widgets:
-            print 'Got to change the sensitivity of many widgets to', not is_streaming
-            for widget in _widgets_to_toggle_sensitivity:
-                widget.set_sensitive(not is_streaming)
+            new_sensitivity = not is_streaming
+            print 'Got to change the sensitivity of many widgets to', new_sensitivity
+            for widget in _other_widgets_to_toggle_sensitivity:
+                widget.set_sensitive(new_sensitivity)
+            for widget in _video_widgets_to_toggle_sensitivity:
+                widget.set_sensitive(new_sensitivity)
+                
             # Update the summary: 
             # peer: --------------------------------
             if is_streaming:
@@ -885,6 +893,24 @@ class Gui(object):
             else:
                 self.info_peer_widget.set_text(_("Not connected"))
 
+        self._update_rtcp_stats(is_streaming)
+        
+        # also clean up the preview drawing area every second
+        if self.preview_manager.is_busy():
+            already_what_we_want = not self.preview_in_window_widget.get_property('sensitive')
+            if not already_what_we_want:
+                for widget in _video_widgets_to_toggle_sensitivity:
+                    if widget is not self.video_view_preview_widget:
+                        widget.set_sensitive(False)
+            elif not is_streaming:
+                for widget in _video_widgets_to_toggle_sensitivity:
+                    widget.set_sensitive(True)
+        else:
+            if self.preview_area_x_window_id is not None:
+                if self.preview_area_widget.window is not None:
+                    self.preview_area_widget.window.clear()
+
+    def _update_rtcp_stats(self, is_streaming=False):
         # update the audio and video summary:(even if the state has not just changed)
         if is_streaming:
             def _bitrate_string(bitrate):
@@ -901,7 +927,7 @@ class Gui(object):
                 else:
                     return ""
 
-
+            details = self.app.streamer_manager.session_details
             rtcp_stats = self.app.streamer_manager.rtcp_stats
             # send video: --------------------------------
             _info_send_video = _("%(width)dx%(height)d %(codec)s") % {
@@ -956,10 +982,6 @@ class Gui(object):
             self.info_receive_video_widget.set_text("")
             self.info_receive_audio_widget.set_text("")
         
-        # also clean up the preview drawing area
-        if not self.preview_manager.is_busy():
-            if self.preview_area_x_window_id is not None:
-                self.preview_area_widget.window.clear()
         
     def update_local_ip(self):
         """
