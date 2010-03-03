@@ -109,7 +109,7 @@ class Application(object):
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = communication.Client()
-        self.client.connection_error_signal.connect(self.on_connection_error)
+        #self.client.connection_error_signal.connect(self.on_connection_error)
         self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
@@ -530,7 +530,7 @@ class Application(object):
                 elif exc_type is error.ConnectError:
                     msg = _("No route to host %(ip)s.") % {"ip": ip}
                 else:
-                    msg = _("Error trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "port": port, "reason": reason}
+                    msg = _("Error trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "port": port, "reason": reason.value}
                 print(msg)
                 self.gui.hide_calling_dialog()
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
@@ -592,12 +592,12 @@ class Application(object):
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
-    def on_connection_error(self, err, msg):
-        """
-        @param err: Exception message.
-        @param msg: Legible message.
-        """
-        self.gui.hide_calling_dialog()
-        text = _("Connection error: %(message)s\n%(error)s") % {"error": err, "message": msg}
-        dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
+    #def on_connection_error(self, err, msg):
+    #    """
+    #    @param err: Exception message.
+    #    @param msg: Legible message.
+    #    """
+    #    self.gui.hide_calling_dialog()
+    #    text = _("Connection error: %(message)s\n%(error)s") % {"error": err, "message": msg}
+    #    dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
