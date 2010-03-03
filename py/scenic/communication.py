@@ -49,10 +49,10 @@ class Server(object):
     def on_dict_received(self, server_proto, d):
         print "Communication: received", d
         msg = d
-        self.last_message_received = d["msg"]
         addr = server_proto.get_peer_ip()
         self.remote_ip = addr
         self.received_command_signal(msg, addr)
+        self.last_message_received = d["msg"]
 
     def change_port(self, new_port):
         """

@@ -306,6 +306,12 @@ class Application(object):
             return True
 
     def handle_invite(self, message, addr):
+        """
+        handles the INVITE message. 
+        Refuses if : 
+         * jackd is not running
+         * We already just got an INVITE and didn't answer yet.
+        """
         self.got_bye = False
         self._check_protocol_version(message)
         
@@ -321,17 +327,29 @@ class Application(object):
         # check if the contact is in the addressbook
         contact = self._get_contact_by_addr(addr)
         invited_by = addr
+        send_to_port = message["please_send_to_port"]
+
+        def _simply_refuse():
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0})
+        
         if contact is not None:
             invited_by = contact["name"]
 
+        if self.get_last_message_received() == "INVITE" and self.get_last_message_sent() != "REFUSE": # FIXME: does that cover all cases?
+            _simply_refuse()
+            print("REFUSED an INVITE since we already got one from someone else.")
+            return
+            
         if self.streamer_manager.is_busy():
-            send_to_port = message["please_send_to_port"]
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
+            _simply_refuse()
             print("Refused invitation: we are busy.")
-        elif not self.devices["jackd_is_running"]:
-            send_to_port = message["please_send_to_port"]
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
+            return 
+        
+        if not self.devices["jackd_is_running"]:
+            _simply_refuse()
             dialogs.ErrorDialog.create(_("Refused invitation: jack is not running."), parent=self.gui.main_window)
+            return
+        
         else:
             self.remote_config = {
                 "audio": message["audio"],
