@@ -1582,9 +1582,32 @@ PAL</property>
                                                 <property name="receives_default">True</property>
                                                 <property name="has_tooltip">True</property>
                                                 <property name="tooltip_text">Open a window with the selected video source</property>
-                                                <property name="label" translatable="yes">Preview</property>
                                                 <property name="response_id">0</property>
                                                 <signal name="toggled" handler="on_video_view_preview_toggled"/>
+                                                <child>
+                                                  <widget class="GtkHBox" id="hbox13">
+                                                    <property name="visible">True</property>
+                                                    <child>
+                                                      <widget class="GtkImage" id="video_preview_icon">
+                                                        <property name="visible">True</property>
+                                                        <property name="stock">gtk-media-play</property>
+                                                      </widget>
+                                                      <packing>
+                                                        <property name="expand">False</property>
+                                                        <property name="fill">False</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <widget class="GtkLabel" id="label3">
+                                                        <property name="visible">True</property>
+                                                        <property name="label" translatable="yes">Preview</property>
+                                                      </widget>
+                                                      <packing>
+                                                        <property name="position">1</property>
+                                                      </packing>
+                                                    </child>
+                                                  </widget>
+                                                </child>
                                               </widget>
                                               <packing>
                                                 <property name="y_options"></property>
@@ -2304,6 +2327,9 @@ JACK</property>
                                 <property name="n_rows">2</property>
                                 <property name="n_columns">3</property>
                                 <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
                                   <widget class="GtkHBox" id="jack_running_hbox">
                                     <property name="visible">True</property>
                                     <child>
@@ -2333,16 +2359,6 @@ JACK</property>
                                       </packing>
                                     </child>
                                   </widget>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="empty">
-                                    <property name="visible">True</property>
-                                    <property name="ypad">10</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                  </packing>
                                 </child>
                                 <child>
                                   <widget class="GtkLabel" id="jack_latency">

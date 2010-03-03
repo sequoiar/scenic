@@ -519,7 +519,7 @@ class Application(object):
             ip = contact["address"]
 
             def _on_connected(proto):
-                self.gui._schedule_offerer_invite_timeout()
+                self.gui._schedule_inviting_timeout_delayed()
                 self.client.send(msg)
                 return proto
             def _on_error(reason):

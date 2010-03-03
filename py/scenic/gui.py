@@ -305,6 +305,7 @@ class Gui(object):
         self._video_view_preview_toggled_by_user = True
         # preview:
         self.preview_manager = preview.Preview(self.app)
+        self.video_preview_icon_widget = widgets_tree.get_widget("video_preview_icon")
         self.preview_manager.state_changed_signal.connect(self.on_preview_manager_state_changed)
         self.main_window.show()
         
@@ -391,6 +392,9 @@ class Gui(object):
             self._video_view_preview_toggled_by_user = True
             if self.preview_manager.is_busy():
                 self.preview_manager.stop()
+            self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_PLAY, 4)
+        elif new_state == process.STATE_STARTING:
+            self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_STOP, 4)
 
     def close_preview_if_running(self):
         """
@@ -805,6 +809,10 @@ class Gui(object):
          * the label
         Makes the contact list sensitive or not.
         """
+        self._toggle_streaming_state_sensitivity()
+        self._update_rtcp_stats()
+
+    def _toggle_streaming_state_sensitivity(self):
         _video_widgets_to_toggle_sensitivity = [
             self.video_capture_size_widget,
             self.video_source_widget,
@@ -865,23 +873,25 @@ class Gui(object):
             else:
                 self.info_peer_widget.set_text(_("Not connected"))
 
-        self._update_rtcp_stats(is_streaming)
         
         # also clean up the preview drawing area every second
         if self.preview_manager.is_busy():
-            if self.preview_in_window_widget.get_property('sensitive'):
+            if self.preview_in_window_widget.get_property('sensitive'): # check if we have to change their state.
                 for widget in _video_widgets_to_toggle_sensitivity:
                     if widget is not self.video_view_preview_widget:
                         widget.set_sensitive(False)
+                # change icon
         else:
             if not is_streaming: # FIXME
+                #if self.video_preview_icon_widget.get_stock() == gtk.STOCK_MEDIA_STOP:
                 for widget in _video_widgets_to_toggle_sensitivity:
                     widget.set_sensitive(True)
             if self.preview_area_x_window_id is not None:
                 if self.preview_area_widget.window is not None:
                     self.preview_area_widget.window.clear()
 
-    def _update_rtcp_stats(self, is_streaming=False):
+    def _update_rtcp_stats(self):
+        is_streaming = self.app.has_session()
         # update the audio and video summary:(even if the state has not just changed)
         if is_streaming:
             def _bitrate_string(bitrate):
