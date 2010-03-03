@@ -361,6 +361,8 @@ class Application(object):
         return ret
     
     def handle_cancel(self):
+        if self.get_last_message_sent() == "ACCEPT":
+            self.cleanup_after_rtp_stream()
         self.client.disconnect()
         self.gui.invited_dialog.hide()
         dialogs.ErrorDialog.create(_("Remote peer cancelled invitation."), parent=self.gui.main_window)
@@ -584,6 +586,7 @@ class Application(object):
         """
         self.client.send({"msg":"CANCEL", "sid":0})
         self.client.disconnect()
+        self.cleanup_after_rtp_stream()
     
     def send_refuse_and_disconnect(self):
         """
