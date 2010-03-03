@@ -144,7 +144,7 @@ const char* VideoSourceConfig::deviceName() const
 
 int VideoSourceConfig::listCameras()
 {
-    DC1394::listCameras();
+    Dc1394::listCameras();
     v4l2util::listCameras();
     return 0;
 }

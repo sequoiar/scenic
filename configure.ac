@@ -92,7 +92,7 @@ fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 
-dnl check for python, FIXME are we checking for python twice?
+dnl check for python
 AM_PATH_PYTHON([2.5])
 
 # BOOST m4 tests

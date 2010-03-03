@@ -188,7 +188,7 @@ bool modeIsSupported(int mode, const dc1394video_modes_t &supportedModes,
 
 
 /// FIXME: have all the modes here and this will also depend on framerate
-bool DC1394::requiresMoreISOSpeed(int mode)
+bool Dc1394::requiresMoreISOSpeed(int mode)
 {
     switch (mode)
     {
@@ -208,7 +208,7 @@ bool DC1394::requiresMoreISOSpeed(int mode)
     }
 }
 
-int DC1394::capsToMode(int cameraId, int width, int height, 
+int Dc1394::capsToMode(int cameraId, int width, int height, 
         const std::string &colourspace, int framerate)
 {
     Dc1394Handle dc(cameraId);
@@ -244,48 +244,46 @@ int Dc1394Handle::capsToMode(int width, int height,
         // 640x480 first because it's the nominal case)
         // FIXME: should be else ifs unless resolutions match
         if RETURN_MODE_FROM_CAPS(640, 480, YUV422)
-            if RETURN_MODE_FROM_CAPS(640, 480, YUV411)
-                if RETURN_MODE_FROM_CAPS(160, 120, YUV444) 
-                    if RETURN_MODE_FROM_CAPS(320, 240, YUV422)
-                        if RETURN_MODE_FROM_CAPS(800, 600, YUV422)
-                            if RETURN_MODE_FROM_CAPS(1024, 768, YUV422)
-                                if RETURN_MODE_FROM_CAPS(1280, 960, YUV422)
-                                    if RETURN_MODE_FROM_CAPS(1600, 1200, YUV422)
-
-                                        LOG_DEBUG("Colourspace " << colourspace << " and resolution "
-                                                << width << "x" << height << " are not supported by this camera");
+        if RETURN_MODE_FROM_CAPS(640, 480, YUV411)
+        if RETURN_MODE_FROM_CAPS(160, 120, YUV444) 
+        if RETURN_MODE_FROM_CAPS(320, 240, YUV422)
+        if RETURN_MODE_FROM_CAPS(800, 600, YUV422)
+        if RETURN_MODE_FROM_CAPS(1024, 768, YUV422)
+        if RETURN_MODE_FROM_CAPS(1280, 960, YUV422)
+        if RETURN_MODE_FROM_CAPS(1600, 1200, YUV422)
+        LOG_DEBUG("Colourspace " << colourspace << " and resolution "
+                << width << "x" << height << " are not supported by this camera");
     }
     else if (colourspace == "gray")
     {
         // not else if because resolutions are the same
         if RETURN_MODE_FROM_CAPS(640, 480, MONO8)
-            if RETURN_MODE_FROM_CAPS(640, 480, MONO16)
-                if RETURN_MODE_FROM_CAPS(800, 600, MONO8)
-                    if RETURN_MODE_FROM_CAPS(800, 600, MONO16)
-                        if RETURN_MODE_FROM_CAPS(1024, 768, MONO8)
-                            if RETURN_MODE_FROM_CAPS(1024, 768, MONO16)
-                                if RETURN_MODE_FROM_CAPS(1280, 960, MONO8)
-                                    if RETURN_MODE_FROM_CAPS(1600, 1200, MONO8)
-                                        if RETURN_MODE_FROM_CAPS(1280, 960, MONO16)
-                                            // FIXME:
-                                            // This could be supported but won't work unless you use
-                                            // dc1394_video_set_operation_mode(camera->camera_info, DC1394_OPERATION_MODE_1394B);
-                                            // and then increase the ISO speed to 800
-                                            // dc1394_video_set_iso_speed(camera->camera_info,DC1394_ISO_SPEED_800);
-                                            if RETURN_MODE_FROM_CAPS(1600, 1200, MONO16)
-
-                                                LOG_WARNING("Colourspace " << colourspace << " and resolution "
-                                                        << width << "x" << height << " are not supported by this camera");
+        if RETURN_MODE_FROM_CAPS(640, 480, MONO16)
+        if RETURN_MODE_FROM_CAPS(800, 600, MONO8)
+        if RETURN_MODE_FROM_CAPS(800, 600, MONO16)
+        if RETURN_MODE_FROM_CAPS(1024, 768, MONO8)
+        if RETURN_MODE_FROM_CAPS(1024, 768, MONO16)
+        if RETURN_MODE_FROM_CAPS(1280, 960, MONO8)
+        if RETURN_MODE_FROM_CAPS(1600, 1200, MONO8)
+        if RETURN_MODE_FROM_CAPS(1280, 960, MONO16)
+        // FIXME:
+        // This could be supported but won't work unless you use
+        // dc1394_video_set_operation_mode(camera->camera_info, DC1394_OPERATION_MODE_1394B);
+        // and then increase the ISO speed to 800
+        // dc1394_video_set_iso_speed(camera->camera_info,DC1394_ISO_SPEED_800);
+        if RETURN_MODE_FROM_CAPS(1600, 1200, MONO16)
+        LOG_WARNING("Colourspace " << colourspace << " and resolution " <<
+                width << "x" << height << " are not supported by this camera");
     }
     else if (colourspace == "rgb")
     {
         if RETURN_MODE_FROM_CAPS(640, 480, RGB8)
-            if RETURN_MODE_FROM_CAPS(800, 600, RGB8)
-                if RETURN_MODE_FROM_CAPS(1024, 768, RGB8)
-                    if RETURN_MODE_FROM_CAPS(1280, 960, RGB8)
-                        if RETURN_MODE_FROM_CAPS(1600, 1200, RGB8)
-                            LOG_WARNING("Colourspace " << colourspace << " and resolution "
-                                    << width << "x" << height << " are not supported by this camera");
+        if RETURN_MODE_FROM_CAPS(800, 600, RGB8)
+        if RETURN_MODE_FROM_CAPS(1024, 768, RGB8)
+        if RETURN_MODE_FROM_CAPS(1280, 960, RGB8)
+        if RETURN_MODE_FROM_CAPS(1600, 1200, RGB8)
+        LOG_WARNING("Colourspace " << colourspace << " and resolution " << 
+                width << "x" << height << " are not supported by this camera");
     }
     else
         THROW_ERROR("Invalid colourspace " << colourspace);
@@ -302,12 +300,12 @@ void printSupportedFramerates(dc1394framerates_t framerates)
 
 #define PRINT_CASE_FRACTION(whole, fraction) \
     case (DC1394_FRAMERATE_ ## whole ## _ ## fraction): \
-                                                        LOG_PRINT(# whole  << "." << # fraction); \
+        LOG_PRINT(# whole  << "." << # fraction); \
     break
 
 #define PRINT_CASE(whole) \
     case (DC1394_FRAMERATE_ ## whole): \
-                                       LOG_PRINT(# whole); \
+       LOG_PRINT(# whole); \
     break
 
     for (unsigned framerateIdx = 0; framerateIdx < framerates.num; ++framerateIdx)
@@ -352,7 +350,7 @@ bool isModuleWriteable(const std::string &module)
 }
 
 
-void DC1394::listCameras()
+void Dc1394::listCameras()
 {
     LOG_DEBUG("listing cameras");
 
@@ -386,7 +384,7 @@ void DC1394::listCameras()
     else
         raw1394_destroy_handle(tmpHandle);
     
-    int nCameras = DC1394::nCameras();
+    int nCameras = Dc1394::nCameras();
 
     for (int i = 0; i != nCameras; ++i)
     {
@@ -429,23 +427,23 @@ void Dc1394Handle::printInfo() const
     }
 }
 
-int DC1394::nCameras()
+int Dc1394::nCameras()
 {
     Dc1394Handle dc;
     return dc.nCameras();
 }
 
-bool DC1394::areCamerasConnected()
+bool Dc1394::areCamerasConnected()
 {
     return nCameras() != 0;
 }
 
 
-int DC1394::GUIDToCameraNumber(unsigned long long GUID)
+int Dc1394::GUIDToCameraNumber(unsigned long long GUID)
 {
     int result = -1;
     bool found = false;
-    int nCameras = DC1394::nCameras();
+    int nCameras = Dc1394::nCameras();
 
     for (int i = 0; not found && i != nCameras; ++i)
     {

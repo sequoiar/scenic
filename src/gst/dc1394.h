@@ -25,22 +25,19 @@
 #include <gst/gst.h>
 #include <string>
 
-class DC1394 
+namespace Dc1394 
 {
-    public:
-        static void listCameras();
-        static int capsToMode(int cameraNumber, int width, 
-                int height, 
-                const std::string &colourspace,
-                int framerate);
-        static int GUIDToCameraNumber(unsigned long long GUID);
-        static bool requiresMoreISOSpeed(int mode);
-        static const int MAX_ISO_SPEED = 800;
-        static bool areCamerasConnected();
-        static int nCameras();
-    private:
-        DC1394();
-};
+    void listCameras();
+    int capsToMode(int cameraNumber, int width, 
+            int height, 
+            const std::string &colourspace,
+            int framerate);
+    int GUIDToCameraNumber(unsigned long long GUID);
+    bool requiresMoreISOSpeed(int mode);
+    bool areCamerasConnected();
+    int nCameras();
+    static const int MAX_ISO_SPEED = 800;
+}
 
 #endif //_DC1394_H_
 
