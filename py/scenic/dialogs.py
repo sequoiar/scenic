@@ -29,6 +29,132 @@ if __name__ == "__main__":
 from twisted.internet import reactor
 from twisted.internet import defer
 import gtk
+from scenic import glade
+
+class GladeDialogFactory(object):
+    """
+    Factory for dialogs created with Glade.
+    """
+    def __init__(self, name, parent=None, modal=True):
+        """
+        @param name: Name of the dialog in glade.
+        """
+        self.name = name
+        self._dialog = None
+        self._parent = parent
+        self._is_modal = modal
+        self._destroyed = False
+        self._terminating = False
+        self._widgets_tree = None # different every time we call show()
+        
+    def show(self):
+        """
+        Creates a new dialog using the glade XML file.
+        Returns a Deferred which is fired when the dialog is closed.
+        @rettype: L{Deferred}
+        """
+        if self.exists():
+            msg = "Dialog %s already exists." % (self.name)
+            raise RuntimeError(msg)
+        else:
+            self._widgets_tree = glade.get_widgets_tree()
+            self._dialog = self._widgets_tree.get_widget(self.name)
+            self._dialog.connect('delete-event', self._on_delete_event)
+            self._dialog.connect('destroy-event', self._on_destroy_event)
+            self._dialog.set_transient_for(self._parent)
+            self._dialog.set_modal(self._is_modal)
+            self._destroyed = False
+            self._terminating = False
+            self._dialog.show()
+            self._deferred = defer.Deferred()
+            return self._deferred
+
+    def exists(self):
+        """
+        @rettype: bool
+        """
+        return self._dialog is not None
+
+    def hide(self):
+        """
+        Actually destroys the widget.
+        """
+        self._terminate(False)
+
+    def _terminate(self, answer=None):
+        """
+        Calls the deferred with answer as result.
+        @param answer: None or bool.
+        """
+        if self.exists():
+            self._terminating = True
+            self._deferred.callback(answer)
+            if not self._destroyed:
+                if self._dialog.get_property('visible'):
+                    self._dialog.hide()
+                self._dialog.destroy()
+            self._dialog = None
+        else:
+            print("Dialog %s is already destroyed."  % (self.name))
+        
+    def _on_delete_event(self):
+        if not self._terminating:
+            self._terminate(False)
+
+    def _on_destroy_event(self, widget, event):
+        self._destroyed = True
+        if not self._terminating:
+            self._terminate(answer=False)
+        return True # True to stop other handlers from being invoked for the event. False to propagate the event further.
+
+class ConfirmDialog(GladeDialogFactory):
+    """
+    Could be replaced by the yes/no dialog below.
+    """
+    def __init__(self, parent=None):
+        widget_name = "confirm_dialog"
+        GladeDialogFactory.__init__(self, widget_name, parent=parent, modal=True)
+
+    def show(self, text):
+        """
+        @param text: Text to display in the label.
+        """
+        deferred = GladeDialogFactory.show(self)
+        label = self._widgets_tree.get_widget("confirm_label")
+        label.set_label(text)
+        self._dialog.connect('response', self._on_response_event, callback)
+        return deferred
+
+    def _on_response_event(self, widget, response_id):
+        """
+        Calls the deferred with True of False as a result.
+        """
+        result = response_id == gtk.RESPONSE_OK or response_id == gtk.RESPONSE_YES
+        print("RESULT %s" % (result))
+        self._terminate(result)
+
+class InvitedDialog(GladeDialogFactory):
+    def __init__(self, parent=None):
+        widget_name = "invited_dialog"
+        GladeDialogFactory.__init__(self, widget_name, parent=parent, modal=True)
+    
+    def show(self, text):
+        """
+        @param text: Text to display in the label.
+        """
+        deferred = GladeDialogFactory.show(self)
+        label = self._widgets_tree.get_widget("invited_dialog_label")
+        label.set_label(text)
+        self._dialog.connect('response', self._on_response_event)
+        return deferred
+
+    def _on_response_event(self, widget, response_id):
+        """
+        Calls the deferred with True of False as a result.
+        """
+        result = response_id == gtk.RESPONSE_OK or response_id == gtk.RESPONSE_YES
+        print("RESULT %s" % (result))
+        self._terminate(result)
 
 class ErrorDialog(object):
     """

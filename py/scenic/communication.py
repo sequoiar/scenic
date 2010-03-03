@@ -88,15 +88,14 @@ class Server(object):
 class Client(object):
     """
     TCP sender
+    Attribute connection_error_signal is a signal with arguments: error string, legible message.
     """
-    def __init__(self, connection_error_handler):
+    def __init__(self):
         self.port = None
         self.host = None
         self.sic_sender = None
         self.clientPort = None
-        
         self.connection_error_signal = sig.Signal()
-        self.connection_error_signal.connect(connection_error_handler) # TODO
         
     def connect(self, host, port):
         """

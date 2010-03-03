@@ -55,9 +55,8 @@ _ = internationalization._
 
 class Config(saving.ConfigStateSaving):
     """
-    Class attributes are default.
+    Configuration for the application.
     """
-
     def __init__(self):
         # Default values
         self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
@@ -85,11 +84,11 @@ class Config(saving.ConfigStateSaving):
         self.video_bitrate = 3.0
         self.video_jitterbuffer = 75
         
+        # Done with the configuration entries.
         config_file = 'configuration.json'
         config_dir = os.path.expanduser("~/.scenic")
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
-
 
 class Application(object):
     """
@@ -109,7 +108,8 @@ class Application(object):
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
-        self.client = communication.Client(self.on_connection_error) # XXX
+        self.client = communication.Client()
+        self.client.connection_error_signal.connect(self.on_connection_error)
         self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
@@ -230,6 +230,7 @@ class Application(object):
     def before_shutdown(self):
         """
         Last things done before quitting.
+        @rettype: L{DeferredList}
         """
         deferred = defer.Deferred()
         print("The application is shutting down.")
@@ -310,16 +311,13 @@ class Application(object):
         
         def _on_contact_request_dialog_response(response):
             """
-            User is accetping or declining an offer.
+            User is accepting or declining an offer.
             @param result: Answer to the dialog.
             """
-            if response == gtk.RESPONSE_OK:
+            if response:
                 self.send_accept(addr)
-            elif response == gtk.RESPONSE_CANCEL or gtk.RESPONSE_DELETE_EVENT:
-                self.send_refuse_and_disconnect() 
             else:
-                pass
-            return True
+                self.send_refuse_and_disconnect() 
         # check if the contact is in the addressbook
         contact = self._get_contact_by_addr(addr)
         invited_by = addr
@@ -346,10 +344,10 @@ class Application(object):
                     def _connected_cb(proto):
                         self.send_accept(addr)
                     connected_deferred.addCallback(_connected_cb)
-                    # TODO: show a dialog or change the state of the GUI to say we are connected.
                     return # important
             text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept the connection?" % {"invited_by": invited_by})
-            self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
+            dialog_deferred = self.gui.show_invited_dialog(text)
+            dialog_deferred.addCallback(_on_contact_request_dialog_response)
     
     def _get_contact_by_addr(self, addr):
         """
@@ -369,10 +367,9 @@ class Application(object):
 
     def handle_accept(self, message, addr):
         self._check_protocol_version(message)
-        self.gui._unschedule_offerer_invite_timeout()
         self.got_bye = False
         # TODO: Use session to contain settings and ports
-        self.gui.hide_calling_dialog("accept")
+        self.gui.hide_calling_dialog()
         self.remote_config = {
             "audio": message["audio"],
             "video": message["video"]
@@ -386,15 +383,25 @@ class Application(object):
             self.send_ack()
 
     def handle_refuse(self):
-        self.gui._unschedule_offerer_invite_timeout()
-        self.cleanup_after_rtp_stream()
-        self.gui.hide_calling_dialog("refuse")
+        """
+        Got REFUSE
+        """
+        self.gui.hide_calling_dialog()
+        self._free_ports()
+        text = _("Connection refused.\n\nThe contact refused the connection.")
+        dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
+        """
+        Got ACK
+        """
         print("Got ACK. Starting streamers as answerer.")
         self.start_streamers(addr)
 
     def handle_bye(self):
+        """
+        Got BYE
+        """
         self.got_bye = True
         self.stop_streamers()
         if self.client.is_connected():
@@ -403,15 +410,17 @@ class Application(object):
             self.disconnect_client()
 
     def handle_ok(self):
+        """
+        Got OK
+        """
         print("received ok. Everything has an end.")
         print('disconnecting client')
         self.disconnect_client()
 
     def on_server_receive_command(self, message, addr):
-        # XXX
         msg = message["msg"]
         print("Got %s from %s" % (msg, addr))
-        
+        # TODO: use prefixedMethods from twisted.
         if msg == "INVITE":
             self.handle_invite(message, addr)
         elif msg == "CANCEL":
@@ -514,8 +523,11 @@ class Application(object):
                 self.client.send(msg)
                 return proto
             def _on_error(reason):
-                print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
-                self.gui.hide_calling_dialog()# "err", str(reason))
+                #FIXME: do we need this error dialog?
+                msg = _("Error trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "port": port, "reason": reason}
+                print(msg)
+                self.gui.hide_calling_dialog()
+                dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
                 return None
                
             print("sending %s to %s:%s" % (msg, ip, port))
@@ -575,7 +587,11 @@ class Application(object):
                 self.send_bye()
             
     def on_connection_error(self, err, msg):
-        # XXX
-        self.gui.hide_calling_dialog(msg)
+        """
+        @param err: Exception message.
+        @param msg: Legible message.
+        """
+        self.gui.hide_calling_dialog()
         text = _("Connection error: %(message)s\n%(error)s") % {"error": err, "message": msg}
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
+

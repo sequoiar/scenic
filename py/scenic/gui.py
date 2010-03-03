@@ -21,10 +21,6 @@
 
 """
 Scenic GTK GUI.
-
-Former Notes
-------------
- * bug pour setter le bouton par defaut quand on change de tab. Il faut que le tab est le focus pour que ca marche. Pourtant le "print" apparait ???
 """
 
 import sys
@@ -32,7 +28,6 @@ import os
 import smtplib
 import gtk
 import gtk.gdk
-import gtk.glade
 import webbrowser
 from twisted.internet import reactor
 from twisted.internet import defer
@@ -41,6 +36,7 @@ from twisted.python.reflect import prefixedMethods
 from scenic import configure
 from scenic import process # just for constants
 from scenic import dialogs
+from scenic import glade
 from scenic import preview
 from scenic import network
 from scenic.devices import cameras
@@ -79,6 +75,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.""")
+
+PROJECT_WEBSITE = "http://svn.sat.qc.ca/trac/scenic"
 
 AUTHORS_LIST = [
     'Alexandre Quessy <alexandre@quessy.net>',
@@ -178,30 +176,6 @@ def format_contact_markup(contact):
         auto_accept = "\n  " + _("Automatically accept invitations")
     return "<b>%s</b>\n  IP: %s%s" % (contact["name"], contact["address"], auto_accept) 
 
-def get_widgets_tree():
-    """
-    Returns a L{gtk.glade.XML} object.
-    
-    Keep in mind that gtk.glade automatically caches XML trees. So don't try
-    any complex tricks to reuse XML trees if you have to create the same UI
-    multiple times. The correct thing to do is simply to instantiate the XML
-    multiple times with the same parameters. 
-    """
-    # Set the Glade file
-    glade_file = os.path.join(configure.GLADE_DIR, 'scenic.glade')
-    if os.path.isfile(glade_file):
-        glade_path = glade_file
-    else:
-        text = _("Error : Could not find the Glade file %(filename)s. Exitting.") % {"filename": glade_file}
-        print(text)
-        def _exit_cb(result):
-            print("Exiting")
-            if reactor.running:
-                reactor.stop()
-        dialogs.ErrorDialog.create(text, parent=None).addCallback(_exit_cb)
-        # FIXME: raise error or what? Exitting for now
-        sys.exit(1)
-    return gtk.glade.XML(glade_path, domain=configure.APPNAME)
 
 class Gui(object):
     """
@@ -212,8 +186,8 @@ class Gui(object):
     def __init__(self, app, kiosk_mode=False, fullscreen=False):
         self.app = app
         self.kiosk_mode_on = kiosk_mode
-        self._offerer_invite_timeout = None
-        widgets_tree = get_widgets_tree()
+        self._inviting_timeout_delayed = None
+        widgets_tree = glade.get_widgets_tree()
         
         # connects callbacks to widgets automatically
         glade_signal_slots = {}
@@ -228,36 +202,32 @@ class Gui(object):
         self.main_tabs_widget = widgets_tree.get_widget("mainTabs")
         self.system_tab_contents_widget = widgets_tree.get_widget("system_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
-        # confirm_dialog:
-        self.confirm_dialog = widgets_tree.get_widget("confirm_dialog")
-        self.confirm_dialog.connect('delete-event', self.confirm_dialog.hide_on_delete)
-        self.confirm_dialog.set_transient_for(self.main_window)
-        self.confirm_label = widgets_tree.get_widget("confirm_label")
+        
+        # ------------------------------ dialogs:
+        # confirm_dialog: (a simple yes/no)
+        self.confirm_dialog = dialogs.ConfirmDialog(parent=self.main_window)
 
         # calling_dialog: (this widget is created and destroyed really often !!
-        self.calling_dialog = widgets_tree.get_widget("calling_dialog")
-        self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
+        self.calling_dialog = None
         
-        # Could not connect:
-        self.error_label_widget = widgets_tree.get_widget("error_dialog_label")
         # invited_dialog:
-        self.invited_dialog = widgets_tree.get_widget("invited_dialog")
-        self.invited_dialog.set_transient_for(self.main_window)
-        self.invited_dialog.connect('delete-event', self.invited_dialog.hide_on_delete)
-        self.invited_dialog_label_widget = widgets_tree.get_widget("invited_dialog_label")
-
-        # invite button:
-        self.invite_label_widget = widgets_tree.get_widget("invite_label")
-        self.invite_icon_widget = widgets_tree.get_widget("invite_icon")
+        self.invited_dialog = dialogs.InvitedDialog(parent=self.main_window)
         
         # edit_contact_window:
         self.edit_contact_window = widgets_tree.get_widget("edit_contact_window")
         self.edit_contact_window.set_transient_for(self.main_window) # child of main window
         self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
+        
         # fields in the edit contact window:
         self.contact_name_widget = widgets_tree.get_widget("contact_name")
         self.contact_addr_widget = widgets_tree.get_widget("contact_addr")
         self.contact_auto_accept_widget = widgets_tree.get_widget("contact_auto_accept")
+        
+        # -------------------- main window widgets:
+        # invite button:
+        self.invite_label_widget = widgets_tree.get_widget("invite_label")
+        self.invite_icon_widget = widgets_tree.get_widget("invite_icon")
+        
         # addressbook buttons:
         self.edit_contact_widget = widgets_tree.get_widget("edit_contact")
         self.add_contact_widget = widgets_tree.get_widget("add_contact")
@@ -321,21 +291,24 @@ class Gui(object):
             print("Making the main window fullscreen.")
             self.toggle_fullscreen()
         
-        # Build the contact list view
+        # ------------------ contact list view
         self.selection = self.contact_list_widget.get_selection()
         self.selection.connect("changed", self.on_contact_list_changed, None) 
         self.contact_tree = gtk.ListStore(str)
         self.contact_list_widget.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=False)
         self.contact_list_widget.append_column(column)
+        # TODO: those state variables interactive/not could be merged into a single one
         self._v4l2_input_changed_by_user = True # if False, the software is changing those drop-down values itself.
         self._v4l2_standard_changed_by_user = True
         self._video_source_changed_by_user = True
         self._video_view_preview_toggled_by_user = True
+        # preview:
         self.preview_manager = preview.Preview(self.app)
         self.preview_manager.state_changed_signal.connect(self.on_preview_manager_state_changed)
         self.main_window.show()
-
+        
+        # recurring calls:
         self._streaming_state_check_task = task.LoopingCall(self.update_streaming_state)
         self._streaming_state_check_task.start(1.0, now=False)
         self._update_id_task = task.LoopingCall(self.update_local_ip)
@@ -1209,106 +1182,74 @@ class Gui(object):
             self.app.stop_streamers()
         else:
             self.app.send_invite()
-    
-    def on_invite_contact_cancelled(self, *args):
-        """
-        Sends a CANCEL to the remote peer when invite contact window is closed.
-        """
-        # unschedule this timeout as we don't care if our peer answered or not
-        self._unschedule_offerer_invite_timeout()
-        self.app.send_cancel_and_disconnect()
-        # don't let the delete-event propagate
-        if self.calling_dialog.get_property('visible'):
-            self.calling_dialog.hide()
-        return True
 
     def show_confirm_dialog(self, text, callback=None):
         """
-        Shows a confirm dialog, the old way.
+        This could be replaced by a yes/no dialog. That's actually what it is.
         """
-        # TODO: deprecate
-        def _response_cb(widget, response_id, callback):
-            widget.hide()
-            if callback is not None:
-                callback(response_id == gtk.RESPONSE_OK)
-            widget.disconnect(slot1)
+        deferred = self.confirm_dialog.show(text)
+        if callback is not None:
+            deferred.addCallback(callback)
 
-        self.confirm_label.set_label(text)
-        dialog = self.confirm_dialog
-        dialog.set_modal(True)
-        slot1 = dialog.connect('response', _response_cb, callback)
-        dialog.show()
-
-    def show_invited_dialog(self, text, callback=None):
+    def show_invited_dialog(self, text):
         """ 
-        We disconnect and reconnect the callbacks every time
-        this is called, otherwise we'd would have multiple 
-        callback invokations per response since the widget 
-        stays alive 
+        This could be replaced by a yes/no dialog. That's actually what it is.
+        @rettype: L{Deferred}
         """
-        def _response_cb(widget, response_id, callback):
-            widget.hide()
-            if callback is not None:
-                callback(response_id)
-            widget.disconnect(slot1)
-
-        self.invited_dialog_label_widget.set_label(text)
-        dialog = self.invited_dialog
-        dialog.set_modal(True)
-        slot1 = dialog.connect('response', _response_cb, callback)
-        dialog.show()
+        return self.invited_dialog.show(text)
 
     def show_calling_dialog(self):
         """
         Creates a new widget and show it.
         """
         self.calling_dialog = None
-        widgets_tree = get_widgets_tree()
+        widgets_tree = glade.get_widgets_tree()
         self.calling_dialog = widgets_tree.get_widget("calling_dialog")
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         self.calling_dialog.show()
+    
+    def on_invite_contact_cancelled(self, *args):
+        """
+        Sends a CANCEL to the remote peer when invite contact window is closed.
+        """
+        # unschedule this timeout as we don't care if our peer answered or not
+        self.app.send_cancel_and_disconnect()
+        # don't let the delete-event propagate
+        if self.calling_dialog.get_property('visible'):
+            self.calling_dialog.hide()
+        return True
 
-    def hide_calling_dialog(self, msg=None, err=""):
+    def hide_calling_dialog(self):
         """
         Hides the "calling_dialog" dialog.
-        Shows an error dialog if the argument msg is set to "err", "timeout", "answTimeout", "send", "refuse" or "badAnsw".
-        If msg is "err", the err argument is going to be used as an error message text.
         """
-        self.calling_dialog.hide()
-        text = None
-        if msg == "err":
-            text = _("Contact unreacheable.\n\nCould not connect to the IP address of this contact.")
-        elif msg == "answTimeout":
-            text = _("Contact answer timeout.\n\nThe contact did not answer soon enough.")
-        elif msg == "send":
-            text = _("Problem sending command.\n\nError: %s") % err
-        elif msg == "refuse":
-            text = _("Connection refused.\n\nThe contact refused the connection.")
-        elif msg == "badAnsw":
-            text = _("Invalid answer.\n\nThe answer was not valid.")
-        elif msg is None:
-            pass
-        if text is not None:
-            dialogs.ErrorDialog.create(text, parent=self.main_window)
+        self._unschedule_inviting_timeout_delayed()
+        if self.calling_dialog is not None:
+            self.calling_dialog.hide()
 
-    def _unschedule_offerer_invite_timeout(self):
-        """ Unschedules our offer invite timeout function """
-        if self._offerer_invite_timeout is not None and self._offerer_invite_timeout.active():
-            self._offerer_invite_timeout.cancel()
-            self._offerer_invite_timeout = None
+    def _unschedule_inviting_timeout_delayed(self):
+        """
+        Unschedules our offer timeout delayed call. 
+        """
+        if self._inviting_timeout_delayed is not None and self._inviting_timeout_delayed.active():
+            self._inviting_timeout_delayed.cancel()
+            self._inviting_timeout_delayed = None
     
-    def _schedule_offerer_invite_timeout(self):
-        """ Schedules our offer invite timeout function """
+    def _schedule_inviting_timeout_delayed(self):
+        """ 
+        Schedules our offer invite timeout function 
+        """
         def _cl_offerer_invite_timed_out():
-            # XXX
             # in case of invite timeout, act as if we'd cancelled the invite ourselves
             self.on_invite_contact_cancelled()
-            self.hide_calling_dialog("answTimeout")
+            self.hide_calling_dialog()
+            text = _("The invitation expired. \n\nThe remote peer did not answer quick enough.")
+            dialogs.ErrorDialog.create(text, parent=self.main_window)
             # here we return false so that this callback is unregistered
             return False
 
-        if self._offerer_invite_timeout is None or not self._offerer_invite_timeout.active():
-            self._offerer_invite_timeout = reactor.callLater(INVITE_TIMEOUT, _cl_offerer_invite_timed_out)
+        if self._inviting_timeout_delayed is None or not self._inviting_timeout_delayed.active():
+            self._inviting_timeout_delayed = reactor.callLater(INVITE_TIMEOUT, _cl_offerer_invite_timed_out)
         else:
             print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
@@ -1340,7 +1281,6 @@ class Gui(object):
             self.jack_latency_widget.set_text("")
             self.jack_sampling_rate_widget.set_text("")
             
-PROJECT_WEBSITE = "http://svn.sat.qc.ca/trac/scenic"
 
 class About(object):
     """
@@ -1371,7 +1311,6 @@ class About(object):
         # Connect to callbacks
         self.about_dialog.connect('response', self.destroy_about)
         self.about_dialog.connect('delete_event', self.destroy_about)
-        self.about_dialog.connect("delete-event", self.destroy_about)
         self.about_dialog.show_all()
 
     @staticmethod
@@ -1387,3 +1326,4 @@ class About(object):
 
     def destroy_about(self, *args):
         self.about_dialog.destroy()
+
