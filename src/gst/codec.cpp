@@ -34,7 +34,6 @@
 #include "codec.h"
 #include "rtpPay.h"
 #include "pipeline.h"
-#include "mapMsg.h"
 
 #include "rtpReceiver.h"
 
@@ -168,9 +167,9 @@ void VideoDecoder::adjustJitterBuffer()
 // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
 // int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
 
-H264Encoder::H264Encoder(Pipeline &pipeline, MapMsg &settings) : 
+H264Encoder::H264Encoder(Pipeline &pipeline, int bitrate) : 
     VideoEncoder(pipeline, "x264enc", true),
-    bitrate_(settings["bitrate"]) 
+    bitrate_(bitrate) 
 {
     // hardware threads: 1-n, 0 for automatic 
     int numThreads = boost::thread::hardware_concurrency();
@@ -239,9 +238,9 @@ void H264Decoder::adjustJitterBuffer()
 
 
 /// Constructor 
-H263Encoder::H263Encoder(Pipeline &pipeline, MapMsg &settings) : 
+H263Encoder::H263Encoder(Pipeline &pipeline, int bitrate) : 
     VideoEncoder(pipeline, "ffenc_h263p", false),
-    bitrate_(settings["bitrate"])
+    bitrate_(bitrate)
 {
     setBitrate(bitrate_);
 }
@@ -274,9 +273,9 @@ RtpPay* H263Decoder::createDepayloader() const
 
 
 /// Constructor 
-Mpeg4Encoder::Mpeg4Encoder(Pipeline &pipeline, MapMsg &settings) : 
+Mpeg4Encoder::Mpeg4Encoder(Pipeline &pipeline, int bitrate) : 
     VideoEncoder(pipeline, "ffenc_mpeg4", false), // FIXME: interlaced may cause stuttering
-    bitrate_(settings["bitrate"])
+    bitrate_(bitrate)
 {
     setBitrate(bitrate_);
 }
@@ -309,14 +308,14 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
-TheoraEncoder::TheoraEncoder(Pipeline &pipeline, MapMsg &settings) : 
+TheoraEncoder::TheoraEncoder(Pipeline &pipeline, int bitrate, int quality) : 
     VideoEncoder(pipeline, "theoraenc", false),
-    bitrate_(settings["bitrate"]), 
-    quality_(settings["quality"]) 
+    bitrate_(bitrate), 
+    quality_(quality) 
 {
     setSpeedLevel(MAX_SPEED_LEVEL);
     //g_object_set(encoder_, "keyframe-force", 1, NULL);
-    if (bitrate_)
+    if (bitrate_ != 0)
         setBitrate(bitrate_);
     else
         setQuality(quality_);

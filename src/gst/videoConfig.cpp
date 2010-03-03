@@ -22,10 +22,10 @@
 
 #include "util.h"
 #include "videoSize.h"
-#include "mapMsg.h"
 
 #include <fstream>
 #include <boost/filesystem/operations.hpp>
+#include <boost/program_options.hpp>
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
@@ -53,19 +53,19 @@ T fromString(const std::string& s,
 }
 
 
-VideoSourceConfig::VideoSourceConfig(MapMsg &msg) : 
-    source_(msg["source"]), 
-    bitrate_(msg["bitrate"]), 
-    quality_(msg["quality"]), 
-    deviceName_(msg["device"]),
-    location_(msg["location"]), 
-    cameraNumber_(msg["camera-number"]),
-    GUID_(fromString<unsigned long long>(msg["camera-guid"], std::hex)),
-    framerate_(msg["framerate"]),
-    captureWidth_(msg["width"]),
-    captureHeight_(msg["height"]),
-    grayscale_(msg["grayscale"]),
-    pictureAspectRatio_(msg["aspect-ratio"])
+VideoSourceConfig::VideoSourceConfig(const boost::program_options::variables_map &options) : 
+    source_(options["videosource"].as<std::string>()), 
+    bitrate_(options["videobitrate"].as<int>()), 
+    quality_(options["videoquality"].as<int>()), 
+    deviceName_(options["videodevice"].as<std::string>()),
+    location_(options["videolocation"].as<std::string>()), 
+    cameraNumber_(options["camera-number"].as<int>()),
+    GUID_(fromString<unsigned long long>(options["camera-guid"].as<std::string>(), std::hex)),
+    framerate_(options["framerate"].as<int>()),
+    captureWidth_(options["width"].as<int>()),
+    captureHeight_(options["height"].as<int>()),
+    grayscale_(options["grayscale"].as<bool>()),
+    pictureAspectRatio_(options["aspect-ratio"].as<std::string>())
 {}
 
 
@@ -209,16 +209,18 @@ std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, 
 }
 
 
-VideoSinkConfig::VideoSinkConfig(MapMsg &msg) : 
-    sink_(msg["sink"]), 
-    screenNum_(msg["screen"]), 
-    doDeinterlace_(msg["deinterlace"]), 
-    sharedVideoId_(msg["shared-video-id"]),
+VideoSinkConfig::VideoSinkConfig(const boost::program_options::variables_map &options) : 
+    sink_(options["videosink"].as<std::string>()), 
+    screenNum_(options["screen"].as<int>()), 
+    doDeinterlace_(options["deinterlace"].as<bool>()), 
+    sharedVideoId_(options["shared-video-id"].as<std::string>()),
     /// if display-resolution is not specified, default to capture-resolution
-    displayWidth_(std::min(static_cast<int>(msg["display-width"] ? msg["display-width"] : msg["width"]), VideoScale::MAX_SCALE)),
-    displayHeight_(std::min(static_cast<int>(msg["display-height"] ? msg["display-height"] : msg["height"]), VideoScale::MAX_SCALE)),
-    flipMethod_(msg["flip-video"]),
-    xid_(static_cast<int>(msg["x-window-id"]))
+    displayWidth_(std::min(static_cast<int>(options.count("display-width") ? 
+                    options["display-width"].as<int>() : options["width"].as<int>()), VideoScale::MAX_SCALE)),
+    displayHeight_(std::min(static_cast<int>(options.count("display-height") ? 
+                    options["display-height"].as<int>() : options["height"].as<int>()), VideoScale::MAX_SCALE)),
+    flipMethod_(options["flip-video"].as<std::string>()),
+    xid_(options["x-window-id"].as<unsigned long>())
 {}
 
 

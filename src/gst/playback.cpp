@@ -25,7 +25,6 @@
 
 #include "pipeline.h"
 #include "gutil.h"
-#include "mapMsg.h"
 
 
 Playback::Playback(Pipeline &pipeline) : pipeline_(pipeline)

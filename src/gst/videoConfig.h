@@ -23,8 +23,8 @@
 #define _VIDEO_CONFIG_H_
 
 #include <string>
+#include <boost/program_options.hpp>
 
-class MapMsg;
 class Pipeline;
 class VideoSource;
 class VideoScale;
@@ -34,7 +34,7 @@ class VideoSink;
 class VideoSourceConfig
 {
     public:
-        VideoSourceConfig(MapMsg &msg);
+        VideoSourceConfig(const boost::program_options::variables_map &options);
         VideoSource* createSource(Pipeline &pipeline) const;  // factory method
 
         const char *source() const { return source_.c_str(); }
@@ -85,7 +85,7 @@ class VideoSinkConfig
 {
     public:
 
-        VideoSinkConfig(MapMsg &msg);
+        VideoSinkConfig(const boost::program_options::variables_map &options);
         VideoSink* createSink(Pipeline &pipeline) const;
         VideoScale* createVideoScale(Pipeline &pipeline) const;
         VideoFlip* createVideoFlip(Pipeline &pipeline) const;

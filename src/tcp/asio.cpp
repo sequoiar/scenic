@@ -170,7 +170,7 @@ class TcpReceiver {
 };
 
 
-std::string asio::tcpGetBuffer(int port, int &/*id*/)
+std::string asio::tcpGetBuffer(int port)
 {
     std::string buffer;
     boost::asio::io_service io_service;
@@ -185,7 +185,7 @@ std::string asio::tcpGetBuffer(int port, int &/*id*/)
 }
 
 
-bool asio::tcpSendBuffer(const std::string &ip, int port, int /*id*/, const std::string &caps)
+bool asio::tcpSendBuffer(const std::string &ip, int port, const std::string &caps)
 {
     using boost::lexical_cast;
 

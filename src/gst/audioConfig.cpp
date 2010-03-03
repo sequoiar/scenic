@@ -22,19 +22,21 @@
 
 #include "util.h"
 #include <boost/filesystem.hpp>
-#include "mapMsg.h"
+#include <boost/program_options.hpp>
 
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
 #include "jackUtils.h"
 
-AudioSourceConfig::AudioSourceConfig(MapMsg &msg) :
-    source_(msg["source"]), 
-    sourceName_(msg["jack-client-name"]),
-    deviceName_(msg["device"]), 
-    location_(msg["location"]), 
-    numChannels_(msg["numchannels"])
+namespace po = boost::program_options;
+
+AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
+    source_(options["audiosource"].as<std::string>()), 
+    sourceName_(options["jack-client-name"].as<std::string>()),
+    deviceName_(options["audiodevice"].as<std::string>()), 
+    location_(options["audiolocation"].as<std::string>()), 
+    numChannels_(options["numchannels"].as<int>())
 {
     if (source_.empty())
         THROW_CRITICAL("No source specified");
@@ -111,11 +113,11 @@ bool AudioSourceConfig::locationExists() const
 
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(MapMsg &msg) : 
-    sink_(msg["sink"]), 
-    sinkName_(msg["jack-client-name"]),
-    deviceName_(msg["device"]), 
-    bufferTime_(static_cast<int>(msg["audio-buffer-usec"]))
+AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) : 
+    sink_(options["audiosink"].as<std::string>()), 
+    sinkName_(options["jack-client-name"].as<std::string>()),
+    deviceName_(options["audiodevice"].as<std::string>()), 
+    bufferTime_(options["audio-buffer-usec"].as<int>())
 {
 }
 

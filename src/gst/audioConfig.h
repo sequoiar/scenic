@@ -25,19 +25,19 @@
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
+#include <boost/program_options.hpp>
 
 // forward declarations
 class Pipeline;
 class AudioSource;
 class AudioSink;
-class MapMsg;
 
 /// Immutable class that is used to parameterize AudioSender objects. 
 class AudioSourceConfig
 {
     public:
         
-        AudioSourceConfig(MapMsg &msg);     
+        AudioSourceConfig(const boost::program_options::variables_map &options);     
         
         const char *source() const;
 
@@ -66,7 +66,7 @@ class AudioSourceConfig
 class AudioSinkConfig
 {
     public:
-        AudioSinkConfig(MapMsg &msg);
+        AudioSinkConfig(const boost::program_options::variables_map &options);
         
         AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }

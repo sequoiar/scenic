@@ -30,7 +30,6 @@
 class _GstElement;
 class RtpPay;
 class Pay;
-class MapMsg;
 class Pipeline;
 
 
@@ -132,7 +131,7 @@ class VideoDecoder : public Decoder
 class H264Encoder : public VideoEncoder
 {
     public: 
-        H264Encoder(Pipeline &pipeline, MapMsg &settings);
+        H264Encoder(Pipeline &pipeline, int bitrate);
         void setBitrate(int bitrate);
 
     private:
@@ -156,7 +155,7 @@ class H264Decoder : public VideoDecoder {
 class H263Encoder : public VideoEncoder
 {
     public: 
-        H263Encoder(Pipeline &pipeline, MapMsg &settings);
+        H263Encoder(Pipeline &pipeline, int bitrate);
 
     private:
         int bitrate_;
@@ -180,7 +179,7 @@ class H263Decoder : public VideoDecoder
 class Mpeg4Encoder : public VideoEncoder
 {
     public:
-        Mpeg4Encoder(Pipeline &pipeline, MapMsg &settings);
+        Mpeg4Encoder(Pipeline &pipeline, int bitrate);
         ~Mpeg4Encoder();
 
     private:
@@ -203,7 +202,7 @@ class Mpeg4Decoder: public VideoDecoder
 class TheoraEncoder : public VideoEncoder
 {
     public:
-        TheoraEncoder(Pipeline &pipeline, MapMsg &settings);
+        TheoraEncoder(Pipeline &pipeline, int bitrate, int quality);
         ~TheoraEncoder();
         void setBitrate(int bitrate);
         void setQuality(int quality);

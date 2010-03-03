@@ -27,7 +27,6 @@
 #include <gst/gst.h>
 #include "audioLevel.h"
 #include "pipeline.h"
-#include "mapMsg.h"
 
 #include <iterator>
 

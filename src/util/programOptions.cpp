@@ -25,7 +25,6 @@
 
 namespace po = boost::program_options;
 
-
 po::options_description ProgramOptions::createDefaultOptions()
 {
     using std::string;
@@ -102,24 +101,5 @@ po::options_description ProgramOptions::createDefaultOptions()
     }
 
     return desc;
-}
-
-
-MapMsg ProgramOptions::toMapMsg(const po::variables_map &options)
-{
-    MapMsg msg;
-    for (po::variables_map::const_iterator iter = options.begin(); iter != options.end(); ++iter)
-        if (iter->second.value().type() == typeid(::std::string))
-            msg[iter->first] = iter->second.as<std::string>();  // template argument for .as<T> must be an lvalue
-        else if (iter->second.value().type() == typeid(int))
-            msg[iter->first] =  iter->second.as<int>();
-        else if (iter->second.value().type() == typeid(bool))
-            msg[iter->first] =  iter->second.as<bool>();
-        else if (iter->second.value().type() == typeid(unsigned long))
-            msg[iter->first] =  static_cast<int>(iter->second.as<unsigned long>());
-        else
-            LOG_WARNING("Unexpected type");
-
-    return msg;
 }
 
