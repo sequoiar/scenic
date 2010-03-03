@@ -1228,10 +1228,8 @@ class Gui(object):
         """
         # unschedule this timeout as we don't care if our peer answered or not
         self.app.send_cancel_and_disconnect()
-        # don't let the delete-event propagate
-        if self.calling_dialog.get_property('visible'):
-            self.calling_dialog.hide()
-        return True
+        self.hide_calling_dialog()
+        return True # don't let the delete-event propagate
 
     def hide_calling_dialog(self):
         """

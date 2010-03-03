@@ -34,7 +34,7 @@ class Server(object):
         self.server_factory.dict_received_signal.connect(self.on_dict_received)
         self._port_obj = None
         self.remote_ip = None
-        
+        self.last_message_received = ""
         self.received_command_signal = sig.Signal()
         self.received_command_signal.connect(app.on_server_receive_command)
  
@@ -49,6 +49,7 @@ class Server(object):
     def on_dict_received(self, server_proto, d):
         print "Communication: received", d
         msg = d
+        self.last_message_received = d["msg"]
         addr = server_proto.get_peer_ip()
         self.remote_ip = addr
         self.received_command_signal(msg, addr)
@@ -96,6 +97,7 @@ class Client(object):
         self.sic_sender = None
         self.clientPort = None
         self.connection_error_signal = sig.Signal()
+        self.last_message_sent = ""# ACK, BYE, ACCEPT, etc.
         
     def connect(self, host, port):
         """
@@ -133,10 +135,12 @@ class Client(object):
  
     def send(self, msg):
         """
+        Sends a dict, which has to have the key "msg".
         @param msg: dict
         @rettype: None
         """
         if self.is_connected():
+            self.last_message_sent = msg["msg"]
             self.sic_sender.send_message(msg)
         else:
             error = "Not connected, cannot send message " + str(msg)

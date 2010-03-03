@@ -366,21 +366,24 @@ class Application(object):
         dialogs.ErrorDialog.create(_("Remote peer cancelled invitation."), parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
-        self._check_protocol_version(message)
-        self.got_bye = False
-        # TODO: Use session to contain settings and ports
-        self.gui.hide_calling_dialog()
-        self.remote_config = {
-            "audio": message["audio"],
-            "video": message["video"]
-            }
-        if self.streamer_manager.is_busy():
-            print("Got ACCEPT but we are busy. This is very strange")
-            dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
+        if self.get_last_message_sent() == "CANCEL":
+            self.send_bye() # If got ACCEPT, but had sent CANCEL, send BYE.
         else:
-            print("Got ACCEPT. Starting streamers as initiator.")
-            self.start_streamers(addr)
-            self.send_ack()
+            self._check_protocol_version(message)
+            self.got_bye = False
+            # TODO: Use session to contain settings and ports
+            self.gui.hide_calling_dialog()
+            self.remote_config = {
+                "audio": message["audio"],
+                "video": message["video"]
+                }
+            if self.streamer_manager.is_busy():
+                print("Got ACCEPT but we are busy. This is very strange")
+                dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
+            else:
+                print("Got ACCEPT. Starting streamers as initiator.")
+                self.start_streamers(addr)
+                self.send_ack()
 
     def handle_refuse(self):
         """
@@ -553,8 +556,18 @@ class Application(object):
             }
         msg.update(self._get_local_config_message_items())
         self.client.send(msg)
-        
+
+    def get_last_message_sent(self):
+        return self.client.last_message_sent
+
+    def get_last_message_received(self):
+        return self.server.last_message_received
+    
     def send_ack(self):
+        """
+        Sends ACK.
+        INVITE, ACCEPT, ACK
+        """
         self.client.send({"msg":"ACK", "sid":0})
 
     def send_bye(self):
