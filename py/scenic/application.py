@@ -524,7 +524,13 @@ class Application(object):
                 return proto
             def _on_error(reason):
                 #FIXME: do we need this error dialog?
-                msg = _("Error trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "port": port, "reason": reason}
+                exc_type = type(reason.value)
+                if exc_type is error.ConnectionRefusedError:
+                    msg = _("Scenic is not listening on port %(port)d on host %(ip)s.") % {"ip": ip, "port": port}
+                elif exc_type is error.ConnectError:
+                    msg = _("No route to host %(ip)s.") % {"ip": ip}
+                else:
+                    msg = _("Error trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "port": port, "reason": reason}
                 print(msg)
                 self.gui.hide_calling_dialog()
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
