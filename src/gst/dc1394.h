@@ -37,6 +37,9 @@ class DC1394
         static bool requiresMoreISOSpeed(int mode);
         static const int MAX_ISO_SPEED = 800;
         static bool areCamerasConnected();
+        static int nCameras();
+    private:
+        DC1394();
 };
 
 #endif //_DC1394_H_

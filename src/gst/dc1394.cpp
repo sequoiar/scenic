@@ -20,7 +20,8 @@
 //
 
 #include "util.h"
-#include "./dc1394.h"
+#include "dc1394.h"
+#include "noncopyable.h"
 
 #include <boost/filesystem/operations.hpp>
 #include <fstream>
@@ -28,67 +29,121 @@
 #include <libraw1394/raw1394.h>
 #include <iomanip>
 
-int cleanup(dc1394_t *& dc1394, dc1394camera_t *& camera, dc1394camera_list_t *& cameras)
-{
-    if (dc1394)
-    {
-        dc1394_free(dc1394);
-        dc1394 = 0;
-    }
 
-    if (cameras) {
-        dc1394_camera_free_list(cameras);
-        cameras = NULL;
-    }
+class Dc1394Handle : public boost::noncopyable {
+    public:
+        // camera-less version
+        Dc1394Handle() : cameraId_(0), dc1394_(0), cameras_(0), camera_(0)
+        {
+            dc1394_ = dc1394_new();
+            if (dc1394_ == 0)
+                LOG_ERROR("Could not get handle to dc1394, are /dev/raw1394 and /dev/video1394 present?");
+            dc1394error_t camerr = dc1394_camera_enumerate(dc1394_, &cameras_);
+            if (camerr != DC1394_SUCCESS or cameras_ == 0)
+                LOG_ERROR("Can't find cameras error : " << camerr);
+        }
 
-    if (camera) {
-        dc1394_camera_free(camera);
-        camera = NULL;
-    }
-    return 1;
-}
+        explicit Dc1394Handle(int id) : cameraId_(id), dc1394_(0), cameras_(0), camera_(0)
+        {
+            if (cameraId_ < 0)
+                LOG_ERROR("Invalid camera id " << cameraId_);
+            dc1394_ = dc1394_new();
+            if (dc1394_ == 0)
+                LOG_ERROR("Could not get handle to dc1394, are /dev/raw1394 and /dev/video1394 present?");
+            dc1394error_t camerr = dc1394_camera_enumerate(dc1394_, &cameras_);
+            if (camerr != DC1394_SUCCESS or cameras_ == 0)
+                LOG_ERROR("Can't find cameras error : " << camerr);
+
+            if (cameras_->num > 0)
+            {
+                camera_ = dc1394_camera_new_unit(dc1394_, cameras_->ids[cameraId_].guid, cameras_->ids[cameraId_].unit);
+                if (camera_ == 0)
+                    LOG_ERROR("Could not get handle to dc1394 camera");
+            }
+        }
+
+        ~Dc1394Handle() 
+        {
+            LOG_DEBUG("Destroying dc1394handle");
+            if (camera_ != 0) 
+                dc1394_camera_free(camera_);
+            if (cameras_ != 0)
+                dc1394_camera_free_list(cameras_);
+            if (dc1394_ != 0)
+                dc1394_free(dc1394_);
+        }
+
+        unsigned long long guid() const
+        {
+            if (cameraId_ >= 0)
+                return cameras_->ids[cameraId_].guid;
+            else
+            {
+                LOG_ERROR("Cannot get guid for invalid camera id " << cameraId_);
+                return 0;
+            }
+        }
+
+        int nCameras() const
+        {
+            if (cameras_ == 0)
+                LOG_ERROR("Cannot query number of cameras");
+            return cameras_->num;
+        }
+
+        void printInfo() const;
+
+        int capsToMode(int width, int height, 
+                const std::string &colourspace, int framerate) const;
+
+    private:
+        int cameraId_;
+        dc1394_t * dc1394_; 
+        dc1394camera_list_t * cameras_;
+        dc1394camera_t * camera_; 
+};
 
 
 int dc1394_caps_print_format_vmode_caps(int mode)
 {
-  int retval = 0;
+    int retval = 0;
 
-  switch (mode) 
-  {
+    switch (mode) 
+    {
 #define PRINT_CASE(x) \
-            case (DC1394_VIDEO_MODE_ ##x): \
-                      LOG_PRINT("    " << # x << " (vmode " << mode << ")" << std::endl); \
-            break
+        case (DC1394_VIDEO_MODE_ ##x): \
+                                       LOG_PRINT("    " << # x << " (vmode " << mode << ")" << std::endl); \
+        break
 
-    PRINT_CASE(160x120_YUV444);
-    PRINT_CASE(320x240_YUV422);
-    PRINT_CASE(640x480_YUV411);
-    PRINT_CASE(640x480_YUV422);
-    PRINT_CASE(640x480_RGB8);
-    PRINT_CASE(640x480_MONO8);
-    PRINT_CASE(640x480_MONO16);
-    PRINT_CASE(800x600_YUV422);
-    PRINT_CASE(800x600_RGB8);
-    PRINT_CASE(800x600_MONO8);
-    PRINT_CASE(1024x768_YUV422);
-    PRINT_CASE(1024x768_RGB8);
-    PRINT_CASE(1024x768_MONO8);
-    PRINT_CASE(800x600_MONO16);
-    PRINT_CASE(1024x768_MONO16);
-    PRINT_CASE(1280x960_YUV422);
-    PRINT_CASE(1280x960_RGB8);
-    PRINT_CASE(1280x960_MONO8);
-    PRINT_CASE(1600x1200_YUV422);
-    PRINT_CASE(1600x1200_RGB8);
-    PRINT_CASE(1600x1200_MONO8);
-    PRINT_CASE(1280x960_MONO16);
-    PRINT_CASE(1600x1200_MONO16);
+        PRINT_CASE(160x120_YUV444);
+        PRINT_CASE(320x240_YUV422);
+        PRINT_CASE(640x480_YUV411);
+        PRINT_CASE(640x480_YUV422);
+        PRINT_CASE(640x480_RGB8);
+        PRINT_CASE(640x480_MONO8);
+        PRINT_CASE(640x480_MONO16);
+        PRINT_CASE(800x600_YUV422);
+        PRINT_CASE(800x600_RGB8);
+        PRINT_CASE(800x600_MONO8);
+        PRINT_CASE(1024x768_YUV422);
+        PRINT_CASE(1024x768_RGB8);
+        PRINT_CASE(1024x768_MONO8);
+        PRINT_CASE(800x600_MONO16);
+        PRINT_CASE(1024x768_MONO16);
+        PRINT_CASE(1280x960_YUV422);
+        PRINT_CASE(1280x960_RGB8);
+        PRINT_CASE(1280x960_MONO8);
+        PRINT_CASE(1600x1200_YUV422);
+        PRINT_CASE(1600x1200_RGB8);
+        PRINT_CASE(1600x1200_MONO8);
+        PRINT_CASE(1280x960_MONO16);
+        PRINT_CASE(1600x1200_MONO16);
 
-    default:
+        default:
         LOG_WARNING("Unknown vmode " << mode);
         retval = -1;
-  }
-  return retval;
+    }
+    return retval;
 #undef PRINT_CASE
 }
 
@@ -153,40 +208,30 @@ bool DC1394::requiresMoreISOSpeed(int mode)
     }
 }
 
-/// FIXME: replace with table-driven method
 int DC1394::capsToMode(int cameraId, int width, int height, 
         const std::string &colourspace, int framerate)
+{
+    Dc1394Handle dc(cameraId);
+    return dc.capsToMode(width, height, colourspace, framerate);
+}
+
+/// FIXME: replace with table-driven method
+int Dc1394Handle::capsToMode(int width, int height, 
+        const std::string &colourspace, int framerate) const
 {
     int mode = 0;
     dc1394video_modes_t modes;
     dc1394error_t camerr;
-    dc1394_t * dc1394 = dc1394_new();
-    if (dc1394 == 0)
-    {
-        LOG_ERROR("Could not get handle to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
-        return 0;
-    }
 
-    dc1394camera_list_t *cameras = 0;
-    camerr = dc1394_camera_enumerate(dc1394, &cameras);
-
-    dc1394camera_t *camera =
-        dc1394_camera_new_unit (dc1394, cameras->ids[cameraId].guid,
-                cameras->ids[cameraId].unit);
-
-    camerr = dc1394_video_get_supported_modes(camera, &modes);
+    camerr = dc1394_video_get_supported_modes(camera_, &modes);
     if (camerr != DC1394_SUCCESS) 
-    {
         LOG_ERROR("Error getting supported modes\n");
-        cleanup(dc1394, camera, cameras);
-        return 0;
-    }
 
 #define RETURN_MODE_FROM_CAPS(WIDTH, HEIGHT, COLOURSPACE)  \
     (width == (WIDTH) and height == (HEIGHT))  \
     {                                             \
         int testMode = DC1394_VIDEO_MODE_ ## WIDTH ##x ## HEIGHT ##_ ## COLOURSPACE; \
-        if (modeIsSupported(testMode, modes, framerate, camera))    \
+        if (modeIsSupported(testMode, modes, framerate, camera_))    \
         {                                       \
             mode = testMode;                    \
             LOG_DEBUG("Using mode " << mode);   \
@@ -239,20 +284,14 @@ int DC1394::capsToMode(int cameraId, int width, int height,
                 if RETURN_MODE_FROM_CAPS(1024, 768, RGB8)
                     if RETURN_MODE_FROM_CAPS(1280, 960, RGB8)
                         if RETURN_MODE_FROM_CAPS(1600, 1200, RGB8)
-
                             LOG_WARNING("Colourspace " << colourspace << " and resolution "
                                     << width << "x" << height << " are not supported by this camera");
     }
     else
         THROW_ERROR("Invalid colourspace " << colourspace);
 
-    /// cleanup camera resources
-    dc1394_camera_free(camera);
-    camera = 0;
-    cleanup(dc1394, camera, cameras);
-
 #undef RETURN_MODE_FROM_CAPS
-    return 0; 
+    return 0;   /// never gets called
 }
 
 
@@ -317,14 +356,6 @@ void DC1394::listCameras()
 {
     LOG_DEBUG("listing cameras");
 
-    dc1394error_t camerr;
-    dc1394video_modes_t modes;
-    dc1394framerates_t framerates;
-
-    dc1394_t * dc1394 = 0;
-    dc1394camera_list_t *cameras = 0;
-    dc1394camera_t *camera = 0;
-
     // make sure raw1394 is loaded and read/writeable
     raw1394handle_t tmpHandle = raw1394_new_handle();
     if (tmpHandle == NULL) 
@@ -348,52 +379,35 @@ void DC1394::listCameras()
         else if (boost::filesystem::exists("/dev/video1394"))
             LOG_WARNING("Module raw1394 is not loaded.");
         else
-            LOG_DEBUG("Neither raw1394 nor video1394 modules are loaded");// do nothing, neither module is loaded, we can assume no firewire utilization
-
+            LOG_DEBUG("Neither raw1394 nor video1394 modules are loaded");
+        // do nothing, neither module is loaded, we can assume no firewire utilization
         return;
     }
     else
         raw1394_destroy_handle(tmpHandle);
+    
+    int nCameras = DC1394::nCameras();
 
-    dc1394 = dc1394_new();
-    if (dc1394 == 0)
+    for (int i = 0; i != nCameras; ++i)
     {
-        LOG_WARNING("Could not get handle to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
-        cleanup(dc1394, camera, cameras);
-        return;
+        Dc1394Handle dc(i);
+        dc.printInfo();
     }
+}
 
-    camerr = dc1394_camera_enumerate(dc1394, &cameras);
-
-    if (camerr != DC1394_SUCCESS or cameras == 0)
+void Dc1394Handle::printInfo() const
+{
+    if (camera_ != 0)
     {
-        LOG_ERROR("Can't find cameras error : " << camerr);
-        cleanup(dc1394, camera, cameras);
-        return;
-    }
+        dc1394video_modes_t modes;
+        dc1394framerates_t framerates;
+        LOG_PRINT("\nDC1394 Camera " << cameraId_ << ": " 
+                << camera_->vendor << " " << camera_->model << std::endl);
+        LOG_PRINT("GUID = " << std::hex << guid() << std::endl);
+        dc1394error_t camerr = dc1394_video_get_supported_modes(camera_, &modes);
 
-    if (cameras->num == 0) 
-    {
-        LOG_INFO("There were no dc1394 cameras");
-        cleanup(dc1394, camera, cameras);
-        return;
-    }
-
-    for (unsigned srcCamNum = 0; srcCamNum < cameras->num; ++srcCamNum)
-    {
-        camera =
-            dc1394_camera_new_unit (dc1394, cameras->ids[srcCamNum].guid,
-                    cameras->ids[srcCamNum].unit);
-        LOG_PRINT("\nDC1394 Camera " << srcCamNum << ": " << camera->vendor << " " << camera->model << std::endl);
-        LOG_PRINT("GUID = " << std::hex << cameras->ids[srcCamNum].guid << std::endl);
-
-        camerr = dc1394_video_get_supported_modes(camera, &modes);
         if (camerr != DC1394_SUCCESS) 
-        {
             LOG_ERROR("Error getting supported modes\n");
-            cleanup(dc1394, camera, cameras);
-            return;
-        }
 
         LOG_PRINT("Supported modes :\n");
         for (int i = modes.num - 1; i >= 0; --i)
@@ -403,111 +417,48 @@ void DC1394::listCameras()
             if (m < DC1394_VIDEO_MODE_EXIF) 
             {
                 if (dc1394_caps_print_format_vmode_caps(m) < 0)
-                {
                     LOG_ERROR("attempt to query mode " << m << " failed");
-                    cleanup(dc1394, camera, cameras);
-                    return;
-                }
 
-                camerr = dc1394_video_get_supported_framerates(camera,
+                camerr = dc1394_video_get_supported_framerates(camera_,
                         (dc1394video_mode_t) m, &framerates);
                 if (camerr != DC1394_SUCCESS)
-                {
                     LOG_ERROR("dc1394 error : " << camerr);
-                    cleanup(dc1394, camera, cameras);
-                    return;
-                }
                 printSupportedFramerates(framerates);
             }
         }
-
-        dc1394_camera_free(camera);
-        camera = 0;
     }
-
-    cleanup(dc1394, camera, cameras);
 }
 
+int DC1394::nCameras()
+{
+    Dc1394Handle dc;
+    return dc.nCameras();
+}
 
 bool DC1394::areCamerasConnected()
 {
-    bool result;
-    dc1394error_t camerr;
-
-    dc1394_t * dc1394 = 0;
-    dc1394camera_list_t *cameras = 0;
-    dc1394camera_t *camera = 0;
-
-    dc1394 = dc1394_new();
-    if (dc1394 == 0)
-    {
-        LOG_WARNING("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
-        return false;
-    }
-
-    camerr = dc1394_camera_enumerate(dc1394, &cameras);
-
-    if (camerr != DC1394_SUCCESS or cameras == 0)
-    {
-        cleanup(dc1394, camera, cameras);
-        THROW_CRITICAL("Can't find cameras error : " << camerr);
-    }
-    result = cameras->num == 0;
-        
-    cleanup(dc1394, camera, cameras);
-    return result;
+    return nCameras() != 0;
 }
 
 
 int DC1394::GUIDToCameraNumber(unsigned long long GUID)
 {
-    if (not areCamerasConnected())
-    {
-        LOG_INFO("There are no dc1394 cameras connected");
-        return -1;
-    }
-
     int result = -1;
-    dc1394error_t camerr;
-
-    dc1394_t * dc1394 = 0;
-    dc1394camera_list_t *cameras = 0;
-    dc1394camera_t *camera = 0;
-
-    dc1394 = dc1394_new();
-    if (dc1394 == 0)
-    {
-        LOG_ERROR("Could not get handled to dc1394, are /dev/raw1394 and /dev/video1394 present?\n");
-        return -1;
-    }
-
-    camerr = dc1394_camera_enumerate(dc1394, &cameras);
-
-    if (camerr != DC1394_SUCCESS or cameras == 0)
-    {
-        LOG_ERROR("Can't find cameras error : " << camerr);
-        cleanup(dc1394, camera, cameras);
-        return -1;
-    }
-
     bool found = false;
+    int nCameras = DC1394::nCameras();
 
-    for (unsigned srcCamNum = 0; !found && srcCamNum < cameras->num; ++srcCamNum)
+    for (int i = 0; not found && i != nCameras; ++i)
     {
-        camera =
-            dc1394_camera_new_unit (dc1394, cameras->ids[srcCamNum].guid,
-                    cameras->ids[srcCamNum].unit);
-        LOG_DEBUG("GUID = " << std::hex << cameras->ids[srcCamNum].guid);
-        if (GUID == cameras->ids[srcCamNum].guid)
+        Dc1394Handle dc(i);
+        LOG_DEBUG("GUID = " << std::hex << dc.guid());
+
+        if (GUID == dc.guid())
         {
-            result = srcCamNum;
+            result = i;
             found = true;
         }
-        dc1394_camera_free(camera);
-        camera = 0;
     }
 
-    cleanup(dc1394, camera, cameras);
     if (result == -1)
         LOG_WARNING("Could not find camera with guid " << GUID);
 
