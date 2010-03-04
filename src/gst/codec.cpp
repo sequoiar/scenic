@@ -38,11 +38,11 @@
 #include "rtpReceiver.h"
 
 /// Constructor 
-Encoder::Encoder(Pipeline &pipeline, const char *encoder) : 
+Encoder::Encoder(const Pipeline &pipeline, const char *encoder) : 
     pipeline_(pipeline), encoder_(pipeline_.makeElement(encoder, NULL))
 {}
 
-Encoder::Encoder(Pipeline &pipeline) : 
+Encoder::Encoder(const Pipeline &pipeline) : 
     pipeline_(pipeline), encoder_(0) // for encoder-less raw
 {}
 
@@ -82,13 +82,13 @@ void Encoder::setBitrate(int bitrate)
 }
 
 /// Constructor 
-Decoder::Decoder(Pipeline &pipeline, const char *decoder) : 
+Decoder::Decoder(const Pipeline &pipeline, const char *decoder) : 
     pipeline_(pipeline), decoder_(pipeline_.makeElement(decoder, NULL))
 {}
 
 
 /// Constructor 
-Decoder::Decoder(Pipeline &pipeline) : 
+Decoder::Decoder(const Pipeline &pipeline) : 
     pipeline_(pipeline), decoder_(0) // for decoderless raw
 {}
 
@@ -100,7 +100,7 @@ Decoder::~Decoder()
 }
 
 
-VideoEncoder::VideoEncoder(Pipeline &pipeline, const char *encoder, bool supportsInterlaced) :
+VideoEncoder::VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced) :
     Encoder(pipeline, encoder),
     colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)), 
     supportsInterlaced_(supportsInterlaced)  // most codecs don't have this property
@@ -118,7 +118,7 @@ VideoEncoder::~VideoEncoder()
     pipeline_.remove(&colorspace_);
 }
 
-VideoDecoder::VideoDecoder(Pipeline &pipeline, const char *decoder, bool doDeinterlace) : 
+VideoDecoder::VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace) : 
     Decoder(pipeline, decoder),
     doDeinterlace_(doDeinterlace), 
     colorspace_(0), 
@@ -167,7 +167,7 @@ void VideoDecoder::adjustJitterBuffer()
 // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
 // int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
 
-H264Encoder::H264Encoder(Pipeline &pipeline, int bitrate) : 
+H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) : 
     VideoEncoder(pipeline, "x264enc", true),
     bitrate_(bitrate) 
 {
@@ -215,7 +215,7 @@ Pay* H264Encoder::createPayloader() const
 }
 
 
-H264Decoder::H264Decoder(Pipeline &pipeline, bool doDeinterlace) : 
+H264Decoder::H264Decoder(const Pipeline &pipeline, bool doDeinterlace) : 
     VideoDecoder(pipeline, "ffdec_h264", doDeinterlace)
 {
     addDeinterlace();
@@ -238,7 +238,7 @@ void H264Decoder::adjustJitterBuffer()
 
 
 /// Constructor 
-H263Encoder::H263Encoder(Pipeline &pipeline, int bitrate) : 
+H263Encoder::H263Encoder(const Pipeline &pipeline, int bitrate) : 
     VideoEncoder(pipeline, "ffenc_h263p", false),
     bitrate_(bitrate)
 {
@@ -258,7 +258,7 @@ Pay* H263Encoder::createPayloader() const
 }
 
 
-H263Decoder::H263Decoder(Pipeline &pipeline, bool doDeinterlace) : 
+H263Decoder::H263Decoder(const Pipeline &pipeline, bool doDeinterlace) : 
     VideoDecoder(pipeline, "ffdec_h263", doDeinterlace)
 {
     addDeinterlace();
@@ -273,7 +273,7 @@ RtpPay* H263Decoder::createDepayloader() const
 
 
 /// Constructor 
-Mpeg4Encoder::Mpeg4Encoder(Pipeline &pipeline, int bitrate) : 
+Mpeg4Encoder::Mpeg4Encoder(const Pipeline &pipeline, int bitrate) : 
     VideoEncoder(pipeline, "ffenc_mpeg4", false), // FIXME: interlaced may cause stuttering
     bitrate_(bitrate)
 {
@@ -293,7 +293,7 @@ Pay* Mpeg4Encoder::createPayloader() const
 }
 
 
-Mpeg4Decoder::Mpeg4Decoder(Pipeline &pipeline, bool doDeinterlace) : 
+Mpeg4Decoder::Mpeg4Decoder(const Pipeline &pipeline, bool doDeinterlace) : 
     VideoDecoder(pipeline, "ffdec_mpeg4", doDeinterlace)
 {
     addDeinterlace();
@@ -308,7 +308,7 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
-TheoraEncoder::TheoraEncoder(Pipeline &pipeline, int bitrate, int quality) : 
+TheoraEncoder::TheoraEncoder(const Pipeline &pipeline, int bitrate, int quality) : 
     VideoEncoder(pipeline, "theoraenc", false),
     bitrate_(bitrate), 
     quality_(quality) 
@@ -362,7 +362,7 @@ Pay* TheoraEncoder::createPayloader() const
 }
 
 
-TheoraDecoder::TheoraDecoder(Pipeline &pipeline, bool doDeinterlace) : 
+TheoraDecoder::TheoraDecoder(const Pipeline &pipeline, bool doDeinterlace) : 
     VideoDecoder(pipeline, "theoradec", doDeinterlace)
 {
     addDeinterlace();
@@ -374,7 +374,7 @@ RtpPay* TheoraDecoder::createDepayloader() const
 }
 
 /// Constructor 
-VorbisEncoder::VorbisEncoder(Pipeline &pipeline) :
+VorbisEncoder::VorbisEncoder(const Pipeline &pipeline) :
     Encoder(pipeline, "vorbisenc")
 {
 }
@@ -397,7 +397,7 @@ unsigned long long VorbisDecoder::minimumBufferTime()
 }
 
 
-VorbisDecoder::VorbisDecoder(Pipeline &pipeline) :
+VorbisDecoder::VorbisDecoder(const Pipeline &pipeline) :
     Decoder(pipeline, "vorbisdec")
 {}
 
@@ -409,7 +409,7 @@ RtpPay* VorbisDecoder::createDepayloader() const
 }
 
 /// Constructor
-RawEncoder::RawEncoder(Pipeline &pipeline) : 
+RawEncoder::RawEncoder(const Pipeline &pipeline) : 
     Encoder(pipeline),
     aconv_(pipeline_.makeElement("audioconvert", NULL))
 {}
@@ -427,7 +427,7 @@ Pay* RawEncoder::createPayloader() const
 }
 
 /// Constructor
-RawDecoder::RawDecoder(Pipeline &pipeline) :
+RawDecoder::RawDecoder(const Pipeline &pipeline) :
     Decoder(pipeline),
     aconv_(pipeline_.makeElement("audioconvert", NULL))
 {}
@@ -453,7 +453,7 @@ double LameEncoder::userQualityToLameQuality(double f)
 }
 
 /// Constructor
-LameEncoder::LameEncoder(Pipeline &pipeline, double quality) : 
+LameEncoder::LameEncoder(const Pipeline &pipeline, double quality) : 
     Encoder(pipeline, "lamemp3enc"),
     aconv_(pipeline_.makeElement("audioconvert", NULL)),
     mp3parse_(pipeline_.makeElement("mp3parse", NULL))
@@ -472,7 +472,7 @@ LameEncoder::~LameEncoder()
 }
 
 /// Constructor
-MadDecoder::MadDecoder(Pipeline &pipeline) :
+MadDecoder::MadDecoder(const Pipeline &pipeline) :
     Decoder(pipeline, "mad"),
     aconv_(pipeline_.makeElement("audioconvert", NULL))
 {
