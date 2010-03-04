@@ -35,7 +35,7 @@ class VideoSourceConfig
 {
     public:
         VideoSourceConfig(const boost::program_options::variables_map &options);
-        VideoSource* createSource(Pipeline &pipeline) const;  // factory method
+        VideoSource* createSource(const Pipeline &pipeline) const;  // factory method
 
         const char *source() const { return source_.c_str(); }
         std::string sourceString() const { return source_; }
@@ -87,8 +87,8 @@ class VideoSinkConfig
 
         VideoSinkConfig(const boost::program_options::variables_map &options);
         VideoSink* createSink(Pipeline &pipeline) const;
-        VideoScale* createVideoScale(Pipeline &pipeline) const;
-        VideoFlip* createVideoFlip(Pipeline &pipeline) const;
+        VideoScale* createVideoScale(const Pipeline &pipeline) const;
+        VideoFlip* createVideoFlip(const Pipeline &pipeline) const;
         bool doDeinterlace() const { return doDeinterlace_; }
         std::string flipMethod() const { return flipMethod_; }
 

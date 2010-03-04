@@ -69,7 +69,7 @@ void InterleavedAudioSource::Interleave::set_channel_layout()
 }
 
 
-InterleavedAudioSource::Interleave::Interleave(Pipeline &pipeline, const AudioSourceConfig &config)
+InterleavedAudioSource::Interleave::Interleave(const Pipeline &pipeline, const AudioSourceConfig &config)
     : pipeline_(pipeline),
       interleave_(pipeline_.makeElement("interleave", NULL)), 
     config_(config)

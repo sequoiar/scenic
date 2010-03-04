@@ -46,8 +46,8 @@ class Pipeline : boost::noncopyable
         void subscribe(BusMsgHandler *obj);
         void unsubscribe(BusMsgHandler *obj);
 
-        GstClockID add_clock_callback(GstClockCallback callback, void *user_data);
-        void remove_clock_callback(GstClockID clockId);
+        GstClockID add_clock_callback(GstClockCallback callback, void *user_data) const;
+        void remove_clock_callback(GstClockID clockId) const;
 
         void updateSampleRate(unsigned newRate);
         void remove(_GstElement ** element) const;

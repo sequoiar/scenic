@@ -34,7 +34,7 @@
 #include <iostream>
 
 /// Constructor 
-AudioSource::AudioSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+AudioSource::AudioSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     pipeline_(pipeline),
     config_(config), 
     source_(0)
@@ -76,7 +76,7 @@ void AudioSource::initCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
 
 
 /// Constructor 
-InterleavedAudioSource::InterleavedAudioSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+InterleavedAudioSource::InterleavedAudioSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), 
     interleave_(pipeline, config_), 
     sources_(), 
@@ -100,7 +100,7 @@ InterleavedAudioSource::~InterleavedAudioSource()
 
 
 /// Constructor 
-AudioTestSource::AudioTestSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     InterleavedAudioSource(pipeline, config), 
     frequencies_(),
     clockId_(0), 
@@ -211,7 +211,7 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
 void AudioFileSource::restartPlayback()
 {
     const gint64 BEGIN_TIME_NS = 0;
-    AudioSource::pipeline_.seekTo(BEGIN_TIME_NS);
+    BusMsgHandler::pipeline_->seekTo(BEGIN_TIME_NS); // have to specify whose pipeline reference
     if (loopCount_ > 0)  // avoids endless decrements
         loopCount_--;
 }
@@ -226,7 +226,7 @@ AudioFileSource::~AudioFileSource()
 
 
 /// Constructor 
-AudioAlsaSource::AudioAlsaSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), capsFilter_(0), aconv_(0)
 {
     source_ = pipeline_.makeElement(config_.source(), NULL);
@@ -247,7 +247,7 @@ AudioAlsaSource::~AudioAlsaSource()
 }
 
 /// Constructor 
-AudioPulseSource::AudioPulseSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), 
     capsFilter_(0),
     aconv_(0)
@@ -271,7 +271,7 @@ AudioPulseSource::~AudioPulseSource()
 
 
 /// Constructor 
-AudioJackSource::AudioJackSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), capsFilter_(0)
 {
     source_ = pipeline_.makeElement(config_.source(), config_.sourceName());
@@ -323,7 +323,7 @@ bool AudioJackSource::handleMessage(const std::string &path, const std::string &
 
 
 /// Constructor 
-AudioDvSource::AudioDvSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+AudioDvSource::AudioDvSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), 
     queue_(0),
     aconv_(0)

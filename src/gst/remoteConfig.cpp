@@ -93,7 +93,7 @@ SenderConfig::SenderConfig(Pipeline &pipeline,
 {}
 
 
-VideoEncoder * SenderConfig::createVideoEncoder(Pipeline &pipeline, int bitrate, int quality) const
+VideoEncoder * SenderConfig::createVideoEncoder(const Pipeline &pipeline, int bitrate, int quality) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
@@ -115,7 +115,7 @@ VideoEncoder * SenderConfig::createVideoEncoder(Pipeline &pipeline, int bitrate,
 }
 
 
-Encoder * SenderConfig::createAudioEncoder(Pipeline &pipeline, double quality) const
+Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, double quality) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
@@ -244,7 +244,7 @@ ReceiverConfig::ReceiverConfig(const std::string &codec__,
     }
 }
 
-VideoDecoder * ReceiverConfig::createVideoDecoder(Pipeline &pipeline, bool doDeinterlace) const
+VideoDecoder * ReceiverConfig::createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
@@ -265,7 +265,7 @@ VideoDecoder * ReceiverConfig::createVideoDecoder(Pipeline &pipeline, bool doDei
 }
 
 
-Decoder * ReceiverConfig::createAudioDecoder(Pipeline &pipeline) const
+Decoder * ReceiverConfig::createAudioDecoder(const Pipeline &pipeline) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");

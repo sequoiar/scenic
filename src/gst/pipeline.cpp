@@ -407,7 +407,7 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec) const
 }
 
 
-GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user_data)
+GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user_data) const
 {
     GstClockID clockId = gst_clock_new_periodic_id(clock(), startTime_, GST_SECOND);
     gst_clock_id_wait_async(clockId, callback, user_data);
@@ -415,7 +415,7 @@ GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user
 }
 
 
-void Pipeline::remove_clock_callback(GstClockID clockId)
+void Pipeline::remove_clock_callback(GstClockID clockId) const
 {
     stop();
     gst_clock_id_unschedule(clockId);

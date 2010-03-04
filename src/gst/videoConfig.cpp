@@ -69,7 +69,7 @@ VideoSourceConfig::VideoSourceConfig(const boost::program_options::variables_map
 {}
 
 
-VideoSource * VideoSourceConfig::createSource(Pipeline &pipeline) const
+VideoSource * VideoSourceConfig::createSource(const Pipeline &pipeline) const
 {
     // FIXME: should derived class specific arguments just be passed in here to their constructors?
     if (source_ == "videotestsrc")
@@ -268,13 +268,13 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 }
 
 
-VideoScale* VideoSinkConfig::createVideoScale(Pipeline &pipeline) const
+VideoScale* VideoSinkConfig::createVideoScale(const Pipeline &pipeline) const
 {
     return new VideoScale(pipeline, displayWidth_, displayHeight_);
 }
 
 
-VideoFlip* VideoSinkConfig::createVideoFlip(Pipeline &pipeline) const
+VideoFlip* VideoSinkConfig::createVideoFlip(const Pipeline &pipeline) const
 {
     return new VideoFlip(pipeline, flipMethod_);
 }
