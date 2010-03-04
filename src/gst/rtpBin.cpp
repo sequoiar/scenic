@@ -39,7 +39,7 @@ bool RtpBin::destroyed_ = false;
 
 std::map<int, RtpBin*> RtpBin::sessions_;
 
-RtpBin::RtpBin(Pipeline &pipeline) : 
+RtpBin::RtpBin(const Pipeline &pipeline) : 
     pipeline_(pipeline),
     rtcp_sender_(0), 
     rtcp_receiver_(0), 

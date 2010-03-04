@@ -40,7 +40,7 @@ class RtpReceiver
     : public RtpBin
 {
     public:
-        RtpReceiver(Pipeline &pipeline) : 
+        RtpReceiver(const Pipeline &pipeline) : 
             RtpBin(pipeline), 
             rtp_receiver_(0), 
             depayloader_(0), 
