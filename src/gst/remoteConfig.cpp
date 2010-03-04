@@ -121,7 +121,7 @@ Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, double qual
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "vorbis")
-        return new VorbisEncoder(pipeline);
+        return new VorbisEncoder(pipeline, quality);
     else if (codec_ == "raw")
         return new RawEncoder(pipeline);
     else if (codec_ == "mp3")

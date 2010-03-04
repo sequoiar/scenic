@@ -338,11 +338,11 @@ void TheoraEncoder::setBitrate(int newBitrate)
 // theora specific
 void TheoraEncoder::setQuality(int quality)
 {
-    tassert(encoder_ != 0);
-    if (quality < MIN_QUALITY or quality > MAX_QUALITY)
-        THROW_ERROR("Quality must be in range [" << MIN_QUALITY << "-" << MAX_QUALITY << "]");
-    LOG_DEBUG("Quality " << quality);
-    g_object_set(encoder_, "quality", quality, NULL);
+    if (quality >= MIN_QUALITY and quality <= MAX_QUALITY)
+    {
+        LOG_DEBUG("Quality " << quality);
+        g_object_set(encoder_, "quality", quality, NULL);
+    }
 }
 
 
@@ -373,10 +373,19 @@ RtpPay* TheoraDecoder::createDepayloader() const
     return new TheoraDepay(pipeline_);
 }
 
+void VorbisEncoder::setQuality(double quality)
+{
+    static const double MIN_QUALITY = -0.1;  // from the vorbis plugin
+    static const double MAX_QUALITY = 1.0;  // from the vorbis plugin
+    if (quality >= MIN_QUALITY and quality <= MAX_QUALITY)
+        g_object_set(encoder_, "quality", quality, NULL);
+}
+
 /// Constructor 
-VorbisEncoder::VorbisEncoder(const Pipeline &pipeline) :
+VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, double quality) :
     Encoder(pipeline, "vorbisenc")
 {
+    setQuality(quality);
 }
 
 
@@ -445,11 +454,13 @@ RtpPay* RawDecoder::createDepayloader() const
     return new L16Depay(pipeline_);
 }
 
-double LameEncoder::userQualityToLameQuality(double f)
+void LameEncoder::setQuality(double quality)
 {
     static const double SCALE = 10.0;    // from the lame plugin
     static const double MIN_QUALITY = 0.01;  // from the lame plugin
-    return std::fabs(SCALE - (std::max(f, MIN_QUALITY) * SCALE));
+    static const double MAX_QUALITY = 1.0;  // from the lame plugin
+    if (quality >= MIN_QUALITY and quality <= MAX_QUALITY)
+        g_object_set(encoder_, "quality", std::fabs(SCALE - (quality * SCALE)), NULL);
 }
 
 /// Constructor
@@ -458,7 +469,7 @@ LameEncoder::LameEncoder(const Pipeline &pipeline, double quality) :
     aconv_(pipeline_.makeElement("audioconvert", NULL)),
     mp3parse_(pipeline_.makeElement("mp3parse", NULL))
 {
-    g_object_set(encoder_, "quality", userQualityToLameQuality(quality), NULL);
+    setQuality(quality);
     gstlinkable::link(aconv_, encoder_);
     gstlinkable::link(encoder_, mp3parse_);
 }

@@ -59,7 +59,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("videobitrate,x", po::value<int>()->default_value(3000000), "video bitrate (1000000,3000000)")
             ("videoquality,X", po::value<int>()->default_value(32), 
                     "use specified video quality instead of bitrate for theora (0-63)")
-            ("audioquality", po::value<double>()->default_value(0.5), "quality for compressed audio (0.0-1.0)")
+            ("audioquality", po::value<double>()->default_value(-1.0), "quality for compressed audio (0.0-1.0)")
             ("audiosource,e", po::value<string>()->default_value("jackaudiosrc"), 
              "audio input (jackaudiosrc,alsasrc,pulsesrc)")
             ("videosource,u", po::value<string>()->default_value("videotestsrc"), 

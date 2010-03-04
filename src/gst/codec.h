@@ -229,12 +229,13 @@ class TheoraDecoder: public VideoDecoder
 
 
 /// Encoder that encodes raw audio using the vorbis encoder.
-class VorbisEncoder : public  Encoder
+class VorbisEncoder : public Encoder
 {
     public: 
-        VorbisEncoder(const Pipeline &pipeline);
+        VorbisEncoder(const Pipeline &pipeline, double quality);
 
     private:
+        void setQuality(double quality);
         ~VorbisEncoder();
         Pay* createPayloader() const;
 };
@@ -294,7 +295,7 @@ class LameEncoder : public Encoder
         Pay* createPayloader() const;
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return mp3parse_; }
-        static double userQualityToLameQuality(double f);
+        void setQuality(double quality);
 };
 
 /// Decoder that decodes mpeg to raw audio.
