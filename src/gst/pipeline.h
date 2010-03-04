@@ -42,7 +42,7 @@ class Pipeline : boost::noncopyable
         ~Pipeline();
 
         bool isAlive() { return pipeline_ == 0; }
-        _GstElement *makeElement(const char *factoryName, const char *elementName);
+        _GstElement *makeElement(const char *factoryName, const char *elementName) const;
         void subscribe(BusMsgHandler *obj);
         void unsubscribe(BusMsgHandler *obj);
 
@@ -50,8 +50,8 @@ class Pipeline : boost::noncopyable
         void remove_clock_callback(GstClockID clockId);
 
         void updateSampleRate(unsigned newRate);
-        void remove(_GstElement ** element);
-        void remove(std::vector < _GstElement * >&elementVec);
+        void remove(_GstElement ** element) const;
+        void remove(std::vector < _GstElement * >&elementVec) const;
         bool isPlaying() const;
         unsigned actualSampleRate() const;
         bool isReady() const;
@@ -61,10 +61,8 @@ class Pipeline : boost::noncopyable
         void start();
         void pause();
         void makeReady();
-        void stop();
-        void notifyQuitted() { quitted_ = true; }
-        void quit();
-        bool quitted() { return quitted_; }
+        void stop() const;
+        void quit() const;
         void makeVerbose();
         void postInterrupt();
 
@@ -82,7 +80,6 @@ class Pipeline : boost::noncopyable
         _GstElement *pipeline_;
         GstClockTime startTime_;
         std::vector<BusMsgHandler*> handlers_;
-        bool quitted_;
         unsigned sampleRate_;
         char *titleStr_;
         static const unsigned int SAMPLE_RATE = 48000;

@@ -34,7 +34,6 @@ class Playback {
         bool isPlaying();
         void makeVerbose();
         void quit();
-        bool quitted();
         int sampleRate();
     private:
         Pipeline &pipeline_;

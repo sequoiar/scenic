@@ -40,7 +40,7 @@
 // in the pipeline
 
 Pipeline::Pipeline() : pipeline_(0), startTime_(0), handlers_(), 
-    quitted_(false), sampleRate_(SAMPLE_RATE)
+    sampleRate_(SAMPLE_RATE)
 {
     LOG_DEBUG("Calling gst_init");
 
@@ -348,15 +348,14 @@ void Pipeline::pause()
 }
 
 
-void Pipeline::quit()
+void Pipeline::quit() const
 {
     stop();
-    notifyQuitted();
     gutil::killMainLoop();
 }
 
 
-void Pipeline::stop()
+void Pipeline::stop() const
 {
     if (isStopped())        // only needs to be stopped once
         return;
@@ -377,7 +376,7 @@ void Pipeline::add(GstElement *element) const
 }
 
 
-void Pipeline::remove(GstElement **element) // guarantees that original pointer will be zeroed
+void Pipeline::remove(GstElement **element) const // guarantees that original pointer will be zeroed
 {                                           // and not reusable
     stop();
     if (*element and pipeline_)
@@ -389,7 +388,7 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
 }
 
 
-void Pipeline::remove(std::vector<GstElement*> &elementVec)
+void Pipeline::remove(std::vector<GstElement*> &elementVec) const
 {
     stop();
     std::vector<GstElement *>::iterator iter;
@@ -435,7 +434,7 @@ GstClock* Pipeline::clock() const
     return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
 }
 
-GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) 
+GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) const
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
     if(!element)

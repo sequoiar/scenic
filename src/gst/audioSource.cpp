@@ -170,7 +170,7 @@ const int AudioFileSource::LOOP_INFINITE = -1;
 
 /// Constructor 
 AudioFileSource::AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
-    AudioSource(pipeline, config), BusMsgHandler(pipeline), aconv_(0), loopCount_(0) 
+    AudioSource(pipeline, config), BusMsgHandler(&pipeline), aconv_(0), loopCount_(0) 
 {
     tassert(config_.locationExists());
 

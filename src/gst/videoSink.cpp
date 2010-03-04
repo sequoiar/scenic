@@ -56,7 +56,7 @@ bool GtkVideoSink::hasWindow() const
     return xid_ == 0;
 }
         
-GtkVideoSink::GtkVideoSink(Pipeline &pipeline, int screen_num, unsigned long xid) : 
+GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid) : 
     VideoSink(pipeline), 
     xid_(xid),
     isFullscreen_(false),
@@ -284,7 +284,7 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
 
 XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid) : 
     GtkVideoSink(pipeline, screenNum, xid),
-    BusMsgHandler(pipeline)
+    BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
@@ -318,7 +318,7 @@ XvImageSink::~XvImageSink()
 }
 
 
-XImageSink::XImageSink(Pipeline &pipeline) : 
+XImageSink::XImageSink(const Pipeline &pipeline) : 
     VideoSink(pipeline),
     colorspc_(pipeline_.makeElement("ffmpegcolorspace", NULL)) 
 {

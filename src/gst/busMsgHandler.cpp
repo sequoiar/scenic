@@ -32,16 +32,16 @@
 * the Observer and Chain of Responsibility patterns.
 */
 
-BusMsgHandler::BusMsgHandler(Pipeline &pipeline) : pipeline_(pipeline)
+BusMsgHandler::BusMsgHandler(Pipeline *pipeline) : pipeline_(pipeline)
 {
-    pipeline_.subscribe(this);
+    pipeline_->subscribe(this);
 }
 
 BusMsgHandler::~BusMsgHandler() 
 {
     // FIXME: not clean, but at least this way if we go down out of order due to siginit
     // we don't recreate the pipeline just to remove ourselves
-    if (pipeline_.isAlive())
-        pipeline_.unsubscribe(this);
+    if (pipeline_->isAlive())
+        pipeline_->unsubscribe(this);
 }
 

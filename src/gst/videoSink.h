@@ -40,12 +40,12 @@ class _GdkEventWindowState;
 class VideoSink : public GstLinkableSink, boost::noncopyable
 {
     public:
-        explicit VideoSink(Pipeline &pipeline) : pipeline_(pipeline), sink_(0) {};
+        explicit VideoSink(const Pipeline &pipeline) : pipeline_(pipeline), sink_(0) {};
         virtual ~VideoSink() {};
 
     protected:
         virtual void destroySink();
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
         _GstElement *sink_;
 };
 
@@ -53,7 +53,7 @@ class GtkVideoSink
 : public VideoSink, public MessageHandler
 {
     public:
-        GtkVideoSink(Pipeline &pipeline, int screen_num, unsigned long xid);
+        GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid);
         void createControl();
         virtual ~GtkVideoSink(){};
         void showWindow();
@@ -107,7 +107,7 @@ class XImageSink
 : public VideoSink
 {
     public: 
-        XImageSink(Pipeline &pipeline); 
+        XImageSink(const Pipeline &pipeline); 
 
     private:
         ~XImageSink();

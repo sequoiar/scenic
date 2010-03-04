@@ -77,7 +77,7 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
 
 GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_num, unsigned long xid) : 
     GtkVideoSink(pipeline, screen_num, xid), 
-    BusMsgHandler(pipeline)
+    BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);

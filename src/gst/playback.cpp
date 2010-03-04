@@ -62,11 +62,6 @@ void Playback::makeVerbose()
     pipeline_.makeVerbose();
 }
 
-bool Playback::quitted()
-{
-    return pipeline_.quitted();
-}
-
 int Playback::sampleRate()
 {
     return pipeline_.actualSampleRate();

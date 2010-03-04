@@ -39,7 +39,7 @@
 #include "fileSource.h"
 
 /// Constructor
-VideoSource::VideoSource(Pipeline &pipeline, const VideoSourceConfig &config)
+VideoSource::VideoSource(const Pipeline &pipeline, const VideoSourceConfig &config)
     :
         pipeline_(pipeline),
         config_(config),
@@ -84,7 +84,7 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
 
 
 /// Constructor
-VideoTestSource::VideoTestSource(Pipeline &pipeline,
+VideoTestSource::VideoTestSource(const Pipeline &pipeline,
         const VideoSourceConfig &config)
     :
         VideoSource(pipeline, config)
@@ -103,7 +103,7 @@ VideoTestSource::~VideoTestSource()
 
 
 /// Constructor
-VideoFileSource::VideoFileSource(Pipeline &pipeline, const VideoSourceConfig &config) 
+VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConfig &config) 
     :
         VideoSource(pipeline, config),
         identity_(pipeline_.makeElement("identity", NULL))
@@ -124,7 +124,7 @@ VideoFileSource::~VideoFileSource()
 
 
 /// Constructor
-VideoDvSource::VideoDvSource(Pipeline &pipeline, 
+VideoDvSource::VideoDvSource(const Pipeline &pipeline, 
         const VideoSourceConfig &config) :
     VideoSource(pipeline, config),
     queue_(pipeline_.makeElement("queue", NULL)),
@@ -151,7 +151,7 @@ bool VideoV4lSource::willModifyCaptureResolution() const
 }
 
 
-VideoV4lSource::VideoV4lSource(Pipeline &pipeline, 
+VideoV4lSource::VideoV4lSource(const Pipeline &pipeline, 
         const VideoSourceConfig &config)
 : VideoSource(pipeline, config), expectedStandard_("NTSC"), actualStandard_("")
 {
@@ -225,7 +225,7 @@ std::string VideoV4lSource::srcCaps() const
 }
 
 
-VideoDc1394Source::VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig &config) :
+VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config) :
     VideoSource(pipeline, config)
 {
     if (Dc1394::areCamerasConnected())

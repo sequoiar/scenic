@@ -87,7 +87,7 @@ SenderConfig::SenderConfig(Pipeline &pipeline,
         const std::string &remoteHost__,
         int port__) :
     RemoteConfig(codec__, remoteHost__, port__),
-    BusMsgHandler(pipeline),
+    BusMsgHandler(&pipeline),
     message_(""), 
     capsOutOfBand_(false)    // this will be determined later
 {}
