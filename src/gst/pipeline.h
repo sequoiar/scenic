@@ -58,13 +58,12 @@ class Pipeline : boost::noncopyable
         bool isPaused() const;
         bool isStopped() const;
         void seekTo(gint64 pos);
-        void start();
-        void pause();
-        void makeReady();
+        void start() const;
+        void pause() const;
+        void makeReady() const;
         void stop() const;
         void quit() const;
-        void makeVerbose();
-        void postInterrupt();
+        void makeVerbose() const;
 
     private:
         static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);

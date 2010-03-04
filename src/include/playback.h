@@ -27,7 +27,7 @@ class Pipeline;
 
 class Playback {
     public:
-        Playback(Pipeline &pipeline);
+        Playback(const Pipeline &pipeline);
         void start();
         void pause();
         void stop();
@@ -36,7 +36,7 @@ class Playback {
         void quit();
         int sampleRate();
     private:
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
 };
 
 #endif // _PLAYBACK_H_

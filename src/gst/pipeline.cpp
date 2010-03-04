@@ -189,7 +189,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 }
 
 
-void Pipeline::makeVerbose()
+void Pipeline::makeVerbose() const
 {
     // Get verbose output
     gchar *exclude_args = NULL;     // set args to be excluded from output
@@ -315,7 +315,7 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 }
 
 
-void Pipeline::start()
+void Pipeline::start() const
 {
     if (isPlaying())        // only needs to be started once
         return;
@@ -326,7 +326,7 @@ void Pipeline::start()
 
 
 
-void Pipeline::makeReady()
+void Pipeline::makeReady() const
 {
     if (isReady())        // only needs to be started once
         return;
@@ -337,7 +337,7 @@ void Pipeline::makeReady()
 
 
 
-void Pipeline::pause()
+void Pipeline::pause() const
 {
     if (isPaused())        // only needs to be paused once
         return;
@@ -496,18 +496,5 @@ void Pipeline::updateSampleRate(unsigned newRate)
 unsigned Pipeline::actualSampleRate() const
 {
     return sampleRate_;
-}
-
-
-void Pipeline::postInterrupt()
-{
-    /* post an application specific message */
-    if (pipeline_)
-    {
-        gst_element_post_message (GST_ELEMENT (pipeline_),
-                gst_message_new_application (GST_OBJECT (pipeline_),
-                    gst_structure_new ("MilhouseInterrupt",
-                        "message", G_TYPE_STRING, "Pipeline interrupted", NULL)));
-    }
 }
 

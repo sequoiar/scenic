@@ -27,7 +27,7 @@
 #include "gutil.h"
 
 
-Playback::Playback(Pipeline &pipeline) : pipeline_(pipeline)
+Playback::Playback(const Pipeline &pipeline) : pipeline_(pipeline)
 {
 }
 
