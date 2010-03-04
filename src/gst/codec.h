@@ -23,7 +23,6 @@
 #define _CODEC_H_
 
 #include "gstLinkable.h"
-
 #include "noncopyable.h"
 
 // forward declarations
@@ -31,7 +30,6 @@ class _GstElement;
 class RtpPay;
 class Pay;
 class Pipeline;
-
 
 /** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
@@ -287,7 +285,7 @@ class RawDecoder : public Decoder
 class LameEncoder : public Encoder
 {
     public:
-        LameEncoder(Pipeline &pipeline);
+        LameEncoder(Pipeline &pipeline, double quality);
         ~LameEncoder();
 
     private:
@@ -296,11 +294,7 @@ class LameEncoder : public Encoder
         Pay* createPayloader() const;
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return mp3parse_; }
-        
-        ///No Copy Constructor
-        LameEncoder(const LameEncoder&);     
-        ///No Assignment Operator
-        LameEncoder& operator=(const LameEncoder&);     
+        static double userQualityToLameQuality(double f);
 };
 
 /// Decoder that decodes mpeg to raw audio.

@@ -82,7 +82,7 @@ class SenderConfig : public RemoteConfig, public BusMsgHandler
                 int port);
 
         VideoEncoder* createVideoEncoder(Pipeline &pipeline, int bitrate, int quality) const;
-        Encoder* createAudioEncoder(Pipeline &pipeline) const;
+        Encoder* createAudioEncoder(Pipeline &pipeline, double quality) const;
         bool capsOutOfBand() { return capsOutOfBand_; }
         void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
 

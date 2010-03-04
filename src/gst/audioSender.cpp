@@ -82,7 +82,7 @@ void AudioSender::createSource(Pipeline &pipeline)
 
 void AudioSender::createCodec(Pipeline &pipeline)
 {
-    tassert(encoder_ = remoteConfig_->createAudioEncoder(pipeline));
+    tassert(encoder_ = remoteConfig_->createAudioEncoder(pipeline, audioConfig_->quality()));
     gstlinkable::link(*source_, *encoder_);
 }
 

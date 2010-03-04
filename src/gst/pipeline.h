@@ -70,7 +70,7 @@ class Pipeline : boost::noncopyable
 
     private:
         static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);
-        void add(_GstElement * element);
+        void add(_GstElement * element) const;
         _GstBus* getBus() const;
         GstClock* clock() const;
 

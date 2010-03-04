@@ -21,7 +21,7 @@
  */
 
 #include <algorithm> // for std::find
-#include <unistd.h>
+#include <cmath> // for std::fabs
 
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
@@ -445,12 +445,20 @@ RtpPay* RawDecoder::createDepayloader() const
     return new L16Depay(pipeline_);
 }
 
+double LameEncoder::userQualityToLameQuality(double f)
+{
+    static const double SCALE = 10.0;    // from the lame plugin
+    static const double MIN_QUALITY = 0.01;  // from the lame plugin
+    return std::fabs(SCALE - (std::max(f, MIN_QUALITY) * SCALE));
+}
+
 /// Constructor
-LameEncoder::LameEncoder(Pipeline &pipeline) : 
+LameEncoder::LameEncoder(Pipeline &pipeline, double quality) : 
     Encoder(pipeline, "lamemp3enc"),
     aconv_(pipeline_.makeElement("audioconvert", NULL)),
     mp3parse_(pipeline_.makeElement("mp3parse", NULL))
 {
+    g_object_set(encoder_, "quality", userQualityToLameQuality(quality), NULL);
     gstlinkable::link(aconv_, encoder_);
     gstlinkable::link(encoder_, mp3parse_);
 }

@@ -46,6 +46,7 @@ class AudioSourceConfig
         bool hasDeviceName() const { return !deviceName_.empty(); }
         bool hasLocation() const { return !location_.empty(); }
 
+        double quality() const;
         const char *sourceName() const;
         const char *deviceName() const;
         const char *location() const;
@@ -56,6 +57,7 @@ class AudioSourceConfig
 
     private:
         const std::string source_;
+        const double quality_;
         const std::string sourceName_;
         const std::string deviceName_;
         const std::string location_;

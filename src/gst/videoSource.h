@@ -25,12 +25,11 @@
 
 #include "noncopyable.h"
 
-#include <gst/gstclock.h>
+#include <string>
 
 class Pipeline;
 class VideoSourceConfig;
 class _GstElement;
-class _GstPad;
 
 class VideoSource
     : public GstLinkableSource, boost::noncopyable

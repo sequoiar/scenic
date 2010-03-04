@@ -33,6 +33,7 @@ namespace po = boost::program_options;
 
 AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
     source_(options["audiosource"].as<std::string>()), 
+    quality_(options["audioquality"].as<double>()), 
     sourceName_(options["jack-client-name"].as<std::string>()),
     deviceName_(options["audiodevice"].as<std::string>()), 
     location_(options["audiolocation"].as<std::string>()), 
@@ -44,6 +45,11 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
         THROW_CRITICAL("Invalid number of channels");
 }
 
+
+double AudioSourceConfig::quality() const
+{
+    return quality_;
+}
 
 /// Returns c-style string specifying the source 
 const char *AudioSourceConfig::source() const

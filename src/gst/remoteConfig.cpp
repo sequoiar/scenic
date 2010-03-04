@@ -115,7 +115,7 @@ VideoEncoder * SenderConfig::createVideoEncoder(Pipeline &pipeline, int bitrate,
 }
 
 
-Encoder * SenderConfig::createAudioEncoder(Pipeline &pipeline) const
+Encoder * SenderConfig::createAudioEncoder(Pipeline &pipeline, double quality) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
@@ -125,7 +125,7 @@ Encoder * SenderConfig::createAudioEncoder(Pipeline &pipeline) const
     else if (codec_ == "raw")
         return new RawEncoder(pipeline);
     else if (codec_ == "mp3")
-        return new LameEncoder(pipeline);
+        return new LameEncoder(pipeline, quality);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");

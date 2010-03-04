@@ -371,7 +371,7 @@ void Pipeline::stop()
 }
 
 
-void Pipeline::add(GstElement *element)
+void Pipeline::add(GstElement *element) const
 {
     gst_bin_add(GST_BIN(pipeline_), element);
 }
