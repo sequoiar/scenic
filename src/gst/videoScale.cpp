@@ -41,7 +41,7 @@ VideoScale::VideoScale(const Pipeline &pipeline, int width, int height) :
     GstCaps *tempCaps;
     
     static const vector<string> FORMATS = 
-        list_of<string>("x-raw-yuv")("x-raw-rgb")("x-raw-gray");
+        list_of<string>("x-raw-gray")("x-raw-yuv")("x-raw-rgb");
 
     for (vector<string>::const_iterator format = FORMATS.begin();
             format != FORMATS.end(); ++format)

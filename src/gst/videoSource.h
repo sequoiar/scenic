@@ -111,9 +111,8 @@ class VideoDc1394Source
     : public VideoSource
 {
     public:
-        explicit VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config);
+        VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config);
     private:
-        enum {DMA_BUFFER_SIZE_IN_FRAMES = 2};
         std::string srcCaps() const;
         _GstElement *srcElement() { return capsFilter_; }
 };

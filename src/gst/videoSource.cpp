@@ -239,6 +239,7 @@ VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSource
     else
         LOG_DEBUG("No valid camera-number or guid specified, using default camera number 0");
     /// TODO: test. this will hopefully help reduce the lag we're seeing with dc1394src
+    enum {DMA_BUFFER_SIZE_IN_FRAMES = 2};
     g_object_set(G_OBJECT(source_), "buffer-size", DMA_BUFFER_SIZE_IN_FRAMES, NULL);
 
     capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
