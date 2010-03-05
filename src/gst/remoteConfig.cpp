@@ -115,17 +115,17 @@ VideoEncoder * SenderConfig::createVideoEncoder(const Pipeline &pipeline, int bi
 }
 
 
-Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, double quality) const
+Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, int bitrate, double quality) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "vorbis")
-        return new VorbisEncoder(pipeline, quality);
+        return new VorbisEncoder(pipeline, bitrate, quality);
     else if (codec_ == "raw")
         return new RawEncoder(pipeline);
     else if (codec_ == "mp3")
-        return new LameEncoder(pipeline, quality);
+        return new LameEncoder(pipeline, bitrate, quality);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");

@@ -22,6 +22,7 @@
 
 #include <algorithm> // for std::find
 #include <cmath> // for std::fabs
+#include <sstream> // for ostringstream
 
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
@@ -30,6 +31,8 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/assign.hpp>
+
 
 #include "codec.h"
 #include "rtpPay.h"
@@ -373,19 +376,20 @@ RtpPay* TheoraDecoder::createDepayloader() const
     return new TheoraDepay(pipeline_);
 }
 
-void VorbisEncoder::setQuality(double quality)
+
+/// Constructor 
+VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality) 
+    :
+        Encoder(pipeline, "vorbisenc")
 {
     static const double MIN_QUALITY = -0.1;  // from the vorbis plugin
     static const double MAX_QUALITY = 1.0;  // from the vorbis plugin
+    static const int MIN_BITRATE = 0;  
+    static const int BITS_PER_KB = 1024;  
     if (quality >= MIN_QUALITY and quality <= MAX_QUALITY)
         g_object_set(encoder_, "quality", quality, NULL);
-}
-
-/// Constructor 
-VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, double quality) :
-    Encoder(pipeline, "vorbisenc")
-{
-    setQuality(quality);
+    else if (bitrate > MIN_BITRATE)
+        g_object_set(encoder_, "bitrate", bitrate * BITS_PER_KB, NULL);
 }
 
 
@@ -454,22 +458,34 @@ RtpPay* RawDecoder::createDepayloader() const
     return new L16Depay(pipeline_);
 }
 
-void LameEncoder::setQuality(double quality)
+
+/// Constructor
+LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality) 
+    : 
+        Encoder(pipeline, "lamemp3enc"),
+        aconv_(pipeline_.makeElement("audioconvert", NULL)),
+        mp3parse_(pipeline_.makeElement("mp3parse", NULL))
 {
     static const double SCALE = 10.0;    // from the lame plugin
     static const double MIN_QUALITY = 0.01;  // from the lame plugin
     static const double MAX_QUALITY = 1.0;  // from the lame plugin
+
+    using namespace boost::assign;
+    std::vector<int> allowedBitrates;
+    allowedBitrates += 7, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320;
+
     if (quality >= MIN_QUALITY and quality <= MAX_QUALITY)
         g_object_set(encoder_, "quality", std::fabs(SCALE - (quality * SCALE)), NULL);
-}
+    else if (std::find(allowedBitrates.begin(), allowedBitrates.end(), bitrate) != allowedBitrates.end())
+        g_object_set(encoder_, "bitrate", bitrate, NULL);
+    else if (bitrate > 0) // 0 means unused, so ignore it
+    {
+        std::ostringstream str;
+        std::copy(allowedBitrates.begin(), allowedBitrates.end(), std::ostream_iterator<int>(str, " "));
+        LOG_WARNING("Ignoring invalid bitrate value of " << 
+                bitrate << ", allowed bitrates are:\n " << str.str());
+    }
 
-/// Constructor
-LameEncoder::LameEncoder(const Pipeline &pipeline, double quality) : 
-    Encoder(pipeline, "lamemp3enc"),
-    aconv_(pipeline_.makeElement("audioconvert", NULL)),
-    mp3parse_(pipeline_.makeElement("mp3parse", NULL))
-{
-    setQuality(quality);
     gstlinkable::link(aconv_, encoder_);
     gstlinkable::link(encoder_, mp3parse_);
 }

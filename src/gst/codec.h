@@ -232,10 +232,9 @@ class TheoraDecoder: public VideoDecoder
 class VorbisEncoder : public Encoder
 {
     public: 
-        VorbisEncoder(const Pipeline &pipeline, double quality);
+        VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality);
 
     private:
-        void setQuality(double quality);
         ~VorbisEncoder();
         Pay* createPayloader() const;
 };
@@ -286,7 +285,7 @@ class RawDecoder : public Decoder
 class LameEncoder : public Encoder
 {
     public:
-        LameEncoder(const Pipeline &pipeline, double quality);
+        LameEncoder(const Pipeline &pipeline, int bitrate, double quality);
         ~LameEncoder();
 
     private:
@@ -295,7 +294,6 @@ class LameEncoder : public Encoder
         Pay* createPayloader() const;
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return mp3parse_; }
-        void setQuality(double quality);
 };
 
 /// Decoder that decodes mpeg to raw audio.
