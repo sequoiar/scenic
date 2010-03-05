@@ -89,6 +89,7 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
     // or at least querying the element responsible for more info
     std::string srcName = gst_object_get_name(src);
     if (srcName.find("udpsrc") != std::string::npos) // this comes from a udpsrc
+    {
         if (errStr.find("Could not get/set settings from/on resource") != std::string::npos)
         {
             int port;
@@ -97,6 +98,19 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
             return srcName + ":" + errStr + " Port " + 
                 boost::lexical_cast<std::string>(port) + " may be in use by another process.";
         }
+    }
+    else if (srcName.find("v4l2src") != std::string::npos) // this comes from a v4l2src
+    {
+        static const std::string v4l2busy("Could not enqueue buffers in device ");
+        size_t pos = errStr.find(v4l2busy);
+        if (pos != std::string::npos)
+        {
+            std::string deviceName(errStr.substr(pos + v4l2busy.length(), errStr.length() - v4l2busy.length() - 1));
+            return srcName + ":" + errStr + 
+                 deviceName + " is probably already in use.";
+        }
+    }
+
     return srcName + ":" + errStr;
 }
 
