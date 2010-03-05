@@ -228,7 +228,7 @@ std::string VideoV4lSource::srcCaps() const
 VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config) :
     VideoSource(pipeline, config)
 {
-    if (Dc1394::areCamerasConnected())
+    if (not Dc1394::areCamerasConnected())
         THROW_CRITICAL("No dc1394 camera connected");
 
     source_ = pipeline_.makeElement(config_.source(), NULL);
