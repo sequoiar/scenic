@@ -48,11 +48,17 @@ LogLevel MilhouseLogger::argToLogLevel(const std::string &level)
 
     if (upperCase == "GST-DEBUG" or upperCase == "6")
     {
-        gstDebug_ = true;
+        gstDebug_ = true;   // special case
         return DEBUG;
     }
     else
-        return strings[upperCase];
+    {
+        // make sure the argument wasn't junk
+        if (strings.find(upperCase) != strings.end())
+            return strings[upperCase];
+        else // default to DEBUG, this user probably needs it
+            return DEBUG;
+    }
 }
 
 
