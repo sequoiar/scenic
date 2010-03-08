@@ -1229,7 +1229,7 @@ class Gui(object):
         """
         # unschedule this timeout as we don't care if our peer answered or not
         self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_CANCELLED)
-        print("Inviting window is closed. !!!!!!!!!!!!!!!!!")
+        print("Inviting window is closed. ")
         self.hide_calling_dialog()
         return True # don't let the delete-event propagate
 
@@ -1255,7 +1255,7 @@ class Gui(object):
         """
         def _cl_offerer_invite_timed_out():
             # in case of invite timeout, act as if we'd cancelled the invite ourselves
-            print("Inviting window time out. !!!!!!!!!!!!!!!!!")
+            print("Inviting window time out. ")
             self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_TIMEOUT)
             self.on_invite_contact_cancelled()
             self.hide_calling_dialog()
