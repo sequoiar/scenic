@@ -1134,13 +1134,20 @@ class Gui(object):
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             print(msg)
                             dialogs.ErrorDialog.create(msg, parent=self.main_window)
+                            
+                            self._v4l2_standard_changed_by_user = False
+                            _set_combobox_value(self.v4l2_standard_widget, actua_standard)
+                            self._v4l2_standard_changed_by_user = True
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
                             print("Successfully changed standard to %s for device %s." % (actual_standard, current_camera_name))
                             print("Now polling cameras.")
+                    self.v4l2_standard_widget.set_sensitive(True)
                 
                 standard_name = _get_combobox_value(widget)
                 cam = self.app.devices["cameras"][current_camera_name]
+                
+                self.v4l2_standard_widget.set_sensitive(False)
                 d = cameras.set_v4l2_video_standard(device_name=current_camera_name, standard=standard_name)
                 def _cb(result):
                     d2 = self.app.poll_camera_devices()
