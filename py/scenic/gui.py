@@ -124,18 +124,22 @@ def _set_combobox_value(widget, value=None):
     """
     Sets the current value of a GTK ComboBox widget.
     """
-    index = None
     tree_model = widget.get_model()
     index = 0
+    got_it = False
     for i in iter(tree_model):
         v = i[0]
         if v == value:
+            got_it = True
             break # got it
         index += 1
-    if index is None:
-        widget.set_active(-1)
-    else:
+    if got_it:
+        #widget.set_active(-1)  NONE
         widget.set_active(index)
+    else:
+        widget.set_active(0) # FIXME: -1)
+        msg = "ComboBox widget %s doesn't have value %s." % (widget, value)
+        print msg
 
 #videotestsrc legible name:
 VIDEO_TEST_INPUT = "Color bars"
@@ -1115,10 +1119,10 @@ class Gui(object):
             # change standard for device
             current_camera_name = _get_combobox_value(self.video_source_widget)
             if current_camera_name != VIDEO_TEST_INPUT:
-                standard_name = _get_combobox_value(widget)
-                cam = self.app.devices["cameras"][current_camera_name]
-                d = cameras.set_v4l2_video_standard(device_name=current_camera_name, standard=standard_name)
                 def _cb2(result):
+                    # callback for the poll_cameras_devices deferred.
+                    # check if successfully changed norm
+                    # see below
                     cameras = self.app.devices["cameras"]
                     try:
                         cam = cameras[current_camera_name]
@@ -1129,13 +1133,19 @@ class Gui(object):
                         if actual_standard != standard_name:
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             print(msg)
+                            dialogs.ErrorDialog.create(msg, parent=self.main_window)
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
                             print("Successfully changed standard to %s for device %s." % (actual_standard, current_camera_name))
+                            print("Now polling cameras.")
+                
+                standard_name = _get_combobox_value(widget)
+                cam = self.app.devices["cameras"][current_camera_name]
+                d = cameras.set_v4l2_video_standard(device_name=current_camera_name, standard=standard_name)
                 def _cb(result):
                     d2 = self.app.poll_camera_devices()
-                    #d2 = cameras.list_cameras()
                     d2.addCallback(_cb2)
+                    
                 d.addCallback(_cb)
         
     def on_v4l2_input_changed(self, widget):

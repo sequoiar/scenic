@@ -182,11 +182,14 @@ class Application(object):
             print("cameras: %s" % (cameras))
             self.gui.update_camera_devices()
             self.gui.video_capture_size_widget.set_sensitive(True)
+            print("setting video_capture_size widget sensitige to true")
         def _errback(reason):
             self.gui.video_capture_size_widget.set_sensitive(True)
+            print("setting video_capture_size widget sensitige to true")
             return reason
         self.gui.video_capture_size_widget.set_sensitive(False)
         deferred.addCallback(_callback)
+        print("setting video_capture_size widget sensitige to false")
         deferred.addErrback(_errback)
         return deferred
 
