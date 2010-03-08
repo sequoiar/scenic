@@ -340,33 +340,28 @@ class Application(object):
             _simply_refuse()
             print("REFUSED an INVITE since we already got one from someone else.")
             return
-            
-        if self.streamer_manager.is_busy():
-            _simply_refuse()
-            print("Refused invitation: we are busy.")
-            return 
         
-        if not self.devices["jackd_is_running"]:
-            _simply_refuse()
-            dialogs.ErrorDialog.create(_("Refused invitation: jack is not running."), parent=self.gui.main_window)
-            return
-        
-        else:
-            self.remote_config = {
-                "audio": message["audio"],
-                "video": message["video"]
-                }
-            connected_deferred = self.client.connect(addr, message["please_send_to_port"])
-            if contact is not None:
-                if contact["auto_accept"]:
+        def _check_cb(result):
+            if not result:
+                _simply_refuse() # TODO: add reason param: Technical problems.
+            else:
+                self.remote_config = {
+                    "audio": message["audio"],
+                    "video": message["video"]
+                    }
+                connected_deferred = self.client.connect(addr, message["please_send_to_port"])
+                if contact is not None and contact["auto_accept"]:
                     print("Contact %s is on auto_accept. Accepting." % (invited_by))
                     def _connected_cb(proto):
                         self.send_accept(addr)
                     connected_deferred.addCallback(_connected_cb)
-                    return # important
-            text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept the connection?" % {"invited_by": invited_by})
-            dialog_deferred = self.gui.show_invited_dialog(text)
-            dialog_deferred.addCallback(_on_contact_request_dialog_response)
+                else:
+                    text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept the connection?" % {"invited_by": invited_by})
+                    dialog_deferred = self.gui.show_invited_dialog(text)
+                    dialog_deferred.addCallback(_on_contact_request_dialog_response)
+        
+        flight_check_deferred = self.check_if_ready_to_stream(role="answerer")
+        flight_check_deferred.addCallback(_check_cb)
     
     def _get_contact_by_addr(self, addr):
         """
@@ -534,54 +529,86 @@ class Application(object):
                 }
             }
 
-    def send_invite(self):
-        if not self.devices["jackd_is_running"]:
-            dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming, JACK is not running."), parent=self.gui.main_window)
-            return
-            
-        if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming. A streaming session is already in progress."), parent=self.gui.main_window)
+    def check_if_ready_to_stream(self, role="offerer"):
+        """
+        Flight check.
+        
+        Checks if ready to stream. 
+        Will pop up error dialog if there are errors.
+        Calls the deferred with a result that is True of False.
+        @rettype: L{Deferred}
+        @param role: Either "offerer" or "answerer".
+        """
+        #TODO: poll X11 devices
+        #TODO: poll xv extension
+        if role == "offerer":
+            error_msg = _("Impossible to invite a contact to start streaming.")
+        elif role == "answerer":
+            error_msg = _("Impossible to accept an invitation to stream.")
         else:
-            #TODO: use the Deferred it will return
-            self.prepare_before_rtp_stream()
-            msg = {
-                "msg":"INVITE",
-                "protocol": self.protocol_version,
-                "sid":0, 
-                "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
-                }
-            msg.update(self._get_local_config_message_items())
-            contact = self.address_book.selected_contact
-            port = self.config.negotiation_port
-            ip = contact["address"]
+            raise RuntimeError("Invalid role value : %s" % (role))
             
-            
+        if not self.devices["jackd_is_running"]:
+            # TODO: Actually poll jackd right now.
+            dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
+            return defer.succeed(False)
+        elif self.streamer_manager.is_busy():
+            dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
+            return defer.succeed(False)
+        else:
+            #deferred = defer.Deferred()
+            #return deferred
+            return defer.succeed(True)
 
-            def _on_connected(proto):
-                self.gui._schedule_inviting_timeout_delayed()
-                self.client.send(msg)
-                return proto
-            def _on_error(reason):
-                #FIXME: do we need this error dialog?
-                exc_type = type(reason.value)
-                if exc_type is error.ConnectionRefusedError:
-                    msg = _("Could not invite contact %(name)s. \n\nScenic is not listening on port %(port)d of host %(ip)s.") % {"ip": ip, "name": contact["name"], "port": port}
-                elif exc_type is error.ConnectError:
-                    msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
-                elif exc_type is error.NoRouteError:
-                    msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
-                else:
-                    msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
-                print(msg)
-                self.gui.hide_calling_dialog()
-                dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
-                return None
-               
-            print("sending %s to %s:%s" % (msg, ip, port))
-            deferred = self.client.connect(ip, port)
-            deferred.addCallback(_on_connected).addErrback(_on_error)
-            self.gui.show_calling_dialog()
-            # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
+    def send_invite(self):
+        """
+        Does the flight check. If OK, send an INVITE.
+        """
+        def _check_cb(result):
+            #TODO: use the Deferred it will return
+            if result:
+                self.prepare_before_rtp_stream()
+                msg = {
+                    "msg":"INVITE",
+                    "protocol": self.protocol_version,
+                    "sid":0, 
+                    "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
+                    }
+                msg.update(self._get_local_config_message_items())
+                contact = self.address_book.selected_contact
+                port = self.config.negotiation_port
+                ip = contact["address"]
+                
+                def _on_connected(proto):
+                    self.gui._schedule_inviting_timeout_delayed()
+                    self.client.send(msg)
+                    return proto
+                def _on_error(reason):
+                    #FIXME: do we need this error dialog?
+                    exc_type = type(reason.value)
+                    if exc_type is error.ConnectionRefusedError:
+                        msg = _("Could not invite contact %(name)s. \n\nScenic is not listening on port %(port)d of host %(ip)s.") % {"ip": ip, "name": contact["name"], "port": port}
+                    elif exc_type is error.ConnectError:
+                        msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
+                    elif exc_type is error.NoRouteError:
+                        msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
+                    else:
+                        msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
+                    print(msg)
+                    self.gui.hide_calling_dialog()
+                    dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    return None
+                   
+                print("sending %s to %s:%s" % (msg, ip, port))
+                deferred = self.client.connect(ip, port)
+                deferred.addCallback(_on_connected).addErrback(_on_error)
+                self.gui.show_calling_dialog()
+                # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
+            else:
+                print("Cannot send INVITE.")
+
+        check_deferred = self.check_if_ready_to_stream(role="offerer")
+        check_deferred.addCallback(_check_cb)
     
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
