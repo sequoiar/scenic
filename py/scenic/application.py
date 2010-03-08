@@ -181,7 +181,13 @@ class Application(object):
             self.devices["cameras"] = cameras
             print("cameras: %s" % (cameras))
             self.gui.update_camera_devices()
+            self.gui.video_capture_size_widget.set_sensitive(True)
+        def _errback(reason):
+            self.gui.video_capture_size_widget.set_sensitive(True)
+            return reason
+        self.gui.video_capture_size_widget.set_sensitive(False)
         deferred.addCallback(_callback)
+        deferred.addErrback(_errback)
         return deferred
 
     def poll_xvideo_extension(self):
