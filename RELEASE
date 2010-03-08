@@ -57,4 +57,5 @@ Scenic Fixes:
 #228: gross output in error dialog on trying to join
 #322: Add current DISPLAY variable to list of screens
 #310: os.environ['GTK2_RC-FILES'] should be cleared when launching external applications
+#330: Image size list should be updated when standard is changed
 

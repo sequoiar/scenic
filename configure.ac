@@ -146,6 +146,11 @@ else
     AC_DEFINE(CONFIG_GL,[],[GL define from configure])
 fi
 
+
+# Check for gst-plugins that we use
+# FIXME: check the result of this call
+python utils/gst_check.py
+
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
     CXXFLAGS="-g -O0 -rdynamic -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
