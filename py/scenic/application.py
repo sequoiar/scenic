@@ -387,7 +387,7 @@ class Application(object):
         contact_name = ""
         if contact is not None:
             contact_name = contact["name"]
-        txt = _("Contact %(name) invited you but cancelled his invitation.") % {"name": contact_name}
+        txt = _("Contact %(name)s invited you but cancelled his invitation.") % {"name": contact_name}
         # Turning the reason into readable i18n str.
         if message.has_key("reason"):
             reason = message["reason"]
