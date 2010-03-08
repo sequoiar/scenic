@@ -177,17 +177,21 @@ class Application(object):
         @rettype: Deferred
         """
         deferred = cameras.list_cameras()
+        toggle_size_sensitivity = self.gui.video_capture_size_widget.get_property("sensitive")
         def _callback(cameras):
             self.devices["cameras"] = cameras
             print("cameras: %s" % (cameras))
             self.gui.update_camera_devices()
-            self.gui.video_capture_size_widget.set_sensitive(True)
+            if toggle_size_sensitivity:
+                self.gui.video_capture_size_widget.set_sensitive(True)
             print("setting video_capture_size widget sensitige to true")
         def _errback(reason):
-            self.gui.video_capture_size_widget.set_sensitive(True)
+            if toggle_size_sensitivity:
+                self.gui.video_capture_size_widget.set_sensitive(True)
             print("setting video_capture_size widget sensitige to true")
             return reason
-        self.gui.video_capture_size_widget.set_sensitive(False)
+        if toggle_size_sensitivity:
+            self.gui.video_capture_size_widget.set_sensitive(False)
         deferred.addCallback(_callback)
         print("setting video_capture_size widget sensitige to false")
         deferred.addErrback(_errback)

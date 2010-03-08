@@ -1232,6 +1232,7 @@ class Gui(object):
         self.calling_dialog = None
         widgets_tree = glade.get_widgets_tree()
         self.calling_dialog = widgets_tree.get_widget("calling_dialog")
+        self.calling_dialog.set_parent(self.main_window)
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         self.calling_dialog.show()
     
