@@ -53,7 +53,6 @@ from scenic import gui
 from scenic import internationalization
 _ = internationalization._
 
-
 class Config(saving.ConfigStateSaving):
     """
     Configuration for the application.
@@ -531,7 +530,7 @@ class Application(object):
 
     def check_if_ready_to_stream(self, role="offerer"):
         """
-        Flight check.
+        Does the flight check, checking if ready to stream.
         
         Checks if ready to stream. 
         Will pop up error dialog if there are errors.
@@ -541,29 +540,62 @@ class Application(object):
         """
         #TODO: poll X11 devices
         #TODO: poll xv extension
-        if role == "offerer":
-            error_msg = _("Impossible to invite a contact to start streaming.")
-        elif role == "answerer":
-            error_msg = _("Impossible to accept an invitation to stream.")
-        else:
-            raise RuntimeError("Invalid role value : %s" % (role))
+        deferred = defer.Deferred()
+        def _callback(result):
+            # callback for the deferred list created below.
+            # calls the deferred's callback
+            if role == "offerer":
+                error_msg = _("Impossible to invite a contact to start streaming.")
+            elif role == "answerer":
+                error_msg = _("Impossible to accept an invitation to stream.")
+            else:
+                raise RuntimeError("Invalid role value : %s" % (role))
             
-        if not self.devices["jackd_is_running"]:
-            # TODO: Actually poll jackd right now.
-            dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
-            return defer.succeed(False)
-        elif self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
-            return defer.succeed(False)
-        else:
-            #deferred = defer.Deferred()
-            #return deferred
-            return defer.succeed(True)
+            x11_displays = [display["name"] for display in self.devices["x11_displays"]]
+            cameras = self.devices["cameras"].keys()
+                
+            if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared !.") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
+                return deferred.callback(False)
+            elif self.config.video_source == "v4l2src" and self.config.video_device not in cameras: #TODO: do not test if not sending video
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared !.") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
+                return deferred.callback(False)
+                
+            elif not self.devices["jackd_is_running"]:
+                # TODO: Actually poll jackd right now.
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
+                return deferred.callback(False)
+            elif self.streamer_manager.is_busy():
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
+                deferred.callback(False)
+            
+            # "cameras": {}, # dict of dicts (only V4L2 cameras for now)
+            elif not self.devices["xvideo_is_present"]: #TODO: do not test if not receiving video
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X video extension is not present."), parent=self.gui.main_window)
+                deferred.callback(False)
+            else:
+                deferred.callback(True)
+        
+        deferred_list = defer.DeferredList([
+            self.poll_x11_devices(), 
+            self.poll_xvideo_extension(),
+            self.poll_camera_devices()
+            ])
+        self._poll_jackd() # does not return a deferred for now... called in a looping call.
+        deferred_list.addCallback(_callback)
+        return deferred
 
     def send_invite(self):
         """
         Does the flight check. If OK, send an INVITE.
         """
+        contact = self.address_book.get_currently_selected_contact()
+        if contact is None:
+            dialogs.ErrorDialog.create(_("You must select a contact to invite."), parent=self.gui.main_window)
+            return  # important
+        else:
+            ip = contact["address"]
+            
         def _check_cb(result):
             #TODO: use the Deferred it will return
             if result:
@@ -575,9 +607,7 @@ class Application(object):
                     "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
                     }
                 msg.update(self._get_local_config_message_items())
-                contact = self.address_book.selected_contact
                 port = self.config.negotiation_port
-                ip = contact["address"]
                 
                 def _on_connected(proto):
                     self.gui._schedule_inviting_timeout_delayed()
