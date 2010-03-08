@@ -1,82 +1,60 @@
-Release notes for Scenic 0.4.2
+Release notes for Scenic 0.4.3
 
     Milhouse:
-    This minor release fixes some system-level bugs. Improvements to
-    RTCP stats allow for more detailed info on rtp session quality.
-    Cleaner output so that Scenic can report on errors/etc. Improvements
-    to --list-cameras.
+    This release fixes a bug with dc1394src in localvideo. This release
+    introduces audiobitrate and quality settings for vorbis and mp3.
+    Another new feature is the xid option that allows a user to specify
+    an xid for the video window that could belong to a separate process. 
 
     Scenic GUI:
-    Lots of improvements to the UI, include more advanced state management for both
-    sessions and processes. More forwarding of info output by Milhouse (errors, rtcp, etc.)
-
-    Documentation:
-    Documentaion for installation is still accurate, but some operations (video
-    and audio testing) needs to use more Scenic new features. Documentation has
-    been updated to include Debian-specific instructions.  Testing on Debian
-    still have to be made, especially that it doesn't come with a realtime kernel.
-    Hardware support is probably different too. We'll update
+    This release improves error dialogs and error handling in general.
+    It also allows a milhouse video preview to be embedded in scenic.
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
     scenic.
-    * In the older source directory, use "make uninstall" as root to uninstall
-    previous installations.
+    * In the older source directory, use "make uninstall" as root to
+    uninstall previous installations.
     * Don't forget to run ldconfig after installation.
-    * As of this release, you may want to run ./utils/install_gstreamer.sh 
-    again or simply apply the utils/rtpsource.diff patch to
-    gst-plugins-good-0.10.17, then recompile and reinstall it.  Refer to
+    * As of 0.4.2 and later (this release included), 
+    you may want to run ./utils/install_gstreamer.sh again or simply
+    apply the utils/rtpsource.diff patch to gst-plugins-good-0.10.17,
+    then recompile and reinstall it. Refer to
     https://bugzilla.gnome.org/show_bug.cgi?id=611213
-    This fix adds receiver side bitrate estimation. Note that milhouse will function 
-    fine without it, as will scenic.
-    * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras. Install them 
-    with aptitude.
+    This fix adds receiver side bitrate estimation. Note that milhouse
+    will function fine without it, as will scenic.
+    * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
+    Install them with aptitude.
 
     Backward compatibility:
     Each release in the 0.4 series should be interoperable between each other.
 
     Milhouse dependency for Scenic
-    Scenic always needs the same version of milhouse, eg. scenic 0.4.1 needs milhouse 0.4.1
+    Scenic always needs the same version of milhouse, eg. scenic 0.4.1
+    needs milhouse 0.4.1
 
     Limitations:
-    * While milhouse support many video and audio input types, Scenic
+    * While milhouse supports many video and audio input types, Scenic
     only support a subset of it. 
     * Network testing and MIDI transmission are not handled by Scenic
     yet.
 
-Fixes:
+Milhouse Fixes:
 
-#283: X11 display option is not working in the GUI
-#284: X11 device setting is not saved in state saving
-#298: Sender doesn't give the audio codec that the receiver wants.
-#315: Add a window icon to milhouse
-#162: when using dc1394src, if you use the same device in another process, interrupt won't work on milhouse
-#204: test_dc_ctl segfaults on Karmic
-#240: check if the videodevice is v4l2, not v4l
-#244: Change status icons for each contact
-#253: Improve preview window behaviour
-#264: videoflip is frail with input material
-#268: Show infos when streaming
-#270: deactivate certain widgets while streaming
-#275: use rtcp stats to determine streaming status in scenic
-#276: when done streaming, video bitrate widget becomes sensitive for theora
-#278: Crash with info formatting when using theora
-#279: Add RTCP stats to GUI
-#280: Consider only the last 2 seconds for packet loss
-#281: Parse milhouse output for errors and warnings
-#296: configure detect presence or absence of libboost*dev libraries and header, but don't act accordingly
-#297: gtk theme is not loaded on karmic
-#299: Display bitrate stats in sender
-#300: Display a summary of session errors in a single error dialog
-#301: Report bitrate on receiver side.
-#307: Make sure all messages are internationalized
-#313: The IP address field for a new contact only accepts 15 characters
-#256: Some dialogs lose their contents
-#266: gtkrc theme not loaded on Karmic
-#267: GtkSpinButton setting an adjustment with non-zero page size is deprecated
-#273: Contact name in the milhouse window
-#277: Show local IP in summary
-#289: Validate domain name addresses and IP addresses
-#269: Use gtk.TextIter to create tags in the summary text view
-#271: bad folder permission for scenic-0.4.1 extracted with fileroller
-#247: --snapshot-file argument to display a snaphost in the GUI
+#236: add audio bitrate/quality settings for mp3 and vorbis
+#321: use variable map everywhere
+#326: dc1394src has too much colourspace conversion for localvideo
+#238: --x-window-id option added
+
+Scenic Fixes:
+#274: accepting invite at last minutes leads to one way stream
+#308: Add a timeout to some dialogs
+#309: Receiving an invitation should make the peer unavailable for others
+#325: When the answerer cancels, he sees a timeout error dialog
+#312: An invite to an unreachable address gives a bad error message
+#316: Add display and fullscreen in summary
+#319: start jackd in short form leads to KeyError when looking for jack info
+#228: gross output in error dialog on trying to join
+#322: Add current DISPLAY variable to list of screens
+#310: os.environ['GTK2_RC-FILES'] should be cleared when launching external applications
+
