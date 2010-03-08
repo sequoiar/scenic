@@ -1118,7 +1118,8 @@ class Gui(object):
                 standard_name = _get_combobox_value(widget)
                 cam = self.app.devices["cameras"][current_camera_name]
                 d = cameras.set_v4l2_video_standard(device_name=current_camera_name, standard=standard_name)
-                def _cb2(cameras):
+                def _cb2(result):
+                    cameras = self.app.devices["cameras"]
                     try:
                         cam = cameras[current_camera_name]
                     except KeyError, e:
@@ -1132,7 +1133,8 @@ class Gui(object):
                         else:
                             print("Successfully changed standard to %s for device %s." % (actual_standard, current_camera_name))
                 def _cb(result):
-                    d2 = cameras.list_cameras()
+                    d2 = self.app.poll_camera_devices()
+                    #d2 = cameras.list_cameras()
                     d2.addCallback(_cb2)
                 d.addCallback(_cb)
         
