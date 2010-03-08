@@ -39,9 +39,11 @@ class Preview(object):
                 print("WARNING: XID of the preview drawing area is None !")
             else:
                 x_window_id = self.app.gui.preview_area_x_window_id
-        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s --display %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio, self.app.config.video_display)
+        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio)
         if x_window_id is not None:
             command += " --x-window-id %d" % (x_window_id)
+        else:
+            command += " --display %s" % (self.app.config.video_display) # xid does not work if DISPLAY is set to an other display.
         if self.app.config.video_source != "videotestsrc":
             command += " --videodevice %s" % (self.app.config.video_device)
         return command
