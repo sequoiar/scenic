@@ -68,6 +68,16 @@ def _list_x11_displays(verbose):
         if not found_screen_for_display:
             break
     dev_null.close()
+    
+    # add current DISPLAY variable if not in the list of detected displays. (most likely because it's a ssh -X session)
+    if os.environ.has_key("DISPLAY"):
+        display = os.environ["DISPLAY"]
+        found_it = False
+        for d in displays:
+            if d["name"] == display:
+                found_it = True
+        if not found_it:
+            displays.append({"name":display, "dimensions":"unknown", "resolution":"unknown"})
     return displays
 
 def list_x11_displays(verbose=True):

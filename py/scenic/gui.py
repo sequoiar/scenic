@@ -39,6 +39,7 @@ from scenic import dialogs
 from scenic import glade
 from scenic import preview
 from scenic import network
+from scenic import communication
 from scenic.devices import cameras
 from scenic.devices import networkinterfaces
 from scenic.internationalization import _
@@ -1227,7 +1228,8 @@ class Gui(object):
         Sends a CANCEL to the remote peer when invite contact window is closed.
         """
         # unschedule this timeout as we don't care if our peer answered or not
-        self.app.send_cancel_and_disconnect()
+        self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_CANCELLED)
+        print("Inviting window is closed. !!!!!!!!!!!!!!!!!")
         self.hide_calling_dialog()
         return True # don't let the delete-event propagate
 
@@ -1253,6 +1255,8 @@ class Gui(object):
         """
         def _cl_offerer_invite_timed_out():
             # in case of invite timeout, act as if we'd cancelled the invite ourselves
+            print("Inviting window time out. !!!!!!!!!!!!!!!!!")
+            self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_TIMEOUT)
             self.on_invite_contact_cancelled()
             self.hide_calling_dialog()
             text = _("The invitation expired. \n\nThe remote peer did not answer quick enough.")

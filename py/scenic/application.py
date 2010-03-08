@@ -53,6 +53,7 @@ from scenic import gui
 from scenic import internationalization
 _ = internationalization._
 
+
 class Config(saving.ConfigStateSaving):
     """
     Configuration for the application.
@@ -378,12 +379,25 @@ class Application(object):
                 break
         return ret
     
-    def handle_cancel(self):
+    def handle_cancel(self, message, addr):
+        # If had previously sent ACCEPT and receive CANCEL, abort the session.
         if self.get_last_message_sent() == "ACCEPT":
             self.cleanup_after_rtp_stream()
+        contact = self._get_contact_by_addr(addr)
+        contact_name = ""
+        if contact is not None:
+            contact_name = contact["name"]
+        txt = _("Contact %(name) invited you but cancelled his invitation.") % {"name": contact_name}
+        # Turning the reason into readable i18n str.
+        if message.has_key("reason"):
+            reason = message["reason"]
+            if reason == communication.CANCEL_REASON_TIMEOUT:
+                txt += "\n\n" + _("The invitation expired.")
+            elif reason == communication.CANCEL_REASON_CANCELLED:
+                txt += "\n\n" + _("The peer cancelled the invitation.")
         self.client.disconnect()
         self.gui.invited_dialog.hide()
-        dialogs.ErrorDialog.create(_("Remote peer cancelled invitation."), parent=self.gui.main_window)
+        dialogs.ErrorDialog.create(txt, parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
         if self.get_last_message_sent() == "CANCEL":
@@ -411,7 +425,7 @@ class Application(object):
         """
         self.gui.hide_calling_dialog()
         self._free_ports()
-        text = _("Connection refused.\n\nThe contact refused the connection.")
+        text = _("The contact refused to stream with you.\n\nIt may be caused by a ongoing session with an other peer or by technical problems.")
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
@@ -447,7 +461,7 @@ class Application(object):
         if msg == "INVITE":
             self.handle_invite(message, addr)
         elif msg == "CANCEL":
-            self.handle_cancel()
+            self.handle_cancel(message, addr)
         elif msg == "ACCEPT":
             self.handle_accept(message, addr)
         elif msg == "REFUSE":
@@ -540,6 +554,8 @@ class Application(object):
             contact = self.address_book.selected_contact
             port = self.config.negotiation_port
             ip = contact["address"]
+            
+            
 
             def _on_connected(proto):
                 self.gui._schedule_inviting_timeout_delayed()
@@ -549,11 +565,13 @@ class Application(object):
                 #FIXME: do we need this error dialog?
                 exc_type = type(reason.value)
                 if exc_type is error.ConnectionRefusedError:
-                    msg = _("Scenic is not listening on port %(port)d on host %(ip)s.") % {"ip": ip, "port": port}
+                    msg = _("Could not invite contact %(name)s. \n\nScenic is not listening on port %(port)d of host %(ip)s.") % {"ip": ip, "name": contact["name"], "port": port}
                 elif exc_type is error.ConnectError:
-                    msg = _("No route to host %(ip)s.") % {"ip": ip}
+                    msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
+                elif exc_type is error.NoRouteError:
+                    msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
                 else:
-                    msg = _("Error trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "port": port, "reason": reason.value}
+                    msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
                 print(msg)
                 self.gui.hide_calling_dialog()
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
@@ -597,13 +615,17 @@ class Application(object):
         """
         self.client.send({"msg":"BYE", "sid":0})
     
-    def send_cancel_and_disconnect(self):
+    def send_cancel_and_disconnect(self, reason=""):
         """
         Sends CANCEL
         CANCEL cancels the invite on the remote host.
         """
-        self.client.send({"msg":"CANCEL", "sid":0})
-        self.client.disconnect()
+        #TODO: add reason argument.
+        #CANCEL_REASON_TIMEOUT = "timed out"
+        #CANCEL_REASON_CANCELLED = "cancelled"
+        if self.client.is_connected():
+            self.client.send({"msg":"CANCEL", "reason": reason, "sid":0})
+            self.client.disconnect()
         self.cleanup_after_rtp_stream()
     
     def send_refuse_and_disconnect(self):
