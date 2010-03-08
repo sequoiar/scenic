@@ -58,3 +58,4 @@ Scenic Fixes:
 #322: Add current DISPLAY variable to list of screens
 #310: os.environ['GTK2_RC-FILES'] should be cleared when launching external applications
 #329: Sometimes some unsupported image sizes are listed
+#331: Preview not in a window should use the parent's display
