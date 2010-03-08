@@ -149,7 +149,7 @@ fi
 
 # Check for gst-plugins that we use
 # FIXME: check the result of this call
-#python utils/gst_check.py
+python utils/gst_check.py
 
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
