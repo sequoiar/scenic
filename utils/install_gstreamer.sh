@@ -92,29 +92,6 @@ do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
 
-if [ -r $RTPPATCH ]; then
-    echo "Patching gst-plugins-good to add bitrate reporting to rtpsource.c"
-    pushd $GST_GOOD
-    popd
-    echo "Done patching $GST_GOOD"
-else
-    echo "No rtpsource.diff found"
-    echo "Patch available on http://svn.sat.qc.ca/scenic/trunk/utils/rtpsource.diff"
-    echo "Warning, bitrate reporting will not be available on receiver side."
-fi
-
-if [ -r $DC1394PATCH ]; then
-    echo "Patching gst-plugins-bad to add iso-speed property to dc1394src"
-    pushd $GST_BAD
-    patch -p1 -i $DC1394PATCH
-    popd
-    echo "Done patching $GST_BAD"
-else
-    echo "No dc1394-iso-speed.diff found"
-    echo "Patch available on http://svn.sat.qc.ca/scenic/trunk/utils/dc1394-iso-speed.diff"
-    echo "Warning, iso-speed will be always 400Mbps."
-fi
-
 RTPPATCH=$SCRIPT_PATH/rtpsource.diff
 DC1394PATCH=$SCRIPT_PATH/dc1394-iso-speed.diff
 # Build!
