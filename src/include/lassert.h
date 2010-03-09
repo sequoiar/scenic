@@ -30,11 +30,11 @@
 #define tassert(expr)                                                        \
     ((expr)                             \
      ?__ASSERT_VOID_CAST (0)            \
-     :  assert_throw(__STRING(expr), __FILE__, __LINE__, __ASSERT_FUNCTION))
+     :  assert_throw(__STRING(expr), __FILE__, __LINE__))
 
 ///throws an exception in case of assertion failure
 void assert_throw(__const char *__assertion, __const char *__file,
-                           unsigned int __line, __const char *__function);
+                           unsigned int __line);
 #endif  //ASSERT_THROWS
 
 #endif  //__LASSERT_H__
