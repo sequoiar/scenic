@@ -43,7 +43,7 @@ Milhouse Fixes:
 
 #236: add audio bitrate/quality settings for mp3 and vorbis
 #321: use variable map everywhere
-#326: dc1394src has too much colourspace conversion for localvideo
+#326: dc1394src has too many colourspace conversions for localvideo
 #238: --x-window-id option added
 #334: install_gstreamer.sh, boost1_35_for_hardy.sh, gst_check.py and install_lame.sh are not in the tarball
 
