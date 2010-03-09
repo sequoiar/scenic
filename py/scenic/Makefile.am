@@ -4,7 +4,7 @@ scenicdir = $(libdir)/scenic/py/scenic
 
 # in alphabetical order:
 scenic_PYTHON = application.py \
-	communication.py
+	communication.py \
 	configure.py \
 	dialogs.py \
 	glade.py \
