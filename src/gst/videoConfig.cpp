@@ -144,8 +144,15 @@ const char* VideoSourceConfig::deviceName() const
 
 int VideoSourceConfig::listCameras()
 {
-    Dc1394::listCameras();
     v4l2util::listCameras();
+    try 
+    {
+        Dc1394::listCameras();
+    }
+    catch (ErrorExcept &e)
+    {
+        LOG_DEBUG("Got exception " << e.what());
+    }
     return 0;
 }
 
@@ -169,8 +176,8 @@ std::string VideoSourceConfig::pixelAspectRatio() const
 
 std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, const std::string &pictureAspectRatio)
 {
-// Reference:
-// http://en.wikipedia.org/wiki/Pixel_aspect_ratio#Pixel_aspect_ratios_of_common_video_formats
+    // Reference:
+    // http://en.wikipedia.org/wiki/Pixel_aspect_ratio#Pixel_aspect_ratios_of_common_video_formats
 
     using std::map;
     using std::string;
