@@ -33,15 +33,11 @@ std::string CapsClient::getCaps()
             socket.close();
             socket.connect(*endpoint_iterator++, error);
         }
-        if (error == boost::asio::error::connection_refused)
+        if (error == boost::asio::error::connection_refused or
+                error == boost::asio::error::host_not_found)
         {
             LOG_DEBUG("no host yet, sleep");
-            boost::this_thread::sleep(boost::posix_time::millisec(1000));
-        }
-        else if (error == boost::asio::error::host_not_found)
-        {
-            LOG_DEBUG("no host yet, sleep");
-            boost::this_thread::sleep(boost::posix_time::millisec(1000));
+            boost::this_thread::sleep(boost::posix_time::seconds(1));
         }
         else if (error)
             throw boost::system::system_error(error);
@@ -49,6 +45,7 @@ std::string CapsClient::getCaps()
             gotCaps = true;
 
         // client must check for this in case we've been interrupted
+        // FIXME: this isn't very elegant but at least it gets us to the top level
         if (signal_handlers::signalFlag())
             THROW_ERROR("INTERRUPTED");
     }
