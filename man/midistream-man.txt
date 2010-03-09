@@ -1,19 +1,18 @@
 [EXAMPLES]
 Let say we want to stream MIDI data from host 10.10.10.80 to host 10.10.10.65. We first need to plug our input MIDI device on the first computer, and to choose an output MIDI device on the second computer. We can list the MIDI devices on each computer using the following command: 
 .TP
-midistream --list-devices
+  midistream --list-devices
 .TP
 This way, you know the number of the MIDI device to use on each host. The next step is to know the IP address of each host. The ifconfig command can help you with that. Finally, start the sender on the first computer, and the receiver on the second.
 .TP
 On the first host, start the sender: 
 .TP
-midistream -a 10.10.10.65 -i 3 -s 10000 -v
+  midistream -a 10.10.10.65 -i 3 -s 10000 -v
 .TP
 
 On the second host, start the receiver:
 .TP
-midistream -a 10.10.10.80 -o 0 -r 10000 -v
-.TP
+  midistream -a 10.10.10.80 -o 0 -r 10000 -v
 
 [AUTHOR]
 Society for Arts and Technology
