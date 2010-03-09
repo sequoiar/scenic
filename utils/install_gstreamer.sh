@@ -12,12 +12,12 @@
 #  6. gst-plugin-ugly 0.10.13
 #  7. gst-ffmpeg 0.10.10.9
 
-SCRIPT_PATH=$(pwd)
+SCRIPT_PATH=$(pwd)/$(dirname $0)
 
 DOWNLOAD_DIR=~/src/gstreamer-src
 if [ ! -d $DOWNLOAD_DIR ]
 then
-    DOWNLOAD_DIR=$(mktemp -p /tmp -d)
+    mkdir -p $DOWNLOAD_DIR
 fi
 
 # makeinstall is a shell script for safe inclusion in /etc/sudoers
@@ -92,32 +92,31 @@ do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
 
-RTPPATCH=$SCRIPT_PATH/rtpsource.diff
 if [ -r $RTPPATCH ]; then
     echo "Patching gst-plugins-good to add bitrate reporting to rtpsource.c"
     pushd $GST_GOOD
-    patch -p1 < $RTPPATCH
     popd
     echo "Done patching $GST_GOOD"
 else
     echo "No rtpsource.diff found"
-    echo "Patch available on http://svn.sat.qc.ca/trunk/utils/rtpsource.diff"
+    echo "Patch available on http://svn.sat.qc.ca/scenic/trunk/utils/rtpsource.diff"
     echo "Warning, bitrate reporting will not be available on receiver side."
 fi
 
-DC1394PATCH=$SCRIPT_PATH/dc1394-iso-speed.diff
 if [ -r $DC1394PATCH ]; then
     echo "Patching gst-plugins-bad to add iso-speed property to dc1394src"
     pushd $GST_BAD
-    patch -p1 < $DC1394PATCH
+    patch -p1 -i $DC1394PATCH
     popd
     echo "Done patching $GST_BAD"
 else
     echo "No dc1394-iso-speed.diff found"
-    echo "Patch available on http://svn.sat.qc.ca/trunk/utils/dc1394-iso-speed.diff"
+    echo "Patch available on http://svn.sat.qc.ca/scenic/trunk/utils/dc1394-iso-speed.diff"
     echo "Warning, iso-speed will be always 400Mbps."
 fi
 
+RTPPATCH=$SCRIPT_PATH/rtpsource.diff
+DC1394PATCH=$SCRIPT_PATH/dc1394-iso-speed.diff
 # Build!
 for module in $MODULES
 do
@@ -128,6 +127,17 @@ do
     echo $PWD
     tar xjf ${module}.tar.bz2
     pushd ${module}
+    if [ ${module} == "$GST_BAD" ]; then
+        patch --dry-run -p1 -i $DC1394PATCH
+        if [ $? -eq 0 ]; then
+            patch -p1 -i $DC1394PATCH
+        fi
+    elif [ ${module} == "$GST_GOOD" ]; then
+        patch --dry-run -p1 -i $RTPPATCH
+        if [ $? -eq 0 ]; then
+            patch -p1 -i $RTPPATCH
+        fi
+    fi
     make clean
     ./configure --disable-docbook --disable-gtk-doc
     make
