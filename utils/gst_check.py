@@ -88,7 +88,7 @@ try:
 except:
     pass
 
-optional_plugins = ["dc1394src", "dv1394src", "alsasrc", "alsasink", "pulsesrc", "pulsesink", "glimagesink"]
+optional_plugins = ["dc1394src", "dv1394src", "alsasrc", "alsasink", "pulsesrc", "pulsesink", "glimagesink", "theoraenc", "theoradec"]
 
 for plugin in gst_plugins:
     if gst.element_factory_find(plugin) is None: 
