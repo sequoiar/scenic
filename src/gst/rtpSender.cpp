@@ -72,7 +72,7 @@ void RtpSender::sendCapsChanged(GstPad *pad, GParamSpec * /*pspec*/, RtpSender* 
 void RtpSender::onNewSSRC(GstElement * /*rtpbin*/, guint session, guint ssrc, gpointer /*data*/)
 {
     /// FIXME: make sure this is correct
-    LOG_INFO("New stream connected for session " << sessions_[session]->sessionName() << " with ssrc " << ssrc);
+    LOG_INFO("New ssrc " << ssrc << " for session " << sessions_[session]->sessionName());
 }
 
 

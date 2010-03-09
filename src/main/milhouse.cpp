@@ -255,10 +255,18 @@ int main(int argc, char **argv)
     }
     catch (const Except &e) // these are our exceptions, so we can assume they've already been logged
     {
+        if (std::string(e.what()).find("INTERRUPTED") != std::string::npos)
+        {
+            std::cout << "Interrupted" << std::endl;
+            ret = 0;
+        }
+        else
+        {
 #ifdef CONFIG_DEBUG_LOCAL
-        std::cerr << "exitting with error: " << e.what() << std::endl;
+            std::cerr << "exitting with error: " << e.what() << std::endl;
 #endif
-        ret = 1;
+            ret = 1;
+        }
     }
     catch (const std::exception &e) // these are other exceptions (not one of our exception classes)
     {

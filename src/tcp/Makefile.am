@@ -1,7 +1,7 @@
-asiodir = $(libdir)/scenic
-asio_LTLIBRARIES = libasio.la
+capsdir = $(libdir)/scenic
+caps_LTLIBRARIES = libcaps.la
 
-libasio_la_SOURCES = asio.cpp asio.h
+libcaps_la_SOURCES = CapsServer.cpp CapsServer.h CapsClient.cpp CapsClient.h
 
-libasio_la_CPPFLAGS = $(BOOST_CPPFLAGS) 
+libcaps_la_CPPFLAGS = $(BOOST_CPPFLAGS) 
 INCLUDES = -I$(top_srcdir)/src/include -I$(top_srcdir)/src

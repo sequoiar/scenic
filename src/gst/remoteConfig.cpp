@@ -24,10 +24,12 @@
 
 #include <algorithm>
 #include <boost/assign.hpp>
+#include <boost/lexical_cast.hpp>
 #include <gst/gst.h>
 #include "pipeline.h"
 #include "remoteConfig.h"
-#include "tcp/asio.h"
+#include "tcp/CapsServer.h"
+#include "tcp/CapsClient.h"
 #include "codec.h"
 
 const int RemoteConfig::PORT_MIN = 1024;
@@ -89,7 +91,8 @@ SenderConfig::SenderConfig(Pipeline &pipeline,
     RemoteConfig(codec__, remoteHost__, port__),
     BusMsgHandler(&pipeline),
     message_(""), 
-    capsOutOfBand_(false)    // this will be determined later
+    capsOutOfBand_(false),    // this will be determined later
+    capsServer_()
 {}
 
 
@@ -135,17 +138,9 @@ Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, int bitrate
 }
 
 
-gboolean SenderConfig::sendMessage(gpointer data) 
+void SenderConfig::sendMessage() 
 {
-    const SenderConfig *context = static_cast<const SenderConfig*>(data);
-    LOG_DEBUG("\n\n\nSending tcp msg for host " 
-            << context->remoteHost_ << " on port " << context->capsPort()); 
-
-    /// FIXME: everytime a receiver starts, it should ask sender for caps, then the sender can
-    /// send them.
-    if (asio::tcpSendBuffer(context->remoteHost_, context->capsPort(), context->message_))
-        LOG_INFO("Caps sent successfully");
-    return TRUE;    // try again later, in case we have a new receiver
+    capsServer_.reset(new CapsServer(capsPort(), message_));
 }
 
 
@@ -170,12 +165,9 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
             return false;   // not our caps, ignore it
         else if (capsOutOfBand_) 
         { 
-            LOG_DEBUG("Sending caps for codec " << codec());
-            /// FIXME: don't use timeout_add, just call tcpSendBuffer which will schedule itself repeatedly
+            LOG_DEBUG("Creating caps server for codec " << codec());
             message_ = std::string(newCapsStr);
-            enum {MESSAGE_SEND_TIMEOUT = 1000}; // send caps once every second
-            g_timeout_add(MESSAGE_SEND_TIMEOUT, static_cast<GSourceFunc>(SenderConfig::sendMessage), 
-                    static_cast<gpointer>(this));
+            sendMessage();
             return true;
         }
         else
@@ -314,8 +306,9 @@ bool ReceiverConfig::capsMatchCodec() const
 void ReceiverConfig::receiveCaps()
 {
     // this blocks
-    std::string msg(asio::tcpGetBuffer(capsPort()));
-    caps_ = msg;
+    LOG_DEBUG("Creating new caps client to get caps from " << remoteHost_);
+    CapsClient capsClient(remoteHost_, boost::lexical_cast<std::string>(capsPort()));
+    caps_ = capsClient.getCaps();
     LOG_DEBUG("Received caps " << caps_);
 }
 

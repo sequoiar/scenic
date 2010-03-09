@@ -12,8 +12,8 @@ milhouse_CPPFLAGS= $(GLIB_CFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU
 else
 milhouse_CPPFLAGS= $(GLIB_CFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS) 
 endif
-LDADD = $(top_builddir)/src/gst/libgst.la $(ALL_GST_LIBS) $(JACK_LIBS) \
-        $(top_builddir)/src/tcp/libasio.la \
+milhouse_LDADD = $(top_builddir)/src/gst/libgst.la $(ALL_GST_LIBS) $(JACK_LIBS) \
+        $(top_builddir)/src/tcp/libcaps.la \
 		$(GTK_LIBS) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(BOOST_ASIO_LIB) \
 		$(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(LIBDC1394_LIBS) $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_FILESYSTEM_LIB) $(top_builddir)/src/util/libutil.la $(top_builddir)/src/gutil/libgutil.la $(top_builddir)/src/shared_video/libshared_video.la
 

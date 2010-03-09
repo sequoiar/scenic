@@ -53,7 +53,6 @@ static std::string sigToString(int sig)
     }
 }
 
-
 static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
 {
     LOG_INFO("Got signal " << sigToString(sig) << ", going down!");
@@ -79,6 +78,7 @@ void signal_handlers::setHandlers()
     sa.sa_sigaction = signalHandler;
     static const int NUM_SIGNALS = 5; 
     static const int signals[NUM_SIGNALS]  = {SIGHUP, SIGINT, SIGQUIT, SIGABRT, SIGTERM};
+
     for (int sig = 0; sig != NUM_SIGNALS; ++sig)
         if (sigaction(signals[sig], &sa, NULL) == -1)
             THROW_ERROR("Cannot register signal " << sigToString(signals[sig]) 

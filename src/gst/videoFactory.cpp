@@ -39,7 +39,7 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
     std::string remoteHost(options["address"].as<std::string>());
     int port = options["videoport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
-    bool negotiateCaps = options["negotiate-caps"].as<bool>();
+    bool negotiateCaps = not options["disable-caps-negotiation"].as<bool>();
     bool enableControls = options["enable-controls"].as<bool>();
 
     // get caps here, based on codec, capture width and capture height
@@ -67,7 +67,7 @@ shared_ptr<VideoSender> videofactory::buildVideoSender(Pipeline &pipeline, const
     shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port)); 
     shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, rConfig));
 
-    rConfig->capsOutOfBand(options["negotiate-caps"].as<bool>() 
+    rConfig->capsOutOfBand(not options["disable-caps-negotiation"].as<bool>() 
             or !tx->capsAreCached());
 
     return tx;

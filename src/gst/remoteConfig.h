@@ -25,7 +25,9 @@
 
 #include <string>
 #include <set>
+#include <boost/scoped_ptr.hpp>
 #include "portOffsets.h"
+#include "tcp/CapsServer.h"
 
 #include "busMsgHandler.h"
 
@@ -87,11 +89,12 @@ class SenderConfig : public RemoteConfig, public BusMsgHandler
         void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
 
     private:
-        static int sendMessage(void *data);
+        void sendMessage();
 
         std::string message_;
         bool capsOutOfBand_;
         bool handleBusMsg(_GstMessage *msg);
+        boost::scoped_ptr<CapsServer> capsServer_;
 };
 
 
