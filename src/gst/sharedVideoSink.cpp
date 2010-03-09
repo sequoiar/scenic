@@ -53,10 +53,10 @@ shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory(const std::
         // set size
         shm->truncate(sizeof(SharedVideoBuffer));
     }
-    catch (interprocess_exception &ex)
+    catch (const interprocess_exception &ex)
     {
         removeSharedMemory(id);
-        LOG_ERROR("Got interprocess exception " << ex.what());
+        throw;
     }
     return shm;
 }
@@ -125,13 +125,12 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         context->sharedBuffer_->notifyConsumer();
         // mutex is released here (goes out of scope)
     }
-    catch (interprocess_exception &ex)
+    catch (const interprocess_exception &ex)
     {
         removeSharedMemory(context->id_);
-        LOG_ERROR(ex.what());
         /* we don't need the appsink buffer anymore */
         gst_buffer_unref(buffer);
-        return;
+        throw;
     }
 
     /* we don't need the appsink buffer anymore */

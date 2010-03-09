@@ -144,9 +144,9 @@ const char* VideoSourceConfig::deviceName() const
 
 int VideoSourceConfig::listCameras()
 {
-    v4l2util::listCameras();
-    try 
+    try  // catch exceptions here because we're dealing with devices
     {
+        v4l2util::listCameras();
         Dc1394::listCameras();
     }
     catch (ErrorExcept &e)
