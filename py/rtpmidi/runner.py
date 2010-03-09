@@ -24,6 +24,7 @@ Main runner of the app is the run() function.
 import os
 import sys
 import signal
+import socket
 from twisted.internet import reactor
 from optparse import OptionParser
 
@@ -150,10 +151,15 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
             sys.exit(2)
     # string options:
     if options.address is not None:
-        config.peer_address = options.address
-        if not utils.check_ip(config.peer_address):
-            print "Wrong ip address format: ", config.peer_address
-            sys.exit(2)
+        if utils.check_ip(options.address):
+            config.peer_address = options.address
+        else:
+            try:
+                config.peer_address = socket.gethostbyname(options.address)
+            except socket.gaierror, e:
+                print "socket error: %s" % (str(e))
+                print "Wrong ip address format: ", options.address
+                sys.exit(2)
     # validate logic in options : -----------------
     if config.peer_address is None:
         print "Error: You must specify a peer address."

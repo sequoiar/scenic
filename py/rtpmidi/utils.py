@@ -30,11 +30,11 @@ def check_ip(address):
     if re.match('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address):
 	    values = [int(i) for i in address.split('.')]
 	    if ip_range(values):
-		    return 1
+		    return True 
 	    else:
-		    return 0
+		    return False 
     else:
-	    return 0
+	    return False
             
 def ip_range(nums):
     for num in nums:

@@ -145,7 +145,7 @@ class MidiIn(object):
             return True
 
         else:
-            print "INPUT: Wrong midi device selected (-d to list devices)"
+            print "INPUT: Invalid midi device selected"
             print dev_list
             return False
         

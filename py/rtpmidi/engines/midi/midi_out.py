@@ -148,7 +148,7 @@ class MidiOut(object):
             return True
 
         else:
-            print "OUTPUT: Wrong midi device selected (-d to list devices)"
+            print "OUTPUT: Invalid midi device selected"
             print dev_list
         return False
 
