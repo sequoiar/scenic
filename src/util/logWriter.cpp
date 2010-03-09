@@ -106,13 +106,6 @@ Log::Subscriber::Subscriber()
     lf = this;
 }
 
-bool xlogLevelMatch(LogLevel level)
-{
-    if (level >= LOG_LEVEL and logLevelIsValid(level))
-        return true;
-    else
-        return false;
-}
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &/*functionName*/, int lineNum)
