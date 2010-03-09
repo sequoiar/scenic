@@ -21,7 +21,6 @@
  */
 
 #include "util.h"
-#include "mapMsg.h"
 
 #include "pipeline.h"
 #include "gstLinkable.h"
@@ -74,11 +73,7 @@ void VideoSender::createSource(Pipeline &pipeline)
 
 void VideoSender::createCodec(Pipeline &pipeline)
 {
-    MapMsg settings;
-    settings["bitrate"] = videoConfig_->bitrate();
-    settings["quality"] = videoConfig_->quality();
-    tassert(encoder_ = remoteConfig_->createVideoEncoder(pipeline, settings));
-
+    tassert(encoder_ = remoteConfig_->createVideoEncoder(pipeline, videoConfig_->bitrate(), videoConfig_->quality()));
     gstlinkable::link(*source_, *encoder_);
 }
 

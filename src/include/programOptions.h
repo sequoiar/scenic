@@ -24,13 +24,11 @@
 #define __PROGRAM_OPTIONS_H__
 
 #include <boost/program_options.hpp>
-#include "mapMsg.h"
 
 class ProgramOptions
 {
     public:
         static boost::program_options::options_description createDefaultOptions();
-        static MapMsg toMapMsg(const boost::program_options::variables_map &options);
 };
 
 #endif // __PROGRAM_OPTIONS_H__

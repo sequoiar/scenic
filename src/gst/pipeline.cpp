@@ -40,7 +40,7 @@
 // in the pipeline
 
 Pipeline::Pipeline() : pipeline_(0), startTime_(0), handlers_(), 
-    quitted_(false), sampleRate_(SAMPLE_RATE)
+    sampleRate_(SAMPLE_RATE)
 {
     LOG_DEBUG("Calling gst_init");
 
@@ -89,6 +89,7 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
     // or at least querying the element responsible for more info
     std::string srcName = gst_object_get_name(src);
     if (srcName.find("udpsrc") != std::string::npos) // this comes from a udpsrc
+    {
         if (errStr.find("Could not get/set settings from/on resource") != std::string::npos)
         {
             int port;
@@ -97,6 +98,19 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
             return srcName + ":" + errStr + " Port " + 
                 boost::lexical_cast<std::string>(port) + " may be in use by another process.";
         }
+    }
+    else if (srcName.find("v4l2src") != std::string::npos) // this comes from a v4l2src
+    {
+        static const std::string v4l2busy("Could not enqueue buffers in device ");
+        size_t pos = errStr.find(v4l2busy);
+        if (pos != std::string::npos)
+        {
+            std::string deviceName(errStr.substr(pos + v4l2busy.length(), errStr.length() - v4l2busy.length() - 1));
+            return srcName + ":" + errStr + 
+                 deviceName + " is probably already in use.";
+        }
+    }
+
     return srcName + ":" + errStr;
 }
 
@@ -189,7 +203,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 }
 
 
-void Pipeline::makeVerbose()
+void Pipeline::makeVerbose() const
 {
     // Get verbose output
     gchar *exclude_args = NULL;     // set args to be excluded from output
@@ -315,7 +329,7 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 }
 
 
-void Pipeline::start()
+void Pipeline::start() const
 {
     if (isPlaying())        // only needs to be started once
         return;
@@ -326,7 +340,7 @@ void Pipeline::start()
 
 
 
-void Pipeline::makeReady()
+void Pipeline::makeReady() const
 {
     if (isReady())        // only needs to be started once
         return;
@@ -337,7 +351,7 @@ void Pipeline::makeReady()
 
 
 
-void Pipeline::pause()
+void Pipeline::pause() const
 {
     if (isPaused())        // only needs to be paused once
         return;
@@ -348,15 +362,14 @@ void Pipeline::pause()
 }
 
 
-void Pipeline::quit()
+void Pipeline::quit() const
 {
     stop();
-    notifyQuitted();
     gutil::killMainLoop();
 }
 
 
-void Pipeline::stop()
+void Pipeline::stop() const
 {
     if (isStopped())        // only needs to be stopped once
         return;
@@ -371,13 +384,13 @@ void Pipeline::stop()
 }
 
 
-void Pipeline::add(GstElement *element)
+void Pipeline::add(GstElement *element) const
 {
     gst_bin_add(GST_BIN(pipeline_), element);
 }
 
 
-void Pipeline::remove(GstElement **element) // guarantees that original pointer will be zeroed
+void Pipeline::remove(GstElement **element) const // guarantees that original pointer will be zeroed
 {                                           // and not reusable
     stop();
     if (*element and pipeline_)
@@ -389,7 +402,7 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
 }
 
 
-void Pipeline::remove(std::vector<GstElement*> &elementVec)
+void Pipeline::remove(std::vector<GstElement*> &elementVec) const
 {
     stop();
     std::vector<GstElement *>::iterator iter;
@@ -408,7 +421,7 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
 }
 
 
-GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user_data)
+GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user_data) const
 {
     GstClockID clockId = gst_clock_new_periodic_id(clock(), startTime_, GST_SECOND);
     gst_clock_id_wait_async(clockId, callback, user_data);
@@ -416,7 +429,7 @@ GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user
 }
 
 
-void Pipeline::remove_clock_callback(GstClockID clockId)
+void Pipeline::remove_clock_callback(GstClockID clockId) const
 {
     stop();
     gst_clock_id_unschedule(clockId);
@@ -435,7 +448,7 @@ GstClock* Pipeline::clock() const
     return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
 }
 
-GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) 
+GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) const
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
     if(!element)
@@ -497,18 +510,5 @@ void Pipeline::updateSampleRate(unsigned newRate)
 unsigned Pipeline::actualSampleRate() const
 {
     return sampleRate_;
-}
-
-
-void Pipeline::postInterrupt()
-{
-    /* post an application specific message */
-    if (pipeline_)
-    {
-        gst_element_post_message (GST_ELEMENT (pipeline_),
-                gst_message_new_application (GST_OBJECT (pipeline_),
-                    gst_structure_new ("MilhouseInterrupt",
-                        "message", G_TYPE_STRING, "Pipeline interrupted", NULL)));
-    }
 }
 

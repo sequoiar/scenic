@@ -23,16 +23,13 @@
 #define _CODEC_H_
 
 #include "gstLinkable.h"
-
 #include "noncopyable.h"
 
 // forward declarations
 class _GstElement;
 class RtpPay;
 class Pay;
-class MapMsg;
 class Pipeline;
-
 
 /** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
@@ -41,8 +38,8 @@ class Pipeline;
 class Encoder : public GstLinkableFilter, boost::noncopyable
 {
     public:
-        Encoder(Pipeline &pipeline, const char *encoder);
-        Encoder(Pipeline &pipeline);
+        Encoder(const Pipeline &pipeline, const char *encoder);
+        Encoder(const Pipeline &pipeline);
         virtual ~Encoder();
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual Pay* createPayloader() const = 0;
@@ -50,7 +47,7 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
         virtual void setBitrate(int bitrate);
 
     protected:
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
         virtual void setBitrateInKbs(int bitrate);
         _GstElement *encoder_;
 
@@ -66,8 +63,8 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
 class Decoder : public GstLinkableFilter, boost::noncopyable
 {
     public:
-        Decoder(Pipeline &pipeline, const char *decoder);
-        Decoder(Pipeline &pipeline);
+        Decoder(const Pipeline &pipeline, const char *decoder);
+        Decoder(const Pipeline &pipeline);
         virtual ~Decoder();
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
@@ -76,7 +73,7 @@ class Decoder : public GstLinkableFilter, boost::noncopyable
         virtual unsigned long long minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
         
     protected:
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
         _GstElement *decoder_;
 
     private:
@@ -88,7 +85,7 @@ class Decoder : public GstLinkableFilter, boost::noncopyable
 class VideoEncoder : public Encoder 
 {
     public: 
-        VideoEncoder(Pipeline &pipeline, const char *encoder, bool supportsInterlaced);
+        VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced);
         ~VideoEncoder();
 
     protected:
@@ -107,7 +104,7 @@ class VideoEncoder : public Encoder
 class VideoDecoder : public Decoder 
 {
     public: 
-        VideoDecoder(Pipeline &pipeline, const char *decoder, bool doDeinterlace);
+        VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace);
         ~VideoDecoder();
         virtual void adjustJitterBuffer();
     
@@ -132,7 +129,7 @@ class VideoDecoder : public Decoder
 class H264Encoder : public VideoEncoder
 {
     public: 
-        H264Encoder(Pipeline &pipeline, MapMsg &settings);
+        H264Encoder(const Pipeline &pipeline, int bitrate);
         void setBitrate(int bitrate);
 
     private:
@@ -144,7 +141,7 @@ class H264Encoder : public VideoEncoder
 /// Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
 class H264Decoder : public VideoDecoder {
     public:
-        H264Decoder(Pipeline &pipeline, bool doDeinterlace);
+        H264Decoder(const Pipeline &pipeline, bool doDeinterlace);
     private: 
         RtpPay* createDepayloader() const;
         void adjustJitterBuffer(); 
@@ -156,7 +153,7 @@ class H264Decoder : public VideoDecoder {
 class H263Encoder : public VideoEncoder
 {
     public: 
-        H263Encoder(Pipeline &pipeline, MapMsg &settings);
+        H263Encoder(const Pipeline &pipeline, int bitrate);
 
     private:
         int bitrate_;
@@ -169,7 +166,7 @@ class H263Encoder : public VideoEncoder
 class H263Decoder : public VideoDecoder
 {
     public:
-        H263Decoder(Pipeline &pipeline, bool doDeinterlace);
+        H263Decoder(const Pipeline &pipeline, bool doDeinterlace);
     private: 
         RtpPay* createDepayloader() const;
 };
@@ -180,7 +177,7 @@ class H263Decoder : public VideoDecoder
 class Mpeg4Encoder : public VideoEncoder
 {
     public:
-        Mpeg4Encoder(Pipeline &pipeline, MapMsg &settings);
+        Mpeg4Encoder(const Pipeline &pipeline, int bitrate);
         ~Mpeg4Encoder();
 
     private:
@@ -193,7 +190,7 @@ class Mpeg4Encoder : public VideoEncoder
 class Mpeg4Decoder: public VideoDecoder
 {
     public:
-        Mpeg4Decoder(Pipeline &pipeline, bool doDeinterlace);
+        Mpeg4Decoder(const Pipeline &pipeline, bool doDeinterlace);
     private: 
         RtpPay* createDepayloader() const;
 };
@@ -203,7 +200,7 @@ class Mpeg4Decoder: public VideoDecoder
 class TheoraEncoder : public VideoEncoder
 {
     public:
-        TheoraEncoder(Pipeline &pipeline, MapMsg &settings);
+        TheoraEncoder(const Pipeline &pipeline, int bitrate, int quality);
         ~TheoraEncoder();
         void setBitrate(int bitrate);
         void setQuality(int quality);
@@ -225,17 +222,17 @@ class TheoraEncoder : public VideoEncoder
 class TheoraDecoder: public VideoDecoder
 {
     public:
-        TheoraDecoder(Pipeline &pipeline, bool doDeinterlace);
+        TheoraDecoder(const Pipeline &pipeline, bool doDeinterlace);
     private: 
         RtpPay* createDepayloader() const;
 };
 
 
 /// Encoder that encodes raw audio using the vorbis encoder.
-class VorbisEncoder : public  Encoder
+class VorbisEncoder : public Encoder
 {
     public: 
-        VorbisEncoder(Pipeline &pipeline);
+        VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality);
 
     private:
         ~VorbisEncoder();
@@ -246,7 +243,7 @@ class VorbisEncoder : public  Encoder
 class VorbisDecoder : public Decoder
 {
     public: 
-        VorbisDecoder(Pipeline &pipeline);
+        VorbisDecoder(const Pipeline &pipeline);
         bool adjustsBufferTime() { return true; }
         unsigned long long minimumBufferTime();
     private: 
@@ -258,7 +255,7 @@ class VorbisDecoder : public Decoder
 class RawEncoder : public Encoder
 {
     public:
-        RawEncoder(Pipeline &pipeline);
+        RawEncoder(const Pipeline &pipeline);
         ~RawEncoder();
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return aconv_; }
@@ -272,7 +269,7 @@ class RawEncoder : public Encoder
 class RawDecoder : public Decoder
 {
     public:
-        RawDecoder(Pipeline &pipeline);
+        RawDecoder(const Pipeline &pipeline);
         ~RawDecoder();
 
     private:
@@ -288,7 +285,7 @@ class RawDecoder : public Decoder
 class LameEncoder : public Encoder
 {
     public:
-        LameEncoder(Pipeline &pipeline);
+        LameEncoder(const Pipeline &pipeline, int bitrate, double quality);
         ~LameEncoder();
 
     private:
@@ -297,11 +294,6 @@ class LameEncoder : public Encoder
         Pay* createPayloader() const;
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *srcElement() { return mp3parse_; }
-        
-        ///No Copy Constructor
-        LameEncoder(const LameEncoder&);     
-        ///No Assignment Operator
-        LameEncoder& operator=(const LameEncoder&);     
 };
 
 /// Decoder that decodes mpeg to raw audio.
@@ -309,7 +301,7 @@ class LameEncoder : public Encoder
 class MadDecoder : public Decoder
 {
     public:
-        MadDecoder(Pipeline &pipeline);
+        MadDecoder(const Pipeline &pipeline);
         ~MadDecoder();
     private:
         _GstElement *srcElement() { return aconv_; }

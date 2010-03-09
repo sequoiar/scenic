@@ -28,7 +28,7 @@
 
 Dv1394 *Dv1394::instance_ = 0;
 
-Dv1394::Dv1394(Pipeline &pipeline) : 
+Dv1394::Dv1394(const Pipeline &pipeline) : 
     pipeline_(pipeline),
     dv1394src_(pipeline_.makeElement("dv1394src", NULL)), 
     dvdemux_(pipeline_.makeElement("dvdemux", "demux")), 
@@ -59,7 +59,7 @@ Dv1394::~Dv1394()
 
 
 /// FIXME: this is crazy annoying, solution is for this not to be a singleton
-Dv1394 * Dv1394::Instance(Pipeline &pipeline)
+Dv1394 * Dv1394::Instance(const Pipeline &pipeline)
 {
     if (instance_ == 0)
         instance_ = new Dv1394(pipeline);

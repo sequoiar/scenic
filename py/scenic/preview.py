@@ -33,7 +33,17 @@ class Preview(object):
         width, height = self.app.config.video_capture_size.split("x")
         aspect_ratio = self.app.config.video_aspect_ratio
         window_title = _("Local preview")
+        x_window_id = None
+        if not self.app.config.preview_in_window:
+            if self.app.gui.preview_area_x_window_id is None:
+                print("WARNING: XID of the preview drawing area is None !")
+            else:
+                x_window_id = self.app.gui.preview_area_x_window_id
         command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio)
+        if x_window_id is not None:
+            command += " --x-window-id %d" % (x_window_id)
+        else:
+            command += " --display %s" % (self.app.config.video_display) # xid does not work if DISPLAY is set to an other display.
         if self.app.config.video_source != "videotestsrc":
             command += " --videodevice %s" % (self.app.config.video_device)
         return command
@@ -43,12 +53,19 @@ class Preview(object):
         if self.state != process.STATE_STOPPED:
             raise RuntimeError("Cannot start preview since it is %s." % (self.state)) # the programmer has done something wrong if we're here.
         else:
-            #self.app.save_configuration() DONE IN THE GUI
             command = self._create_command()
         self.process_manager = process.ProcessManager(command=command, identifier="preview")
+        self.process_manager.stdout_line_signal.connect(self.on_stdout_line)
+        self.process_manager.stderr_line_signal.connect(self.on_stderr_line)
         self.process_manager.state_changed_signal.connect(self.on_process_state_changed)
         self._set_state(process.STATE_STARTING)
         self.process_manager.start()
+
+    def on_stdout_line(self, line):
+        print line
+
+    def on_stderr_line(self, line):
+        print line        
         
     def on_process_state_changed(self, process_manager, process_state):
         """

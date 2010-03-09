@@ -22,10 +22,10 @@
 
 #include "util.h"
 #include "videoSize.h"
-#include "mapMsg.h"
 
 #include <fstream>
 #include <boost/filesystem/operations.hpp>
+#include <boost/program_options.hpp>
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
@@ -53,23 +53,23 @@ T fromString(const std::string& s,
 }
 
 
-VideoSourceConfig::VideoSourceConfig(MapMsg &msg) : 
-    source_(msg["source"]), 
-    bitrate_(msg["bitrate"]), 
-    quality_(msg["quality"]), 
-    deviceName_(msg["device"]),
-    location_(msg["location"]), 
-    cameraNumber_(msg["camera-number"]),
-    GUID_(fromString<unsigned long long>(msg["camera-guid"], std::hex)),
-    framerate_(msg["framerate"]),
-    captureWidth_(msg["width"]),
-    captureHeight_(msg["height"]),
-    grayscale_(msg["grayscale"]),
-    pictureAspectRatio_(msg["aspect-ratio"])
+VideoSourceConfig::VideoSourceConfig(const boost::program_options::variables_map &options) : 
+    source_(options["videosource"].as<std::string>()), 
+    bitrate_(options["videobitrate"].as<int>()), 
+    quality_(options["videoquality"].as<int>()), 
+    deviceName_(options["videodevice"].as<std::string>()),
+    location_(options["videolocation"].as<std::string>()), 
+    cameraNumber_(options["camera-number"].as<int>()),
+    GUID_(fromString<unsigned long long>(options["camera-guid"].as<std::string>(), std::hex)),
+    framerate_(options["framerate"].as<int>()),
+    captureWidth_(options["width"].as<int>()),
+    captureHeight_(options["height"].as<int>()),
+    grayscale_(options["grayscale"].as<bool>()),
+    pictureAspectRatio_(options["aspect-ratio"].as<std::string>())
 {}
 
 
-VideoSource * VideoSourceConfig::createSource(Pipeline &pipeline) const
+VideoSource * VideoSourceConfig::createSource(const Pipeline &pipeline) const
 {
     // FIXME: should derived class specific arguments just be passed in here to their constructors?
     if (source_ == "videotestsrc")
@@ -144,7 +144,7 @@ const char* VideoSourceConfig::deviceName() const
 
 int VideoSourceConfig::listCameras()
 {
-    DC1394::listCameras();
+    Dc1394::listCameras();
     v4l2util::listCameras();
     return 0;
 }
@@ -209,15 +209,18 @@ std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, 
 }
 
 
-VideoSinkConfig::VideoSinkConfig(MapMsg &msg) : 
-    sink_(msg["sink"]), 
-    screenNum_(msg["screen"]), 
-    doDeinterlace_(msg["deinterlace"]), 
-    sharedVideoId_(msg["shared-video-id"]),
+VideoSinkConfig::VideoSinkConfig(const boost::program_options::variables_map &options) : 
+    sink_(options["videosink"].as<std::string>()), 
+    screenNum_(options["screen"].as<int>()), 
+    doDeinterlace_(options["deinterlace"].as<bool>()), 
+    sharedVideoId_(options["shared-video-id"].as<std::string>()),
     /// if display-resolution is not specified, default to capture-resolution
-    displayWidth_(std::min(static_cast<int>(msg["display-width"] ? msg["display-width"] : msg["width"]), VideoScale::MAX_SCALE)),
-    displayHeight_(std::min(static_cast<int>(msg["display-height"] ? msg["display-height"] : msg["height"]), VideoScale::MAX_SCALE)),
-    flipMethod_(msg["flip-video"])
+    displayWidth_(std::min(static_cast<int>(options.count("display-width") ? 
+                    options["display-width"].as<int>() : options["width"].as<int>()), VideoScale::MAX_SCALE)),
+    displayHeight_(std::min(static_cast<int>(options.count("display-height") ? 
+                    options["display-height"].as<int>() : options["height"].as<int>()), VideoScale::MAX_SCALE)),
+    flipMethod_(options["flip-video"].as<std::string>()),
+    xid_(options["x-window-id"].as<unsigned long>())
 {}
 
 
@@ -248,12 +251,12 @@ int VideoSinkConfig::effectiveDisplayHeight() const
 VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
+        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_, xid_);
     else if (sink_ == "ximagesink")
         return new XImageSink(pipeline);
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_);
+        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), screenNum_, xid_);
 #endif
     else if (sink_ == "sharedvideosink")
         return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
@@ -265,13 +268,13 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 }
 
 
-VideoScale* VideoSinkConfig::createVideoScale(Pipeline &pipeline) const
+VideoScale* VideoSinkConfig::createVideoScale(const Pipeline &pipeline) const
 {
     return new VideoScale(pipeline, displayWidth_, displayHeight_);
 }
 
 
-VideoFlip* VideoSinkConfig::createVideoFlip(Pipeline &pipeline) const
+VideoFlip* VideoSinkConfig::createVideoFlip(const Pipeline &pipeline) const
 {
     return new VideoFlip(pipeline, flipMethod_);
 }

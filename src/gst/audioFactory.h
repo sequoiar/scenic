@@ -24,71 +24,18 @@
 #ifndef _AUDIO_FACTORY_H_
 #define _AUDIO_FACTORY_H_
 
-#include "util.h"
-#include "mapMsg.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/program_options.hpp>
 
-#include "audioConfig.h"
 #include "audioSender.h"
 #include "audioReceiver.h"
-#include "remoteConfig.h"
-#include "capsParser.h"
-#include "pipeline.h"
 
-#include <boost/shared_ptr.hpp>
+class Pipeline;
 
 namespace audiofactory
 {
-    using boost::shared_ptr;
-
-    static const int MSG_ID = 1;
-
-    /// Convert command line options to ipcp
-    static void rxOptionsToIPCP(MapMsg &options)
-    {
-        options["port"] = options["audioport"];
-        options["codec"] = options["audiocodec"];
-        options["sink"] = options["audiosink"];
-        options["device"] = options["audiodevice"];
-        options["location"] = options["audiolocation"];
-    }
-
-    /// Convert command line options to ipcp
-    static void txOptionsToIPCP(MapMsg &options)
-    {
-        options["port"] = options["audioport"];
-        options["codec"] = options["audiocodec"];
-        options["source"] = options["audiosource"];
-        options["device"] = options["audiodevice"];
-        options["location"] = options["audiolocation"];
-    }
-
-    static shared_ptr<AudioSender> 
-        buildAudioSender(Pipeline &pipeline, MapMsg &msg)
-        {
-            shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(msg));           
-
-            shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, msg, MSG_ID));
-
-            shared_ptr<AudioSender> tx(new AudioSender(pipeline, aConfig, rConfig));
-
-            rConfig->capsOutOfBand(msg["negotiate-caps"] 
-                    or !tx->capsAreCached());
-
-            return tx;
-        }
-
-    static shared_ptr<AudioReceiver> 
-        buildAudioReceiver(Pipeline &pipeline, MapMsg &msg)
-        {
-            shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(msg));
-
-            std::string caps(CapsParser::getAudioCaps(msg["codec"],
-                        msg["numchannels"], pipeline.actualSampleRate()));
-
-            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID));
-
-            return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));
-        }
+    boost::shared_ptr<AudioSender> buildAudioSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    boost::shared_ptr<AudioReceiver> buildAudioReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
 }
 
 #endif // _AUDIO_FACTORY_H_

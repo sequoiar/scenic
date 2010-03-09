@@ -21,19 +21,12 @@
 
 """
 Main of the application.
+Some imports are in run().
 """
 import sys
 import os
-from optparse import OptionParser
-from twisted.internet import gtk2reactor
-gtk2reactor.install() # has to be done before importing reactor
-from twisted.internet import reactor
-from twisted.internet import error
 from twisted.python import log
 from twisted.python import logfile
-
-from scenic import application
-from scenic import configure
 
 def start_logging_to_stdout():
     log.startLogging(sys.stdout)
@@ -86,6 +79,24 @@ def moo():
     """)
 
 def run():
+    """
+    Main function of the application
+    """
+    from scenic import configure
+    
+    if not os.environ.has_key('GTK2_RC_FILES'):
+        name = "Darklooks"
+        file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
+        os.environ["GTK2_RC_FILES"] = file_name # has to be done before gtk2reactor.install()
+        configure.custom_environment_variables["GTK2_RC_FILES"] = file_name
+    
+    from optparse import OptionParser
+    from twisted.internet import gtk2reactor
+    gtk2reactor.install() # has to be done before importing reactor
+    from twisted.internet import reactor
+    from twisted.internet import error
+    from scenic import application
+    
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(configure.VERSION))
     parser.add_option("-k", "--kiosk", action="store_true", help="Run in kiosk mode")

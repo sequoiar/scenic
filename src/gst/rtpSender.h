@@ -36,7 +36,7 @@ class RtpSender
     : public RtpBin
 {
     public:
-        RtpSender(Pipeline &pipeline) : 
+        RtpSender(const Pipeline &pipeline) : 
             RtpBin(pipeline), 
             rtp_sender_(0),
             send_rtp_sink_(0),

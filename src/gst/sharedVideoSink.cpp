@@ -69,7 +69,9 @@ bool SharedVideoSink::removeSharedMemory(const std::string &id)
 }
 
 
-SharedVideoSink::SharedVideoSink(Pipeline &pipeline, int width, int height, const std::string &id) : 
+SharedVideoSink::SharedVideoSink(const Pipeline &pipeline, 
+        int width, int height, const std::string &id) 
+:
     VideoSink(pipeline),
     id_(id),
     colorspc_(0), 
@@ -140,7 +142,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
 void SharedVideoSink::prepareSink(int width, int height)
 {
     GstCaps *videoCaps; 
-    
+
     std::ostringstream capsStr;
 
     /// FIXME: should detect caps from preceding element in pipeline if possible

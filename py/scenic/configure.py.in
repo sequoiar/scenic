@@ -47,3 +47,15 @@ def replace_install_paths_with_devel_paths():
     THEMES_DIR = os.path.join(root_dir, 'data', 'themes')
     LOCALE_DIR = os.path.join(root_dir, "locale")
     #print("Changed paths to %s %s %s %s" % (GLADE_DIR, PIXMAPS_DIR, THEMES_DIR, LOCALE_DIR))
+
+
+# Env vars that should not be passed to spawned processes.
+custom_environment_variables = {}
+
+def environ_without_custom():
+    ret = os.environ
+    keys = ret.keys()
+    for k, v in custom_environment_variables.iteritems():
+        if k in keys:
+            del ret[k]
+    return ret

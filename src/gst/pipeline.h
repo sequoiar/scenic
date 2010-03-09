@@ -42,35 +42,32 @@ class Pipeline : boost::noncopyable
         ~Pipeline();
 
         bool isAlive() { return pipeline_ == 0; }
-        _GstElement *makeElement(const char *factoryName, const char *elementName);
+        _GstElement *makeElement(const char *factoryName, const char *elementName) const;
         void subscribe(BusMsgHandler *obj);
         void unsubscribe(BusMsgHandler *obj);
 
-        GstClockID add_clock_callback(GstClockCallback callback, void *user_data);
-        void remove_clock_callback(GstClockID clockId);
+        GstClockID add_clock_callback(GstClockCallback callback, void *user_data) const;
+        void remove_clock_callback(GstClockID clockId) const;
 
         void updateSampleRate(unsigned newRate);
-        void remove(_GstElement ** element);
-        void remove(std::vector < _GstElement * >&elementVec);
+        void remove(_GstElement ** element) const;
+        void remove(std::vector < _GstElement * >&elementVec) const;
         bool isPlaying() const;
         unsigned actualSampleRate() const;
         bool isReady() const;
         bool isPaused() const;
         bool isStopped() const;
         void seekTo(gint64 pos);
-        void start();
-        void pause();
-        void makeReady();
-        void stop();
-        void notifyQuitted() { quitted_ = true; }
-        void quit();
-        bool quitted() { return quitted_; }
-        void makeVerbose();
-        void postInterrupt();
+        void start() const;
+        void pause() const;
+        void makeReady() const;
+        void stop() const;
+        void quit() const;
+        void makeVerbose() const;
 
     private:
         static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);
-        void add(_GstElement * element);
+        void add(_GstElement * element) const;
         _GstBus* getBus() const;
         GstClock* clock() const;
 
@@ -82,7 +79,6 @@ class Pipeline : boost::noncopyable
         _GstElement *pipeline_;
         GstClockTime startTime_;
         std::vector<BusMsgHandler*> handlers_;
-        bool quitted_;
         unsigned sampleRate_;
         char *titleStr_;
         static const unsigned int SAMPLE_RATE = 48000;

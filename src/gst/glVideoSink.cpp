@@ -75,38 +75,41 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_num) : 
-    GtkVideoSink(pipeline, screen_num), 
-    BusMsgHandler(pipeline)
+GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_num, unsigned long xid) : 
+    GtkVideoSink(pipeline, screen_num, xid), 
+    BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
-    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    g_signal_connect(G_OBJECT(window_), "key-press-event",
-            G_CALLBACK(key_press_event_cb), this);
-    g_signal_connect(G_OBJECT(window_), "scroll-event",
-            G_CALLBACK(mouse_wheel_cb), NULL);
-    g_signal_connect(G_OBJECT(window_), "destroy",
-            G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
+    if (hasWindow())
+    {
+        gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
+        //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+        g_signal_connect(G_OBJECT(window_), "key-press-event",
+                G_CALLBACK(key_press_event_cb), this);
+        g_signal_connect(G_OBJECT(window_), "scroll-event",
+                G_CALLBACK(mouse_wheel_cb), NULL);
+        g_signal_connect(G_OBJECT(window_), "destroy",
+                G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
-    gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
-    gtk_widget_set_events(window_, GDK_SCROLL_MASK);
+        gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
+        gtk_widget_set_events(window_, GDK_SCROLL_MASK);
 
-    /* configure elements */
-    //g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
-    //g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
-    showWindow();
-    hideCursor();
-    gtk_widget_set_size_request(drawingArea_, width, height);
+        /* configure elements */
+        //g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
+        //g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
+        showWindow();
+        hideCursor();
+        gtk_widget_set_size_request(drawingArea_, width, height);
+    }
 }
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
     const static GLfloat vwinRatio = (gfloat) videosize::WIDTH / (gfloat) videosize::HEIGHT ;
     LOG_DEBUG("WIDTH: " << width << ", HEIGHT: " << height << std::endl);
-    
+
     // /TODO:oldDOCS
     // explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
@@ -118,7 +121,7 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
+
     gluPerspective(45, NTSC_VIDEO_RATIO , 0.1, 100);  
 
     glMatrixMode(GL_MODELVIEW);	
@@ -130,7 +133,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 {
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_MODELVIEW);
-    
+
     gfloat aspectRatio = (gfloat) width / (gfloat) height;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -141,12 +144,12 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glTranslatef(leftCrop_, topCrop_,  0.01f);
 
     glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(aspectRatio,  1.0f, 0.0f);
-        glVertex3f(aspectRatio,  2.0f, 0.0f);
-        glVertex3f(-aspectRatio, 2.0f, 0.0f);
-        glVertex3f(-aspectRatio,0.0f,0.0f);
-        glVertex3f(0.0f,0.0f,0.0f);
+    glVertex3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(aspectRatio,  1.0f, 0.0f);
+    glVertex3f(aspectRatio,  2.0f, 0.0f);
+    glVertex3f(-aspectRatio, 2.0f, 0.0f);
+    glVertex3f(-aspectRatio,0.0f,0.0f);
+    glVertex3f(0.0f,0.0f,0.0f);
     glEnd();
 
     glLoadIdentity();
@@ -155,12 +158,12 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
 
     glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(aspectRatio,0.0f,0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f,  -1.0f, 0.0f);
-        glVertex3f(2 * aspectRatio,  -1.0f, 0.0f); 
-        glVertex3f(2 * aspectRatio,  1.0f, 0.0f);
-        glVertex3f(aspectRatio,  1.0f, 0.0f);
+    glVertex3f(aspectRatio,0.0f,0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f,  -1.0f, 0.0f);
+    glVertex3f(2 * aspectRatio,  -1.0f, 0.0f); 
+    glVertex3f(2 * aspectRatio,  1.0f, 0.0f);
+    glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
 
     glEnable (GL_TEXTURE_RECTANGLE_ARB);

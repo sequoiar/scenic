@@ -34,13 +34,13 @@ class _GstPad;
 class FileSource : boost::noncopyable
 {
     public:
-        static _GstElement * acquireAudio(Pipeline &pipeline, const std::string &location);
-        static _GstElement * acquireVideo(Pipeline &pipeline, const std::string &location);
+        static _GstElement * acquireAudio(const Pipeline &pipeline, const std::string &location);
+        static _GstElement * acquireVideo(const Pipeline &pipeline, const std::string &location);
         static void releaseAudio(const std::string &location);
         static void releaseVideo(const std::string &location);
         
     private:
-        FileSource(Pipeline &pipeline, const std::string &location);
+        FileSource(const Pipeline &pipeline, const std::string &location);
         ~FileSource();
         bool isLinked();
         void removeVideo();
@@ -51,7 +51,7 @@ class FileSource : boost::noncopyable
                                    void *data);
 
         static std::map<std::string, FileSource*> fileSources_;
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
         _GstElement *filesrc_;
         _GstElement *decodebin_;
         _GstElement *videoQueue_;

@@ -27,17 +27,16 @@ class Pipeline;
 
 class Playback {
     public:
-        Playback(Pipeline &pipeline);
+        Playback(const Pipeline &pipeline);
         void start();
         void pause();
         void stop();
         bool isPlaying();
         void makeVerbose();
         void quit();
-        bool quitted();
         int sampleRate();
     private:
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
 };
 
 #endif // _PLAYBACK_H_

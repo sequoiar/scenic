@@ -25,7 +25,6 @@
 
 namespace po = boost::program_options;
 
-
 po::options_description ProgramOptions::createDefaultOptions()
 {
     using std::string;
@@ -58,8 +57,11 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("version,w", po::bool_switch(), "display version info")
             ("numchannels,c", po::value<int>()->default_value(2), "number of audio channels")
             ("videobitrate,x", po::value<int>()->default_value(3000000), "video bitrate (1000000,3000000)")
-            ("videoquality,X", po::value<int>()->default_value(0), 
+            ("videoquality,X", po::value<int>()->default_value(32), 
                     "use specified video quality instead of bitrate for theora (0-63)")
+            ("audioquality", po::value<double>()->default_value(-1.0), "quality for compressed audio (0.0-1.0)")
+            ("audiobitrate", po::value<int>()->default_value(0), "bitrate for compressed audio in kbps "
+             "(7,16,24,32,40,48,56,64,80,96,112,128,160,192,224,256,320)")
             ("audiosource,e", po::value<string>()->default_value("jackaudiosrc"), 
              "audio input (jackaudiosrc,alsasrc,pulsesrc)")
             ("videosource,u", po::value<string>()->default_value("videotestsrc"), 
@@ -95,26 +97,12 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("display", po::value<string>(), "set DISPLAY environment variable")
             ("v4l2-standard", po::value<string>(), "set v4l2 standard (NTSC,PAL)")
             ("v4l2-input", po::value<int>(), "set v4l2 input (0,1,2)")
+            ("x-window-id", po::value<unsigned long>()->default_value(0), "set x-window-id to display video in an existing window")
             ;
 
         descriptionInitialized = true;
     }
 
     return desc;
-}
-
-
-MapMsg ProgramOptions::toMapMsg(const po::variables_map &options)
-{
-    MapMsg msg;
-    for (po::variables_map::const_iterator iter = options.begin(); iter != options.end(); ++iter)
-        if (iter->second.value().type() == typeid(::std::string))
-            msg[iter->first] = iter->second.as<std::string>();  // template argument for .as<T> must be an lvalue
-        else if (iter->second.value().type() == typeid(int))
-            msg[iter->first] =  iter->second.as<int>();
-        else if (iter->second.value().type() == typeid(bool))
-            msg[iter->first] =  iter->second.as<bool>();
-
-    return msg;
 }
 

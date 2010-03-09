@@ -27,7 +27,6 @@
 #include <gst/gst.h>
 #include "audioLevel.h"
 #include "pipeline.h"
-#include "mapMsg.h"
 
 #include <iterator>
 
@@ -35,7 +34,7 @@
 /** Constructor sets by default emitMessages to true 
  * and message interval to one second */
 AudioLevel::AudioLevel(Pipeline &pipeline) : 
-    BusMsgHandler(pipeline),
+    BusMsgHandler(&pipeline),
     pipeline_(pipeline),
     level_(pipeline_.makeElement("level", NULL)),
             emitMessages_(true) 

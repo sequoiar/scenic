@@ -33,13 +33,13 @@ class _GstElement;
 class RtpPay : public GstLinkableFilter, boost::noncopyable
 {
     public:
-        explicit RtpPay(Pipeline &pipeline) : pipeline_(pipeline), rtpPay_(0) {}
+        explicit RtpPay(const Pipeline &pipeline) : pipeline_(pipeline), rtpPay_(0) {}
         virtual ~RtpPay();
         _GstElement *srcElement() { return rtpPay_; }
         _GstElement *sinkElement() { return rtpPay_; }
 
     protected:
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
         _GstElement *rtpPay_;
 };
 
@@ -49,7 +49,7 @@ class Pay : public RtpPay
         virtual ~Pay();
 
     protected:
-        Pay(Pipeline &pipeline);
+        Pay(const Pipeline &pipeline);
         static const long long MAX_PTIME = 2000000LL;
 
     private:
@@ -66,49 +66,49 @@ class Pay : public RtpPay
 class Depay : public RtpPay
 {
     protected:
-        Depay(Pipeline &pipeline);
+        Depay(const Pipeline &pipeline);
 };
 
 
 class TheoraPay : public Pay
 {
     public:
-        explicit TheoraPay(Pipeline &pipeline);
+        explicit TheoraPay(const Pipeline &pipeline);
 };
 
 
 class TheoraDepay : public Depay
 {
     public:
-        explicit TheoraDepay(Pipeline &pipeline);
+        explicit TheoraDepay(const Pipeline &pipeline);
 };
 
 
 class H264Pay : public Pay
 {
     public:
-        explicit H264Pay(Pipeline &pipeline);
+        explicit H264Pay(const Pipeline &pipeline);
 };
 
 
 class H264Depay : public Depay
 {
     public:
-        explicit H264Depay(Pipeline &pipeline);
+        explicit H264Depay(const Pipeline &pipeline);
 };
 
 
 class H263Pay : public Pay
 {
     public:
-        explicit H263Pay(Pipeline &pipeline);
+        explicit H263Pay(const Pipeline &pipeline);
 };
 
 
 class H263Depay : public Depay
 {
     public:
-        explicit H263Depay(Pipeline &pipeline);
+        explicit H263Depay(const Pipeline &pipeline);
 };
 
 
@@ -117,54 +117,54 @@ class Mpeg4Pay : public Pay, public MessageHandler
     private: 
         bool handleMessage(const std::string &path, const std::string &arguments); 
     public:
-        explicit Mpeg4Pay(Pipeline &pipeline);
+        explicit Mpeg4Pay(const Pipeline &pipeline);
 };
 
 
 class Mpeg4Depay : public Depay
 {
     public:
-        explicit Mpeg4Depay(Pipeline &pipeline);
+        explicit Mpeg4Depay(const Pipeline &pipeline);
 };
 
 
 class VorbisPay : public Pay
 {
     public:
-        explicit VorbisPay(Pipeline &pipeline);
+        explicit VorbisPay(const Pipeline &pipeline);
 };
 
 
 class VorbisDepay : public Depay 
 {
     public:
-        explicit VorbisDepay(Pipeline &pipeline);
+        explicit VorbisDepay(const Pipeline &pipeline);
 };
 
 
 class L16Pay : public Pay
 {
     public:
-        explicit L16Pay(Pipeline &pipeline);
+        explicit L16Pay(const Pipeline &pipeline);
 };
 
 class L16Depay : public Depay 
 {
     public:
-        explicit L16Depay(Pipeline &pipeline);
+        explicit L16Depay(const Pipeline &pipeline);
 };
 
 
 class MpaPay : public Pay
 {
     public:
-       explicit MpaPay(Pipeline &pipeline);
+       explicit MpaPay(const Pipeline &pipeline);
 };
 
 class MpaDepay : public Depay
 {
     public:
-        explicit MpaDepay(Pipeline &pipeline);
+        explicit MpaDepay(const Pipeline &pipeline);
 };
 
 #endif //_PAY_H_

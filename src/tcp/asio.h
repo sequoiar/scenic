@@ -25,8 +25,8 @@
 #include <string>
 
 namespace asio {
-    std::string tcpGetBuffer(int port, int &id);
-    bool tcpSendBuffer(const std::string &ip, int port, int id, const std::string &caps);
+    std::string tcpGetBuffer(int port);
+    bool tcpSendBuffer(const std::string &ip, int port, const std::string &caps);
 }
 
 #endif //_ASIO_H_
