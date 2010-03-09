@@ -281,6 +281,13 @@ class Gui(object):
         self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
         # system tab contents:
         self.network_admin_widget = widgets_tree.get_widget("network_admin")
+
+        # MIDI tab
+        self.midi_tab_contents_widget = widgets_tree.get_widget("midi_tab_contents")
+        # remove MIDI tab:
+        tab_num = self.main_tabs_widget.page_num(self.midi_tab_contents_widget)
+        print "Removing tab number %d." % (tab_num)
+        self.main_tabs_widget.remove_page(tab_num)
             
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
