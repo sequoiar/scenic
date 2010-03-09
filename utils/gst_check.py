@@ -97,6 +97,7 @@ for plugin in gst_plugins:
 print("-------------------------------")
 if len(missing_plugins) == 0:
     print("All " + str(len(gst_plugins)) + " necessary plugins installed")
+    sys.exit(0)
 else:
     print("The following gstreamer plugins need to be installed: ")
     for plugin in missing_plugins:
@@ -104,3 +105,4 @@ else:
     print("You may have to install the corresponding development headers \
     (i.e. lib<MODULE>-dev)")
     print("before building the missing gstreamer plugins")
+    sys.exit(1)
