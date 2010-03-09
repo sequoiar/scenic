@@ -253,7 +253,7 @@ int main(int argc, char **argv)
         Milhouse milhouse;
         ret = milhouse.run(argc, argv);
     }
-    catch (const Except &e) // these are our exceptions, so we can assume they've already been logged
+    catch (const Except &e) // these are our exceptions
     {
         if (std::string(e.what()).find("INTERRUPTED") != std::string::npos)
         {
@@ -262,9 +262,7 @@ int main(int argc, char **argv)
         }
         else
         {
-#ifdef CONFIG_DEBUG_LOCAL
             std::cerr << "exitting with error: " << e.what() << std::endl;
-#endif
             ret = 1;
         }
     }

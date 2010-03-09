@@ -85,11 +85,8 @@ void MilhouseLogger::printMessages()
         std::string msg;
         printQueue_.wait_and_pop(msg);
         
-        /// quit when msg starts with quit:, output error and critical msgs to cerr and other msgs to cout
+        /// quit when msg starts with quit:
         if (msg != "quit:")
-            if (msg.find("ERROR") != std::string::npos or msg.find("CRITICAL") != std::string::npos)
-                std::cerr << msg;
-            else
                 std::cout << msg;
         else  // got a sentinel
             done = true;

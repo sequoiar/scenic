@@ -143,17 +143,18 @@ void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &
 {
     std::string strerr = log_(msg, level, fileName, functionName, lineNum);
     
-    (*lf)(level, strerr);
-
     if (level < THROW)
+    {
+        (*lf)(level, strerr);  // log it now if not a throw
         return;
+    }
 
     if (level < CRITICAL)
-        throw(ErrorExcept(strerr.c_str()));
+        throw (ErrorExcept(strerr.c_str()));
     else if (level < ASSERT_FAIL)
-        throw(CriticalExcept(strerr.c_str()));
+        throw (CriticalExcept(strerr.c_str()));
     else
-        throw(AssertExcept(strerr.c_str()));
+        throw (AssertExcept(strerr.c_str()));
 
 }
 
