@@ -145,6 +145,12 @@ class AddressBook(object):
         self.selected = 0 # index of the selected contact
         self.file_name = os.path.expanduser("~/.scenic/contacts.json")
         self.load()
+    
+    def get_currently_selected_contact(self):
+        """
+        @rettype: dict or None
+        """
+        return self.contact_list[self.selected]
 
     def load(self):
         """

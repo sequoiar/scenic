@@ -38,14 +38,14 @@ class _GstElement;
 class VideoFlip : public GstLinkableFilter, public boost::noncopyable
 {
     public:
-        VideoFlip(Pipeline &pipeline, const std::string &flipMethod);
+        VideoFlip(const Pipeline &pipeline, const std::string &flipMethod);
         ~VideoFlip();
 
     private:
         _GstElement *sinkElement() { return colorspace_; }
         _GstElement *srcElement() { return videoflip_; }
 
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
         _GstElement *colorspace_;
         _GstElement *videoflip_;
 };

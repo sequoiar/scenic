@@ -24,6 +24,16 @@
 
 #include <iostream>
 #include <sstream>
+#include<iomanip>
+
+#define BACKTRACE
+#ifdef BACKTRACE
+#include <signal.h>
+#include <execinfo.h>
+#include <cxxabi.h>
+#include <dlfcn.h>
+#include <stdlib.h>
+#endif
 
 #ifdef CONFIG_DEBUG_LOCAL
 #define LOG_LEVEL DEBUG
@@ -98,13 +108,12 @@ Log::Subscriber::Subscriber()
 
 bool xlogLevelMatch(LogLevel level)
 {
-    if (level >= LOG_LEVEL && logLevelIsValid(level))
+    if (level >= LOG_LEVEL and logLevelIsValid(level))
         return true;
     else
         return false;
 }
 
-#include<iomanip>
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &/*functionName*/, int lineNum)
 {
@@ -130,33 +139,25 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 
 //TODO DOCUMENT THIS
 void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
-        const std::string &functionName, int lineNum, int err)
+        const std::string &functionName, int lineNum)
 {
     std::string strerr = log_(msg, level, fileName, functionName, lineNum);
-
-    if(err == -1) //TODO Is this used?
-        throw(Except(msg.c_str(), 0));
-
+    
     (*lf)(level, strerr);
 
     if (level < THROW)
         return;
 
-    if(level < CRITICAL)
-        throw(ErrorExcept(strerr.c_str(), err));
-    if(level < ASSERT_FAIL)
+    if (level < CRITICAL)
+        throw(ErrorExcept(strerr.c_str()));
+    else if (level < ASSERT_FAIL)
         throw(CriticalExcept(strerr.c_str()));
-    throw(AssertExcept(strerr.c_str()));
+    else
+        throw(AssertExcept(strerr.c_str()));
 
 }
-#define BACKTRACE
-#ifdef BACKTRACE
-#include <signal.h>
-#include <execinfo.h>
-#include <cxxabi.h>
-#include <dlfcn.h>
-#include <stdlib.h>
 
+#ifdef BACKTRACE
 void backtrace()
 {
     void *trace[16];
@@ -191,5 +192,5 @@ void assert_throw(__const char *__assertion, __const char *__file,
         unsigned int __line, __const char *__function)
 {
     backtrace();
-    cerr_log_throw(__assertion, ASSERT_FAIL, __file, __function, __line, 0);
+    cerr_log_throw(__assertion, ASSERT_FAIL, __file, __function, __line);
 }

@@ -57,7 +57,7 @@ int flipMethodToInt(const std::string &flipMethod)
         return result;
 }
 
-VideoFlip::VideoFlip(Pipeline &pipeline, const std::string &flipMethod) : 
+VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) : 
     pipeline_(pipeline),
     colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
     videoflip_(pipeline_.makeElement("videoflip", NULL))

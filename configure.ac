@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(SCENIC, 0.4.2)  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, 0.4.3)  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -92,7 +92,7 @@ fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 
-dnl check for python, FIXME are we checking for python twice?
+dnl check for python
 AM_PATH_PYTHON([2.5])
 
 # BOOST m4 tests
@@ -145,6 +145,11 @@ if test "x${no_glu}" = "xyes" ; then
 else
     AC_DEFINE(CONFIG_GL,[],[GL define from configure])
 fi
+
+
+# Check for gst-plugins that we use
+# FIXME: check the result of this call
+python utils/gst_check.py
 
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])

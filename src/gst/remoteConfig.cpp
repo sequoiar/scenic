@@ -28,17 +28,19 @@
 #include "pipeline.h"
 #include "remoteConfig.h"
 #include "tcp/asio.h"
-#include "mapMsg.h"
 #include "codec.h"
 
 const int RemoteConfig::PORT_MIN = 1024;
 const int RemoteConfig::PORT_MAX = 65000;
 
-
 std::set<int> RemoteConfig::usedPorts_;
         
-RemoteConfig::RemoteConfig(MapMsg &msg, int msgId__) : 
-    codec_(msg["codec"]), remoteHost_(msg["address"]), port_(msg["port"]), msgId_(msgId__)
+RemoteConfig::RemoteConfig(const std::string &codec__,
+        const std::string &remoteHost__,
+        int port__) :
+    codec_(codec__), 
+    remoteHost_(remoteHost__), 
+    port_(port__)
 {}
 
 
@@ -80,27 +82,30 @@ void RemoteConfig::checkPorts() const
 }
         
 
-SenderConfig::SenderConfig(Pipeline &pipeline, MapMsg &msg, int msgId__) : 
-    RemoteConfig(msg, msgId__), 
-    BusMsgHandler(pipeline),
+SenderConfig::SenderConfig(Pipeline &pipeline,
+        const std::string &codec__,
+        const std::string &remoteHost__,
+        int port__) :
+    RemoteConfig(codec__, remoteHost__, port__),
+    BusMsgHandler(&pipeline),
     message_(""), 
     capsOutOfBand_(false)    // this will be determined later
 {}
 
 
-VideoEncoder * SenderConfig::createVideoEncoder(Pipeline &pipeline, MapMsg &settings) const
+VideoEncoder * SenderConfig::createVideoEncoder(const Pipeline &pipeline, int bitrate, int quality) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "h264")
-        return new H264Encoder(pipeline, settings);
+        return new H264Encoder(pipeline, bitrate);
     else if (codec_ == "h263")
-        return new H263Encoder(pipeline, settings);       // set caps from here?
+        return new H263Encoder(pipeline, bitrate);       // set caps from here?
     else if (codec_ == "mpeg4")
-        return new Mpeg4Encoder(pipeline, settings);
+        return new Mpeg4Encoder(pipeline, bitrate);
     else if (codec_ == "theora")
-        return new TheoraEncoder(pipeline, settings);
+        return new TheoraEncoder(pipeline, bitrate, quality);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -110,17 +115,17 @@ VideoEncoder * SenderConfig::createVideoEncoder(Pipeline &pipeline, MapMsg &sett
 }
 
 
-Encoder * SenderConfig::createAudioEncoder(Pipeline &pipeline) const
+Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, int bitrate, double quality) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "vorbis")
-        return new VorbisEncoder(pipeline);
+        return new VorbisEncoder(pipeline, bitrate, quality);
     else if (codec_ == "raw")
         return new RawEncoder(pipeline);
     else if (codec_ == "mp3")
-        return new LameEncoder(pipeline);
+        return new LameEncoder(pipeline, bitrate, quality);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -134,12 +139,11 @@ gboolean SenderConfig::sendMessage(gpointer data)
 {
     const SenderConfig *context = static_cast<const SenderConfig*>(data);
     LOG_DEBUG("\n\n\nSending tcp msg for host " 
-            << context->remoteHost_ << " on port " << context->capsPort() 
-            << " with id " << context->msgId_);
+            << context->remoteHost_ << " on port " << context->capsPort()); 
 
     /// FIXME: everytime a receiver starts, it should ask sender for caps, then the sender can
     /// send them.
-    if (asio::tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
+    if (asio::tcpSendBuffer(context->remoteHost_, context->capsPort(), context->message_))
         LOG_INFO("Caps sent successfully");
     return TRUE;    // try again later, in case we have a new receiver
 }
@@ -182,9 +186,9 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
 }
 
 static const std::vector<std::string> AUDIO_CODECS = 
-    boost::assign::list_of<std::string>("raw")("mp3")("vorbis");
+boost::assign::list_of<std::string>("raw")("mp3")("vorbis");
 static const std::vector<std::string> VIDEO_CODECS = 
-    boost::assign::list_of<std::string>("mpeg4")("h264")("h263")("theora");
+boost::assign::list_of<std::string>("mpeg4")("h264")("h263")("theora");
 
 /// FIXME: this method and the one below it need a list of codecs, should only have one
 std::string RemoteConfig::codecMediaType() const
@@ -210,18 +214,23 @@ std::string RemoteConfig::identifier() const
 bool ReceiverConfig::isSupportedCodec(const std::string &codec)
 {
     bool result = std::find(AUDIO_CODECS.begin(), AUDIO_CODECS.end(), codec) != AUDIO_CODECS.end()
-    or std::find(VIDEO_CODECS.begin(), VIDEO_CODECS.end(), codec) != VIDEO_CODECS.end();
+        or std::find(VIDEO_CODECS.begin(), VIDEO_CODECS.end(), codec) != VIDEO_CODECS.end();
     return result;
 }
 
 
-ReceiverConfig::ReceiverConfig(MapMsg &msg,
-        const std::string &caps__,
-        int msgId__) : 
-    RemoteConfig(msg, msgId__), 
-    multicastInterface_(msg["multicast-interface"]), caps_(caps__), 
-    capsOutOfBand_(msg["negotiate-caps"] or caps_ == ""),
-    jitterbufferControlEnabled_(msg["enable-controls"])
+ReceiverConfig::ReceiverConfig(const std::string &codec__,
+        const std::string &remoteHost__,
+        int port__,
+        const std::string &multicastInterface__,
+        bool negotiateCaps,
+        bool enableControls,
+        const std::string &caps__) :
+    RemoteConfig(codec__, remoteHost__, port__), 
+    multicastInterface_(multicastInterface__),
+    caps_(caps__), 
+    capsOutOfBand_(negotiateCaps or caps_ == ""),
+    jitterbufferControlEnabled_(enableControls)
 {
     if (capsOutOfBand_) // couldn't find caps, need them from other host or we've explicitly been told to send caps
     {
@@ -235,7 +244,7 @@ ReceiverConfig::ReceiverConfig(MapMsg &msg,
     }
 }
 
-VideoDecoder * ReceiverConfig::createVideoDecoder(Pipeline &pipeline, bool doDeinterlace) const
+VideoDecoder * ReceiverConfig::createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
@@ -256,7 +265,7 @@ VideoDecoder * ReceiverConfig::createVideoDecoder(Pipeline &pipeline, bool doDei
 }
 
 
-Decoder * ReceiverConfig::createAudioDecoder(Pipeline &pipeline) const
+Decoder * ReceiverConfig::createAudioDecoder(const Pipeline &pipeline) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
@@ -279,12 +288,12 @@ Decoder * ReceiverConfig::createAudioDecoder(Pipeline &pipeline) const
 bool RemoteConfig::capsMatchCodec(const std::string &encodingName, const std::string &codec)
 {
     return (encodingName == "VORBIS" and codec == "vorbis")
-    or (encodingName == "L16" and codec == "raw")
-    or (encodingName == "MPA" and codec == "mp3")
-    or (encodingName == "MP4V-ES" and codec == "mpeg4")
-    or (encodingName == "H264" and codec == "h264")
-    or (encodingName == "H263-1998" and codec == "h263")
-    or (encodingName == "THEORA" and codec == "theora");
+        or (encodingName == "L16" and codec == "raw")
+        or (encodingName == "MPA" and codec == "mp3")
+        or (encodingName == "MP4V-ES" and codec == "mpeg4")
+        or (encodingName == "H264" and codec == "h264")
+        or (encodingName == "H263-1998" and codec == "h263")
+        or (encodingName == "THEORA" and codec == "theora");
 }
 
 /// This function makes sure that the caps set on this receiver by a sender, match the codec
@@ -304,10 +313,8 @@ bool ReceiverConfig::capsMatchCodec() const
 
 void ReceiverConfig::receiveCaps()
 {
-    int id;
     // this blocks
-    std::string msg(asio::tcpGetBuffer(capsPort(), id));
-    //tassert(id == msgId_);
+    std::string msg(asio::tcpGetBuffer(capsPort()));
     caps_ = msg;
     LOG_DEBUG("Received caps " << caps_);
 }

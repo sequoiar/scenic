@@ -45,9 +45,9 @@ class BusMsgHandler : boost::noncopyable
          * Destructor */
         
     protected:
-        explicit BusMsgHandler(Pipeline &pipeline);
+        explicit BusMsgHandler(Pipeline *pipeline);
         virtual ~BusMsgHandler();
-        Pipeline &pipeline_;
+        Pipeline *pipeline_;
 };
 
 #endif // _BUS_MSG_HANDLER_H_ 

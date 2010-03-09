@@ -20,6 +20,7 @@
  */
 
 #include <cstdlib>
+#include <iostream>
 
 #include "util.h"
 
@@ -28,6 +29,7 @@
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
 #include "gst/messageDispatcher.h"
+#include "gst/pipeline.h"
 #include "playback.h"
 
 #include "milhouse.h"
@@ -49,17 +51,13 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     shared_ptr<VideoReceiver> vRx;
     shared_ptr<AudioReceiver> aRx;
 
-    if (!disableVideo)       
+    if (not disableVideo)       
     {
-        MapMsg ipcp(ProgramOptions::toMapMsg(options));
-        videofactory::rxOptionsToIPCP(ipcp);
-        vRx = videofactory::buildVideoReceiver(pipeline, ipcp);
+        vRx = videofactory::buildVideoReceiver(pipeline, options);
     }
-    if (!disableAudio)
+    if (not disableAudio)
     {
-        MapMsg ipcp(ProgramOptions::toMapMsg(options));
-        audiofactory::rxOptionsToIPCP(ipcp);
-        aRx = audiofactory::buildAudioReceiver(pipeline, ipcp);
+        aRx = audiofactory::buildAudioReceiver(pipeline, options);
 
         if (options["disable-jack-autoconnect"].as<bool>())
             MessageDispatcher::sendMessage("disable-jack-autoconnect");
@@ -101,16 +99,12 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
 
     if (!disableVideo)
     {
-        MapMsg ipcp(ProgramOptions::toMapMsg(options));
-        videofactory::txOptionsToIPCP(ipcp);
-        vTx = videofactory::buildVideoSender(pipeline, ipcp);
+        vTx = videofactory::buildVideoSender(pipeline, options);
     }
 
     if (!disableAudio)
     {
-        MapMsg ipcp(ProgramOptions::toMapMsg(options));
-        audiofactory::txOptionsToIPCP(ipcp);
-        aTx = audiofactory::buildAudioSender(pipeline, ipcp);
+        aTx = audiofactory::buildAudioSender(pipeline, options);
 
         if (options["disable-jack-autoconnect"].as<bool>())
             MessageDispatcher::sendMessage("disable-jack-autoconnect");
@@ -137,9 +131,7 @@ void Milhouse::runAsLocal(const po::variables_map &options)
     shared_ptr<LocalVideo> localVideo;
     //shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
 
-    MapMsg ipcp(ProgramOptions::toMapMsg(options));
-    videofactory::localOptionsToIPCP(ipcp);
-    localVideo = videofactory::buildLocalVideo(pipeline, ipcp);
+    localVideo = videofactory::buildLocalVideo(pipeline, options);
 
     playback.start();
     

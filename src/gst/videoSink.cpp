@@ -49,29 +49,43 @@ bool initializeGtk()
     gtk_init(0, NULL);
     return true;
 }
-        
-GtkVideoSink::GtkVideoSink(Pipeline &pipeline, int screen_num) : 
-    VideoSink(pipeline), 
-    gtkInitialized_(initializeGtk()),
-    window_(gtk_window_new(GTK_WINDOW_TOPLEVEL)), 
-    screen_num_(screen_num), drawingArea_(gtk_drawing_area_new()),
-	vbox_(gtk_vbox_new(FALSE, 0)),
-	hbox_(gtk_hbox_new(FALSE, 0)),
-	horizontalSlider_(0),
-	sliderFrame_(0),
-    isFullscreen_(false)
-{
-    namespace fs = boost::filesystem;
-    gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
 
-    gtk_container_add(GTK_CONTAINER(window_), hbox_);
-    fs::path iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
-    if (fs::exists(iconPath))
-        gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.string().c_str(), NULL);
-    
-    // add listener for window-state-event to detect fullscreenness
-    g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);
+/// true if we're not using some external xwindow
+bool GtkVideoSink::hasWindow() const
+{
+    return xid_ == 0;
+}
+        
+GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid) : 
+    VideoSink(pipeline), 
+    xid_(xid),
+    isFullscreen_(false),
+    gtkInitialized_(initializeGtk()),
+    window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0), 
+    screen_num_(screen_num), 
+    drawingArea_(hasWindow() ? gtk_drawing_area_new() : 0),
+	vbox_(hasWindow() ? gtk_vbox_new(FALSE, 0) : 0),
+	hbox_(hasWindow() ? gtk_hbox_new(FALSE, 0) : 0),
+	horizontalSlider_(0),
+	sliderFrame_(0)
+{
+    if (hasWindow())
+    {
+        namespace fs = boost::filesystem;
+        gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
+
+        gtk_container_add(GTK_CONTAINER(window_), hbox_);
+        fs::path iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
+        if (fs::exists(iconPath))
+            gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.string().c_str(), NULL);
+
+        // add listener for window-state-event to detect fullscreenness
+        g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);
+    }
+    else
+        if (!g_thread_supported())
+            g_thread_init(NULL);
 }
 
 
@@ -90,7 +104,10 @@ gboolean GtkVideoSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindow
 Window GtkVideoSink::getXWindow()
 { 
     // FIXME: see https://bugzilla.gnome.org/show_bug.cgi?id=599885
-    return GDK_WINDOW_XWINDOW(drawingArea_->window);
+    if (hasWindow())
+        return GDK_WINDOW_XWINDOW(drawingArea_->window);
+    else
+        return xid_;
 }
 
 
@@ -130,8 +147,8 @@ void GtkVideoSink::hideCursor()
         static GdkBitmap *empty_bitmap;
         const static GdkColor color = {0, 0, 0, 0};
         empty_bitmap = gdk_bitmap_create_from_data(GDK_WINDOW(drawingArea_->window),
-            invisible_cursor_bits,
-            1, 1);
+                invisible_cursor_bits,
+                1, 1);
         cursor = gdk_cursor_new_from_pixmap(empty_bitmap, empty_bitmap, &color,
                 &color, 0, 0);
     }
@@ -180,17 +197,20 @@ bool GtkVideoSink::handleMessage(const std::string &path, const std::string &arg
 {
     if (path == "fullscreen")
     {
-        toggleFullscreen();
+        if (hasWindow())
+            toggleFullscreen();
         return true;
     }
     else if (path == "window-title")
     {
-        gtk_window_set_title(GTK_WINDOW(window_), arguments.c_str());
+        if (hasWindow())
+            gtk_window_set_title(GTK_WINDOW(window_), arguments.c_str());
         return true;
     }
     else if (path == "create-control")
     {
-        createControl();
+        if (hasWindow())
+            createControl();
         return true;
     }
 
@@ -204,24 +224,17 @@ void GtkVideoSink::createControl()
     LOG_INFO("Creating controls");
     sliderFrame_ = gtk_frame_new("Jitterbuffer Latency (ms)");
     // min, max, step-size
-	horizontalSlider_ = gtk_hscale_new_with_range(RtpReceiver::MIN_LATENCY, RtpReceiver::MAX_LATENCY, 1.0);
+    horizontalSlider_ = gtk_hscale_new_with_range(RtpReceiver::MIN_LATENCY, RtpReceiver::MAX_LATENCY, 1.0);
 
     // set initial value
     gtk_range_set_value(GTK_RANGE(horizontalSlider_), RtpReceiver::INIT_LATENCY);
 
     gtk_container_add(GTK_CONTAINER(sliderFrame_), horizontalSlider_);
-	gtk_box_pack_start(GTK_BOX(vbox_), sliderFrame_, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox_), sliderFrame_, FALSE, FALSE, 0);
     g_signal_connect(G_OBJECT(horizontalSlider_), "value-changed",
-			 G_CALLBACK(RtpReceiver::updateLatencyCb), NULL);
+            G_CALLBACK(RtpReceiver::updateLatencyCb), NULL);
     showWindow();
 }
-
-void VideoSink::prepareSink()
-{
-    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
-}
-
 
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
@@ -261,41 +274,43 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     if (!gst_structure_has_name(message->structure, "prepare-xwindow-id"))
         return false;
 
-    LOG_DEBUG("Got prepare-xwindow-id msg");
+    gdk_threads_enter();
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), getXWindow());
+    gdk_threads_leave();
 
+    LOG_DEBUG("Got prepare-xwindow-id msg");
     return true;
 }
 
-XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNum) : 
-    GtkVideoSink(pipeline, screenNum),
-    BusMsgHandler(pipeline)
+XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid) : 
+    GtkVideoSink(pipeline, screenNum, xid),
+    BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
-    prepareSink();
+    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
+    if (hasWindow())
+    {
+        LOG_DEBUG("Setting default window size to " << width << "x" << height);
+        gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
+        //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
-    /// FIXME: this is ifdef'd out to avoid getting that  Xinerama error msg every time
+        gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
+        g_signal_connect(G_OBJECT(window_), "key-press-event",
+                G_CALLBACK(XvImageSink::key_press_event_cb), this);
+        g_signal_connect(G_OBJECT(window_), "destroy",
+                G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
-    LOG_DEBUG("Setting default window size to " << width << "x" << height);
-    gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
-    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+        showWindow();
 
-    gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
-    g_signal_connect(G_OBJECT(window_), "key-press-event",
-            G_CALLBACK(XvImageSink::key_press_event_cb), this);
-    g_signal_connect(G_OBJECT(window_), "destroy",
-            G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
-
-    showWindow();
-
-    gtk_widget_set_size_request(drawingArea_, width, height);
+        gtk_widget_set_size_request(drawingArea_, width, height);
+    }
 }
 
 
 XvImageSink::~XvImageSink()
 {
     GtkVideoSink::destroySink();
-    if (window_)
+    if (hasWindow() and window_ != 0)
     {
         gtk_widget_destroy(window_);
         LOG_DEBUG("Videosink window destroyed");
@@ -303,13 +318,13 @@ XvImageSink::~XvImageSink()
 }
 
 
-XImageSink::XImageSink(Pipeline &pipeline) : 
+XImageSink::XImageSink(const Pipeline &pipeline) : 
     VideoSink(pipeline),
     colorspc_(pipeline_.makeElement("ffmpegcolorspace", NULL)) 
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
     sink_ = pipeline_.makeElement("ximagesink", NULL);
-    prepareSink();
+    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
 
     gstlinkable::link(colorspc_, sink_);
 }

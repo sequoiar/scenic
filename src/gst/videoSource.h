@@ -25,12 +25,11 @@
 
 #include "noncopyable.h"
 
-#include <gst/gstclock.h>
+#include <string>
 
 class Pipeline;
 class VideoSourceConfig;
 class _GstElement;
-class _GstPad;
 
 class VideoSource
     : public GstLinkableSource, boost::noncopyable
@@ -41,8 +40,8 @@ class VideoSource
         void setCapsFilter(const std::string &srcCaps);
 
     protected:
-        VideoSource(Pipeline &pipeline, const VideoSourceConfig &config);
-        Pipeline &pipeline_;
+        VideoSource(const Pipeline &pipeline, const VideoSourceConfig &config);
+        const Pipeline &pipeline_;
         const VideoSourceConfig &config_;
         _GstElement *source_;
         _GstElement *capsFilter_;
@@ -56,7 +55,7 @@ class VideoTestSource
     : public VideoSource
 {
     public:
-        VideoTestSource(Pipeline &pipeline, const VideoSourceConfig &config);
+        VideoTestSource(const Pipeline &pipeline, const VideoSourceConfig &config);
         void filterCaps();
 
     private:
@@ -68,7 +67,7 @@ class VideoFileSource
     : public VideoSource
 {
     public:
-        VideoFileSource(Pipeline &pipeline, const VideoSourceConfig &config);
+        VideoFileSource(const Pipeline &pipeline, const VideoSourceConfig &config);
 
     private:
         ~VideoFileSource();
@@ -82,7 +81,7 @@ class VideoDvSource
     : public VideoSource
 {
     public:
-        VideoDvSource(Pipeline &pipeline, const VideoSourceConfig &config);
+        VideoDvSource(const Pipeline &pipeline, const VideoSourceConfig &config);
 
     private:
         ~VideoDvSource();
@@ -96,7 +95,7 @@ class VideoV4lSource
     : public VideoSource
 {
     public:
-        VideoV4lSource(Pipeline &pipeline, const VideoSourceConfig &config);
+        VideoV4lSource(const Pipeline &pipeline, const VideoSourceConfig &config);
     private:
         std::string expectedStandard_;
         std::string actualStandard_;
@@ -112,9 +111,8 @@ class VideoDc1394Source
     : public VideoSource
 {
     public:
-        explicit VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig &config);
+        VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config);
     private:
-        enum {DMA_BUFFER_SIZE_IN_FRAMES = 2};
         std::string srcCaps() const;
         _GstElement *srcElement() { return capsFilter_; }
 };

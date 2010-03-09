@@ -53,22 +53,20 @@ class Except : public std::runtime_error
 {
     public:
         LogLevel log_;
-        int errno_; //TODO used?
 
-        Except(const char* log_msg, int err) : std::runtime_error(log_msg),
-            log_(WARNING), errno_(err)
+        Except(const char* log_msg) : std::runtime_error(log_msg),
+            log_(WARNING)
     {}
         Except() : std::runtime_error(""),
-            log_(NONE), errno_(0)
+            log_(NONE)
     {}
-        virtual ~Except() throw() {}
 };
 
 /** Recovery should be possible */
 class ErrorExcept : public Except
 {
     public:
-        ErrorExcept(const char* log_msg, int err = 0) : Except(log_msg, err)
+        ErrorExcept(const char* log_msg) : Except(log_msg)
     {
         log_ = ERROR;
     }
@@ -78,7 +76,7 @@ class ErrorExcept : public Except
 class CriticalExcept : public Except
 {
     public:
-        CriticalExcept(const char* log_msg, int err = 0) : Except(log_msg, err)
+        CriticalExcept(const char* log_msg) : Except(log_msg)
     { 
         log_ = CRITICAL;
     }

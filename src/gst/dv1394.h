@@ -32,7 +32,7 @@ class Dv1394 : boost::noncopyable
 {
     public:
         /// This is the single point of access to the singleton instance of this Dv1394 object
-        static Dv1394 * Instance(Pipeline &pipeline);
+        static Dv1394 * Instance(const Pipeline &pipeline);
         static void reset();
         void setAudioSink(_GstElement *audioSink);
         void setVideoSink(_GstElement *videoSink);
@@ -41,9 +41,9 @@ class Dv1394 : boost::noncopyable
         static void cb_new_src_pad(_GstElement *  /*srcElement*/, _GstPad * srcPad, void *data);
 
     private:
-        Dv1394(Pipeline &pipeline);
+        Dv1394(const Pipeline &pipeline);
         ~Dv1394();
-        Pipeline &pipeline_;
+        const Pipeline &pipeline_;
 
         _GstElement *dv1394src_;
         _GstElement *dvdemux_;

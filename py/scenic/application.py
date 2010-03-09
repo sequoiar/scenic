@@ -55,9 +55,8 @@ _ = internationalization._
 
 class Config(saving.ConfigStateSaving):
     """
-    Class attributes are default.
+    Configuration for the application.
     """
-
     def __init__(self):
         # Default values
         self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
@@ -77,6 +76,7 @@ class Config(saving.ConfigStateSaving):
         self.video_display = ":0.0"
         self.video_fullscreen = False
         self.video_capture_size = "640x480"
+        self.preview_in_window = False
         #video_window_size = "640x480"
         self.video_aspect_ratio = "4:3" 
         self.confirm_quit = True
@@ -84,11 +84,11 @@ class Config(saving.ConfigStateSaving):
         self.video_bitrate = 3.0
         self.video_jitterbuffer = 75
         
+        # Done with the configuration entries.
         config_file = 'configuration.json'
         config_dir = os.path.expanduser("~/.scenic")
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
-
 
 class Application(object):
     """
@@ -108,7 +108,8 @@ class Application(object):
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
-        self.client = communication.Client(self.on_connection_error) # XXX
+        self.client = communication.Client()
+        #self.client.connection_error_signal.connect(self.on_connection_error)
         self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
@@ -176,11 +177,24 @@ class Application(object):
         @rettype: Deferred
         """
         deferred = cameras.list_cameras()
+        toggle_size_sensitivity = self.gui.video_capture_size_widget.get_property("sensitive")
         def _callback(cameras):
             self.devices["cameras"] = cameras
             print("cameras: %s" % (cameras))
             self.gui.update_camera_devices()
+            if toggle_size_sensitivity:
+                self.gui.video_capture_size_widget.set_sensitive(True)
+            print("setting video_capture_size widget sensitige to true")
+        def _errback(reason):
+            if toggle_size_sensitivity:
+                self.gui.video_capture_size_widget.set_sensitive(True)
+            print("setting video_capture_size widget sensitige to true")
+            return reason
+        if toggle_size_sensitivity:
+            self.gui.video_capture_size_widget.set_sensitive(False)
         deferred.addCallback(_callback)
+        print("setting video_capture_size widget sensitige to false")
+        deferred.addErrback(_errback)
         return deferred
 
     def poll_xvideo_extension(self):
@@ -229,6 +243,7 @@ class Application(object):
     def before_shutdown(self):
         """
         Last things done before quitting.
+        @rettype: L{DeferredList}
         """
         deferred = defer.Deferred()
         print("The application is shutting down.")
@@ -247,7 +262,8 @@ class Application(object):
             print('stopping server')
         reactor.callLater(0.1, _later)
         d1 = self.server.close()
-        return defer.DeferredList([deferred, d1])
+        d2 = self.gui.close_preview_if_running()
+        return defer.DeferredList([deferred, d1, d2])
         
     # ------------------------- session occuring -------------
     def has_session(self):
@@ -257,7 +273,8 @@ class Application(object):
         return self.streamer_manager.is_busy()
     # -------------------- streamer ports -----------------
     def prepare_before_rtp_stream(self):
-        self.gui.close_preview_if_running()
+        #TODO: return a Deferred
+        self.gui.close_preview_if_running() # TODO: use its deferred
         self.save_configuration()
         self._allocate_ports()
         
@@ -302,51 +319,61 @@ class Application(object):
             return True
 
     def handle_invite(self, message, addr):
+        """
+        handles the INVITE message. 
+        Refuses if : 
+         * jackd is not running
+         * We already just got an INVITE and didn't answer yet.
+        """
         self.got_bye = False
         self._check_protocol_version(message)
         
         def _on_contact_request_dialog_response(response):
             """
-            User is accetping or declining an offer.
+            User is accepting or declining an offer.
             @param result: Answer to the dialog.
             """
-            if response == gtk.RESPONSE_OK:
+            if response:
                 self.send_accept(addr)
-            elif response == gtk.RESPONSE_CANCEL or gtk.RESPONSE_DELETE_EVENT:
-                self.send_refuse_and_disconnect() 
             else:
-                pass
-            return True
+                self.send_refuse_and_disconnect() 
         # check if the contact is in the addressbook
         contact = self._get_contact_by_addr(addr)
         invited_by = addr
+        send_to_port = message["please_send_to_port"]
+
+        def _simply_refuse():
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0})
+        
         if contact is not None:
             invited_by = contact["name"]
 
-        if self.streamer_manager.is_busy():
-            send_to_port = message["please_send_to_port"]
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
-            print("Refused invitation: we are busy.")
-        elif not self.devices["jackd_is_running"]:
-            send_to_port = message["please_send_to_port"]
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0}) #FIXME: where do we get the port number from?
-            dialogs.ErrorDialog.create(_("Refused invitation: jack is not running."), parent=self.gui.main_window)
-        else:
-            self.remote_config = {
-                "audio": message["audio"],
-                "video": message["video"]
-                }
-            connected_deferred = self.client.connect(addr, message["please_send_to_port"])
-            if contact is not None:
-                if contact["auto_accept"]:
+        if self.get_last_message_received() == "INVITE" and self.get_last_message_sent() != "REFUSE": # FIXME: does that cover all cases?
+            _simply_refuse()
+            print("REFUSED an INVITE since we already got one from someone else.")
+            return
+        
+        def _check_cb(result):
+            if not result:
+                _simply_refuse() # TODO: add reason param: Technical problems.
+            else:
+                self.remote_config = {
+                    "audio": message["audio"],
+                    "video": message["video"]
+                    }
+                connected_deferred = self.client.connect(addr, message["please_send_to_port"])
+                if contact is not None and contact["auto_accept"]:
                     print("Contact %s is on auto_accept. Accepting." % (invited_by))
                     def _connected_cb(proto):
                         self.send_accept(addr)
                     connected_deferred.addCallback(_connected_cb)
-                    # TODO: show a dialog or change the state of the GUI to say we are connected.
-                    return # important
-            text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept the connection?" % {"invited_by": invited_by})
-            self.gui.show_invited_dialog(text, _on_contact_request_dialog_response)
+                else:
+                    text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept the connection?" % {"invited_by": invited_by})
+                    dialog_deferred = self.gui.show_invited_dialog(text)
+                    dialog_deferred.addCallback(_on_contact_request_dialog_response)
+        
+        flight_check_deferred = self.check_if_ready_to_stream(role="answerer")
+        flight_check_deferred.addCallback(_check_cb)
     
     def _get_contact_by_addr(self, addr):
         """
@@ -359,39 +386,66 @@ class Application(object):
                 break
         return ret
     
-    def handle_cancel(self):
+    def handle_cancel(self, message, addr):
+        # If had previously sent ACCEPT and receive CANCEL, abort the session.
+        if self.get_last_message_sent() == "ACCEPT":
+            self.cleanup_after_rtp_stream()
+        contact = self._get_contact_by_addr(addr)
+        contact_name = ""
+        if contact is not None:
+            contact_name = contact["name"]
+        txt = _("Contact %(name)s invited you but cancelled his invitation.") % {"name": contact_name}
+        # Turning the reason into readable i18n str.
+        if message.has_key("reason"):
+            reason = message["reason"]
+            if reason == communication.CANCEL_REASON_TIMEOUT:
+                txt += "\n\n" + _("The invitation expired.")
+            elif reason == communication.CANCEL_REASON_CANCELLED:
+                txt += "\n\n" + _("The peer cancelled the invitation.")
         self.client.disconnect()
         self.gui.invited_dialog.hide()
-        dialogs.ErrorDialog.create(_("Remote peer cancelled invitation."), parent=self.gui.main_window)
+        dialogs.ErrorDialog.create(txt, parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
-        self._check_protocol_version(message)
-        self.gui._unschedule_offerer_invite_timeout()
-        self.got_bye = False
-        # TODO: Use session to contain settings and ports
-        self.gui.hide_calling_dialog("accept")
-        self.remote_config = {
-            "audio": message["audio"],
-            "video": message["video"]
-            }
-        if self.streamer_manager.is_busy():
-            print("Got ACCEPT but we are busy. This is very strange")
-            dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
+        if self.get_last_message_sent() == "CANCEL":
+            self.send_bye() # If got ACCEPT, but had sent CANCEL, send BYE.
         else:
-            print("Got ACCEPT. Starting streamers as initiator.")
-            self.start_streamers(addr)
-            self.send_ack()
+            self._check_protocol_version(message)
+            self.got_bye = False
+            # TODO: Use session to contain settings and ports
+            self.gui.hide_calling_dialog()
+            self.remote_config = {
+                "audio": message["audio"],
+                "video": message["video"]
+                }
+            if self.streamer_manager.is_busy():
+                print("Got ACCEPT but we are busy. This is very strange")
+                dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
+            else:
+                print("Got ACCEPT. Starting streamers as initiator.")
+                self.start_streamers(addr)
+                self.send_ack()
 
     def handle_refuse(self):
-        self.gui._unschedule_offerer_invite_timeout()
-        self.cleanup_after_rtp_stream()
-        self.gui.hide_calling_dialog("refuse")
+        """
+        Got REFUSE
+        """
+        self.gui.hide_calling_dialog()
+        self._free_ports()
+        text = _("The contact refused to stream with you.\n\nIt may be caused by a ongoing session with an other peer or by technical problems.")
+        dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
+        """
+        Got ACK
+        """
         print("Got ACK. Starting streamers as answerer.")
         self.start_streamers(addr)
 
     def handle_bye(self):
+        """
+        Got BYE
+        """
         self.got_bye = True
         self.stop_streamers()
         if self.client.is_connected():
@@ -400,19 +454,21 @@ class Application(object):
             self.disconnect_client()
 
     def handle_ok(self):
+        """
+        Got OK
+        """
         print("received ok. Everything has an end.")
         print('disconnecting client')
         self.disconnect_client()
 
     def on_server_receive_command(self, message, addr):
-        # XXX
         msg = message["msg"]
         print("Got %s from %s" % (msg, addr))
-        
+        # TODO: use prefixedMethods from twisted.
         if msg == "INVITE":
             self.handle_invite(message, addr)
         elif msg == "CANCEL":
-            self.handle_cancel()
+            self.handle_cancel(message, addr)
         elif msg == "ACCEPT":
             self.handle_accept(message, addr)
         elif msg == "REFUSE":
@@ -485,43 +541,121 @@ class Application(object):
                 }
             }
 
-    def send_invite(self):
-        if not self.devices["jackd_is_running"]:
-            dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming, JACK is not running."), parent=self.gui.main_window)
-            return
+    def check_if_ready_to_stream(self, role="offerer"):
+        """
+        Does the flight check, checking if ready to stream.
+        
+        Checks if ready to stream. 
+        Will pop up error dialog if there are errors.
+        Calls the deferred with a result that is True of False.
+        @rettype: L{Deferred}
+        @param role: Either "offerer" or "answerer".
+        """
+        #TODO: poll X11 devices
+        #TODO: poll xv extension
+        deferred = defer.Deferred()
+        def _callback(result):
+            # callback for the deferred list created below.
+            # calls the deferred's callback
+            if role == "offerer":
+                error_msg = _("Impossible to invite a contact to start streaming.")
+            elif role == "answerer":
+                error_msg = _("Impossible to accept an invitation to stream.")
+            else:
+                raise RuntimeError("Invalid role value : %s" % (role))
             
-        if self.streamer_manager.is_busy():
-            dialogs.ErrorDialog.create(_("Impossible to invite a contact to start streaming. A streaming session is already in progress."), parent=self.gui.main_window)
-        else:
-            self.prepare_before_rtp_stream()
-            msg = {
-                "msg":"INVITE",
-                "protocol": self.protocol_version,
-                "sid":0, 
-                "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
-                }
-            msg.update(self._get_local_config_message_items())
-            contact = self.address_book.selected_contact
-            port = self.config.negotiation_port
-            ip = contact["address"]
+            x11_displays = [display["name"] for display in self.devices["x11_displays"]]
+            cameras = self.devices["cameras"].keys()
+                
+            if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared !.") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
+                return deferred.callback(False)
+            elif self.config.video_source == "v4l2src" and self.config.video_device not in cameras: #TODO: do not test if not sending video
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared !.") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
+                return deferred.callback(False)
+                
+            elif not self.devices["jackd_is_running"]:
+                # TODO: Actually poll jackd right now.
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
+                return deferred.callback(False)
+            elif self.streamer_manager.is_busy():
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
+                deferred.callback(False)
+            
+            # "cameras": {}, # dict of dicts (only V4L2 cameras for now)
+            elif not self.devices["xvideo_is_present"]: #TODO: do not test if not receiving video
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X video extension is not present."), parent=self.gui.main_window)
+                deferred.callback(False)
+            else:
+                deferred.callback(True)
+        
+        deferred_list = defer.DeferredList([
+            self.poll_x11_devices(), 
+            self.poll_xvideo_extension(),
+            self.poll_camera_devices()
+            ])
+        self._poll_jackd() # does not return a deferred for now... called in a looping call.
+        deferred_list.addCallback(_callback)
+        return deferred
 
-            def _on_connected(proto):
-                self.gui._schedule_offerer_invite_timeout()
-                self.client.send(msg)
-                return proto
-            def _on_error(reason):
-                print ("error trying to connect to %s:%s : %s" % (ip, port, reason))
-                self.gui.hide_calling_dialog()# "err", str(reason))
-                return None
-               
-            print("sending %s to %s:%s" % (msg, ip, port))
-            deferred = self.client.connect(ip, port)
-            deferred.addCallback(_on_connected).addErrback(_on_error)
-            self.gui.show_calling_dialog()
-            # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
+    def send_invite(self):
+        """
+        Does the flight check. If OK, send an INVITE.
+        """
+        contact = self.address_book.get_currently_selected_contact()
+        if contact is None:
+            dialogs.ErrorDialog.create(_("You must select a contact to invite."), parent=self.gui.main_window)
+            return  # important
+        else:
+            ip = contact["address"]
+            
+        def _check_cb(result):
+            #TODO: use the Deferred it will return
+            if result:
+                self.prepare_before_rtp_stream()
+                msg = {
+                    "msg":"INVITE",
+                    "protocol": self.protocol_version,
+                    "sid":0, 
+                    "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
+                    }
+                msg.update(self._get_local_config_message_items())
+                port = self.config.negotiation_port
+                
+                def _on_connected(proto):
+                    self.gui._schedule_inviting_timeout_delayed()
+                    self.client.send(msg)
+                    return proto
+                def _on_error(reason):
+                    #FIXME: do we need this error dialog?
+                    exc_type = type(reason.value)
+                    if exc_type is error.ConnectionRefusedError:
+                        msg = _("Could not invite contact %(name)s. \n\nScenic is not listening on port %(port)d of host %(ip)s.") % {"ip": ip, "name": contact["name"], "port": port}
+                    elif exc_type is error.ConnectError:
+                        msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
+                    elif exc_type is error.NoRouteError:
+                        msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
+                    else:
+                        msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
+                    print(msg)
+                    self.gui.hide_calling_dialog()
+                    dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    return None
+                   
+                print("sending %s to %s:%s" % (msg, ip, port))
+                deferred = self.client.connect(ip, port)
+                deferred.addCallback(_on_connected).addErrback(_on_error)
+                self.gui.show_calling_dialog()
+                # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
+            else:
+                print("Cannot send INVITE.")
+
+        check_deferred = self.check_if_ready_to_stream(role="offerer")
+        check_deferred.addCallback(_check_cb)
     
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
+        #TODO: use the Deferred it will return
         self.prepare_before_rtp_stream()
         msg = {
             "msg":"ACCEPT", 
@@ -530,8 +664,18 @@ class Application(object):
             }
         msg.update(self._get_local_config_message_items())
         self.client.send(msg)
-        
+
+    def get_last_message_sent(self):
+        return self.client.last_message_sent
+
+    def get_last_message_received(self):
+        return self.server.last_message_received
+    
     def send_ack(self):
+        """
+        Sends ACK.
+        INVITE, ACCEPT, ACK
+        """
         self.client.send({"msg":"ACK", "sid":0})
 
     def send_bye(self):
@@ -541,13 +685,18 @@ class Application(object):
         """
         self.client.send({"msg":"BYE", "sid":0})
     
-    def send_cancel_and_disconnect(self):
+    def send_cancel_and_disconnect(self, reason=""):
         """
         Sends CANCEL
         CANCEL cancels the invite on the remote host.
         """
-        self.client.send({"msg":"CANCEL", "sid":0})
-        self.client.disconnect()
+        #TODO: add reason argument.
+        #CANCEL_REASON_TIMEOUT = "timed out"
+        #CANCEL_REASON_CANCELLED = "cancelled"
+        if self.client.is_connected():
+            self.client.send({"msg":"CANCEL", "reason": reason, "sid":0})
+            self.client.disconnect()
+        self.cleanup_after_rtp_stream()
     
     def send_refuse_and_disconnect(self):
         """
@@ -569,8 +718,12 @@ class Application(object):
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             
-    def on_connection_error(self, err, msg):
-        # XXX
-        self.gui.hide_calling_dialog(msg)
-        text = _("Connection error: %(message)s\n%(error)s") % {"error": err, "message": msg}
-        dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
+    #def on_connection_error(self, err, msg):
+    #    """
+    #    @param err: Exception message.
+    #    @param msg: Legible message.
+    #    """
+    #    self.gui.hide_calling_dialog()
+    #    text = _("Connection error: %(message)s\n%(error)s") % {"error": err, "message": msg}
+    #    dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
+

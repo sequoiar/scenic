@@ -29,7 +29,6 @@
 
 #include "busMsgHandler.h"
 
-class MapMsg;
 class Encoder;
 class Pipeline;
 class VideoEncoder;
@@ -43,8 +42,9 @@ class Decoder;
 class RemoteConfig 
 {
     public:
-        RemoteConfig(MapMsg &msg,
-                int msgId__); 
+        RemoteConfig(const std::string &codec, 
+                const std::string &remoteHost, 
+                int port);
         
         virtual ~RemoteConfig(){};
         static bool capsMatchCodec(const std::string &encodingName, const std::string &codec);
@@ -65,24 +65,24 @@ class RemoteConfig
         const std::string codec_;
         const std::string remoteHost_;
         const int port_;
-        const int msgId_;
         static const int PORT_MIN;
         static const int PORT_MAX;
         static std::set<int> usedPorts_;
 
     private:
         std::string codecMediaType() const;
-        RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
 };
 
 class SenderConfig : public RemoteConfig, public BusMsgHandler
 {
     public:
-        SenderConfig(Pipeline &pipeline, MapMsg &msg,
-                int msgId__);
+        SenderConfig(Pipeline &pipeline,
+                const std::string &codec, 
+                const std::string &remoteHost, 
+                int port);
 
-        VideoEncoder* createVideoEncoder(Pipeline &pipeline, MapMsg &settings) const;
-        Encoder* createAudioEncoder(Pipeline &pipeline) const;
+        VideoEncoder* createVideoEncoder(const Pipeline &pipeline, int bitrate, int quality) const;
+        Encoder* createAudioEncoder(const Pipeline &pipeline, int bitrate, double quality) const;
         bool capsOutOfBand() { return capsOutOfBand_; }
         void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
 
@@ -98,11 +98,16 @@ class SenderConfig : public RemoteConfig, public BusMsgHandler
 class ReceiverConfig : public RemoteConfig
 {
     public:
-        ReceiverConfig(MapMsg &msg, const std::string &caps__,
-                int msgId__); 
+        ReceiverConfig(const std::string &codec, 
+                const std::string &remoteHost, 
+                int port,
+                const std::string &multicastInterface,
+                bool negotiateCaps,
+                bool enableControls,
+                const std::string &caps); 
 
-        VideoDecoder* createVideoDecoder(Pipeline &pipeline, bool doDeinterlace) const;
-        Decoder* createAudioDecoder(Pipeline &pipeline) const;
+        VideoDecoder* createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const;
+        Decoder* createAudioDecoder(const Pipeline &pipeline) const;
 
         const char *multicastInterface() const { return multicastInterface_.c_str(); }
         const char *caps() const { return caps_.c_str(); }

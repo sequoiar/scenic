@@ -41,24 +41,30 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     sourceConfig_(sourceConfig),
     sinkConfig_(sinkConfig),
     source_(sourceConfig_->createSource(pipeline_)), 
-    colourspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
+    colourspace_(0),
     videoscale_(sinkConfig_->createVideoScale(pipeline_)),
-    videoflip_(sinkConfig_->createVideoFlip(pipeline_)),
+    videoflip_(sinkConfig_->flipMethod() != "none" ? sinkConfig_->createVideoFlip(pipeline_) : 0),
     sink_(sinkConfig_->createSink(pipeline_))
 {
-    if (sourceConfig_->sourceString() != "dc1394src")
+    // dc1394src needs an extra colourspace if not being encoded or flipped
+    if (sourceConfig_->sourceString() == "dc1394src" and videoflip_ == 0)
+    {
+        colourspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
+        gstlinkable::link(*source_, colourspace_);
+        gstlinkable::link(colourspace_, *videoscale_);
+    }
+    else
     {
         gstlinkable::link(*source_, *videoscale_);
+    }
+
+    if (videoflip_ != 0)
+    {
         gstlinkable::link(*videoscale_, *videoflip_);
         gstlinkable::link(*videoflip_, *sink_);
     }
     else
-    {
-        gstlinkable::link(*source_, colourspace_);
-        gstlinkable::link(colourspace_, *videoscale_);
-        gstlinkable::link(*videoscale_, *videoflip_);
-        gstlinkable::link(*videoflip_, *sink_);
-    }
+        gstlinkable::link(*videoscale_, *sink_);
 }
 
 /// Destructor 

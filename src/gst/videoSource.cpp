@@ -20,13 +20,15 @@
  *
  */
 
-#include "util.h"
-
+#include "videoSource.h"
 #include <sstream>
+#include <string>
+#include <vector>
 #include <boost/lexical_cast.hpp>
 
+#include "util.h"
+
 #include "gstLinkable.h"
-#include "videoSource.h"
 #include "pipeline.h"
 #include "videoConfig.h"
 
@@ -36,13 +38,13 @@
 
 #include "fileSource.h"
 
-
 /// Constructor
-VideoSource::VideoSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
-    pipeline_(pipeline),
-    config_(config), 
-    source_(0), 
-    capsFilter_(0)
+VideoSource::VideoSource(const Pipeline &pipeline, const VideoSourceConfig &config)
+    :
+        pipeline_(pipeline),
+        config_(config),
+        source_(0),
+        capsFilter_(0)
 {}
 
 
@@ -58,7 +60,7 @@ std::string VideoSource::defaultSrcCaps() const
     std::ostringstream capsStr;
     capsStr << "video/x-raw-yuv, width=" << config_.captureWidth()
         << ", height=" << config_.captureHeight() << ", framerate="
-        << config_.framerate() << "000/1001, pixel-aspect-ratio=" 
+        << config_.framerate() << "000/1001, pixel-aspect-ratio="
         << config_.pixelAspectRatio();
     return capsStr.str();
 }
@@ -82,8 +84,10 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
 
 
 /// Constructor
-VideoTestSource::VideoTestSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
-    VideoSource(pipeline, config)
+VideoTestSource::VideoTestSource(const Pipeline &pipeline,
+        const VideoSourceConfig &config)
+    :
+        VideoSource(pipeline, config)
 {
     source_ = pipeline_.makeElement(config_.source(), NULL);
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
@@ -99,9 +103,10 @@ VideoTestSource::~VideoTestSource()
 
 
 /// Constructor
-VideoFileSource::VideoFileSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
-    VideoSource(pipeline, config), 
-    identity_(pipeline_.makeElement("identity", NULL))
+VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConfig &config) 
+    :
+        VideoSource(pipeline, config),
+        identity_(pipeline_.makeElement("identity", NULL))
 {
     tassert(config_.locationExists());
     g_object_set(identity_, "silent", TRUE, NULL);
@@ -119,9 +124,10 @@ VideoFileSource::~VideoFileSource()
 
 
 /// Constructor
-VideoDvSource::VideoDvSource(Pipeline &pipeline, const VideoSourceConfig &config) : 
-    VideoSource(pipeline, config), 
-    queue_(pipeline_.makeElement("queue", NULL)), 
+VideoDvSource::VideoDvSource(const Pipeline &pipeline, 
+        const VideoSourceConfig &config) :
+    VideoSource(pipeline, config),
+    queue_(pipeline_.makeElement("queue", NULL)),
     dvdec_(pipeline_.makeElement("dvdec", NULL))
 {
     Dv1394::Instance(pipeline_)->setVideoSink(queue_);
@@ -138,15 +144,16 @@ VideoDvSource::~VideoDvSource()
 }
 
 
-bool VideoV4lSource::willModifyCaptureResolution() const 
-{ 
-    return v4l2util::captureWidth(deviceStr()) != config_.captureWidth() or  
-        v4l2util::captureHeight(deviceStr()) != config_.captureHeight(); 
-} 
+bool VideoV4lSource::willModifyCaptureResolution() const
+{
+    return v4l2util::captureWidth(deviceStr()) != config_.captureWidth() or
+        v4l2util::captureHeight(deviceStr()) != config_.captureHeight();
+}
 
 
-VideoV4lSource::VideoV4lSource(Pipeline &pipeline, const VideoSourceConfig &config)
-    : VideoSource(pipeline, config), expectedStandard_("NTSC"), actualStandard_("")
+VideoV4lSource::VideoV4lSource(const Pipeline &pipeline, 
+        const VideoSourceConfig &config)
+: VideoSource(pipeline, config), expectedStandard_("NTSC"), actualStandard_("")
 {
     source_ = pipeline_.makeElement(config_.source(), NULL);
     // set a v4l2src if given to config as an arg, otherwise use default
@@ -154,15 +161,15 @@ VideoV4lSource::VideoV4lSource(Pipeline &pipeline, const VideoSourceConfig &conf
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
     if (!v4l2util::checkStandard(expectedStandard_, actualStandard_, deviceStr()))
-        LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard " 
+        LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard "
                 << expectedStandard_ << ", it is " << actualStandard_);
 
     LOG_DEBUG("v4l width is " << v4l2util::captureWidth(deviceStr()));
     LOG_DEBUG("v4l height is " << v4l2util::captureHeight(deviceStr()));
 
-    if (willModifyCaptureResolution())  
+    if (willModifyCaptureResolution())
     {
-        LOG_INFO("Changing v4l resolution to " << 
+        LOG_INFO("Changing v4l resolution to " <<
                 config_.captureWidth() << "x" << config_.captureHeight());
         v4l2util::setFormatVideo(deviceStr(), config_.captureWidth(), config_.captureHeight());
     }
@@ -179,7 +186,7 @@ std::string VideoV4lSource::deviceStr() const
     gchar *device_cstr;
     g_object_get(G_OBJECT(source_), "device", &device_cstr, NULL);    // get actual used device
 
-    std::string deviceString(device_cstr);        // stay safe from memory leaks
+    std::string deviceString(device_cstr); // stay safe from memory leaks
     g_free(device_cstr);
     return deviceString;
 }
@@ -194,9 +201,9 @@ std::string VideoV4lSource::srcCaps() const
         capsSuffix = "30000/1001"; // NTSC is drop frame
     else if (actualStandard_ == "PAL")
         capsSuffix = "25/1"; // PAL is not drop frame
-    else 
+    else
     {
-        capsSuffix = boost::lexical_cast<std::string>(config_.framerate()); 
+        capsSuffix = boost::lexical_cast<std::string>(config_.framerate());
         capsSuffix += "/1";
         LOG_WARNING("Unsupported standard, " << actualStandard_
                 << "trying to add framerate " << capsSuffix << " to caps");
@@ -208,8 +215,8 @@ std::string VideoV4lSource::srcCaps() const
     capsSuffix += ", pixel-aspect-ratio=";
     capsSuffix += config_.pixelAspectRatio();
 
-    capsStr << "video/x-raw-yuv, width=" << config_.captureWidth() << ", height=" 
-        << config_.captureHeight() 
+    capsStr << "video/x-raw-yuv, width=" << config_.captureWidth() << ", height="
+        << config_.captureHeight()
         << ", framerate="
         << capsSuffix;
     LOG_DEBUG("V4l2src caps are " << capsStr.str());
@@ -218,20 +225,21 @@ std::string VideoV4lSource::srcCaps() const
 }
 
 
-VideoDc1394Source::VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig &config) : 
-    VideoSource(pipeline, config) 
+VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config) :
+    VideoSource(pipeline, config)
 {
-    if (DC1394::areCamerasConnected())
+    if (not Dc1394::areCamerasConnected())
         THROW_CRITICAL("No dc1394 camera connected");
 
     source_ = pipeline_.makeElement(config_.source(), NULL);
     if (config_.hasGUID())
-        g_object_set(G_OBJECT(source_), "camera-number", DC1394::GUIDToCameraNumber(config_.GUID()), NULL);
+        g_object_set(G_OBJECT(source_), "camera-number", Dc1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
         g_object_set(G_OBJECT(source_), "camera-number", config_.cameraNumber(), NULL);
     else
         LOG_DEBUG("No valid camera-number or guid specified, using default camera number 0");
     /// TODO: test. this will hopefully help reduce the lag we're seeing with dc1394src
+    enum {DMA_BUFFER_SIZE_IN_FRAMES = 2};
     g_object_set(G_OBJECT(source_), "buffer-size", DMA_BUFFER_SIZE_IN_FRAMES, NULL);
 
     capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
@@ -241,46 +249,46 @@ VideoDc1394Source::VideoDc1394Source(Pipeline &pipeline, const VideoSourceConfig
 }
 
 
-std::string VideoDc1394Source::srcCaps() const 
-{ 
-    typedef std::vector<std::string> ColourspaceList; 
-    std::ostringstream capsStr; 
-    int cameraNumber; 
-    int mode = 0; 
-    g_object_get(source_, "camera-number", &cameraNumber, NULL); 
+std::string VideoDc1394Source::srcCaps() const
+{
+    typedef std::vector<std::string> ColourspaceList;
+    std::ostringstream capsStr;
+    int cameraNumber;
+    int mode = 0;
+    g_object_get(source_, "camera-number", &cameraNumber, NULL);
 
-    std::string colourSpace; 
-    ColourspaceList spaces; 
-    // if we support other colourspaces besides grayscale 
-    if (!config_.forceGrayscale()) 
-    { 
-        /// favour rgb because we need to be have that colourspace for shared video buffer 
-        spaces.push_back("rgb"); 
-        spaces.push_back("yuv"); 
+    std::string colourSpace;
+    ColourspaceList spaces;
+    // if we support other colourspaces besides grayscale
+    if (not config_.forceGrayscale())
+    {
+        /// favour rgb because we need to be have that colourspace for shared video buffer
+        spaces.push_back("rgb");
+        spaces.push_back("yuv");
     } 
-    spaces.push_back("gray"); 
+    spaces.push_back("gray");
 
-    for (ColourspaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space) 
-    { 
-        colourSpace = *space; 
-        mode = DC1394::capsToMode(cameraNumber, config_.captureWidth(),  
-                config_.captureHeight(), colourSpace, config_.framerate()); 
-    } 
+    for (ColourspaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space)
+    {
+        colourSpace = *space;
+        mode = Dc1394::capsToMode(cameraNumber, config_.captureWidth(),
+                config_.captureHeight(), colourSpace, config_.framerate());
+    }
 
-    // vmode takes into account resolution, bpp, depth 
-    if (mode != 0) 
-        capsStr << "video/x-raw-" << colourSpace << ", vmode=" << mode << ",framerate="<< config_.framerate() << "/1"; 
-    else 
-        THROW_CRITICAL("Could not find appropriate video mode for colourspace " 
-                << colourSpace  << " and resolution " 
-                << config_.captureWidth() << "x" << config_.captureHeight()); 
+    // vmode takes into account resolution, bpp, depth
+    if (mode != 0)
+        capsStr << "video/x-raw-" << colourSpace << ", vmode=" << mode << ",framerate="<< config_.framerate() << "/1";
+    else
+        THROW_CRITICAL("Could not find appropriate video mode for colourspace "
+                << colourSpace  << " and resolution "
+                << config_.captureWidth() << "x" << config_.captureHeight());
 
-    if (DC1394::requiresMoreISOSpeed(mode)) 
-    { 
-        // FIXME: should set to b-mode too 
-        LOG_DEBUG("Setting iso speed to 800"); 
-        g_object_set(source_, "iso-speed", DC1394::MAX_ISO_SPEED, NULL); 
-    } 
-    return capsStr.str(); 
+    if (Dc1394::requiresMoreISOSpeed(mode))
+    {
+        // FIXME: should set to b-mode too
+        LOG_DEBUG("Setting iso speed to 800");
+        g_object_set(source_, "iso-speed", Dc1394::MAX_ISO_SPEED, NULL);
+    }
+    return capsStr.str();
 }
 

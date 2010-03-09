@@ -24,97 +24,20 @@
 #ifndef _VIDEO_FACTORY_H_
 #define _VIDEO_FACTORY_H_
 
-#include "util.h"
-#include "mapMsg.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/program_options.hpp>
 
-#include "videoConfig.h"
 #include "videoSender.h"
 #include "videoReceiver.h"
-#include "remoteConfig.h"
-#include "capsParser.h"
 #include "localVideo.h"
 
-#include <boost/shared_ptr.hpp>
+class Pipeline;
 
 namespace videofactory
 {
-    using boost::shared_ptr;
-    static const int MSG_ID = 2;
-
-    /// Convert command line options to ipcp
-    static void rxOptionsToIPCP(MapMsg &options)
-    {
-        // FIXME: remove unused keys
-        options["port"] = options["videoport"];
-        options["codec"] = options["videocodec"];
-        options["sink"] = options["videosink"];
-        options["device"] = options["videodevice"];
-        options["location"] = options["videolocation"];
-    }
-
-    /// Convert command line options to ipcp
-    static void txOptionsToIPCP(MapMsg &options)
-    {
-        options["port"] = options["videoport"];
-        options["codec"] = options["videocodec"];
-        options["source"] = options["videosource"];
-        options["device"] = options["videodevice"];
-        options["location"] = options["videolocation"];
-        options["bitrate"] = options["videobitrate"];
-        options["quality"] = options["videoquality"];
-    }
-
-    /// Convert command line options to ipcp
-    static void localOptionsToIPCP(MapMsg &options)
-    {
-        options["source"] = options["videosource"];
-        options["sink"] = options["videosink"];
-        options["device"] = options["videodevice"];
-        options["location"] = options["videolocation"];
-
-        // FIXME: unused
-        options["bitrate"] = options["videobitrate"];
-        options["quality"] = options["videoquality"];
-        options["port"] = options["videoport"];
-        options["codec"] = options["videocodec"];
-    }
-
-    static shared_ptr<VideoReceiver> 
-        buildVideoReceiver(Pipeline &pipeline, MapMsg &msg)
-        {
-            shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
-
-            // get caps here, based on codec, capture width and capture height
-            std::string caps(CapsParser::getVideoCaps(msg["codec"], msg["width"], msg["height"], msg["aspect-ratio"]));
-
-            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
-
-            return shared_ptr<VideoReceiver>(new VideoReceiver(pipeline, vConfig, rConfig));
-        }
-
-
-    static shared_ptr<VideoSender> 
-        buildVideoSender(Pipeline &pipeline, MapMsg &msg)
-        {
-            shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(msg));
-
-            shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, msg, MSG_ID)); 
-            shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, rConfig));
-
-            rConfig->capsOutOfBand(msg["negotiate-caps"] 
-                    or !tx->capsAreCached());
-
-            return tx;
-        }
-
-    static shared_ptr<LocalVideo> 
-        buildLocalVideo(Pipeline &pipeline, MapMsg &msg)
-        {
-            shared_ptr<VideoSourceConfig> sourceConfig(new VideoSourceConfig(msg));
-            shared_ptr<VideoSinkConfig> sinkConfig(new VideoSinkConfig(msg));
-
-            return shared_ptr<LocalVideo>(new LocalVideo(pipeline, sourceConfig, sinkConfig));
-        }
+    boost::shared_ptr<VideoReceiver> buildVideoReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    boost::shared_ptr<VideoSender> buildVideoSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    boost::shared_ptr<LocalVideo> buildLocalVideo(Pipeline &pipeline, const boost::program_options::variables_map &options);
 }
 
 #endif // _VIDEO_FACTORY_H_

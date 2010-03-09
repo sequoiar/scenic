@@ -25,10 +25,9 @@
 
 #include "pipeline.h"
 #include "gutil.h"
-#include "mapMsg.h"
 
 
-Playback::Playback(Pipeline &pipeline) : pipeline_(pipeline)
+Playback::Playback(const Pipeline &pipeline) : pipeline_(pipeline)
 {
 }
 
@@ -61,11 +60,6 @@ void Playback::quit()
 void Playback::makeVerbose()
 {
     pipeline_.makeVerbose();
-}
-
-bool Playback::quitted()
-{
-    return pipeline_.quitted();
 }
 
 int Playback::sampleRate()
