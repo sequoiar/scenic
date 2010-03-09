@@ -19,27 +19,35 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 """
-Executable script which calls rtpmidi.runner.run()
+Utilities only used within runner.py
 """
-import os
-import sys
+import re
 
-SCRIPTS_DIR = "scripts"
-VERSION = """@PACKAGE_VERSION@"""
-PYTHON_LIB_PATH = """@PYTHON_LIB_PATH@"""# path to where the module is installed
-
-def _is_in_devel():
-    d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[1]
-    return d == SCRIPTS_DIR
-
-if __name__ == "__main__":
-    if _is_in_devel():
-        d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
-        sys.path.insert(0, d)
-        os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
+def check_ip(address):
+    """
+    Check address format 
+    """
+    if re.match('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address):
+	    values = [int(i) for i in address.split('.')]
+	    if ip_range(values):
+		    return 1
+	    else:
+		    return 0
     else:
-        sys.path.append(PYTHON_LIB_PATH)
-    from rtpmidi import runner
-    
-    runner.run(VERSION)
-    
+	    return 0
+            
+def ip_range(nums):
+    for num in nums:
+        if num < 0 or num > 255:
+            return False
+    return True
+
+def check_port(portnum):
+    """
+    Checks if the port is in a usable range.
+    """
+    #TODO: do not allow ports for which you must be root to use them.
+    if 0 < portnum < 65535:
+        return True
+    else:
+        return False

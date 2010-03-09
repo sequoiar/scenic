@@ -8,11 +8,11 @@ common_mandeps = $(top_srcdir)/configure.ac
 # Depend on the source, not the binary; we don't need to regenerate the
 # binary when any source file changes, only the main one.
 # Use -o so that the `missing' program can infer the output file.
-milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOptions.cpp $(common_mandeps)
+milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOptions.cpp $(common_mandeps) $(top_srcdir)/man/milhouse-man.txt
 	$(HELP2MAN) --include=milhouse-man.txt --name="Milhouse is a Gstreamer application for audio and video over RTP" --no-info $(top_builddir)/src/main/milhouse -o $@
 
-scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  $(top_srcdir)/py/scenic/configure.py.in $(common_mandeps)
+scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  $(top_srcdir)/py/scenic/configure.py.in $(common_mandeps) $(top_srcdir)/man/scenic-man.txt
 	$(HELP2MAN) --include=scenic-man.txt --name="Scenic Audio/Video Streaming Software for GNU/Linux" --no-info $(top_builddir)/py/scripts/scenic -o $@
 
-midistream.1: $(top_srcdir)/py/scripts/midistream.in $(common_mandeps)
-	$(HELP2MAN) --name="MIDI RTP Streaming Software" --no-info $(top_builddir)/py/scripts/midistream -o $@
+midistream.1: $(top_srcdir)/py/scripts/midistream.in $(top_srcdir)/py/rtpmidi/runner.py $(common_mandeps) $(top_srcdir)/man/midistream-man.txt
+	$(HELP2MAN) --include=midistream-man.txt --name="MIDI RTP Streaming Software" --no-info $(top_builddir)/py/scripts/midistream -o $@

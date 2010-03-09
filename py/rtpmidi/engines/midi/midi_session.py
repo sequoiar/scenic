@@ -57,6 +57,7 @@ class MidiSession(RTPSession):
 
         #Recovery utils
         self.recovery = 0
+        self.recovery_journal_system = None
 
         if recovery:
             self.recovery = 1
@@ -240,13 +241,14 @@ class MidiSession(RTPSession):
         packet = OldPacket(self.seq, midi_list, 0)
 
         chunk = ""
+        recovery_journal = ""
         if recovery:
             #Recovery Journal (can be empty) 
             #TODO customize it for each member of the feed
-            recovery_journal = self.recovery_journal_system.content
-
-            if recovery_journal == "":
-                recovery = 0
+            if self.recovery_journal_system is not None:
+                recovery_journal = self.recovery_journal_system.content
+                if recovery_journal == "":
+                    recovery = 0
 
         #Packing All
         #Testing length of midi list ( in nb notes )
