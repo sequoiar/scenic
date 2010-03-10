@@ -144,7 +144,7 @@ class AudioTestSource : public InterleavedAudioSource
  *  number of plays).
  */
 
-class AudioFileSource : public AudioSource, public BusMsgHandler
+class AudioFileSource : public AudioSource, BusMsgHandler
 {
     public:
         AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config);

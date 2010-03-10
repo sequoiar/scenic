@@ -75,7 +75,7 @@ class RemoteConfig
         std::string codecMediaType() const;
 };
 
-class SenderConfig : public RemoteConfig, public BusMsgHandler
+class SenderConfig : public RemoteConfig, BusMsgHandler
 {
     public:
         SenderConfig(Pipeline &pipeline,

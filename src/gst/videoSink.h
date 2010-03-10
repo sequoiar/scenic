@@ -50,7 +50,7 @@ class VideoSink : public GstLinkableSink, boost::noncopyable
 };
 
 class GtkVideoSink
-: public VideoSink, public MessageHandler
+: public VideoSink, MessageHandler
 {
     public:
         GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid);
@@ -88,7 +88,7 @@ class GtkVideoSink
 
 
 class XvImageSink
-: public GtkVideoSink, public BusMsgHandler
+: public GtkVideoSink, BusMsgHandler
 {
     public:
         XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid);
