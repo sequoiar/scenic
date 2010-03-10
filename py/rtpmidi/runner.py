@@ -56,8 +56,15 @@ def sigint_handler(signum, frame):
     """
     SIGINT handler.
     """
-    global launch_flag
     print "\nSIGINT caught! Shutting down midi stream module."
+    RTPControl().stop()
+    reactor.stop()
+
+def sigterm_handler(signum, frame):
+    """
+    SIGTERM handler.
+    """
+    print "\nSIGTERM caught! Shutting down midi stream module."
     RTPControl().stop()
     reactor.stop()
 
@@ -73,7 +80,7 @@ def list_midi_devices():
     print "    Input devices:"
     print "    --------------"
     for dev in dev_in:
-        print "     * input  %2s %30s" % (dev[0], dev[1]),
+        print "     * input  %2s %30s" % (dev[0], '"%s"' % (dev[1])),
         if dev[2] == 1:
             print "  [open]"
         else:
@@ -81,7 +88,7 @@ def list_midi_devices():
     print "    Output devices:"
     print "    ---------------"
     for dev in dev_out:
-        print "     * output %2s %30s" % (dev[0], dev[1]),
+        print "     * output %2s %30s" % (dev[0], '"%s"' % (dev[1])),
         if dev[2] == 1:
             print "  [open]"
         else:
@@ -209,4 +216,5 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
             sys.exit(2)
     RTPControl().start_session(midi_session_c)
     signal.signal(signal.SIGINT, sigint_handler)
+    signal.signal(signal.SIGTERM, sigterm_handler)
     reactor.run()

@@ -39,6 +39,8 @@ class StreamerManager(object):
         self.milhouse_send_cmd = None
         self.sender = None
         self.receiver = None
+        self.midi_receiver = None
+        self.midi_sender = None
         self.state = process.STATE_STOPPED
         self.state_changed_signal = sig.Signal()
         # for stats
@@ -99,9 +101,30 @@ class StreamerManager(object):
         if contact is not None:
             contact_name = contact["name"]
         
-        remote_config = self.app.remote_config
+        remote_config = self.app.remote_config # FIXME: should the remote config be passed as a param to this method?
         send_width, send_height = self.app.config.video_capture_size.split("x")
         receive_width, receive_height = remote_config["video"]["capture_size"].split("x")
+        
+        # MIDI
+        midi_send_enabled = self.app.config.midi_send_enabled and remote_config["midi"]["recv_enabled"]
+        midi_recv_enabled = self.app.config.midi_recv_enabled and remote_config["midi"]["send_enabled"]
+        midi_input_device = None
+        midi_output_device = None
+        try:
+            midi_input_device = int(self.app.config.midi_input_device.split(":")[0])
+        except KeyError, e:
+            midi_send_enabled = False
+            print(str(e))
+            raise # this should not happen
+        try:
+            midi_output_device = int(self.app.config.midi_output_device.split(":")[0])
+        except KeyError, e:
+            midi_recv_enabled = False
+            print(str(e))
+            raise # this should not happen
+        
+        print "remote_config:", remote_config
+        
         self.session_details = {
             "peer": {
                 "address": addr,
@@ -131,6 +154,11 @@ class StreamerManager(object):
                     "numchannels": remote_config["audio"]["numchannels"],
                     "codec": remote_config["audio"]["codec"],
                     "port": remote_config["audio"]["port"], 
+                }, 
+                "midi": {
+                    "enabled": midi_send_enabled,
+                    "input_device": midi_input_device,
+                    "port": remote_config["midi"]["port"]
                 }
             },
             # -------------------- recv ------------
@@ -158,6 +186,11 @@ class StreamerManager(object):
                     "codec": self.app.config.audio_codec, 
                     "port": self.app.recv_audio_port,
                     "sink": self.app.config.audio_sink
+                },
+                "midi": {
+                    "enabled": midi_recv_enabled,
+                    "output_device": midi_output_device,
+                    "port": str(self.app.recv_midi_port),
                 }
             }
         }
@@ -271,24 +304,68 @@ class StreamerManager(object):
             "receive": [], # list of strings
             }
         # every element in the lists must be strings since we join them 
+        # ---- audio/video receiver ----
         recv_cmd = " ".join(self.milhouse_recv_cmd)
         self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
         self.receiver.state_changed_signal.connect(self.on_process_state_changed)
         self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
         self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
+        # ---- audio/video sender ----
         send_cmd = " ".join(self.milhouse_send_cmd)
         self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
         self.sender.state_changed_signal.connect(self.on_process_state_changed)
         self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
         self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
+        
+        midi_recv_enabled = self.session_details["receive"]["midi"]["enabled"]
+        midi_send_enabled = self.session_details["send"]["midi"]["enabled"]
+        
+        if midi_recv_enabled:
+            midi_recv_args = [
+                "midistream",
+                "--verbose",
+                "--address", details["peer"]["address"],
+                "--receiving-port", str(details["receive"]["midi"]["port"]),
+                "--output-device", str(details["receive"]["midi"]["output_device"]),
+                ]
+            midi_recv_command = " ".join(midi_recv_args) 
+            self.midi_receiver = process.ProcessManager(command=midi_recv_command, identifier="midi_receiver")
+            self.midi_receiver.state_changed_signal.connect(self.on_process_state_changed)
+            self.midi_receiver.stdout_line_signal.connect(self.on_midi_stdout_line)
+            self.midi_receiver.stderr_line_signal.connect(self.on_midi_stderr_line)
+        
+        if midi_send_enabled:
+            midi_send_args = [
+                "midistream",
+                "--verbose",
+                "--address", details["peer"]["address"],
+                "--sending-port", str(details["send"]["midi"]["port"]),
+                "--input-device", str(details["send"]["midi"]["input_device"]),
+                ]
+            midi_send_command = " ".join(midi_send_args) 
+            self.midi_sender = process.ProcessManager(command=midi_send_command, identifier="midi_sender")
+            self.midi_sender.state_changed_signal.connect(self.on_process_state_changed)
+            self.midi_sender.stdout_line_signal.connect(self.on_midi_stdout_line)
+            self.midi_sender.stderr_line_signal.connect(self.on_midi_stderr_line)
+        
         # starting
         self._set_state(process.STATE_STARTING)
         print "$", send_cmd
         self.sender.start()
         print "$", recv_cmd
         self.receiver.start()
+        if midi_recv_enabled:
+            self.midi_receiver.start()
+        if midi_send_enabled:
+            self.midi_sender.start()
 
-    def on_receiver_stdout_line(self, line):
+    def on_midi_stdout_line(self, process_manager, line):
+        print process_manager.identifier, line
+
+    def on_midi_stderr_line(self, process_manager, line):
+        print process_manager.identifier, line
+
+    def on_receiver_stdout_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stdout
         """
@@ -305,8 +382,7 @@ class StreamerManager(object):
         else:
             print "%9s stdout: %s" % (self.receiver.identifier, line)
 
-
-    def on_receiver_stderr_line(self, line):
+    def on_receiver_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
@@ -314,7 +390,7 @@ class StreamerManager(object):
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
     
-    def on_sender_stdout_line(self, line):
+    def on_sender_stdout_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stdout
         """
@@ -354,7 +430,7 @@ class StreamerManager(object):
         except ValueError, e:
             print(e)
 
-    def on_sender_stderr_line(self, line):
+    def on_sender_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
@@ -367,6 +443,18 @@ class StreamerManager(object):
         Retuns True if a streaming session is in progress.
         """
         return self.state != process.STATE_STOPPED
+
+    def get_all_streamer_process_managers(self):
+        """
+        Returns all the current streaming process managers for the current session.
+        @rettype: list
+        """
+        ret = [self.sender, self.receiver]
+        if self.session_details["receive"]["midi"]["enabled"]:
+            ret.append(self.midi_receiver)
+        if self.session_details["send"]["midi"]["enabled"]:
+            ret.append(self.midi_sender)
+        return ret
 
     def on_process_state_changed(self, process_manager, process_state):
         """
@@ -390,7 +478,7 @@ class StreamerManager(object):
             # Next, if all streamers are dead, we can say this manager is stopped
             if self.state == process.STATE_STOPPING:
                 one_is_left = False
-                for proc in [self.sender, self.receiver]:
+                for proc in self.get_all_streamer_process_managers():
                     if process_manager is not proc and proc.state != process.STATE_STOPPED:
                         print("Streamer process %s is not dead, so we are not done stopping. Its state is %s." % (proc, proc.state))
                         one_is_left = True
@@ -422,6 +510,10 @@ class StreamerManager(object):
         if show_error_dialog:
             msg = _("Some errors occured during the audio/video streaming session.")
             dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window, details=details)
+        # TODO: should we set all our process managers to None
+        for proc in self.get_all_streamer_process_managers():
+            proc = None
+        print "should all be None:", self.get_all_streamer_process_managers()
     
     def _set_state(self, new_state):
         """
@@ -444,7 +536,7 @@ class StreamerManager(object):
         # stopping
         if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
             self._set_state(process.STATE_STOPPING)
-            for proc in [self.sender, self.receiver]:
+            for proc in self.get_all_streamer_process_managers():
                 if proc is not None:
                     if proc.state != process.STATE_STOPPED and proc.state != process.STATE_STOPPING:
                         proc.stop()

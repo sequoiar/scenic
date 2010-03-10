@@ -49,6 +49,7 @@ from scenic import ports
 from scenic.devices import jackd
 from scenic.devices import x11
 from scenic.devices import cameras
+from scenic.devices import midi
 from scenic import gui
 from scenic import internationalization
 _ = internationalization._
@@ -61,11 +62,13 @@ class Config(saving.ConfigStateSaving):
         # Default values
         self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
         self.smtpserver = "smtp.sat.qc.ca"
+        # ----------- AUDIO --------------
         self.email_info = "scenic@sat.qc.ca"
         self.audio_source = "jackaudiosrc"
         self.audio_sink = "jackaudiosink"
         self.audio_codec = "raw"
         self.audio_channels = 2
+        # ------------- VIDEO -------------
         self.video_source = "v4l2src"
         self.video_device = "/dev/video0"
         self.video_deinterlace = False
@@ -83,6 +86,11 @@ class Config(saving.ConfigStateSaving):
         #self.theme = "Darklooks"
         self.video_bitrate = 3.0
         self.video_jitterbuffer = 75
+        # ----------- MIDI ----------------
+        self.midi_recv_enabled = False
+        self.midi_send_enabled = False
+        self.midi_input_device = "" # ID and name
+        self.midi_output_device = "" # ID and name
         
         # Done with the configuration entries.
         config_file = 'configuration.json'
@@ -101,6 +109,7 @@ class Application(object):
         self.log_file_name = log_file_name
         self.recv_video_port = None
         self.recv_audio_port = None
+        self.recv_midi_port = None
         self.remote_config = {} # dict
         self.ports_allocator = ports.PortsAllocator()
         self.address_book = saving.AddressBook()
@@ -122,7 +131,9 @@ class Application(object):
             "xvideo_is_present": False, # bool
             "jackd_is_running": False,
             "jackd_is_zombie": False,
-            "jack_servers": [] # list of dicts
+            "jack_servers": [], # list of dicts
+            "midi_input_devices": [],
+            "midi_output_devices": [],
             }
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         reactor.callLater(0, self._start_the_application)
@@ -150,9 +161,32 @@ class Application(object):
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_xvideo_extension(),
-            self.poll_camera_devices()
+            self.poll_camera_devices(), 
+            self.poll_midi_devices()
             ])
         deferred_list.addCallback(_callback)
+
+    def poll_midi_devices(self):
+        """
+        Called once at startup, and then the GUI can call it.
+        @rettype: L{Deferred}
+        """
+        deferred = midi.list_midi_devices()
+        def _callback(midi_devices):
+            input_devices = []
+            output_devices = []
+            for device in midi_devices:
+                if device["is_input"]:
+                    input_devices.append(device)
+                else:
+                    output_devices.append(device)
+            self.devices["midi_input_devices"] = input_devices
+            self.devices["midi_output_devices"] = output_devices
+            print("MIDI inputs: %s" % (input_devices))
+            print("MIDI outputs: %s" % (output_devices))
+            self.gui.update_midi_devices()
+        deferred.addCallback(_callback)
+        return deferred
 
     def poll_x11_devices(self):
         """
@@ -285,10 +319,11 @@ class Application(object):
         # TODO: start_session
         self.recv_video_port = self.ports_allocator.allocate()
         self.recv_audio_port = self.ports_allocator.allocate()
+        self.recv_midi_port = self.ports_allocator.allocate()
 
     def _free_ports(self):
         # TODO: stop_session
-        for port in [self.recv_video_port, self.recv_audio_port]:
+        for port in [self.recv_video_port, self.recv_audio_port, self.recv_midi_port]:
             try:
                 self.ports_allocator.free(port)
             except ports.PortsAllocatorError, e:
@@ -357,9 +392,11 @@ class Application(object):
             if not result:
                 _simply_refuse() # TODO: add reason param: Technical problems.
             else:
+                # FIXME: the copy of dict should be more straightforward.
                 self.remote_config = {
                     "audio": message["audio"],
-                    "video": message["video"]
+                    "video": message["video"],
+                    "midi": message["midi"]
                     }
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
                 if contact is not None and contact["auto_accept"]:
@@ -414,9 +451,11 @@ class Application(object):
             self.got_bye = False
             # TODO: Use session to contain settings and ports
             self.gui.hide_calling_dialog()
+            # FIXME: the copy of dict should be more straightforward
             self.remote_config = {
                 "audio": message["audio"],
-                "video": message["video"]
+                "video": message["video"],
+                "midi": message["midi"]
                 }
             if self.streamer_manager.is_busy():
                 print("Got ACCEPT but we are busy. This is very strange")
@@ -538,6 +577,11 @@ class Application(object):
                 "codec": self.config.audio_codec,
                 "numchannels": self.config.audio_channels,
                 "port": self.recv_audio_port
+                },
+            "midi": {
+                "port": self.recv_midi_port,
+                "recv_enabled": self.config.midi_recv_enabled,
+                "send_enabled": self.config.midi_send_enabled
                 }
             }
 

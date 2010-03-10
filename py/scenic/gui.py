@@ -106,12 +106,15 @@ def _get_combobox_value(widget):
         tree_model_row = tree_model[index]
     except IndexError, e:
         raise RuntimeError("ComboBox widget %s doesn't have value with index %s." % (widget, index))
+    #except TypeError, e:
+    #    raise RuntimeError("%s is not a ComboBox widget" % (widget))
     return tree_model_row[0] 
 
 def _set_combobox_choices(widget, choices=[]):
     """
     Sets the choices in a GTK combobox.
     """
+    #XXX: combo boxes in the glade file must have a space as a value to have a tree iter
     #TODO When we change a widget value, its changed callback is called...
     previous_value = _get_combobox_value(widget)
     tree_model = gtk.ListStore(str)
@@ -124,6 +127,7 @@ def _set_combobox_value(widget, value=None):
     """
     Sets the current value of a GTK ComboBox widget.
     """
+    #XXX: combo boxes in the glade file must have a space as a value to have a tree iter
     tree_model = widget.get_model()
     index = 0
     got_it = False
@@ -251,6 +255,8 @@ class Gui(object):
         self.info_receive_video_widget = widgets_tree.get_widget("info_receive_video")
         self.info_receive_audio_widget = widgets_tree.get_widget("info_receive_audio")
         self.info_ip_widget = widgets_tree.get_widget("info_ip")
+        self.info_receive_midi_widget = widgets_tree.get_widget("info_receive_midi")
+        self.info_send_midi_widget = widgets_tree.get_widget("info_send_midi")
 
         # video
         self.video_capture_size_widget = widgets_tree.get_widget("video_capture_size")
@@ -283,12 +289,11 @@ class Gui(object):
         self.network_admin_widget = widgets_tree.get_widget("network_admin")
 
         # MIDI tab
-        self.midi_tab_contents_widget = widgets_tree.get_widget("midi_tab_contents")
-        # remove MIDI tab:
-        tab_num = self.main_tabs_widget.page_num(self.midi_tab_contents_widget)
-        print "Removing tab number %d." % (tab_num)
-        self.main_tabs_widget.remove_page(tab_num)
-            
+        self.midi_send_enabled_widget = widgets_tree.get_widget("midi_send_enabled")
+        self.midi_recv_enabled_widget = widgets_tree.get_widget("midi_recv_enabled")
+        self.midi_input_device_widget = widgets_tree.get_widget("midi_input_device")
+        self.midi_output_device_widget = widgets_tree.get_widget("midi_output_device")
+
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
             self.main_window.set_decorated(False)
@@ -732,6 +737,20 @@ class Gui(object):
             audio_numchannels = 2
         self.app.config.audio_channels = audio_numchannels
         print " * audio_numchannels", self.app.config.audio_channels
+        
+        # MIDI:
+        midi_send_enabled = self.midi_send_enabled_widget.get_active()
+        midi_recv_enabled = self.midi_recv_enabled_widget.get_active()
+        midi_input = _get_combobox_value(self.midi_input_device_widget)
+        midi_output = _get_combobox_value(self.midi_output_device_widget)
+        print " * midi_send_enabled:", midi_send_enabled
+        print " * midi_recv_enabled:", midi_recv_enabled
+        print " * midi_input_device:", midi_input
+        print " * midi_output_device:", midi_output
+        self.app.config.midi_send_enabled = midi_send_enabled
+        self.app.config.midi_recv_enabled = midi_recv_enabled
+        self.app.config.midi_input_device = midi_input
+        self.app.config.midi_output_device = midi_output
 
     def update_widgets_with_saved_config(self):
         """
@@ -810,6 +829,16 @@ class Gui(object):
         self.audio_numchannels_widget.set_value(audio_numchannels) # spinbutton
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         _set_combobox_value(self.audio_codec_widget, audio_codec)
+        
+        # MIDI:
+        print "MIDI send enabled:", self.app.config.midi_send_enabled
+        print "MIDI recv enabled:", self.app.config.midi_recv_enabled
+        print "MIDI input:", self.app.config.midi_input_device
+        print "MIDI output:", self.app.config.midi_output_device
+        self.midi_send_enabled_widget.set_active(self.app.config.midi_send_enabled)
+        self.midi_recv_enabled_widget.set_active(self.app.config.midi_recv_enabled)
+        _set_combobox_value(self.midi_input_device_widget, self.app.config.midi_input_device)
+        _set_combobox_value(self.midi_output_device_widget, self.app.config.midi_output_device)
 
     def update_streaming_state(self):
         """
@@ -846,6 +875,10 @@ class Gui(object):
             self.video_jitterbuffer_widget,
             self.video_codec_widget,
             self.video_display_widget,
+            self.midi_input_device_widget, 
+            self.midi_output_device_widget,
+            self.midi_send_enabled_widget, 
+            self.midi_recv_enabled_widget,
             ]
         
         self.update_bitrate_and_codec()
@@ -973,11 +1006,29 @@ class Gui(object):
                 }
             _info_recv_audio += _format_bitrate(rtcp_stats["receive"]["audio"]["bitrate"])
             self.info_receive_audio_widget.set_text(_info_recv_audio)
+            # MIDI : --------------------------
+            _info_recv_midi = ""
+            _info_send_midi = ""
+            if details["receive"]["midi"]["enabled"]:
+                _info_recv_midi += _("Receiving MIDI") + "\n"
+                _info_recv_midi += _("Output device: %(name)s" % {"name": self.app.config.midi_output_device})
+            else:
+                _info_recv_midi += _("Disabled")
+            if details["send"]["midi"]["enabled"]:
+                _info_send_midi += _("Sending MIDI") + "\n"
+                _info_send_midi += _("Input device: %(name)s" % {"name": self.app.config.midi_input_device})
+            else:
+                _info_send_midi += _("Disabled")
+                
+            self.info_receive_midi_widget.set_text(_info_recv_midi)
+            self.info_send_midi_widget.set_text(_info_send_midi)
         else:
             self.info_send_video_widget.set_text("")
             self.info_send_audio_widget.set_text("")
             self.info_receive_video_widget.set_text("")
             self.info_receive_audio_widget.set_text("")
+            self.info_receive_midi_widget.set_text("")
+            self.info_send_midi_widget.set_text("")
         
         
     def update_local_ip(self):
@@ -1043,6 +1094,16 @@ class Gui(object):
         x11_displays = [display["name"] for display in self.app.devices["x11_displays"]]
         print("Updating X11 displays with values %s" % (x11_displays))
         _set_combobox_choices(self.video_display_widget, x11_displays)
+
+    def update_midi_devices(self):
+        """
+        Called once Application.poll_midi_devices has been run
+        """
+        input_devices = ["%2s: %s" % (device["number"], device["name"]) for device in self.app.devices["midi_input_devices"]]
+        output_devices = ["%2s: %s" % (device["number"], device["name"]) for device in self.app.devices["midi_output_devices"]]
+        print("Updating MIDI devices with values %s %s" % (input_devices, output_devices))
+        _set_combobox_choices(self.midi_input_device_widget, input_devices)
+        _set_combobox_choices(self.midi_output_device_widget, output_devices)
 
     def update_camera_devices(self):
         """

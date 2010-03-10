@@ -61,12 +61,12 @@ class ProcessIO(protocol.ProcessProtocol):
     def outReceived(self, data):
         for line in data.splitlines():
             if line != "":
-                self.manager.stdout_line_signal(line)
+                self.manager.stdout_line_signal(self.manager, line)
 
     def errReceived(self, data):
         for line in data.splitlines():
             if line != "":
-                self.manager.stderr_line_signal(line)
+                self.manager.stderr_line_signal(self.manager, line)
 
     def processEnded(self, reason):
         exit_code = reason.value.exitCode

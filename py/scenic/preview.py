@@ -61,10 +61,10 @@ class Preview(object):
         self._set_state(process.STATE_STARTING)
         self.process_manager.start()
 
-    def on_stdout_line(self, line):
+    def on_stdout_line(self, process_manager, line):
         print line
 
-    def on_stderr_line(self, line):
+    def on_stderr_line(self, process_manager, line):
         print line        
         
     def on_process_state_changed(self, process_manager, process_state):
