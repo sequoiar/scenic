@@ -84,6 +84,9 @@ if test "x${have_libraw1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing package: libraw1394-dev ])
 fi
 
+# FIXME: make this optional
+AC_DEFINE(CONFIG_IEEE1394,[],[Everything in raw1394 is defined from configure])
+
 #Trying to set LIBDC1394 using pkg-config
 PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394=true, have_libdc1394=false)
 if test "x${have_libdc1394}" = "xfalse" ; then

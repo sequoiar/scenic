@@ -98,13 +98,16 @@ raw1394handle_t raw1394_open(int port)
 }
 
 
-int discoverAVC(int* port, octlet_t* guid)
+/// FIXME: test with multiple devices
+std::vector<std::string> discoverAVC(int* port, octlet_t* guid)
 {
     rom1394_directory rom_dir;
     raw1394handle_t handle;
     int device = -1;
     int i, j = 0;
     int m = raw1394_get_num_ports();
+    std::vector<std::string> results;
+    std::ostringstream stream;
 
     if (*port >= 0)
     {
@@ -143,8 +146,10 @@ int discoverAVC(int* port, octlet_t* guid)
                     rom1394_free_directory(&rom_dir);
                     octlet_t my_guid, *pguid = (*guid == 1)? guid : &my_guid;
                     *pguid = rom1394_get_guid( handle, i );
-                    LOG_DEBUG("Found AV/C device with GUID 0x" << 
-                        (quadlet_t) (*pguid>>32) << (quadlet_t) (*pguid & 0xffffffff) << std::endl);
+                    stream << "AV/C device with GUID 0x" << 
+                        (quadlet_t) (*pguid>>32) << (quadlet_t) (*pguid & 0xffffffff) << std::endl;
+                    results.push_back(stream.str());
+                    LOG_DEBUG(stream.str());
                     device = i;
                     *port = j;
                     break;
@@ -155,11 +160,10 @@ int discoverAVC(int* port, octlet_t* guid)
         raw1394_destroy_handle(handle);
     }
 
-    return device;
+    return results;
 }
 
-
-bool Raw1394::cameraIsReady() 
+std::vector<std::string> Raw1394::getDeviceList()
 {
     raw1394handle_t handle;
     int port, device;
@@ -170,11 +174,35 @@ bool Raw1394::cameraIsReady()
         THROW_ERROR("raw1394 cannot get handle");
 
     raw1394_destroy_handle(handle);
+    std::vector<std::string> devices(discoverAVC(&port, &guid));
+    return devices;
+}
 
-    if (discoverAVC(&port, &guid) == -1)
-        LOG_WARNING("Dv source is not ready");
+
+bool Raw1394::cameraIsReady() 
+{
+    std::vector<std::string> devices(getDeviceList());
+
+    if (devices.empty())
+    {
+        LOG_WARNING("Dv source is not ready, no device available");
+        return false;
+    }
 
     return true;
+}
+
+void Raw1394::listCameras() 
+{
+    using std::vector;
+    using std::string;
+    vector<string> devices(getDeviceList());
+    if (not devices.empty())
+    {
+        LOG_PRINT("\nDV1394 devices:\n");
+        for (vector<string>::const_iterator iter = devices.begin(); iter != devices.end(); ++iter)
+            LOG_PRINT("    " << *iter << std::endl);
+    }
 }
 #endif
 

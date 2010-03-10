@@ -24,6 +24,8 @@
 #define _RAW1394UTIL_H_ 
 
 #include "config.h"
+#include <string>
+#include <vector>
 
 #ifdef CONFIG_IEEE1394
 #include <libraw1394/raw1394.h>
@@ -32,12 +34,15 @@
 class Raw1394 
 {
 public:
-
 #ifdef CONFIG_IEEE1394
+    static void listCameras();
     static bool cameraIsReady();
 #else
+    static void listCameras() {};
     static bool cameraIsReady() { return false; }
 #endif
+private:
+    static std::vector<std::string> getDeviceList();
 };
 
 #endif // RAW1394UTIL_H 

@@ -37,8 +37,10 @@
 #include "glVideoSink.h"
 #endif
 
+// for list cameras
 #include "dc1394.h"
 #include "v4l2util.h"
+#include "raw1394Util.h"
 
 
 template <class T>
@@ -148,6 +150,7 @@ int VideoSourceConfig::listCameras()
     {
         v4l2util::listCameras();
         Dc1394::listCameras();
+        Raw1394::listCameras();
     }
     catch (ErrorExcept &e)
     {
