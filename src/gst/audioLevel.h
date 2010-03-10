@@ -37,7 +37,7 @@ class _GstMessage;
  *  the rms value of each audio channel passing through it.
  */
 
-class AudioLevel : GstLinkableFilter, BusMsgHandler
+class AudioLevel : public GstLinkableFilter, BusMsgHandler
 {
     public:
         AudioLevel(Pipeline &pipeline);

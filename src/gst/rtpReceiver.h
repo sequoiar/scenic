@@ -37,7 +37,7 @@ class _GstRtpBin;
 class _GstPad;
 
 class RtpReceiver
-    : public RtpBin
+    : RtpBin
 {
     public:
         RtpReceiver(const Pipeline &pipeline) : 

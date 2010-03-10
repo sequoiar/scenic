@@ -33,7 +33,7 @@ class _GParamSpec;
 class RtpPay;
 
 class RtpSender
-    : public RtpBin
+    : RtpBin
 {
     public:
         RtpSender(const Pipeline &pipeline) : 
