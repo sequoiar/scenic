@@ -30,7 +30,7 @@
 #include <iomanip>
 
 
-class Dc1394Handle : public boost::noncopyable {
+class Dc1394Handle : boost::noncopyable {
     public:
         // camera-less version
         Dc1394Handle() : cameraId_(0), dc1394_(0), cameras_(0), camera_(0)

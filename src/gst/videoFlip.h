@@ -35,7 +35,7 @@ class _GstElement;
  *  A filter that scales video to a specified resolution.
  */
 
-class VideoFlip : public GstLinkableFilter, public boost::noncopyable
+class VideoFlip : public GstLinkableFilter, boost::noncopyable
 {
     public:
         VideoFlip(const Pipeline &pipeline, const std::string &flipMethod);

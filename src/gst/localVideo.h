@@ -34,7 +34,7 @@ class VideoFlip;
 class VideoSink;
 class _GstElement;
 
-class LocalVideo : public boost::noncopyable
+class LocalVideo : boost::noncopyable
 {
     public:
         LocalVideo(Pipeline &pipeline, boost::shared_ptr<VideoSourceConfig> sourceConfig,
