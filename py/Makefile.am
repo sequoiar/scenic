@@ -6,6 +6,7 @@ TESTS = scenic/test/test_communication.py \
 		scenic/test/test_x11.py \
 		scenic/test/test_ports.py \
 		scenic/test/test_cameras.py \
+		scenic/test/test_midi.py \
 		scenic/test/test_signals.py
 
 desktopdir = $(datadir)/applications
