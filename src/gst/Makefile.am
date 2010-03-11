@@ -15,7 +15,7 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   audioSender.h audioReceiver.h $(top_srcdir)/src/include/alsa.h caps.h \
 				   videoConfig.h rtpBin.h pipeline.h \
 				   rtpSender.h rtpReceiver.h audioSource.h \
-				   gstLinkable.h videoSink.h audioSink.h $(top_srcdir)/src/include/jackUtils.h \
+				   gstLinkable.h videoSink.h audioSink.h jackUtils.h \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
 				   audioLevel.h glVideoSink.h $(top_srcdir)/src/include/playback.h dv1394.h v4l2util.h \
