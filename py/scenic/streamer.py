@@ -108,20 +108,8 @@ class StreamerManager(object):
         # MIDI
         midi_send_enabled = self.app.config.midi_send_enabled and remote_config["midi"]["recv_enabled"]
         midi_recv_enabled = self.app.config.midi_recv_enabled and remote_config["midi"]["send_enabled"]
-        midi_input_device = None
-        midi_output_device = None
-        try:
-            midi_input_device = int(self.app.config.midi_input_device.split(":")[0])
-        except KeyError, e:
-            midi_send_enabled = False
-            print(str(e))
-            raise # this should not happen
-        try:
-            midi_output_device = int(self.app.config.midi_output_device.split(":")[0])
-        except KeyError, e:
-            midi_recv_enabled = False
-            print(str(e))
-            raise # this should not happen
+        midi_input_device = self.app.config.midi_input_device
+        midi_output_device = self.app.config.midi_output_device
         
         print "remote_config:", remote_config
         
@@ -324,12 +312,12 @@ class StreamerManager(object):
         if midi_recv_enabled:
             midi_recv_args = [
                 "midistream",
-                #"--verbose",
                 "--address", details["peer"]["address"],
                 "--receiving-port", str(details["receive"]["midi"]["port"]),
                 "--jitter-buffer", str(details["receive"]["midi"]["jitterbuffer"]),
-                "--output-device", str(details["receive"]["midi"]["output_device"]),
+                "--output-device", str(self.app.get_midi_device_number(details["receive"]["midi"]["output_device"], is_input=False)),
                 ]
+                #"--verbose",
             midi_recv_command = " ".join(midi_recv_args) 
             self.midi_receiver = process.ProcessManager(command=midi_recv_command, identifier="midi_receiver")
             self.midi_receiver.state_changed_signal.connect(self.on_process_state_changed)
@@ -339,11 +327,11 @@ class StreamerManager(object):
         if midi_send_enabled:
             midi_send_args = [
                 "midistream",
-                #"--verbose",
                 "--address", details["peer"]["address"],
                 "--sending-port", str(details["send"]["midi"]["port"]),
-                "--input-device", str(details["send"]["midi"]["input_device"]),
+                "--input-device", str(self.app.get_midi_device_number(details["send"]["midi"]["input_device"], is_input=True)),
                 ]
+                #"--verbose",
             midi_send_command = " ".join(midi_send_args) 
             self.midi_sender = process.ProcessManager(command=midi_send_command, identifier="midi_sender")
             self.midi_sender.state_changed_signal.connect(self.on_process_state_changed)

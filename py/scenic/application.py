@@ -138,6 +138,27 @@ class Application(object):
             }
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         reactor.callLater(0, self._start_the_application)
+    
+    def get_midi_device_number(self, device_name, is_input):
+        """
+        Returns the number of a MIDI device, given its name.
+        
+        Returns None if the device name is not found.
+        @param is_input: bool True if it's an input device, False for an output device.
+        @param device_name: str
+        """
+        ret = None
+        if is_input:
+            for dev in self.devices["midi_input_devices"]:
+                if dev["name"] == device_name:
+                    ret = dev["number"]
+                    break
+        else:
+            for dev in self.devices["midi_output_devices"]:
+                if dev["name"] == device_name:
+                    ret = dev["number"]
+                    break
+        return ret
 
     def _start_the_application(self):
         """
@@ -610,11 +631,14 @@ class Application(object):
                 raise RuntimeError("Invalid role value : %s" % (role))
             
             x11_displays = [display["name"] for display in self.devices["x11_displays"]]
+            midi_input_devices = [device["name"] for device in self.devices["midi_input_devices"]]
+            midi_output_devices = [device["name"] for device in self.devices["midi_output_devices"]]
             cameras = self.devices["cameras"].keys()
                 
             if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared!") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
                 return deferred.callback(False)
+            
             elif self.config.video_source == "v4l2src" and self.config.video_device not in cameras: #TODO: do not test if not sending video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
                 return deferred.callback(False)
@@ -623,19 +647,30 @@ class Application(object):
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
                 return deferred.callback(False)
+            
             elif self.streamer_manager.is_busy():
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
+                deferred.callback(False)
+            
+            elif self.config.midi_recv_enabled and self.config.midi_output_device not in midi_output_devices:
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI output device %(device)s disappeared!") % {"device": self.config.midi_output_device}, parent=self.gui.main_window)
+                deferred.callback(False)
+            
+            elif self.config.midi_send_enabled and self.config.midi_input_device not in midi_input_devices:
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI input device %(device)s disappeared!") % {"device": self.config.midi_input_device}, parent=self.gui.main_window)
                 deferred.callback(False)
             
             # "cameras": {}, # dict of dicts (only V4L2 cameras for now)
             elif not self.devices["xvideo_is_present"]: #TODO: do not test if not receiving video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X video extension is not present."), parent=self.gui.main_window)
                 deferred.callback(False)
+            
             else:
                 deferred.callback(True)
         
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
+            self.poll_midi_devices(), 
             self.poll_xvideo_extension(),
             self.poll_camera_devices()
             ])
