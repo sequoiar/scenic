@@ -95,7 +95,6 @@ AC_DEFUN([AX_BOOST_PROGRAM_OPTIONS],
                                    [link_program_options="no"])
                   done
                 fi
-            echo 'fuck'
 				if test "x$link_program_options" != "xyes"; then
 					AC_MSG_ERROR([Could not link against [$ax_lib] !])
 				fi
