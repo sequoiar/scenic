@@ -29,6 +29,7 @@
 #include "audioSink.h"
 #include "jackUtils.h"
 
+static const int USEC_PER_MILLISEC = 1000;
 namespace po = boost::program_options;
 
 AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
@@ -38,7 +39,8 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
     sourceName_(options["jack-client-name"].as<std::string>()),
     deviceName_(options["audiodevice"].as<std::string>()), 
     location_(options["audiolocation"].as<std::string>()), 
-    numChannels_(options["numchannels"].as<int>())
+    numChannels_(options["numchannels"].as<int>()),
+    bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC)
 {
     if(numChannels_ < 1)
         THROW_CRITICAL("Invalid number of channels");
@@ -66,6 +68,12 @@ const char *AudioSourceConfig::source() const
 int AudioSourceConfig::numChannels() const 
 { 
     return numChannels_; 
+}
+
+/// Returns buffer time, which must be an unsigned long long for gstreamer's audiosink to accept it safely
+unsigned long long AudioSourceConfig::bufferTime() const
+{
+    return bufferTime_;
 }
 
 /// Factory method that creates an AudioSource based on this object's source_ string 

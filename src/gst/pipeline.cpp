@@ -451,8 +451,11 @@ GstClock* Pipeline::clock() const
 GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) const
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
-    if(!element)
-        THROW_ERROR("element not made. factoryName: " << factoryName << " elementName: " << elementName); 
+    if (element == 0)
+        THROW_ERROR("Element not made. factoryName: " << 
+                factoryName << " elementName: " << elementName << 
+                "check that all necessary plugins are installed with " <<
+                "gst-check.py");
 
     add(element);
     return element;

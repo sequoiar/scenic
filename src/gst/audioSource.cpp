@@ -290,6 +290,17 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     gst_caps_unref(caps);
 
     gstlinkable::link(source_, capsFilter_);
+    if (config_.bufferTime() < Jack::safeBufferTime())
+    {
+        LOG_WARNING("Buffer time " << config_.bufferTime() << " is too low, using " << Jack::safeBufferTime() << " instead");
+        g_object_set(G_OBJECT(source_), "buffer-time", Jack::safeBufferTime(), NULL);
+    }
+    else
+        g_object_set(G_OBJECT(source_), "buffer-time", config_.bufferTime(), NULL);
+
+    unsigned long long val;
+    g_object_get(source_, "buffer-time", &val, NULL);
+    LOG_DEBUG("Buffer time is " << val);
 }
 
 

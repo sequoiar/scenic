@@ -67,8 +67,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("videosource,u", po::value<string>()->default_value("videotestsrc"), 
                     "video input (v4l2src,dc1394src,v4lsrc,dv1394src)")
             ("timeout,z", po::value<int>()->default_value(0), "time in ms to wait before quitting, 0=run indefinitely")
-            ("audio-buffer,b", po::value<int>()->default_value(10), "size of receiver's "
-                    "audio buffer in milliseconds, must be >= 10")
+            ("audio-buffer,b", po::value<int>()->default_value(15), "size of audio buffer in milliseconds, must be >= 10")
             ("jitterbuffer,g", po::value<int>()->default_value(50), "size of receiver's rtp jitterbuffers in milliseconds, must be > 1")
             ("camera-number,G", po::value<int>()->default_value(-1), "camera id for dc1394src")
             ("camera-guid,U", po::value<std::string>()->default_value("0"), "camera guid for dc1394src")

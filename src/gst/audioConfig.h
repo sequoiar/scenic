@@ -55,6 +55,7 @@ class AudioSourceConfig
         bool locationExists() const;
          
         AudioSource* createSource(Pipeline &pipeline) const;
+        unsigned long long bufferTime() const;
 
     private:
         const std::string source_;
@@ -64,6 +65,7 @@ class AudioSourceConfig
         const std::string deviceName_;
         const std::string location_;
         const int numChannels_;
+        const unsigned long long bufferTime_;
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  
@@ -77,7 +79,6 @@ class AudioSinkConfig
         const char *sinkName() const;
         const char *deviceName() const;
         unsigned long long bufferTime() const;
-        static const int USEC_PER_MILLISEC = 1000;
 
     private:
         const std::string sink_;
