@@ -20,6 +20,7 @@
  *
  */
 
+#include <glib-object.h>
 #include <string>
 #include <map>
 #include "util.h"

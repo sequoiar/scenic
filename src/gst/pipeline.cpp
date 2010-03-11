@@ -39,7 +39,7 @@
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
 
-Pipeline::Pipeline() : pipeline_(0), startTime_(0), handlers_(), 
+Pipeline::Pipeline() : pipeline_(0), handlers_(), 
     sampleRate_(SAMPLE_RATE)
 {
     LOG_DEBUG("Calling gst_init");
@@ -58,10 +58,6 @@ Pipeline::Pipeline() : pipeline_(0), startTime_(0), handlers_(),
     gst_init(&argc, &argv);
 
     tassert(pipeline_ = gst_pipeline_new("pipeline"));
-
-    // this will be used as a reference for future
-    // pipeline synchronization
-    startTime_ = gst_clock_get_time(clock());
 
     /* watch for messages on the pipeline's bus (note that this will only
      *      work like this when a GLib main loop is running) */
@@ -203,17 +199,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 }
 
 
-void Pipeline::makeVerbose() const
-{
-    // Get verbose output
-    gchar *exclude_args = NULL;     // set args to be excluded from output
-    gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
-    g_signal_connect(pipeline_, "deep_notify",
-            G_CALLBACK(deepNotifyCb), exclude_list);
-}
-
-
-void Pipeline::deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gchar **excluded_props)
+void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gchar **excluded_props)
 {
     GValue value; /* the important thing is that value.type = 0 */
     memset(&value, 0, sizeof(value));
@@ -262,6 +248,16 @@ void Pipeline::deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec *
 }
 
 
+void Pipeline::makeVerbose() const
+{
+    // Get verbose output
+    gchar *exclude_args = NULL;     // set args to be excluded from output
+    gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
+    g_signal_connect(pipeline_, "deep_notify",
+            G_CALLBACK(deepNotifyCb), exclude_list);
+}
+
+
 bool Pipeline::isPlaying() const
 {
     if (GST_STATE(pipeline_) == GST_STATE_PLAYING)
@@ -298,7 +294,7 @@ bool Pipeline::isStopped() const
 }
 
 
-bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
+bool checkStateChange(GstBus *bus, GstStateChangeReturn ret)
 {
     if (ret == GST_STATE_CHANGE_NO_PREROLL)
     {
@@ -307,9 +303,6 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
     }
     else if (ret == GST_STATE_CHANGE_FAILURE) 
     {
-        GstBus *bus;
-        bus = getBus();
-
         /* check if there is an error message with details on the bus */
         GstMessage *msg = gst_bus_poll(bus, GST_MESSAGE_ERROR, 0);
         if (msg) 
@@ -334,7 +327,7 @@ void Pipeline::start() const
     if (isPlaying())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    tassert(checkStateChange(ret)); // set it to playing
+    tassert(checkStateChange(getBus(), ret)); // set it to playing
     LOG_DEBUG("Now playing");
 }
 
@@ -345,7 +338,7 @@ void Pipeline::makeReady() const
     if (isReady())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    tassert(checkStateChange(ret)); // set it to playing
+    tassert(checkStateChange(getBus(), ret)); // set it to playing
     LOG_DEBUG("Now ready");
 }
 
@@ -357,7 +350,7 @@ void Pipeline::pause() const
         return;
     makeReady();
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-    tassert(checkStateChange(ret)); // set it to paused
+    tassert(checkStateChange(getBus(), ret)); // set it to paused
     LOG_DEBUG("Now paused");
 }
 
@@ -376,7 +369,7 @@ void Pipeline::stop() const
     if (pipeline_)
     {
         GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-        tassert(checkStateChange(ret)); // set it to paused
+        tassert(checkStateChange(getBus(), ret)); // set it to paused
         LOG_DEBUG("Now stopped/null");
     }
     else
@@ -421,31 +414,9 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec) const
 }
 
 
-GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user_data) const
-{
-    GstClockID clockId = gst_clock_new_periodic_id(clock(), startTime_, GST_SECOND);
-    gst_clock_id_wait_async(clockId, callback, user_data);
-    return clockId;
-}
-
-
-void Pipeline::remove_clock_callback(GstClockID clockId) const
-{
-    stop();
-    gst_clock_id_unschedule(clockId);
-    gst_clock_id_unref(clockId);
-}
-
-
 GstBus* Pipeline::getBus() const
 {
     return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
-}
-
-
-GstClock* Pipeline::clock() const
-{
-    return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
 }
 
 GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) const

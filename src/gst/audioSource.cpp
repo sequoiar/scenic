@@ -103,7 +103,6 @@ InterleavedAudioSource::~InterleavedAudioSource()
 AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     InterleavedAudioSource(pipeline, config), 
     frequencies_(),
-    clockId_(0), 
     offset_(0) 
 {
     frequencies_.push_back(std::vector<double>()); // two rows
@@ -135,12 +134,13 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
 
     gst_caps_unref(caps);
 
-    clockId_ = pipeline_.add_clock_callback(timedCallback, this);
+    static const int PERIOD_MS = 1000;
+    callback_ = g_timeout_add(PERIOD_MS, timedCallback, this);
 }
 
 
 /// Asynchronous timed callback which will periodically toggle the frequency output by each channel 
-gboolean AudioTestSource::timedCallback(GstClock *, GstClockTime, GstClockID, gpointer user_data)
+gboolean AudioTestSource::timedCallback(gpointer user_data)
 {
     AudioTestSource * context = static_cast<AudioTestSource*>(user_data);
     context->toggle_frequency();
@@ -162,7 +162,7 @@ void AudioTestSource::toggle_frequency()
 /// Destructor 
 AudioTestSource::~AudioTestSource()
 {
-    pipeline_.remove_clock_callback(clockId_);
+    g_source_remove(callback_);
 }
 
 

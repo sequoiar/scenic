@@ -24,6 +24,7 @@ this class manages a collection of filesrcs, which video and audiosources try to
 if a location already exists, try to plug into that one.
 else create new filesrc and plug into it */
 
+#include <gst/gst.h>
 #include "util.h"
 #include "pipeline.h"
 #include "gstLinkable.h"

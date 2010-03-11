@@ -20,6 +20,7 @@
  *
  */
 
+#include <gst/gst.h>
 #include "dv1394.h"
 #include "raw1394Util.h"
 #include "gstLinkable.h"

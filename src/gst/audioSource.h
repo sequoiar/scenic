@@ -122,14 +122,11 @@ class AudioTestSource : public InterleavedAudioSource
     private:
         ~AudioTestSource();
 
-        static int timedCallback(GstClock *clock, 
-                GstClockTime time, 
-                GstClockID id,
-                void *user_data);
+        static int timedCallback(void *data);
         void toggle_frequency();
 
         std::vector< std::vector <double> > frequencies_;
-        GstClockID clockId_;
+        unsigned int callback_;
         int offset_;
 };
 

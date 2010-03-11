@@ -24,8 +24,6 @@
 #define _PIPELINE_H_
 
 #include <vector>
-#include <gst/gstclock.h>
-#include <gst/gstelement.h>
 
 #include "noncopyable.h"
 
@@ -46,9 +44,6 @@ class Pipeline : boost::noncopyable
         void subscribe(BusMsgHandler *obj);
         void unsubscribe(BusMsgHandler *obj);
 
-        GstClockID add_clock_callback(GstClockCallback callback, void *user_data) const;
-        void remove_clock_callback(GstClockID clockId) const;
-
         void updateSampleRate(unsigned newRate);
         void remove(_GstElement ** element) const;
         void remove(std::vector < _GstElement * >&elementVec) const;
@@ -57,7 +52,7 @@ class Pipeline : boost::noncopyable
         bool isReady() const;
         bool isPaused() const;
         bool isStopped() const;
-        void seekTo(gint64 pos);
+        void seekTo(long long pos);
         void start() const;
         void pause() const;
         void makeReady() const;
@@ -66,18 +61,14 @@ class Pipeline : boost::noncopyable
         void makeVerbose() const;
 
     private:
-        static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);
         void add(_GstElement * element) const;
         _GstBus* getBus() const;
-        GstClock* clock() const;
 
-        static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
-        bool checkStateChange(GstStateChangeReturn ret) const;
+        static int bus_call(_GstBus *bus, _GstMessage *msg, void *data);
 
-        void updateListeners(GstMessage *msg);
+        void updateListeners(_GstMessage *msg);
 
         _GstElement *pipeline_;
-        GstClockTime startTime_;
         std::vector<BusMsgHandler*> handlers_;
         unsigned sampleRate_;
         char *titleStr_;
