@@ -293,6 +293,7 @@ class Gui(object):
         self.midi_recv_enabled_widget = widgets_tree.get_widget("midi_recv_enabled")
         self.midi_input_device_widget = widgets_tree.get_widget("midi_input_device")
         self.midi_output_device_widget = widgets_tree.get_widget("midi_output_device")
+        self.midi_jitterbuffer_widget = widgets_tree.get_widget("midi_jitterbuffer")
 
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
@@ -743,14 +744,17 @@ class Gui(object):
         midi_recv_enabled = self.midi_recv_enabled_widget.get_active()
         midi_input = _get_combobox_value(self.midi_input_device_widget)
         midi_output = _get_combobox_value(self.midi_output_device_widget)
+        midi_jitterbuffer = self.midi_jitterbuffer_widget.get_value_as_int() 
         print " * midi_send_enabled:", midi_send_enabled
         print " * midi_recv_enabled:", midi_recv_enabled
         print " * midi_input_device:", midi_input
         print " * midi_output_device:", midi_output
+        print " * midi_jitterbuffer:", midi_jitterbuffer
         self.app.config.midi_send_enabled = midi_send_enabled
         self.app.config.midi_recv_enabled = midi_recv_enabled
         self.app.config.midi_input_device = midi_input
         self.app.config.midi_output_device = midi_output
+        self.app.config.midi_jitterbuffer = midi_jitterbuffer
 
     def update_widgets_with_saved_config(self):
         """
@@ -835,10 +839,12 @@ class Gui(object):
         print "MIDI recv enabled:", self.app.config.midi_recv_enabled
         print "MIDI input:", self.app.config.midi_input_device
         print "MIDI output:", self.app.config.midi_output_device
+        print "MIDI jitterbuffer:", self.app.config.midi_jitterbuffer
         self.midi_send_enabled_widget.set_active(self.app.config.midi_send_enabled)
         self.midi_recv_enabled_widget.set_active(self.app.config.midi_recv_enabled)
         _set_combobox_value(self.midi_input_device_widget, self.app.config.midi_input_device)
         _set_combobox_value(self.midi_output_device_widget, self.app.config.midi_output_device)
+        self.midi_jitterbuffer_widget.set_value(midi_jitterbuffer)
 
     def update_streaming_state(self):
         """
@@ -879,6 +885,7 @@ class Gui(object):
             self.midi_output_device_widget,
             self.midi_send_enabled_widget, 
             self.midi_recv_enabled_widget,
+            self.midi_jitterbuffer_widget,
             ]
         
         self.update_bitrate_and_codec()
@@ -1011,7 +1018,8 @@ class Gui(object):
             _info_send_midi = ""
             if details["receive"]["midi"]["enabled"]:
                 _info_recv_midi += _("Receiving MIDI") + "\n"
-                _info_recv_midi += _("Output device: %(name)s" % {"name": self.app.config.midi_output_device})
+                _info_recv_midi += _("Output device: %(name)s" % {"name": self.app.config.midi_output_device}) + "\n"
+                _info_recv_midi += _("Jitter buffer: %(jitterbuffer)d ms" % {"jitterbuffer": self.app.config.midi_jitterbuffer})
             else:
                 _info_recv_midi += _("Disabled")
             if details["send"]["midi"]["enabled"]:

@@ -91,6 +91,7 @@ class Config(saving.ConfigStateSaving):
         self.midi_send_enabled = False
         self.midi_input_device = "" # ID and name
         self.midi_output_device = "" # ID and name
+        self.midi_jitterbuffer = 10 # ms
         
         # Done with the configuration entries.
         config_file = 'configuration.json'

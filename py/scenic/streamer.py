@@ -189,6 +189,7 @@ class StreamerManager(object):
                 },
                 "midi": {
                     "enabled": midi_recv_enabled,
+                    "jitterbuffer": self.app.config.midi_jitterbuffer,
                     "output_device": midi_output_device,
                     "port": str(self.app.recv_midi_port),
                 }
@@ -326,6 +327,7 @@ class StreamerManager(object):
                 "--verbose",
                 "--address", details["peer"]["address"],
                 "--receiving-port", str(details["receive"]["midi"]["port"]),
+                "--jitter-buffer", str(details["receive"]["midi"]["jitterbuffer"]),
                 "--output-device", str(details["receive"]["midi"]["output_device"]),
                 ]
             midi_recv_command = " ".join(midi_recv_args) 
