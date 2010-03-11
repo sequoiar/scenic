@@ -899,7 +899,7 @@ class Gui(object):
         _contact_list_currently_sensitive = self.contact_list_widget.get_property("sensitive")
         streaming_state_has_changed = is_streaming == _contact_list_currently_sensitive
         if streaming_state_has_changed:
-            print("straming state has changed to %s" % (is_streaming))
+            print("streaming state has changed to %s" % (is_streaming))
             if is_streaming:
                 text = _("Stop streaming")
                 icon = gtk.STOCK_CONNECT
