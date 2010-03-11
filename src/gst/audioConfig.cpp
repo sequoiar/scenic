@@ -128,7 +128,7 @@ AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) :
     sink_(options["audiosink"].as<std::string>()), 
     sinkName_(options["jack-client-name"].as<std::string>()),
     deviceName_(options["audiodevice"].as<std::string>()), 
-    bufferTime_(options["audio-buffer-usec"].as<int>())
+    bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC)
 {
 }
 

@@ -36,7 +36,6 @@ namespace Jack {
         unsigned int framesPerPeriod();
         unsigned long long minBufferTime();
         unsigned long long safeBufferTime();
-        const unsigned long long SAFETY_OFFSET = 10000LL;   // extra buffering
 }
 
 #endif //  _JACK_UTILS_H_

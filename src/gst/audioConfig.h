@@ -77,7 +77,7 @@ class AudioSinkConfig
         const char *sinkName() const;
         const char *deviceName() const;
         unsigned long long bufferTime() const;
-        static const unsigned long long DEFAULT_BUFFER_TIME = 11333LL;
+        static const int USEC_PER_MILLISEC = 1000;
 
     private:
         const std::string sink_;

@@ -173,6 +173,6 @@ unsigned long long Jack::minBufferTime()
 
 unsigned long long Jack::safeBufferTime()
 {
-    return minBufferTime() + SAFETY_OFFSET;
+    return minBufferTime();
 }
 
