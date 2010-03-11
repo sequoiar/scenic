@@ -198,6 +198,7 @@ class Gui(object):
         self._inviting_timeout_delayed = None
         widgets_tree = glade.get_widgets_tree()
         
+        self._widgets_changed_by_user = True
         # connects callbacks to widgets automatically
         glade_signal_slots = {}
         for method in prefixedMethods(self, "on_"):
@@ -765,6 +766,7 @@ class Gui(object):
          * Sets the value of each widget according to the data stored in the configuration file.
         It could be called again, once another config file has been read.
         """
+        self._widgets_changed_by_user = False
         print("Changing widgets value according to configuration.")
         print(self.app.config.__dict__)
         # VIDEO CAPTURE SIZE:
@@ -847,6 +849,7 @@ class Gui(object):
         _set_combobox_value(self.midi_input_device_widget, self.app.config.midi_input_device)
         _set_combobox_value(self.midi_output_device_widget, self.app.config.midi_output_device)
         self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
+        self._widgets_changed_by_user = True
 
     def update_streaming_state(self):
         """
@@ -963,12 +966,14 @@ class Gui(object):
                 self.midi_jitterbuffer_widget.set_sensitive(True)
 
     def on_midi_send_enabled_toggled(self, *args):
-        self._gather_configuration()
-        self.make_midi_widget_sensitive_or_not()
+        if self._widgets_changed_by_user:
+            self._gather_configuration()
+            self.make_midi_widget_sensitive_or_not()
     
     def on_midi_recv_enabled_toggled(self, *args):
-        self._gather_configuration()
-        self.make_midi_widget_sensitive_or_not()
+        if self._widgets_changed_by_user:
+            self._gather_configuration()
+            self.make_midi_widget_sensitive_or_not()
 
     def _update_rtcp_stats(self):
         is_streaming = self.app.has_session()
@@ -1135,11 +1140,13 @@ class Gui(object):
         """
         Called once Application.poll_midi_devices has been run
         """
+        self._widgets_changed_by_user = False
         input_devices = [device["name"] for device in self.app.devices["midi_input_devices"]]
         output_devices = [device["name"] for device in self.app.devices["midi_output_devices"]]
         print("Updating MIDI devices with values %s %s" % (input_devices, output_devices))
         _set_combobox_choices(self.midi_input_device_widget, input_devices)
         _set_combobox_choices(self.midi_output_device_widget, output_devices)
+        self._widgets_changed_by_user = True
 
     def update_camera_devices(self):
         """
