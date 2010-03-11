@@ -468,6 +468,8 @@ class Gui(object):
             pass
         elif tab_name == "system_tab_contents":
             self.network_admin_widget.grab_default()
+        elif tab_name == "midi_tab_contents":
+            self.app.poll_midi_devices()
 
     def on_contact_list_changed(self, *args):
         # FIXME: what is args?
@@ -924,7 +926,8 @@ class Gui(object):
                 self.info_peer_widget.set_text(peer_name)
             else:
                 self.info_peer_widget.set_text(_("Not connected"))
-
+            
+            self.make_midi_widget_sensitive_or_not()       
         
         # also clean up the preview drawing area every second
         if self.preview_manager.is_busy():
@@ -941,6 +944,31 @@ class Gui(object):
             if self.preview_area_x_window_id is not None:
                 if self.preview_area_widget.window is not None:
                     self.preview_area_widget.window.clear()
+
+    def make_midi_widget_sensitive_or_not(self):
+        # make the MIDI widget insensitive if disabled
+        print("make_midi_widget_sensitive_or_not")
+        is_streaming = self.app.has_session()
+        if not is_streaming:
+            if not self.app.config.midi_send_enabled:
+                self.midi_input_device_widget.set_sensitive(False)
+            else:
+                self.midi_input_device_widget.set_sensitive(True)
+                
+            if not self.app.config.midi_recv_enabled:
+                self.midi_output_device_widget.set_sensitive(False)
+                self.midi_jitterbuffer_widget.set_sensitive(False)
+            else:
+                self.midi_output_device_widget.set_sensitive(True)
+                self.midi_jitterbuffer_widget.set_sensitive(True)
+
+    def on_midi_send_enabled_toggled(self, *args):
+        self._gather_configuration()
+        self.make_midi_widget_sensitive_or_not()
+    
+    def on_midi_recv_enabled_toggled(self, *args):
+        self._gather_configuration()
+        self.make_midi_widget_sensitive_or_not()
 
     def _update_rtcp_stats(self):
         is_streaming = self.app.has_session()
