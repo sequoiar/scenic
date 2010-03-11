@@ -324,7 +324,7 @@ class StreamerManager(object):
         if midi_recv_enabled:
             midi_recv_args = [
                 "midistream",
-                "--verbose",
+                #"--verbose",
                 "--address", details["peer"]["address"],
                 "--receiving-port", str(details["receive"]["midi"]["port"]),
                 "--jitter-buffer", str(details["receive"]["midi"]["jitterbuffer"]),
@@ -339,7 +339,7 @@ class StreamerManager(object):
         if midi_send_enabled:
             midi_send_args = [
                 "midistream",
-                "--verbose",
+                #"--verbose",
                 "--address", details["peer"]["address"],
                 "--sending-port", str(details["send"]["midi"]["port"]),
                 "--input-device", str(details["send"]["midi"]["input_device"]),
