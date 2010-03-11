@@ -26,6 +26,7 @@ import sys
 import signal
 import socket
 from twisted.internet import reactor
+from twisted.internet import defer
 from optparse import OptionParser
 
 from rtpmidi.engines.midi.midi_session import MidiSession
@@ -52,21 +53,6 @@ class Config(object):
         self.follow_standard = False
         self.verbose = False
 
-def sigint_handler(signum, frame):
-    """
-    SIGINT handler.
-    """
-    print "\nSIGINT caught! Shutting down midi stream module."
-    RTPControl().stop()
-    reactor.stop()
-
-def sigterm_handler(signum, frame):
-    """
-    SIGTERM handler.
-    """
-    print "\nSIGTERM caught! Shutting down midi stream module."
-    RTPControl().stop()
-    reactor.stop()
 
 def list_midi_devices():
     """
@@ -94,6 +80,18 @@ def list_midi_devices():
         else:
             print "  [closed]"
 
+def cleanup_everything():
+    print "Shutting down midi stream module."
+    # FIXME: what does it do, actually?
+    return RTPControl().stop()
+
+def before_shutdown():
+    """
+    @rettype: Deferred
+    """
+    cleanup_everything() # FIXME: does it return a Deferred?
+    return defer.succeed(None)
+    
 def run(version):
     """
     MAIN of the application.
@@ -215,6 +213,5 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
             print("Could not start session with output device %s" % (config.output_device))
             sys.exit(2)
     RTPControl().start_session(midi_session_c)
-    signal.signal(signal.SIGINT, sigint_handler)
-    signal.signal(signal.SIGTERM, sigterm_handler)
+    reactor.addSystemEventTrigger("before", "shutdown", before_shutdown)
     reactor.run()
