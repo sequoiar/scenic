@@ -19,7 +19,6 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
-import sys 
 from twisted.internet import reactor
 from twisted.internet import protocol
 from twisted.internet import defer

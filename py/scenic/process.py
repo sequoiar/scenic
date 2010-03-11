@@ -7,7 +7,6 @@ import os
 import time
 import logging
 import signal
-import cStringIO
 from twisted.internet import error
 from twisted.internet import protocol
 from twisted.internet import reactor

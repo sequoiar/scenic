@@ -23,10 +23,8 @@
 Scenic GTK GUI.
 """
 
-import sys
 import os
 import smtplib
-import gtk
 import gtk.gdk
 import webbrowser
 from twisted.internet import reactor
@@ -1153,10 +1151,10 @@ class Gui(object):
         Called once Application.poll_camera_devices has been run
         """
         self._video_source_changed_by_user = False
-        cameras = self.app.devices["cameras"].keys()
-        cameras.insert(0, VIDEO_TEST_INPUT)
-        print("Updating video sources with values %s" % (cameras))
-        _set_combobox_choices(self.video_source_widget, cameras)
+        video_sources = self.app.devices["cameras"].keys()
+        video_sources.insert(0, VIDEO_TEST_INPUT)
+        print("Updating video sources with values %s" % (video_sources))
+        _set_combobox_choices(self.video_source_widget, video_sources)
         self.update_v4l2_inputs_size_and_norm()
         self._video_source_changed_by_user = True
 
@@ -1247,7 +1245,7 @@ class Gui(object):
                             dialogs.ErrorDialog.create(msg, parent=self.main_window)
                             
                             self._v4l2_standard_changed_by_user = False
-                            _set_combobox_value(self.v4l2_standard_widget, actua_standard)
+                            _set_combobox_value(self.v4l2_standard_widget, actual_standard)
                             self._v4l2_standard_changed_by_user = True
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
@@ -1350,6 +1348,7 @@ class Gui(object):
         self.calling_dialog = None
         widgets_tree = glade.get_widgets_tree()
         self.calling_dialog = widgets_tree.get_widget("calling_dialog")
+        # FIXME: can't set a parent on a toplevel window
         self.calling_dialog.set_parent(self.main_window)
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         self.calling_dialog.show()
