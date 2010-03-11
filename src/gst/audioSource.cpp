@@ -151,11 +151,10 @@ gboolean AudioTestSource::timedCallback(gpointer user_data)
 void AudioTestSource::toggle_frequency()
 {
     int i = 0;
+    offset_ = (offset_ == 0) ? 1 : 0;
 
     for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "freq", frequencies_[offset_][i++], NULL);
-
-    offset_ = (offset_ == 0) ? 1 : 0;
 }
 
 
