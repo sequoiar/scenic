@@ -1,6 +1,6 @@
 SUBDIRS = doc scenic scripts rtpmidi
 
-TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../../src/main:$(PATH) PYTHONPATH=../../py:$(PYTHONPATH) trial
+TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../../src/main:$(PWD)/scripts:$(PATH) PYTHONPATH=../../py:$(PYTHONPATH) trial
         
 TESTS = scenic/test/test_communication.py \
 		scenic/test/test_x11.py \
