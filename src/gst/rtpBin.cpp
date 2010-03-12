@@ -271,6 +271,7 @@ int RtpBin::createSinkSocket(const char *hostname, int port)
 #else
 int RtpBin::createSinkSocket(const char * /*hostname*/, int /*port*/)
 {
+    LOG_DEBUG("Not creating sockets");
     return -1;
 }
 #endif
@@ -347,6 +348,7 @@ int RtpBin::createSourceSocket(int port)
 #else
 int RtpBin::createSourceSocket(int /*port*/)
 {
+    LOG_DEBUG("Not creating sockets");
     return -1;
 }
 #endif
