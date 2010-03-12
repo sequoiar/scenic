@@ -149,9 +149,10 @@ else
     AC_DEFINE(CONFIG_GL,[],[GL define from configure])
 fi
 
+# Check for pypm
+AX_PYTHON_MODULE(pypm,[Missing pypm])
 
 # Check for gst-plugins that we use
-# FIXME: check the result of this call
 if ! python utils/gst_check.py; then
     AC_MSG_ERROR([Not all gstreamer plugins installed])
 fi
