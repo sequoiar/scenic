@@ -29,6 +29,16 @@ from twisted.internet import reactor
 from twisted.internet import defer
 from optparse import OptionParser
 
+try:
+    from rtpmidi.engines.midi.midi_session import MidiSession
+    from rtpmidi.protocols.rtp.rtp_control import RTPControl
+    from rtpmidi import utils
+except ImportError, e:
+    print "Import error %s" % (str(e))
+    imported_midi = False
+else:
+    imported_midi = True
+
 class Config(object):
     """
     Configuration for the application.
@@ -114,11 +124,10 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
     parser.add_option("-v", "--verbose", action="store_true", help="Enables a verbose output"),
     (options, args) = parser.parse_args()
 
-# FIXME: this is an ugly workaround so that --help doesn't depend on pypm
-    from rtpmidi.engines.midi.midi_session import MidiSession
-    from rtpmidi.protocols.rtp.rtp_control import RTPControl
-    from rtpmidi import utils
-    
+    if not imported_midi:
+        print "MIDI module cannot run, importing rtp modules was not successful"
+        sys.exit(1)
+
     config = Config()
     
     if options.list_devices:
