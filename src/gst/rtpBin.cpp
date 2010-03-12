@@ -36,7 +36,6 @@ GstElement *RtpBin::rtpbin_ = 0;
 int RtpBin::sessionCount_ = 0;
 bool RtpBin::destroyed_ = false;
 
-
 std::map<int, RtpBin*> RtpBin::sessions_;
 
 RtpBin::RtpBin(const Pipeline &pipeline) : 
@@ -225,17 +224,18 @@ void RtpBin::unregisterSession()
     sessions_.erase(sessionId_); // remove session name by id
 }
 
+#ifdef CREATE_SOCKFD
 int RtpBin::createSinkSocket(const char *hostname, int port)
 {
     using boost::lexical_cast;
     using std::string;
     int sockfd;
-    struct addrinfo hints, *servinfo, *p;
+    addrinfo hints, *servinfo, *p;
     int rv;
     std::string portStr(lexical_cast<string>(port));
     LOG_DEBUG("Trying socket for host " << hostname << ", port " << portStr);
 
-    memset(&hints, 0, sizeof hints);
+    memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
 
@@ -243,23 +243,20 @@ int RtpBin::createSinkSocket(const char *hostname, int port)
         THROW_ERROR("getaddrinfo: " << gai_strerror(rv));
 
     // loop through all the results and make a socket
-    for(p = servinfo; p != NULL; p = p->ai_next) 
+    for (p = servinfo; p != NULL; p = p->ai_next) 
     {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                        p->ai_protocol)) == -1) 
+        if (p->ai_family == AF_INET or p->ai_family == AF_INET6)
         {
-            perror("socket error");
-            continue;
+            std::string family = p->ai_family == AF_INET ? "IPV4" : "IPV6";
+            LOG_DEBUG(family << " Socket");
+            break;
         }
-        else if (p->ai_family == AF_INET)
-            LOG_DEBUG("IPV4 socket");
-        else if (p->ai_family == AF_INET6)
-            LOG_DEBUG("IPV4 socket");
         else 
             LOG_DEBUG("Unknown address family");
-
-        break;
     }
+    if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                    p->ai_protocol)) == -1) 
+        LOG_WARNING("socket error");
 
     if (p == NULL) 
     {
@@ -271,8 +268,15 @@ int RtpBin::createSinkSocket(const char *hostname, int port)
     LOG_DEBUG("socket created successfully\n");
     return sockfd;
 }
+#else
+int RtpBin::createSinkSocket(const char * /*hostname*/, int /*port*/)
+{
+    return -1;
+}
+#endif
 
 
+#ifdef CREATE_SOCKFD
 int RtpBin::createSourceSocket(int port)
 {
     using std::string;
@@ -340,4 +344,10 @@ int RtpBin::createSourceSocket(int port)
     LOG_DEBUG("socket created successfully");
     return sockfd;
 }
+#else
+int RtpBin::createSourceSocket(int /*port*/)
+{
+    return -1;
+}
+#endif
 
