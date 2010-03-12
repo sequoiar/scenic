@@ -163,7 +163,8 @@ bool modeIsSupported(int mode, const dc1394video_modes_t &supportedModes,
                 dc1394framerates_t framerates;
                 dc1394_video_get_supported_framerates(camera,
                         (dc1394video_mode_t) m, &framerates);
-                for (unsigned framerateIdx = 0; !frameratesMatch and framerateIdx < framerates.num; 
+                for (unsigned framerateIdx = 0; 
+                        not frameratesMatch and framerateIdx < framerates.num;
                         ++framerateIdx)
                 {
                     switch (framerates.framerates[framerateIdx])
@@ -181,7 +182,7 @@ bool modeIsSupported(int mode, const dc1394video_modes_t &supportedModes,
             }
         }
     }
-    if (!frameratesMatch)
+    if (not frameratesMatch)
         LOG_WARNING("So far only 15 fps and 30 fps are supported");
     return frameratesMatch;
 }
@@ -243,45 +244,45 @@ int Dc1394Handle::capsToMode(int width, int height,
     {
         // 640x480 first because it's the nominal case)
         // FIXME: should be else ifs unless resolutions match
-        if RETURN_MODE_FROM_CAPS(640, 480, YUV422)
-        if RETURN_MODE_FROM_CAPS(640, 480, YUV411)
-        if RETURN_MODE_FROM_CAPS(160, 120, YUV444) 
-        if RETURN_MODE_FROM_CAPS(320, 240, YUV422)
-        if RETURN_MODE_FROM_CAPS(800, 600, YUV422)
-        if RETURN_MODE_FROM_CAPS(1024, 768, YUV422)
-        if RETURN_MODE_FROM_CAPS(1280, 960, YUV422)
-        if RETURN_MODE_FROM_CAPS(1600, 1200, YUV422)
+        if RETURN_MODE_FROM_CAPS(640, 480, YUV422);
+        if RETURN_MODE_FROM_CAPS(640, 480, YUV411);
+        if RETURN_MODE_FROM_CAPS(160, 120, YUV444);
+        if RETURN_MODE_FROM_CAPS(320, 240, YUV422);
+        if RETURN_MODE_FROM_CAPS(800, 600, YUV422);
+        if RETURN_MODE_FROM_CAPS(1024, 768, YUV422);
+        if RETURN_MODE_FROM_CAPS(1280, 960, YUV422);
+        if RETURN_MODE_FROM_CAPS(1600, 1200, YUV422);
         LOG_DEBUG("Colourspace " << colourspace << " and resolution "
                 << width << "x" << height << " are not supported by this camera");
     }
     else if (colourspace == "gray")
     {
         // not else if because resolutions are the same
-        if RETURN_MODE_FROM_CAPS(640, 480, MONO8)
-        if RETURN_MODE_FROM_CAPS(640, 480, MONO16)
-        if RETURN_MODE_FROM_CAPS(800, 600, MONO8)
-        if RETURN_MODE_FROM_CAPS(800, 600, MONO16)
-        if RETURN_MODE_FROM_CAPS(1024, 768, MONO8)
-        if RETURN_MODE_FROM_CAPS(1024, 768, MONO16)
-        if RETURN_MODE_FROM_CAPS(1280, 960, MONO8)
-        if RETURN_MODE_FROM_CAPS(1600, 1200, MONO8)
-        if RETURN_MODE_FROM_CAPS(1280, 960, MONO16)
+        if RETURN_MODE_FROM_CAPS(640, 480, MONO8);
+        if RETURN_MODE_FROM_CAPS(640, 480, MONO16);
+        if RETURN_MODE_FROM_CAPS(800, 600, MONO8);
+        if RETURN_MODE_FROM_CAPS(800, 600, MONO16);
+        if RETURN_MODE_FROM_CAPS(1024, 768, MONO8);
+        if RETURN_MODE_FROM_CAPS(1024, 768, MONO16);
+        if RETURN_MODE_FROM_CAPS(1280, 960, MONO8);
+        if RETURN_MODE_FROM_CAPS(1600, 1200, MONO8);
+        if RETURN_MODE_FROM_CAPS(1280, 960, MONO16);
         // FIXME:
         // This could be supported but won't work unless you use
         // dc1394_video_set_operation_mode(camera->camera_info, DC1394_OPERATION_MODE_1394B);
         // and then increase the ISO speed to 800
         // dc1394_video_set_iso_speed(camera->camera_info,DC1394_ISO_SPEED_800);
-        if RETURN_MODE_FROM_CAPS(1600, 1200, MONO16)
+        if RETURN_MODE_FROM_CAPS(1600, 1200, MONO16);
         LOG_WARNING("Colourspace " << colourspace << " and resolution " <<
                 width << "x" << height << " are not supported by this camera");
     }
     else if (colourspace == "rgb")
     {
-        if RETURN_MODE_FROM_CAPS(640, 480, RGB8)
-        if RETURN_MODE_FROM_CAPS(800, 600, RGB8)
-        if RETURN_MODE_FROM_CAPS(1024, 768, RGB8)
-        if RETURN_MODE_FROM_CAPS(1280, 960, RGB8)
-        if RETURN_MODE_FROM_CAPS(1600, 1200, RGB8)
+        if RETURN_MODE_FROM_CAPS(640, 480, RGB8);
+        if RETURN_MODE_FROM_CAPS(800, 600, RGB8);
+        if RETURN_MODE_FROM_CAPS(1024, 768, RGB8);
+        if RETURN_MODE_FROM_CAPS(1280, 960, RGB8);
+        if RETURN_MODE_FROM_CAPS(1600, 1200, RGB8);
         LOG_WARNING("Colourspace " << colourspace << " and resolution " << 
                 width << "x" << height << " are not supported by this camera");
     }

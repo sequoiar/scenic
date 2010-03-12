@@ -29,10 +29,6 @@ from twisted.internet import reactor
 from twisted.internet import defer
 from optparse import OptionParser
 
-from rtpmidi.engines.midi.midi_session import MidiSession
-from rtpmidi.protocols.rtp.rtp_control import RTPControl
-from rtpmidi import utils
-
 class Config(object):
     """
     Configuration for the application.
@@ -117,10 +113,14 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
     parser.add_option("-f", "--follow-standard", action="store_true", help="Take care of MIDI standard (ex: omni on) in recovery journal (experimental)"),
     parser.add_option("-v", "--verbose", action="store_true", help="Enables a verbose output"),
     (options, args) = parser.parse_args()
+
+# FIXME: this is an ugly workaround so that --help doesn't depend on pypm
+    from rtpmidi.engines.midi.midi_session import MidiSession
+    from rtpmidi.protocols.rtp.rtp_control import RTPControl
+    from rtpmidi import utils
     
     config = Config()
     
-    # FIXME: use optparse
     if options.list_devices:
         list_midi_devices()
         sys.exit(0)
