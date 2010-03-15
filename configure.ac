@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(SCENIC, 0.4.3)  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, 0.4.4)  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -84,6 +84,9 @@ if test "x${have_libraw1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing package: libraw1394-dev ])
 fi
 
+# FIXME: make this optional
+AC_DEFINE(CONFIG_IEEE1394,[],[Everything in raw1394 is defined from configure])
+
 #Trying to set LIBDC1394 using pkg-config
 PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394=true, have_libdc1394=false)
 if test "x${have_libdc1394}" = "xfalse" ; then
@@ -95,14 +98,13 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 dnl check for python
 AM_PATH_PYTHON([2.5])
 
-# BOOST m4 tests
+dnl BOOST m4 tests
 AX_BOOST_BASE([1.35], [], [echo "libboost-1.35 or greater required"; exit -1])
 AX_BOOST_THREAD
 if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 AX_BOOST_SYSTEM
-dnl AC_MSG_NOTICE(["boost system var is " ${ax_cv_boost_system} ])
 if test "x${ax_cv_boost_system}" = "xno" ; then
 	AC_MSG_ERROR([missing package: libboost-system-dev])
 fi
@@ -146,10 +148,21 @@ else
     AC_DEFINE(CONFIG_GL,[],[GL define from configure])
 fi
 
+# Check for pypm
+AX_PYTHON_MODULE([pypm], [Missing pypm])
+AX_PYTHON_MODULE([twisted], [Missing twisted])
+AX_PYTHON_MODULE([gtk], [Missing gtk])
+AX_PYTHON_MODULE([gst], [Missing gst])
+AX_PYTHON_MODULE([json], [])
+AX_PYTHON_MODULE([simplejson], [])
+
+AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"], 
+    AS_IF([test "x${HAVE_PYMOD_SIMPLEJSON}" = "xno"],
+        [AC_MSG_ERROR([Requires one of json or simplejson])]))
 
 # Check for gst-plugins that we use
-# FIXME: check the result of this call
-python utils/gst_check.py
+GST_CHECK=$srcdir/utils/gst_check.py
+AS_IF([! python $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed])])
 
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
