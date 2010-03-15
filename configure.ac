@@ -152,6 +152,7 @@ fi
 AX_PYTHON_MODULE([pypm], [Missing pypm])
 AX_PYTHON_MODULE([twisted], [Missing twisted])
 AX_PYTHON_MODULE([gtk], [Missing gtk])
+AX_PYTHON_MODULE([gst], [Missing gst])
 AX_PYTHON_MODULE([json], [])
 AX_PYTHON_MODULE([simplejson], [])
 
