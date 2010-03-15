@@ -89,6 +89,8 @@ def run():
         file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
         os.environ["GTK2_RC_FILES"] = file_name # has to be done before gtk2reactor.install()
         configure.custom_environment_variables["GTK2_RC_FILES"] = file_name
+    if "/sbin" not in os.environ["PATH"]: # for ifconfig
+        os.environ["PATH"] += ":/sbin"
     
     from optparse import OptionParser
     from twisted.internet import gtk2reactor
