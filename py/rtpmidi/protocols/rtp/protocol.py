@@ -485,7 +485,7 @@ class RTPProtocol(DatagramProtocol):
                             if VERBOSE:
                                 line = "Loosing too much packet !!"
                                 print line
-                        #Ajusting latency (based on round trip time/jitter)
+                        #Adjusting latency (based on round trip time/jitter)
                         #self.test_jitter()
                         #self.test_delay()
                         

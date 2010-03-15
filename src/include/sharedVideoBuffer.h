@@ -90,4 +90,8 @@ class SharedVideoBuffer
         bool doPush_;
 };
 
+extern "C" {
+    void shared_video_is_present(void);
+}
+
 #endif // _SHARED_VIDEO_BUFFER_H_
