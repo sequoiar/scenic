@@ -181,7 +181,7 @@ def getMapper():
         _installedShutdownHook = True
     try:
         from __main__ import app
-    except:
+    except ImportError:
         app = None
     natPref = 'both'
     if app is not None:

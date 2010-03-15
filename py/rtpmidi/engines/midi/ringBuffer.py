@@ -1,6 +1,3 @@
-import logging
-from rtpmidi.engines.midi.midi_object import MidiNote
-import time
 from threading import Lock
 
 class myFIFO(object):

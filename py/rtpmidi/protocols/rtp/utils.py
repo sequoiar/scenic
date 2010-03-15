@@ -1,6 +1,3 @@
-from struct import unpack
-from struct import pack
-
 class  Singleton (object):
     instances = {}
     def __new__(cls, *args, **kargs): 
@@ -9,6 +6,13 @@ class  Singleton (object):
         return Singleton.instances[cls]
 
 
+class TestSingleton(Singleton):
+    def __init__(self, argr):
+        self.test = 10
+        self.arg = argr
+
+    def tt(self):
+        self.o = 69
 
 """
 class Singleton:
@@ -57,15 +61,6 @@ class Singleton(object):
         return cls._ref
 
 
-class TestSingleton(Singleton):
-    def __init__(self, argr):
-        self.test = 10
-        self.arg = argr
-
-    def tt(self):
-        self.o = 69
-
-
 def pitch_cmp(x, y):
     if x[0][1] > y[0][1]:
         return 1
@@ -86,4 +81,3 @@ if __name__ == "__main__":
     print e.arg
     print e.o
     print a.o
-    

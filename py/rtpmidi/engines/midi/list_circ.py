@@ -43,10 +43,6 @@ class ListCirc(object):
 	def __len__(self):
 		return len(self.list)
 
-
-#list for sent packet in order to retreive them in case of lose on the network
-from midi_object import OldPacket
-
 class PacketCirc(ListCirc):
 		
 	#Recupere une note avec son compteur (numero)		

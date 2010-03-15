@@ -7,13 +7,14 @@ from list_circ import  PacketCirc
 from recovery_journal import RecoveryJournal
 from recovery_journal import compare_history_with_recovery
 from rtpmidi.protocols.rtp.rtp_session import RTPSession
-from rtpmidi.protocols.rtp.rtp_session import RTPControl
 
 #midi import
 from rtpmidi.engines.midi.midi_in import MidiIn
 from rtpmidi.engines.midi.midi_out import MidiOut
 import pypm
 from time import time
+
+from twisted.internet import task
 
 #Constants
 DEFAULT_PORT = 44000

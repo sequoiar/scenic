@@ -3,10 +3,6 @@ from struct import pack
 from struct import unpack
 import time
 
-#data
-from rtpmidi.engines.midi.midi_object import OldPacket
-from rtpmidi.engines.midi.list_circ import  PacketCirc
-
 #Recovery Chapters
 from rtpmidi.engines.midi.recovery_journal_chapters import ChapterP 
 from rtpmidi.engines.midi.recovery_journal_chapters import ChapterC 
@@ -14,6 +10,9 @@ from rtpmidi.engines.midi.recovery_journal_chapters import ChapterW
 from rtpmidi.engines.midi.recovery_journal_chapters import ChapterN 
 from rtpmidi.engines.midi.recovery_journal_chapters import ChapterT 
 from rtpmidi.engines.midi.recovery_journal_chapters import ChapterA 
+
+#data
+from rtpmidi.engines.midi.midi_object import OldPacket
 
 HISTORY_SIZE = 1024
 
@@ -241,7 +240,7 @@ class ChannelJournal(object):
                         afters.append((data[seq][i], time))
 
                     else:
-                        res = afters_actions.index(pitch)
+                        res = afters_action.index(pitch)
                         afters[res] = (data[seq][i], time)
 
                 #note afters 0xA
@@ -252,7 +251,7 @@ class ChannelJournal(object):
                         poly_afters.append((data[seq][i], time))
 
                     else:
-                        res = poly_afters_actions.index(pitch)
+                        res = poly_afters_action.index(pitch)
                         poly[res] = (data[seq][i], time)
 
                 #else log unknown notes

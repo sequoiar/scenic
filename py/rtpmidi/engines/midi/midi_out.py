@@ -4,14 +4,12 @@ from twisted.internet import reactor
 
 #Midi Streams
 from rtpmidi.engines.midi.ringBuffer import myRingBuffer
-from rtpmidi.engines.midi.ringBuffer import myFIFO
 from rtpmidi.engines.midi.midi_object import SafeKeyboard
 
 import Queue
 
 #Utils
 import time
-import sys
 import pypm
 
 #Midi Commands

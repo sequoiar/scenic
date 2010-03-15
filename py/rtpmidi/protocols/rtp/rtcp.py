@@ -15,8 +15,6 @@ import struct
 
 #twisted imports
 from twisted.internet.protocol import DatagramProtocol
-from twisted.internet.reactor import callLater
-from twisted.internet.defer import Deferred
 from twisted.internet.task import LoopingCall
 
 #data import

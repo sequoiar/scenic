@@ -3,7 +3,7 @@
 # Copyright (C) 2004 Jamey Hicks
 #
 
-from rtpmidi.protocols.rtp.formats import RTPDict, PTMarker, SDPGenerator, PT_CN, PT_xCN, PT_NTE, PT_PCMU, PT_AVP
+from rtpmidi.protocols.rtp.formats import RTPDict, PTMarker, PT_AVP
 from twisted.python.util import OrderedDict
 
 class BadAnnounceError(Exception):

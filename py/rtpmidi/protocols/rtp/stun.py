@@ -5,10 +5,10 @@
 
 import socket
 import struct
-from twisted.internet import defer
 from twisted.internet import reactor
 from twisted.internet.protocol import DatagramProtocol
 from twisted.python import log
+from twisted.internet import defer
 
 import sets
 
@@ -489,7 +489,6 @@ class StunHook(_StunBase):
         """ Sniff out external address. Returns a deferred with the external
             address as a 2-tuple (ip, port)
         """
-        from twisted.internet import defer
         self.installStun()
         self.deferred = defer.Deferred()
         for host, port in self.servers[:3]:
