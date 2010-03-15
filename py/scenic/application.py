@@ -35,7 +35,6 @@ Negotiation is done as follow:
 
 """
 import os
-import gtk # for dialog responses. TODO: remove
 from twisted.internet import defer
 from twisted.internet import error
 from twisted.internet import task

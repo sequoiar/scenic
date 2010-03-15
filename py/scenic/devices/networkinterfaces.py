@@ -22,7 +22,6 @@
 Tools to list network interfaces.
 """
 import os
-from twisted.internet import threads
 from twisted.internet import utils
 from twisted.internet import defer
 from twisted.internet import reactor

@@ -34,9 +34,7 @@ WARNING: For now, only supports short options to jackd. (such as "-d alsa" and n
 import os
 import sys
 import glob
-import pprint
 from twisted.internet import reactor
-from twisted.python import failure
 
 def double_fork(args):
     """

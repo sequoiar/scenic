@@ -122,7 +122,7 @@ class ConfirmDialog(GladeDialogFactory):
         deferred = GladeDialogFactory.show(self)
         label = self._widgets_tree.get_widget("confirm_label")
         label.set_label(text)
-        self._dialog.connect('response', self._on_response_event, callback)
+        self._dialog.connect('response', self._on_response_event, None)
         return deferred
 
     def _on_response_event(self, widget, response_id):

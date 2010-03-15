@@ -26,7 +26,6 @@ import pprint
 from twisted.internet import utils
 from twisted.internet import defer
 from twisted.python import procutils
-from twisted.internet import reactor
 
 def _parse_milhouse_list_cameras(text):
     """

@@ -3,8 +3,6 @@
 
 from twisted.trial import unittest
 from scenic import sig
-from twisted.internet import reactor
-from twisted.internet import defer
 
 class Test_01_Method_Signals(unittest.TestCase):
     def _slot(self):
