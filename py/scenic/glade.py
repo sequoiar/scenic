@@ -24,10 +24,10 @@ Glade RAD tool file loading and widgets factory.
 """
 import os
 import sys
-import gtk
 import gtk.glade
 from twisted.internet import reactor
 from scenic import configure
+from scenic.internationalization import _
 
 def get_widgets_tree():
     """
