@@ -150,7 +150,18 @@ else
 fi
 
 # Check for pypm
-AX_PYTHON_MODULE(pypm,[Missing pypm])
+AX_PYTHON_MODULE(pypm, [Missing pypm])
+AX_PYTHON_MODULE(twisted, [Missing twisted])
+AX_PYTHON_MODULE(gtk, [Missing gtk])
+# FIXME: should fatal if neither are installed
+AX_PYTHON_MODULE(json, [])
+AX_PYTHON_MODULE(simplejson, [])
+
+if test "x${HAVE_PYMOD_JSON}" = "xno"; then
+    if test "x${HAVE_PYMOD_SIMPLEJSON}" = "xno"; then
+        AC_MSG_ERROR("Requires one of json or simplejson")
+    fi
+fi
 
 # Check for gst-plugins that we use
 if ! python utils/gst_check.py; then
