@@ -21,9 +21,7 @@
 """
 Main runner of the app is the run() function.
 """
-import os
 import sys
-import signal
 import socket
 from twisted.internet import reactor
 from twisted.internet import defer

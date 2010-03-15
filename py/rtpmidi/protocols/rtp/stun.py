@@ -489,7 +489,6 @@ class StunHook(_StunBase):
         """ Sniff out external address. Returns a deferred with the external
             address as a 2-tuple (ip, port)
         """
-        from twisted.internet import defer
         self.installStun()
         self.deferred = defer.Deferred()
         for host, port in self.servers[:3]:
