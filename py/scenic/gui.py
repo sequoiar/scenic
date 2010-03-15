@@ -846,6 +846,7 @@ class Gui(object):
         self.midi_recv_enabled_widget.set_active(self.app.config.midi_recv_enabled)
         _set_combobox_value(self.midi_input_device_widget, self.app.config.midi_input_device)
         _set_combobox_value(self.midi_output_device_widget, self.app.config.midi_output_device)
+        self.make_midi_widget_sensitive_or_not()
         self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
         self._widgets_changed_by_user = True
 
