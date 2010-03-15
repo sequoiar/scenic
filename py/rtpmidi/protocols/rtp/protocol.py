@@ -485,7 +485,9 @@ class RTPProtocol(DatagramProtocol):
                             if VERBOSE:
                                 line = "Loosing too much packet !!"
                                 print line
-                        #Ajusting latency (based on round trip time/jitter)
+                        #Adjusting latency (based on round trip time/jitter)
+                        #self.test_jitter()
+                        #self.test_delay()
                         
                     #Adding packet to the jitter buffer
                     if DEBUG:
@@ -538,6 +540,78 @@ class RTPProtocol(DatagramProtocol):
         #TEst : packet must be consistent with CC ? and 
         #payload type(chek midi payload)
         return True
+
+#   def test_jitter(self, ):
+#       jbtime = self.jitter_buffer_time
+#       #Ajusting jitter buffer size and timestamp
+#       if int(jitter_average) > int(jbtime) + 3:
+#           self.app.midi_out.latency += \
+#               int(jitter_average - jbtime) \
+#               + 10
+#           self.jitter_buffer_time += \
+#               int(jitter_average - jbtime) \
+#               + 10
+#           #Logging
+#           line = "Increasing jitter buffer, now set to "
+#           line += str(self.jitter_buffer_time)
+#           line += " ms, jitter estimation is "
+#           line += str(int(jitter_average)) + " ms"
+#           log.info(line)
+#       elif int(jitter_average) < (int(jbtime) - 10) \
+#               and (jbtime - (jbtime - jitter_average) - 3) \
+#               > MIN_JITTER_BUFFER_TIME \
+#               and jbtime > MIN_JITTER_BUFFER_TIME:
+#           self.app.midi_out.latency -= \
+#               int(jbtime - jitter_average) - 3
+#           self.jitter_buffer_time -= \
+#               int(jbtime - jitter_average) - 3
+#           #Logging
+#           line = "Decreasing jitter buffer, now set to "
+#           line += str(self.jitter_buffer_time)
+#           line += " ms, jitter estimation is "
+#           line += str(int(jitter_average)) + " ms"
+#           log.info(line)
+
+#   def test_delay(self):
+#       if DEBUG:
+#           print "test delay"
+#       if self.rt_time != None and self.rt_time_ref != None:
+#           rt_time = self.rt_time * 1000
+#           rt_time_ref = self.rt_time_ref * 1000
+#           if rt_time > rt_time_ref:
+#                           #latency MUST be > to the split between initial 
+#                           #rt_time and rt_time_ref
+#               self.app.midi_out.latency += \
+#                   int(rt_time - rt_time_ref) + 10
+#                           #Logging action
+#               line = "Updating latency to feet the changing delay"
+#               line += ", now set to "
+#               line += str(self.app.midi_out.latency) + " ms"
+#               log.nfo(line)
+
+#                           #Update split_ts
+#               self.split_ts = new_split_ts
+#           elif rt_time < (rt_time_ref - 40)  \
+#                   and (self.app.midi_out.latency  > MIN_LATENCY) \
+#                   and ((self.app.midi_out.latency  \
+#                             - int(rt_time_ref - rt_time) - 10)  \
+#                            > MIN_LATENCY):
+#                           #latency
+#               self.app.midi_out.latency -= \
+#                   int(rt_time_ref - rt_time) - 10
+#                           #Logging action
+#               line = "Updating latency to feet the changing delay"
+#               line += ", now set to "
+#               line += str(self.app.midi_out.latency) + " ms"
+#               log.info(line)
+#                           #Update round trip time ref
+#               self.rt_time_ref = rt_time / 1000
+#       else:
+#           if self.rt_time != None:
+#               if DEBUG:
+#                   print "init rt_ref time"
+#               self.rt_time_ref = self.rt_time
+#
 
     def genSSRC(self):
         # Python-ish hack at RFC1889, Appendix A.6
