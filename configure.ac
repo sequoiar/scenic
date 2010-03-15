@@ -98,14 +98,13 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 dnl check for python
 AM_PATH_PYTHON([2.5])
 
-# BOOST m4 tests
+dnl BOOST m4 tests
 AX_BOOST_BASE([1.35], [], [echo "libboost-1.35 or greater required"; exit -1])
 AX_BOOST_THREAD
 if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 AX_BOOST_SYSTEM
-dnl AC_MSG_NOTICE(["boost system var is " ${ax_cv_boost_system} ])
 if test "x${ax_cv_boost_system}" = "xno" ; then
 	AC_MSG_ERROR([missing package: libboost-system-dev])
 fi
@@ -150,18 +149,15 @@ else
 fi
 
 # Check for pypm
-AX_PYTHON_MODULE(pypm, [Missing pypm])
-AX_PYTHON_MODULE(twisted, [Missing twisted])
-AX_PYTHON_MODULE(gtk, [Missing gtk])
-# FIXME: should fatal if neither are installed
-AX_PYTHON_MODULE(json, [])
-AX_PYTHON_MODULE(simplejson, [])
+AX_PYTHON_MODULE([pypm], [Missing pypm])
+AX_PYTHON_MODULE([twisted], [Missing twisted])
+AX_PYTHON_MODULE([gtk], [Missing gtk])
+AX_PYTHON_MODULE([json], [])
+AX_PYTHON_MODULE([simplejson], [])
 
-if test "x${HAVE_PYMOD_JSON}" = "xno"; then
-    if test "x${HAVE_PYMOD_SIMPLEJSON}" = "xno"; then
-        AC_MSG_ERROR("Requires one of json or simplejson")
-    fi
-fi
+AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"], 
+    AS_IF([test "x${HAVE_PYMOD_SIMPLEJSON}" = "xno"],
+        [AC_MSG_ERROR([Requires one of json or simplejson])]))
 
 # Check for gst-plugins that we use
 if ! python utils/gst_check.py; then
