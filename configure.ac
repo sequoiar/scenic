@@ -160,7 +160,8 @@ AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"],
         [AC_MSG_ERROR([Requires one of json or simplejson])]))
 
 # Check for gst-plugins that we use
-if ! python utils/gst_check.py; then
+GST_CHECK=$srcdir/utils/gst_check.py
+if ! python $GST_CHECK; then
     AC_MSG_ERROR([Not all gstreamer plugins installed])
 fi
 
