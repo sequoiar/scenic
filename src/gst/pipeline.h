@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "noncopyable.h"
+#include <glib/gtypes.h>
 
 class _GstElement;
 class _GstPad;
@@ -52,7 +53,7 @@ class Pipeline : boost::noncopyable
         bool isReady() const;
         bool isPaused() const;
         bool isStopped() const;
-        void seekTo(long long pos);
+        void seekTo(gint64 pos);
         void start() const;
         void pause() const;
         void makeReady() const;

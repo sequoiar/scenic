@@ -464,9 +464,9 @@ void Pipeline::updateListeners(GstMessage *msg)
 }
 
 
-void Pipeline::seekTo(long long pos)
+void Pipeline::seekTo(gint64 pos)
 {
-    if (!gst_element_seek (pipeline_, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+    if (!gst_element_seek(pipeline_, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
                 GST_SEEK_TYPE_SET, pos,
                 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
         THROW_ERROR("Seek failed!");

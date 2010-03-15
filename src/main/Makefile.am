@@ -8,9 +8,9 @@ bin_PROGRAMS = milhouse
 
 milhouse_SOURCES = milhouse.cpp milhouseLogger.cpp milhouseLogger.h ConcurrentQueue.h milhouse.h
 if SVN
-milhouse_CPPFLAGS= -D SVNVERSION=\"$(shell svnversion)\"
+milhouse_CPPFLAGS = $(GLIB_CFLAGS) -D SVNVERSION=\"$(shell svnversion)\"
 else
-milhouse_CPPFLAGS=
+milhouse_CPPFLAGS = $(GLIB_CFLAGS)
 endif
 milhouse_LDADD = $(top_builddir)/src/gst/libgst.la $(ALL_GST_LIBS) $(JACK_LIBS) \
         $(top_builddir)/src/tcp/libcaps.la \
