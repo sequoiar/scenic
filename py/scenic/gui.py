@@ -1350,7 +1350,7 @@ class Gui(object):
         widgets_tree = glade.get_widgets_tree()
         self.calling_dialog = widgets_tree.get_widget("calling_dialog")
         # FIXME: can't set a parent on a toplevel window
-        self.calling_dialog.set_parent(self.main_window)
+        #self.calling_dialog.set_parent(self.main_window)
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         self.calling_dialog.show()
     
