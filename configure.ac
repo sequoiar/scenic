@@ -161,6 +161,7 @@ AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"],
         [AC_MSG_ERROR([Requires one of json or simplejson])]))
 
 # Check for gst-plugins that we use
+# FIXME python should be derived like in m4_ax_python_module.m4
 GST_CHECK=$srcdir/utils/gst_check.py
 AS_IF([! python $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed])])
 
