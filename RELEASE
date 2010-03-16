@@ -34,6 +34,7 @@ in the 0.5 branch.
 
 Misc. Fixes:
 #370: RELEASE not include in tarball by make dist
+#373: add README
 
 Milhouse Fixes:
 #328: improve gst element checking at configure stage
