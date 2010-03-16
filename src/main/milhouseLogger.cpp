@@ -93,7 +93,8 @@ void MilhouseLogger::printMessages()
                 std::cout << msg;
         else  // got a sentinel
             done = true;
-        boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+        // since we're not busy waiting, we don't really need this sleep
+        // boost::this_thread::sleep(boost::posix_time::milliseconds(1));
     }
 }
 
