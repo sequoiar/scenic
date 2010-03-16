@@ -88,6 +88,8 @@ try:
 except:
     pass
 
+optional_plugins = ["dc1394src", "dv1394src", "alsasrc", "alsasink", "pulsesrc", "pulsesink", "glimagesink", "theoraenc", "theoradec"]
+
 for plugin in gst_plugins:
     if gst.element_factory_find(plugin) is None: 
         print("Error: plugin " + plugin + " is NOT installed")
@@ -97,10 +99,18 @@ for plugin in gst_plugins:
 print("-------------------------------")
 if len(missing_plugins) == 0:
     print("All " + str(len(gst_plugins)) + " necessary plugins installed")
+    sys.exit(0)
 else:
     print("The following gstreamer plugins need to be installed: ")
+    missing_critical = False
     for plugin in missing_plugins:
         print(plugin)
+        if plugin not in optional_plugins:
+            missing_critical = True
     print("You may have to install the corresponding development headers \
     (i.e. lib<MODULE>-dev)")
     print("before building the missing gstreamer plugins")
+    if missing_critical:
+        sys.exit(1)
+    else:
+        sys.exit(0)
