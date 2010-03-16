@@ -29,12 +29,15 @@
 #include <libraw1394/raw1394.h>
 #include <iomanip>
 
-
 class Dc1394Handle : boost::noncopyable {
     public:
         // camera-less version
         Dc1394Handle() : cameraId_(0), dc1394_(0), cameras_(0), camera_(0)
         {
+            // override log handler to catch library errors
+            dc1394log_t type = DC1394_LOG_ERROR;
+            dc1394_log_register_handler(type, log_handler, 0);
+
             dc1394_ = dc1394_new();
             if (dc1394_ == 0)
                 LOG_ERROR("Could not get handle to dc1394, are /dev/raw1394 and /dev/video1394 present?");
@@ -45,6 +48,10 @@ class Dc1394Handle : boost::noncopyable {
 
         explicit Dc1394Handle(int id) : cameraId_(id), dc1394_(0), cameras_(0), camera_(0)
         {
+            // override log handler to catch library errors
+            dc1394log_t type = DC1394_LOG_ERROR;
+            dc1394_log_register_handler(type, log_handler, 0);
+
             if (cameraId_ < 0)
                 LOG_ERROR("Invalid camera id " << cameraId_);
             dc1394_ = dc1394_new();
@@ -97,6 +104,11 @@ class Dc1394Handle : boost::noncopyable {
                 const std::string &colourspace, int framerate) const;
 
     private:
+        static void log_handler(dc1394log_t /*type*/, const char *message, void * /*user*/)
+        {
+            LOG_DEBUG(message);
+        }
+
         int cameraId_;
         dc1394_t * dc1394_; 
         dc1394camera_list_t * cameras_;
