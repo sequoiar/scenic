@@ -56,7 +56,7 @@ AudioSink::~AudioSink()
 /// caught by a signal hander.
 void AudioSink::FPE_ExceptionHandler(int /*nSig*/, int nErrType, int * /*pnReglist*/)
 {
-    std::string jackWarning(": this COULD be because the buffer-time of an audiosink is too low");
+    static const std::string jackWarning(": this COULD be because the buffer-time of an audiosink is too low");
     switch(nErrType)
     {
         case FPE_INTDIV:  
