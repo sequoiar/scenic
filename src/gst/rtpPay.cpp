@@ -123,7 +123,7 @@ bool Mpeg4Pay::handleMessage(const std::string &path, const std::string &/*argum
 {
     if (path == "disable-send-config")
     {
-        assert(rtpPay_);
+        tassert(rtpPay_);
         LOG_DEBUG("setting send-config to false in rtpmp4vpay");
         g_object_set(rtpPay_, "send-config", FALSE, NULL);
         return true;

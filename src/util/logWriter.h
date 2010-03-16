@@ -83,14 +83,14 @@ namespace Log
             do {                         \
             std::ostringstream mangle84579568749576948;      \
             mangle84579568749576948 << msg;                  \
-            cerr_log_throw(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__);    \
+            cerr_log_throw(mangle84579568749576948.str(), level, __FILE__, __LINE__);    \
             }                           \
             while(0)
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, int lineNum);
+                int lineNum);
 
 void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, int lineNum);
+                int lineNum);
 
 #endif //  _LOG_WRITER_H_

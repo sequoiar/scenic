@@ -180,7 +180,7 @@ AudioJackSink::~AudioJackSink()
 
 bool AudioJackSink::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
-    assert(sink_);
+    tassert(sink_);
     if (path == "disable-jack-autoconnect")
     {
         g_object_set(G_OBJECT(sink_), "connect", 0, NULL);

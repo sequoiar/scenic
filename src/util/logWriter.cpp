@@ -106,16 +106,9 @@ Log::Subscriber::Subscriber()
     lf = this;
 }
 
-bool xlogLevelMatch(LogLevel level)
-{
-    if (level >= LOG_LEVEL and logLevelIsValid(level))
-        return true;
-    else
-        return false;
-}
 
-std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &/*functionName*/, int lineNum)
+std::string log_(const std::string &msg, LogLevel level, 
+        const std::string &fileName, int lineNum)
 {
     std::ostringstream logMsg;
     if (level == PRINT) // for normal printing without log formatting
@@ -138,15 +131,16 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 }
 
 //TODO DOCUMENT THIS
-void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
-        const std::string &functionName, int lineNum)
+void cerr_log_throw(const std::string &msg, LogLevel level, 
+        const std::string &fileName, int lineNum)
 {
-    std::string strerr = log_(msg, level, fileName, functionName, lineNum);
-    
-    (*lf)(level, strerr);
+    std::string strerr = log_(msg, level, fileName, lineNum);
 
     if (level < THROW)
+    {
+        (*lf)(level, strerr);  // log it now if not a throw
         return;
+    }
 
     if (level < CRITICAL)
         throw(ErrorExcept(strerr.c_str()));
@@ -189,8 +183,8 @@ void backtrace()
 void backtrace(){}
 #endif
 void assert_throw(__const char *__assertion, __const char *__file,
-        unsigned int __line, __const char *__function)
+        unsigned int __line)
 {
     backtrace();
-    cerr_log_throw(__assertion, ASSERT_FAIL, __file, __function, __line);
+    cerr_log_throw(__assertion, ASSERT_FAIL, __file, __line);
 }

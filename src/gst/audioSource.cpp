@@ -312,7 +312,7 @@ std::string AudioJackSource::getCapsFilterCapsString()
 
 bool AudioJackSource::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
-    assert(source_);
+    tassert(source_);
     if (path == "disable-jack-autoconnect")
     {
         g_object_set(G_OBJECT(source_), "connect", 0, NULL);
