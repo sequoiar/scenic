@@ -154,7 +154,7 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
         return new AudioPulseSink(pipeline, *this);
     else
     {
-        THROW_CRITICAL(sink_ << " is an invalid videosink");
+        THROW_CRITICAL(sink_ << " is an invalid audiosink");
         return 0;
     }
 }
