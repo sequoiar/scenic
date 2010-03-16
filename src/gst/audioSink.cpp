@@ -30,18 +30,17 @@
 #include "pipeline.h"
 #include "alsa.h"
 
-bool AudioSink::signalHandlerAttached_ = false;
-        
 /// Constructor 
 AudioSink::AudioSink(Pipeline &pipeline) : 
     pipeline_(pipeline),
     sink_(0)
 {
     // attach floating point exception signal handler
-    if (!signalHandlerAttached_)
+    static bool signalHandlerAttached = false; // thread-safe in gcc
+    if (not signalHandlerAttached)
     {
         signal(SIGFPE, (void (*)(int))FPE_ExceptionHandler);
-        signalHandlerAttached_ = true;
+        signalHandlerAttached = true;
     }
 }
 

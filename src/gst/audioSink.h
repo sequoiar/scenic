@@ -49,7 +49,6 @@ class AudioSink : public GstLinkableSink, boost::noncopyable
         const static unsigned long long BUFFER_TIME;
 
     private:
-        static bool signalHandlerAttached_;
         static void FPE_ExceptionHandler(int nSig, int nErrType, int *pnReglist);
         _GstElement *sinkElement() { return sink_; }
 };

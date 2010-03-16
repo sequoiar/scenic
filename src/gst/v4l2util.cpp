@@ -212,10 +212,10 @@ std::string v4l2util::field2s(int val)
 
 std::string v4l2util::num2s(unsigned num)
 {
-    char buf[10];
+    std::ostringstream buf;
+    buf << std::hex << num;
 
-    sprintf(buf, "%08x", num);
-    return buf;
+    return buf.str();
 }
 
 std::string v4l2util::fcc2s(unsigned int val)
