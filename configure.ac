@@ -223,8 +223,6 @@ data/pixmaps/Makefile
 data/themes/Makefile
 data/themes/Darklooks/Makefile
 doc/Makefile
-doc/network/Makefile
-doc/figures/Makefile
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile
