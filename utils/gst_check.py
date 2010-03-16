@@ -35,10 +35,13 @@ except ImportError:
     print("import failed, please install gst-python")
     sys.exit(1)
 
+#FIXME: not very pythonic
+VERBOSE = sys.argv[-1] == '--verbose' or sys.argv[-1] == '-v'
+
 # Get the full path to cpp files relative to the script location
 cwd = os.path.dirname(os.path.realpath(__file__))
 cpp_files = glob.glob(os.path.realpath(cwd + "/../src/gst") + "/*.cpp")
-if ( len(cpp_files) == 0):
+if (len(cpp_files) == 0):
     sys.stderr.write("No cpp files found. Make sure the script is located within source directory \"utils\".")
     sys.exit(2)
 
@@ -95,10 +98,15 @@ for plugin in gst_plugins:
         print("Error: plugin " + plugin + " is NOT installed")
         missing_plugins.append(plugin)
     else:
-        print(plugin + " installed")
-print("-------------------------------")
+        if VERBOSE:
+            print(plugin + " installed")
+
+if VERBOSE:
+    print("-------------------------------")
+
 if len(missing_plugins) == 0:
-    print("All " + str(len(gst_plugins)) + " necessary plugins installed")
+    if VERBOSE:
+        print("All " + str(len(gst_plugins)) + " necessary plugins installed")
     sys.exit(0)
 else:
     print("The following gstreamer plugins need to be installed: ")
