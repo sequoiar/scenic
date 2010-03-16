@@ -54,19 +54,35 @@ class ProcessIO(protocol.ProcessProtocol):
         @param slave: Manager instance.
         """
         self.manager = manager
+        self.out_leftover = ""
+        self.err_leftover = ""
 
     def connectionMade(self):
         self.manager._on_connection_made()
 
     def outReceived(self, data):
-        for line in data.splitlines():
+        """ 
+        Handoff complete lines to manager. Save the leftover line 
+        for the next time this is called 
+        """
+        lines = data.splitlines()
+        self.manager.stdout_line_signal(self.out_leftover + lines[0])
+        for line in lines[1:-1]:
             if line != "":
                 self.manager.stdout_line_signal(line)
+        self.out_leftover = lines[-1]
 
     def errReceived(self, data):
-        for line in data.splitlines():
+        """ 
+        Handoff complete lines to manager. Save the leftover line 
+        for the next time this is called 
+        """
+        lines = data.splitlines()
+        self.manager.stderr_line_signal(self.err_leftover + lines[0])
+        for line in lines[1:-1]:
             if line != "":
                 self.manager.stderr_line_signal(line)
+        self.err_leftover = lines[-1]
 
     def processEnded(self, reason):
         exit_code = reason.value.exitCode
