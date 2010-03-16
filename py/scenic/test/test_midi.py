@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Unit tests for the X11 function.
+Unit tests for listing MIDI devices.
 """ 
 from twisted.trial import unittest
 from scenic.devices import midi

@@ -51,7 +51,7 @@ class GladeDialogFactory(object):
         """
         Creates a new dialog using the glade XML file.
         Returns a Deferred which is fired when the dialog is closed.
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         if self.exists():
             msg = "Dialog %s already exists." % (self.name)
@@ -71,7 +71,7 @@ class GladeDialogFactory(object):
 
     def exists(self):
         """
-        @rettype: bool
+        @rtype: bool
         """
         return self._dialog is not None
 
@@ -203,7 +203,7 @@ class ErrorDialog(object):
         """
         Returns a Deferred which will be called with a True result.
         @param message: str
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         d = defer.Deferred()
         dialog = ErrorDialog(d, message, parent, details)
@@ -252,7 +252,7 @@ class YesNoDialog(object):
         """
         Returns a Deferred which will be called with a boolean result.
         @param message: str
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         d = defer.Deferred()
         dialog = YesNoDialog(d, message, parent)

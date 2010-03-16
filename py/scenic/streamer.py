@@ -437,7 +437,7 @@ class StreamerManager(object):
     def get_all_streamer_process_managers(self):
         """
         Returns all the current streaming process managers for the current session.
-        @rettype: list
+        @rtype: list
         """
         ret = [self.sender, self.receiver]
         if self.session_details["receive"]["midi"]["enabled"]:

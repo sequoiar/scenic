@@ -148,7 +148,7 @@ class AddressBook(object):
     
     def get_currently_selected_contact(self):
         """
-        @rettype: dict or None
+        @rtype: dict or None
         """
         return self.contact_list[self.selected]
 

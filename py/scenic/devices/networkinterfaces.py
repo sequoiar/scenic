@@ -46,7 +46,7 @@ def _parse_ifconfig(text):
 def list_network_interfaces_addresses():
     """
     Lists network interfaces IP.
-    @rettype: Deferred
+    @rtype: Deferred
     """
     def _cb(result, deferred):
         #print 'cb', result

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Unit tests for the SIC protocol, sender and receiver.
+"""
 
 from twisted.trial import unittest
 from scenic import sic
@@ -9,7 +12,7 @@ from twisted.internet import defer
 
 class Test_01_SIC_Client_Server(unittest.TestCase):
     """
-    Test the L{osc.Sender} and L{osc.Receiver} over UDP via localhost.
+    Tests the Server and Receiver 
     """
     timeout = 1
 

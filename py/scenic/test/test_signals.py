@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Unit tests for our pure Python implementation of the signal-slot pattern.
+"""
 
 from twisted.trial import unittest
 from scenic import sig

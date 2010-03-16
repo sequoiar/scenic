@@ -19,6 +19,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Unit tests for the port allocator.
+"""
+
 from twisted.trial import unittest
 from scenic.ports import PortsAllocator
 from scenic.ports import PortsAllocatorError
