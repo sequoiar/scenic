@@ -37,6 +37,7 @@
 #include "glVideoSink.h"
 #endif
 
+// for list cameras
 #include "dc1394.h"
 #include "v4l2util.h"
 
@@ -48,7 +49,7 @@ T fromString(const std::string& s,
     T t;
     std::istringstream iss(s);
     if ((iss >> f >> t).fail())
-        THROW_CRITICAL("Could not convert string " << s << " to hex");
+        THROW_ERROR("Could not convert string " << s << " to hex");
     return t;
 }
 
@@ -85,7 +86,7 @@ VideoSource * VideoSourceConfig::createSource(const Pipeline &pipeline) const
     else if (source_ == "dc1394src")
         return new VideoDc1394Source(pipeline, *this);
     else 
-        THROW_ERROR(source_ << " is an invalid source!");
+        THROW_ERROR(source_ << " is an invalid videosource!");
 
     LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", location: " 
             << location_ << ", device: " << deviceName_);
@@ -144,8 +145,15 @@ const char* VideoSourceConfig::deviceName() const
 
 int VideoSourceConfig::listCameras()
 {
-    Dc1394::listCameras();
-    v4l2util::listCameras();
+    try  // catch exceptions here because we're dealing with devices
+    {
+        v4l2util::listCameras();
+        Dc1394::listCameras();
+    }
+    catch (ErrorExcept &e)
+    {
+        LOG_DEBUG("Got exception " << e.what());
+    }
     return 0;
 }
 
@@ -261,7 +269,7 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
     else if (sink_ == "sharedvideosink")
         return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
     else
-        THROW_ERROR(sink_ << " is an invalid sink");
+        THROW_ERROR(sink_ << " is an invalid videosink");
 
     LOG_DEBUG("Video sink " << sink_ << " built"); 
     return 0;
