@@ -19,7 +19,7 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 #
 
-
+import sys
 try:
     import pygst
     pygst.require('0.10')
