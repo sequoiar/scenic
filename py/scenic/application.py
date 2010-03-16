@@ -190,7 +190,7 @@ class Application(object):
     def poll_midi_devices(self):
         """
         Called once at startup, and then the GUI can call it.
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         deferred = midi.list_midi_devices()
         def _callback(midi_devices):
@@ -213,7 +213,7 @@ class Application(object):
         """
         Called once at startup, and then the GUI can call it.
         Calls gui.update_x11_devices.
-        @rettype: Deferred
+        @rtype: Deferred
         """
         deferred = x11.list_x11_displays(verbose=False)
         def _callback(x11_displays):
@@ -229,7 +229,7 @@ class Application(object):
         Called once at startup, and then the GUI can call it.
         Calls gui.update_camera_devices.
         For now, we only take into account V4L2 cameras.
-        @rettype: Deferred
+        @rtype: Deferred
         """
         deferred = cameras.list_cameras()
         toggle_size_sensitivity = self.gui.video_capture_size_widget.get_property("sensitive")
@@ -255,7 +255,7 @@ class Application(object):
     def poll_xvideo_extension(self):
         """
         Called once at startup, and then the GUI can call it.
-        @rettype: Deferred
+        @rtype: Deferred
         """
         deferred = x11.xvideo_extension_is_present()
         def _callback(xvideo_is_present):
@@ -298,7 +298,7 @@ class Application(object):
     def before_shutdown(self):
         """
         Last things done before quitting.
-        @rettype: L{DeferredList}
+        @rtype: L{DeferredList}
         """
         deferred = defer.Deferred()
         print("The application is shutting down.")
@@ -323,7 +323,7 @@ class Application(object):
     # ------------------------- session occuring -------------
     def has_session(self):
         """
-        @rettype: bool
+        @rtype: bool
         """
         return self.streamer_manager.is_busy()
     # -------------------- streamer ports -----------------
@@ -365,7 +365,7 @@ class Application(object):
         """
         Checks if the remote peer's SIC protocol matches.
         @param message: dict messages received in an INVITE or ACCEPT SIC message. 
-        @rettype: bool
+        @rtype: bool
         """
         # TODO: break if not compatible in a next release.
         if message["protocol"] != self.protocol_version:
@@ -563,7 +563,7 @@ class Application(object):
     def disconnect_client(self):
         """
         Disconnects the SIC sender.
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         def _cb(result, d1):
             d1.callback(True)
@@ -584,7 +584,7 @@ class Application(object):
     def _get_local_config_message_items(self):
         """
         Returns a dict with keys 'audio' and 'video' to send to remote peer.
-        @rettype: dict
+        @rtype: dict
         """
         return {
             "video": {
@@ -613,7 +613,7 @@ class Application(object):
         Checks if ready to stream. 
         Will pop up error dialog if there are errors.
         Calls the deferred with a result that is True of False.
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         @param role: Either "offerer" or "answerer".
         """
         #TODO: poll X11 devices

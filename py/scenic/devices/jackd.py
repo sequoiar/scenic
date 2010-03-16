@@ -196,7 +196,7 @@ def jackd_get_infos():
 if __name__ == "__main__":
     def _poll_jackd():
         """
-        @rettype: Deferred
+        @rtype: Deferred
         """
         try:
             jack_servers = jackd_get_infos() # returns a list a dict such as :

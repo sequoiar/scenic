@@ -175,7 +175,7 @@ def format_contact_markup(contact):
     """
     Formats a contact for the Adressbook GTK widget.
     @param contact: A dict with keys "name" and "address"
-    @rettype: str
+    @rtype: str
     @return: Pango markup for the TreeView widget.
     """
     auto_accept = ""
@@ -415,7 +415,7 @@ class Gui(object):
 
     def close_preview_if_running(self):
         """
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         def _cl(deferred):
             if self.preview_manager.is_busy():
@@ -1338,7 +1338,7 @@ class Gui(object):
     def show_invited_dialog(self, text):
         """ 
         This could be replaced by a yes/no dialog. That's actually what it is.
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         return self.invited_dialog.show(text)
 
@@ -1463,7 +1463,7 @@ class About(object):
     @staticmethod
     def create():
         """
-        @rettype: None
+        @rtype: None
         """
         dialog = About()
         return dialog.show_about_dialog()

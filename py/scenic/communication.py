@@ -105,7 +105,7 @@ class Client(object):
     def connect(self, host, port):
         """
         Connects and sends an INVITE message
-        @rettype: L{Deferred}
+        @rtype: L{Deferred}
         """
         def _on_connected(proto):
             print "connected"
@@ -140,7 +140,7 @@ class Client(object):
         """
         Sends a dict, which has to have the key "msg".
         @param msg: dict
-        @rettype: None
+        @rtype: None
         """
         if self.is_connected():
             self.last_message_sent = msg["msg"]
@@ -154,7 +154,7 @@ class Client(object):
 
     def disconnect(self):
         """
-        @rettype: Deferred
+        @rtype: Deferred
         """
         if self.is_connected():
             d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost

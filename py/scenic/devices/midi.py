@@ -51,7 +51,7 @@ def _parse_miditream_list_devices(text):
     """
     Parses the output of `midistream --list-devices`
     Returns a list of dict with keys "name", "number", "is_input", "is_open".
-    @rettype: list
+    @rtype: list
     """
     midi_devices = []
     for line in text.splitlines():
@@ -82,7 +82,7 @@ def list_midi_devices(verbose=True):
     """
     Twisted wrapper for _list_x11_displays.
     Result is a dict with keys "input" and "output". The value are dict with ID and name for each device.
-    @rettype: Deferred
+    @rtype: Deferred
     """
     deferred = defer.Deferred()
     def _cb(text, deferred):

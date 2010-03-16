@@ -34,7 +34,7 @@ def start_logging_to_stdout():
 def start_file_logging(full_path="/var/tmp/scenic/scenic.log"):
     """
     Starts logging the Master infos to a file.
-    @rettype: str path to the log file
+    @rtype: str path to the log file
     """
     file_name = os.path.basename(full_path)
     directory = os.path.dirname(full_path)

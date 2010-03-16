@@ -28,7 +28,7 @@ class Preview(object):
         Looks in the settings, and returns a bash command to run for the preview.
         Note that the preview doesn't use the display option, which sets the X11 DISPLAY.
         The preview is only for video, no sound.
-        @rettype: str
+        @rtype: str
         """
         width, height = self.app.config.video_capture_size.split("x")
         aspect_ratio = self.app.config.video_aspect_ratio

@@ -33,7 +33,7 @@ def _parse_milhouse_list_cameras(text):
     Parses the output of `milhouse --list-cameras`
     Returns a dict of dict with keys "name", "size", "standard", "is_interlaced", "input", "inputs", "supported_sizes"
     For now, considers only V4L2 cameras.
-    @rettype: list
+    @rtype: list
     """
     v4l2_devices = {}
     currently_parsed_is_v4l2 = False
@@ -127,7 +127,7 @@ def list_cameras():
     """
     Calls the Deferred with the dict of devices as argument. 
     
-    @rettype: Deferred
+    @rtype: Deferred
     """
     def _cb(text, deferred):
         #print text
@@ -238,7 +238,7 @@ Exitting Milhouse
 def set_v4l2_input_number(device_name="/dev/video0", input_number=0):
     """
     Sets input number for a V4L2 device.
-    @rettype: Deferred
+    @rtype: Deferred
     """
     command_name = "milhouse"
     args = ['--v4l2-input', str(input_number), '--videodevice', device_name]
@@ -253,7 +253,7 @@ def set_v4l2_input_number(device_name="/dev/video0", input_number=0):
 def set_v4l2_video_standard(device_name="/dev/video0", standard="ntsc"):
     """
     Sets norm for a V4L2 device.
-    @rettype: Deferred
+    @rtype: Deferred
     """
     command_name = "milhouse"
     args = ['--v4l2-standard', standard, '--videodevice', device_name]

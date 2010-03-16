@@ -41,7 +41,7 @@ def _list_x11_displays(verbose):
     It is also a lot easier to debug this way.
     
     Returns a list of dict whose keys are : name, dimensions, resolution
-    :rettype: list of dict
+    @rtype: list of dict
     """
     dev_null = open("/dev/null", "wa")
     displays = []
@@ -84,7 +84,7 @@ def list_x11_displays(verbose=True):
     """
     Twisted wrapper for _list_x11_displays.
     Result is a list of dicts with keys 'name', 'dimensions', 'resolution'.
-    @rettype: Deferred
+    @rtype: Deferred
     """
     return threads.deferToThread(_list_x11_displays, verbose)
 
@@ -93,7 +93,7 @@ def xvideo_extension_is_present():
     Checks for XV extension.
     Result is boolean.
     
-    @rettype: Deferred
+    @rtype: Deferred
     """
     def _cb(result, deferred):
         ret = True
