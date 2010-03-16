@@ -57,12 +57,15 @@ class Config(object):
         self.follow_standard = False
         self.verbose = False
 
-
 def list_midi_devices():
     """
     Lists MIDI devices.
+    
+    @return: None
     """
     rtp_control = RTPControl()
+    #FIXME: We should not need to instanciated all those session objects to simply list MIDI devices!
+    # we give it dummy port numbers, just to enable sending and receiving. 
     midi_session = rtp_control.add_session(MidiSession("127.0.0.1", rport=1, sport=1))
     midi_session = rtp_control.get_session(midi_session)
     dev_in, dev_out = midi_session.get_devices()
@@ -91,7 +94,7 @@ def cleanup_everything():
 
 def before_shutdown():
     """
-    @rettype: Deferred
+    @rtype: Deferred
     """
     cleanup_everything() # FIXME: does it return a Deferred?
     return defer.succeed(None)
@@ -208,7 +211,7 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
         follow_standard=config.follow_standard,
         verbose=config.verbose))
     midi_session = RTPControl().get_session(midi_session_c)
-    dev_in, dev_out = midi_session.get_devices()
+    dev_in, dev_out = midi_session.get_devices() #FIXME: I think this might crash if we're either not sending or receiving, since it will return a 1-tuple
     if config.input_device is not None:
         res = midi_session.set_device_in(config.input_device)
         if not res:
