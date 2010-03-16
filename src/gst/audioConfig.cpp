@@ -40,8 +40,6 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
     location_(options["audiolocation"].as<std::string>()), 
     numChannels_(options["numchannels"].as<int>())
 {
-    if (source_.empty())
-        THROW_CRITICAL("No source specified");
     if(numChannels_ < 1)
         THROW_CRITICAL("Invalid number of channels");
 }
@@ -89,7 +87,7 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
     else if (source_ == "pulsesrc")
         return new AudioPulseSource(pipeline, *this);
     else 
-        THROW_CRITICAL(source_ << " is an invalid source");
+        THROW_ERROR(source_ << " is an invalid audiosource");
     return 0;
 }
 
@@ -148,7 +146,7 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
         return new AudioPulseSink(pipeline, *this);
     else
     {
-        THROW_CRITICAL(sink_ << " is an invalid sink");
+        THROW_ERROR(sink_ << " is an invalid audiosink");
         return 0;
     }
 }
