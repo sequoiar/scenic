@@ -95,7 +95,7 @@ class SharedVideoBuffer
 // AC_MSG_NOTICE([found libshared_video]), AC_MSG_ERROR([didn't find libshared_video]), [-pthread])
 
 extern "C" {
-    void shared_video_is_present(void);
+    void shared_video_is_present();
 }
 
 #endif // _SHARED_VIDEO_BUFFER_H_

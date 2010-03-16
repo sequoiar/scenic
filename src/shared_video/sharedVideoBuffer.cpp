@@ -137,7 +137,7 @@ int SharedVideoBuffer::getHeight()
 }
  
 // Used by AC_CHECK_LIB in configure.ac
-void shared_video_is_present(void)
+void shared_video_is_present()
 {
 }
 
