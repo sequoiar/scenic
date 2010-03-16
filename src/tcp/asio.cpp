@@ -85,7 +85,7 @@ class ReceiverSession : public boost::enable_shared_from_this<ReceiverSession> {
                 {
                     socket_.get_io_service().stop();
                     // FIXME: caps server will have to be more elegant than this
-                    THROW_ERROR("Interrupted while waiting to receive caps");
+                    THROW_ERROR("INTERRUPTED");
                 }
             }
         }

@@ -69,7 +69,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     if (options.count("jitterbuffer"))
         RtpReceiver::setLatency(options["jitterbuffer"].as<int>());
 
-    if (!disableVideo)
+    if (not disableVideo)
     {
         if(options["fullscreen"].as<bool>())
             MessageDispatcher::sendMessage("fullscreen");
@@ -97,12 +97,12 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
     shared_ptr<VideoSender> vTx;
     shared_ptr<AudioSender> aTx;
 
-    if (!disableVideo)
+    if (not disableVideo)
     {
         vTx = videofactory::buildVideoSender(pipeline, options);
     }
 
-    if (!disableAudio)
+    if (not disableAudio)
     {
         aTx = audiofactory::buildAudioSender(pipeline, options);
 
@@ -210,15 +210,15 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    if ((!options["sender"].as<bool>() and !options["receiver"].as<bool>()) 
+    if ((not options["sender"].as<bool>() and not options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
         LOG_ERROR("argument error: must be sender OR receiver OR localvideo."); 
         return 1;
     }
 
-    bool disableVideo = !options.count("videoport");
-    bool disableAudio = !options.count("audioport");
+    bool disableVideo = not options.count("videoport");
+    bool disableAudio = not options.count("audioport");
 
 
     if (disableVideo and disableAudio)
@@ -228,7 +228,7 @@ short Milhouse::run(int argc, char **argv)
     }
 
     // Fail early, other port checks do happen later too
-    if (!disableAudio and !disableVideo)
+    if (not disableAudio and not disableVideo)
         if (options["videoport"].as<int>() == options["audioport"].as<int>())
         {
             LOG_ERROR("argument error: videoport and audioport cannot be equal"); 
@@ -253,12 +253,18 @@ int main(int argc, char **argv)
         Milhouse milhouse;
         ret = milhouse.run(argc, argv);
     }
-    catch (const Except &e) // these are our exceptions, so we can assume they've already been logged
+    catch (const Except &e)  // these are our exceptions
     {
-#ifdef CONFIG_DEBUG_LOCAL
-        std::cerr << "exitting with error: " << e.what() << std::endl;
-#endif
-        ret = 1;
+        if (std::string(e.what()).find("INTERRUPTED") not_eq std::string::npos)
+        {
+            std::cout << "Interrupted" << std::endl;
+            ret = 0;
+        }
+        else
+        {
+            std::cerr << "exitting with error: " << e.what() << std::endl;
+            ret = 1;
+        }
     }
     catch (const std::exception &e) // these are other exceptions (not one of our exception classes)
     {
