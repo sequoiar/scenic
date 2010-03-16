@@ -7,13 +7,16 @@ all:
         echo "make all in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) all); done
 
-html: doxygen
+html: doxygen epydoc
 	@for i in $(SUBDIRS); do \
         echo "make html in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) html); done
 	
 doxygen:
 	@if [ -z `which doxygen` ]; then echo "No Doxygen!"; else doxygen; fi
+
+epydoc:
+	@if [ -z `which epydoc` ]; then echo "No epydoc!"; else epydoc --html --output pythondocs --url http://svn.sat.qc.ca/trac/scenic/ --name Scenic --verbose --simple-term --css epydoc.css ../py/scenic ../py/scripts/scenic ../py/scripts/midistream ../py/rtpmidi; fi
 
 install: 
 	@if test -e html; then \

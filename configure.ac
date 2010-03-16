@@ -160,6 +160,24 @@ AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"],
     AS_IF([test "x${HAVE_PYMOD_SIMPLEJSON}" = "xno"],
         [AC_MSG_ERROR([Requires one of json or simplejson])]))
 
+# check for programs
+# Maybe $PATH does not contain /sbin
+AC_CHECK_PROG(IFCONFIG, ifconfig, yes, no, "${PATH}:/sbin")
+AS_IF([test "x${IFCONFIG}" = "xno"],
+    [AC_MSG_ERROR([Requires ifconfig])])
+
+AC_CHECK_PROG(XDPYINFO, xdpyinfo, yes, no)
+AS_IF([test "x${XDPYINFO}" = "xno"],
+    [AC_MSG_ERROR([Requires xdpyinfo])])
+
+AC_CHECK_PROG(XVINFO, xvinfo, yes, no)
+AS_IF([test "x${XVINFO}" = "xno"],
+    [AC_MSG_ERROR([Requires xvinfo])])
+
+AC_CHECK_PROG(JACKD, jackd, yes, no)
+AS_IF([test "x${JACKD}" = "xno"],
+    [AC_MSG_ERROR([Requires jackd])])
+
 # Check for gst-plugins that we use
 # PYTHON defined in ax_python_module
 GST_CHECK=$srcdir/utils/gst_check.py
