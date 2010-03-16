@@ -148,7 +148,8 @@ else
     AC_DEFINE(CONFIG_GL,[],[GL define from configure])
 fi
 
-# Check for pypm
+# Check for python modules, if second arg is non-empty,
+# configure exits with an error (NOTE: it will not print this argument!)
 AX_PYTHON_MODULE([pypm], [Missing pypm])
 AX_PYTHON_MODULE([twisted], [Missing twisted])
 AX_PYTHON_MODULE([gtk], [Missing gtk])
