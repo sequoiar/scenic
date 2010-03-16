@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#define CREATE_SOCKFD
 #include <gst/gst.h>
 #include <cstring>
 #include <netdb.h>
