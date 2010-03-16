@@ -567,10 +567,10 @@ class Application(object):
             cameras = self.devices["cameras"].keys()
                 
             if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
-                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared !.") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared!") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
                 return deferred.callback(False)
             elif self.config.video_source == "v4l2src" and self.config.video_device not in cameras: #TODO: do not test if not sending video
-                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared !.") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
                 return deferred.callback(False)
                 
             elif not self.devices["jackd_is_running"]:
