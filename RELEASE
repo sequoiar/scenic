@@ -1,14 +1,8 @@
-Release notes for Scenic 0.4.3
+Release notes for Scenic 0.4.4
 
-    Milhouse:
-    This release fixes a bug with dc1394src in localvideo. This release
-    introduces audiobitrate and quality settings for vorbis and mp3.
-    Another new feature is the xid option that allows a user to specify
-    an xid for the video window that could belong to a separate process. 
-
-    Scenic GUI:
-    This release improves error dialogs and error handling in general.
-    It also allows a milhouse video preview to be embedded in scenic.
+This release backports various major bugfixes (mainly packaging), and 
+introduces no new features since 0.4.3, as new development takes place 
+in the 0.5 branch.
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -16,22 +10,21 @@ Release notes for Scenic 0.4.3
     * In the older source directory, use "make uninstall" as root to
     uninstall previous installations.
     * Don't forget to run ldconfig after installation.
-    * As of 0.4.2 and later (this release included), 
-    you may want to run ./utils/install_gstreamer.sh again or simply
-    apply the utils/rtpsource.diff patch to gst-plugins-good-0.10.17,
-    then recompile and reinstall it. Refer to
+    * As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
+    again or simply apply the utils/rtpsource.diff patch to
+    gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
     https://bugzilla.gnome.org/show_bug.cgi?id=611213
     This fix adds receiver side bitrate estimation. Note that milhouse
     will function fine without it, as will scenic.
     * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
-    Install them with aptitude.
+    Install them with aptitude. 
 
     Backward compatibility:
-    Each release in the 0.4 series should be interoperable between each other.
+    Each release in the 0.4 series should be interoperable with each other.
 
     Milhouse dependency for Scenic
-    Scenic always needs the same version of milhouse, eg. scenic 0.4.1
-    needs milhouse 0.4.1
+    Scenic always needs the same version of milhouse, eg. scenic 0.4.4
+    needs milhouse 0.4.4
 
     Limitations:
     * While milhouse supports many video and audio input types, Scenic
@@ -39,27 +32,17 @@ Release notes for Scenic 0.4.3
     * Network testing and MIDI transmission are not handled by Scenic
     yet.
 
-Milhouse Fixes:
+Misc. Fixes:
+#370: RELEASE not include in tarball by make dist
 
-#236: add audio bitrate/quality settings for mp3 and vorbis
-#321: use variable map everywhere
-#326: dc1394src has too many colourspace conversions for localvideo
-#238: --x-window-id option added
-#334: install_gstreamer.sh, boost1_35_for_hardy.sh, gst_check.py and install_lame.sh are not in the tarball
+Milhouse Fixes:
+#328: improve gst element checking at configure stage
+#364: make distcheck broken by gst_check.py
+#372: make shared_video compatible with AC_CHECK_LIB
 
 Scenic Fixes:
-#274: accepting invite at last minutes leads to one way stream
-#308: Add a timeout to some dialogs
-#309: Receiving an invitation should make the peer unavailable for others
-#325: When the answerer cancels, he sees a timeout error dialog
-#312: An invite to an unreachable address gives a bad error message
-#316: Add display and fullscreen in summary
-#319: start jackd in short form leads to KeyError when looking for jack info
-#228: gross output in error dialog on trying to join
-#322: Add current DISPLAY variable to list of screens
-#310: os.environ['GTK2_RC-FILES'] should be cleared when launching external applications
-#306: Do a flight check before starting a stream
-#329: Sometimes some unsupported image sizes are listed
-#331: Preview not in a window should use the parent's display
-#333: make distcheck fails
+#356: when inviting, gtkwarning gets posted
+#361: check for python modules at configure stage
+#349: ./configure should check for python-portmidi
+#347: fix ProcessIO to avoid truncating output
 
