@@ -30,8 +30,6 @@
 # http://diary.atzm.org/20080912.html
 
 
-import sys
-import os
 import os.path
 import glob
 import commands
