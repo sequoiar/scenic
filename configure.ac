@@ -162,7 +162,8 @@ AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"],
 
 # Check for gst-plugins that we use
 GST_CHECK=$srcdir/utils/gst_check.py
-AS_IF([! python $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed])])
+# PYTHON defined in ax_python_module
+AS_IF([! $PYTHON $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed])])
 
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
