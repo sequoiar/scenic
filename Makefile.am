@@ -1,5 +1,6 @@
 SUBDIRS = src locale data py doc utils man 
 ACLOCAL_AMFLAGS = -I m4
+EXTRA_DIST = RELEASE
 
 install-exec-hook:
 	@if test -e doc/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/sphinx; cp -fvr py/docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/sphinx; fi
