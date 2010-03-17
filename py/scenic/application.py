@@ -22,17 +22,35 @@
 """
 Main application classes.
 
-Negotiation is done as follow:
-------------------------------
- * {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
-   * Each peer ask for ports to send to, and of media settings as well. "video": [{"port":10000, "codec":"mpeg4", "bitrate":3000000}]
- * {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
- * {"msg":"REFUSE", "sid":0}
- * {"msg":"CANCEL", "sid":0}
- * {"msg":"ACK", "sid":0}
- * {"msg":"BYE", "sid":0}
- * {"msg":"OK", "sid":0}
+Here is the sequence in which events occur.
+===========================================
+ - At startup, the config file is read.
+ - Next, we need to disable the interactivity of widgets
+ - We then set the widget's values, and make them interactive again.
+ - Some widgets do things when they are changed. Some toggle the sensitivity (gray out) of some other widgets, whereas some other will call external processes to change video and audio devices properties. 
+ - When the user decides to start a streaming session, the value of all widgets is read, and we save those values in the config file. 
+ - Next, the offerer connects to the answerer and sends it a dict of its configuration options, serialized in JSON. 
+ - If the answerer accepts, he sends back its options. Each peer decides which port he listens to for each service. (audio, video, MIDI streams) 
+ - Next, the streamer manager store a summary of both peer's options in a large dict. That's where we check which processes we will need to start. 
+ - The streamer manager starts the processes. 
+ - Some processes' output might be checked for error messages, which can be shown to the user in error dialogs.
+ - As soon as one process dies or the user wants to stop the streaming session, we kill all streamer processes and send "BYE" to the other peer. The other peer also stops all its streamer processes.
+ - When a session is in progress, many widgets are grayed out. It is not the case when there is no session in progress.
 
+The preview
+===========
+The preview works a little like the streamer manager, but is simpler since it does not involve a remote peer. It is a process that is started. When it dies, we toggle the start of the start/stop button. 
+
+Negotiation sequence
+====================
+ - {"msg":"INVITE", "videoport":10000, "audioport":11000, "sid":0, "please_send_to_port":999}
+  - Each peer ask for ports to send to, and of media settings as well. "video": [{"port":10000, "codec":"mpeg4", "bitrate":3000000}]
+ - {"msg":"ACCEPT", "videoport":10000, "audioport":11000, "sid":0}
+ - {"msg":"REFUSE", "sid":0}
+ - {"msg":"CANCEL", "sid":0}
+ - {"msg":"ACK", "sid":0}
+ - {"msg":"BYE", "sid":0}
+ - {"msg":"OK", "sid":0}
 """
 import os
 from twisted.internet import defer
