@@ -1,4 +1,4 @@
-dist_pkgdata_DATA=footer.html header.html doxygen.css Doxyfile
+dist_pkgdata_DATA=footer.html header.html doxygen.css epydoc.css Doxyfile
 
 all: 
 	@for i in $(SUBDIRS); do \

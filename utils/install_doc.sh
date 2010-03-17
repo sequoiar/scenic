@@ -7,5 +7,5 @@ fi
 target="$1"
 base=$(dirname $0)/..
 
-rsync -rv $base/doc/html/ $target/doxygen/
-rsync -rv $base/doc/pythondocs $target/epydocs/
+rsync -rv --delete $base/doc/html/ $target/doxygen/
+rsync -rv --delete $base/doc/pythondocs/ $target/epydocs/
