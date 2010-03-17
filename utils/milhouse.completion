@@ -5,7 +5,7 @@ _milhouse()
 
         COMPREPLY=()
         cur=${COMP_WORDS[COMP_CWORD]}
-        COMPREPLY=($(compgen -W "$(milhouse --help | awk '/, --/ { sub(/^.*-., /, "");sub(/[ =].*$/,"");print }')" -- $cur ) )
+        COMPREPLY=($(compgen -W "$(milhouse --help | awk '/--/ { sub(/^.*--/, "--");sub(/[ =].*$/,"");print }')" -- $cur ) )
 }
 complete -F _milhouse milhouse
 
