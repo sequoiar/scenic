@@ -17,9 +17,33 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+
+#include <stdio.h>
 
 int main(int argc, char *argv[])
 {
+    const char* backend = "alsa";
+    const char* device = "hw:0";
+    const char* name = "default";
+    int nperiods = 2;
+    int period = 1024;
+    int pid = 7471;
+    int rate = 44100;
+
+    printf(
+    "backend:   %s  \n"
+    "device:    %s  \n"
+    "name:      %s  \n"
+    "nperiods:  %d  \n"
+    "period:    %d  \n"
+    "pid:       %d  \n"
+    "rate:      %d  \n",
+    backend,
+    device,
+    name,
+    nperiods,
+    period,
+    pid,
+    rate);
     return 0;
 }
