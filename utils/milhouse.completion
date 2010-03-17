@@ -1,0 +1,11 @@
+have milhouse &&
+_milhouse()
+{
+        local cur
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        COMPREPLY=($(compgen -W "$(milhouse --help | awk '/, --/ { sub(/^.*-., /, "");sub(/[ =].*$/,"");print }')" -- $cur ) )
+}
+complete -F _milhouse milhouse
+
