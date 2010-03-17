@@ -226,6 +226,7 @@ doc/Makefile
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile
+utils/jack-info/Makefile
 src/Makefile
 py/Makefile
 py/doc/Makefile

@@ -1,5 +1,4 @@
 import subprocess
-import platform
 from twisted.trial import unittest
 
 class TestDcCtl(unittest.TestCase):
