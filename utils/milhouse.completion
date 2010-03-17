@@ -5,7 +5,19 @@ _milhouse()
 
         COMPREPLY=()
         cur=${COMP_WORDS[COMP_CWORD]}
-        COMPREPLY=($(compgen -W "$(milhouse --help | awk '/--/ { sub(/^.*--/, "--");sub(/[ =].*$/,"");print }')" -- $cur ) )
+        prev="${COMP_WORDS[COMP_CWORD-1]}"
+        
+        if [[ "$cur" == -* ]]; then
+            COMPREPLY=($(compgen -W "$(milhouse --help | awk '/--/ { sub(/^.*--/, "--");sub(/[ =].*$/,"");print }')" -- $cur ) )
+        else
+            case "$prev" in
+            --videosource ) COMPREPLY=($(compgen -W "videotestsrc v4l2src v4lsrc dc1394src dv1394src filesrc" -- $cur ) ) ;;
+            --videodevice ) COMPREPLY=($(compgen -W "$(milhouse --list-cameras | awk '/Video4/ { sub(/:/, "");print $3 }')" -- $cur ) ) ;;
+            --audiosource ) COMPREPLY=($(compgen -W "audiotestsrc jackaudiosrc alsasrc pulsesrc" -- $cur ) ) ;;
+            --aspect-ratio ) COMPREPLY=($(compgen -W "4:3 16:9" -- $cur ) ) ;;
+            *) ;;
+            esac
+        fi
 }
 complete -F _milhouse milhouse
 
