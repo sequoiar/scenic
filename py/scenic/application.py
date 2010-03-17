@@ -103,7 +103,7 @@ class Config(saving.ConfigStateSaving):
     def __init__(self):
         # Default values
         self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
-        self.smtpserver = "smtp.sat.qc.ca"
+        self.smtpserver = "smtp.sat.qc.ca" 
         # ----------- AUDIO --------------
         self.email_info = "scenic@sat.qc.ca"
         self.audio_source = "jackaudiosrc"
@@ -200,6 +200,53 @@ class Application(object):
                 if dev["name"] == device_name:
                     ret = dev["number"]
                     break
+        return ret
+
+    def format_midi_device_name(self, midi_device_dict):
+        """
+        Formats a MIDI device name to show it to the user and save it to the state saving.
+        
+        If you change the format here, change the parsing in the device name parsing method.
+        
+        @param midi_device_dict: Dict of MIDI device info, as given by the MIDI device driver.
+        @type midi_device_dict: dict
+        @rtype: str
+        """
+        return "%s (%s)" % (midi_device_dict["name"], midi_device_dict["number"])
+
+    def parse_midi_device_name(self, formatted_name, is_input):
+        """
+        Parses a MIDI device name shown to the user, and return the device's number, or None if it is not found.
+        
+        It will not be found in the system if it doesn't exist anymore.        
+        See format_midi_device_name.
+
+        @param formatted_name: Name of the device, as given by the format_midi_device_name method.
+        @type formatted_name: str
+        @param is_input: True if it's an input device, False for an output device.
+        @type is_input: bool
+        @rtype: dict
+        """
+        # TODO: use only one method for MIDI, v4l2 devices, DC, DV, etc. 
+        #TODO: change second arg to a key name in the self.devices
+        #TODO: is it really possible to make a generic method for that?
+        ret = None
+        tokens = formatted_name.split("(") # split tokens
+        number = int(tokens[-1].split(")")[0]) # last token without closing parenthesis
+        name = "(".join(tokens[0:-1]).strip() # all tokens except last
+        if is_input:
+            key = "midi_input_devices"
+        else:
+            key = "midi_output_devices"
+        # try to find a device that matches both name and number
+        for dev in self.devices[key]:
+            if dev["name"] == name and dev["number"] == number:
+                ret = dev
+        # try to find a device that matches only the name
+        if ret is None:
+            for dev in self.devices[key]:
+                if dev["name"] == name:
+                    ret = dev
         return ret
 
     def _start_the_application(self):
@@ -626,7 +673,7 @@ class Application(object):
     
     def _get_local_config_message_items(self):
         """
-        Returns a dict with keys 'audio' and 'video' to send to remote peer.
+        Returns a dict with keys 'audio', 'midi' and 'video' to send to remote peer.
         @rtype: dict
         """
         return {
