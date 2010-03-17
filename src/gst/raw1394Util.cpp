@@ -143,15 +143,15 @@ std::vector<std::string> discoverAVC(int* port, octlet_t* guid)
                          avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or 
                        (rom_dir.unit_spec_id == MOTDCT_SPEC_ID))
                 {
-                    rom1394_free_directory(&rom_dir);
                     octlet_t my_guid, *pguid = (*guid == 1)? guid : &my_guid;
                     *pguid = rom1394_get_guid( handle, i );
-                    stream << "AV/C device with GUID 0x" << 
+                    stream << rom_dir.label << ": GUID 0x" << 
                         (quadlet_t) (*pguid>>32) << (quadlet_t) (*pguid & 0xffffffff) << std::endl;
                     results.push_back(stream.str());
                     LOG_DEBUG(stream.str());
                     device = i;
                     *port = j;
+                    rom1394_free_directory(&rom_dir);
                     break;
                 }
                 rom1394_free_directory(&rom_dir);
