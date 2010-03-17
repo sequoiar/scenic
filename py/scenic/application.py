@@ -22,8 +22,8 @@
 """
 Main application classes.
 
-Here is the sequence in which events occur.
-===========================================
+Summary of events
+=================
  - At startup, the config file is read.
  - Next, we need to disable the interactivity of widgets
  - We then set the widget's values, and make them interactive again.
@@ -36,6 +36,7 @@ Here is the sequence in which events occur.
  - Some processes' output might be checked for error messages, which can be shown to the user in error dialogs.
  - As soon as one process dies or the user wants to stop the streaming session, we kill all streamer processes and send "BYE" to the other peer. The other peer also stops all its streamer processes.
  - When a session is in progress, many widgets are grayed out. It is not the case when there is no session in progress.
+ - When we quit, the state of each widget is saved to the config file.
 
 The preview
 ===========
@@ -51,6 +52,30 @@ Negotiation sequence
  - {"msg":"ACK", "sid":0}
  - {"msg":"BYE", "sid":0}
  - {"msg":"OK", "sid":0}
+
+Devices names
+=============
+Identifying the devices is a difficult task. The users prefers to see the name of the device, not its number. That's what we show to the user and keep in the state saving. That makes it easier to identify them when there number changes. 
+
+For example, a given V4L2 video device can be mounted as /dev/video0 once and as /dev/video1 at an other time. Same for MIDI devices. 
+
+But what if we have two devices with same name? Here are two examples:
+
+MIDI example
+------------
+ - M Audio Delta 1010LT MIDI (2)
+ - USB Oxygen 8 v2 MIDI 1 (3)
+ - USB Oxygen 8 v2 MIDI 1 (5)
+
+V4L2 example
+------------
+ - BT878 video (Osprey 210/220/230 (/dev/video0)
+ - BT878 video (Osprey 210/220/230 (/dev/video1)
+ - UVC Camera (046d:0990) (/dev/video2)
+
+It's nice to show the device number/identifier to the user. In the worst case, the user can test the device to see if it's the right one or not. 
+
+So, our choice is to store both the name of the device and its number in the combo box widget and in the state saving. When we load the device name and number from the config file, we first check for the device with that name and number. If it does not exist, we try to find the first device with that name that we can find. If it does not exist, it defaults to the first choice in the list of devices of that kind. 
 """
 import os
 from twisted.internet import defer
