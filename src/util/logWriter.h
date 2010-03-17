@@ -75,22 +75,21 @@ namespace Log
 }
 
 #define THROW_(msg, level)     LOG_(msg, level)
-//Note mangle84579568749576948 varible name so that hiding an existing 
-//variable is unlikely
-//Do{} while(0) construct to preserve one statement syntax of LOG()
+// FIXME: find a way to do this without macros
+// use the name logger__FUNCTION____LINE___ 
+// to avoid shadowing other local variables
 
-#define LOG_(msg, level)                 \
-            do {                         \
-            std::ostringstream mangle84579568749576948;      \
-            mangle84579568749576948 << msg;                  \
-            cerr_log_throw(mangle84579568749576948.str(), level, __FILE__, __LINE__);    \
-            }                           \
-            while(0)
+#define LOG_(msg, level)                                                                        \
+    do {                                                                                        \
+        std::ostringstream logger ## __FUNCTION__ ## __LINE__;                                  \
+        logger ## __FUNCTION__ ## __LINE__ << msg;                                              \
+        cerr_log_throw(logger ## __FUNCTION__ ## __LINE__.str(), level, __FILE__, __LINE__);    \
+    } while (0)
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
-                int lineNum);
+        int lineNum);
 
-void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
-                int lineNum);
+void cerr_log_throw(const std::string &msg, LogLevel level, const std::string &fileName,
+        int lineNum);
 
 #endif //  _LOG_WRITER_H_
