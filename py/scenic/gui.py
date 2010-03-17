@@ -196,7 +196,7 @@ class Gui(object):
         self._inviting_timeout_delayed = None
         widgets_tree = glade.get_widgets_tree()
         
-        self._widgets_changed_by_user = True
+        self._widgets_changed_by_user = True # if False, we are changing some widget's value programmatically.
         # connects callbacks to widgets automatically
         glade_signal_slots = {}
         for method in prefixedMethods(self, "on_"):
@@ -316,10 +316,6 @@ class Gui(object):
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=False)
         self.contact_list_widget.append_column(column)
         # TODO: those state variables interactive/not could be merged into a single one
-        self._v4l2_input_changed_by_user = True # if False, the software is changing those drop-down values itself.
-        self._v4l2_standard_changed_by_user = True
-        self._video_source_changed_by_user = True
-        self._video_view_preview_toggled_by_user = True
         # preview:
         self.preview_manager = preview.Preview(self.app)
         self.video_preview_icon_widget = widgets_tree.get_widget("video_preview_icon")
@@ -404,9 +400,8 @@ class Gui(object):
     def on_preview_manager_state_changed(self, manager, new_state):
         if new_state == process.STATE_STOPPED:
             print("Making the preview button to False since the preview process died.")
-            self._video_view_preview_toggled_by_user = False
-            self.video_view_preview_widget.set_active(False)
-            self._video_view_preview_toggled_by_user = True
+            self._widgets_changed_by_user = False
+            self._widgets_changed_by_user = True
             if self.preview_manager.is_busy():
                 self.preview_manager.stop()
             self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_PLAY, 4)
@@ -439,7 +434,7 @@ class Gui(object):
         #TODO: stop it when button is toggled to false.
         # It can be the user that pushed the button, or it can be toggled by the software.
         print 'video_view_preview toggled', widget.get_active()
-        if self._video_view_preview_toggled_by_user:
+        if self._widgets_changed_by_user:
             if widget.get_active():
                 self.app.save_configuration() #gathers and saves
                 self.preview_manager.start()
@@ -1151,13 +1146,13 @@ class Gui(object):
         """
         Called once Application.poll_camera_devices has been run
         """
-        self._video_source_changed_by_user = False
+        self._widgets_changed_by_user = False
         video_sources = self.app.devices["cameras"].keys()
         video_sources.insert(0, VIDEO_TEST_INPUT)
         print("Updating video sources with values %s" % (video_sources))
         _set_combobox_choices(self.video_source_widget, video_sources)
         self.update_v4l2_inputs_size_and_norm()
-        self._video_source_changed_by_user = True
+        self._widgets_changed_by_user = True
 
     def update_v4l2_inputs_size_and_norm(self):
         """
@@ -1166,8 +1161,7 @@ class Gui(object):
         If the selected is not a V4L2, disables the input and norm widgets.
         """
         value = _get_combobox_value(self.video_source_widget)
-        self._v4l2_input_changed_by_user = False
-        self._v4l2_standard_changed_by_user = False
+        self._widgets_changed_by_user = False
         # change choices and value:
         if value == VIDEO_TEST_INPUT:
             # INPUTS:
@@ -1205,15 +1199,14 @@ class Gui(object):
             print "supported sizes: ", cam["supported_sizes"]
             _set_combobox_choices(self.video_capture_size_widget, cam["supported_sizes"]) # TODO: more test sizes
         # once done:
-        self._v4l2_input_changed_by_user = True
-        self._v4l2_standard_changed_by_user = True
+        self._widgets_changed_by_user = True
             
     def on_video_source_changed(self, widget):
         """
         Called when the user changes the video source.
          * updates the input
         """
-        if self._video_source_changed_by_user:
+        if self._widgets_changed_by_user: 
             current_camera_name = _get_combobox_value(self.video_source_widget)
             if current_camera_name != VIDEO_TEST_INPUT:
                 self.app.poll_camera_devices()
@@ -1225,7 +1218,7 @@ class Gui(object):
         Calls `milhouse --videodevice /dev/videoX --v4l2-standard XXX
         Values are either NTSC or PAL.
         """
-        if self._v4l2_standard_changed_by_user:
+        if self._widgets_changed_by_user: 
             # change standard for device
             current_camera_name = _get_combobox_value(self.video_source_widget)
             if current_camera_name != VIDEO_TEST_INPUT:
@@ -1245,9 +1238,9 @@ class Gui(object):
                             print(msg)
                             dialogs.ErrorDialog.create(msg, parent=self.main_window)
                             
-                            self._v4l2_standard_changed_by_user = False
+                            self._widgets_changed_by_user = False
                             _set_combobox_value(self.v4l2_standard_widget, actual_standard)
-                            self._v4l2_standard_changed_by_user = True
+                            self._widgets_changed_by_user = True
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
                             print("Successfully changed standard to %s for device %s." % (actual_standard, current_camera_name))
@@ -1270,7 +1263,7 @@ class Gui(object):
         When the user changes the V4L2 input, we actually change this input using milhouse.
         Calls `milhouse --videodevice /dev/videoX --v4l2-input N
         """
-        if self._v4l2_input_changed_by_user:
+        if self._widgets_changed_by_user:
             # change input for device
             current_camera_name = _get_combobox_value(self.video_source_widget)
             if current_camera_name != VIDEO_TEST_INPUT:
