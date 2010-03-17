@@ -39,6 +39,9 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
+    // FIXME: temporary workaround for #143
+    if (remoteHost == "localhost")
+        remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();
 
     shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port));
@@ -56,6 +59,9 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
+    // FIXME: temporary workaround for #143
+    if (remoteHost == "localhost")
+        remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
     bool negotiateCaps = not options["disable-caps-negotiation"].as<bool>();
