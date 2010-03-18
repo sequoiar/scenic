@@ -13,7 +13,7 @@ _milhouse()
             case "$prev" in
             --videosource ) COMPREPLY=($(compgen -W "videotestsrc v4l2src v4lsrc dc1394src dv1394src filesrc" -- $cur ) ) ;;
             --videodevice ) COMPREPLY=($(compgen -W "$(milhouse --list-cameras | awk '/Video4/ { sub(/:/, "");print $3 }')" -- $cur ) ) ;;
-            --audiosource ) COMPREPLY=($(compgen -W "audiotestsrc jackaudiosrc alsasrc pulsesrc" -- $cur ) ) ;;
+            --audiosource ) COMPREPLY=($(compgen -W "audiotestsrc jackaudiosrc alsasrc pulsesrc filesrc" -- $cur ) ) ;;
             --aspect-ratio ) COMPREPLY=($(compgen -W "4:3 16:9" -- $cur ) ) ;;
             *) ;;
             esac

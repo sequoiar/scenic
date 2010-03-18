@@ -19,16 +19,27 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdio.h>
+#include <jack/jack.h>
+
 
 int main(int argc, char *argv[])
 {
     const char* backend = "alsa";
     const char* device = "hw:0";
     const char* name = "default";
-    int nperiods = 2;
-    int period = 1024;
+    int nperiods;
+    jack_nframes_t period;
     int pid = 7471;
-    int rate = 44100;
+    jack_nframes_t rate;
+
+    jack_client_t *client;
+    jack_status_t status;
+    client = jack_client_open("jack-info", JackNoStartServer, &status);
+    period = jack_get_buffer_size(client);
+    rate = jack_get_sample_rate(client);
+    nperiods = rate / period;
+    jack_client_close(client);
+
 
     printf(
     "backend:   %s  \n"
