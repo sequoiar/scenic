@@ -83,7 +83,9 @@ void AudioReceiver::createSink(Pipeline &pipeline)
     gstlinkable::link(*decoder_, *sink_);   
     setCaps();
     tassert(gotCaps_);
-    tassert(remoteConfig_->capsMatchCodec()); 
+    if (not remoteConfig_->capsMatchCodec()) 
+        THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
+
     if (decoder_->adjustsBufferTime())
         sink_->adjustBufferTime(decoder_->minimumBufferTime()); // increase jitterbuffer as needed
 }

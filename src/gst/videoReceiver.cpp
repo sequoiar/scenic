@@ -105,7 +105,8 @@ void VideoReceiver::createSink(Pipeline &pipeline)
 
     setCaps();
     tassert(gotCaps_);
-    tassert(remoteConfig_->capsMatchCodec()); 
+    if (not remoteConfig_->capsMatchCodec()) 
+        THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
     decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed
 }
 
