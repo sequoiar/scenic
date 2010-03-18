@@ -69,10 +69,10 @@ Pipeline::Pipeline() : pipeline_(0), handlers_(),
 
 Pipeline::~Pipeline()
 {
+    Dv1394::reset();
     LOG_INFO("Unreffing pipeline");
     gst_object_unref(GST_OBJECT(pipeline_));
 
-    Dv1394::reset();
     delete [] titleStr_;
     titleStr_ = 0;
 }
