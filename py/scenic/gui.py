@@ -405,6 +405,9 @@ class Gui(object):
             if self.preview_manager.is_busy():
                 self.preview_manager.stop()
             self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_PLAY, 4)
+            self._widgets_changed_by_user = False
+            self. # XXX
+            self._widgets_changed_by_user = True
         elif new_state == process.STATE_STARTING:
             self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_STOP, 4)
 
