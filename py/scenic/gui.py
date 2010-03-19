@@ -400,13 +400,11 @@ class Gui(object):
     def on_preview_manager_state_changed(self, manager, new_state):
         if new_state == process.STATE_STOPPED:
             print("Making the preview button to False since the preview process died.")
-            self._widgets_changed_by_user = False
-            self._widgets_changed_by_user = True
-            if self.preview_manager.is_busy():
+            if self.preview_manager.is_busy(): # very unlikely
                 self.preview_manager.stop()
             self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_PLAY, 4)
             self._widgets_changed_by_user = False
-            self. # XXX
+            self.video_view_preview_widget.set_active(False)
             self._widgets_changed_by_user = True
         elif new_state == process.STATE_STARTING:
             self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_STOP, 4)
