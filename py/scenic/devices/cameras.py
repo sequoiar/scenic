@@ -44,7 +44,7 @@ def _beautify_camera_name(name):
     if name in ugly_to_beautiful_camera_names.keys():
         return ugly_to_beautiful_camera_names[name]
     elif name.startswith("UVC Camera"):
-        return "USB " % (name[4:]) # we replace UVC by USB
+        return "USB %s" % (name[4:]) # we replace UVC by USB
     else:
         return name
 
