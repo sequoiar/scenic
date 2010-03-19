@@ -478,6 +478,7 @@ class Gui(object):
             self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0] # FIXME: this var should be deprecated
             self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index] # FIXME: deprecate this!
             self.app.address_book.selected = self.selected_contact_index
+            self.update_invite_button_with_contact_name()
         else:
             # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(False)
@@ -826,6 +827,8 @@ class Gui(object):
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
             self.invite_contact_widget.set_sensitive(False)
+        # change invite button with the name of the selected contact
+        self.update_invite_button_with_contact_name()
         # AUDIO:
         audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
@@ -905,11 +908,11 @@ class Gui(object):
             print("streaming state has changed to %s" % (is_streaming))
             if is_streaming:
                 text = _("Stop streaming")
+                self.invite_label_widget.set_text(text)
                 icon = gtk.STOCK_CONNECT
             else:
-                text = _("Invite this contact")
+                self.update_invite_button_with_contact_name()
                 icon = gtk.STOCK_DISCONNECT
-            self.invite_label_widget.set_text(text)
             self.invite_icon_widget.set_from_stock(icon, 4)
             
             # Toggle sensitivity of many widgets:
@@ -947,6 +950,14 @@ class Gui(object):
             if self.preview_area_x_window_id is not None:
                 if self.preview_area_widget.window is not None:
                     self.preview_area_widget.window.clear()
+
+    def update_invite_button_with_contact_name(self):
+        contact = self.app.address_book.selected_contact
+        if contact is None:
+            text = _("Please select a contact")
+        else:
+            text = _("Invite %(contact)s") % {"contact": contact["name"]}
+        self.invite_label_widget.set_text(text)
 
     def make_midi_widget_sensitive_or_not(self):
         # make the MIDI widget insensitive if disabled
@@ -1070,7 +1081,6 @@ class Gui(object):
             self.info_receive_audio_widget.set_text("")
             self.info_receive_midi_widget.set_text("")
             self.info_send_midi_widget.set_text("")
-        
         
     def update_local_ip(self):
         """
