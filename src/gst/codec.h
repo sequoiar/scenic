@@ -236,7 +236,9 @@ class VorbisEncoder : public Encoder
 
     private:
         ~VorbisEncoder();
+        _GstElement *sinkElement() { return queue_; }
         Pay* createPayloader() const;
+        _GstElement *queue_;
 };
 
 /// Decoder that decodes vorbis into raw audio using the vorbis decoder.

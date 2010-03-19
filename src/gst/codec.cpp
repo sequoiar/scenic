@@ -380,8 +380,10 @@ RtpPay* TheoraDecoder::createDepayloader() const
 /// Constructor 
 VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality) 
     :
-        Encoder(pipeline, "vorbisenc")
+        Encoder(pipeline, "vorbisenc"),
+        queue_(pipeline.makeElement("queue", 0))
 {
+    gstlinkable::link(queue_, encoder_);
     static const double MIN_QUALITY = -0.1;  // from the vorbis plugin
     static const double MAX_QUALITY = 1.0;  // from the vorbis plugin
     static const int MIN_BITRATE = 0;  
