@@ -46,13 +46,13 @@ def _parse_milhouse_list_cameras(text):
             current_v4l2_device = name
             #print "  name", name
             v4l2_devices[name] = {
-                "name": name,
+                "name": name, # /dev/video0
                 "size": None,
                 "standard": None,
                 "is_interlaced": False,
                 "input": None, # int
-                "card": "",
-                "inputs": [],
+                "card": "", # Osprey 110
+                "inputs": [], # list of inputs
                 "supported_sizes": []
                 }
             currently_parsed_is_v4l2 = True
@@ -150,7 +150,6 @@ def list_cameras():
     d.addErrback(_eb, deferred)
     return deferred
 
-
 #if __name__ == "__main__":
 #    def _go():
 #        def _cb(result):
@@ -163,7 +162,6 @@ def list_cameras():
 #
 #    reactor.callLater(0, _go)
 #    reactor.run()
-
 
 TESTDATA = """Ver:0.3.6
 INFO:Built on Feb 10 2010 at 10:17:35
@@ -249,7 +247,6 @@ def set_v4l2_input_number(device_name="/dev/video0", input_number=0):
     deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
     return deferred
 
-
 def set_v4l2_video_standard(device_name="/dev/video0", standard="ntsc"):
     """
     Sets norm for a V4L2 device.
@@ -263,7 +260,6 @@ def set_v4l2_video_standard(device_name="/dev/video0", standard="ntsc"):
         return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
     deferred = utils.getProcessOutput(executable, args=args, env=os.environ)
     return deferred
-
 
 if __name__ == "__main__":
     pprint.pprint(_parse_milhouse_list_cameras(TESTDATA))

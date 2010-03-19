@@ -219,6 +219,25 @@ class Application(object):
         """
         return _format_device_name_and_identifier(midi_device_dict["name"], str(midi_device_dict["number"]))
 
+    def format_v4l2_device_name(self, device_dict):
+        print "formatyting v4l2 device name", device_dict
+        return _format_device_name_and_identifier(device_dict["card"], device_dict["name"])
+
+    def parse_v4l2_device_name(self, formatted_name):
+        ret = None
+        name, identifier = _parse_device_name_and_identifier(formatted_name)
+        key = "cameras"
+        # try to find a device that matches both name and identifier
+        for dev in self.devices[key].values():
+            if dev["card"] == name and dev["name"] == identifier:
+                ret = dev
+        if ret is None:
+            # try to find a device that matches only the name
+            for dev in self.devices[key].values():
+                if dev["card"] == name:
+                    ret = dev
+        return ret
+    
     def parse_midi_device_name(self, formatted_name, is_input=False):
         """
         Parses a MIDI device name shown to the user, and return the device's number, or None if it is not found.
@@ -232,9 +251,6 @@ class Application(object):
         @type is_input: bool
         @rtype: dict
         """
-        #TODO: use only one method for MIDI, v4l2 devices, DC, DV, etc. 
-        #TODO: change second arg to a key name in the self.devices
-        #TODO: is it really possible to make a generic method for that?
         ret = None
         name, number = _parse_device_name_and_identifier(formatted_name)
         if is_input:

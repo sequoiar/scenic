@@ -221,7 +221,12 @@ class StreamerManager(object):
             '--audioport', str(details["send"]["audio"]["port"]),
             ]
         if details["send"]["video"]["source"] == "v4l2src":
-            self.milhouse_send_cmd.extend(["--videodevice", details["send"]["video"]["device"]])
+            dev = self.app.parse_v4l2_device_name(details["send"]["video"]["device"])
+            if dev is None:
+                print "v4l2 device is not found !!!!"
+            else:
+                v4l2_dev_name = dev["name"]
+            self.milhouse_send_cmd.extend(["--videodevice", v4l2_dev_name])
         if details["send"]["video"]["codec"] != "theora":
             self.milhouse_send_cmd.extend(['--videobitrate', str(int(details["send"]["video"]["bitrate"] * 1000000))])
 

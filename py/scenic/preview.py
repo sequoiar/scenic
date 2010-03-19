@@ -45,7 +45,12 @@ class Preview(object):
         else:
             command += " --display %s" % (self.app.config.video_display) # xid does not work if DISPLAY is set to an other display.
         if self.app.config.video_source != "videotestsrc":
-            command += " --videodevice %s" % (self.app.config.video_device)
+            dev = self.app.parse_v4l2_device_name(self.app.config.video_device)
+            if dev is None:
+                print "v4l2 device is not found !", self.app.config.video_device
+                #FIXME: handle this
+            video_device = dev["name"]
+            command += " --videodevice %s" % (video_device)
         return command
         
     def start(self):

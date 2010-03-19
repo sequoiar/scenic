@@ -684,9 +684,14 @@ class Gui(object):
         video_source = _get_combobox_value(self.video_source_widget)
         if video_source == "Color bars":
             self.app.config.video_source = "videotestsrc"
-        elif video_source.startswith("/dev/video"): # TODO: firewire!
-            self.app.config.video_device = video_source # this is subtle
+        else:
+            #video_device = self.app.parse_v4l2_device_name(video_source)
+            #if video_device is None:
+            #    print "Could not find video device %s" % (video_source)
+            #elif video_source.startswith("/dev/video"): # TODO: firewire!
+            #TODO: check if it is a v4l2 device.
             self.app.config.video_source = "v4l2src"
+            self.app.config.video_device = video_source # Using the name and id as a video_device
         print ' * videosource:', self.app.config.video_source
         # VIDEO CODEC:
         video_codec = _get_combobox_value(self.video_codec_widget)
@@ -1147,7 +1152,7 @@ class Gui(object):
         Called once Application.poll_camera_devices has been run
         """
         self._widgets_changed_by_user = False
-        video_sources = self.app.devices["cameras"].keys()
+        video_sources = [self.app.format_v4l2_device_name(dev) for dev in self.app.devices["cameras"].values()]
         video_sources.insert(0, VIDEO_TEST_INPUT)
         print("Updating video sources with values %s" % (video_sources))
         _set_combobox_choices(self.video_source_widget, video_sources)
@@ -1175,29 +1180,40 @@ class Gui(object):
         else:
             # INPUTS:
             current_camera_name = _get_combobox_value(self.video_source_widget)
-            cam = self.app.devices["cameras"][current_camera_name]
-            current_input = cam["input"]
-            if current_input is not None: # check if device has many inputs
-                self.v4l2_input_widget.set_sensitive(True)
-                _set_combobox_choices(self.v4l2_input_widget, cam["inputs"])
-                _set_combobox_value(self.v4l2_input_widget, cam["inputs"][current_input]) # which in turn calls on_v4l2_input_changed
-            else:
+            cam = self.app.parse_v4l2_device_name(current_camera_name)
+            if cam is None:
+                print "v4l2 device is none !!", current_camera_name
+                # INPUTS:
                 self.v4l2_input_widget.set_sensitive(False)
                 self.v4l2_input_widget.set_active(-1)
-                
-            # STANDARD: 
-            current_standard = cam["standard"]
-            if current_standard is not None: # check if device supports different standards
-                self.v4l2_standard_widget.set_sensitive(True)
-                _set_combobox_choices(self.v4l2_standard_widget, VIDEO_STANDARDS)
-                _set_combobox_value(self.v4l2_standard_widget, cam["standard"]) # which in turn calls on_v4l2_standard_changed
-            else:
+                # STANDARD:
                 self.v4l2_standard_widget.set_sensitive(False)
                 self.v4l2_standard_widget.set_active(-1)
-            #self.v4l2_standard_widget.set_sensitive(True)
-            # SIZE:
-            print "supported sizes: ", cam["supported_sizes"]
-            _set_combobox_choices(self.video_capture_size_widget, cam["supported_sizes"]) # TODO: more test sizes
+                # SIZE:
+                _set_combobox_choices(self.video_capture_size_widget, ALL_SUPPORTED_SIZE)
+            else:
+                current_input = cam["input"]
+                if current_input is not None: # check if device has many inputs
+                    self.v4l2_input_widget.set_sensitive(True)
+                    _set_combobox_choices(self.v4l2_input_widget, cam["inputs"])
+                    _set_combobox_value(self.v4l2_input_widget, cam["inputs"][current_input]) # which in turn calls on_v4l2_input_changed
+                else:
+                    self.v4l2_input_widget.set_sensitive(False)
+                    self.v4l2_input_widget.set_active(-1)
+                
+                # STANDARD: 
+                current_standard = cam["standard"]
+                if current_standard is not None: # check if device supports different standards
+                    self.v4l2_standard_widget.set_sensitive(True)
+                    _set_combobox_choices(self.v4l2_standard_widget, VIDEO_STANDARDS)
+                    _set_combobox_value(self.v4l2_standard_widget, cam["standard"]) # which in turn calls on_v4l2_standard_changed
+                else:
+                    self.v4l2_standard_widget.set_sensitive(False)
+                    self.v4l2_standard_widget.set_active(-1)
+                #self.v4l2_standard_widget.set_sensitive(True)
+                # SIZE:
+                print "supported sizes: ", cam["supported_sizes"]
+                _set_combobox_choices(self.video_capture_size_widget, cam["supported_sizes"]) # TODO: more test sizes
         # once done:
         self._widgets_changed_by_user = True
             
@@ -1207,8 +1223,10 @@ class Gui(object):
          * updates the input
         """
         if self._widgets_changed_by_user: 
-            current_camera_name = _get_combobox_value(self.video_source_widget)
-            if current_camera_name != VIDEO_TEST_INPUT:
+            full_name = _get_combobox_value(self.video_source_widget)
+            if full_name != VIDEO_TEST_INPUT:
+                dev = self.app.parse_v4l2_device_name(full_name)
+                current_camera_name = dev["name"]
                 self.app.poll_camera_devices()
             self.update_v4l2_inputs_size_and_norm()
 
@@ -1220,8 +1238,10 @@ class Gui(object):
         """
         if self._widgets_changed_by_user: 
             # change standard for device
-            current_camera_name = _get_combobox_value(self.video_source_widget)
-            if current_camera_name != VIDEO_TEST_INPUT:
+            full_name = _get_combobox_value(self.video_source_widget)
+            if full_name != VIDEO_TEST_INPUT:
+                dev = self.app.parse_v4l2_device_name(full_name)
+                current_camera_name = dev["name"]
                 def _cb2(result):
                     # callback for the poll_cameras_devices deferred.
                     # check if successfully changed norm
@@ -1248,8 +1268,7 @@ class Gui(object):
                     self.v4l2_standard_widget.set_sensitive(True)
                 
                 standard_name = _get_combobox_value(widget)
-                cam = self.app.devices["cameras"][current_camera_name]
-                
+                #cam = self.app.devices["cameras"][current_camera_name]
                 self.v4l2_standard_widget.set_sensitive(False)
                 d = cameras.set_v4l2_video_standard(device_name=current_camera_name, standard=standard_name)
                 def _cb(result):
