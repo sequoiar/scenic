@@ -150,7 +150,11 @@ fi
 
 # Check for python modules, if second arg is non-empty,
 # configure exits with an error (NOTE: it will not print this argument!)
-AX_PYTHON_MODULE([pypm], [Missing pypm])
+
+AX_PYTHON_MODULE([pypm], [])
+AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
+        [AC_MSG_ERROR([Requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home])])
+
 AX_PYTHON_MODULE([twisted], [Missing twisted])
 AX_PYTHON_MODULE([gtk], [Missing gtk])
 AX_PYTHON_MODULE([gst], [Missing gst])
@@ -180,8 +184,8 @@ AS_IF([test "x${JACKD}" = "xno"],
     [AC_MSG_ERROR([Requires jackd])])
 
 # Check for gst-plugins that we use
-# PYTHON defined in ax_python_module
 GST_CHECK=$srcdir/utils/gst_check.py
+# PYTHON defined in ax_python_module
 AS_IF([! $PYTHON $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed])])
 
 if test "x${enable_debug}" = "xyes" ; then
