@@ -1062,13 +1062,13 @@ class Gui(object):
             _info_send_midi = ""
             if details["receive"]["midi"]["enabled"]:
                 _info_recv_midi += _("Receiving MIDI") + "\n"
-                _info_recv_midi += _("Output device: %(name)s" % {"name": self.app.config.midi_output_device}) + "\n"
+                #_info_recv_midi += _("Output device: %(name)s" % {"name": self.app.config.midi_output_device}) + "\n"
                 _info_recv_midi += _("Jitter buffer: %(jitterbuffer)d ms" % {"jitterbuffer": self.app.config.midi_jitterbuffer})
             else:
                 _info_recv_midi += _("Disabled")
             if details["send"]["midi"]["enabled"]:
                 _info_send_midi += _("Sending MIDI") + "\n"
-                _info_send_midi += _("Input device: %(name)s" % {"name": self.app.config.midi_input_device})
+                #_info_send_midi += _("Input device: %(name)s" % {"name": self.app.config.midi_input_device})
             else:
                 _info_send_midi += _("Disabled")
                 
