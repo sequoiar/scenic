@@ -310,12 +310,14 @@ class StreamerManager(object):
         midi_send_enabled = self.session_details["send"]["midi"]["enabled"]
         
         if midi_recv_enabled:
+            midi_out_device = self.app.parse_midi_device_name(details["receive"]["midi"]["output_device"], is_input=False)
+            #TODO: check if is None
             midi_recv_args = [
                 "midistream",
                 "--address", details["peer"]["address"],
                 "--receiving-port", str(details["receive"]["midi"]["port"]),
                 "--jitter-buffer", str(details["receive"]["midi"]["jitterbuffer"]),
-                "--output-device", str(self.app.get_midi_device_number(details["receive"]["midi"]["output_device"], is_input=False)),
+                "--output-device", str(midi_out_device["number"])
                 ]
                 #"--verbose",
             midi_recv_command = " ".join(midi_recv_args) 
@@ -325,11 +327,13 @@ class StreamerManager(object):
             self.midi_receiver.stderr_line_signal.connect(self.on_midi_stderr_line)
         
         if midi_send_enabled:
+            midi_in_device = self.app.parse_midi_device_name(details["receive"]["midi"]["input_device"], is_input=True)
+            #TODO: check if is None
             midi_send_args = [
                 "midistream",
                 "--address", details["peer"]["address"],
                 "--sending-port", str(details["send"]["midi"]["port"]),
-                "--input-device", str(self.app.get_midi_device_number(details["send"]["midi"]["input_device"], is_input=True)),
+                "--input-device", str(midi_in_device["number"])
                 ]
                 #"--verbose",
             midi_send_command = " ".join(midi_send_args) 

@@ -1135,8 +1135,8 @@ class Gui(object):
         Called once Application.poll_midi_devices has been run
         """
         self._widgets_changed_by_user = False
-        input_devices = [device["name"] for device in self.app.devices["midi_input_devices"]]
-        output_devices = [device["name"] for device in self.app.devices["midi_output_devices"]]
+        input_devices = [self.app.format_midi_device_name(device) for device in self.app.devices["midi_input_devices"]]
+        output_devices = [self.app.format_midi_device_name(device) for device in self.app.devices["midi_output_devices"]]
         print("Updating MIDI devices with values %s %s" % (input_devices, output_devices))
         _set_combobox_choices(self.midi_input_device_widget, input_devices)
         _set_combobox_choices(self.midi_output_device_widget, output_devices)

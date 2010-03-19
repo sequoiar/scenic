@@ -141,6 +141,35 @@ class Config(saving.ConfigStateSaving):
         config_file_path = os.path.join(config_dir, config_file)
         saving.ConfigStateSaving.__init__(self, config_file_path)
 
+def _format_device_name_and_identifier(name, identifier):
+    """
+    Formats a device name to show it to the user and save it to the state saving.
+    
+    If you change the format here, change the parsing in the device name parsing method.
+    See _parse_device_name_and_identifier.
+    @param name: Name of the device.
+    @param identifier: Identifier of the device.
+    @rtype: str
+    """
+    #@param midi_device_dict: Dict of MIDI device info, as given by the MIDI device driver.
+    #@type midi_device_dict: dict
+    #@rtype: str
+    return "%s (%s)" % (name, identifier)
+
+def _parse_device_name_and_identifier(formatted_name):
+    """
+    Splits a device name and identifier.
+
+    See _format_device_name_and_identifier.
+    @param formatted_name: Name and identifier as shown to the user.
+    @rtype: tuple
+    @return: Name and identifier of the device. Both strings.
+    """
+    tokens = formatted_name.split("(") # split tokens
+    number = tokens[-1].split(")")[0] # last token without closing parenthesis
+    name = "(".join(tokens[0 : -1]).strip() # all tokens except last
+    return name, number
+
 class Application(object):
     """
     Main class of the application.
@@ -181,40 +210,16 @@ class Application(object):
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         reactor.callLater(0, self._start_the_application)
     
-    def get_midi_device_number(self, device_name, is_input):
-        """
-        Returns the number of a MIDI device, given its name.
-        
-        Returns None if the device name is not found.
-        @param is_input: bool True if it's an input device, False for an output device.
-        @param device_name: str
-        """
-        ret = None
-        if is_input:
-            for dev in self.devices["midi_input_devices"]:
-                if dev["name"] == device_name:
-                    ret = dev["number"]
-                    break
-        else:
-            for dev in self.devices["midi_output_devices"]:
-                if dev["name"] == device_name:
-                    ret = dev["number"]
-                    break
-        return ret
-
     def format_midi_device_name(self, midi_device_dict):
         """
         Formats a MIDI device name to show it to the user and save it to the state saving.
-        
-        If you change the format here, change the parsing in the device name parsing method.
-        
         @param midi_device_dict: Dict of MIDI device info, as given by the MIDI device driver.
         @type midi_device_dict: dict
         @rtype: str
         """
-        return "%s (%s)" % (midi_device_dict["name"], midi_device_dict["number"])
+        return _format_device_name_and_identifier(midi_device_dict["name"], str(midi_device_dict["number"]))
 
-    def parse_midi_device_name(self, formatted_name, is_input):
+    def parse_midi_device_name(self, formatted_name, is_input=False):
         """
         Parses a MIDI device name shown to the user, and return the device's number, or None if it is not found.
         
@@ -227,20 +232,18 @@ class Application(object):
         @type is_input: bool
         @rtype: dict
         """
-        # TODO: use only one method for MIDI, v4l2 devices, DC, DV, etc. 
+        #TODO: use only one method for MIDI, v4l2 devices, DC, DV, etc. 
         #TODO: change second arg to a key name in the self.devices
         #TODO: is it really possible to make a generic method for that?
         ret = None
-        tokens = formatted_name.split("(") # split tokens
-        number = int(tokens[-1].split(")")[0]) # last token without closing parenthesis
-        name = "(".join(tokens[0:-1]).strip() # all tokens except last
+        name, number = _parse_device_name_and_identifier(formatted_name)
         if is_input:
             key = "midi_input_devices"
         else:
             key = "midi_output_devices"
         # try to find a device that matches both name and number
         for dev in self.devices[key]:
-            if dev["name"] == name and dev["number"] == number:
+            if dev["name"] == name and dev["number"] == int(number):
                 ret = dev
         # try to find a device that matches only the name
         if ret is None:
@@ -312,7 +315,6 @@ class Application(object):
             self.gui.update_x11_devices()
         deferred.addCallback(_callback)
         return deferred
-
 
     def poll_camera_devices(self):
         """
@@ -741,11 +743,11 @@ class Application(object):
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
                 deferred.callback(False)
             
-            elif self.config.midi_recv_enabled and self.config.midi_output_device not in midi_output_devices:
+            elif self.config.midi_recv_enabled and self.parse_midi_device_name(self.config.midi_output_device, is_input=False) is None:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI output device %(device)s disappeared!") % {"device": self.config.midi_output_device}, parent=self.gui.main_window)
                 deferred.callback(False)
             
-            elif self.config.midi_send_enabled and self.config.midi_input_device not in midi_input_devices:
+            elif self.config.midi_send_enabled and self.parse_midi_device_name(self.config.midi_input_device, is_input=True) is None:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI input device %(device)s disappeared!") % {"device": self.config.midi_input_device}, parent=self.gui.main_window)
                 deferred.callback(False)
             
