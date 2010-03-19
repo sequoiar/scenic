@@ -28,6 +28,26 @@ from twisted.internet import defer
 from twisted.python import procutils
 from twisted.internet import reactor
 
+ugly_to_beautiful_camera_names = {
+    "BT878 video (Osprey 210/220/230": "Osprey 210/220/230",
+    "BT878 video (Osprey 100/150 (87": "Osprey 100/150",
+    }
+
+def _beautify_camera_name(name):
+    """
+    Renames a camera with a better name if it's in our list of know camera names.
+    
+    @rtype: str
+    @type name: str
+    """
+    global ugly_to_beautiful_camera_names
+    if name in ugly_to_beautiful_camera_names.keys():
+        return ugly_to_beautiful_camera_names[name]
+    elif name.startswith("UVC Camera"):
+        return "USB " % (name[4:]) # we replace UVC by USB
+    else:
+        return name
+
 def _parse_milhouse_list_cameras(text):
     """
     Parses the output of `milhouse --list-cameras`
@@ -87,7 +107,7 @@ def _parse_milhouse_list_cameras(text):
                 v4l2_devices[current_v4l2_device]["is_interlaced"] = is_interlaced
                 #print "  interlaced:", is_interlaced
             elif line.startswith("Card type"):
-                card = value
+                card = _beautify_camera_name(value)
                 v4l2_devices[current_v4l2_device]["card"] = card
                 #print "  card:", card
             elif line.startswith("Video input"):

@@ -220,7 +220,7 @@ class Application(object):
         return _format_device_name_and_identifier(midi_device_dict["name"], str(midi_device_dict["number"]))
 
     def format_v4l2_device_name(self, device_dict):
-        print "formatyting v4l2 device name", device_dict
+        print "formatting v4l2 device name", device_dict
         return _format_device_name_and_identifier(device_dict["card"], device_dict["name"])
 
     def parse_v4l2_device_name(self, formatted_name):
