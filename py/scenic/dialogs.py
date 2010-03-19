@@ -97,7 +97,7 @@ class GladeDialogFactory(object):
         else:
             print("Dialog %s is already destroyed."  % (self.name))
         
-    def _on_delete_event(self):
+    def _on_delete_event(self, *args):
         if not self._terminating:
             self._terminate(False)
 
@@ -125,7 +125,7 @@ class ConfirmDialog(GladeDialogFactory):
         self._dialog.connect('response', self._on_response_event, None)
         return deferred
 
-    def _on_response_event(self, widget, response_id):
+    def _on_response_event(self, widget, response_id, *args):
         """
         Calls the deferred with True of False as a result.
         """
@@ -148,7 +148,7 @@ class InvitedDialog(GladeDialogFactory):
         self._dialog.connect('response', self._on_response_event)
         return deferred
 
-    def _on_response_event(self, widget, response_id):
+    def _on_response_event(self, widget, response_id, *args):
         """
         Calls the deferred with True of False as a result.
         """
