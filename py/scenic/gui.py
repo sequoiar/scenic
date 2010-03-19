@@ -1287,7 +1287,7 @@ class Gui(object):
             current_camera_name = _get_combobox_value(self.video_source_widget)
             if current_camera_name != VIDEO_TEST_INPUT:
                 input_name = _get_combobox_value(widget)
-                cam = self.app.devices["cameras"][current_camera_name]
+                cam = self.app.devices["cameras"][input_name]
                 input_number = cam["inputs"].index(input_name)
                 d = cameras.set_v4l2_input_number(device_name=current_camera_name, input_number=input_number)
                 def _cb2(cameras):

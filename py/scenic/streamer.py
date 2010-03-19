@@ -332,7 +332,7 @@ class StreamerManager(object):
             self.midi_receiver.stderr_line_signal.connect(self.on_midi_stderr_line)
         
         if midi_send_enabled:
-            midi_in_device = self.app.parse_midi_device_name(details["receive"]["midi"]["input_device"], is_input=True)
+            midi_in_device = self.app.parse_midi_device_name(details["send"]["midi"]["input_device"], is_input=True)
             #TODO: check if is None
             midi_send_args = [
                 "midistream",
