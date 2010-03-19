@@ -534,7 +534,7 @@ class Application(object):
                         self.send_accept(addr)
                     connected_deferred.addCallback(_connected_cb)
                 else:
-                    text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept the connection?" % {"invited_by": invited_by})
+                    text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept?" % {"invited_by": invited_by})
                     dialog_deferred = self.gui.show_invited_dialog(text)
                     dialog_deferred.addCallback(_on_contact_request_dialog_response)
         
