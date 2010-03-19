@@ -39,6 +39,8 @@ class Dv1394 : boost::noncopyable
         void unsetAudioSink();
         void unsetVideoSink();
         static void cb_new_src_pad(_GstElement *  /*srcElement*/, _GstPad * srcPad, void *data);
+        // FIXME: SO GROSS!
+        void doTimestamp();
 
     private:
         Dv1394(const Pipeline &pipeline);

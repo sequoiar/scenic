@@ -29,6 +29,13 @@
 
 Dv1394 *Dv1394::instance_ = 0;
 
+/// used by localvideo
+void Dv1394::doTimestamp()
+{
+    tassert(dv1394src_ != 0);
+    g_object_set(dv1394src_, "do-timestamp", TRUE, NULL);
+}
+
 Dv1394::Dv1394(const Pipeline &pipeline) : 
     pipeline_(pipeline),
     dv1394src_(pipeline_.makeElement("dv1394src", NULL)), 

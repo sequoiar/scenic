@@ -31,6 +31,8 @@
 #include "videoFlip.h"
 #include "videoSink.h"
 
+#include "dv1394.h"
+
 using boost::shared_ptr;
 
 /// Constructor
@@ -65,6 +67,10 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     }
     else
         gstlinkable::link(*videoscale_, *sink_);
+
+    /// FIXME: hack for dv1394src
+    if (sourceConfig_->sourceString() == "dv1394src")
+        Dv1394::Instance(pipeline)->doTimestamp();
 }
 
 /// Destructor 
