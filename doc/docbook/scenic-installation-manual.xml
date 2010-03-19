@@ -6,6 +6,7 @@
   <!ENTITY manrevision "0.1">
   <!ENTITY date "March 2010">
   <!ENTITY app "<application>Scenic </application>">
+  <!ENTITY usermanual "scenic-user-manual.xml">
   <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
        Use the appversion entity to specify the version of the application.
@@ -125,7 +126,8 @@
 <!-- Translators may also add here feedback address for translations -->
     </legalnotice> 
   </bookinfo> 
-
+     
+  &usermanual;
   <indexterm zone="index"> 
     <primary>MY-GNOME-APP</primary> 
   </indexterm> 
@@ -268,6 +270,14 @@ The Scenic development project is a part of the SAT PropulseART research program
   
   <chapter id="HardwareSetup"> 
     <title>Hardware Setup</title>
+    <screenshot>
+    <screeninfo>Hardware_Setup-01</screeninfo>
+    <mediaobject>
+    <caption><para>The diagram below illustrate a generic Scenic connection sheme:</para></caption>    </mediaobject>
+    <imageobject><imagedata fileref="fig/hardware_setup_01.jpg" format="JPG"/> </imageobject>
+    <textobject><phrase>generic connection sheme:</phrase></textobject>
+    </screenshot>
+
   </chapter>
 
   <chapter id="SoftwareInstallation"> 
