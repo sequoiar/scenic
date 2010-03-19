@@ -155,9 +155,9 @@ AX_PYTHON_MODULE([pypm], [])
 AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
         [AC_MSG_ERROR([Requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home])])
 
-AX_PYTHON_MODULE([twisted], [Missing twisted])
-AX_PYTHON_MODULE([gtk], [Missing gtk])
-AX_PYTHON_MODULE([gst], [Missing gst])
+AX_PYTHON_MODULE([twisted], [Fatal])
+AX_PYTHON_MODULE([gtk], [Fatal])
+AX_PYTHON_MODULE([gst], [Fatal])
 AX_PYTHON_MODULE([json], [])
 AX_PYTHON_MODULE([simplejson], [])
 
