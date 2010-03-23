@@ -1293,31 +1293,37 @@ class Gui(object):
         When the user changes the V4L2 input, we actually change this input using milhouse.
         Calls `milhouse --videodevice /dev/videoX --v4l2-input N
         """
+        def _cb2(cameras):
+            try:
+                cam = cameras[current_camera_name]
+            except KeyError, e:
+                print("Camera %s disappeared !" % (current_camera_name))
+            else:
+                actual_input = cam["input"]
+                if actual_input != input_number:
+                    msg = _("Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s.") % {"current_input": actual_input, "desired_input": input_number, "device_name": current_camera_name}
+                    print(msg)
+                    # Maybe we should show an error dialog in that case, or set the value to what it really is.
+                else:
+                    print("Successfully changed input to %s for device %s." % (actual_input, current_camera_name))
+
+        def _cb(result):
+            d2 = cameras.list_cameras()
+            d2.addCallback(_cb2)
+
         if self._widgets_changed_by_user:
             # change input for device
             current_camera_name = _get_combobox_value(self.video_source_widget)
             if current_camera_name != VIDEO_TEST_INPUT:
-                input_name = _get_combobox_value(widget)
-                cam = self.app.devices["cameras"][input_name]
-                input_number = cam["inputs"].index(input_name)
-                d = cameras.set_v4l2_input_number(device_name=current_camera_name, input_number=input_number)
-                def _cb2(cameras):
-                    try:
-                        cam = cameras[current_camera_name]
-                    except KeyError, e:
-                        print("Camera %s disappeared !" % (current_camera_name))
-                    else:
-                        actual_input = cam["input"]
-                        if actual_input != input_number:
-                            msg = _("Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s.") % {"current_input": actual_input, "desired_input": input_number, "device_name": current_camera_name}
-                            print(msg)
-                            # Maybe we should show an error dialog in that case, or set the value to what it really is.
-                        else:
-                            print("Successfully changed input to %s for device %s." % (actual_input, current_camera_name))
-                def _cb(result):
-                    d2 = cameras.list_cameras()
-                    d2.addCallback(_cb2)
-                d.addCallback(_cb)
+                input_name = _get_combobox_value(widget) # self.v4l2_input_widget
+                #cam = self.app.devices["cameras"][input_name]
+                cam = self.app.parse_v4l2_device_name(current_camera_name)
+                if cam is None:
+                    print("No such v4l2 device: %s" % (input_name))
+                else:
+                    input_number = cam["inputs"].index(input_name)
+                    d = cameras.set_v4l2_input_number(device_name=cam["name"], input_number=input_number)
+                    d.addCallback(_cb)
 
     # -------------------------- menu items -----------------
     
