@@ -1,7 +1,7 @@
 have milhouse &&
 _milhouse()
 {
-        local cur
+        local cur prev
 
         COMPREPLY=()
         cur=${COMP_WORDS[COMP_CWORD]}
