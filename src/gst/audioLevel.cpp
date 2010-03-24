@@ -26,6 +26,7 @@
 #include <cmath>
 #include <gst/gst.h>
 #include "audioLevel.h"
+#include "vumeter.h"
 #include "pipeline.h"
 
 #include <iterator>

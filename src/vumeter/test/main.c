@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "vumeter.h"
 
-const gboolean LOG = FALSE;
+static const gboolean LOG = FALSE;
 
 static void
 set_value (gdouble value, gpointer data)

@@ -97,6 +97,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("v4l2-standard", po::value<string>(), "set v4l2 standard (NTSC,PAL)")
             ("v4l2-input", po::value<int>(), "set v4l2 input (0,1,2)")
             ("x-window-id", po::value<unsigned long>()->default_value(0), "set x-window-id to display video in an existing window")
+            ("vumeter-id", po::value<unsigned long>()->default_value(0), "id of the socket where the vumeters will be displayed")
             ;
 
         descriptionInitialized = true;

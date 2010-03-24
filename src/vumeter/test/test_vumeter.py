@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from twisted.trial import unittest
+import os
 import sys
 import subprocess
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gobject
 
 class TestVumeter(unittest.TestCase):
     def test_vumeter(self):
@@ -44,4 +44,7 @@ class TestVumeter(unittest.TestCase):
         gtk.main()
         self.failUnless(self.plug_added)
         self.failUnless(self.plug_removed)
+
+    if "DISPLAY" not in os.environ:
+        test_vumeter.skip = "No DISPLAY set, cannot run test"
 
