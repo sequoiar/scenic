@@ -1,4 +1,4 @@
-TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
+TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../:$(PATH) trial
 check_PROGRAMS = meter
 TESTS = test_vumeter.py
 

@@ -6,6 +6,7 @@
 #include <gdk/gdkx.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 #include "vumeter.h"
 
 const gboolean LOG = FALSE;
@@ -90,6 +91,13 @@ embed_event (GtkWidget * plug, gpointer data)
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
 }
 
+gboolean quit_cb(gpointer data)
+{
+    UNUSED(data);
+    gtk_main_quit();
+    return TRUE;
+}
+
 int
 main (int argc, char **argv)
 {
@@ -97,21 +105,26 @@ main (int argc, char **argv)
   GtkWidget *vumeter;
   GstBus *bus;
   gint watch_id;
+  GdkNativeWindow socket_id;  
   GstElement *pipeline;
   GstElement *source;
   GstElement *level;
+  GstElement *sink;
   enum
   { SINE = 0, SQUARE, SAW, TRIANGLE, SILENCE, WHITE_NOISE, PINK_NOISE,
     SINE_TABLE, TICKS, GAUSSIAN_NOISE
   };
 
-  GstElement *sink;
+  if (argc < 2)
+      socket_id = 0;
+  else
+      socket_id = atol(argv[1]);
 
   gtk_init (&argc, &argv);
   gst_init (&argc, &argv);
 
   /* make window */
-  plug = gtk_plug_new (0);
+  plug = gtk_plug_new (socket_id);
 
   /* end main loop when plug is destroyed */
   g_signal_connect (G_OBJECT (plug), "destroy", gtk_main_quit, NULL);
@@ -138,6 +151,8 @@ main (int argc, char **argv)
   gtk_widget_show_all (plug);
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
+  /* end in 1 second */
+  g_timeout_add(1000, quit_cb, NULL);
   gtk_main();
 
   gst_element_set_state (pipeline, GST_STATE_NULL);
