@@ -1,5 +1,7 @@
 vumeterdir = $(libdir)/scenic
 vumeter_LTLIBRARIES = libvumeter.la
+TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 PATH=../:$(PATH) trial
+TESTS = test/test_vumeter.py
 
 libvumeter_la_SOURCES = vumeter.cpp $(top_srcdir)/src/include/vumeter.h
 INCLUDES = -I$(top_srcdir)/src/include
