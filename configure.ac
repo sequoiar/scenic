@@ -256,6 +256,7 @@ src/util/Makefile
 src/gutil/Makefile
 src/shared_video/Makefile
 src/vumeter/Makefile
+src/vumeter/test/Makefile
 src/tcp/Makefile
 src/gst/Makefile
 src/firereset/Makefile

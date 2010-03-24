@@ -1,0 +1,8 @@
+TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
+check_PROGRAMS = meter
+TESTS = test_vumeter.py
+
+meter_SOURCES = main.c
+meter_CPPFLAGS = $(GLIB_CFLAGS) $(GTK_CFLAGS) $(GST_CFLAGS)
+meter_LDADD = $(GLIB_LIBS) $(GTK_LIBS) $(GST_LIBS) ../libvumeter.la
+INCLUDES = -I$(top_srcdir)/src/include
