@@ -81,14 +81,10 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
 
 
 void
-embed_event (GtkWidget * plug, gpointer data)
+embed_event (GtkWidget * plug)
 {
-  GstElement *pipeline = (GstElement *) data;
   UNUSED (plug);
   g_print ("embedded!");
-  /* we set the pipeline to PLAYING, this will distribute a default clock and
-   * start running. no preroll is needed */
-  gst_element_set_state (pipeline, GST_STATE_PLAYING);
 }
 
 gboolean quit_cb(gpointer data)
@@ -135,24 +131,26 @@ main (int argc, char **argv)
   /* make pipeline */
   pipeline = gst_pipeline_new ("pipeline");
   g_signal_connect (G_OBJECT (plug), "embedded",
-      G_CALLBACK (embed_event), pipeline);
+      G_CALLBACK (embed_event), NULL );
   source = gst_element_factory_make ("audiotestsrc", NULL);
   g_object_set (source, "wave", TICKS, NULL);
   level = gst_element_factory_make ("level", NULL);
-  sink = gst_element_factory_make ("autoaudiosink", NULL);
+  sink = gst_element_factory_make ("fakesink", NULL);
+  g_object_set(sink, "sync", TRUE, NULL);
 
   gst_bin_add_many (GST_BIN (pipeline), source, level, sink, NULL);
   gst_element_link_many (source, level, sink, NULL);
 
   bus = gst_element_get_bus (pipeline);
   watch_id = gst_bus_add_watch (bus, message_handler, vumeter);
+  gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
   /* show window and run main loop */
   gtk_widget_show_all (plug);
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
-  /* end in 1 second */
-  g_timeout_add(1000, quit_cb, NULL);
+  /* end in 1/2 second */
+  g_timeout_add(500, quit_cb, NULL);
   gtk_main();
 
   gst_element_set_state (pipeline, GST_STATE_NULL);

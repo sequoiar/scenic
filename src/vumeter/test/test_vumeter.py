@@ -12,6 +12,8 @@ class TestVumeter(unittest.TestCase):
             Makes a gtk window, gives socket id for the meter program
             to use for its plug which contains the vumeter.
         """
+        self.plug_added = False
+        self.plug_removed = False
         window = gtk.Window()
         window.show()
 
@@ -22,20 +24,23 @@ class TestVumeter(unittest.TestCase):
         print "Socket ID=", socket.get_id()
         window.connect("destroy", gtk.main_quit)
 
-        def plugged_event(widget):
+        def on_plug_added(widget):
             print "I (", widget, ") have just had a plug inserted!"
+            self.plug_added = True
+        def on_plug_removed(widget):
+            print "I (", widget, ") have just had a plug removed!"
+            self.plug_removed = True
+            gtk.main_quit()
 
-        socket.connect("plug-added", plugged_event)
-        socket.connect("plug-removed", gtk.main_quit)
+        socket.connect("plug-added", on_plug_added)
+        socket.connect("plug-removed", on_plug_removed)
 
         # redirect stderr to stdout
         print "opening process"
         command = 'meter %ld' % (socket.get_id())
         proc = subprocess.Popen([command, '"to stdout"'], 
-                shell=True, 
-                stderr=subprocess.STDOUT,
-                stdout=subprocess.PIPE)
-        #stdout_value = proc.communicate()[0]
-        #print stdout_value
+                shell=True)
         gtk.main()
+        self.failUnless(self.plug_added)
+        self.failUnless(self.plug_removed)
 
