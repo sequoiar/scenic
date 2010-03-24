@@ -5,6 +5,7 @@ import subprocess
 import pygtk
 pygtk.require('2.0')
 import gtk
+import gobject
 
 class TestVumeter(unittest.TestCase):
     def test_vumeter(self):

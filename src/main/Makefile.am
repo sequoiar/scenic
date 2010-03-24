@@ -6,7 +6,7 @@ TESTS = test/test_milhouse.py
 
 bin_PROGRAMS = milhouse
 
-milhouse_SOURCES = milhouse.cpp milhouseLogger.cpp milhouseLogger.h ConcurrentQueue.h milhouse.h
+milhouse_SOURCES = main.cpp milhouse.cpp milhouseLogger.cpp milhouseLogger.h ConcurrentQueue.h milhouse.h
 #FIXME GLIB_CFLAGS only here because pipeline.h has include glib/gtypes.h
 if SVN
 milhouse_CPPFLAGS = $(GLIB_CFLAGS) -D SVNVERSION=\"$(shell svnversion)\"

@@ -243,35 +243,3 @@ short Milhouse::run(int argc, char **argv)
     return 0;
 }
 
-int main(int argc, char **argv)
-{
-    int ret = 0;
-
-    try
-    {
-        signal_handlers::setHandlers();
-        Milhouse milhouse;
-        ret = milhouse.run(argc, argv);
-    }
-    catch (const Except &e)  // these are our exceptions
-    {
-        if (std::string(e.what()).find("INTERRUPTED") not_eq std::string::npos)
-        {
-            std::cout << "Interrupted" << std::endl;
-            ret = 0;
-        }
-        else
-        {
-            std::cerr << "exitting with error: " << e.what() << std::endl;
-            ret = 1;
-        }
-    }
-    catch (const std::exception &e)  // these are other exceptions (not one of our exception classes)
-    {
-        std::cerr << "exitting with error: " << e.what() << std::endl;
-        ret = 1;
-    }
-    std::cout << "Exitting Milhouse" << std::endl;
-    return ret;
-}
-
