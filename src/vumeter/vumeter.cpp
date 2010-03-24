@@ -1,9 +1,10 @@
 /* vumeter.c */
 
 #include "vumeter.h"
-#include <math.h>
+#include <cmath>
+#include <string>
 
-#define GRADIENT_SIZE 20
+static const int GRADIENT_SIZE = 20;
 
 static void gtk_vumeter_class_init (GtkVumeterClass * klass);
 static void gtk_vumeter_init (GtkVumeter * vumeter);
@@ -21,10 +22,11 @@ GtkType
 gtk_vumeter_get_type ()
 {
   static GtkType gtk_vumeter_type = 0;
+  gchar name[] = "GtkVumeter";
 
   if (!gtk_vumeter_type) {
     static const GtkTypeInfo gtk_vumeter_info = {
-      "GtkVumeter",
+      name,
       sizeof (GtkVumeter),
       sizeof (GtkVumeterClass),
       (GtkClassInitFunc) gtk_vumeter_class_init,
@@ -272,7 +274,7 @@ gtk_vumeter_destroy (GtkObject * object)
 
   vumeter = GTK_VUMETER (object);
 
-  klass = gtk_type_class (gtk_widget_get_type ());
+  klass = static_cast<GtkVumeterClass*>(gtk_type_class (gtk_widget_get_type ()));
 
   if (GTK_OBJECT_CLASS (klass)->destroy) {
     (*GTK_OBJECT_CLASS (klass)->destroy) (object);
