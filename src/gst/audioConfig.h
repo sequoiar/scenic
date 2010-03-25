@@ -25,11 +25,13 @@
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
+#include <gdk/gdktypes.h>
 #include <boost/program_options.hpp>
 
 // forward declarations
 class Pipeline;
 class AudioSource;
+class AudioLevel;
 class AudioSink;
 
 /// Immutable class that is used to parameterize AudioSender objects. 
@@ -55,6 +57,7 @@ class AudioSourceConfig
         bool locationExists() const;
          
         AudioSource* createSource(Pipeline &pipeline) const;
+        AudioLevel* createLevel(Pipeline &pipeline) const;
         unsigned long long bufferTime() const;
 
     private:
@@ -66,6 +69,7 @@ class AudioSourceConfig
         const std::string location_;
         const int numChannels_;
         const unsigned long long bufferTime_;
+        GdkNativeWindow socketID_;
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  

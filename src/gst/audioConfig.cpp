@@ -26,6 +26,7 @@
 
 #include "audioConfig.h"
 #include "audioSource.h"
+#include "audioLevel.h"
 #include "audioSink.h"
 #include "jackUtils.h"
 
@@ -40,10 +41,13 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
     deviceName_(options["audiodevice"].as<std::string>()), 
     location_(options["audiolocation"].as<std::string>()), 
     numChannels_(options["numchannels"].as<int>()),
-    bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC)
+    bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC),
+    socketID_(options["vumeter-id"].as<unsigned long>())
 {
+    using boost::lexical_cast;
+    using std::string;
     if(numChannels_ < 1)
-        THROW_CRITICAL("Invalid number of channels");
+        throw std::range_error("Invalid number of channels=" + lexical_cast<string>(numChannels_));
 }
 
 
@@ -99,6 +103,14 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
     return 0;
 }
 
+/// Factory method that creates an AudioLevel based on this object's socketID
+AudioLevel* AudioSourceConfig::createLevel(Pipeline &pipeline) const
+{
+    if (socketID_ != 0)
+        return new AudioLevel(pipeline, socketID_);
+    else 
+        return 0;
+}
 
 /// Returns c-style string specifying the location (filename) 
 const char* AudioSourceConfig::location() const

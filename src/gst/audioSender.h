@@ -34,6 +34,7 @@
 #include <boost/shared_ptr.hpp>
 
 class AudioSource;
+class AudioLevel;
 class Pipeline;
 class Encoder;
 class Pay;
@@ -61,6 +62,7 @@ class AudioSender
         Pipeline &pipeline_;
         RtpSender session_;
         AudioSource *source_;
+        AudioLevel *level_;
 
         Encoder *encoder_;
         Pay *payloader_;

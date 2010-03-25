@@ -42,13 +42,19 @@ AudioLevel::AudioLevel(Pipeline &pipeline, GdkNativeWindow socketID) :
     emitMessages_(true),
     vumeter_(gtk_vumeter_new())
 {
+    // FIXME: get rid of this
+    gtk_init(0, 0);
     /* make window */
     GtkWidget *plug = gtk_plug_new(socketID);
     /* end main loop when plug is destroyed */
     /// FIXME: maybe this should stop pipeline too?
-    g_signal_connect (G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
+    g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
+    gtk_container_add(GTK_CONTAINER (plug), vumeter_);
+    /* show window and log its id */
+    gtk_widget_show_all(plug);
+    LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
 
-    g_object_set(G_OBJECT(level_), "interval", 1000000000LL, "message", emitMessages_, NULL);
+    g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
 }
 
 /// Destructor 

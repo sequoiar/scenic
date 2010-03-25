@@ -29,6 +29,10 @@ class TestVumeter(unittest.TestCase):
             print "I (", widget, ") have just had a plug inserted!"
             self.plug_added = True
         def on_plug_removed(widget):
+            """ 
+                This would return True if we wanted to reuse the 
+                socket.
+            """
             print "I (", widget, ") have just had a plug removed!"
             self.plug_removed = True
             gtk.main_quit()

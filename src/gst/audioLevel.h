@@ -24,7 +24,7 @@
 #ifndef _AUDIO_LEVEL_H_
 #define _AUDIO_LEVEL_H_
 
-#include <gdk/gdk.h>
+#include <gdk/gdktypes.h>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
 
