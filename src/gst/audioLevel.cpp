@@ -25,6 +25,7 @@
 #include <cstring>
 #include <cmath>
 #include <gst/gst.h>
+#include "gutil.h"
 #include "audioLevel.h"
 #include "vumeter.h"
 #include "pipeline.h"
@@ -34,7 +35,7 @@
 
 /** Constructor sets by default emitMessages to true 
  * and message interval to one second */
-AudioLevel::AudioLevel(Pipeline &pipeline) : 
+AudioLevel::AudioLevel(Pipeline &pipeline, GdkNativeWindow socketID) : 
     BusMsgHandler(&pipeline),
     pipeline_(pipeline),
     level_(pipeline_.makeElement("level", NULL)),
@@ -42,9 +43,10 @@ AudioLevel::AudioLevel(Pipeline &pipeline) :
     vumeter_(gtk_vumeter_new())
 {
     /* make window */
-    GtkWidget *plug = gtk_plug_new(0);
+    GtkWidget *plug = gtk_plug_new(socketID);
     /* end main loop when plug is destroyed */
-    g_signal_connect (G_OBJECT (plug), "destroy", gtk_main_quit, NULL);
+    /// FIXME: maybe this should stop pipeline too?
+    g_signal_connect (G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
 
     g_object_set(G_OBJECT(level_), "interval", 1000000000LL, "message", emitMessages_, NULL);
 }

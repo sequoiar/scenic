@@ -24,6 +24,7 @@
 #ifndef _AUDIO_LEVEL_H_
 #define _AUDIO_LEVEL_H_
 
+#include <gdk/gdk.h>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
 
@@ -41,7 +42,7 @@ class _GtkWidget;
 class AudioLevel : public GstLinkableFilter, BusMsgHandler
 {
     public:
-        AudioLevel(Pipeline &pipeline);
+        AudioLevel(Pipeline &pipeline, GdkNativeWindow socketID);
         ~AudioLevel();
         void interval(unsigned long long newInterval);
 
