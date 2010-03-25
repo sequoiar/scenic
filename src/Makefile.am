@@ -1,1 +1,1 @@
-SUBDIRS = include util gst gutil shared_video tcp main firereset vumeter
+SUBDIRS = include util gst gutil shared_video tcp vumeter main firereset
