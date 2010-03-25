@@ -1,14 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
 "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY legal SYSTEM "installation/legal.xml">
   <!ENTITY appversion "0.4.4">
   <!ENTITY manrevision "0.1">
   <!ENTITY date "March 2010">
   <!ENTITY app "<application>Scenic </application>">
-  <!ENTITY Introduction SYSTEM "inst-intro.xml">
-  <!ENTITY Hardware_Requirements SYSTEM "inst-hardware-requirement.xml">
-  <!ENTITY Hardware_Setup SYSTEM "inst-hardware-setup.xml">
+  <!ENTITY Introduction SYSTEM "installation/introduction.xml">
+  <!ENTITY Hardware_Requirements SYSTEM "installation/hardware-requirement.xml">
+  <!ENTITY Hardware_Setup SYSTEM "installation/hardware-setup.xml">
+  <!ENTITY Software_Installation SYSTEM "installation/software.xml">
+  <!ENTITY Audio-Video_Configuration "installation/audio-video.xml">
+  <!ENTITY Network_Test "installation/network.xml">
+  <!ENTITY Command_Line "installation/commandline.xml">
   <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
        Use the appversion entity to specify the version of the application.
