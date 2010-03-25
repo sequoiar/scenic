@@ -69,7 +69,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
         rms = pow (10, peak_dB / 20);
         if (LOG)
           g_print ("    normalized rms value: %f\n", rms);
-        if (channels == 1)
+        if (i == channels - 1)
           set_value (rms, data);
       }
     }
@@ -104,6 +104,9 @@ main (int argc, char **argv)
   GdkNativeWindow socket_id;  
   GstElement *pipeline;
   GstElement *source;
+  GstCaps *caps;
+  GstPad *sourcePad;
+  GstElement *audioconvert;
   GstElement *level;
   GstElement *sink;
   enum
@@ -133,13 +136,21 @@ main (int argc, char **argv)
   g_signal_connect (G_OBJECT (plug), "embedded",
       G_CALLBACK (embed_event), NULL );
   source = gst_element_factory_make ("audiotestsrc", NULL);
-  g_object_set (source, "wave", TICKS, NULL);
+  g_object_set (source, "wave", GAUSSIAN_NOISE, NULL);
+
+  g_assert((sourcePad = gst_element_get_static_pad(source, "src")) != 0);
+  caps = gst_caps_from_string("audio/x-raw-int, channels=8, rate=44100");
+  gst_pad_set_caps(sourcePad, caps);
+  gst_caps_unref(caps);
+  gst_object_unref(sourcePad);
+
+  audioconvert = gst_element_factory_make("audioconvert", NULL);
   level = gst_element_factory_make ("level", NULL);
   sink = gst_element_factory_make ("fakesink", NULL);
   g_object_set(sink, "sync", TRUE, NULL);
 
-  gst_bin_add_many (GST_BIN (pipeline), source, level, sink, NULL);
-  gst_element_link_many (source, level, sink, NULL);
+  gst_bin_add_many (GST_BIN (pipeline), source, audioconvert, level, sink, NULL);
+  gst_element_link_many (source, audioconvert, level, sink, NULL);
 
   bus = gst_element_get_bus (pipeline);
   watch_id = gst_bus_add_watch (bus, message_handler, vumeter);
@@ -150,7 +161,7 @@ main (int argc, char **argv)
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
   /* end in 1/2 second */
-  g_timeout_add(500, quit_cb, NULL);
+  g_timeout_add(1000, quit_cb, NULL);
   gtk_main();
 
   gst_element_set_state (pipeline, GST_STATE_NULL);
@@ -158,5 +169,6 @@ main (int argc, char **argv)
               (pipeline))));
   gst_object_unref (GST_OBJECT (pipeline));
   g_print ("axed pipeline\n");
+
   return 0;
 }
