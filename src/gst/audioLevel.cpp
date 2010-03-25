@@ -38,8 +38,14 @@ AudioLevel::AudioLevel(Pipeline &pipeline) :
     BusMsgHandler(&pipeline),
     pipeline_(pipeline),
     level_(pipeline_.makeElement("level", NULL)),
-            emitMessages_(true) 
+    emitMessages_(true),
+    vumeter_(gtk_vumeter_new())
 {
+    /* make window */
+    GtkWidget *plug = gtk_plug_new(0);
+    /* end main loop when plug is destroyed */
+    g_signal_connect (G_OBJECT (plug), "destroy", gtk_main_quit, NULL);
+
     g_object_set(G_OBJECT(level_), "interval", 1000000000LL, "message", emitMessages_, NULL);
 }
 
@@ -62,6 +68,18 @@ void AudioLevel::emitMessages(bool doEmit)
 double AudioLevel::dbToLinear(double db)
 {
     return pow(10, db * 0.05);
+}
+
+void
+AudioLevel::setValue(gdouble value, GtkWidget *vumeter)
+{
+  GdkRegion *region;
+
+  GTK_VUMETER(vumeter)->sel = value;
+
+  region = gdk_drawable_get_clip_region (vumeter->window);
+  gdk_window_invalidate_region (vumeter->window, region, TRUE);
+  gdk_window_process_updates (vumeter->window, TRUE);
 }
 
 /** 
@@ -91,6 +109,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
             rmsValues.push_back(dbToLinear(rmsDb));    // new channel
         }
         /// FIXME: write these somewhere
+        setValue(rmsValues[0], vumeter_);
 
         return true;
     }

@@ -31,6 +31,7 @@
 class Pipeline;
 class _GstElement;
 class _GstMessage;
+class _GtkWidget;
 
 /** 
  *  A filter that calculates and periodically reports 
@@ -49,6 +50,7 @@ class AudioLevel : public GstLinkableFilter, BusMsgHandler
         void emitMessages(bool doEmit);
 
     private:
+        static void setValue(gdouble value, _GtkWidget *vumeter);
         _GstElement *srcElement() { return level_; }
 
         _GstElement *sinkElement() { return level_; }
@@ -62,6 +64,7 @@ class AudioLevel : public GstLinkableFilter, BusMsgHandler
         Pipeline &pipeline_;
         _GstElement *level_;
         bool emitMessages_;
+        _GtkWidget *vumeter_;
 
         AudioLevel(const AudioLevel&);     //No Copy Constructor
         AudioLevel& operator=(const AudioLevel&);     //No Assignment Operator
