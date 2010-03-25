@@ -284,6 +284,22 @@ class Gui(object):
 
         self.jack_latency_widget = widgets_tree.get_widget("jack_latency")
         self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
+
+        # audio levels:
+        self.audio_levels_input_widget = widgets_tree.get_widget("audio_levels_input")
+        socket = gtk.Socket()
+        socket.show()
+        self.audio_levels_input_widget.add(socket)
+        self.audio_levels_input_socket_id = socket.get_id()
+        def _plug_added_cb(widget):
+            """ Called when a plug is added to socket """
+            print "I (", widget, ") have just had a plug inserted!"
+
+        def _plug_removed_cb(widget):
+            """ Called when a plug is removed from socket """
+            print "I (", widget, ") have just had a plug removed!"
+            return True
+        
         # system tab contents:
         self.network_admin_widget = widgets_tree.get_widget("network_admin")
 
@@ -731,7 +747,9 @@ class Gui(object):
         print " * audio_source:", audio_source_readable
         print " * audio_codec:", audio_codec_readable
         print " * audio_numchannels:", audio_numchannels
+        print " * audio_vumeter_id:", self.audio_levels_input_socket_id
         self.app.config.audio_source = AUDIO_SOURCES[audio_source_readable]
+        self.app.config.audio_vumeter_id = self.audio_levels_input_socket_id
         self.app.config.audio_codec = AUDIO_CODECS[audio_codec_readable]
         # FIXME: the interface should already prevent this case from happening
         if audio_numchannels > 2 and self.app.config.audio_codec == "mp3":
