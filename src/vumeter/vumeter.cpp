@@ -250,7 +250,7 @@ gtk_vumeter_paint (GtkWidget * widget)
 
   cairo_set_source_rgb (cr, 0.2, 0.4, 0);
 
-  for (i = 1; i <= GRADIENT_SIZE; i++) {
+  for (i = 1; i < GRADIENT_SIZE; i++) {
     if (i > GRADIENT_SIZE - rect)       /* light up */
       cairo_set_source_rgb (cr, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b);
     else                        /* don't light up */
