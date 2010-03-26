@@ -10,9 +10,9 @@
   <!ENTITY Hardware_Requirements SYSTEM "installation/hardware-requirement.xml">
   <!ENTITY Hardware_Setup SYSTEM "installation/hardware-setup.xml">
   <!ENTITY Software_Installation SYSTEM "installation/software.xml">
-  <!ENTITY Audio-Video_Configuration "installation/audio-video.xml">
-  <!ENTITY Network_Test "installation/network.xml">
-  <!ENTITY Command_Line "installation/commandline.xml">
+  <!ENTITY Audio_Video SYSTEM "installation/audio-video.xml">
+  <!ENTITY Network_Test SYSTEM "installation/network.xml">
+  <!ENTITY Command_Line SYSTEM "installation/commandline.xml">
   <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
        Use the appversion entity to specify the version of the application.
@@ -124,4 +124,8 @@
   &Introduction;
   &Hardware_Requirements;
   &Hardware_Setup;
+  &Software_Installation;
+  &Audio_Video;
+  &Network_Test;
+  &Command_Line;
 </book>

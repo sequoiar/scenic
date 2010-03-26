@@ -1,3 +1,4 @@
-  <chapter id="ConfigureAVsetup"> 
-    <title>Configure and Test Audio And Video Setup</title>
+  <chapter id="Audio-Video"> 
+    <title>Audio and Video Configuration</title>
+    <para> First verify that you have all required dependencies at our Software Installation page. Then add your username to the different groups </para>
   </chapter>

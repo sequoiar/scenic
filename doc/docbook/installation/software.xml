@@ -1,7 +1,7 @@
-  <chapter id="SoftwareInstallation"> 
+  <chapter id="Software-Installation"> 
     <title>Software Installation</title>
     <para> A standard Scenic installation always requires at least two computers with identical linux operating systems, the required libraries and development packages, and a build of the most recent release of the Scenic software.
 The computers must meet these minimum requirements.
 Note that prior to using Scenic you also need to meet the required network specification
-For The HelloWorld project partners, we strongly recommend to follow our HelloWorld Steps page where we describe how to perform a network test between two partners. 
+For The HelloWorld project partners, we strongly recommend to follow our HelloWorld Steps page where we describe how to perform a network test between two partners. </para>
   </chapter>
