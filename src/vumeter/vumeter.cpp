@@ -17,7 +17,6 @@ static gboolean gtk_vumeter_expose (GtkWidget * widget, GdkEventExpose * event);
 static void gtk_vumeter_paint (GtkWidget * widget);
 static void gtk_vumeter_destroy (GtkObject * object);
 
-
 GtkType
 gtk_vumeter_get_type ()
 {
@@ -48,13 +47,11 @@ gtk_vumeter_set_state (GtkVumeter * vumeter, gint num)
   gtk_vumeter_paint (GTK_WIDGET (vumeter));
 }
 
-
 GtkWidget *
 gtk_vumeter_new ()
 {
   return GTK_WIDGET (gtk_type_new (gtk_vumeter_get_type ()));
 }
-
 
 typedef struct RGB
 {
@@ -152,14 +149,11 @@ gtk_vumeter_class_init (GtkVumeterClass * klass)
   init_gradient ();
 }
 
-
-
 static void
 gtk_vumeter_init (GtkVumeter * vumeter)
 {
   vumeter->sel = 0.0;
 }
-
 
 static void
 gtk_vumeter_size_request (GtkWidget * widget, GtkRequisition * requisition)
@@ -171,7 +165,6 @@ gtk_vumeter_size_request (GtkWidget * widget, GtkRequisition * requisition)
   requisition->width = 46;
   requisition->height = 100;
 }
-
 
 static void
 gtk_vumeter_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
@@ -187,7 +180,6 @@ gtk_vumeter_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
         allocation->x, allocation->y, allocation->width, allocation->height);
   }
 }
-
 
 static void
 gtk_vumeter_realize (GtkWidget * widget)
@@ -219,7 +211,6 @@ gtk_vumeter_realize (GtkWidget * widget)
   widget->style = gtk_style_attach (widget->style, widget->window);
   gtk_style_set_background (widget->style, widget->window, GTK_STATE_NORMAL);
 }
-
 
 static gboolean
 gtk_vumeter_expose (GtkWidget * widget, GdkEventExpose * event)
@@ -261,7 +252,6 @@ gtk_vumeter_paint (GtkWidget * widget)
 
   cairo_destroy (cr);
 }
-
 
 static void
 gtk_vumeter_destroy (GtkObject * object)

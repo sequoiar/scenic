@@ -33,6 +33,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
     const gchar *name = gst_structure_get_name (s);
 
     if (strncmp (name, "level", strlen ("level")) == 0) {
+      GtkWidget **vumeters = (GtkWidget **) data;
       gint channels;
       GstClockTime endtime;
       gdouble rms_dB, peak_dB, decay_dB;
@@ -50,7 +51,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
       channels = gst_value_list_get_size (list);
 
       for (i = 0; i < channels; ++i) {
-        if (LOG)
+        if (1)
           g_print ("channel %d\n", i);
         list = gst_structure_get_value (s, "rms");
         value = gst_value_list_get_value (list, i);
@@ -69,8 +70,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
         rms = pow (10, peak_dB / 20);
         if (LOG)
           g_print ("    normalized rms value: %f\n", rms);
-        if (i == channels - 1)
-          set_value (rms, data);
+        set_value (rms, vumeters[i]);
       }
     }
   }
@@ -98,21 +98,25 @@ int
 main (int argc, char **argv)
 {
   GtkWidget *plug;
-  GtkWidget *vumeter;
+  enum { NUM_CHANNELS = 8 };
+  GtkWidget *vumeters[NUM_CHANNELS];
+  GtkWidget *hbox;
   GstBus *bus;
   gint watch_id;
   GdkNativeWindow socket_id;  
   GstElement *pipeline;
   GstElement *source;
+  GstElement *capsfilter;
   GstCaps *caps;
-  GstPad *sourcePad;
-  GstElement *audioconvert;
+  /*GstElement *audioconvert;*/
   GstElement *level;
   GstElement *sink;
+  gint i;
   enum
   { SINE = 0, SQUARE, SAW, TRIANGLE, SILENCE, WHITE_NOISE, PINK_NOISE,
     SINE_TABLE, TICKS, GAUSSIAN_NOISE
   };
+  enum {SPACING = 5}; 
 
   if (argc < 2)
       socket_id = 0;
@@ -122,38 +126,44 @@ main (int argc, char **argv)
   gtk_init (&argc, &argv);
   gst_init (&argc, &argv);
 
+  /* make frame with homogenous spacing*/
+  hbox = gtk_hbox_new(TRUE, SPACING);
   /* make window */
   plug = gtk_plug_new (socket_id);
 
   /* end main loop when plug is destroyed */
   g_signal_connect (G_OBJECT (plug), "destroy", gtk_main_quit, NULL);
 
-  vumeter = gtk_vumeter_new ();
-  gtk_container_add (GTK_CONTAINER (plug), vumeter);
+  for (i = 0; i < NUM_CHANNELS; ++i)
+  {
+    vumeters[i] = gtk_vumeter_new ();
+    gtk_container_add (GTK_CONTAINER (hbox), vumeters[i]);
+  }
+    gtk_container_add (GTK_CONTAINER (plug), hbox);
 
   /* make pipeline */
   pipeline = gst_pipeline_new ("pipeline");
   g_signal_connect (G_OBJECT (plug), "embedded",
       G_CALLBACK (embed_event), NULL );
   source = gst_element_factory_make ("audiotestsrc", NULL);
-  g_object_set (source, "wave", GAUSSIAN_NOISE, NULL);
+  g_object_set (source, "wave", SINE, NULL);
 
-  g_assert((sourcePad = gst_element_get_static_pad(source, "src")) != 0);
-  caps = gst_caps_from_string("audio/x-raw-int, channels=8, rate=44100");
-  gst_pad_set_caps(sourcePad, caps);
+  capsfilter= gst_element_factory_make ("capsfilter", NULL);
+  /* 2 channels is sadly the max for audiotestsrc without interleaving */
+  g_assert((caps = gst_caps_from_string("audio/x-raw-int, channels=2, rate=48000")));
+  g_object_set(capsfilter, "caps", caps, NULL);
   gst_caps_unref(caps);
-  gst_object_unref(sourcePad);
 
-  audioconvert = gst_element_factory_make("audioconvert", NULL);
+  /*audioconvert = gst_element_factory_make("audioconvert", NULL);*/
   level = gst_element_factory_make ("level", NULL);
   sink = gst_element_factory_make ("fakesink", NULL);
   g_object_set(sink, "sync", TRUE, NULL);
 
-  gst_bin_add_many (GST_BIN (pipeline), source, audioconvert, level, sink, NULL);
-  gst_element_link_many (source, audioconvert, level, sink, NULL);
+  gst_bin_add_many (GST_BIN (pipeline), source, capsfilter, level, sink, NULL);
+  gst_element_link_many (source, capsfilter, level, sink, NULL);
 
   bus = gst_element_get_bus (pipeline);
-  watch_id = gst_bus_add_watch (bus, message_handler, vumeter);
+  watch_id = gst_bus_add_watch (bus, message_handler, vumeters);
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
   /* show window and run main loop */
@@ -161,7 +171,7 @@ main (int argc, char **argv)
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
   /* end in 1/2 second */
-  g_timeout_add(1000, quit_cb, NULL);
+  g_timeout_add(300, quit_cb, NULL);
   gtk_main();
 
   gst_element_set_state (pipeline, GST_STATE_NULL);
