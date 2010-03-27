@@ -25,6 +25,7 @@
 #define _AUDIO_LEVEL_H_
 
 #include <gdk/gdktypes.h>
+#include <vector>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
 
@@ -42,7 +43,7 @@ class _GtkWidget;
 class AudioLevel : public GstLinkableFilter, BusMsgHandler
 {
     public:
-        AudioLevel(Pipeline &pipeline, GdkNativeWindow socketID);
+        AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID);
         ~AudioLevel();
         void interval(unsigned long long newInterval);
 
@@ -65,7 +66,7 @@ class AudioLevel : public GstLinkableFilter, BusMsgHandler
         Pipeline &pipeline_;
         _GstElement *level_;
         bool emitMessages_;
-        _GtkWidget *vumeter_;
+        std::vector<_GtkWidget *> vumeters_;
 
         AudioLevel(const AudioLevel&);     //No Copy Constructor
         AudioLevel& operator=(const AudioLevel&);     //No Assignment Operator

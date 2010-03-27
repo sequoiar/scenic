@@ -35,21 +35,29 @@
 
 /** Constructor sets by default emitMessages to true 
  * and message interval to one second */
-AudioLevel::AudioLevel(Pipeline &pipeline, GdkNativeWindow socketID) : 
+AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID) : 
     BusMsgHandler(&pipeline),
     pipeline_(pipeline),
     level_(pipeline_.makeElement("level", NULL)),
-    emitMessages_(true),
-    vumeter_(gtk_vumeter_new())
+    emitMessages_(true)
 {
     // FIXME: get rid of this
     gtk_init(0, 0);
+    const int SPACING = 10;
+    GtkWidget *hbox = gtk_hbox_new(TRUE /*homogenous spacing*/, SPACING);
+
+    for (int i = 0; i < numChannels; ++i)
+    {
+        vumeters_.push_back(gtk_vumeter_new());
+        gtk_container_add(GTK_CONTAINER (hbox), vumeters_[i]);
+    }
+
     /* make window */
     GtkWidget *plug = gtk_plug_new(socketID);
     /* end main loop when plug is destroyed */
     /// FIXME: maybe this should stop pipeline too?
     g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
-    gtk_container_add(GTK_CONTAINER (plug), vumeter_);
+    gtk_container_add(GTK_CONTAINER (plug), hbox);
     /* show window and log its id */
     gtk_widget_show_all(plug);
     LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
@@ -115,9 +123,9 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
             value = gst_value_list_get_value(list, channelIdx);
             rmsDb = g_value_get_double(value);
             rmsValues.push_back(dbToLinear(rmsDb));    // new channel
+            /// FIXME: write these somewhere
+            setValue(rmsValues[channelIdx], vumeters_[channelIdx]);
         }
-        /// FIXME: write these somewhere
-        setValue(rmsValues[0], vumeter_);
 
         return true;
     }
