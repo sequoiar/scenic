@@ -1,5 +1,4 @@
-gutildir = $(libdir)/scenic
-gutil_LTLIBRARIES= libgutil.la
+pkglib_LTLIBRARIES= libgutil.la
 
 libgutil_la_SOURCES = gloop.cpp \
                      gloop.h \

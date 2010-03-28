@@ -1,6 +1,4 @@
-gstdir = $(libdir)/scenic
-
-gst_LTLIBRARIES = libgst.la
+pkglib_LTLIBRARIES = libgst.la
 
 libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp \

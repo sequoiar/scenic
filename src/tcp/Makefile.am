@@ -1,5 +1,4 @@
-capsdir = $(libdir)/scenic
-caps_LTLIBRARIES = libcaps.la
+pkglib_LTLIBRARIES = libcaps.la
 
 libcaps_la_SOURCES = CapsServer.cpp CapsServer.h CapsClient.cpp CapsClient.h
 

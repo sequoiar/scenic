@@ -3,6 +3,7 @@
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 #include <gst/gst.h>
+#include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <string.h>
 #include <math.h>
