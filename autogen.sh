@@ -19,6 +19,8 @@ if test ! -e ChangeLog ; then
 touch ChangeLog
 fi
 
+mkdir -p build-aux
+
 # could be replaced with autoreconf -fivI m4 (verbose, force rebuild of ltmain, .in files, etc.)
 libtoolize --force
 aclocal -I m4

@@ -38,7 +38,8 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
       gint channels;
       GstClockTime endtime;
       gdouble rms_dB, peak_dB, decay_dB;
-      gdouble rms;
+      /*gdouble rms;*/
+      gdouble peak;
       const GValue *list;
       const GValue *value;
 
@@ -52,7 +53,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
       channels = gst_value_list_get_size (list);
 
       for (i = 0; i < channels; ++i) {
-        if (1)
+        if (LOG)
           g_print ("channel %d\n", i);
         list = gst_structure_get_value (s, "rms");
         value = gst_value_list_get_value (list, i);
@@ -63,15 +64,15 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
         list = gst_structure_get_value (s, "decay");
         value = gst_value_list_get_value (list, i);
         decay_dB = g_value_get_double (value);
-        if (LOG)
+        if (1)
           g_print ("    RMS: %f dB, peak: %f dB, decay: %f dB\n",
               rms_dB, peak_dB, decay_dB);
 
         /* converting from dB to normal gives us a value between 0.0 and 1.0 */
-        rms = pow (10, peak_dB / 20);
-        if (LOG)
-          g_print ("    normalized rms value: %f\n", rms);
-        set_value (rms, vumeters[i]);
+        peak = pow (10, peak_dB / 20);
+        if (1)
+          g_print ("    normalized peak value: %f\n", peak);
+        set_value (peak, vumeters[i]);
       }
     }
   }
@@ -147,7 +148,7 @@ main (int argc, char **argv)
   g_signal_connect (G_OBJECT (plug), "embedded",
       G_CALLBACK (embed_event), NULL );
   source = gst_element_factory_make ("audiotestsrc", NULL);
-  g_object_set (source, "wave", SINE, NULL);
+  g_object_set (source, "wave", GAUSSIAN_NOISE, NULL);
 
   capsfilter= gst_element_factory_make ("capsfilter", NULL);
   /* 2 channels is sadly the max for audiotestsrc without interleaving */
@@ -172,7 +173,7 @@ main (int argc, char **argv)
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
   /* end in 1/2 second */
-  g_timeout_add(200, quit_cb, NULL);
+  g_timeout_add(200, quit_cb, NULL); 
   gtk_main();
 
   gst_element_set_state (pipeline, GST_STATE_NULL);

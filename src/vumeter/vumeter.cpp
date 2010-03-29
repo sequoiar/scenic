@@ -228,8 +228,7 @@ static void
 gtk_vumeter_paint (GtkWidget * widget)
 {
   cairo_t *cr;
-  gdouble pos = GTK_VUMETER (widget)->sel;
-  gdouble rect = pos * GRADIENT_SIZE;
+  gint num_bars = GTK_VUMETER (widget)->sel * GRADIENT_SIZE;
   gint i;
 
   cr = gdk_cairo_create (widget->window);
@@ -241,12 +240,12 @@ gtk_vumeter_paint (GtkWidget * widget)
 
   cairo_set_source_rgb (cr, 0.2, 0.4, 0);
 
-  for (i = 1; i < GRADIENT_SIZE; i++) {
-    if (i > GRADIENT_SIZE - rect)       /* light up */
+  for (i = 0; i < GRADIENT_SIZE; i++) {
+    if (i >= GRADIENT_SIZE - num_bars)       /* light up */
       cairo_set_source_rgb (cr, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b);
     else                        /* don't light up */
       cairo_set_source_rgb (cr, 0.2, 0.4, 0);
-    cairo_rectangle (cr, 8, i * 4, 30, 3);
+    cairo_rectangle (cr, 8, (i + 1) * 4, 30, 3);
     cairo_fill (cr);
   }
 
