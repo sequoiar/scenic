@@ -109,7 +109,33 @@ Some graphic card may work only on certain releases. Before buying a graphic car
         </sect2>
         <sect2 id="VideoCaptureCard">
         <title>Video Capture card</title>
-        </sect2>
+        <para>     Here is a list of the video capture cards tested with Scenic:
+
+Best Quality
+
+Good quality
+
+    Viewcast Osprey 100
+    Viewcast Osprey 210
+    Pinacle Dazzle AVC 100 (only in Ubuntu Karmic)
+
+Medium Quality
+
+    WintvHauppauge 350
+    WintvHauppauge 1800
+
+    NOTE: Choosing capture cards or DV
+
+Capture cards have a few advantages over DV converters: they don't need additionnal converters, they are prone to less latency (typically always less than 60ms), you can manage multiple inputs through software and you can control image variables (brightness, contrast, etc). On the minus side, you need a PC with an available PCI slot. USB video capture devices are usually of domestic quality.
+
+    If the PC has a Firewire (IEEE1394) interface, you can use a DV converter to get video. The quality and available features on these are quite varying. DV transmissioin is already (lightly) compressed, so videos have to be uncompressed first, then compressed again for transmission. This procedure adds a bit of latency (approximately 200ms). Image quality from a high end converter can be considered as good as that from capture cards. </para>
+
+      </sect2>
+      <sect2 id="Camera">
+      <title>Camera and Camcorder</title>
+      <para> USB, DV Point grey FL2G Sony XD-Cam EX1 Sony PD-170 Sony PDX-10
+            Unibrain 
+      
       </sect1>
 
       <sect1 id="AudioHardwareSpecification"> 
