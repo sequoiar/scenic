@@ -71,8 +71,10 @@
       <title>Video Hardware Specifications</title>
         <sect2 id="GraphicCard">
         <title>Graphic Card </title>
-        <para>The graphic card will manage your video output. The choice of your graphic card will depend on how you want to use Scenic. For now, we only support nvidia video card. Some ATI cards have problems with Xvideo extension. YMMV.
-        Before choosing your graphic card. Determine the following needs:
+        <para>The graphic card will manage your video output. The choice of your graphic card will depend on how you want to use Scenic. For now, we only support nvidia video card. Some ATI cards have problems with Xvideo extension. 
+        Before choosing your graphic card, determine on wich linux distribution and releases you are.
+
+Some graphic card may work only on certain releases. Before buying a graphic card, verify on the nvidia unix page that the hardware you are planning to use is supported not only by your linux distribution but also on the release you are using. 
         </para> 
         <table>
           <title>Graphic Card Specifications</title>
