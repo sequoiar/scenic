@@ -24,7 +24,5 @@ milhouse_LDADD = $(ALL_GST_LIBS) $(JACK_LIBS) \
         $(top_builddir)/src/shared_video/libshared_video.la \
         $(top_builddir)/src/vumeter/libvumeter.la
 
-INCLUDES =
-
 clean-local:
 	rm -rf _trial_temp
