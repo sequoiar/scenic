@@ -172,7 +172,7 @@ main (int argc, char **argv)
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
   /* end in 1/2 second */
-  g_timeout_add(300, quit_cb, NULL);
+  g_timeout_add(200, quit_cb, NULL);
   gtk_main();
 
   gst_element_set_state (pipeline, GST_STATE_NULL);

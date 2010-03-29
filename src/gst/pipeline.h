@@ -72,7 +72,6 @@ class Pipeline : boost::noncopyable
         _GstElement *pipeline_;
         std::vector<BusMsgHandler*> handlers_;
         unsigned sampleRate_;
-        char *titleStr_;
         static const unsigned int SAMPLE_RATE = 48000;
 };
 

@@ -41,8 +41,6 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     level_(pipeline_.makeElement("level", NULL)),
     emitMessages_(true)
 {
-    // FIXME: get rid of this
-    gtk_init(0, 0);
     const int SPACING = 10;
     GtkWidget *hbox = gtk_hbox_new(TRUE /*homogenous spacing*/, SPACING);
 

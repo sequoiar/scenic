@@ -65,7 +65,6 @@ class GtkVideoSink
 
     protected:
         void toggleFullscreen() { toggleFullscreen(window_); }
-        bool gtkInitialized_;
         _GtkWidget *window_;
         int screen_num_;
         _GtkWidget *drawingArea_;

@@ -21,6 +21,8 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <gst/gst.h>
+#include <gtk/gtk.h>
 
 #include "util.h"
 
@@ -167,6 +169,9 @@ short Milhouse::run(int argc, char **argv)
 
     if (options.count("help") or argc == 1) 
         return usage(desc);
+
+    gst_init(&argc, &argv);
+    gtk_init(&argc, &argv);
 
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
 

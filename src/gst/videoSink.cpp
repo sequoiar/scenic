@@ -44,12 +44,6 @@ void VideoSink::destroySink()
     pipeline_.remove(&sink_);
 }
 
-bool initializeGtk()
-{
-    gtk_init(0, NULL);
-    return true;
-}
-
 /// true if we're not using some external xwindow
 bool GtkVideoSink::hasWindow() const
 {
@@ -60,7 +54,6 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned lo
     VideoSink(pipeline), 
     xid_(xid),
     isFullscreen_(false),
-    gtkInitialized_(initializeGtk()),
     window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0), 
     screen_num_(screen_num), 
     drawingArea_(hasWindow() ? gtk_drawing_area_new() : 0),
