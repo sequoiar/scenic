@@ -112,6 +112,16 @@ AudioLevel* AudioSourceConfig::createLevel(Pipeline &pipeline) const
         return 0;
 }
 
+/// Fixme: abstract the common stuff into baseclass
+/// Factory method that creates an AudioLevel based on this object's socketID
+AudioLevel* AudioSinkConfig::createLevel(Pipeline &pipeline) const
+{
+    if (socketID_ != 0)
+        return new AudioLevel(pipeline, numChannels_, socketID_);
+    else 
+        return 0;
+}
+
 /// Returns c-style string specifying the location (filename) 
 const char* AudioSourceConfig::location() const
 {
@@ -148,7 +158,9 @@ AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) :
     sink_(options["audiosink"].as<std::string>()), 
     sinkName_(options["jack-client-name"].as<std::string>()),
     deviceName_(options["audiodevice"].as<std::string>()), 
-    bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC)
+    bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC),
+    socketID_(options["vumeter-id"].as<unsigned long>()),
+    numChannels_(options["numchannels"].as<int>())
 {
 }
 

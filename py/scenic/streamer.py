@@ -172,6 +172,7 @@ class StreamerManager(object):
                 "audio": {
                     # decided locally:
                     "numchannels": self.app.config.audio_channels, # int
+                    "vumeter-id": self.app.config.audio_vumeter_id,
                     "codec": self.app.config.audio_codec, 
                     "port": self.app.recv_audio_port,
                     "sink": self.app.config.audio_sink
@@ -248,6 +249,7 @@ class StreamerManager(object):
             '--numchannels', str(details["receive"]["audio"]["numchannels"]),
             '--audiocodec', details["receive"]["audio"]["codec"],
             '--audioport', str(details["receive"]["audio"]["port"]),
+            '--vumeter-id', str(details["send"]["audio"]["vumeter-id"]),
             '--window-title', details["receive"]["video"]["window-title"],
             '--display', details["receive"]["video"]["display"],
             ]

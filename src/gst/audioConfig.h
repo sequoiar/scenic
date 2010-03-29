@@ -78,6 +78,7 @@ class AudioSinkConfig
     public:
         AudioSinkConfig(const boost::program_options::variables_map &options);
         
+        AudioLevel* createLevel(Pipeline &pipeline) const;
         AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *sinkName() const;
@@ -89,6 +90,8 @@ class AudioSinkConfig
         const std::string sinkName_;
         const std::string deviceName_;
         const unsigned long long bufferTime_;
+        GdkNativeWindow socketID_;
+        const int numChannels_;
 };
 
 #endif // _AUDIO_LOCAL_CONFIG_H_

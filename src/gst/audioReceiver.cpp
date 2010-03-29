@@ -29,6 +29,7 @@
 #include "remoteConfig.h"
 #include "rtpPay.h"
 #include "codec.h"
+#include "audioLevel.h"
 #include "audioSink.h"
 
 #include <boost/shared_ptr.hpp>
@@ -46,6 +47,7 @@ AudioReceiver::AudioReceiver(Pipeline &pipeline,
     gotCaps_(false),
     depayloader_(0), 
     decoder_(0), 
+    level_(0),
     sink_(0)
 { 
     tassert(remoteConfig_->hasCodec()); 
@@ -58,6 +60,7 @@ AudioReceiver::~AudioReceiver()
 {
     remoteConfig_->cleanupPorts();
     delete sink_;
+    delete level_;
     delete decoder_;
     delete depayloader_;
 }
@@ -66,6 +69,9 @@ AudioReceiver::~AudioReceiver()
 void AudioReceiver::createCodec(Pipeline &pipeline)
 {
     tassert(decoder_ = remoteConfig_->createAudioDecoder(pipeline));
+    level_ = audioConfig_->createLevel(pipeline);
+    if (level_ != 0)
+            gstlinkable::link(*decoder_, *level_);
 }
 
 
@@ -80,7 +86,13 @@ void AudioReceiver::createDepayloader()
 void AudioReceiver::createSink(Pipeline &pipeline)
 {
     tassert(sink_ = audioConfig_->createSink(pipeline));
-    gstlinkable::link(*decoder_, *sink_);   
+    if (level_ != 0)
+    {
+        gstlinkable::link(*decoder_, *level_);
+        gstlinkable::link(*level_, *sink_);   
+    }
+    else
+        gstlinkable::link(*decoder_, *sink_);   
     setCaps();
     tassert(gotCaps_);
     if (not remoteConfig_->capsMatchCodec()) 
