@@ -1,150 +1,339 @@
-  <chapter id="Hardware-Requirements"> 
-    <title>Hardware Requirements</title>
-     <para>The use of Scenic require specific hardware. Telepresence system oriented for realtime performance have to met certain standard, this for good reliability and performance. Our team is continuously testing various devices and computer parts. We frequently update this page with material that is adequate to use in a telepresence system. For any material that is not proposed in our list, please contact us. </para>
-     <sect1 id="ComputerSpecifications"> 
-     <title>Computer Specifications</title>
-     We recommend the following computer specification: 
+<chapter id="Hardware-Requirements"> 
+<title>Hardware Requirements</title>
+<para>The use of Scenic require specific hardware. Telepresence system oriented for realtime performance have to met certain standard, this for good reliability and performance. Our team is continuously testing various devices and computer parts. We frequently update this page with material that is adequate to use in a telepresence system. For any material that is not proposed in our list, please contact us.</para>
+   <sect1 id="ComputerSpecifications"> 
+   <title>Computer Specifications</title>
+   <para> We recommend the following computer specification:</para>
 
       <table>
-          <title>High Performance Computer Specification</title>
-          <tgroup cols="2">
-              <tbody>
-                  <row>
-                      <entry>Computer Memory</entry>
-                      <entry>4GB</entry>
-                 </row>
-                 <row>
-                     <entry>Processor</entry>
-                     <entry>Intel Core 2 Quad</entry>
-                 </row>
-                 <row>
-                     <entry>Motherboard</entry>
-                     <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
-                 </row>
-              </tbody>
-          </tgroup>
+      <title>High Performance Computer Specification</title>
+         <tgroup cols="2">
+            <tbody>
+               <row>
+                  <entry>Computer Memory</entry>
+                  <entry>4GB</entry>
+               </row>
+               <row>
+                  <entry>Processor</entry>
+                  <entry>Intel Core 2 Quad</entry>
+               </row>
+               <row>
+                  <entry>Motherboard</entry>
+                  <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
+               </row>
+            </tbody>
+         </tgroup>
       </table>
       
       <table>
-          <title>Medium Performance Computer Specification</title>
-          <tgroup cols="2">
-              <tbody>
-                  <row>
-                      <entry>Computer Memory</entry>
-                      <entry>2GB</entry>
-                 </row>
-                 <row>
-                     <entry>Processor</entry>
-                     <entry>Intel Core 2 Quad</entry>
-                 </row>
-                 <row>
-                     <entry>Motherboard</entry>
-                     <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
-                 </row>
-              </tbody>
-          </tgroup>
+      <title>Medium Performance Computer Specification</title>
+         <tgroup cols="2">
+            <tbody>
+               <row>
+                  <entry>Computer Memory</entry>
+                  <entry>2GB</entry>
+               </row>
+               <row>
+                  <entry>Processor</entry>
+                  <entry>Intel Core 2 Quad</entry>
+               </row>
+               <row>
+                  <entry>Motherboard</entry>
+                  <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
+               </row>
+            </tbody>
+         </tgroup>
       </table>
 
       <table>
-          <title>Medium Performance Computer Specification</title>
-          <tgroup cols="2">
-              <tbody>
-                  <row>
-                      <entry>Computer Memory</entry>
-                      <entry>2GB</entry>
-                 </row>
-                 <row>
-                     <entry>Processor</entry>
-                     <entry>Intel Dual Core</entry>
-                 </row>
-                 <row>
-                     <entry>Motherboard</entry>
-                     <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
-                 </row>
-              </tbody>
-          </tgroup>
+      <title>Low Performance Computer Specification</title>
+         <tgroup cols="2">
+            <tbody>
+               <row>
+                  <entry>Computer Memory</entry>
+                  <entry>2GB</entry>
+               </row>
+               <row>
+                  <entry>Processor</entry>
+                  <entry>Intel Dual Core</entry>
+               </row>
+               <row>
+                  <entry>Motherboard</entry>
+                  <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
+               </row>
+            </tbody>
+         </tgroup>
       </table>
-      
-      </sect1>
+   </sect1>
     
-      <sect1 id="VideoHardwareSpecifications"> 
-      <title>Video Hardware Specifications</title>
-        <sect2 id="GraphicCard">
-        <title>Graphic Card </title>
-        <para>The graphic card will manage your video output. The choice of your graphic card will depend on how you want to use Scenic. For now, we only support nvidia video card. Some ATI cards have problems with Xvideo extension. 
-        Before choosing your graphic card, determine on wich linux distribution and releases you are.
-
-Some graphic card may work only on certain releases. Before buying a graphic card, verify on the nvidia unix page that the hardware you are planning to use is supported not only by your linux distribution but also on the release you are using. 
-        </para> 
-        <table>
-          <title>Graphic Card Specifications</title>
-          <tgroup cols="2">
-              <thead>
+   <sect1 id="VideoHardwareSpecifications"> 
+   <title>Video Hardware Specifications</title>
+      <sect2 id="GraphicCard">
+      <title>Graphic Card </title>
+      <para>The graphic card will manage your video output. The choice of your graphic card will depend on how you want to use Scenic. For now, we only support nvidia video card. Some ATI cards have problems with Xvideo extension. Before choosing your graphic card, determine on wich linux distribution and releases you are.
+Some graphic card may work only on certain releases. Before buying a graphic card, verify on the nvidia unix page that the hardware you are planning to use is supported not only by your linux distribution but also on the release you are using. </para> 
+<para> We need to define the type of video output you will need. Usually this output is sent to a video mixer, a video projector, a monitor or any video display. On the table below we list the various possible ouput  on a graphic card.</para>
+         <table>
+         <title>Graphic Card Output Types</title>
+            <tgroup cols="2">
+               <thead>
                   <row>
                       <entry>Video Output</entry>
                       <entry>Determine the number and type of video output required</entry>
                   </row>
-              </thead>
-              <tbody>
+               </thead>
+               <tbody>
                   <row>
                       <entry>VGA</entry>
                       <entry>The lowest common denominator that all PC graphics hardware supports</entry>
-                 </row>
-                 <row>
+                  </row>
+                  <row>
                      <entry>DVI</entry>
                      <entry></entry>
-                 </row>
-                 <row>
+                  </row>
+                  <row>
                      <entry>S-Video</entry>
                      <entry></entry>
-                 </row>
-                 <row>
+                  </row>
+                  <row>
                      <entry>HDMI</entry>
                      <entry>Not supported and not tested</entry>
-                 </row>
-              </tbody>
-          </tgroup>
-        </table>
+                  </row>
+               </tbody>
+            </tgroup>
+         </table> 
+         <para> Once you have selected the type of output you need, you will have to choose the graphic card. This choice depends mainly of the final video quality you are expecting. </para>
+         <table>
+            <title>High Quality Graphic Card</title>
+               <tgroup cols="3">
+                  <thead>
+                     <row>
+                        <entry>Device</entry>
+                        <entry>Status</entry>
+                        <entry>Usage</entry>
+                     </row>
+                  </thead>
+                  <tbody>
+                     <row>
+                        <entry>Nvidia Quadro FX Serie</entry>
+                        <entry>Actually in testing</entry>
+                        <entry>Used only for 3D project </entry>
+                     </row>
+                  </tbody>
+               </tgroup>
+            </table> 
 
-        </sect2>
-        <sect2 id="VideoCaptureCard">
-        <title>Video Capture card</title>
-        <para>     Here is a list of the video capture cards tested with Scenic:
+            <table>
+            <title>Medium Quality Graphic Card</title>
+               <tgroup cols="3">
+                  <thead>
+                     <row>
+                        <entry>Device</entry>
+                        <entry>Status</entry>
+                        <entry>Usage</entry>
+                     </row>
+                  </thead>
+                  <tbody>
+                     <row>
+                        <entry>nvidia 9800 GT</entry>
+                        <entry>Fully Supported</entry>
+                        <entry>Genral good quality projection</entry>
+                     </row>
+                     <row>
+                        <entry>nvida 5200 GT</entry>
+                        <entry>Fully Supported</entry>
+                        <entry>Regaular telepresence project</entry>
+                     </row>
+                  </tbody>
+               </tgroup>
+            </table>
+                
+            <table>
+            <title> Low Quality Graphic Card</title>
+               <tgroup cols="3">
+                  <thead>
+                     <row>
+                        <entry>Device</entry>
+                        <entry>Status</entry>
+                        <entry>Usage</entry>
+                     </row>
+                  </thead>
+                  <tbody>
+                     <row>
+                        <entry>Built-in laptop graphic card, ie Intel, Asus </entry>
+                        <entry>Fully Supported</entry>
+                        <entry>For Testing purpose only</entry>
+                     </row>
+                  </tbody>
+               </tgroup>
+            </table>
+         </sect2>
 
-Best Quality
+         <sect2 id="VideoCapture">
+         <title>Video Capture</title>
+         <para>The video capture is usally a card or a device connected on one end to your camera and on the other end, to your computer. Choosing your video capture device depends on the many factors:</para>
+         <itemizedlist>
+            <listitem><para>The ouput cable on your camera</para></listitem>
+            <listitem><para>The output resolution of your camera</para></listitem>
+            <listitem><para>The video capture quality you need</para></listitem>
+            <listitem><para>The computer specification descriped in the previous section</para></listitem>
+            <listitem><para>The final output you need</para></listitem>
+         </itemizedlist>
+         <para> Giving these factors, we suggest some devices ordered by the quality and performance that they provide.</para>
+           
+            <table>
+            <title>High Quality Capture</title>
+               <tgroup cols="6">
+                  <thead>
+                     <row>
+                        <entry>Device</entry>
+                        <entry>Status</entry>
+                        <entry>Max Resolutions</entry>
+                        <entry>Max fps for Max Res</entry>
+                        <entry>Input</entry>
+                        <entry>Connection Type</entry>
+                     </row>
+                  </thead>
+                  <tbody>
+                     <row>
+                        <entry>DVI2USB Capture</entry>
+                        <entry>Actually in testing</entry>
+                        <entry>1920x1200</entry>
+                        <entry>32fps</entry>
+                        <entry>DVI/VGA</entry>
+                        <entry>USB2</entry>
+                     </row>
+                  </tbody>
+               </tgroup>
+            </table> 
 
-Good quality
-
-    Viewcast Osprey 100
-    Viewcast Osprey 210
-    Pinacle Dazzle AVC 100 (only in Ubuntu Karmic)
-
-Medium Quality
-
-    WintvHauppauge 350
-    WintvHauppauge 1800
-
-    NOTE: Choosing capture cards or DV
-
-Capture cards have a few advantages over DV converters: they don't need additionnal converters, they are prone to less latency (typically always less than 60ms), you can manage multiple inputs through software and you can control image variables (brightness, contrast, etc). On the minus side, you need a PC with an available PCI slot. USB video capture devices are usually of domestic quality.
-
-    If the PC has a Firewire (IEEE1394) interface, you can use a DV converter to get video. The quality and available features on these are quite varying. DV transmissioin is already (lightly) compressed, so videos have to be uncompressed first, then compressed again for transmission. This procedure adds a bit of latency (approximately 200ms). Image quality from a high end converter can be considered as good as that from capture cards. </para>
+            <table>
+            <title>Medium Quality Capture</title>
+               <tgroup cols="6">
+                  <thead>
+                     <row>
+                        <entry>Device</entry>
+                        <entry>Status</entry>
+                        <entry>Max Resolutions</entry>
+                        <entry>Max fps for Max Res</entry>
+                        <entry>Input</entry>
+                        <entry>Connection Type</entry>
+                     </row>
+                  </thead>
+                  <tbody>
+                     <row>
+                        <entry>Viewcast Osprey 100/210</entry>
+                        <entry>Fully Supported</entry>
+                        <entry>720x480</entry>
+                        <entry>30fps</entry>
+                        <entry>3xComposite 1xS-Video</entry>
+                        <entry>PCI</entry>
+                     </row>
+                     <row>
+                        <entry>Pinnacle Dazzle</entry>
+                        <entry>Fully Supported</entry>
+                        <entry>720x480</entry>
+                        <entry>30fps</entry>
+                        <entry>1xComposite 1xS-Video</entry>
+                        <entry>USB2</entry>
+                     </row>
+                     <row>
+                        <entry>Unibrain Fireboard 800</entry>
+                        <entry>Fully Supported</entry>
+                        <entry>720x480</entry>
+                        <entry>30fps</entry>
+                        <entry>1xComposite 1xS-Video</entry>
+                        <entry>USB2</entry>
+                     </row>
+                  </tbody>
+               </tgroup>
+            </table>
+                
+            <table>
+            <title> Low Quality Capture</title>
+               <tgroup cols="6">
+                  <thead>
+                     <row>
+                        <entry>Device</entry>
+                        <entry>Status</entry>
+                        <entry>Max Resolutions</entry>
+                        <entry>Max fps for Max Res</entry>
+                        <entry>Input</entry>
+                        <entry>Connection Type</entry>
+                     </row>
+                  </thead>
+                  <tbody>
+                     <row>
+                        <entry>WintvHauppauge 350/1800</entry>
+                        <entry>Fully Supported</entry>
+                        <entry>740x480</entry>
+                        <entry>30fps</entry>
+                        <entry>S-Video</entry>
+                        <entry>PCI</entry>
+                     </row>
+                  </tbody>
+               </tgroup>
+            </table>
 
       </sect2>
-      <sect2 id="Camera">
-      <title>Camera and Camcorder</title>
-      <para> USB, DV Point grey FL2G Sony XD-Cam EX1 Sony PD-170 Sony PDX-10
-            Unibrain 
-      
-      </sect1>
+         <sect2 id="Camera">
+         <title>Camera and Camcorder</title>
+         <para> USB, DV Point grey FL2G Sony XD-Cam EX1 Sony PD-170 Sony PDX-10 Unibrain </para>
+         </sect2>
 
-      <sect1 id="AudioHardwareSpecification"> 
-      <title>Audio Hardware Specifications</title>
-      </sect1>
-      
-      <sect1 id="Network Specifications">
-      <title>Network Specifications </title>
-      </sect1>
-        
+   </sect1>
  
-  </chapter>
+   <sect1 id="AudioHardwareSpecification"> 
+   <title>Audio Hardware Specifications</title>
+      <table>
+      <title>High quality audio card</title>
+         <tgroup cols="4">
+            <thead>
+               <row>
+                  <entry>Device</entry>
+                  <entry>Status</entry>
+                  <entry>Usage</entry>
+                  <entry>Num. Channel</entry>
+                  <entry>Min. Latency Tested</entry>
+               </row>
+            </thead>
+            <tbody>
+               <row>
+                  <entry> RME </entry>
+                  <entry>Actually in testing</entry>
+                  <entry>Good for audio recording, Orchestracl show </entry>
+                  <entry> RME </entry>
+                  <entry> RME </entry>
+               </row>
+            </tbody>
+         </tgroup>
+      </table> 
+      <table>
+      <title>Medium quality audio card</title>
+         <tgroup cols="4">
+            <thead>
+               <row>
+                  <entry>Device</entry>
+                  <entry>Status</entry>
+                  <entry>Usage</entry>
+                  <entry>Num. Channel</entry>
+                  <entry>Min. Latency Tested</entry>
+               </row>
+            </thead>
+            <tbody>
+               <row>
+                  <entry>Edirol FA101</entry>
+                  <entry>Supported</entry>
+                  <entry>Good for Installation, show</entry>
+                  <entry> RME </entry>
+                  <entry> RME </entry>
+               </row>
+            </tbody>
+         </tgroup>
+      </table> 
+   </sect1>
+   <sect1 id="Network Specifications">
+   <title>Network Specifications </title>
+   </sect1>
+ 
+</chapter> 
