@@ -87,10 +87,7 @@ void AudioReceiver::createSink(Pipeline &pipeline)
 {
     tassert(sink_ = audioConfig_->createSink(pipeline));
     if (level_ != 0)
-    {
-        gstlinkable::link(*decoder_, *level_);
         gstlinkable::link(*level_, *sink_);   
-    }
     else
         gstlinkable::link(*decoder_, *sink_);   
     setCaps();
