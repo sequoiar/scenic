@@ -123,6 +123,19 @@ init_gradient ()
 {
   gint i, j;
   for (i = 0, j = GRADIENT_SIZE - 1; i < GRADIENT_SIZE; ++i, --j) {
+    double val = ((i + 2) / (double) GRADIENT_SIZE) * 120.0;
+    RGB rgb = HSVtoRGB (val, 1.0, 1.0);
+    GRADIENT[j].r = rgb.r;
+    GRADIENT[j].g = rgb.g;
+    GRADIENT[j].b = rgb.b;
+  }
+}
+#if 0
+static void
+init_gradient ()
+{
+  gint i, j;
+  for (i = 0, j = GRADIENT_SIZE - 1; i < GRADIENT_SIZE; ++i, --j) {
     double val = pow (j / (double) GRADIENT_SIZE, M_E) * 120;
     RGB rgb = HSVtoRGB (val, 1.0, 1.0);
     GRADIENT[j].r = rgb.r;
@@ -130,6 +143,7 @@ init_gradient ()
     GRADIENT[j].b = rgb.b;
   }
 }
+#endif
 
 static void
 gtk_vumeter_class_init (GtkVumeterClass * klass)
@@ -228,7 +242,7 @@ static void
 gtk_vumeter_paint (GtkWidget * widget)
 {
   cairo_t *cr;
-  const gint HIGHLIGHTED_BARS = GTK_VUMETER (widget)->sel * GRADIENT_SIZE;
+  //const gint HIGHLIGHTED_BARS = GTK_VUMETER (widget)->sel * GRADIENT_SIZE;
   gint i;
 
   cr = gdk_cairo_create (widget->window);
@@ -240,32 +254,47 @@ gtk_vumeter_paint (GtkWidget * widget)
 
   cairo_set_source_rgb (cr, 0.2, 0.4, 0);
 
-  for (i = 0; i < GRADIENT_SIZE; i++) {
-    if (i < HIGHLIGHTED_BARS)       /* light up */
-      cairo_set_source_rgb (cr, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b);
-    else                        /* don't light up */
-      cairo_set_source_rgb (cr, 0.2, 0.4, 0);
-    cairo_rectangle (cr, 8, (i + 1) * 4, 30, 3);
-    cairo_fill (cr);
+  static const gdouble HEIGHT = 256.0;
+  cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, HEIGHT);
+  for (i = 0; i < GRADIENT_SIZE; ++i)
+  {
+      // 0.95 factor makes it more green overall
+      gdouble offset = 1.0 - (i  / (gdouble)GRADIENT_SIZE);
+      cairo_pattern_add_color_stop_rgba(gradient, offset, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b, 1);
   }
+  cairo_rectangle(cr, 0, HEIGHT * (1.0 - GTK_VUMETER(widget)->sel), HEIGHT, HEIGHT);
+  cairo_set_source(cr, gradient);
+  cairo_fill(cr);
+  cairo_pattern_destroy(gradient);
+
+#if 0
+  for (i = 0; i < GRADIENT_SIZE; i++) {
+      if (i < HIGHLIGHTED_BARS)       /* light up */
+          cairo_set_source_rgb (cr, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b);
+      else                        /* don't light up */
+          cairo_set_source_rgb (cr, 0.2, 0.4, 0);
+      cairo_rectangle (cr, 8, (i + 1) * 4, 30, 3);
+      cairo_fill (cr);
+  }
+#endif
 
   cairo_destroy (cr);
 }
 
-static void
+    static void
 gtk_vumeter_destroy (GtkObject * object)
 {
-  GtkVumeter *vumeter;
-  GtkVumeterClass *klass;
+    GtkVumeter *vumeter;
+    GtkVumeterClass *klass;
 
-  g_return_if_fail (object != NULL);
-  g_return_if_fail (GTK_IS_VUMETER (object));
+    g_return_if_fail (object != NULL);
+    g_return_if_fail (GTK_IS_VUMETER (object));
 
-  vumeter = GTK_VUMETER (object);
+    vumeter = GTK_VUMETER (object);
 
-  klass = static_cast<GtkVumeterClass*>(gtk_type_class (gtk_widget_get_type ()));
+    klass = static_cast<GtkVumeterClass*>(gtk_type_class (gtk_widget_get_type ()));
 
-  if (GTK_OBJECT_CLASS (klass)->destroy) {
-    (*GTK_OBJECT_CLASS (klass)->destroy) (object);
-  }
+    if (GTK_OBJECT_CLASS (klass)->destroy) {
+        (*GTK_OBJECT_CLASS (klass)->destroy) (object);
+    }
 }
