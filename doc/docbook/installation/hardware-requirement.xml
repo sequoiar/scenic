@@ -275,7 +275,8 @@ Some graphic card may work only on certain releases. Before buying a graphic car
                </tgroup>
             </table>
 
-      </sect2>
+         </sect2>
+
          <sect2 id="Camera">
          <title>Camera and Camcorder</title>
          <para> USB, DV Point grey FL2G Sony XD-Cam EX1 Sony PD-170 Sony PDX-10 Unibrain </para>
@@ -287,51 +288,79 @@ Some graphic card may work only on certain releases. Before buying a graphic car
    <title>Audio Hardware Specifications</title>
       <table>
       <title>High quality audio card</title>
-         <tgroup cols="4">
+         <tgroup cols="7">
             <thead>
                <row>
                   <entry>Device</entry>
                   <entry>Status</entry>
                   <entry>Usage</entry>
+                  <entry>Connection Type</entry>
                   <entry>Num. Channel</entry>
                   <entry>Min. Latency Tested</entry>
+                  <entry>Link</entry>
                </row>
             </thead>
             <tbody>
                <row>
-                  <entry> RME </entry>
+                  <entry> RME Hammerfall Digiface</entry>
                   <entry>Actually in testing</entry>
-                  <entry>Good for audio recording, Orchestracl show </entry>
-                  <entry> RME </entry>
-                  <entry> RME </entry>
+                  <entry>Good for professional audio recording, Orchestral show </entry>
+                  <entry> PCI </entry>
+                  <entry> 24 </entry>
+                  <entry>2.6 ms </entry>
+                  <entry><ulink url="http://www.rme-audio.de/en_products_digiface.php"><citetitle>RME Digiface</citetitle></ulink></entry>
                </row>
             </tbody>
          </tgroup>
       </table> 
       <table>
       <title>Medium quality audio card</title>
-         <tgroup cols="4">
+         <tgroup cols="7">
             <thead>
                <row>
                   <entry>Device</entry>
                   <entry>Status</entry>
                   <entry>Usage</entry>
+                  <entry>Connection Type</entry>
                   <entry>Num. Channel</entry>
                   <entry>Min. Latency Tested</entry>
+                  <entry>Link</entry>
                </row>
             </thead>
             <tbody>
                <row>
                   <entry>Edirol FA101</entry>
                   <entry>Supported</entry>
-                  <entry>Good for Installation, show</entry>
-                  <entry> RME </entry>
-                  <entry> RME </entry>
+                  <entry>Good Multipurpose Soundcard</entry>
+                  <entry>Firewire</entry>
+                  <entry> 10 </entry>
+                  <entry> 2.6 ms </entry>
+                  <entry><ulink url="http://www.roland.com/products/en/FA-101/"><citetitle>Edirol FA101</citetitle></ulink></entry>
+               </row> 
+               <row>
+                  <entry>Edirol FA66</entry>
+                  <entry>Supported</entry>
+                  <entry>Good Multipurpose Soundcard</entry>
+                  <entry>Firewire</entry>
+                  <entry> 6 </entry>
+                  <entry> 2.6 ms </entry>
+                  <entry><ulink url="http://www.roland.com/products/en/FA-66/"><citetitle>Edirol FA66</citetitle></ulink></entry>
                </row>
+               <row>
+                  <entry>M-Audio Delta 1010</entry>
+                  <entry>Supported</entry>
+                  <entry>Good Multipurpose Soundcard</entry>
+                  <entry>PCI</entry>
+                  <entry> 10 </entry>
+                  <entry> 2.6 ms </entry>
+                  <entry><ulink url="http://www.m-audio.com/products/en_us/Delta1010.html"><citetitle>M-Audio Delta1010</citetitle></ulink></entry>
+               </row>
+ 
             </tbody>
          </tgroup>
       </table> 
    </sect1>
+
    <sect1 id="Network Specifications">
    <title>Network Specifications </title>
    </sect1>
