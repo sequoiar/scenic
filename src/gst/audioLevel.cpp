@@ -41,7 +41,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     level_(pipeline_.makeElement("level", NULL)),
     emitMessages_(true)
 {
-    const int SPACING = 10;
+    static const int SPACING = 5;
     GtkWidget *hbox = gtk_hbox_new(TRUE /*homogenous spacing*/, SPACING);
 
     for (int i = 0; i < numChannels; ++i)
@@ -61,6 +61,8 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
 
     g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
+    static const int DEFAULT_INTERVAL_NS = 75000000;
+    g_object_set(G_OBJECT(level_), "interval", DEFAULT_INTERVAL_NS, NULL);
 }
 
 /// Destructor 
