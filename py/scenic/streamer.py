@@ -137,7 +137,7 @@ class StreamerManager(object):
                 "audio": {
                     # decided locally:
                     "source": self.app.config.audio_source,
-                    "vumeter-id": self.app.config.audio_input_vumeter_id,
+                    "vumeter-id": self.app.gui.audio_levels_input_socket_id,
 
                     # Decided by remote peer:
                     "numchannels": remote_config["audio"]["numchannels"],
@@ -172,7 +172,7 @@ class StreamerManager(object):
                 "audio": {
                     # decided locally:
                     "numchannels": self.app.config.audio_channels, # int
-                    "vumeter-id": self.app.config.audio_output_vumeter_id,
+                    "vumeter-id": self.app.gui.audio_levels_output_socket_id,
                     "codec": self.app.config.audio_codec, 
                     "port": self.app.recv_audio_port,
                     "sink": self.app.config.audio_sink
