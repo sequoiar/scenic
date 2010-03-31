@@ -64,13 +64,13 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
         list = gst_structure_get_value (s, "decay");
         value = gst_value_list_get_value (list, i);
         decay_dB = g_value_get_double (value);
-        if (1)
+        if (LOG)
           g_print ("    RMS: %f dB, peak: %f dB, decay: %f dB\n",
               rms_dB, peak_dB, decay_dB);
 
         /* converting from dB to normal gives us a value between 0.0 and 1.0 */
         peak = pow (10, peak_dB / 20);
-        if (1)
+        if (LOG)
           g_print ("    normalized peak value: %f\n", peak);
         set_value (peak, vumeters[i]);
       }
@@ -147,8 +147,8 @@ main (int argc, char **argv)
   pipeline = gst_pipeline_new ("pipeline");
   g_signal_connect (G_OBJECT (plug), "embedded",
       G_CALLBACK (embed_event), NULL );
-  source = gst_element_factory_make ("audiotestsrc", NULL);
-  g_object_set (source, "wave", TICKS, NULL);
+  source = gst_element_factory_make ("jackaudiosrc", NULL);
+  /*g_object_set (source, "wave", TICKS, NULL);*/
 
   capsfilter= gst_element_factory_make ("capsfilter", NULL);
   /* 2 channels is sadly the max for audiotestsrc without interleaving */
@@ -158,6 +158,7 @@ main (int argc, char **argv)
 
   /*audioconvert = gst_element_factory_make("audioconvert", NULL);*/
   level = gst_element_factory_make ("level", NULL);
+  g_object_set(level, "interval", 75000000, NULL);
   sink = gst_element_factory_make ("fakesink", NULL);
   g_object_set(sink, "sync", TRUE, NULL);
 

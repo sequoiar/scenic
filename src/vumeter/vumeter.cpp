@@ -176,7 +176,7 @@ gtk_vumeter_size_request (GtkWidget * widget, GtkRequisition * requisition)
   g_return_if_fail (GTK_IS_VUMETER (widget));
   g_return_if_fail (requisition != NULL);
 
-  requisition->width = 46;
+  requisition->width = 10;
   requisition->height = 100;
 }
 
@@ -209,7 +209,7 @@ gtk_vumeter_realize (GtkWidget * widget)
   attributes.window_type = GDK_WINDOW_CHILD;
   attributes.x = widget->allocation.x;
   attributes.y = widget->allocation.y;
-  attributes.width = 46;
+  attributes.width = 20;
   attributes.height = 100;
 
   attributes.wclass = GDK_INPUT_OUTPUT;
@@ -242,41 +242,25 @@ static void
 gtk_vumeter_paint (GtkWidget * widget)
 {
   cairo_t *cr;
-  //const gint HIGHLIGHTED_BARS = GTK_VUMETER (widget)->sel * GRADIENT_SIZE;
   gint i;
 
   cr = gdk_cairo_create (widget->window);
 
-  cairo_translate (cr, 0, 7);
-
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_paint (cr);
-
-  cairo_set_source_rgb (cr, 0.2, 0.4, 0);
-
   static const gdouble HEIGHT = 256.0;
   cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, HEIGHT);
   for (i = 0; i < GRADIENT_SIZE; ++i)
   {
-      // 0.95 factor makes it more green overall
+      // reduce first term (1.0) to have more green)
       gdouble offset = 1.0 - (i  / (gdouble)GRADIENT_SIZE);
       cairo_pattern_add_color_stop_rgba(gradient, offset, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b, 1);
   }
-  cairo_rectangle(cr, 0, HEIGHT * (1.0 - GTK_VUMETER(widget)->sel), HEIGHT, HEIGHT);
-  cairo_set_source(cr, gradient);
-  cairo_fill(cr);
-  cairo_pattern_destroy(gradient);
 
-#if 0
-  for (i = 0; i < GRADIENT_SIZE; i++) {
-      if (i < HIGHLIGHTED_BARS)       /* light up */
-          cairo_set_source_rgb (cr, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b);
-      else                        /* don't light up */
-          cairo_set_source_rgb (cr, 0.2, 0.4, 0);
-      cairo_rectangle (cr, 8, (i + 1) * 4, 30, 3);
-      cairo_fill (cr);
-  }
-#endif
+  cairo_rectangle(cr, 0, HEIGHT * (1.0 - GTK_VUMETER(widget)->sel), 20, HEIGHT);
+  cairo_set_source(cr, gradient);
+  cairo_pattern_destroy(gradient);
+  cairo_fill(cr);
 
   cairo_destroy (cr);
 }
