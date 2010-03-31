@@ -147,8 +147,8 @@ main (int argc, char **argv)
   pipeline = gst_pipeline_new ("pipeline");
   g_signal_connect (G_OBJECT (plug), "embedded",
       G_CALLBACK (embed_event), NULL );
-  source = gst_element_factory_make ("jackaudiosrc", NULL);
-  /*g_object_set (source, "wave", TICKS, NULL);*/
+  source = gst_element_factory_make ("audiotestsrc", NULL);
+  g_object_set (source, "wave", TICKS, NULL);
 
   capsfilter= gst_element_factory_make ("capsfilter", NULL);
   /* 2 channels is sadly the max for audiotestsrc without interleaving */
@@ -173,7 +173,7 @@ main (int argc, char **argv)
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
   /* end in 1/2 second */
-  g_timeout_add(2000000, quit_cb, NULL); 
+  g_timeout_add(200, quit_cb, NULL); 
   gtk_main();
 
   gst_element_set_state (pipeline, GST_STATE_NULL);
