@@ -64,7 +64,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
         list = gst_structure_get_value (s, "decay");
         value = gst_value_list_get_value (list, i);
         decay_dB = g_value_get_double (value);
-        if (LOG)
+        if (1)
           g_print ("    RMS: %f dB, peak: %f dB, decay: %f dB\n",
               rms_dB, peak_dB, decay_dB);
 
@@ -72,7 +72,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
         peak = pow (10, peak_dB / 20);
         if (LOG)
           g_print ("    normalized peak value: %f\n", peak);
-        set_value (peak, vumeters[i]);
+        set_value (peak_dB, vumeters[i]);
       }
     }
   }

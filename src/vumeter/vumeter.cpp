@@ -262,7 +262,6 @@ gtk_vumeter_paint (GtkWidget * widget)
     cairo_t *cr = gdk_cairo_create (widget->window);
 	static const int db_points[] = { -50, -40, -20, -30, -10, -3, 0, 4 };
 
-    cairo_set_source_rgb (cr, 0, 0, 0);
     cairo_paint (cr);
     cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, widget->allocation.height);
     for (gint i = 0; i < GRADIENT_SIZE; ++i) 
@@ -275,10 +274,10 @@ gtk_vumeter_paint (GtkWidget * widget)
     cairo_select_font_face (cr, "Sans",
             CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size (cr, 8);
-    cairo_set_source_rgb (cr, 1.0, 1.0, 1.0);
+    cairo_set_source_rgb (cr, 0.80, 0.80, 0.80); // text colour
 	char buf[32];
     gdouble max_text_width = 0;
-    for (size_t i = 0; i < sizeof(db_points)/sizeof(db_points[0]); ++i)
+    for (size_t i = 0; i < sizeof(db_points) / sizeof(db_points[0]); ++i)
     {
         snprintf(buf, sizeof(buf), "-%d", std::abs(db_points[i]));
         cairo_text_extents (cr, buf, &te);
@@ -292,7 +291,7 @@ gtk_vumeter_paint (GtkWidget * widget)
     }
 
     cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
-    cairo_rectangle(cr, 0, widget->allocation.height * (1.0 - GTK_VUMETER(widget)->sel), widget->allocation.width - max_text_width, widget->allocation.height);
+    cairo_rectangle(cr, 0, db_to_vertical_offset(widget, GTK_VUMETER(widget)->sel), widget->allocation.width - max_text_width, widget->allocation.height);
 
     cairo_set_source(cr, gradient);
     cairo_pattern_destroy(gradient);
