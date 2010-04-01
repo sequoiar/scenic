@@ -273,25 +273,35 @@ gtk_vumeter_paint (GtkWidget * widget)
     cairo_text_extents_t te;
     cairo_select_font_face (cr, "Sans",
             CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size (cr, 8);
+    cairo_set_font_size (cr, 7);
     cairo_set_source_rgb (cr, 0.80, 0.80, 0.80); // text colour
 	char buf[32];
     gdouble max_text_width = 0;
     for (size_t i = 0; i < sizeof(db_points) / sizeof(db_points[0]); ++i)
     {
-        snprintf(buf, sizeof(buf), "-%d", std::abs(db_points[i]));
+        snprintf(buf, sizeof(buf), "%d", db_points[i]);
         cairo_text_extents (cr, buf, &te);
         max_text_width = std::max(te.width, max_text_width);
-
         gdouble vertical_offset = db_to_vertical_offset(widget, db_points[i]);
 
         cairo_move_to (cr, widget->allocation.width -  te.width - te.x_bearing,
-            vertical_offset);
+            vertical_offset - (te.height / 2) - te.y_bearing);
         cairo_show_text (cr, buf);
     }
 
+    const int DASH_SIZE = 4;
+    cairo_set_line_width (cr, 1.0);
+    for (int i = 4; i >= -50;)
+    {
+        gdouble pos = db_to_vertical_offset(widget, i);
+        cairo_move_to (cr, widget->allocation.width - max_text_width - DASH_SIZE - 5, pos);
+        cairo_line_to (cr, widget->allocation.width - max_text_width - 5, pos);
+        cairo_stroke (cr);
+        i = i > -10 ? i - 2 : i - 4;
+    }
+
     cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
-    cairo_rectangle(cr, 0, db_to_vertical_offset(widget, GTK_VUMETER(widget)->sel), widget->allocation.width - max_text_width, widget->allocation.height);
+    cairo_rectangle(cr, 0, db_to_vertical_offset(widget, GTK_VUMETER(widget)->sel), widget->allocation.width - max_text_width - DASH_SIZE - 5, widget->allocation.height);
 
     cairo_set_source(cr, gradient);
     cairo_pattern_destroy(gradient);
