@@ -301,10 +301,12 @@ class Gui(object):
        #    """ Called when a plug is added to socket """
        #    print "I (", widget, ") have just had a plug inserted!"
 
-       #def _plug_removed_cb(widget):
-       #    """ Called when a plug is removed from socket """
-       #    print "I (", widget, ") have just had a plug removed!"
-       #    return True
+        def _plug_removed_cb(widget):
+            """ Called when a plug is removed from socket, returns
+                True so that it can be reused
+                """
+            print "I (", widget, ") have just had a plug removed!"
+            return True
         
         # system tab contents:
         self.network_admin_widget = widgets_tree.get_widget("network_admin")
