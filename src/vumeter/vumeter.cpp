@@ -192,8 +192,6 @@ gtk_vumeter_size_allocate (GtkWidget * widget, GtkAllocation * allocation)
   if (GTK_WIDGET_REALIZED (widget)) {
     gdk_window_move_resize (widget->window,
         allocation->x, allocation->y, allocation->width, allocation->height);
-    GTK_VUMETER(widget)->width = allocation->width;
-    GTK_VUMETER(widget)->height = allocation->height;
   }
 }
 
@@ -250,7 +248,7 @@ gtk_vumeter_paint (GtkWidget * widget)
 
   cairo_set_source_rgb (cr, 0, 0, 0);
   cairo_paint (cr);
-  cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, GTK_VUMETER(widget)->height);
+  cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, widget->allocation.height);
   for (i = 0; i < GRADIENT_SIZE; ++i) 
   {
       // reduce first term (1.0) to have more green)
@@ -258,7 +256,7 @@ gtk_vumeter_paint (GtkWidget * widget)
       cairo_pattern_add_color_stop_rgba(gradient, offset, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b, 1);
   }
 
-  cairo_rectangle(cr, 0, GTK_VUMETER(widget)->height * (1.0 - GTK_VUMETER(widget)->sel), GTK_VUMETER(widget)->width, GTK_VUMETER(widget)->height);
+  cairo_rectangle(cr, 0, widget->allocation.height * (1.0 - GTK_VUMETER(widget)->sel), widget->allocation.width, widget->allocation.height);
   cairo_set_source(cr, gradient);
   cairo_pattern_destroy(gradient);
   cairo_fill(cr);

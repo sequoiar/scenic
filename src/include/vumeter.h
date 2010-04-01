@@ -17,8 +17,6 @@ struct _GtkVumeter
 {
   GtkWidget widget;
 
-  gdouble width;
-  gdouble height;
   gdouble sel;
 };
 

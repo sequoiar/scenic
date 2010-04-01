@@ -158,7 +158,7 @@ main (int argc, char **argv)
 
   /*audioconvert = gst_element_factory_make("audioconvert", NULL);*/
   level = gst_element_factory_make ("level", NULL);
-  g_object_set(level, "interval", 75000000, NULL);
+  g_object_set(level, "interval", 50000000, NULL);
   sink = gst_element_factory_make ("fakesink", NULL);
   g_object_set(sink, "sync", TRUE, NULL);
 
