@@ -13,6 +13,7 @@
   <!ENTITY Audio_Video SYSTEM "installation/audio-video.xml">
   <!ENTITY Network_Test SYSTEM "installation/network.xml">
   <!ENTITY Command_Line SYSTEM "installation/commandline.xml">
+  <!ENTITY About SYSTEM "installation/about.xml">
   <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
        Use the appversion entity to specify the version of the application.
@@ -20,107 +21,9 @@
        Use the date entity to specify the release date of this manual.
        Use the app entity to specify the name of the application. -->
 ]>
-<!-- 
-      (Do not remove this comment block.)
-  Maintained by the GNOME Documentation Project
-  http://developer.gnome.org/projects/gdp
-  Template version: 2.0 beta
-  Template last modified Apr 11, 2002
--->
 <!-- =============Document Header ============================= -->
-<book id="index" lang="en">
-<!-- please do not change the id; for translations, change lang to -->
-<!-- appropriate code -->
-  <bookinfo> 
-    <title>&app; Installation Manual V&manrevision;</title>       
-    <copyright> 
-      <year>2009</year> 
-      <year>2010</year> 
-      <holder>Society for Arts and Technology </holder> 
-    </copyright> 
-<!-- translators: uncomment this
-  <copyright>
-   <year>2002</year>
-   <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
-  </copyright>
-   -->
-<!-- An address can be added to the publisher information.  If a role is 
-     not specified, the publisher/author is the same for all versions of the 
-     document.  -->
-    <publisher> 
-      <publishername> Society for Arts and Technology </publishername> 
-    </publisher> 
-   &legal;
-   <!-- This file  contains link to license for the documentation (GNU FDL), and 
-        other legal stuff such as "NO WARRANTY" statement. Please do not change 
-	any of this. -->
-    <authorgroup> 
-      <author> 
-		<firstname>Philippe</firstname> 
-		<surname>Chevry</surname> 
-		<affiliation> 
-	  		<orgname>Society for Arts and Technology Documentation Project</orgname> 
-	  		<address> <email>doc@sat.qc.ca</email> </address> 
-		</affiliation> 
-      </author> 
-      <author> 
-		<firstname>Simon</firstname> 
-		<surname>Piette</surname> 
-		<affiliation> 
-	  		<orgname>Society for Arts and Technology Documentation Project</orgname> 
-	  		<address> <email>doc@sat.qc.ca</email> </address> 
-		</affiliation> 
-      </author> 
-<!-- This is appropriate place for other contributors: translators,
-     maintainers,  etc. Commented out by default.
-     
-      <othercredit role="translator">
-		<firstname>Latin</firstname> 
-		<surname>Translator 1</surname> 
-		<affiliation> 
-	  		<orgname>Latin Translation Team</orgname> 
-	  		<address> <email>translator@gnome.org</email> </address> 
-		</affiliation>
-		<contrib>Latin translation</contrib>
-      </othercredit>
--->
-    </authorgroup>
-<!-- According to GNU FDL, revision history is mandatory if you are -->
-<!-- modifying/reusing someone else's document.  If not, you can omit it. -->
-<!-- Remember to remove the &manrevision; entity from the revision entries other
--->
-<!-- than the current revision. -->
-<!-- The revision numbering system for GNOME manuals is as follows: -->
-<!-- * the revision number consists of two components -->
-<!-- * the first component of the revision number reflects the release version of the GNOME desktop. -->
-<!-- * the second component of the revision number is a decimal unit that is incremented with each revision of the manual. -->
-<!-- For example, if the GNOME desktop release is V2.x, the first version of the manual that -->
-<!-- is written in that desktop timeframe is V2.0, the second version of the manual is V2.1, etc. -->
-<!-- When the desktop release version changes to V3.x, the revision number of the manual changes -->
-<!-- to V3.0, and so on. -->  
-    <revhistory>
-      <revision> 
-		<revnumber>Scenic Installation Manual V&manrevision;</revnumber> 
-		<date>&date;</date> 
-		<revdescription> 
-	  		<para role="author">SAT DOC
-	    	<email>doc@sat.qc.ca</email>
-	  		</para>
-	  		<para role="publisher">Society for Arts and Technology Documentation Project</para>
-		</revdescription> 
-      </revision> 
-    </revhistory>
-    <releaseinfo>This manual describes version &appversion; of Scenic Installation.
-    </releaseinfo> 
-    <legalnotice> 
-      <title>Feedback</title> 
-      <para>To report a bug or make a suggestion regarding the &app; application or
-      this manual, follow the directions in the <ulink url="ghelp:Scenic-feedback"
-	  type="help">Scenic Help Page</ulink>. 
-      </para>
-<!-- Translators may also add here feedback address for translations -->
-    </legalnotice> 
-  </bookinfo> 
+<book id="Installation-Manual" lang="en">
+  &About;
   &Introduction;
   &Hardware_Requirements;
   &Hardware_Setup;
@@ -128,4 +31,9 @@
   &Audio_Video;
   &Network_Test;
   &Command_Line;
-</book>
+</book>   
+   
+   
+   
+   
+   
