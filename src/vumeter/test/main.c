@@ -118,7 +118,7 @@ main (int argc, char **argv)
   { SINE = 0, SQUARE, SAW, TRIANGLE, SILENCE, WHITE_NOISE, PINK_NOISE,
     SINE_TABLE, TICKS, GAUSSIAN_NOISE
   };
-  enum {SPACING = 5}; 
+  enum {SPACING = 10}; 
 
   if (argc < 2)
       socket_id = 0;
