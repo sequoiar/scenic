@@ -2,7 +2,9 @@
 
 #include "vumeter.h"
 #include <cmath>
+#include <cstdlib> // for abs
 #include <string>
+#include <cstring>
 
 static const int GRADIENT_SIZE = 20;
 
@@ -130,20 +132,6 @@ init_gradient ()
     GRADIENT[j].b = rgb.b;
   }
 }
-#if 0
-static void
-init_gradient ()
-{
-  gint i, j;
-  for (i = 0, j = GRADIENT_SIZE - 1; i < GRADIENT_SIZE; ++i, --j) {
-    double val = pow (j / (double) GRADIENT_SIZE, M_E) * 120;
-    RGB rgb = HSVtoRGB (val, 1.0, 1.0);
-    GRADIENT[j].r = rgb.r;
-    GRADIENT[j].g = rgb.g;
-    GRADIENT[j].b = rgb.b;
-  }
-}
-#endif
 
 static void
 gtk_vumeter_class_init (GtkVumeterClass * klass)
@@ -176,7 +164,7 @@ gtk_vumeter_size_request (GtkWidget * widget, GtkRequisition * requisition)
   g_return_if_fail (GTK_IS_VUMETER (widget));
   g_return_if_fail (requisition != NULL);
 
-  requisition->width = 10;
+  requisition->width = 5;
   requisition->height = 100;
 }
 
@@ -209,7 +197,7 @@ gtk_vumeter_realize (GtkWidget * widget)
   attributes.window_type = GDK_WINDOW_CHILD;
   attributes.x = widget->allocation.x;
   attributes.y = widget->allocation.y;
-  attributes.width = 20;
+  attributes.width = 5;
   attributes.height = 100;
 
   attributes.wclass = GDK_INPUT_OUTPUT;
@@ -238,30 +226,79 @@ gtk_vumeter_expose (GtkWidget * widget, GdkEventExpose * event)
   return FALSE;
 }
 
+static gdouble db_to_vertical_offset(GtkWidget *widget, gdouble db)
+{
+    gfloat def = 0.0f; /* Meter deflection %age */
+ 
+    if (db < -70.0f) {
+        def = 0.0f;
+    } else if (db < -60.0f) {
+        def = (db + 70.0f) * 0.25f;
+    } else if (db < -50.0f) {
+        def = (db + 60.0f) * 0.5f + 2.5f;
+    } else if (db < -40.0f) {
+        def = (db + 50.0f) * 0.75f + 7.5f;
+    } else if (db < -30.0f) {
+        def = (db + 40.0f) * 1.5f + 15.0f;
+    } else if (db < -20.0f) {
+        def = (db + 30.0f) * 2.0f + 30.0f;
+    } else if (db < 6.0f) {
+        def = (db + 20.0f) * 2.5f + 50.0f;
+    } else {
+        def = 115.0f;
+    }
+
+    /* 115 is the deflection %age that would be 
+       when db=6.0. this is an arbitrary
+	    endpoint for our scaling.
+     */
+
+    return widget->allocation.height - floor (widget->allocation.height * (def / 115.0f));
+}
+
 static void
 gtk_vumeter_paint (GtkWidget * widget)
 {
-  cairo_t *cr;
-  gint i;
+    cairo_t *cr = gdk_cairo_create (widget->window);
+	static const int db_points[] = { -50, -40, -20, -30, -10, -3, 0, 4 };
 
-  cr = gdk_cairo_create (widget->window);
+    cairo_set_source_rgb (cr, 0, 0, 0);
+    cairo_paint (cr);
+    cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, widget->allocation.height);
+    for (gint i = 0; i < GRADIENT_SIZE; ++i) 
+    {
+        gdouble offset = 1.0 - (i  / (gdouble)GRADIENT_SIZE);
+        cairo_pattern_add_color_stop_rgba(gradient, offset, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b, 1);
+    }
 
-  cairo_set_source_rgb (cr, 0, 0, 0);
-  cairo_paint (cr);
-  cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, widget->allocation.height);
-  for (i = 0; i < GRADIENT_SIZE; ++i) 
-  {
-      // reduce first term (1.0) to have more green)
-      gdouble offset = 1.0 - (i  / (gdouble)GRADIENT_SIZE);
-      cairo_pattern_add_color_stop_rgba(gradient, offset, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b, 1);
-  }
+    cairo_text_extents_t te;
+    cairo_select_font_face (cr, "Sans",
+            CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size (cr, 8);
+    cairo_set_source_rgb (cr, 1.0, 1.0, 1.0);
+	char buf[32];
+    gdouble max_text_width = 0;
+    for (size_t i = 0; i < sizeof(db_points)/sizeof(db_points[0]); ++i)
+    {
+        snprintf(buf, sizeof(buf), "-%d", std::abs(db_points[i]));
+        cairo_text_extents (cr, buf, &te);
+        max_text_width = std::max(te.width, max_text_width);
 
-  cairo_rectangle(cr, 0, widget->allocation.height * (1.0 - GTK_VUMETER(widget)->sel), widget->allocation.width, widget->allocation.height);
-  cairo_set_source(cr, gradient);
-  cairo_pattern_destroy(gradient);
-  cairo_fill(cr);
+        gdouble vertical_offset = db_to_vertical_offset(widget, db_points[i]);
 
-  cairo_destroy (cr);
+        cairo_move_to (cr, widget->allocation.width -  te.width - te.x_bearing,
+            vertical_offset);
+        cairo_show_text (cr, buf);
+    }
+
+    cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
+    cairo_rectangle(cr, 0, widget->allocation.height * (1.0 - GTK_VUMETER(widget)->sel), widget->allocation.width - max_text_width, widget->allocation.height);
+
+    cairo_set_source(cr, gradient);
+    cairo_pattern_destroy(gradient);
+    cairo_fill(cr);
+
+    cairo_destroy (cr);
 }
 
     static void

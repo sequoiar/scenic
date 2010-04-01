@@ -100,11 +100,12 @@ int
 main (int argc, char **argv)
 {
   GtkWidget *plug;
-  enum { NUM_CHANNELS = 8 };
+  enum { NUM_CHANNELS = 2 };
   GtkWidget *vumeters[NUM_CHANNELS];
   GtkWidget *hbox;
   GstBus *bus;
   gint watch_id;
+  gboolean long_test = FALSE;
   GdkNativeWindow socket_id;  
   GstElement *pipeline;
   GstElement *source;
@@ -118,12 +119,14 @@ main (int argc, char **argv)
   { SINE = 0, SQUARE, SAW, TRIANGLE, SILENCE, WHITE_NOISE, PINK_NOISE,
     SINE_TABLE, TICKS, GAUSSIAN_NOISE
   };
-  enum {SPACING = 10}; 
+  enum {SPACING = 5}; 
 
   if (argc < 2)
       socket_id = 0;
   else
       socket_id = atol(argv[1]);
+  if (argc == 3)
+      long_test = TRUE;
 
   gtk_init (&argc, &argv);
   gst_init (&argc, &argv);
@@ -173,7 +176,7 @@ main (int argc, char **argv)
   gtk_widget_show_all (plug);
   g_print ("%u\n", (unsigned int) gtk_plug_get_id (GTK_PLUG (plug)));
   /* we need to run a GLib main loop to get the messages */
-  /* end in 1/2 second */
+  /* end in 200 ms */
   g_timeout_add(200, quit_cb, NULL); 
   gtk_main();
 

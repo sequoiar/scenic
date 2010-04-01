@@ -16,6 +16,7 @@ class TestVumeter(unittest.TestCase):
         self.plug_added = False
         self.plug_removed = False
         window = gtk.Window()
+        window.set_default_size(80, 480)
         window.show()
 
         socket = gtk.Socket()
