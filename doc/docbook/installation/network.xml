@@ -1,4 +1,172 @@
+<chapter><title>Network Testing</title>
+   <section>
+      <title>Minimum Network Requirements</title>
+   </section>
+   <section>
+      <title>Network speed</title>
+   <para>Network speed and performance are of the utmost importance. To ensure that the network can handle the &app; setup, system administrators / users must perform the tests, described below, on the local network and between two endpoints. </para>
+   <para>The following performance rates must be met: </para>
+   <para>Bandwidth: 3.5Mbps video + 1.6Mbps audio = &gt; 5Mbps + 20%</para>
+   </section>
+   <section><title>Network bandwidth</title>
+   <para>Network bandwidth is a measure of available or consumed data communication resources expressed in bits or multiples of it (kbps, Mbps etc). To determine the required level of needed bandwidth, you have to calculate the Mbps rate of the audio and video tracks (including compression rates). Example: a 3.5 Mbps MPEG4 video with 2 x 800kbps audio channels requires 5.1 Mbps. For best results, users should add to this a 20% leeway and also consider additional network usage such as chat, skype, web browsing and so on. </para>
+   </section>
+   <section><title>Latency</title>
+   <para>Latency is the time taken for a sent packet of data to be received at the other end. It includes the time to encode the packet for transmission and transmit it, the time for that data to traverse the network equipment between the nodes, and the time to receive and decode the data. The degree of permissible latency depends on many factors. Users must first consider the scenic requirements; if for example, you only need to transmit sound one way without any form of interaction, then latency rates are somewhat irrelevant. As a rule, the latency rate should be scaled according to the distance between sites. </para>
+   <para>Latency:30-200ms</para>
+   <para>Approximate rates per average distance: </para>
+   <para>Regional level: 30ms</para>
+   <para/>
+   <para>Across the country: 75ms</para>
+   <para/>
+   <para>Across continents: 200ms</para>
+   </section>
+   <section><title>Jitter</title>
+   <para>Jitter, in the context of computer networks, is a measure of the variability over time of the packet latency across a network. Packet jitter is expressed as an average of the deviation from the network mean latency (see above). Packet jitter is quite important as it can increase the overall rate of latency, it must therefore be taken into account in order to calculate the total latency. The average deviation from the network mean latency should be less than 1%. </para>
+   <para>Jitter: &lt;1%</para></section><section><title>Packet Loss</title>
+   <para>Packet loss occurs when one or more packets of data traveling across a computer network fail to reach their destination. Packet loss causes important signal distortions that are always noticeable, regardless of the packet loss percentage. In a worst case scenario, packet loss should never be higher than 1%. At levels higher than this, there will be a significantly noticeable impact on the quality of the image, and an highly disruptive impact on the quality of the audio transmission. </para>
+   <para>&lt;1%</para>
+   <para>&gt;1% = significant impact</para>
+   </section>
+   <section><title>Local Network Testing</title>
+   <orderedlist>
+      <listitem>
+         <para>You must download the debian sid iperf version 2.0.4-3 or 2.0.4-4 on your desktop and install it on both computer. Double click on the package to start the Ubuntu package manager installation process. </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Test the two iperf sessions on a stable LAN. Here is a diagram of this first test: </para>
+      </listitem>
+   </orderedlist>
+   <para>
+      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/scenic/raw-attachment/wiki/ImageSource/network_testing_01.png"
+                     width="2.068cm"
+                     depth="1.07cm"/> 
+   </para>
+   <orderedlist>
+      <listitem>
+         <para>Connect the two computers to the same switch. </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Assign a static ip address to both computers. Follow the Ubuntu Networking for Basic and Advanced Users Tutorial and at the Network configuration menu, select Static IP Address and assign an IP address, ex: 192.168.2.168. Be sure to give a static IP address that does not conflict with your DHCP range. If in doubt, contact a system administrator. </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>On one of the computers, open a terminal session (Applications/Accessories/Terminal), start an iperf server with the UDP option. </para>
+         <para>iperf -s  -u -i 10</para>
+      </listitem>
+      <listitem>
+         <para>On the other computer, open a terminal session and start an iperf client with the UDP option. </para>
+         <para>iperf -c ''server ip address'' -u -b 1M</para>
+      </listitem>
+      <listitem>
+         <para>The iperf report should be similar to this: </para>
+         <para>------------------------------------------------------------</para>
+         <para>Client connecting to 10.10.10.183, UDP port 5001</para>
+         <para>Sending 1470 byte datagrams</para>
+         <para>UDP buffer size:   108 KByte (default)</para>
+         <para>------------------------------------------------------------</para>
+         <para>[  3] local 10.10.10.162 port 42451 connected with 10.10.10.183 port 5001</para>
+         <para>[ ID] Interval       Transfer     Bandwidth</para>
+         <para>[  3]  0.0-10.0 sec  1.19 MBytes  1000 Kbits/sec</para>
+         <para>[  3] Sent 852 datagrams</para>
+         <para>[  3] Server Report:</para>
+         <para>[  3]  0.0-10.0 sec  1.19 MBytes  1000 Kbits/sec  0.004 ms    0/  852 (0%)</para>
+         <para>------------------------------------------------------</para>
+      </listitem>
+      <listitem>
+         <para>If the server reports 0% packet loss, then test your network with respectively 15M, 30M, 60M, 80M. If you detect packet loss, please refer to our troubleshooting section. </para>
+      </listitem>
+   </orderedlist>
+   </section>
+   <section><title>Bidirectional Local Network Testing</title>
+   <orderedlist>
+      <listitem>
+         <para>This iperf bidirectional test evaluates network performances in the the context of bidirectional video and audio transmission. </para>
+      </listitem>
+   </orderedlist>
+   <para>NOTE: For now we do not recommend the -d option in iperf as it generates unwanted warnings and errors. </para>
+   <orderedlist>
+      <listitem>
+         <para>Single-sided bidirectional test: </para>
+         <para>iperf -c ''server ip address'' -b 30M -r -u </para>
+      </listitem>
+      <listitem>
+         <para>The -r option does a bidirectional test individually, you should get 0% packet loss on both sides. </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Simultaneous client/server test (on computers A and B): </para>
+         <para>iperf  -s  -u</para>
+      </listitem>
+      <listitem>
+         <para>On computers A and B, started at the same time, you should get 0% packet loss on both sides. </para>
+         <para>iperf  -c ''server ip address'' -b 30M -u</para>
+      </listitem>
+   </orderedlist>
+   </section>
+   <section><title>Remote Network Testing</title>
+   <orderedlist>
+      <listitem>
+         <para>Perform a traceroute starting from your computer to the remote computer. This will show you the route taken by the packets across the network. You can use this to determine if the packets are traveling on the proper ISP. </para>
+         <para>traceroute "Remote IP Address"</para>
+      </listitem>
+      <listitem>
+         <para>Now, repeat the same steps as the Local Network Test but this time between your local network and the remote network. </para>
+      </listitem>
+   </orderedlist>
+   <para>
+      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/scenic/raw-attachment/wiki/ImageSource/network_testing_02.png"
+                     width="2.068cm"
+                     depth="1.07cm"/> 
+   </para>
+   </section>
+   <section><title>Useful network testing tools</title>
+      <section><title>Ping</title>
+   <para>Ping will be used here to test the latency over the network. </para>
+   <orderedlist>
+      <listitem>
+         <para>Open a terminal: /Applications/Accessories/Terminal </para>
+         <para>ping www.google.com</para>
+         <para>PING www.l.google.com (74.125.93.104) 56(84) bytes of data.</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=1 ttl=239 time=36.2 ms</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=2 ttl=239 time=37.3 ms</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=3 ttl=239 time=36.4 ms</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=4 ttl=239 time=36.1 ms</para>
+         <para/>
+         <para>--- www.l.google.com ping statistics ---</para>
+         <para>4 packets transmitted, 4 received, 0% packet loss, time 3003ms</para>
+         <para>rtt min/avg/max/mdev = 36.174/36.557/37.322/0.494 ms</para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Here we can observe that the average round trip time is 36.557 millisecond with 0% of packet loss. </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Use ctrl-c to quit. </para>
+      </listitem>
+   </orderedlist>
+      </section>
+      <section><title>Smoke Ping</title>
+      </section>
+      <section><title>Iperf</title>
+      </section>
+      <section><title>Traceroute</title>
+      </section>
+      <section><title>Netem</title>
+      </section>
+      <section><title>Related Links</title>
+   <para>NetEM Testing network problems with netem network testing procedures and New World Symphony technical requirements. Bandwidth Test Controller (BWCTL), a command line client application and a scheduling and policy daemon that wraps iperf. iperf Tutorial UDP Buffer Sizing </para>
+   <para/>
+      </section>
+   </section>
+</chapter>
 
-  <chapter id="NetworkTest"> 
-    <title>Network Test</title>
-  </chapter>

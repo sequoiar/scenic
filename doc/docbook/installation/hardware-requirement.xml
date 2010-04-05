@@ -1,6 +1,6 @@
 <chapter id="Hardware-Requirements"> 
 <title>Hardware Requirements</title>
-<para>The use of Scenic require specific hardware. Telepresence system oriented for realtime performance have to met certain standard, this for good reliability and performance. Our team is continuously testing various devices and computer parts. We frequently update this page with material that is adequate to use in a telepresence system. For any material that is not proposed in our list, please contact us.</para>
+<para>The use of &app; require specific hardware. Telepresence system oriented for realtime performance have to met certain standard, this for good reliability and performance. Our team is continuously testing various devices and computer parts. We frequently update this page with material that is adequate to use in a telepresence system. For any material that is not proposed in our list, please contact us.</para>
    <sect1 id="ComputerSpecifications"> 
    <title>Computer Specifications</title>
    <para> We recommend the following computer specification:</para>
@@ -70,7 +70,7 @@
    <title>Video Hardware Specifications</title>
       <sect2 id="GraphicCard">
       <title>Graphic Card </title>
-      <para>The graphic card will manage your video output. The choice of your graphic card will depend on how you want to use Scenic. For now, we only support nvidia video card. Some ATI cards have problems with Xvideo extension. Before choosing your graphic card, determine on wich linux distribution and releases you are.
+      <para>The graphic card will manage your video output. The choice of your graphic card will depend on how you want to use &app;. For now, we only support nvidia video card. Some ATI cards have problems with Xvideo extension. Before choosing your graphic card, determine on wich linux distribution and releases you are.
 Some graphic card may work only on certain releases. Before buying a graphic card, verify on the nvidia unix page that the hardware you are planning to use is supported not only by your linux distribution but also on the release you are using. </para> 
 <para> We need to define the type of video output you will need. Usually this output is sent to a video mixer, a video projector, a monitor or any video display. On the table below we list the various possible ouput  on a graphic card.</para>
          <table>
@@ -359,10 +359,19 @@ Some graphic card may work only on certain releases. Before buying a graphic car
             </tbody>
          </tgroup>
       </table> 
+   <itemizedlist>
+      <listitem><para> 1 set of headphone </para></listitem>
+      <listitem><para> 1 microphones</para></listitem>
+      <listitem><para> 1 audio  mixerwith at least two audio subgroups, so you can have one mix for local output ans one mix to send on the remote side</para></listitem>
+   </itemizedlist>
    </sect1>
-
-   <sect1 id="Network Specifications">
+   
+   <sect1 id="NetworkSpecifications">
    <title>Network Specifications </title>
+   <itemizedlist>
+      <listitem><para>Ethernet connector (10/100/1000)</para></listitem>     
+      <listitem><para>Network connection devices (hub, firewall, etc...)</para></listitem>     
+   </itemizedlist>
    </sect1>
  
 </chapter> 
