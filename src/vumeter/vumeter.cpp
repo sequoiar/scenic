@@ -6,8 +6,6 @@
 #include <string>
 #include <cstring>
 
-static const int GRADIENT_SIZE = 20;
-
 static void gtk_vumeter_class_init (GtkVumeterClass * klass);
 static void gtk_vumeter_init (GtkVumeter * vumeter);
 static void gtk_vumeter_size_request (GtkWidget * widget,
@@ -55,83 +53,6 @@ gtk_vumeter_new ()
   return GTK_WIDGET (gtk_type_new (gtk_vumeter_get_type ()));
 }
 
-typedef struct RGB
-{
-  gdouble r;
-  gdouble b;
-  gdouble g;
-} RGB;
-
-static RGB GRADIENT[GRADIENT_SIZE];
-
-static RGB
-HSVtoRGB (gdouble h, gdouble s, gdouble v)
-{
-  RGB result;
-  gint i;
-  gdouble f, p, q, t;
-
-  if (s == 0) {
-    /* achromatic (grey) */
-    result.r = result.g = result.b = v;
-    return result;
-  }
-
-  h /= 60;                      /* sector 0 to 5 */
-  i = floor (h);
-  f = h - i;                    /* factorial part of h */
-  p = v * (1 - s);
-  q = v * (1 - s * f);
-  t = v * (1 - s * (1 - f));
-
-  switch (i) {
-    case 0:
-      result.r = v;
-      result.g = t;
-      result.b = p;
-      break;
-    case 1:
-      result.r = q;
-      result.g = v;
-      result.b = p;
-      break;
-    case 2:
-      result.r = p;
-      result.g = v;
-      result.b = t;
-      break;
-    case 3:
-      result.r = p;
-      result.g = q;
-      result.b = v;
-      break;
-    case 4:
-      result.r = t;
-      result.g = p;
-      result.b = v;
-      break;
-    case 5:
-    default:
-      result.r = v;
-      result.g = p;
-      result.b = q;
-      break;
-  }
-  return result;
-}
-
-static void
-init_gradient ()
-{
-  gint i, j;
-  for (i = 0, j = GRADIENT_SIZE - 1; i < GRADIENT_SIZE; ++i, --j) {
-    double val = ((i + 2) / (double) GRADIENT_SIZE) * 120.0;
-    RGB rgb = HSVtoRGB (val, 1.0, 1.0);
-    GRADIENT[j].r = rgb.r;
-    GRADIENT[j].g = rgb.g;
-    GRADIENT[j].b = rgb.b;
-  }
-}
 
 static void
 gtk_vumeter_class_init (GtkVumeterClass * klass)
@@ -148,7 +69,6 @@ gtk_vumeter_class_init (GtkVumeterClass * klass)
   widget_class->expose_event = gtk_vumeter_expose;
 
   object_class->destroy = gtk_vumeter_destroy;
-  init_gradient ();
 }
 
 static void
@@ -253,27 +173,21 @@ static gdouble db_to_vertical_offset(GtkWidget *widget, gdouble db)
 	    endpoint for our scaling.
      */
 
-    return widget->allocation.height - floor (widget->allocation.height * (def / 115.0f));
+    return widget->allocation.height - floor(widget->allocation.height * (def / 115.0f));
 }
 
 static void
 gtk_vumeter_paint (GtkWidget * widget)
 {
-    cairo_t *cr = gdk_cairo_create (widget->window);
+    cairo_t *cr = gdk_cairo_create(widget->window);
 	static const int db_points[] = { -50, -40, -20, -30, -10, -3, 0, 4 };
 
     cairo_paint (cr);
-    cairo_pattern_t *gradient = cairo_pattern_create_linear(0.0, 0.0, 0.0, widget->allocation.height);
-    for (gint i = 0; i < GRADIENT_SIZE; ++i) 
-    {
-        gdouble offset = 1.0 - (i  / (gdouble)GRADIENT_SIZE);
-        cairo_pattern_add_color_stop_rgba(gradient, offset, GRADIENT[i].r, GRADIENT[i].g, GRADIENT[i].b, 1);
-    }
 
     cairo_text_extents_t te;
     cairo_select_font_face (cr, "Sans",
             CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size (cr, 7);
+    cairo_set_font_size (cr, 8);
     cairo_set_source_rgb (cr, 0.80, 0.80, 0.80); // text colour
 	char buf[32];
     gdouble max_text_width = 0;
@@ -301,11 +215,38 @@ gtk_vumeter_paint (GtkWidget * widget)
         i = i > -10 ? i - 2 : i - 4;
     }
 
-    cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
-    cairo_rectangle(cr, 0, db_to_vertical_offset(widget, GTK_VUMETER(widget)->sel), widget->allocation.width - max_text_width - DASH_SIZE - 5, widget->allocation.height);
+    // draw rectangle
+    // green
+    cairo_set_source_rgb (cr, 0.0, 1.0, 0.0);
+    const gdouble rect_width = widget->allocation.width - max_text_width - DASH_SIZE - 5;
+    const gdouble green_rect_height = db_to_vertical_offset(widget, -18.0);
+    cairo_rectangle(cr, 0, green_rect_height /* top */,
+            rect_width, 
+            widget->allocation.height - green_rect_height/* bottom */);
+    cairo_fill(cr);
 
-    cairo_set_source(cr, gradient);
-    cairo_pattern_destroy(gradient);
+    // yellow 
+    cairo_set_source_rgb (cr, 0.8, 1.0, 0.0);
+    const gdouble yellow_rect_height = db_to_vertical_offset(widget, 0.0);
+    cairo_rectangle(cr, 0, yellow_rect_height /* top */,
+            rect_width,
+            green_rect_height - yellow_rect_height/* bottom */);
+    cairo_fill(cr);
+    
+    // red 
+    cairo_set_source_rgb (cr, 1.0, 0.0, 0.0);
+    const gdouble red_rect_height = db_to_vertical_offset(widget, 8.0);
+    cairo_rectangle(cr, 0, red_rect_height /* top */,
+            rect_width,
+            yellow_rect_height - red_rect_height/* bottom */);
+    cairo_fill(cr);
+    
+    // Draw a black rectangle that covers everything but the part of the
+    // vumeter corresponding to the current amplitude
+    cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
+    cairo_rectangle(cr, 0, 0, /* top */
+            rect_width,
+            db_to_vertical_offset(widget, GTK_VUMETER(widget)->sel));
     cairo_fill(cr);
 
     cairo_destroy (cr);
