@@ -150,7 +150,7 @@ main (int argc, char **argv)
   pipeline = gst_pipeline_new ("pipeline");
   g_signal_connect (G_OBJECT (plug), "embedded",
       G_CALLBACK (embed_event), NULL );
-  source = gst_element_factory_make ("jackaudiosrc", NULL);
+  source = gst_element_factory_make ("audiotestsrc", NULL);
   /*g_object_set (source, "wave", TICKS, NULL);*/
 
   capsfilter= gst_element_factory_make ("capsfilter", NULL);

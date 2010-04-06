@@ -290,12 +290,13 @@ gtk_vumeter_paint (GtkWidget * widget)
     }
 
     const int DASH_SIZE = 4;
-    cairo_set_line_width (cr, 1.0);
+    cairo_set_line_width(cr, 1);
     for (int i = 4; i >= -50;)
     {
-        gdouble pos = db_to_vertical_offset(widget, i);
-        cairo_move_to (cr, widget->allocation.width - max_text_width - DASH_SIZE - 5, pos);
-        cairo_line_to (cr, widget->allocation.width - max_text_width - 5, pos);
+        gdouble x = widget->allocation.width - max_text_width - 5.5;
+        gdouble y = db_to_vertical_offset(widget, i) + 0.5;
+        cairo_move_to (cr, x - DASH_SIZE, y);
+        cairo_line_to (cr, x, y);
         cairo_stroke (cr);
         i = i > -10 ? i - 2 : i - 4;
     }
