@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Network Testing</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Scenic Installation Manual V2.1"
+HREF="index.html"><LINK
+REL="PREVIOUS"
+TITLE="Sound check"
+HREF="x939.html"><LINK
+REL="NEXT"
+TITLE="Local Network Testing"
+HREF="x979.html"></HEAD
+><BODY
+CLASS="chapter"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+><SPAN
+CLASS="application"
+>Scenic</SPAN
+> Installation Manual V2.1</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x939.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x979.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="network_test"
+></A
+>Chapter 6. Network Testing</H1
+><P
+>The use of <SPAN
+CLASS="application"
+>Scenic</SPAN
+> require specific network capabilities. In this chapter we will determine what this capabilites are. We will also give you tools how tho evaluate and improve the quality of your network.</P
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN949"
+>6.1. Minimum Network Requirements</A
+></H1
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN951"
+>6.1.1. Network speed</A
+></H2
+><P
+>Network speed and performance are of the utmost importance. To ensure that the network can handle the <SPAN
+CLASS="application"
+>Scenic</SPAN
+> setup, system administrators / users must perform the tests, described below, on the local network and between two endpoints. </P
+><P
+>The following performance rates must be met: </P
+><P
+>Bandwidth: 3.5Mbps video + 1.6Mbps audio = &#62; 5Mbps + 20%</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN957"
+>6.1.2. Network bandwidth</A
+></H2
+><P
+>Network bandwidth is a measure of available or consumed data communication resources expressed in bits or multiples of it (kbps, Mbps etc). To determine the required level of needed bandwidth, you have to calculate the Mbps rate of the audio and video tracks (including compression rates). Example: a 3.5 Mbps MPEG4 video with 2 x 800kbps audio channels requires 5.1 Mbps. For best results, users should add to this a 20% leeway and also consider additional network usage such as chat, skype, web browsing and so on. </P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN960"
+>6.1.3. Latency</A
+></H2
+><P
+>Latency is the time taken for a sent packet of data to be received at the other end. It includes the time to encode the packet for transmission and transmit it, the time for that data to traverse the network equipment between the nodes, and the time to receive and decode the data. The degree of permissible latency depends on many factors. Users must first consider the scenic requirements; if for example, you only need to transmit sound one way without any form of interaction, then latency rates are somewhat irrelevant. As a rule, the latency rate should be scaled according to the distance between sites. </P
+><P
+>Latency:30-200ms</P
+><P
+>Approximate rates per average distance: </P
+><P
+>Regional level: 30ms</P
+><P
+></P
+><P
+>Across the country: 75ms</P
+><P
+></P
+><P
+>Across continents: 200ms</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN970"
+>6.1.4. Jitter</A
+></H2
+><P
+>Jitter, in the context of computer networks, is a measure of the variability over time of the packet latency across a network. Packet jitter is expressed as an average of the deviation from the network mean latency (see above). Packet jitter is quite important as it can increase the overall rate of latency, it must therefore be taken into account in order to calculate the total latency. The average deviation from the network mean latency should be less than 1%. </P
+><P
+>Jitter: &#60;1%</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN974"
+>6.1.5. Packet Loss</A
+></H2
+><P
+>Packet loss occurs when one or more packets of data traveling across a computer network fail to reach their destination. Packet loss causes important signal distortions that are always noticeable, regardless of the packet loss percentage. In a worst case scenario, packet loss should never be higher than 1%. At levels higher than this, there will be a significantly noticeable impact on the quality of the image, and an highly disruptive impact on the quality of the audio transmission. </P
+><P
+>&#60;1%</P
+><P
+>&#62;1% = significant impact</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x939.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x979.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Sound check</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Local Network Testing</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

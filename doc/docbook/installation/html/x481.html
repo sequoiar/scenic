@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Libraries and Development Packages Installation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Scenic Installation Manual V2.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Software Installation"
+HREF="c427.html"><LINK
+REL="PREVIOUS"
+TITLE="Software Installation"
+HREF="c427.html"><LINK
+REL="NEXT"
+TITLE="Building Scenic"
+HREF="x522.html"></HEAD
+><BODY
+CLASS="sect1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+><SPAN
+CLASS="application"
+>Scenic</SPAN
+> Installation Manual V2.1</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c427.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 4. Software Installation</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x522.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN481"
+>4.2. Libraries and Development Packages Installation</A
+></H1
+><P
+>Before performing the scenic installation, please perform an update of your linux distribution: </P
+><PRE
+CLASS="programlisting"
+>sudo aptitude update</PRE
+><PRE
+CLASS="programlisting"
+>sudo aptitude upgrade</PRE
+><P
+></P
+><P
+><SPAN
+CLASS="application"
+>Scenic</SPAN
+> need various package to be installed. You can have a detailed view of the required library and dependency on our <A
+HREF="https://svn.sat.qc.ca/trac/miville/wiki/LibraryPackage"
+TARGET="_top"
+>Library and Package</A
+> page. To install the required these libraries and their dependencies run the following command in the terminal: </P
+><P
+><SPAN
+CLASS="strong"
+><B
+CLASS="emphasis"
+>For Ubuntu 8.04 LTS (Hardy) install the following package:</B
+></SPAN
+></P
+><DIV
+CLASS="table"
+><A
+NAME="AEN492"
+></A
+><P
+><B
+>Table 4-1. </B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><TBODY
+><TR
+><TD
+>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev liblame-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect gnome-themes-extra
+            </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>You must download the debian sid iperf <A
+HREF="http://packages.debian.org/sid/iperf"
+TARGET="_top"
+>version</A
+> 2.0.4-3 or 2.0.4-4 on your desktop and install it on both computers. Double click on the package to start the Ubuntu package manager installation process, or install it as root with dpkg -i ./iperf_2.0.4-3_i386.deb .</P
+><P
+><SPAN
+CLASS="strong"
+><B
+CLASS="emphasis"
+>For Ubuntu 9.10 (Karmic) install the following package:</B
+></SPAN
+></P
+><DIV
+CLASS="table"
+><A
+NAME="AEN501"
+></A
+><P
+><B
+>Table 4-2. </B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><TBODY
+><TR
+><TD
+>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect iperf libmp3lame-dev gnome-themes-extras libboost-dev libboost-thread-dev libboost-system-dev libboost-program-options-dev libasio-dev libboost-iostreams-dev libboost-filesystem-dev
+            </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+></P
+><P
+><SPAN
+CLASS="strong"
+><B
+CLASS="emphasis"
+>For Debian 5.0.4 (lenny) install the following package:</B
+></SPAN
+> </P
+><DIV
+CLASS="table"
+><A
+NAME="AEN509"
+></A
+><P
+><B
+>Table 4-3. </B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><TBODY
+><TR
+><TD
+>sudo aptitude -R install qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev bison flex vorbis-tools ffmpeg libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev libxml2-dev python-twisted doxygen python-setuptools help2man python-simplejson iperf gnome-themes-extras libboost1.35-dev jackd libboost-program-options1.35-dev libboost-thread1.35-dev libboost-system1.35-dev libboost-iostreams1.35-dev libboost-filesystem1.35-dev
+            </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+></P
+><P
+><SPAN
+CLASS="strong"
+><B
+CLASS="emphasis"
+>Now configure your realtime kernel</B
+></SPAN
+></P
+><P
+>When your rt kernel is installed, execute the following commands (to get audio server to run in real time):</P
+><PRE
+CLASS="programlisting"
+>sudo su -c 'echo @audio - rtprio 20 &#62;&#62; /etc/security/limits.conf'</PRE
+><PRE
+CLASS="programlisting"
+>sudo su -c 'echo @audio - memlock 250000 &#62;&#62; /etc/security/limits.conf'</PRE
+><P
+><SPAN
+CLASS="strong"
+><B
+CLASS="emphasis"
+>Then finally, logout and login again. </B
+></SPAN
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c427.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x522.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Software Installation</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c427.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building <SPAN
+CLASS="application"
+>Scenic</SPAN
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

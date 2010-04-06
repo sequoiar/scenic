@@ -1,10 +1,11 @@
-<chapter>
+<chapter id="software_installation">
 <title>Software Installation</title>
    <para>A standard &app; installation always requires at least two computers with identical linux operating systems, the required libraries and development packages, and a build of the most recent release of the &app; software. </para>
-   <para>The computers must meet these <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Requirements">minimum requirements</ulink>. </para>
-   <para>Note that prior to using &app; you also need to meet the <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/TestNetworkCommandLine">required network specification</ulink> 
+   <para>The computers must meet these <link linkend='hardware_requirements'>minimum requirements</link>. </para>
+   <para>Note that prior to using &app; you also need to meet the <link linkend='network_test'>required network specification</link> 
    </para>
-   <para>For <ulink url="http://scenic.sat.qc.ca/en/HelloWorld">The HelloWorld project</ulink> partners, we strongly recommend to follow our <ulink url="http://scenic.sat.qc.ca/en/HelloWorldSteps">HelloWorld Steps</ulink> page where we describe how to perform a network test between two partners. </para><sect1>
+
+   <sect1>
    <title>Operating System Installation</title>
    <para>&app; operates on the Linux based desktop operating system and is tested on the following Linux distribution: </para>
    <informaltable frame="all">
@@ -108,7 +109,14 @@
    <programlisting>sudo su -c 'echo @audio - rtprio 20 &gt;&gt; /etc/security/limits.conf'</programlisting>
    <programlisting>sudo su -c 'echo @audio - memlock 250000 &gt;&gt; /etc/security/limits.conf'</programlisting>
    <para><emphasis role="strong">Then finally, logout and login again. </emphasis></para>
+   </sect1> <sect1>
+   <title>Installing the midi component</title>
+   <para>The midi component in &app; is available on the unstable branch (0.5). You can skip this if you install &app; 0.4.x and you don't want to stream midi, even with the command line. </para>
+   <para>Install the python-portmidi package: <ulink url="https://bitbucket.org/aalex/pyportmidi/downloads/">https://bitbucket.org/aalex/pyportmidi/downloads/</ulink> Note: this package contains patches unavailable with the python bindings that comes with portmidi. </para>
+   <para>
+   </para>
    </sect1>
+
    <sect1>
    <title>Building &app;</title>
    <para>To get the latest &app; version, go to <ulink url="http://scenic.sat.qc.ca/download">http://scenic.sat.qc.ca/download</ulink></para>
@@ -125,11 +133,4 @@
    <programlisting>./utils/boost1_35_for_hardy.sh</programlisting>
    <para><emphasis role="strong">Next, compile scenic: </emphasis></para>
    <programlisting>cd scenic</programlisting>
-   <programlisting>./configure &amp;&amp; make &amp;&amp; sudo make install</programlisting></sect1><sect1>
-   <title>Installing the midi component</title>
-   <para>The midi component in &app; is available on the unstable branch (0.5). You can skip this if you install &app; 0.4.x and you don't want to stream midi, even with the command line. </para>
-   <para>Install the python-portmidi package: <ulink url="https://bitbucket.org/aalex/pyportmidi/downloads/">https://bitbucket.org/aalex/pyportmidi/downloads/</ulink> Note: this package contains patches unavailable with the python bindings that comes with portmidi. </para>
-   <para>
-   </para>
-   </sect1>
-</chapter>
+   <programlisting>./configure &amp;&amp; make &amp;&amp; sudo make install</programlisting></sect1></chapter>

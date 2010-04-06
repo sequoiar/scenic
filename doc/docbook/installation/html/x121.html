@@ -1,0 +1,594 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Video Hardware Specifications</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Scenic Installation Manual V2.1"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Hardware Requirements"
+HREF="c75.html"><LINK
+REL="PREVIOUS"
+TITLE="Hardware Requirements"
+HREF="c75.html"><LINK
+REL="NEXT"
+TITLE="Audio Hardware Specifications"
+HREF="x305.html"></HEAD
+><BODY
+CLASS="sect1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+><SPAN
+CLASS="application"
+>Scenic</SPAN
+> Installation Manual V2.1</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c75.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. Hardware Requirements</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x305.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="VideoHardwareSpecifications"
+>2.2. Video Hardware Specifications</A
+></H1
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="GraphicCard"
+>2.2.1. Graphic Card</A
+></H2
+><P
+>The graphic card will manage your video output. The choice of your graphic card will depend on how you want to use <SPAN
+CLASS="application"
+>Scenic</SPAN
+>. For now, we only support nvidia video card. Some ATI cards have problems with Xvideo extension. Before choosing your graphic card, determine on wich linux distribution and releases you are.
+Some graphic card may work only on certain releases. Before buying a graphic card, verify on the nvidia unix page that the hardware you are planning to use is supported not only by your linux distribution but also on the release you are using. </P
+><P
+> We need to define the type of video output you will need. Usually this output is sent to a video mixer, a video projector, a monitor or any video display. On the table below we list the various possible ouput  on a graphic card.</P
+><DIV
+CLASS="table"
+><A
+NAME="AEN128"
+></A
+><P
+><B
+>Table 2-4. Graphic Card Output Types</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><THEAD
+><TR
+><TH
+>Video Output</TH
+><TH
+>Determine the number and type of video output required</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>VGA</TD
+><TD
+>The lowest common denominator that all PC graphics hardware supports</TD
+></TR
+><TR
+><TD
+>DVI</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>S-Video</TD
+><TD
+>&nbsp;</TD
+></TR
+><TR
+><TD
+>HDMI</TD
+><TD
+>Not supported and not tested</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+> Once you have selected the type of output you need, you will have to choose the graphic card. This choice depends mainly of the final video quality you are expecting. </P
+><DIV
+CLASS="table"
+><A
+NAME="AEN149"
+></A
+><P
+><B
+>Table 2-5. High Quality Graphic Card</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Device</TH
+><TH
+>Status</TH
+><TH
+>Usage</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>Nvidia Quadro FX Serie</TD
+><TD
+>Actually in testing</TD
+><TD
+>Used only for 3D project </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="table"
+><A
+NAME="AEN162"
+></A
+><P
+><B
+>Table 2-6. Medium Quality Graphic Card</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Device</TH
+><TH
+>Status</TH
+><TH
+>Usage</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>nvidia 9800 GT</TD
+><TD
+>Fully Supported</TD
+><TD
+>Genral good quality projection</TD
+></TR
+><TR
+><TD
+>nvida 5200 GT</TD
+><TD
+>Fully Supported</TD
+><TD
+>Regaular telepresence project</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="table"
+><A
+NAME="AEN179"
+></A
+><P
+><B
+>Table 2-7.  Low Quality Graphic Card</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><THEAD
+><TR
+><TH
+>Device</TH
+><TH
+>Status</TH
+><TH
+>Usage</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>Built-in laptop graphic card, ie Intel, Asus </TD
+><TD
+>Fully Supported</TD
+><TD
+>For Testing purpose only</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="VideoCapture"
+>2.2.2. Video Capture</A
+></H2
+><P
+>The video capture is usally a card or a device connected on one end to your camera and on the other end, to your computer. Choosing your video capture device depends on the many factors:</P
+><P
+></P
+><UL
+><LI
+><P
+>The ouput cable on your camera</P
+></LI
+><LI
+><P
+>The output resolution of your camera</P
+></LI
+><LI
+><P
+>The video capture quality you need</P
+></LI
+><LI
+><P
+>The computer specification descriped in the previous section</P
+></LI
+><LI
+><P
+>The final output you need</P
+></LI
+></UL
+><P
+> Giving these factors, we suggest some devices ordered by the quality and performance that they provide.</P
+><DIV
+CLASS="table"
+><A
+NAME="AEN207"
+></A
+><P
+><B
+>Table 2-8. High Quality Capture</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Device</TH
+><TH
+>Status</TH
+><TH
+>Max Resolutions</TH
+><TH
+>Max fps for Max Res</TH
+><TH
+>Input</TH
+><TH
+>Connection Type</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>DVI2USB Capture</TD
+><TD
+>Actually in testing</TD
+><TD
+>1920x1200</TD
+><TD
+>32fps</TD
+><TD
+>DVI/VGA</TD
+><TD
+>USB2</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="table"
+><A
+NAME="AEN226"
+></A
+><P
+><B
+>Table 2-9. Medium Quality Capture</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Device</TH
+><TH
+>Status</TH
+><TH
+>Max Resolutions</TH
+><TH
+>Max fps for Max Res</TH
+><TH
+>Input</TH
+><TH
+>Connection Type</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>Viewcast Osprey 100/210</TD
+><TD
+>Fully Supported</TD
+><TD
+>720x480</TD
+><TD
+>30fps</TD
+><TD
+>3xComposite 1xS-Video</TD
+><TD
+>PCI</TD
+></TR
+><TR
+><TD
+>Pinnacle Dazzle</TD
+><TD
+>Fully Supported</TD
+><TD
+>720x480</TD
+><TD
+>30fps</TD
+><TD
+>1xComposite 1xS-Video</TD
+><TD
+>USB2</TD
+></TR
+><TR
+><TD
+>DV Capture</TD
+><TD
+>Fully Supported</TD
+><TD
+>800x600</TD
+><TD
+>30fps</TD
+><TD
+>i1394</TD
+><TD
+>Firewire</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="table"
+><A
+NAME="AEN259"
+></A
+><P
+><B
+>Table 2-10.  Low Quality Capture</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><COL><COL><COL><COL><THEAD
+><TR
+><TH
+>Device</TH
+><TH
+>Status</TH
+><TH
+>Max Resolutions</TH
+><TH
+>Max fps for Max Res</TH
+><TH
+>Input</TH
+><TH
+>Connection Type</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>WintvHauppauge 350/1800</TD
+><TD
+>Fully Supported</TD
+><TD
+>740x480</TD
+><TD
+>30fps</TD
+><TD
+>S-Video</TD
+><TD
+>PCI</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="Camera"
+>2.2.3. Camera and Camcorder</A
+></H2
+><DIV
+CLASS="table"
+><A
+NAME="AEN280"
+></A
+><P
+><B
+>Table 2-11. List of tested camera</B
+></P
+><TABLE
+BORDER="1"
+CLASS="CALSTABLE"
+><COL><COL><TBODY
+><TR
+><TD
+>Camera</TD
+><TD
+>Status</TD
+></TR
+><TR
+><TD
+>USB Logitech Quickcam</TD
+><TD
+>All v4l2 supported</TD
+></TR
+><TR
+><TD
+>DV Pointgrey FL2G</TD
+><TD
+>Tested</TD
+></TR
+><TR
+><TD
+>Unibrain (most cams)</TD
+><TD
+>Tested</TD
+></TR
+><TR
+><TD
+>Sony XD-Cam EX1</TD
+><TD
+>Tested</TD
+></TR
+><TR
+><TD
+>Sony PD-170</TD
+><TD
+>Tested</TD
+></TR
+><TR
+><TD
+>Sony PD-X10</TD
+><TD
+>Tested</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c75.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x305.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Hardware Requirements</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c75.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Audio Hardware Specifications</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

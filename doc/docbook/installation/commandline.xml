@@ -1,40 +1,44 @@
-<chapter><title>Scenic in command line </title> 
-   <para> The use of Scenic in command line is a powerfull  tool with many option not implemented yet in the Scenic GUI</para>
-<para> The actual name of Scenic commandline is "milhouse"</para>
-   <para>For more complex setup than what Scenic can currently support, we suggest you to use <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> as a launching script. Look at some examples in <ulink url="https://svn.sat.qc.ca/trac/miville/browser/trunk/utils">trunk/utils/</ulink> 
-   </para>
-   <sect1><title>Start the sound server</title>
-   <para> The sound server is an application used to manage the soundcard. Choosing which soundcard to use, seleting the input and output and defining the audio quality. It usually runs as a background process. </para>
-   <para>Foollow our <link linkend='aAV_Configuration'>Audio settings page</link> to start the sound server.
-   </para>
+<chapter>
+   <title>Scenic in command line</title> 
+   <para>The use of Scenic in command line is a powerfull tool with many options not implemented yet in the Scenic GUI.</para>
+   <para>The actual name of Scenic commandline is "milhouse".</para>
+   <para>For more complex setup than what Scenic can currently support, we suggest you to use <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> as a launching script. Look at some examples in <ulink url="https://svn.sat.qc.ca/trac/miville/browser/trunk/utils">trunk/utils/</ulink></para>
+
+   <sect1>
+      <title>Start the sound server</title>
+      <para> The sound server is an application used to manage the soundcard. Choosing which soundcard to use, seleting the input and output and defining the audio quality. It usually runs as a background process. </para>
+      <para>Follow our <link linkend='AV_Configuration'>Audio settings page </link>to start the sound server.</para>
    </sect1>
-   <sect1><title>Start the receivers</title>
-         <para>Set the local_machine display </para>
-         <programlisting>export DISPLAY=:0.0</programlisting>
-         <para>Execute program on the local machine with the following parameters: </para>
-         <programlisting>milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2</programlisting>
-         <para>Set the remote_machine display </para>
-         <programlisting>export DISPLAY=:0.0</programlisting>
-         <para>Execute program on the remote machine with the following parameters: </para>
-         <programlisting>milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 -numchannels 2</programlisting>
+   <sect1>
+   <title>Start the receivers</title>
+      <para>Set the local_machine display </para>
+      <programlisting>export DISPLAY=:0.0</programlisting>
+      <para>Execute program on the local machine with the following parameters: </para>
+      <programlisting>milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 <para> --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 </para>--numchannels 2</programlisting>
+      <para>Set the remote_machine display </para>
+      <programlisting>export DISPLAY=:0.0</programlisting>
+      <para>Execute program on the remote machine with the following parameters:</para>
+      <programlisting>milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4<para> --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000</para> --numchannels 2</programlisting>
    </sect1>
-   <sect1><title>Start the senders</title>
-         <para>Execute program on local machine with the following parameters: </para>
-         <programlisting>milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030  --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2 --audioport 10000</programlisting>
-         <para>Execute program on remote machine with the following parameters: </para>
-         <programlisting>milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030  --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2 --audioport 10000</programlisting>
-         <para>A video window showing live video should appear on one of your designated screens. It is movable by holding down the -alt- key and dragging the window. Pressing 'F' will toggle full screen mode. </para>
-         <para>You should also see the audio connections appear in qjackctl. The outputs are now routable to your speakers or other applications. </para>
-         <para>You should now have video and audio input fully working on both sides. </para>
-         <para>To stop milhouse type ctrl-c in the used terminal or type qq in the video screen </para>
+   <sect1>
+   <title>Start the senders</title>
+      <para>Execute program on local machine with the following parameters: </para>
+      <programlisting>milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030<para> --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2</para> --audioport 10000</programlisting>
+      <para>Execute program on remote machine with the following parameters: </para>
+      <programlisting>milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030<para> --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2</para> --audioport 10000</programlisting>
+      <para>A video window showing live video should appear on one of your designated screens. It is movable by holding down the -alt- key and dragging the window. Pressing 'F' will toggle full screen mode.</para>
+      <para>You should also see the audio connections appear in qjackctl. The outputs are now routable to your speakers or other applications. </para>
+      <para>You should now have video and audio input fully working on both sides. </para>
+      <para>To stop milhouse type ctrl-c in the used terminal or type qq in the video screen </para>
    <para/>
    </sect1>
-   <sect1><title>Milhouse Help</title>
-   <para>Type milhouse --help to have informations on the various available option </para>
-   <programlisting>milhouse --help</programlisting>
-   <para/>
-   <informaltable frame="all">
-      <tgroup cols="2"><tbody><row>
+   <sect1>
+   <title>Milhouse Help</title>
+      <para>Type milhouse --help to have informations on the various available option </para>
+      <programlisting>milhouse --help</programlisting>
+      <para/>
+      <informaltable frame="all">
+         <tgroup cols="2"><tbody><row>
             <entry>
                <para>Help Options:</para>
             </entry>
@@ -395,4 +399,5 @@
             </entry>
          </row></tbody></tgroup>
    </informaltable>
-   </sect1></chapter>
+   </sect1>
+</chapter>
