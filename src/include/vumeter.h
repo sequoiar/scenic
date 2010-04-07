@@ -17,7 +17,8 @@ struct _GtkVumeter
 {
   GtkWidget widget;
 
-  gdouble sel;
+  gdouble peak;
+  gdouble decay_peak;
 };
 
 struct _GtkVumeterClass
@@ -26,7 +27,7 @@ struct _GtkVumeterClass
 };
 
 GtkType gtk_vumeter_get_type (void);
-void gtk_vumeter_set_sel (GtkVumeter * vumeter, gdouble sel);
+void gtk_vumeter_set_peaks (GtkVumeter * vumeter, gdouble peak, gdouble decay_peak);
 GtkWidget *gtk_vumeter_new ();
 
 G_END_DECLS

@@ -13,12 +13,15 @@
 static const gboolean LOG = FALSE;
 
 static void
-set_value (gdouble value, gpointer data)
+set_value (gdouble peak, gdouble decay_peak, gpointer data)
 {
   GdkRegion *region;
 
   GtkWidget *vumeter = (GtkWidget *) data;
-  GTK_VUMETER (vumeter)->sel = value;
+  /* FIXME  this shouldn't work */
+  /*gtk_vumeter_set_peaks(GTK_VUMETER(vumeter), peak, decay_peak);*/
+  GTK_VUMETER(vumeter)->peak = peak;
+  GTK_VUMETER(vumeter)->decay_peak = decay_peak;
 
   region = gdk_drawable_get_clip_region (vumeter->window);
   gdk_window_invalidate_region (vumeter->window, region, TRUE);
@@ -72,7 +75,7 @@ message_handler (GstBus * bus, GstMessage * message, gpointer data)
         peak = pow (10, peak_dB / 20);
         if (LOG)
           g_print ("    normalized peak value: %f\n", peak);
-        set_value (peak_dB, vumeters[i]);
+        set_value (peak_dB, decay_dB, vumeters[i]);
       }
     }
   }
@@ -162,6 +165,7 @@ main (int argc, char **argv)
   /*audioconvert = gst_element_factory_make("audioconvert", NULL);*/
   level = gst_element_factory_make ("level", NULL);
   g_object_set(level, "interval", 50000000, NULL);
+  g_object_set(level, "peak-falloff", 320.0, NULL);
   sink = gst_element_factory_make ("fakesink", NULL);
   g_object_set(sink, "sync", TRUE, NULL);
 

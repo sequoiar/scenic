@@ -41,9 +41,10 @@ gtk_vumeter_get_type ()
 }
 
 void
-gtk_vumeter_set_state (GtkVumeter * vumeter, gint num)
+gtk_vumeter_set_peaks (GtkVumeter * vumeter, gdouble peak, gdouble decay_peak)
 {
-  vumeter->sel = num;
+  vumeter->peak = peak;
+  vumeter->decay_peak = decay_peak;
   gtk_vumeter_paint (GTK_WIDGET (vumeter));
 }
 
@@ -74,7 +75,8 @@ gtk_vumeter_class_init (GtkVumeterClass * klass)
 static void
 gtk_vumeter_init (GtkVumeter * vumeter)
 {
-  vumeter->sel = 0.0;
+  vumeter->peak = 0.0;
+  vumeter->decay_peak = 0.0;
 }
 
 static void
@@ -187,7 +189,7 @@ gtk_vumeter_paint (GtkWidget * widget)
     cairo_text_extents_t te;
     cairo_select_font_face (cr, "Sans",
             CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size (cr, 8);
+    cairo_set_font_size (cr, 7);
     cairo_set_source_rgb (cr, 0.80, 0.80, 0.80); // text colour
 	char buf[32];
     gdouble max_text_width = 0;
@@ -246,8 +248,15 @@ gtk_vumeter_paint (GtkWidget * widget)
     cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
     cairo_rectangle(cr, 0, 0, /* top */
             rect_width,
-            db_to_vertical_offset(widget, GTK_VUMETER(widget)->sel));
+            db_to_vertical_offset(widget, GTK_VUMETER(widget)->peak));
     cairo_fill(cr);
+
+    cairo_set_line_width(cr, 2.0);
+    cairo_set_source_rgb (cr, 0.0, 1.0, 0.0);
+    gdouble decay_peak_height =  db_to_vertical_offset(widget, GTK_VUMETER(widget)->decay_peak);
+    cairo_move_to (cr, 0, decay_peak_height );
+    cairo_line_to (cr, rect_width, decay_peak_height);
+    cairo_stroke(cr);
 
     cairo_destroy (cr);
 }
