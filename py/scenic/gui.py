@@ -286,21 +286,6 @@ class Gui(object):
         self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
 
         # audio levels:
-        self.audio_levels_input_widget = widgets_tree.get_widget("audio_levels_input")
-        in_socket = gtk.Socket()
-        in_socket.show()
-        self.audio_levels_input_widget.add(in_socket)
-        self.audio_levels_input_socket_id = in_socket.get_id()
-        
-        self.audio_levels_output_widget = widgets_tree.get_widget("audio_levels_output")
-        out_socket = gtk.Socket()
-        out_socket.show()
-        self.audio_levels_output_widget.add(out_socket)
-        self.audio_levels_output_socket_id = out_socket.get_id()
-       #def _plug_added_cb(widget):
-       #    """ Called when a plug is added to socket """
-       #    print "I (", widget, ") have just had a plug inserted!"
-
         def _plug_removed_cb(widget):
             """ Called when a plug is removed from socket, returns
                 True so that it can be reused
@@ -308,6 +293,24 @@ class Gui(object):
             print "I (", widget, ") have just had a plug removed!"
             return True
         
+        self.audio_levels_input_widget = widgets_tree.get_widget("audio_levels_input")
+        in_socket = gtk.Socket()
+        in_socket.connect("plug-removed", _plug_removed_cb)
+        in_socket.show()
+        self.audio_levels_input_widget.add(in_socket)
+        self.audio_levels_input_socket_id = in_socket.get_id()
+        
+        self.audio_levels_output_widget = widgets_tree.get_widget("audio_levels_output")
+        out_socket = gtk.Socket()
+        out_socket.connect("plug-removed", _plug_removed_cb)
+        in_socket.show()
+        out_socket.show()
+        self.audio_levels_output_widget.add(out_socket)
+        self.audio_levels_output_socket_id = out_socket.get_id()
+       #def _plug_added_cb(widget):
+       #    """ Called when a plug is added to socket """
+       #    print "I (", widget, ") have just had a plug inserted!"
+
         # system tab contents:
         self.network_admin_widget = widgets_tree.get_widget("network_admin")
 
