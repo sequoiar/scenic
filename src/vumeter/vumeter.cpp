@@ -251,11 +251,17 @@ gtk_vumeter_paint (GtkWidget * widget)
             db_to_vertical_offset(widget, GTK_VUMETER(widget)->peak));
     cairo_fill(cr);
 
+    // Draw decay peak
     cairo_set_line_width(cr, 2.0);
-    cairo_set_source_rgb (cr, 0.0, 1.0, 0.0);
     gdouble decay_peak_height =  db_to_vertical_offset(widget, GTK_VUMETER(widget)->decay_peak);
-    cairo_move_to (cr, 0, decay_peak_height );
-    cairo_line_to (cr, rect_width, decay_peak_height);
+    if (GTK_VUMETER(widget)->decay_peak >= 0.0)
+        cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
+    else if (GTK_VUMETER(widget)->decay_peak >= -18.0)
+        cairo_set_source_rgb(cr, 0.8, 1.0, 0.0);
+    else
+        cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
+    cairo_move_to(cr, 0, decay_peak_height);
+    cairo_line_to(cr, rect_width, decay_peak_height);
     cairo_stroke(cr);
 
     cairo_destroy (cr);
