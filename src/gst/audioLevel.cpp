@@ -87,11 +87,12 @@ double AudioLevel::dbToLinear(double db)
 }
 
 void
-AudioLevel::setValue(gdouble value, GtkWidget *vumeter)
+AudioLevel::setValue(gdouble peak, gdouble decayPeak, GtkWidget *vumeter)
 {
   GdkRegion *region;
 
-  GTK_VUMETER(vumeter)->sel = value;
+  GTK_VUMETER(vumeter)->peak = peak;
+  GTK_VUMETER(vumeter)->decay_peak = decayPeak;
 
   region = gdk_drawable_get_clip_region (vumeter->window);
   gdk_window_invalidate_region (vumeter->window, region, TRUE);
@@ -110,7 +111,8 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
 
     if (std::string(name) == levelStr) {   // this is level's msg
         guint channels;
-        double rmsDb;
+        double peak_db;
+        double decay_db;
         const GValue *list;
         const GValue *value;
 
@@ -118,13 +120,14 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
         list = gst_structure_get_value (s, "rms");
         channels = gst_value_list_get_size (list);
 
-        for (size_t channelIdx = 0; channelIdx < channels; ++channelIdx) {
-            list = gst_structure_get_value(s, "rms");
-            value = gst_value_list_get_value(list, channelIdx);
-            rmsDb = g_value_get_double(value);
-            rmsValues.push_back(dbToLinear(rmsDb));    // new channel
-            /// FIXME: write these somewhere
-            setValue(rmsValues[channelIdx], vumeters_[channelIdx]);
+        for (size_t c = 0; c < channels; ++c) {
+            list = gst_structure_get_value(s, "peak");
+            value = gst_value_list_get_value(list, c);
+            peak_db = g_value_get_double(value);
+            list = gst_structure_get_value (s, "decay");
+            value = gst_value_list_get_value(list, c);
+            decay_db = g_value_get_double(value);
+            setValue(peak_db, decay_db, vumeters_[c]);
         }
 
         return true;

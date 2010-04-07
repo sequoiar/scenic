@@ -52,9 +52,8 @@ class AudioLevel : public GstLinkableFilter, BusMsgHandler
         void emitMessages(bool doEmit);
 
     private:
-        static void setValue(gdouble value, _GtkWidget *vumeter);
+        static void setValue(gdouble peak, gdouble decayPeak, _GtkWidget *vumeter);
         _GstElement *srcElement() { return level_; }
-
         _GstElement *sinkElement() { return level_; }
 
         //void updateRms(double rmsDb, size_t channelIdx);
