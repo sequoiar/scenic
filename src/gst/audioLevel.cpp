@@ -63,6 +63,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
     static const int DEFAULT_INTERVAL_NS = 75000000;
     g_object_set(G_OBJECT(level_), "interval", DEFAULT_INTERVAL_NS, NULL);
+    g_object_set(G_OBJECT(level_), "peak-falloff", 320.0, NULL);
 }
 
 /// Destructor 
