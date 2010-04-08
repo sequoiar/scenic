@@ -40,7 +40,7 @@
 
 namespace po = boost::program_options;
 
-void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo, bool disableAudio)
+void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     using boost::shared_ptr;
 
@@ -53,11 +53,11 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     shared_ptr<VideoReceiver> vRx;
     shared_ptr<AudioReceiver> aRx;
 
-    if (not disableVideo)       
+    if (enableVideo)       
     {
         vRx = videofactory::buildVideoReceiver(pipeline, options);
     }
-    if (not disableAudio)
+    if (enableAudio)
     {
         aRx = audiofactory::buildAudioReceiver(pipeline, options);
 
@@ -71,7 +71,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     if (options.count("jitterbuffer"))
         RtpReceiver::setLatency(options["jitterbuffer"].as<int>());
 
-    if (not disableVideo)
+    if (enableVideo)
     {
         if(options["fullscreen"].as<bool>())
             MessageDispatcher::sendMessage("fullscreen");
@@ -86,7 +86,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
 }
 
 
-void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, bool disableAudio)
+void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     using boost::shared_ptr;
 
@@ -99,12 +99,12 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
     shared_ptr<VideoSender> vTx;
     shared_ptr<AudioSender> aTx;
 
-    if (not disableVideo)
+    if (enableVideo)
     {
         vTx = videofactory::buildVideoSender(pipeline, options);
     }
 
-    if (not disableAudio)
+    if (enableAudio)
     {
         aTx = audiofactory::buildAudioSender(pipeline, options);
 
@@ -130,17 +130,17 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
         pipeline.makeVerbose();
 
     Playback playback(pipeline);
+    shared_ptr<LocalVideo> localVideo;
     if (enableVideo)
     {
         LOG_DEBUG("LOCAL VIDEO");
-        shared_ptr<LocalVideo> localVideo;
         localVideo = videofactory::buildLocalVideo(pipeline, options);
     }
 
+    shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
     if (enableAudio)
     {
         LOG_DEBUG("LOCAL AUDIO");
-        shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
         localAudio = audiofactory::buildLocalAudio(pipeline, options);
     }
 
@@ -236,18 +236,18 @@ short Milhouse::run(int argc, char **argv)
         return 1;
     }
 
-    bool disableVideo = not options.count("videoport");
-    bool disableAudio = not options.count("audioport");
+    bool enableVideo = options.count("videoport");
+    bool enableAudio = options.count("audioport");
 
 
-    if (disableVideo and disableAudio)
+    if (not enableVideo and not enableAudio)
     {
         LOG_ERROR("argument error: must provide videoport and/or audioport. see --help");
         return 1;
     }
 
     // Fail early, other port checks do happen later too
-    if (not disableAudio and not disableVideo)
+    if (enableAudio and enableVideo)
         if (options["videoport"].as<int>() == options["audioport"].as<int>())
         {
             LOG_ERROR("argument error: videoport and audioport cannot be equal"); 
@@ -255,9 +255,9 @@ short Milhouse::run(int argc, char **argv)
         }
 
     if (options["receiver"].as<bool>()) 
-        runAsReceiver(options, disableVideo, disableAudio);
+        runAsReceiver(options, enableVideo, enableAudio);
     else 
-        runAsSender(options, disableVideo, disableAudio);
+        runAsSender(options, enableVideo, enableAudio);
 
     return 0;
 }
