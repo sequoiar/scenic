@@ -2761,7 +2761,7 @@ JACK</property>
                               <widget class="GtkLabel" id="audio_levels_input_label">
                                 <property name="visible">True</property>
                                 <property name="xpad">5</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Audio in&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Sending&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </widget>
                               <packing>
@@ -2805,7 +2805,7 @@ JACK</property>
                               <widget class="GtkLabel" id="audio_levels_output_label1">
                                 <property name="visible">True</property>
                                 <property name="xpad">5</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Audio Out&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Receiving&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </widget>
                               <packing>

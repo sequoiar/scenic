@@ -32,6 +32,8 @@ class Preview(object):
         """
         width, height = self.app.config.video_capture_size.split("x")
         aspect_ratio = self.app.config.video_aspect_ratio
+        numchannels = self.app.config.audio_channels
+        vumeter_id = self.app.gui.audio_levels_input_socket_id
         window_title = _("Local preview")
         x_window_id = None
         if not self.app.config.preview_in_window:
@@ -39,7 +41,7 @@ class Preview(object):
                 print("WARNING: XID of the preview drawing area is None !")
             else:
                 x_window_id = self.app.gui.preview_area_x_window_id
-        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio)
+        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s --localaudio --numchannels %s --vumeter-id %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio, numchannels, vumeter_id)
         if x_window_id is not None:
             command += " --x-window-id %d" % (x_window_id)
         else:
