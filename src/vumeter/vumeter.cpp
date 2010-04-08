@@ -86,7 +86,7 @@ gtk_vumeter_size_request (GtkWidget * widget, GtkRequisition * requisition)
   g_return_if_fail (GTK_IS_VUMETER (widget));
   g_return_if_fail (requisition != NULL);
 
-  requisition->width = 5;
+  requisition->width = 30;
   requisition->height = 100;
 }
 
@@ -119,7 +119,7 @@ gtk_vumeter_realize (GtkWidget * widget)
   attributes.window_type = GDK_WINDOW_CHILD;
   attributes.x = widget->allocation.x;
   attributes.y = widget->allocation.y;
-  attributes.width = 5;
+  attributes.width = 30;
   attributes.height = 100;
 
   attributes.wclass = GDK_INPUT_OUTPUT;
@@ -254,12 +254,7 @@ gtk_vumeter_paint (GtkWidget * widget)
     // Draw decay peak
     cairo_set_line_width(cr, 2.0);
     gdouble decay_peak_height =  db_to_vertical_offset(widget, GTK_VUMETER(widget)->decay_peak);
-    if (GTK_VUMETER(widget)->decay_peak >= 0.0)
-        cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
-    else if (GTK_VUMETER(widget)->decay_peak >= -18.0)
-        cairo_set_source_rgb(cr, 0.8, 1.0, 0.0);
-    else
-        cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
+    cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
     cairo_move_to(cr, 0, decay_peak_height);
     cairo_line_to(cr, rect_width, decay_peak_height);
     cairo_stroke(cr);

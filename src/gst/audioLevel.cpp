@@ -47,7 +47,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     for (int i = 0; i < numChannels; ++i)
     {
         vumeters_.push_back(gtk_vumeter_new());
-        gtk_container_add(GTK_CONTAINER (hbox), vumeters_[i]);
+        gtk_box_pack_start(GTK_BOX(hbox), vumeters_[i], FALSE /*expand*/, FALSE /*packing*/, SPACING);
     }
 
     /* make window */
@@ -61,9 +61,12 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
 
     g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
-    static const int DEFAULT_INTERVAL_NS = 75000000;
-    g_object_set(G_OBJECT(level_), "interval", DEFAULT_INTERVAL_NS, NULL);
-    g_object_set(G_OBJECT(level_), "peak-falloff", 320.0, NULL);
+    static const guint64 INTERVAL_NS = 75000000;
+    static const gdouble PEAK_FALLOFF = 320.0;
+    static const guint64 PEAK_TTL = 3 * 300000000;  // 3 times default
+    g_object_set(G_OBJECT(level_), "interval", INTERVAL_NS, NULL);
+    g_object_set(G_OBJECT(level_), "peak-falloff", PEAK_FALLOFF, NULL);
+    g_object_set(G_OBJECT(level_), "peak-ttl", PEAK_TTL, NULL);
 }
 
 /// Destructor 

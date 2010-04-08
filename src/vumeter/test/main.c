@@ -135,7 +135,7 @@ main (int argc, char **argv)
   gst_init (&argc, &argv);
 
   /* make frame with homogenous spacing*/
-  hbox = gtk_hbox_new(TRUE, SPACING);
+  hbox = gtk_hbox_new(TRUE, 0);
   /* make window */
   plug = gtk_plug_new (socket_id);
 
@@ -145,7 +145,7 @@ main (int argc, char **argv)
   for (i = 0; i < NUM_CHANNELS; ++i)
   {
     vumeters[i] = gtk_vumeter_new ();
-    gtk_container_add (GTK_CONTAINER (hbox), vumeters[i]);
+    gtk_box_pack_start(GTK_BOX(hbox), vumeters[i], FALSE /* EXPAND */, FALSE, 0);
   }
     gtk_container_add (GTK_CONTAINER (plug), hbox);
 
@@ -166,6 +166,7 @@ main (int argc, char **argv)
   level = gst_element_factory_make ("level", NULL);
   g_object_set(level, "interval", 50000000, NULL);
   g_object_set(level, "peak-falloff", 320.0, NULL);
+  g_object_set(level, "peak-ttl", 3 * 300000000, NULL);
   sink = gst_element_factory_make ("fakesink", NULL);
   g_object_set(sink, "sync", TRUE, NULL);
 
