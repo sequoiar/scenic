@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(SCENIC, 0.4.4)  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, 0.4.5)  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])

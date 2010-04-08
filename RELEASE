@@ -1,8 +1,7 @@
-Release notes for Scenic 0.4.4
+Release notes for Scenic 0.4.5
 
-This release backports various major bugfixes (mainly packaging), and 
-introduces no new features since 0.4.3, as new development takes place 
-in the 0.5 branch.
+This release backports a few bugfixes, (mostly in the GUI) and introduces 
+no new features since 0.4.3, as new development takes place in the 0.5 branch.
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -23,27 +22,18 @@ in the 0.5 branch.
     Each release in the 0.4 series should be interoperable with each other.
 
     Milhouse dependency for Scenic
-    Scenic always needs the same version of milhouse, eg. scenic 0.4.4
-    needs milhouse 0.4.4
+    Scenic always needs the same version of milhouse, eg. scenic 0.4.5
+    needs milhouse 0.4.5
 
     Limitations:
     * While milhouse supports many video and audio input types, Scenic
     only support a subset of it. 
     * Network testing and MIDI transmission are not handled by Scenic
-    yet.
+    as of branch 0.4.
 
 Misc. Fixes:
-#370: RELEASE not include in tarball by make dist
-#373: add README
-
-Milhouse Fixes:
-#328: improve gst element checking at configure stage
-#364: make distcheck broken by gst_check.py
-#372: make shared_video compatible with AC_CHECK_LIB
+ * Using HTTP, not FTP for downloading the x264 Gstreamer plugins
+ * Added bash completion for the milhouse command line tool
 
 Scenic Fixes:
-#356: when inviting, gtkwarning gets posted
-#361: check for python modules at configure stage
-#349: ./configure should check for python-portmidi
-#347: fix ProcessIO to avoid truncating output
-
+#379 : Cannot close the delete contact dialog
