@@ -129,16 +129,6 @@ const char* AudioSourceConfig::location() const
 }
 
 
-/// Returns c-style string specifying the source name
-const char* AudioSourceConfig::sourceName() const
-{
-    if (sourceName_ != "")
-        return sourceName_.c_str();
-    else
-        return 0;
-}
-
-
 /// Returns c-style string specifying the device (i.e. plughw:0)
 const char* AudioSourceConfig::deviceName() const
 {

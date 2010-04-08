@@ -120,7 +120,7 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
 }
 
 
-void Milhouse::runAsLocal(const po::variables_map &options)
+void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     using boost::shared_ptr;
 
@@ -130,16 +130,28 @@ void Milhouse::runAsLocal(const po::variables_map &options)
         pipeline.makeVerbose();
 
     Playback playback(pipeline);
-    shared_ptr<LocalVideo> localVideo;
-    //shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
+    if (enableVideo)
+    {
+        LOG_DEBUG("LOCAL VIDEO");
+        shared_ptr<LocalVideo> localVideo;
+        localVideo = videofactory::buildLocalVideo(pipeline, options);
+    }
 
-    localVideo = videofactory::buildLocalVideo(pipeline, options);
+    if (enableAudio)
+    {
+        LOG_DEBUG("LOCAL AUDIO");
+        shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
+        localAudio = audiofactory::buildLocalAudio(pipeline, options);
+    }
 
     playback.start();
-    
-    if(options["fullscreen"].as<bool>())
-        MessageDispatcher::sendMessage("fullscreen");
-    MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
+
+    if (enableVideo)
+    {
+        if(options["fullscreen"].as<bool>())
+            MessageDispatcher::sendMessage("fullscreen");
+        MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
+    }
 
     gutil::runMainLoop(options["timeout"].as<int>());
 
@@ -202,16 +214,18 @@ short Milhouse::run(int argc, char **argv)
         VideoSourceConfig::setStandard(options["videodevice"].as<std::string>(), options["v4l2-standard"].as<std::string>());
         return 0;
     }
-    
+
     if (options.count("v4l2-input"))
     {
         VideoSourceConfig::setInput(options["videodevice"].as<std::string>(), options["v4l2-input"].as<int>());
         return 0;
     }
 
-    if (options["localvideo"].as<bool>()) 
+    bool enableLocalVideo = options["localvideo"].as<bool>();
+    bool enableLocalAudio = options["localaudio"].as<bool>();
+    if (enableLocalVideo or enableLocalAudio)
     {
-        runAsLocal(options);
+        runAsLocal(options, enableLocalVideo, enableLocalAudio);
         return 0;
     }
 

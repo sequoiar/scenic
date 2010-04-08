@@ -32,7 +32,7 @@ class Milhouse {
         boost::program_options::options_description createOptionsDescription();
         void runAsReceiver(const boost::program_options::variables_map &options, bool disableVideo, bool disablAudio);
         void runAsSender(const boost::program_options::variables_map &options, bool disableVideo, bool disablAudio);
-        void runAsLocal(const boost::program_options::variables_map &options);
+        void runAsLocal(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
 
     public:
         short run(int argc, char **argv);

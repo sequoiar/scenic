@@ -29,6 +29,7 @@
 
 #include "audioSender.h"
 #include "audioReceiver.h"
+#include "localAudio.h"
 
 class Pipeline;
 
@@ -36,6 +37,7 @@ namespace audiofactory
 {
     boost::shared_ptr<AudioSender> buildAudioSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
     boost::shared_ptr<AudioReceiver> buildAudioReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    boost::shared_ptr<LocalAudio> buildLocalAudio(Pipeline &pipeline, const boost::program_options::variables_map &options);
 }
 
 #endif // _AUDIO_FACTORY_H_

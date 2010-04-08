@@ -75,3 +75,10 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
 
     return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));
 }
+
+shared_ptr<LocalAudio> audiofactory::buildLocalAudio(Pipeline &pipeline, const po::variables_map &options)
+{
+    shared_ptr<AudioSourceConfig> sourceConfig(new AudioSourceConfig(options));
+    return shared_ptr<LocalAudio>(new LocalAudio(pipeline, sourceConfig));
+}
+

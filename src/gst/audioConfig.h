@@ -50,7 +50,6 @@ class AudioSourceConfig
 
         double quality() const;
         int bitrate() const;
-        const char *sourceName() const;
         const char *deviceName() const;
         const char *location() const;
 
@@ -59,6 +58,7 @@ class AudioSourceConfig
         AudioSource* createSource(Pipeline &pipeline) const;
         AudioLevel* createLevel(Pipeline &pipeline) const;
         unsigned long long bufferTime() const;
+        std::string sourceString() const { return source_; }
 
     private:
         const std::string source_;
