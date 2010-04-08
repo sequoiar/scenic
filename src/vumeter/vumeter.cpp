@@ -14,7 +14,7 @@ static void gtk_vumeter_size_allocate (GtkWidget * widget,
     GtkAllocation * allocation);
 static void gtk_vumeter_realize (GtkWidget * widget);
 static gboolean gtk_vumeter_expose (GtkWidget * widget, GdkEventExpose * event);
-static void gtk_vumeter_paint (GtkWidget * widget);
+static void gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr); 
 static void gtk_vumeter_destroy (GtkObject * object);
 
 GtkType
@@ -45,7 +45,6 @@ gtk_vumeter_set_peaks (GtkVumeter * vumeter, gdouble peak, gdouble decay_peak)
 {
   vumeter->peak = peak;
   vumeter->decay_peak = decay_peak;
-  gtk_vumeter_paint (GTK_WIDGET (vumeter));
 }
 
 GtkWidget *
@@ -142,8 +141,12 @@ gtk_vumeter_expose (GtkWidget * widget, GdkEventExpose * event)
   g_return_val_if_fail (widget != NULL, FALSE);
   g_return_val_if_fail (GTK_IS_VUMETER (widget), FALSE);
   g_return_val_if_fail (event != NULL, FALSE);
+  /* set a clip region for the expose event */
+  cairo_t *cr = gdk_cairo_create(widget->window);
+  cairo_rectangle (cr, event->area.x, event->area.y, event->area.width, event->area.height);
+  cairo_clip(cr);
 
-  gtk_vumeter_paint (widget);
+  gtk_vumeter_paint (widget, cr);
 
   return FALSE;
 }
@@ -179,9 +182,8 @@ static gdouble db_to_vertical_offset(GtkWidget *widget, gdouble db)
 }
 
 static void
-gtk_vumeter_paint (GtkWidget * widget)
+gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
 {
-    cairo_t *cr = gdk_cairo_create(widget->window);
 	static const int db_points[] = { -50, -40, -20, -30, -10, -3, 0, 4 };
 
     cairo_paint (cr);
