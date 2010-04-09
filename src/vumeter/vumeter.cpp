@@ -74,8 +74,8 @@ gtk_vumeter_class_init (GtkVumeterClass * klass)
 static void
 gtk_vumeter_init (GtkVumeter * vumeter)
 {
-  vumeter->peak = 0.0;
-  vumeter->decay_peak = 0.0;
+  vumeter->peak = -70.0;
+  vumeter->decay_peak = -70.0;
 }
 
 static void
