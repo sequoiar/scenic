@@ -53,9 +53,11 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     /* make window */
     GtkWidget *plug = gtk_plug_new(socketID);
     /* end main loop when plug is destroyed */
-    /// FIXME: maybe this should stop pipeline too?
     g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
-    gtk_container_add(GTK_CONTAINER (plug), hbox);
+    GtkWidget *scrolled = gtk_scrolled_window_new(0, 0);
+    g_object_set(scrolled, "vscrollbar-policy", GTK_POLICY_NEVER, NULL);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled), hbox);
+    gtk_container_add(GTK_CONTAINER (plug), scrolled);
     /* show window and log its id */
     gtk_widget_show_all(plug);
     LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
