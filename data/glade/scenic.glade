@@ -971,16 +971,7 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkHBox" id="contactViewButsBox">
-                                        <property name="visible">True</property>
-                                        <child>
-                                          <placeholder/>
-                                        </child>
-                                      </widget>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="position">2</property>
-                                      </packing>
+                                      <placeholder/>
                                     </child>
                                   </widget>
                                   <packing>
@@ -1055,45 +1046,54 @@
                                 <property name="left_padding">5</property>
                                 <property name="right_padding">5</property>
                                 <child>
-                                  <widget class="GtkButton" id="invite_contact">
+                                  <widget class="GtkVBox" id="vbox2">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="has_focus">True</property>
-                                    <property name="can_default">True</property>
-                                    <property name="has_default">True</property>
-                                    <property name="receives_default">False</property>
-                                    <property name="tooltip" translatable="yes">Click this button to make a call</property>
-                                    <signal name="clicked" handler="on_invite_contact_clicked"/>
+                                    <property name="orientation">vertical</property>
                                     <child>
-                                      <widget class="GtkHBox" id="contactJoinButBox">
+                                      <widget class="GtkButton" id="invite_contact">
                                         <property name="visible">True</property>
-                                        <property name="spacing">3</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="can_default">True</property>
+                                        <property name="has_default">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip" translatable="yes">Click this button to make a call</property>
+                                        <signal name="clicked" handler="on_invite_contact_clicked"/>
                                         <child>
-                                          <widget class="GtkImage" id="invite_icon">
+                                          <widget class="GtkHBox" id="contactJoinButBox">
                                             <property name="visible">True</property>
-                                            <property name="stock">gtk-disconnect</property>
+                                            <property name="spacing">3</property>
+                                            <child>
+                                              <widget class="GtkImage" id="invite_icon">
+                                                <property name="visible">True</property>
+                                                <property name="stock">gtk-disconnect</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">False</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <widget class="GtkLabel" id="invite_label">
+                                                <property name="visible">True</property>
+                                                <property name="xpad">5</property>
+                                                <property name="ypad">5</property>
+                                                <property name="label" translatable="yes">Invite the selected contact</property>
+                                                <property name="use_underline">True</property>
+                                              </widget>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">False</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
                                           </widget>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">False</property>
-                                            <property name="position">0</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkLabel" id="invite_label">
-                                            <property name="visible">True</property>
-                                            <property name="xpad">5</property>
-                                            <property name="ypad">5</property>
-                                            <property name="label" translatable="yes">Invite the selected contact</property>
-                                            <property name="use_underline">True</property>
-                                          </widget>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">False</property>
-                                            <property name="position">1</property>
-                                          </packing>
                                         </child>
                                       </widget>
+                                      <packing>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                   </widget>
                                 </child>
@@ -1135,6 +1135,8 @@
                         </child>
                       </widget>
                       <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
