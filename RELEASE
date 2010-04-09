@@ -1,14 +1,6 @@
-Release notes for Scenic 0.4.3
+Release notes for Scenic 0.5.0
 
-    Milhouse:
-    This release fixes a bug with dc1394src in localvideo. This release
-    introduces audiobitrate and quality settings for vorbis and mp3.
-    Another new feature is the xid option that allows a user to specify
-    an xid for the video window that could belong to a separate process. 
-
-    Scenic GUI:
-    This release improves error dialogs and error handling in general.
-    It also allows a milhouse video preview to be embedded in scenic.
+This release implements many new experimental features. These features include MIDI transmission and VU meters. 
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -16,50 +8,67 @@ Release notes for Scenic 0.4.3
     * In the older source directory, use "make uninstall" as root to
     uninstall previous installations.
     * Don't forget to run ldconfig after installation.
-    * As of 0.4.2 and later (this release included), 
-    you may want to run ./utils/install_gstreamer.sh again or simply
-    apply the utils/rtpsource.diff patch to gst-plugins-good-0.10.17,
-    then recompile and reinstall it. Refer to
+    * As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
+    again or simply apply the utils/rtpsource.diff patch to
+    gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
     https://bugzilla.gnome.org/show_bug.cgi?id=611213
     This fix adds receiver side bitrate estimation. Note that milhouse
     will function fine without it, as will scenic.
     * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
-    Install them with aptitude.
+    Install them with aptitude. 
 
     Backward compatibility:
-    Each release in the 0.4 series should be interoperable between each other.
+    Each release in the 0.4 series should be interoperable with each other.
 
     Milhouse dependency for Scenic
-    Scenic always needs the same version of milhouse, eg. scenic 0.4.1
-    needs milhouse 0.4.1
+    Scenic always needs the same version of milhouse, eg. scenic 0.4.5
+    needs milhouse 0.4.5
 
     Limitations:
     * While milhouse supports many video and audio input types, Scenic
     only support a subset of it. 
-    * Network testing and MIDI transmission are not handled by Scenic
-    yet.
+    * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from a long term support with the new features of the 0.5 branch.
 
-Milhouse Fixes:
-
-#236: add audio bitrate/quality settings for mp3 and vorbis
-#321: use variable map everywhere
-#326: dc1394src has too many colourspace conversions for localvideo
-#238: --x-window-id option added
-#334: install_gstreamer.sh, boost1_35_for_hardy.sh, gst_check.py and install_lame.sh are not in the tarball
-
-Scenic Fixes:
-#274: accepting invite at last minutes leads to one way stream
-#308: Add a timeout to some dialogs
-#309: Receiving an invitation should make the peer unavailable for others
-#325: When the answerer cancels, he sees a timeout error dialog
-#312: An invite to an unreachable address gives a bad error message
-#316: Add display and fullscreen in summary
-#319: start jackd in short form leads to KeyError when looking for jack info
-#228: gross output in error dialog on trying to join
-#322: Add current DISPLAY variable to list of screens
-#310: os.environ['GTK2_RC-FILES'] should be cleared when launching external applications
-#306: Do a flight check before starting a stream
-#329: Sometimes some unsupported image sizes are listed
-#331: Preview not in a window should use the parent's display
-#333: make distcheck fails
-
+Misc. Fixes:
+#398: make localaudio that pipes to a fakesink 
+#394: call gst_init and gtk_init as early as possible 
+#386: Cannot delete contacts 
+#381: audio channels widget max should be 24 
+#354: Merge all gui-interactive state variables 
+#384: Put name of selected contact in the invite button 
+#380: Preview button is not set to false when we stop the preview 
+#382: State saving for number of channels does not work for more than 8 channels 
+#352: Should be possible to select some devices with the same name 
+#293: Move the summary section out of the tabs in the GUI 
+#379: Cannot close the delete contact dialog 
+#378: Can't record audio fast enough audio messages sometimes 
+#376: milhouse --localvideo broken for dv 
+#161: ximagesink doesn't work with dv1394src 
+#375: error on cleanup of dv1394 
+#335: default audio-buffer is too big for on board sound 
+#374: convert "localhost" to 127.0.0.1 as temporary workaround for #143 
+#371: get vendor label for dv1394 
+#351: Build python doc with autotools 
+#360: Milhouse --list-cameras expects the dc1394 library? 
+#373: add README 
+#372: make shared_video compatible with AC_CHECK_LIB 
+#370: RELEASE not included in tarball by make dist 
+#356: when invite, gtkwarning gets posted 
+#355: at startup, midi widgets are sensitive even if midi is disabled 
+#328: improve gst element checking at configure-stage 
+#361: Check for all Python modules in the autotools 
+#355: at startup, midi widgets are sensitive even if midi is disabled 
+#365: Testing ticket workflow 
+#364: make distcheck broken by gst_check.py 
+#357: Add new png to makefile 
+#349: ./configure should check for python-portmidi 
+#342: Disable MIDI device widgets when MIDI is disabled 
+#341: Remove MIDI device number 
+#346: Add jitterbuffer controls for MIDI 
+#343: change MIDI tab icon 
+#345: midistream should handle SIGINT well 
+#292: Implement MIDI streaming in the GUI 
+#336: milhouse --list-cameras don't list dv1394 cameras 
+#340: midistream should accept domain names, not only IP addresses 
+#338: Cleanup in options parsing in midistream 
+#164: have receiver request caps from sender 
