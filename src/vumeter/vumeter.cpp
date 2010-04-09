@@ -187,7 +187,9 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
 	static const int db_points[] = { -50, -40, -20, -30, -10, -3, 0, 4 };
 
     cairo_paint (cr);
+    static const gdouble RECT_WIDTH = 10;
 
+    // Write numbers
     cairo_text_extents_t te;
     cairo_select_font_face (cr, "Sans",
             CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
@@ -207,13 +209,14 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
         cairo_show_text (cr, buf);
     }
 
+    // draw dashes
     const int DASH_SIZE = 4;
     cairo_set_line_width(cr, 1);
     for (int i = 4; i >= -50;)
     {
-        gdouble x = widget->allocation.width - max_text_width - 5.5;
+        gdouble x = RECT_WIDTH;
         gdouble y = db_to_vertical_offset(widget, i) + 0.5;
-        cairo_move_to (cr, x - DASH_SIZE, y);
+        cairo_move_to (cr, x + DASH_SIZE, y);
         cairo_line_to (cr, x, y);
         cairo_stroke (cr);
         i = i > -10 ? i - 2 : i - 4;
@@ -222,10 +225,9 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     // draw rectangle
     // green
     cairo_set_source_rgb (cr, 0.0, 1.0, 0.0);
-    const gdouble rect_width = widget->allocation.width - max_text_width - DASH_SIZE - 5;
     const gdouble green_rect_height = db_to_vertical_offset(widget, -18.0);
     cairo_rectangle(cr, 0, green_rect_height /* top */,
-            rect_width, 
+            RECT_WIDTH, 
             widget->allocation.height - green_rect_height/* bottom */);
     cairo_fill(cr);
 
@@ -233,7 +235,7 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     cairo_set_source_rgb (cr, 0.8, 1.0, 0.0);
     const gdouble yellow_rect_height = db_to_vertical_offset(widget, 0.0);
     cairo_rectangle(cr, 0, yellow_rect_height /* top */,
-            rect_width,
+            RECT_WIDTH,
             green_rect_height - yellow_rect_height/* bottom */);
     cairo_fill(cr);
     
@@ -241,7 +243,7 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     cairo_set_source_rgb (cr, 1.0, 0.0, 0.0);
     const gdouble red_rect_height = db_to_vertical_offset(widget, 8.0);
     cairo_rectangle(cr, 0, red_rect_height /* top */,
-            rect_width,
+            RECT_WIDTH,
             yellow_rect_height - red_rect_height/* bottom */);
     cairo_fill(cr);
     
@@ -249,7 +251,7 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     // vumeter corresponding to the current amplitude
     cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
     cairo_rectangle(cr, 0, 0, /* top */
-            rect_width,
+            RECT_WIDTH,
             db_to_vertical_offset(widget, GTK_VUMETER(widget)->peak));
     cairo_fill(cr);
 
@@ -258,7 +260,7 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     gdouble decay_peak_height =  db_to_vertical_offset(widget, GTK_VUMETER(widget)->decay_peak);
     cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
     cairo_move_to(cr, 0, decay_peak_height);
-    cairo_line_to(cr, rect_width, decay_peak_height);
+    cairo_line_to(cr, RECT_WIDTH, decay_peak_height);
     cairo_stroke(cr);
 
     cairo_destroy (cr);

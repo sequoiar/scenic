@@ -41,13 +41,13 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     level_(pipeline_.makeElement("level", NULL)),
     emitMessages_(true)
 {
-    static const int SPACING = 5;
-    GtkWidget *hbox = gtk_hbox_new(TRUE /*homogenous spacing*/, SPACING);
+    static const int SPACING = 1;
+    GtkWidget *hbox = gtk_hbox_new(FALSE/*homogenous spacing*/, SPACING);
 
     for (int i = 0; i < numChannels; ++i)
     {
         vumeters_.push_back(gtk_vumeter_new());
-        gtk_box_pack_start(GTK_BOX(hbox), vumeters_[i], FALSE /*expand*/, FALSE /*packing*/, SPACING);
+        gtk_box_pack_start(GTK_BOX(hbox), vumeters_[i], FALSE, FALSE, 0);
     }
 
     /* make window */
