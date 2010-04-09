@@ -182,9 +182,6 @@ short Milhouse::run(int argc, char **argv)
     if (options.count("help") or argc == 1) 
         return usage(desc);
 
-    gst_init(&argc, &argv);
-    gtk_init(&argc, &argv);
-
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
@@ -220,6 +217,9 @@ short Milhouse::run(int argc, char **argv)
         VideoSourceConfig::setInput(options["videodevice"].as<std::string>(), options["v4l2-input"].as<int>());
         return 0;
     }
+
+    gst_init(&argc, &argv);
+    gtk_init(&argc, &argv);
 
     bool enableLocalVideo = options["localvideo"].as<bool>();
     bool enableLocalAudio = options["localaudio"].as<bool>();
