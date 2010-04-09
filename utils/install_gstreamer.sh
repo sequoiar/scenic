@@ -57,7 +57,7 @@ popd
 
 # get x264, note that as of 09/23/2009 upstream x264 is incompatible with gstreamer
 # and that there are unfortunately no real releases of x264, only daily tarballs
-wget -c ftp://ftp.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
+wget -c http://download.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
 tar xjf $X264.tar.bz2
 pushd $X264
 ## added enable-shared flag to make sure that we can build the gstreamer x264enc

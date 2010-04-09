@@ -1,0 +1,99 @@
+<chapter id="HardwareSetup"> 
+   <title>Hardware Setup</title>
+   <para>&app; require the use of many devices. In this chapter, we will have an overview of what kind of device are generaly use. We will also give some idea on how to connect these devices. What problem the you could face and how to troubleshoot them.</para>
+   <sect1 id="GenericSheme">
+   <title>Generic connection sheme</title>
+   <para>The diagram below illustrate a generic &app; connection sheme:</para>
+      <mediaobject>
+         <imageobject>
+            <imagedata fileref="fig/hardware_setup_01.jpg" format="JPG"/>
+         </imageobject>
+         <textobject>
+            <phrase>Generic Sheme</phrase>
+         </textobject>
+      </mediaobject>
+
+   <para>Audio Input:</para>
+   <itemizedlist>
+      <listitem><para>Microphone in mic entry (or other audio inputs)</para></listitem>
+      <listitem><para>Sound card output channels 1 and 2 in mixer input lines 7 and 8</para></listitem>
+   </itemizedlist> 
+   <para>Audio Output:</para>
+   <itemizedlist>
+      <listitem><para>Subgroup 1 – send to sound card input channels 1 and 2</para></listitem>
+      <listitem><para>Subgroup 2 – send to speakers</para></listitem>
+      <listitem><para>Headphones</para></listitem>
+      <listitem><para>External sound card connected to USB (optional setup)</para></listitem>
+   </itemizedlist>
+   <para>Video Input:</para>
+   <itemizedlist>
+      <listitem><para>Video signal from camera to S Video input on video capture card NOTE: If composite cable, insert yellow connecter.</para></listitem>
+   </itemizedlist>
+   <para>Video Output:</para>
+   <itemizedlist>
+      <listitem><para>DVI to projector / VGA to monitor</para></listitem>
+   </itemizedlist>
+   </sect1>
+   <sect1 id="BidirectionalSetup">
+   <title>Bidirectional Setup</title>
+   <para>The following diagram illustrates a setup for a bilateral remote audio transmission. In this type of connection each location setup is configured to send its audio signal over the Internet to be output in the other location. For this you need identical audio setup in both locations.</para>
+   <mediaobject>
+         <imageobject>
+            <imagedata fileref="fig/hardware_setup_02.jpg" format="JPG"/>
+         </imageobject>
+         <textobject>
+            <phrase>Bidirectional Setup</phrase>
+         </textobject>
+      </mediaobject>
+      <para/>
+   <informaltable frame="all">
+      <tgroup cols="2"><tbody><row>
+            <entry>
+               <para>Room 1 audio mixer setup</para>
+            </entry>
+            <entry>
+               <para>Room 2 audio mixer setup</para>
+            </entry>
+         </row>
+         <row>
+            <entry>
+               <para>Microphone in Mic IN (or other source) of mixer line 1.</para>
+               <para>Open Mic AUX (or line AUX) so you can send the microphone signal to the sound card and then to Room 2.</para>
+               <para>Turn OFF the Mic output level to main mix.</para>
+            </entry>
+            <entry>
+               <para>Microphone in Mic IN (or other source) of mixer line 1.</para>
+               <para>Open Mic AUX (or line AUX) so you can send the microphone signal to the sound card and then to Room 1.</para>
+               <para>Turn OFF the Mic output level to main mix.</para>
+            </entry>
+         </row>
+         <row>
+            <entry>
+               <para>Room 1 audio sent through AUX send 1&amp;2 to sound card input 1&amp;2 then to Room 2.</para>
+            </entry>
+            <entry>
+               <para>Room 2 audio sent through AUX send 1&amp;2 to sound card input 1&amp;2 then to Room 1.</para>
+            </entry>
+         </row>
+         <row>
+            <entry>
+               <para>Room 2 audio redirected through Room 1 sound card outputs 1&amp;2 into mixer input lines 7&amp;8.</para>
+               <para>Turn OFF AUX level of lines 7&amp;8 to avoid resending signal to card. </para>
+            </entry>
+            <entry>
+               <para>Room 1 audio redirected through Room 2 sound card outputs 1&amp;2 into mixer input lines 7&amp;8.</para>
+               <para>Turn OFF AUX level of lines 7&amp;8 to avoid resending signal to card. </para>
+            </entry>
+         </row>
+         <row>
+            <entry>
+               <para>Open main mix levels for lines 7&amp;8 to hear Room 2 audio ouput on main mix. </para>
+            </entry>
+            <entry>
+               <para>Open main mix level for lines 7&amp;8 to hear Room 1 audio ouput on main mix.</para>
+            </entry>
+         </row>
+         </tbody></tgroup>
+   </informaltable>
+   </sect1>
+</chapter>
