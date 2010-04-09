@@ -182,7 +182,8 @@ static gdouble db_to_vertical_offset(GtkWidget *widget, gdouble db)
 static void
 gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
 {
-	static const int db_points[] = { -50, -40, -20, -30, -10, -3, 0, 4 };
+	static const int db_points[] = { -50, -40, -30, -24, -18, -12, -6, -3, 
+        0, 4 };
 
     cairo_paint (cr);
     static const gdouble RECT_WIDTH = 10;
@@ -256,7 +257,10 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     // Draw decay peak
     cairo_set_line_width(cr, 2.0);
     gdouble decay_peak_height =  db_to_vertical_offset(widget, GTK_VUMETER(widget)->decay_peak);
-    cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
+    if (GTK_VUMETER(widget)->decay_peak > 0.0)
+        cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
+    else
+        cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
     cairo_move_to(cr, 0, decay_peak_height);
     cairo_line_to(cr, RECT_WIDTH, decay_peak_height);
     cairo_stroke(cr);
