@@ -91,12 +91,14 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("grayscale,M", po::bool_switch(), "force dc1394 capture to grayscale")
             ("aspect-ratio,A", po::value<string>()->default_value("4:3"), "picture aspect ratio (4:3,16:9)")
             ("localvideo", po::bool_switch(), "display local video only")
+            ("localaudio", po::bool_switch(), "local audio only")
             ("flip-video", po::value<string>()->default_value("none"), "flip video (none, clockwise, rotate-180, "
              "counterclockwise, horizontal-flip, vertical-flip, upper-left-diagonal, upper-right-diagonal)")
             ("display", po::value<string>(), "set DISPLAY environment variable")
             ("v4l2-standard", po::value<string>(), "set v4l2 standard (NTSC,PAL)")
             ("v4l2-input", po::value<int>(), "set v4l2 input (0,1,2)")
             ("x-window-id", po::value<unsigned long>()->default_value(0), "set x-window-id to display video in an existing window")
+            ("vumeter-id", po::value<unsigned long>()->default_value(0), "id of the socket where the vumeters will be displayed")
             ;
 
         descriptionInitialized = true;

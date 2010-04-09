@@ -25,11 +25,13 @@
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
+#include <gdk/gdktypes.h>
 #include <boost/program_options.hpp>
 
 // forward declarations
 class Pipeline;
 class AudioSource;
+class AudioLevel;
 class AudioSink;
 
 /// Immutable class that is used to parameterize AudioSender objects. 
@@ -48,14 +50,15 @@ class AudioSourceConfig
 
         double quality() const;
         int bitrate() const;
-        const char *sourceName() const;
         const char *deviceName() const;
         const char *location() const;
 
         bool locationExists() const;
          
         AudioSource* createSource(Pipeline &pipeline) const;
+        AudioLevel* createLevel(Pipeline &pipeline) const;
         unsigned long long bufferTime() const;
+        std::string sourceString() const { return source_; }
 
     private:
         const std::string source_;
@@ -66,6 +69,7 @@ class AudioSourceConfig
         const std::string location_;
         const int numChannels_;
         const unsigned long long bufferTime_;
+        GdkNativeWindow socketID_;
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  
@@ -74,6 +78,7 @@ class AudioSinkConfig
     public:
         AudioSinkConfig(const boost::program_options::variables_map &options);
         
+        AudioLevel* createLevel(Pipeline &pipeline) const;
         AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *sinkName() const;
@@ -85,6 +90,8 @@ class AudioSinkConfig
         const std::string sinkName_;
         const std::string deviceName_;
         const unsigned long long bufferTime_;
+        GdkNativeWindow socketID_;
+        const int numChannels_;
 };
 
 #endif // _AUDIO_LOCAL_CONFIG_H_

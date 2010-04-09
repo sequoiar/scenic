@@ -21,8 +21,11 @@
  */
 
 #include "util.h"
+#include <boost/lexical_cast.hpp>
+#include <string>
 
 #include "audioSender.h"
+#include "audioLevel.h"
 #include "audioSource.h"
 #include "pipeline.h"
 #include "codec.h"
@@ -30,6 +33,25 @@
 #include "capsParser.h"
 
 using boost::shared_ptr;
+
+static void 
+validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
+{
+    using boost::lexical_cast;
+    using std::string;
+    if (rConfig.codec() == "mp3")
+    {
+        if (aConfig.numChannels() > 2)
+            throw std::range_error("MP3 only accepts 1 or 2 channels, not " +
+                   lexical_cast<string>(aConfig.numChannels()));
+    }
+    else if (rConfig.codec() == "raw")
+    {
+        if (aConfig.numChannels() > 8) 
+            throw std::range_error("Raw currently only accepts 8 channels or less, not " +
+                    lexical_cast<string>(aConfig.numChannels()));
+    }
+}
 
 /// Constructor 
 AudioSender::AudioSender(Pipeline &pipeline,
@@ -40,19 +62,11 @@ AudioSender::AudioSender(Pipeline &pipeline,
     pipeline_(pipeline),
     session_(pipeline), 
     source_(0), 
+    level_(0),
     encoder_(0), 
     payloader_(0)
 {
-    if (remoteConfig_->codec() == "mp3")
-    {
-        if (audioConfig_->numChannels() < 1 or audioConfig_->numChannels() > 2)
-            THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_->numChannels());
-    }
-    else if (remoteConfig_->codec() == "raw")
-    {
-        if (audioConfig_->numChannels() > 8) 
-            THROW_CRITICAL("Raw currently only accepts 8 channels or less, not " << audioConfig_->numChannels());
-    }
+    validateChannels(*aConfig, *rConfig);
     LOG_DEBUG("Creating audio sender pipeline");
     createPipeline(pipeline);
 }
@@ -71,18 +85,25 @@ AudioSender::~AudioSender()
 {
     delete payloader_;
     delete encoder_;
+    delete level_;
     delete source_;
 }
 
 void AudioSender::createSource(Pipeline &pipeline)
 {
     tassert(source_ = audioConfig_->createSource(pipeline));
+    level_ = audioConfig_->createLevel(pipeline);
+    if (level_ != 0)
+            gstlinkable::link(*source_, *level_);
 }
 
 void AudioSender::createCodec(Pipeline &pipeline)
 {
     tassert(encoder_ = remoteConfig_->createAudioEncoder(pipeline, audioConfig_->bitrate(), audioConfig_->quality()));
-    gstlinkable::link(*source_, *encoder_);
+    if (level_ != 0)
+        gstlinkable::link(*level_, *encoder_);
+    else
+        gstlinkable::link(*source_, *encoder_);
 }
 
 

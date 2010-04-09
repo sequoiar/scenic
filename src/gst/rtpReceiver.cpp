@@ -79,6 +79,8 @@ void RtpReceiver::setCaps(const char *capsStr)
     GstCaps *caps;
     if (std::string("") == capsStr)
         THROW_ERROR("Cannot set rtp receiver caps to empty string");
+    else
+        LOG_DEBUG("Got caps string " << capsStr);
     tassert(caps = gst_caps_from_string(capsStr));
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
 

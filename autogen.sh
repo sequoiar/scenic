@@ -20,11 +20,7 @@ touch ChangeLog
 fi
 
 # could be replaced with autoreconf -fivI m4 (verbose, force rebuild of ltmain, .in files, etc.)
-libtoolize --force
-aclocal -I m4
-autoheader
-autoconf -f
-automake -a -f -Wno-portability 
+autoreconf --install
 if [ ! "x$LOGNAME" = "xbbslave" ]; then
     ./configure $@ --enable-svn-revision
 fi

@@ -273,7 +273,7 @@ AudioPulseSource::~AudioPulseSource()
 AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), capsFilter_(0)
 {
-    source_ = pipeline_.makeElement(config_.source(), config_.sourceName());
+    source_ = pipeline_.makeElement(config_.source(), config_.source());
 
     // use auto-forced connect mode if available
     if (Jack::autoForcedSupported(source_))

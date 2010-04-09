@@ -137,6 +137,7 @@ class StreamerManager(object):
                 "audio": {
                     # decided locally:
                     "source": self.app.config.audio_source,
+                    "vumeter-id": self.app.gui.audio_levels_input_socket_id,
 
                     # Decided by remote peer:
                     "numchannels": remote_config["audio"]["numchannels"],
@@ -171,6 +172,7 @@ class StreamerManager(object):
                 "audio": {
                     # decided locally:
                     "numchannels": self.app.config.audio_channels, # int
+                    "vumeter-id": self.app.gui.audio_levels_output_socket_id,
                     "codec": self.app.config.audio_codec, 
                     "port": self.app.recv_audio_port,
                     "sink": self.app.config.audio_sink
@@ -219,6 +221,7 @@ class StreamerManager(object):
             '--numchannels', str(details["send"]["audio"]["numchannels"]),
             '--audiocodec', details["send"]["audio"]["codec"],
             '--audioport', str(details["send"]["audio"]["port"]),
+            '--vumeter-id', str(details["send"]["audio"]["vumeter-id"])
             ]
         if details["send"]["video"]["source"] == "v4l2src":
             dev = self.app.parse_v4l2_device_name(details["send"]["video"]["device"])
@@ -246,6 +249,7 @@ class StreamerManager(object):
             '--numchannels', str(details["receive"]["audio"]["numchannels"]),
             '--audiocodec', details["receive"]["audio"]["codec"],
             '--audioport', str(details["receive"]["audio"]["port"]),
+            '--vumeter-id', str(details["receive"]["audio"]["vumeter-id"]),
             '--window-title', details["receive"]["video"]["window-title"],
             '--display', details["receive"]["video"]["display"],
             ]

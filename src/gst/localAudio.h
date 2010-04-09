@@ -1,5 +1,5 @@
 
-// audioLocal.h
+// localVideo.h
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
@@ -20,52 +20,31 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _AUDIO_SENDER_H_
-#define _AUDIO_SENDER_H_
+#ifndef _LOCAL_AUDIO_H_
+#define _LOCAL_AUDIO_H_
 
-#include "mediaBase.h"
 #include "audioConfig.h"
-#include "remoteConfig.h"
-#include "rtpSender.h"
-#include "busMsgHandler.h"
 #include "noncopyable.h"
 
 #include <boost/shared_ptr.hpp>
 
 class AudioSource;
 class AudioLevel;
-class Pipeline;
-class Encoder;
-class Pay;
-class _GstMessage;
+class _GstElement;
 
-
-class AudioSender
-    : public SenderBase, boost::noncopyable
+class LocalAudio : boost::noncopyable
 {
     public:
-        AudioSender(Pipeline &pipeline,
-                boost::shared_ptr<AudioSourceConfig> aConfig, 
-                boost::shared_ptr<SenderConfig> rConfig);
-
-        ~AudioSender();
+        LocalAudio(Pipeline &pipeline, boost::shared_ptr<AudioSourceConfig> sourceConfig);
+        ~LocalAudio();
 
     private:
-        void createSource(Pipeline &pipeline);
-        void createCodec(Pipeline &pipeline);
-        void createPayloader();
-        virtual bool checkCaps() const;
-
-
-        boost::shared_ptr<AudioSourceConfig> audioConfig_;
         Pipeline &pipeline_;
-        RtpSender session_;
+        boost::shared_ptr<AudioSourceConfig> sourceConfig_;
         AudioSource *source_;
         AudioLevel *level_;
-
-        Encoder *encoder_;
-        Pay *payloader_;
+        _GstElement *fakesink_;
 };
 
-#endif // _AUDIO_SENDER_H_
+#endif // _LOCAL_AUDIO_H_
 

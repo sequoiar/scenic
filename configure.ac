@@ -1,18 +1,20 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.61)
-AC_INIT(SCENIC, 0.5)  # should always be .1 greater than last tag, unless this is a tag
+AC_PREREQ(2.60)
+AC_INIT(SCENIC, [0.5], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
-AC_PROG_LIBTOOL
 
+AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wno-portability])
 
 # Check for C and C++ compilers
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -255,6 +257,8 @@ src/include/Makefile
 src/util/Makefile
 src/gutil/Makefile
 src/shared_video/Makefile
+src/vumeter/Makefile
+src/vumeter/test/Makefile
 src/tcp/Makefile
 src/gst/Makefile
 src/firereset/Makefile

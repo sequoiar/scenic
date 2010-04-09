@@ -34,6 +34,7 @@
 class Pipeline;
 class RtpPay;
 class Decoder;
+class AudioLevel;
 class AudioSink;
 
 /** 
@@ -64,6 +65,7 @@ class AudioReceiver
         bool gotCaps_;
         RtpPay *depayloader_;
         Decoder *decoder_;
+        AudioLevel *level_;
         AudioSink *sink_;
 };
 

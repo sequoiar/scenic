@@ -21,6 +21,8 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <gst/gst.h>
+#include <gtk/gtk.h>
 
 #include "util.h"
 
@@ -38,7 +40,7 @@
 
 namespace po = boost::program_options;
 
-void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo, bool disableAudio)
+void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     using boost::shared_ptr;
 
@@ -51,11 +53,11 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     shared_ptr<VideoReceiver> vRx;
     shared_ptr<AudioReceiver> aRx;
 
-    if (not disableVideo)       
+    if (enableVideo)       
     {
         vRx = videofactory::buildVideoReceiver(pipeline, options);
     }
-    if (not disableAudio)
+    if (enableAudio)
     {
         aRx = audiofactory::buildAudioReceiver(pipeline, options);
 
@@ -69,7 +71,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
     if (options.count("jitterbuffer"))
         RtpReceiver::setLatency(options["jitterbuffer"].as<int>());
 
-    if (not disableVideo)
+    if (enableVideo)
     {
         if(options["fullscreen"].as<bool>())
             MessageDispatcher::sendMessage("fullscreen");
@@ -84,7 +86,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool disableVideo
 }
 
 
-void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, bool disableAudio)
+void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     using boost::shared_ptr;
 
@@ -97,12 +99,12 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
     shared_ptr<VideoSender> vTx;
     shared_ptr<AudioSender> aTx;
 
-    if (not disableVideo)
+    if (enableVideo)
     {
         vTx = videofactory::buildVideoSender(pipeline, options);
     }
 
-    if (not disableAudio)
+    if (enableAudio)
     {
         aTx = audiofactory::buildAudioSender(pipeline, options);
 
@@ -118,7 +120,7 @@ void Milhouse::runAsSender(const po::variables_map &options, bool disableVideo, 
 }
 
 
-void Milhouse::runAsLocal(const po::variables_map &options)
+void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     using boost::shared_ptr;
 
@@ -129,15 +131,27 @@ void Milhouse::runAsLocal(const po::variables_map &options)
 
     Playback playback(pipeline);
     shared_ptr<LocalVideo> localVideo;
-    //shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
+    if (enableVideo)
+    {
+        LOG_DEBUG("LOCAL VIDEO");
+        localVideo = videofactory::buildLocalVideo(pipeline, options);
+    }
 
-    localVideo = videofactory::buildLocalVideo(pipeline, options);
+    shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
+    if (enableAudio)
+    {
+        LOG_DEBUG("LOCAL AUDIO");
+        localAudio = audiofactory::buildLocalAudio(pipeline, options);
+    }
 
     playback.start();
-    
-    if(options["fullscreen"].as<bool>())
-        MessageDispatcher::sendMessage("fullscreen");
-    MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
+
+    if (enableVideo)
+    {
+        if(options["fullscreen"].as<bool>())
+            MessageDispatcher::sendMessage("fullscreen");
+        MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
+    }
 
     gutil::runMainLoop(options["timeout"].as<int>());
 
@@ -197,16 +211,21 @@ short Milhouse::run(int argc, char **argv)
         VideoSourceConfig::setStandard(options["videodevice"].as<std::string>(), options["v4l2-standard"].as<std::string>());
         return 0;
     }
-    
+
     if (options.count("v4l2-input"))
     {
         VideoSourceConfig::setInput(options["videodevice"].as<std::string>(), options["v4l2-input"].as<int>());
         return 0;
     }
 
-    if (options["localvideo"].as<bool>()) 
+    gst_init(&argc, &argv);
+    gtk_init(&argc, &argv);
+
+    bool enableLocalVideo = options["localvideo"].as<bool>();
+    bool enableLocalAudio = options["localaudio"].as<bool>();
+    if (enableLocalVideo or enableLocalAudio)
     {
-        runAsLocal(options);
+        runAsLocal(options, enableLocalVideo, enableLocalAudio);
         return 0;
     }
 
@@ -217,18 +236,18 @@ short Milhouse::run(int argc, char **argv)
         return 1;
     }
 
-    bool disableVideo = not options.count("videoport");
-    bool disableAudio = not options.count("audioport");
+    bool enableVideo = options.count("videoport");
+    bool enableAudio = options.count("audioport");
 
 
-    if (disableVideo and disableAudio)
+    if (not enableVideo and not enableAudio)
     {
         LOG_ERROR("argument error: must provide videoport and/or audioport. see --help");
         return 1;
     }
 
     // Fail early, other port checks do happen later too
-    if (not disableAudio and not disableVideo)
+    if (enableAudio and enableVideo)
         if (options["videoport"].as<int>() == options["audioport"].as<int>())
         {
             LOG_ERROR("argument error: videoport and audioport cannot be equal"); 
@@ -236,42 +255,10 @@ short Milhouse::run(int argc, char **argv)
         }
 
     if (options["receiver"].as<bool>()) 
-        runAsReceiver(options, disableVideo, disableAudio);
+        runAsReceiver(options, enableVideo, enableAudio);
     else 
-        runAsSender(options, disableVideo, disableAudio);
+        runAsSender(options, enableVideo, enableAudio);
 
     return 0;
-}
-
-int main(int argc, char **argv)
-{
-    int ret = 0;
-
-    try
-    {
-        signal_handlers::setHandlers();
-        Milhouse milhouse;
-        ret = milhouse.run(argc, argv);
-    }
-    catch (const Except &e)  // these are our exceptions
-    {
-        if (std::string(e.what()).find("INTERRUPTED") not_eq std::string::npos)
-        {
-            std::cout << "Interrupted" << std::endl;
-            ret = 0;
-        }
-        else
-        {
-            std::cerr << "exitting with error: " << e.what() << std::endl;
-            ret = 1;
-        }
-    }
-    catch (const std::exception &e)  // these are other exceptions (not one of our exception classes)
-    {
-        std::cerr << "exitting with error: " << e.what() << std::endl;
-        ret = 1;
-    }
-    std::cout << "Exitting Milhouse" << std::endl;
-    return ret;
 }
 

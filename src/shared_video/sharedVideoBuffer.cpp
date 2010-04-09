@@ -21,7 +21,7 @@
  */
 
 
-#include "./sharedVideoBuffer.h"
+#include "sharedVideoBuffer.h"
 
 #ifndef LOG_ERROR
 #include <iostream> // for cerr
