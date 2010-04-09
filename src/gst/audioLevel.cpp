@@ -56,6 +56,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
     GtkWidget *scrolled = gtk_scrolled_window_new(0, 0);
     g_object_set(scrolled, "vscrollbar-policy", GTK_POLICY_NEVER, NULL);
+    g_object_set(scrolled, "hscrollbar-policy", GTK_POLICY_AUTOMATIC, NULL);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled), hbox);
     gtk_container_add(GTK_CONTAINER (plug), scrolled);
     /* show window and log its id */
