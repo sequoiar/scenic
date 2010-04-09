@@ -118,8 +118,6 @@ gtk_vumeter_realize (GtkWidget * widget)
   attributes.window_type = GDK_WINDOW_CHILD;
   attributes.x = widget->allocation.x;
   attributes.y = widget->allocation.y;
-  attributes.width = 30;
-  attributes.height = 100;
 
   attributes.wclass = GDK_INPUT_OUTPUT;
   attributes.event_mask = gtk_widget_get_events (widget) | GDK_EXPOSURE_MASK;
