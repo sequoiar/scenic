@@ -9,9 +9,9 @@ bin_PROGRAMS = milhouse
 milhouse_SOURCES = main.cpp milhouse.cpp milhouseLogger.cpp milhouseLogger.h $(top_srcdir)/src/include/ConcurrentQueue.h milhouse.h
 #FIXME GLIB_CFLAGS only here because pipeline.h has include glib/gtypes.h, also GTK flags because of audioSender.h->audioLevel.h
 if SVN
-milhouse_CPPFLAGS = $(GLIB_CFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) -I$(top_srcdir)/src/include -I$(top_srcdir)/src -D SVNVERSION=\"$(shell svnversion)\"
+milhouse_CPPFLAGS = $(GLIB_CFLAGS) $(GTK_CFLAGS) -I$(top_srcdir)/src/include -I$(top_srcdir)/src -D SVNVERSION=\"$(shell svnversion)\"
 else
-milhouse_CPPFLAGS = $(GLIB_CFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) -I$(top_srcdir)/src/include -I$(top_srcdir)/src
+milhouse_CPPFLAGS = $(GLIB_CFLAGS) -I$(top_srcdir)/src/include -I$(top_srcdir)/src
 endif
 milhouse_LDADD = $(ALL_GST_LIBS) $(JACK_LIBS) \
 		$(GTK_LIBS) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(BOOST_ASIO_LIB) \

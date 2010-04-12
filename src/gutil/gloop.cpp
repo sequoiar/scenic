@@ -20,7 +20,8 @@
  *
  */
 
-#include <glib.h>
+#include <gst/gst.h>
+#include <gtk/gtk.h>
 #include "util.h"
 #include "gutil.h"
     
@@ -68,5 +69,11 @@ void gutil::runMainLoop(int ms)
     g_main_loop_run(loop_);
     g_main_loop_unref(loop_);
     loop_ = 0;
+}
+
+void gutil::init_gst_gtk(int argc, char **argv)
+{
+    gst_init(&argc, &argv);
+    gtk_init(&argc, &argv);
 }
 

@@ -21,8 +21,6 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <gst/gst.h>
-#include <gtk/gtk.h>
 
 #include "util.h"
 
@@ -218,8 +216,8 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    gst_init(&argc, &argv);
-    gtk_init(&argc, &argv);
+    // wrapper so main doesn't need to know about gst and gtk
+    gutil::init_gst_gtk(argc, argv);
 
     bool enableLocalVideo = options["localvideo"].as<bool>();
     bool enableLocalAudio = options["localaudio"].as<bool>();
