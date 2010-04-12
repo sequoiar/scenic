@@ -321,6 +321,27 @@ class Gui(object):
         self.midi_output_device_widget = widgets_tree.get_widget("midi_output_device")
         self.midi_jitterbuffer_widget = widgets_tree.get_widget("midi_jitterbuffer")
 
+        # synchronize and disable a/v stuff
+        self.audio_input_buffer_widget = widgets_tree.get_widget("audio_input_buffer")
+        self.audio_output_buffer_widget = widgets_tree.get_widget("audio_output_buffer")
+        self.audio_receive_enabled_widget = widgets_tree.get_widget("audio_receive_enabled")
+        self.audio_send_enabled_widget = widgets_tree.get_widget("audio_send_enabled")
+        self.audio_video_synchronized_widget = widgets_tree.get_widget("audio_video_synchronized")
+        self.video_send_enabled_widget = widgets_tree.get_widget("video_send_enabled")
+        self.video_receive_enabled_widget = widgets_tree.get_widget("video_receive_enabled")
+        self.audio_input_buffer_widget.set_sensitive(False)
+        self.audio_output_buffer_widget.set_sensitive(False)
+        self.audio_receive_enabled_widget.set_sensitive(False)
+        self.audio_send_enabled_widget.set_sensitive(False)
+        self.audio_video_synchronized_widget.set_sensitive(False)
+        self.video_send_enabled_widget.set_sensitive(False)
+        self.video_receive_enabled_widget.set_sensitive(False)
+        self.audio_receive_enabled_widget.set_active(True)
+        self.audio_send_enabled_widget.set_active(True)
+        self.audio_video_synchronized_widget.set_active(True)
+        self.video_send_enabled_widget.set_active(True)
+        self.video_receive_enabled_widget.set_active(True)
+
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
             self.main_window.set_decorated(False)
