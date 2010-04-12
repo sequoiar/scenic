@@ -27,6 +27,8 @@
 #include "gstLinkable.h"
 #include "videoReceiver.h"
 #include "videoScale.h"
+#include "videoConfig.h"
+#include "remoteConfig.h"
 #include "videoFlip.h"
 #include "videoSink.h"
 #include "codec.h"

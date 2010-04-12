@@ -23,15 +23,16 @@
 #ifndef _LOCAL_VIDEO_H_
 #define _LOCAL_VIDEO_H_
 
-#include "videoConfig.h"
 #include "noncopyable.h"
-
 #include <boost/shared_ptr.hpp>
 
+class Pipeline;
 class VideoSource;
+class VideoSourceConfig;
 class VideoScale;
 class VideoFlip;
 class VideoSink;
+class VideoSinkConfig;
 class _GstElement;
 
 class LocalVideo : boost::noncopyable

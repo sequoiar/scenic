@@ -23,12 +23,12 @@
 #ifndef _LOCAL_AUDIO_H_
 #define _LOCAL_AUDIO_H_
 
-#include "audioConfig.h"
+#include <boost/shared_ptr.hpp>
 #include "noncopyable.h"
 
-#include <boost/shared_ptr.hpp>
-
+class Pipeline;
 class AudioSource;
+class AudioSourceConfig;
 class AudioLevel;
 class _GstElement;
 

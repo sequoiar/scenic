@@ -28,6 +28,7 @@
 #include "videoSource.h"
 #include "rtpPay.h"
 #include "videoConfig.h"
+#include "remoteConfig.h"
 #include "codec.h"
 #include "capsParser.h"
 #include "messageDispatcher.h"

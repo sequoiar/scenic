@@ -22,12 +22,12 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-#include "remoteConfig.h"
 
 #include <boost/shared_ptr.hpp>
 
 class Pipeline;
 class _GstMessage;
+class SenderConfig;
 
 class SenderBase 
 {

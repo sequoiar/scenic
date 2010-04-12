@@ -27,6 +27,7 @@
 #include "pipeline.h"
 
 #include "videoSource.h"
+#include "videoConfig.h"
 #include "videoScale.h"
 #include "videoFlip.h"
 #include "videoSink.h"

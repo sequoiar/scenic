@@ -24,7 +24,6 @@
 #define _VIDEO_SENDER_H_
 
 #include "mediaBase.h"
-#include "videoConfig.h"
 #include "rtpSender.h"
 #include "busMsgHandler.h"
 
@@ -32,6 +31,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+class VideoSourceConfig;
 class VideoSource;
 class VideoEncoder;
 class Pay;

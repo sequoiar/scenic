@@ -24,8 +24,6 @@
 #define _VIDEO_RECEIVER_H_
 
 #include "mediaBase.h"
-#include "videoConfig.h"
-#include "remoteConfig.h"
 #include "rtpReceiver.h"
 
 #include <boost/shared_ptr.hpp>
@@ -35,6 +33,8 @@ class VideoDecoder;
 class VideoScale;
 class VideoFlip;
 class VideoSink;
+class VideoSinkConfig;
+class ReceiverConfig;
 
 class VideoReceiver
     : public ReceiverBase

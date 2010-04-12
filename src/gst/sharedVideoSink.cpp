@@ -36,7 +36,7 @@
 
 using boost::interprocess::shared_memory_object;
 using boost::interprocess::read_write;
-using std::tr1::shared_ptr;
+using boost::shared_ptr;
 
 
 shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory(const std::string &id)
