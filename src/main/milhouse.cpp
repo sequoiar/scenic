@@ -30,6 +30,8 @@
 #include "gst/audioFactory.h"
 #include "gst/messageDispatcher.h"
 #include "gst/pipeline.h"
+#include "gst/rtpReceiver.h"
+#include "gst/videoConfig.h"
 #include "playback.h"
 
 #include "milhouse.h"

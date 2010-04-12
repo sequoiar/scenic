@@ -24,6 +24,9 @@
 #include "util.h"
 
 #include "audioFactory.h"
+#include "audioSender.h"
+#include "audioReceiver.h"
+#include "localAudio.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "capsParser.h"
