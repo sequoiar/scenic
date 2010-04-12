@@ -27,6 +27,8 @@
 #include "audioSender.h"
 #include "audioLevel.h"
 #include "audioSource.h"
+#include "audioConfig.h"
+#include "remoteConfig.h"
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
