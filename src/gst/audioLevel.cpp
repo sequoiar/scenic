@@ -68,7 +68,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
 
     g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
     static const guint64 INTERVAL_NS = 75000000;
-    static const gdouble PEAK_FALLOFF = 320.0;
+    static const gdouble PEAK_FALLOFF = 750.0;
     static const guint64 PEAK_TTL = 3 * 300000000;  // 3 times default
     g_object_set(G_OBJECT(level_), "interval", INTERVAL_NS, NULL);
     g_object_set(G_OBJECT(level_), "peak-falloff", PEAK_FALLOFF, NULL);
