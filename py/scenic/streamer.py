@@ -138,6 +138,7 @@ class StreamerManager(object):
                     # decided locally:
                     "source": self.app.config.audio_source,
                     "vumeter-id": self.app.gui.audio_levels_input_socket_id,
+                    "buffer": self.app.config.audio_input_buffer,
 
                     # Decided by remote peer:
                     "numchannels": remote_config["audio"]["numchannels"],
@@ -175,7 +176,8 @@ class StreamerManager(object):
                     "vumeter-id": self.app.gui.audio_levels_output_socket_id,
                     "codec": self.app.config.audio_codec, 
                     "port": self.app.recv_audio_port,
-                    "sink": self.app.config.audio_sink
+                    "sink": self.app.config.audio_sink,
+                    "buffer": self.app.config.audio_output_buffer
                 },
                 "midi": {
                     "enabled": midi_recv_enabled,
@@ -211,17 +213,20 @@ class StreamerManager(object):
             "milhouse", 
             '--sender', 
             '--address', details["peer"]["address"],
+            # video:
             '--videosource', details["send"]["video"]["source"],
             '--videocodec', details["send"]["video"]["codec"],
             '--videoport', str(details["send"]["video"]["port"]),
             '--width', str(details["send"]["video"]["width"]), 
             '--height', str(details["send"]["video"]["height"]),
             '--aspect-ratio', str(details["send"]["video"]["aspect-ratio"]),
+            # audio:
             '--audiosource', details["send"]["audio"]["source"],
             '--numchannels', str(details["send"]["audio"]["numchannels"]),
             '--audiocodec', details["send"]["audio"]["codec"],
             '--audioport', str(details["send"]["audio"]["port"]),
-            '--vumeter-id', str(details["send"]["audio"]["vumeter-id"])
+            '--vumeter-id', str(details["send"]["audio"]["vumeter-id"]),
+            '--audio-buffer', str(details["send"]["audio"]["buffer"])
             ]
         if details["send"]["video"]["source"] == "v4l2src":
             dev = self.app.parse_v4l2_device_name(details["send"]["video"]["device"])
@@ -238,6 +243,7 @@ class StreamerManager(object):
             "milhouse",
             '--receiver', 
             '--address', details["peer"]["address"],
+            # video:
             '--videosink', details["receive"]["video"]["sink"],
             '--videocodec', details["receive"]["video"]["codec"],
             '--videoport', str(details["receive"]["video"]["port"]),
@@ -245,13 +251,15 @@ class StreamerManager(object):
             '--width', str(details["receive"]["video"]["width"]),
             '--height', str(details["receive"]["video"]["height"]),
             '--aspect-ratio', details["receive"]["video"]["aspect-ratio"],
+            '--window-title', details["receive"]["video"]["window-title"],
+            '--display', details["receive"]["video"]["display"],
+            # audio:
             '--audiosink', details["receive"]["audio"]["sink"],
             '--numchannels', str(details["receive"]["audio"]["numchannels"]),
             '--audiocodec', details["receive"]["audio"]["codec"],
             '--audioport', str(details["receive"]["audio"]["port"]),
             '--vumeter-id', str(details["receive"]["audio"]["vumeter-id"]),
-            '--window-title', details["receive"]["video"]["window-title"],
-            '--display', details["receive"]["video"]["display"],
+            '--audio-buffer', str(details["receive"]["audio"]["buffer"])
             ]
         if details["receive"]["video"]["fullscreen"]:
             self.milhouse_recv_cmd.append('--fullscreen')

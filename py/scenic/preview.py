@@ -34,6 +34,7 @@ class Preview(object):
         aspect_ratio = self.app.config.video_aspect_ratio
         numchannels = self.app.config.audio_channels
         vumeter_id = self.app.gui.audio_levels_input_socket_id
+        audio_buffer = self.app.config.audio_input_buffer
         window_title = _("Local preview")
         x_window_id = None
         if not self.app.config.preview_in_window:
@@ -41,9 +42,11 @@ class Preview(object):
                 print("WARNING: XID of the preview drawing area is None !")
             else:
                 x_window_id = self.app.gui.preview_area_x_window_id
-        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio)
+        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio, )
         if self.app.devices["jackd_is_running"]: 
-            command += " --localaudio --numchannels %s --vumeter-id %s" % (numchannels, vumeter_id)
+            command += " --localaudio --numchannels %s --vumeter-id %s --audio-buffer" % (numchannels, vumeter_id, audio_buffer)
+        #else:
+        #    warning_message = "You should consider starting jackd."
         if x_window_id is not None:
             command += " --x-window-id %d" % (x_window_id)
         else:

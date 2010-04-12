@@ -329,8 +329,8 @@ class Gui(object):
         self.audio_video_synchronized_widget = widgets_tree.get_widget("audio_video_synchronized")
         self.video_send_enabled_widget = widgets_tree.get_widget("video_send_enabled")
         self.video_receive_enabled_widget = widgets_tree.get_widget("video_receive_enabled")
-        self.audio_input_buffer_widget.set_sensitive(False)
-        self.audio_output_buffer_widget.set_sensitive(False)
+        #self.audio_input_buffer_widget.set_sensitive(False)
+        #self.audio_output_buffer_widget.set_sensitive(False)
         self.audio_receive_enabled_widget.set_sensitive(False)
         self.audio_send_enabled_widget.set_sensitive(False)
         self.audio_video_synchronized_widget.set_sensitive(False)
@@ -806,6 +806,15 @@ class Gui(object):
         self.app.config.midi_input_device = midi_input
         self.app.config.midi_output_device = midi_output
         self.app.config.midi_jitterbuffer = midi_jitterbuffer
+        
+        # audio buffers:
+        input_buffer = self.audio_input_buffer_widget.get_value_as_int()
+        output_buffer = self.audio_output_buffer_widget.get_value_as_int()
+        print " * audio_input_buffer:", input_buffer
+        print " * audio_output_buffer:", output_buffer
+        self.app.config.audio_input_buffer = input_buffer
+        self.app.config.audio_output_buffer = output_buffer
+
 
     def update_widgets_with_saved_config(self):
         """
@@ -901,6 +910,14 @@ class Gui(object):
         self.make_midi_widget_sensitive_or_not()
         self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
         self._widgets_changed_by_user = True
+
+        # audio buffers:
+        input_buffer = self.app.config.audio_input_buffer
+        output_buffer = self.app.config.audio_output_buffer
+        print " * audio_input_buffer:", input_buffer
+        print " * audio_output_buffer:", output_buffer
+        self.audio_input_buffer_widget.set_value(input_buffer)
+        self.audio_output_buffer_widget.set_value(output_buffer)
 
     def update_streaming_state(self):
         """
