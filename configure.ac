@@ -44,16 +44,18 @@ if test "x${have_glib}" = "xfalse" ; then
     AC_MSG_ERROR([Missing libglib2.0-dev])
 fi
 
-#Trying to set GTK+-2.0 using pkg-config
-PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=true, have_gtk=false)
-if test "x${have_gtk}" = "xfalse" ; then
-    AC_MSG_ERROR([Missing libgtk2.0-dev])
+AM_PATH_GTK_2_0([2.10.0],,AC_MSG_ERROR([Gtk+ 2.10.0 or higher required.]))
+
+#Trying to set GDK_CFLAGS GDK_LIBS using pkg-config
+PKG_CHECK_MODULES(GDK, [gdk-2.0], have_gdk=true, have_gdk=false)
+if test "x${have_gdk}" = "xfalse" ; then
+    AC_MSG_ERROR([gdk-2.0 not found])
 fi
 
 #Trying to set GST_CFLAGS GST_LIBS using pkg-config
 PKG_CHECK_MODULES(GST, gstreamer-0.10, have_gstreamer=true, have_gstreamer=false)
 if test "x${have_gstreamer}" = "xfalse" ; then
-    AC_MSG_ERROR([Missing libgstreamer0.10-dev GStreamer not found.])
+    AC_MSG_ERROR([Missing libgstreamer0.10-dev, gstreamer not found.])
 fi
 
 #Trying to set GSTAUDIO using pkg-config
