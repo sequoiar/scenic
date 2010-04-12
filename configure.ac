@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.60)
-AC_INIT(SCENIC, [0.5], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, [0.5.1], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])

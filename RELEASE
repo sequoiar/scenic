@@ -1,6 +1,6 @@
-Release notes for Scenic 0.5
+Release notes for Scenic 0.5.1
 
-This release adds many new experimental features. These features include MIDI transmission and VU meters. 
+This release is an other unstable version in the 0.5 series. 
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -29,48 +29,5 @@ This release adds many new experimental features. These features include MIDI tr
     only supports a subset of them. 
     * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from long term support of the new features of the 0.5 branch.
 
-Fixes in 0.5:
+Fixes in 0.5.1:
 
-#383: make VUMeter
-#398: make localaudio that pipes to a fakesink 
-#394: call gst_init and gtk_init as early as possible 
-#386: Cannot delete contacts 
-#381: audio channels widget max should be 24 
-#354: Merge all gui-interactive state variables 
-#384: Put name of selected contact in the invite button 
-#380: Preview button is not set to false when we stop the preview 
-#382: State saving for number of channels does not work for more than 8 channels 
-#352: Should be possible to select some devices with the same name 
-#293: Move the summary section out of the tabs in the GUI 
-#379: Cannot close the delete contact dialog 
-#378: Can't record audio fast enough audio messages sometimes 
-#376: milhouse --localvideo broken for dv 
-#161: ximagesink doesn't work with dv1394src 
-#375: error on cleanup of dv1394 
-#335: default audio-buffer is too big for on board sound 
-#374: convert "localhost" to 127.0.0.1 as temporary workaround for #143 
-#371: get vendor label for dv1394 
-#351: Build python doc with autotools 
-#360: Milhouse --list-cameras expects the dc1394 library? 
-#373: add README 
-#372: make shared_video compatible with AC_CHECK_LIB 
-#370: RELEASE not included in tarball by make dist 
-#356: when invite, gtkwarning gets posted 
-#355: at startup, midi widgets are sensitive even if midi is disabled 
-#328: improve gst element checking at configure-stage 
-#361: Check for all Python modules in the autotools 
-#355: at startup, midi widgets are sensitive even if midi is disabled 
-#365: Testing ticket workflow 
-#364: make distcheck broken by gst_check.py 
-#357: Add new png to makefile 
-#349: ./configure should check for python-portmidi 
-#342: Disable MIDI device widgets when MIDI is disabled 
-#341: Remove MIDI device number 
-#346: Add jitterbuffer controls for MIDI 
-#343: change MIDI tab icon 
-#345: midistream should handle SIGINT well 
-#292: Implement MIDI streaming in the GUI 
-#336: milhouse --list-cameras don't list dv1394 cameras 
-#340: midistream should accept domain names, not only IP addresses 
-#338: Cleanup in options parsing in midistream 
-#164: have receiver request caps from sender 
