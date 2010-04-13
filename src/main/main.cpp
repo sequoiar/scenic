@@ -42,13 +42,15 @@ int main(int argc, char **argv)
         }
         else
         {
-            std::cerr << "exitting with error: " << e.what() << std::endl;
+            std::cerr << "exitting with error: " << e.what();
+            std::cerr << "Please file a bug at " << PACKAGE_BUGREPORT << std::endl;
             ret = 1;
         }
     }
     catch (const std::exception &e)  // these are other exceptions (not one of our exception classes)
     {
-        std::cerr << "exitting with error: " << e.what() << std::endl;
+        std::cerr << "exitting with error: " << e.what();
+        std::cerr << "Please file a bug at " << PACKAGE_BUGREPORT << std::endl;
         ret = 1;
     }
     std::cout << "Exitting Milhouse" << std::endl;
