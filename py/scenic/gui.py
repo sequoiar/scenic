@@ -329,8 +329,6 @@ class Gui(object):
         self.audio_video_synchronized_widget = widgets_tree.get_widget("audio_video_synchronized")
         self.video_send_enabled_widget = widgets_tree.get_widget("video_send_enabled")
         self.video_receive_enabled_widget = widgets_tree.get_widget("video_receive_enabled")
-        #self.audio_input_buffer_widget.set_sensitive(False)
-        #self.audio_output_buffer_widget.set_sensitive(False)
         self.audio_receive_enabled_widget.set_sensitive(False)
         self.audio_send_enabled_widget.set_sensitive(False)
         self.audio_video_synchronized_widget.set_sensitive(False)
