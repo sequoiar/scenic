@@ -52,7 +52,6 @@ enum LogLevel {
 class Except : public std::runtime_error
 {
     public:
-        LogLevel log_;
 
         Except(const char* log_msg) : std::runtime_error(log_msg),
             log_(WARNING)
@@ -60,6 +59,8 @@ class Except : public std::runtime_error
         Except() : std::runtime_error(""),
             log_(NONE)
     {}
+    protected:
+        LogLevel log_;
 };
 
 /** Recovery should be possible */
