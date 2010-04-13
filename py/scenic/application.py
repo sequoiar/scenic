@@ -110,6 +110,8 @@ class Config(saving.ConfigStateSaving):
         self.audio_sink = "jackaudiosink"
         self.audio_codec = "raw"
         self.audio_channels = 2
+        self.audio_input_buffer = 15
+        self.audio_output_buffer = 15
         # ------------- VIDEO -------------
         self.video_source = "v4l2src"
         self.video_device = "/dev/video0"
