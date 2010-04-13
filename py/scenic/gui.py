@@ -1069,6 +1069,12 @@ class Gui(object):
                 else:
                     return ""
 
+            def _format_audio_buffer(buffer_ms):
+                """
+                Formats audio buffer in/out for the summary.
+                """
+                return _("Audio buffer: %(buffer)d ms") % {"buffer": buffer_ms}
+
             details = self.app.streamer_manager.session_details
             rtcp_stats = self.app.streamer_manager.rtcp_stats
             # send video: --------------------------------
@@ -1096,6 +1102,8 @@ class Gui(object):
                 }
             _info_send_audio += _format_bitrate(rtcp_stats["send"]["audio"]["bitrate"])
             _info_send_audio += "\n"
+            _info_send_audio += _format_audio_buffer(details["send"]["audio"]["buffer"])
+            _info_send_audio += "\n"
             #_audio_packetloss = rtcp_stats["send"]["audio"]["packets-loss-percent"]
             _info_send_audio += _("Jitter: %(jitter)d ns") % { # % is escaped with an other %
                 "jitter": rtcp_stats["send"]["audio"]["jitter"]
@@ -1121,6 +1129,9 @@ class Gui(object):
                 "codec": details["receive"]["audio"]["codec"] 
                 }
             _info_recv_audio += _format_bitrate(rtcp_stats["receive"]["audio"]["bitrate"])
+            _info_recv_audio += "\n"
+            _info_recv_audio += _format_audio_buffer(details["receive"]["audio"]["buffer"])
+            _info_recv_audio += "\n"
             self.info_receive_audio_widget.set_text(_info_recv_audio)
             # MIDI : --------------------------
             _info_recv_midi = ""
