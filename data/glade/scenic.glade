@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Tue Apr 13 12:22:15 2010 -->
+<!--Generated with glade3 3.4.5 on Tue Apr 13 12:55:51 2010 -->
 <glade-interface>
   <widget class="GtkDialog" id="confirm_dialog">
     <property name="border_width">5</property>
@@ -3083,7 +3083,7 @@ Vorbis</property>
                             <child>
                               <widget class="GtkImage" id="audio_levels_tab_icon">
                                 <property name="visible">True</property>
-                                <property name="pixbuf">levels.png</property>
+                                <property name="pixbuf">levels2.png</property>
                                 <property name="icon_size">2</property>
                               </widget>
                               <packing>
