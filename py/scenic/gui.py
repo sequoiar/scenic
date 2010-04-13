@@ -329,16 +329,8 @@ class Gui(object):
         self.audio_video_synchronized_widget = widgets_tree.get_widget("audio_video_synchronized")
         self.video_send_enabled_widget = widgets_tree.get_widget("video_send_enabled")
         self.video_receive_enabled_widget = widgets_tree.get_widget("video_receive_enabled")
-        self.audio_receive_enabled_widget.set_sensitive(False)
-        self.audio_send_enabled_widget.set_sensitive(False)
-        self.audio_video_synchronized_widget.set_sensitive(False)
-        self.video_send_enabled_widget.set_sensitive(False)
-        self.video_receive_enabled_widget.set_sensitive(False)
-        self.audio_receive_enabled_widget.set_active(True)
-        self.audio_send_enabled_widget.set_active(True)
-        self.audio_video_synchronized_widget.set_active(True)
-        self.video_send_enabled_widget.set_active(True)
-        self.video_receive_enabled_widget.set_active(True)
+
+        self.audio_video_synchronized_widget.set_sensitive(False) # TODO
 
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
@@ -720,6 +712,13 @@ class Gui(object):
         Updates the configuration with the value of each widget.
         """
         print("Gathering configuration from the GUI widgets.")
+        # VIDEO ENABLED: 
+        video_send_enabled = self.video_send_enabled_widget.get_active()
+        self.app.config.video_send_enabled = video_send_enabled
+        print " * video_send_enabled:", self.app.config.video_send_enabled
+        video_recv_enabled = self.video_receive_enabled_widget.get_active()
+        self.app.config.video_recv_enabled = video_recv_enabled
+        print " * video_recv_enabled:", self.app.config.video_recv_enabled
         # VIDEO SIZE:
         video_capture_size = _get_combobox_value(self.video_capture_size_widget)
         self.app.config.video_capture_size = video_capture_size
@@ -771,6 +770,18 @@ class Gui(object):
         print " * preview_in_window: ", preview_in_window
         
         # AUDIO:
+        # enabled: 
+        audio_send_enabled = self.audio_send_enabled_widget.get_active()
+        self.app.config.audio_send_enabled = audio_send_enabled
+        print ' * audio_send_enabled:', self.app.config.audio_send_enabled
+        audio_recv_enabled = self.audio_receive_enabled_widget.get_active()
+        self.app.config.audio_recv_enabled = audio_recv_enabled
+        print ' * audio_recv_enabled:', self.app.config.audio_recv_enabled
+        # sync: 
+        audio_video_synchronized = self.audio_video_synchronized_widget.get_active()
+        self.app.config.audio_video_synchronized = audio_video_synchronized
+        print ' * audio_video_synchronized:', self.app.config.audio_video_synchronized
+        # source, codec, channels:
         audio_source_readable = _get_combobox_value(self.audio_source_widget)
         audio_codec_readable = _get_combobox_value(self.audio_codec_widget)
         audio_numchannels = self.audio_numchannels_widget.get_value_as_int() # spinbutton
@@ -824,6 +835,13 @@ class Gui(object):
         self._widgets_changed_by_user = False
         print("Changing widgets value according to configuration.")
         print(self.app.config.__dict__)
+        # VIDEO ENABLED: 
+        video_send_enabled = self.app.config.video_send_enabled
+        print " * video_send_enabled:", video_send_enabled
+        self.video_send_enabled_widget.set_active(video_send_enabled)
+        video_recv_enabled = self.app.config.video_recv_enabled
+        print " * video_recv_enabled:", video_recv_enabled
+        self.video_receive_enabled_widget.set_active(video_recv_enabled)
         # VIDEO CAPTURE SIZE:
         video_capture_size = self.app.config.video_capture_size
         _set_combobox_choices(self.video_capture_size_widget, ALL_SUPPORTED_SIZE)
@@ -884,7 +902,20 @@ class Gui(object):
             self.invite_contact_widget.set_sensitive(False)
         # change invite button with the name of the selected contact
         self.update_invite_button_with_contact_name()
+
         # AUDIO:
+        # audio enabled:
+        audio_send_enabled = self.app.config.audio_send_enabled
+        print " * audio_send_enabled:", audio_send_enabled
+        self.audio_send_enabled_widget.set_active(audio_send_enabled)
+        audio_recv_enabled = self.app.config.audio_recv_enabled
+        print " * audio_recv_enabled:", audio_recv_enabled
+        self.audio_receive_enabled_widget.set_active(audio_recv_enabled)
+        # audio synchro:
+        audio_video_synchronized = self.app.config.audio_video_synchronized
+        print " * audio_video_synchronized:", audio_video_synchronized
+        self.audio_video_synchronized_widget.set_active(audio_video_synchronized)
+        # source, codec, channels:
         audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
         audio_numchannels = self.app.config.audio_channels
@@ -943,6 +974,8 @@ class Gui(object):
             self.audio_source_widget,
             self.audio_codec_widget,
             self.audio_numchannels_widget,
+            self.audio_output_buffer_widget,
+            self.audio_input_buffer_widget,
             self.contact_list_widget,
             self.add_contact_widget,
             self.remove_contact_widget,
@@ -957,6 +990,10 @@ class Gui(object):
             self.midi_send_enabled_widget, 
             self.midi_recv_enabled_widget,
             self.midi_jitterbuffer_widget,
+            self.audio_send_enabled_widget,
+            self.audio_receive_enabled_widget,
+            self.video_send_enabled_widget,
+            self.video_receive_enabled_widget,
             ]
         
         self.update_bitrate_and_codec()
@@ -1050,6 +1087,7 @@ class Gui(object):
             self.make_midi_widget_sensitive_or_not()
 
     def _update_rtcp_stats(self):
+        SHOW_COMMAND_LINES = True
         is_streaming = self.app.has_session()
         # update the audio and video summary:(even if the state has not just changed)
         if is_streaming:
@@ -1073,63 +1111,107 @@ class Gui(object):
                 """
                 return _("Audio buffer: %(buffer)d ms") % {"buffer": buffer_ms}
 
+            def _format_command_line(cmd):
+                """
+                Formats a bash command line for the summary.
+                """
+                words = cmd.split()
+                length = 0
+                text = ""
+                for word in words: 
+                    length += len(word)
+                    if length >= 40:
+                        text += "\n"
+                        length = 0
+                    text += word + " "
+                return _("Command %(command)s") % {"command": text}
+
             details = self.app.streamer_manager.session_details
             rtcp_stats = self.app.streamer_manager.rtcp_stats
             # send video: --------------------------------
-            _info_send_video = _("%(width)dx%(height)d %(codec)s") % {
-                "width": details["send"]["video"]["width"], 
-                "height": details["send"]["video"]["height"], 
-                "codec": details["send"]["video"]["codec"], 
-                }
-            _info_send_video += _format_bitrate(rtcp_stats["send"]["video"]["bitrate"])
-            _info_send_video += "\n"
-            #_video_packetloss = rtcp_stats["send"]["video"]["packets-loss-percent"]
-            _info_send_video += _("Jitter: %(jitter)d ns") % {# % is escaped with an other %
-                "jitter": rtcp_stats["send"]["video"]["jitter"]
-                }
+            _info_send_video = ""
+            if details["send"]["video"]["enabled"]:
+                _info_send_video += _("%(width)dx%(height)d %(codec)s") % {
+                    "width": details["send"]["video"]["width"], 
+                    "height": details["send"]["video"]["height"], 
+                    "codec": details["send"]["video"]["codec"], 
+                    }
+                _info_send_video += _format_bitrate(rtcp_stats["send"]["video"]["bitrate"])
+                _info_send_video += "\n"
+                #_video_packetloss = rtcp_stats["send"]["video"]["packets-loss-percent"]
+                _info_send_video += _("Jitter: %(jitter)d ns") % {# % is escaped with an other %
+                    "jitter": rtcp_stats["send"]["video"]["jitter"]
+                    }
+            else:
+                _info_send_video += _("Disabled")
+
+
             #_info_send_video += _("jitter: %(jitter)d ns. packet loss: %(packetloss)2.2f%%.") % {# % is escaped with an other %
             #    "jitter": rtcp_stats["send"]["video"]["jitter"],
             #    "packetloss": _video_packetloss
             #    }
             #print("info send video: " + _info_send_video)
+            if SHOW_COMMAND_LINES:
+                if self.app.streamer_manager.sender is not None:
+                    _info_send_video += "\n"
+                    _info_send_video += _format_command_line(self.app.streamer_manager.sender.command)
+                    # TODO: separate video and audio if separate
             self.info_send_video_widget.set_text(_info_send_video)
             # send audio: --------------------------------
-            _info_send_audio = _("%(numchannels)d-channel %(codec)s") % {
-                "numchannels": details["send"]["audio"]["numchannels"], 
-                "codec": details["send"]["audio"]["codec"] 
-                }
-            _info_send_audio += _format_bitrate(rtcp_stats["send"]["audio"]["bitrate"])
-            _info_send_audio += "\n"
-            _info_send_audio += _format_audio_buffer(details["send"]["audio"]["buffer"])
-            _info_send_audio += "\n"
-            #_audio_packetloss = rtcp_stats["send"]["audio"]["packets-loss-percent"]
-            _info_send_audio += _("Jitter: %(jitter)d ns") % { # % is escaped with an other %
-                "jitter": rtcp_stats["send"]["audio"]["jitter"]
-                }
-            #print("info send audio: " + _info_send_audio)
+            _info_send_audio = ""
+            if details["send"]["audio"]["enabled"]:
+                _info_send_audio += _("%(numchannels)d-channel %(codec)s") % {
+                    "numchannels": details["send"]["audio"]["numchannels"], 
+                    "codec": details["send"]["audio"]["codec"] 
+                    }
+                _info_send_audio += _format_bitrate(rtcp_stats["send"]["audio"]["bitrate"])
+                _info_send_audio += "\n"
+                _info_send_audio += _format_audio_buffer(details["send"]["audio"]["buffer"])
+                _info_send_audio += "\n"
+                #_audio_packetloss = rtcp_stats["send"]["audio"]["packets-loss-percent"]
+                _info_send_audio += _("Jitter: %(jitter)d ns") % { # % is escaped with an other %
+                    "jitter": rtcp_stats["send"]["audio"]["jitter"]
+                    }
+            else:
+                _info_send_audio += _("Disabled.")
             self.info_send_audio_widget.set_text(_info_send_audio)
             # recv video: --------------------------------
-            _info_recv_video = _("%(width)dx%(height)d %(codec)s") % {
-                "width": details["receive"]["video"]["width"], 
-                "height": details["receive"]["video"]["height"], 
-                "codec": details["receive"]["video"]["codec"], 
-                }
-            _info_recv_video += _format_bitrate(rtcp_stats["receive"]["video"]["bitrate"])
-            _info_recv_video += "\n" + _("Display: %(display)s") % {"display": details["receive"]["video"]["display"]}
-            if details["receive"]["video"]["fullscreen"]:
-                _info_recv_video += "\n" + _("Fullscreen is enabled.")
+            _info_recv_video = ""
+            if details["receive"]["video"]["enabled"]:
+                _info_recv_video += _("%(width)dx%(height)d %(codec)s") % {
+                    "width": details["receive"]["video"]["width"], 
+                    "height": details["receive"]["video"]["height"], 
+                    "codec": details["receive"]["video"]["codec"], 
+                    }
+                _info_recv_video += _format_bitrate(rtcp_stats["receive"]["video"]["bitrate"])
+                _info_recv_video += "\n" + _("Display: %(display)s") % {"display": details["receive"]["video"]["display"]}
+                if details["receive"]["video"]["fullscreen"]:
+                    _info_recv_video += "\n" + _("Fullscreen is enabled.")
+            else:
+                _info_recv_video += _("Disabled.")
+                
 
+            if SHOW_COMMAND_LINES:
+                if self.app.streamer_manager.receiver is not None:
+                    _info_recv_video += "\n"
+                    _info_recv_video += _format_command_line(self.app.streamer_manager.receiver.command)
+                    # TODO: separate video and audio if separate
             #print("info recv video: " + _info_recv_video)
             self.info_receive_video_widget.set_text(_info_recv_video)
             # recv audio: --------------------------------
-            _info_recv_audio = _("%(numchannels)d-channel %(codec)s") % {
-                "numchannels": details["receive"]["audio"]["numchannels"], 
-                "codec": details["receive"]["audio"]["codec"] 
-                }
-            _info_recv_audio += _format_bitrate(rtcp_stats["receive"]["audio"]["bitrate"])
-            _info_recv_audio += "\n"
-            _info_recv_audio += _format_audio_buffer(details["receive"]["audio"]["buffer"])
-            _info_recv_audio += "\n"
+            _info_recv_audio = ''
+            if details["receive"]["audio"]["enabled"]:
+                _info_recv_audio = _("%(numchannels)d-channel %(codec)s") % {
+                    "numchannels": details["receive"]["audio"]["numchannels"], 
+                    "codec": details["receive"]["audio"]["codec"] 
+                    }
+                _info_recv_audio += _format_bitrate(rtcp_stats["receive"]["audio"]["bitrate"])
+                _info_recv_audio += "\n"
+                _info_recv_audio += _format_audio_buffer(details["receive"]["audio"]["buffer"])
+                _info_recv_audio += "\n"
+            else:
+                _info_recv_audio += _("Disabled.")
+
             self.info_receive_audio_widget.set_text(_info_recv_audio)
             # MIDI : --------------------------
             _info_recv_midi = ""

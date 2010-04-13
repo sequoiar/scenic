@@ -104,8 +104,12 @@ class Config(saving.ConfigStateSaving):
         # Default values
         self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
         self.smtpserver = "smtp.sat.qc.ca" 
+        # ----------- MISC --------------
+        self.email_info = "scenic@sat.qc.ca" 
         # ----------- AUDIO --------------
-        self.email_info = "scenic@sat.qc.ca"
+        self.audio_send_enabled = True
+        self.audio_recv_enabled = True
+        self.audio_video_synchronized = True # we configure what we receive
         self.audio_source = "jackaudiosrc"
         self.audio_sink = "jackaudiosink"
         self.audio_codec = "raw"
@@ -113,6 +117,8 @@ class Config(saving.ConfigStateSaving):
         self.audio_input_buffer = 15
         self.audio_output_buffer = 15
         # ------------- VIDEO -------------
+        self.video_send_enabled = True
+        self.video_recv_enabled = True
         self.video_source = "v4l2src"
         self.video_device = "/dev/video0"
         self.video_deinterlace = False
@@ -654,8 +660,27 @@ class Application(object):
 
     # -------------------------- actions on streamer manager --------
 
+    def _check_if_all_disabled(self):
+        """
+        Checks if al the streams are disabled.
+        @rettype: bool
+        """
+        send_video = self.remote_config["video"]["recv_enabled"] and self.config.video_send_enabled
+        send_audio = self.remote_config["audio"]["recv_enabled"] and self.config.audio_send_enabled
+        recv_audio = self.remote_config["audio"]["send_enabled"] and self.config.audio_recv_enabled
+        recv_video = self.remote_config["video"]["send_enabled"] and self.config.video_recv_enabled
+        recv_midi = self.remote_config["midi"]["send_enabled"] and self.config.midi_recv_enabled
+        send_midi = self.remote_config["midi"]["recv_enabled"] and self.config.midi_send_enabled
+        return not send_video and not send_audio and not recv_audio and not recv_video and not send_midi and not recv_midi
+    
     def start_streamers(self, addr):
-        self.streamer_manager.start(addr)
+        if self._check_if_all_disabled():
+            error_msg = _("Cannot start streaming if all the streams are disabled.")
+            dialogs.ErrorDialog.create(error_msg, parent=self.gui.main_window)
+            self.send_bye()
+            self.stop_streamers()
+        else:
+            self.streamer_manager.start(addr)
 
     def stop_streamers(self):
         # TODO: return a deferred. 
@@ -698,6 +723,8 @@ class Application(object):
         """
         return {
             "video": {
+                "send_enabled": self.config.video_send_enabled,
+                "recv_enabled": self.config.video_recv_enabled,
                 "codec": self.config.video_codec,
                 "bitrate": self.config.video_bitrate, # float Mbps
                 "port": self.recv_video_port,
@@ -705,6 +732,9 @@ class Application(object):
                 "capture_size": self.config.video_capture_size 
                 },
             "audio": {
+                "synchronized": self.config.audio_video_synchronized,
+                "send_enabled": self.config.audio_send_enabled,
+                "recv_enabled": self.config.audio_recv_enabled,
                 "codec": self.config.audio_codec,
                 "numchannels": self.config.audio_channels,
                 "port": self.recv_audio_port
