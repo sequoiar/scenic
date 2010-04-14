@@ -270,8 +270,10 @@ class StreamerManager(object):
         recv_audio_enabled = self.session_details["receive"]["audio"]["enabled"]
         midi_recv_enabled = self.session_details["receive"]["midi"]["enabled"]
         midi_send_enabled = self.session_details["send"]["midi"]["enabled"]
-        extra_send_enabled = not self.session_details["send"]["audio"]["synchronized"]
-        extra_recv_enabled = not self.session_details["receive"]["audio"]["synchronized"]
+        extra_send_enabled = not self.session_details["send"]["audio"]["synchronized"] and send_audio_enabled
+        extra_recv_enabled = not self.session_details["receive"]["audio"]["synchronized"] and recv_audio_enabled
+        normal_recv_enabled = recv_video_enabled or recv_audio_enabled and not extra_recv_enabled # if the self.sender and self.receiver are enabled
+        normal_send_enabled = send_video_enabled or send_audio_enabled and not extra_send_enabled
         if not send_audio_enabled and not send_video_enabled and not midi_send_enabled and not midi_recv_enabled and not recv_audio_enabled and not recv_video_enabled:
             raise RuntimeError("Everything is disabled, but the application is trying to start to stream. This should not happen.") # the programmer has done a mistake if we're here.
 
@@ -280,7 +282,7 @@ class StreamerManager(object):
         print "recv_video_enabled", recv_video_enabled
         print "recv_audio_enabled", recv_audio_enabled
         print "midi_recv_enabled", midi_recv_enabled 
-        print "midi_send_enabled", midi_send_enabled         
+        print "midi_send_enabled", midi_send_enabled
 
         # we store the arguments in lists
         milhouse_send_cmd_common = []
@@ -385,10 +387,11 @@ class StreamerManager(object):
                 milhouse_recv_cmd_final.extend(milhouse_recv_cmd_audio)
             recv_cmd = " ".join(milhouse_recv_cmd_final)
             extra_recv_cmd = " ".join(milhouse_recv_cmd_extra)
-            self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
-            self.receiver.state_changed_signal.connect(self.on_process_state_changed)
-            self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
-            self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
+            if normal_recv_enabled:
+                self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
+                self.receiver.state_changed_signal.connect(self.on_process_state_changed)
+                self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
+                self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
             if extra_recv_enabled:
                 self.extra_receiver = process.ProcessManager(command=extra_recv_cmd, identifier="extra_receiver")
                 self.extra_receiver.state_changed_signal.connect(self.on_process_state_changed)
@@ -408,10 +411,11 @@ class StreamerManager(object):
                 milhouse_send_cmd_final.extend(milhouse_send_cmd_audio)
             send_cmd = " ".join(milhouse_send_cmd_final)
             extra_send_cmd = " ".join(milhouse_send_cmd_extra)
-            self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
-            self.sender.state_changed_signal.connect(self.on_process_state_changed)
-            self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
-            self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
+            if normal_send_enabled:
+                self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
+                self.sender.state_changed_signal.connect(self.on_process_state_changed)
+                self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
+                self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
             if extra_send_enabled:
                 self.extra_sender = process.ProcessManager(command=extra_send_cmd, identifier="extra_sender")
                 self.extra_sender.state_changed_signal.connect(self.on_process_state_changed)
