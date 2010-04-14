@@ -184,8 +184,9 @@ class Application(object):
 
     The devices attributes is a very interesting dict. See the source code.
     """
-    def __init__(self, kiosk_mode=False, fullscreen=False, log_file_name=None):
+    def __init__(self, kiosk_mode=False, fullscreen=False, log_file_name=None, enable_debug=False):
         self.config = Config()
+        self.enable_debug = enable_debug
         self.log_file_name = log_file_name
         self.recv_video_port = None
         self.recv_audio_port = None
@@ -203,7 +204,7 @@ class Application(object):
         self.got_bye = False 
         # starting the GUI:
         internationalization.setup_i18n()
-        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
+        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self.devices = {
             "x11_displays": [], # list of dicts
             "cameras": {}, # dict of dicts (only V4L2 cameras for now)
