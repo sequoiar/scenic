@@ -373,8 +373,11 @@ class StreamerManager(object):
         # TODO: if both disabled, do not start sender/receiver
         # ---- audio/video receiver ----
         if recv_audio_enabled or recv_video_enabled: # receiver(s)
-            milhouse_recv_cmd_final = milhouse_recv_cmd_common 
-            milhouse_recv_cmd_extra = milhouse_recv_cmd_common
+            milhouse_recv_cmd_final = []
+            milhouse_recv_cmd_extra = []
+            
+            milhouse_recv_cmd_final.extend(milhouse_recv_cmd_common)
+            milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_common)
             milhouse_recv_cmd_final.extend(milhouse_recv_cmd_video)
             if extra_recv_enabled:
                 milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_audio)
@@ -393,8 +396,11 @@ class StreamerManager(object):
                 self.extra_receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
         # ---- audio/video sender ----
         if send_audio_enabled or send_video_enabled: # sender(s)
-            milhouse_send_cmd_final = milhouse_send_cmd_common 
-            milhouse_send_cmd_extra = milhouse_send_cmd_common # only used if we have to
+            milhouse_send_cmd_final = []
+            milhouse_send_cmd_extra = []
+            
+            milhouse_send_cmd_final.extend(milhouse_send_cmd_common)
+            milhouse_send_cmd_extra.extend(milhouse_send_cmd_common) # only used if we have to
             milhouse_send_cmd_final.extend(milhouse_send_cmd_video)
             if extra_send_enabled:
                 milhouse_send_cmd_extra.extend(milhouse_send_cmd_audio)
