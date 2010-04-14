@@ -21,6 +21,8 @@
 
 """
 Scenic GTK GUI.
+
+For more documentation on how the configuration option values are gathered and updated from and to GUI widgets, see scenic/application.py
 """
 
 import os
@@ -119,7 +121,8 @@ def _set_combobox_choices(widget, choices=[]):
     for choice in choices:
         tree_model.append([choice])
     widget.set_model(tree_model)
-    _set_combobox_value(widget, previous_value)
+    if previous_value != " ": # we put empty spaces in glade as value, but this is not a real value, and we get rid of it.
+        _set_combobox_value(widget, previous_value)
 
 def _set_combobox_value(widget, value=None):
     """
@@ -140,7 +143,7 @@ def _set_combobox_value(widget, value=None):
         widget.set_active(index)
     else:
         widget.set_active(0) # FIXME: -1)
-        msg = "ComboBox widget %s doesn't have value %s." % (widget, value)
+        msg = "ComboBox widget %s doesn't have value \"%s\"." % (widget, value)
         print msg
 
 #videotestsrc legible name:
@@ -331,7 +334,7 @@ class Gui(object):
         self.video_send_enabled_widget = widgets_tree.get_widget("video_send_enabled")
         self.video_receive_enabled_widget = widgets_tree.get_widget("video_receive_enabled")
 
-        self.audio_video_synchronized_widget.set_sensitive(False) # TODO
+        #self.audio_video_synchronized_widget.set_sensitive(False) # TODO
 
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
@@ -342,7 +345,8 @@ class Gui(object):
             print "Removing tab number %d." % (tab_num)
             self.main_tabs_widget.remove_page(tab_num)
 
-        if not enable_debug:
+        self.enable_debug = enable_debug
+        if not self.enable_debug: # hide the tab if not in debug
             # Removes the debug_tab 
             tab_num = self.main_tabs_widget.page_num(self.debug_tab_contents_widget)
             print "Removing tab number %d." % (tab_num)
@@ -374,6 +378,8 @@ class Gui(object):
         def _start_update_id():
             self._update_id_task.start(10.0, now=True)
         reactor.callLater(0, _start_update_id)
+
+        self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
         # The main app must call init_widgets_value
    
     #TODO: for the preview in the drawing area   
@@ -718,120 +724,55 @@ class Gui(object):
         """
         Updates the configuration with the value of each widget.
         """
+        def _set_config(attribute_name, value):
+            """
+            Sets a configuration entry value and prints it.
+            """
+            setattr(self.app.config, attribute_name, value)
+            print " * %s: %s" % (attribute_name, getattr(self.app.config, attribute_name))
+
         print("Gathering configuration from the GUI widgets.")
-        # VIDEO ENABLED: 
-        video_send_enabled = self.video_send_enabled_widget.get_active()
-        self.app.config.video_send_enabled = video_send_enabled
-        print " * video_send_enabled:", self.app.config.video_send_enabled
-        video_recv_enabled = self.video_receive_enabled_widget.get_active()
-        self.app.config.video_recv_enabled = video_recv_enabled
-        print " * video_recv_enabled:", self.app.config.video_recv_enabled
-        # VIDEO SIZE:
-        video_capture_size = _get_combobox_value(self.video_capture_size_widget)
-        self.app.config.video_capture_size = video_capture_size
-        print ' * video_capture_size:', self.app.config.video_capture_size
-        # DISPLAY:
-        video_display = _get_combobox_value(self.video_display_widget)
-        self.app.config.video_display = video_display
-        print ' * video_display:', self.app.config.video_display
-        # VIDEO SOURCE AND DEVICE:
+        # VIDEO:
+        _set_config("video_send_enabled", self.video_send_enabled_widget.get_active())
+        _set_config("video_recv_enabled", self.video_receive_enabled_widget.get_active())
+        _set_config("video_capture_size", _get_combobox_value(self.video_capture_size_widget))
+        _set_config("video_display", _get_combobox_value(self.video_display_widget))
         video_source = _get_combobox_value(self.video_source_widget)
         if video_source == "Color bars":
-            self.app.config.video_source = "videotestsrc"
+            _set_config("video_source", "videotestsrc")
         else:
             #video_device = self.app.parse_v4l2_device_name(video_source)
             #if video_device is None:
             #    print "Could not find video device %s" % (video_source)
             #elif video_source.startswith("/dev/video"): # TODO: firewire!
             #TODO: check if it is a v4l2 device.
-            self.app.config.video_source = "v4l2src"
-            self.app.config.video_device = video_source # Using the name and id as a video_device
-        print ' * videosource:', self.app.config.video_source
-        # VIDEO CODEC:
-        video_codec = _get_combobox_value(self.video_codec_widget)
-        self.app.config.video_codec = VIDEO_CODECS[video_codec]
-        print ' * video_codec:', self.app.config.video_codec
-        # VIDEO ASPECT RATIO:
-        video_aspect_ratio = _get_combobox_value(self.aspect_ratio_widget)
-        self.app.config.video_aspect_ratio = video_aspect_ratio
-        print ' * video_aspect_ratio:', self.app.config.video_aspect_ratio
-        #VIDEO FULLSCREEN
-        video_fullscreen = self.video_fullscreen_widget.get_active()
-        self.app.config.video_fullscreen = video_fullscreen
-        print ' * video_fullscreen:', self.app.config.video_fullscreen
-        #VIDEO DEINTERLACE
-        video_deinterlace = self.video_deinterlace_widget.get_active()
-        self.app.config.video_deinterlace = video_deinterlace
-        print ' * video_deinterlace:', self.app.config.video_deinterlace
-        # VIDEO JITTERBUFFER
-        video_jitterbuffer = self.video_jitterbuffer_widget.get_value_as_int() # spinbutton
-        self.app.config.video_jitterbuffer = video_jitterbuffer
-        print ' * video_jitterbuffer:', self.app.config.video_jitterbuffer
-        # VIDEO BITRATE
-        video_bitrate = self.video_bitrate_widget.get_value() # spinbutton (float)
-        self.app.config.video_bitrate = float(video_bitrate)
-        print ' * video_bitrate:', self.app.config.video_bitrate
-        # VIDEO PREVIEW
-        preview_in_window = self.preview_in_window_widget.get_active()
-        self.app.config.preview_in_window = preview_in_window
-        print " * preview_in_window: ", preview_in_window
+            _set_config("video_source", "v4l2src")
+            _set_config("video_device", video_source) # Using the name and id as a video_device
+        _set_config("video_codec", VIDEO_CODECS[_get_combobox_value(self.video_codec_widget)])
+        _set_config("video_aspect_ratio", _get_combobox_value(self.aspect_ratio_widget))
+        _set_config("video_fullscreen", self.video_fullscreen_widget.get_active())
+        _set_config("video_deinterlace",  self.video_deinterlace_widget.get_active())
+        _set_config("video_jitterbuffer", self.video_jitterbuffer_widget.get_value_as_int()) # spinbutton
+        _set_config("video_bitrate", float(self.video_bitrate_widget.get_value())) # spinbutton (float)
+        _set_config("preview_in_window", self.preview_in_window_widget.get_active())
         
         # AUDIO:
-        # enabled: 
-        audio_send_enabled = self.audio_send_enabled_widget.get_active()
-        self.app.config.audio_send_enabled = audio_send_enabled
-        print ' * audio_send_enabled:', self.app.config.audio_send_enabled
-        audio_recv_enabled = self.audio_receive_enabled_widget.get_active()
-        self.app.config.audio_recv_enabled = audio_recv_enabled
-        print ' * audio_recv_enabled:', self.app.config.audio_recv_enabled
-        # sync: 
-        audio_video_synchronized = self.audio_video_synchronized_widget.get_active()
-        self.app.config.audio_video_synchronized = audio_video_synchronized
-        print ' * audio_video_synchronized:', self.app.config.audio_video_synchronized
-        # source, codec, channels:
-        audio_source_readable = _get_combobox_value(self.audio_source_widget)
-        audio_codec_readable = _get_combobox_value(self.audio_codec_widget)
-        audio_numchannels = self.audio_numchannels_widget.get_value_as_int() # spinbutton
-        print " * audio_source:", audio_source_readable
-        print " * audio_codec:", audio_codec_readable
-        print " * audio_numchannels:", audio_numchannels
-        self.app.config.audio_source = AUDIO_SOURCES[audio_source_readable]
-        self.app.config.audio_codec = AUDIO_CODECS[audio_codec_readable]
-        # FIXME: the interface should already prevent this case from happening
-        if audio_numchannels > 2 and self.app.config.audio_codec == "mp3":
-            print("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels.")
-            print("This should have been prevented by the widgets logic iteself. Not likely to occur.")
-            dialogs.ErrorDialog.create(_("Will receive 2 channels, since the MP3 codec allows a maximum of 2 channels."))
-            audio_numchannels = 2
-        self.app.config.audio_channels = audio_numchannels
-        print " * audio_numchannels", self.app.config.audio_channels
+        _set_config("audio_send_enabled", self.audio_send_enabled_widget.get_active())
+        _set_config("audio_recv_enabled", self.audio_receive_enabled_widget.get_active())
+        _set_config("audio_video_synchronized", self.audio_video_synchronized_widget.get_active())
+        _set_config("audio_source", AUDIO_SOURCES[_get_combobox_value(self.audio_source_widget)])
+        _set_config("audio_codec", AUDIO_CODECS[_get_combobox_value(self.audio_codec_widget)])
+        _set_config("audio_numchannels", self.audio_numchannels_widget.get_value_as_int()) # spinbutton
+        _set_config("audio_input_buffer", self.audio_input_buffer_widget.get_value_as_int())
+        _set_config("audio_output_buffer", self.audio_output_buffer_widget.get_value_as_int())
         
         # MIDI:
-        midi_send_enabled = self.midi_send_enabled_widget.get_active()
-        midi_recv_enabled = self.midi_recv_enabled_widget.get_active()
-        midi_input = _get_combobox_value(self.midi_input_device_widget)
-        midi_output = _get_combobox_value(self.midi_output_device_widget)
-        midi_jitterbuffer = self.midi_jitterbuffer_widget.get_value_as_int() 
-        print " * midi_send_enabled:", midi_send_enabled
-        print " * midi_recv_enabled:", midi_recv_enabled
-        print " * midi_input_device:", midi_input
-        print " * midi_output_device:", midi_output
-        print " * midi_jitterbuffer:", midi_jitterbuffer
-        self.app.config.midi_send_enabled = midi_send_enabled
-        self.app.config.midi_recv_enabled = midi_recv_enabled
-        self.app.config.midi_input_device = midi_input
-        self.app.config.midi_output_device = midi_output
-        self.app.config.midi_jitterbuffer = midi_jitterbuffer
+        _set_config("midi_send_enabled", self.midi_send_enabled_widget.get_active())
+        _set_config("midi_recv_enabled", self.midi_recv_enabled_widget.get_active())
+        _set_config("midi_input_device", _get_combobox_value(self.midi_input_device_widget))
+        _set_config("midi_output_device", _get_combobox_value(self.midi_output_device_widget))
+        _set_config("midi_jitterbuffer", self.midi_jitterbuffer_widget.get_value_as_int())
         
-        # audio buffers:
-        input_buffer = self.audio_input_buffer_widget.get_value_as_int()
-        output_buffer = self.audio_output_buffer_widget.get_value_as_int()
-        print " * audio_input_buffer:", input_buffer
-        print " * audio_output_buffer:", output_buffer
-        self.app.config.audio_input_buffer = input_buffer
-        self.app.config.audio_output_buffer = output_buffer
-
-
     def update_widgets_with_saved_config(self):
         """
         Called once at startup.
@@ -839,60 +780,37 @@ class Gui(object):
          * Sets the value of each widget according to the data stored in the configuration file.
         It could be called again, once another config file has been read.
         """
+        def _get_config(attribute_name):
+            value = getattr(self.app.config, attribute_name)
+            print " * %s: %s" % (attribute_name, value)
+            return value
+
         self._widgets_changed_by_user = False
         print("Changing widgets value according to configuration.")
-        print(self.app.config.__dict__)
-        # VIDEO ENABLED: 
-        video_send_enabled = self.app.config.video_send_enabled
-        print " * video_send_enabled:", video_send_enabled
-        self.video_send_enabled_widget.set_active(video_send_enabled)
-        video_recv_enabled = self.app.config.video_recv_enabled
-        print " * video_recv_enabled:", video_recv_enabled
-        self.video_receive_enabled_widget.set_active(video_recv_enabled)
-        # VIDEO CAPTURE SIZE:
-        video_capture_size = self.app.config.video_capture_size
+        #print(self.app.config.__dict__)
+        # VIDEO:
+        self.video_send_enabled_widget.set_active(_get_config("video_send_enabled"))
+        self.video_receive_enabled_widget.set_active(_get_config("video_recv_enabled"))
         _set_combobox_choices(self.video_capture_size_widget, ALL_SUPPORTED_SIZE)
-        _set_combobox_value(self.video_capture_size_widget, video_capture_size)
-        print ' * video_capture_size:', video_capture_size
-        # DISPLAY:
-        video_display = self.app.config.video_display
-        _set_combobox_value(self.video_display_widget, video_display)
-        print ' * video_display:', video_display
+        _set_combobox_value(self.video_capture_size_widget, _get_config("video_capture_size"))
+        _set_combobox_value(self.video_display_widget, _get_config("video_display"))
+        _set_combobox_value(self.aspect_ratio_widget, _get_config("video_aspect_ratio"))
+        self.video_fullscreen_widget.set_active(_get_config("video_fullscreen"))
+        self.video_deinterlace_widget.set_active(_get_config("video_deinterlace"))
+        self.video_jitterbuffer_widget.set_value(_get_config("video_jitterbuffer")) # spinbutton
+        self.video_bitrate_widget.set_value(_get_config("video_bitrate")) # spinbutton
+        self.preview_in_window_widget.set_active(_get_config("preview_in_window"))
         # VIDEO SOURCE AND DEVICE:
         if self.app.config.video_source == "videotestsrc":
             video_source = "Color bars"
         elif self.app.config.video_source == "v4l2src":
             video_source = self.app.config.video_device
         _set_combobox_value(self.video_source_widget, video_source)
-        print ' * videosource:', video_source
+        print ' * video_source:', video_source
         # VIDEO CODEC:
         video_codec = _get_key_for_value(VIDEO_CODECS, self.app.config.video_codec)
         _set_combobox_value(self.video_codec_widget, video_codec)
         print ' * video_codec:', video_codec
-        # VIDEO ASPECT RATIO:
-        video_aspect_ratio = self.app.config.video_aspect_ratio
-        _set_combobox_value(self.aspect_ratio_widget, video_aspect_ratio)
-        print ' * video_aspect_ratio:', video_aspect_ratio
-        # VIDEO FULLSCREEN:
-        video_fullscreen = self.app.config.video_fullscreen
-        self.video_fullscreen_widget.set_active(video_fullscreen)
-        print ' * video_fullscreen:', video_fullscreen
-        # VIDEO DEINTERLACE:
-        video_deinterlace = self.app.config.video_deinterlace
-        self.video_deinterlace_widget.set_active(video_deinterlace)
-        print ' * video_deinterlace:', video_deinterlace
-        # VIDEO JITTERBUFFER
-        video_jitterbuffer = self.app.config.video_jitterbuffer
-        self.video_jitterbuffer_widget.set_value(video_jitterbuffer) # spinbutton
-        print ' * video_jitterbuffer:', video_jitterbuffer
-        # VIDEO BITRATE
-        video_bitrate = self.app.config.video_bitrate
-        self.video_bitrate_widget.set_value(video_bitrate) # spinbutton
-        print ' * video_bitrate:', video_bitrate
-        # VIDEO PREVIEW
-        preview_in_window = self.app.config.preview_in_window
-        self.preview_in_window_widget.set_active(preview_in_window)
-        print " * preview_in_window: ", preview_in_window
         
         # ADDRESSBOOK:
         # Init addressbook contact list:
@@ -911,49 +829,31 @@ class Gui(object):
         self.update_invite_button_with_contact_name()
 
         # AUDIO:
-        # audio enabled:
-        audio_send_enabled = self.app.config.audio_send_enabled
-        print " * audio_send_enabled:", audio_send_enabled
-        self.audio_send_enabled_widget.set_active(audio_send_enabled)
-        audio_recv_enabled = self.app.config.audio_recv_enabled
-        print " * audio_recv_enabled:", audio_recv_enabled
-        self.audio_receive_enabled_widget.set_active(audio_recv_enabled)
-        # audio synchro:
-        audio_video_synchronized = self.app.config.audio_video_synchronized
-        print " * audio_video_synchronized:", audio_video_synchronized
-        self.audio_video_synchronized_widget.set_active(audio_video_synchronized)
-        # source, codec, channels:
+        self.audio_send_enabled_widget.set_active(_get_config("audio_send_enabled"))
+        self.audio_receive_enabled_widget.set_active(_get_config("audio_recv_enabled"))
+        self.audio_video_synchronized_widget.set_active(_get_config("audio_video_synchronized"))
+        self.audio_numchannels_widget.set_value(_get_config("audio_channels")) # spinbutton
+        self.audio_input_buffer_widget.set_value(_get_config("audio_input_buffer"))
+        self.audio_output_buffer_widget.set_value(_get_config("audio_output_buffer"))
+        # source, codec
         audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
-        audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
-        audio_numchannels = self.app.config.audio_channels
         print " * audio_source:", audio_source_readable
-        print " * audio_codec:", audio_codec
-        print " * audio_numchannels:", audio_numchannels
-        self.audio_numchannels_widget.set_value(audio_numchannels) # spinbutton
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
+        audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
+        print " * audio_codec:", audio_codec
         _set_combobox_value(self.audio_codec_widget, audio_codec)
         
         # MIDI:
-        print "MIDI send enabled:", self.app.config.midi_send_enabled
-        print "MIDI recv enabled:", self.app.config.midi_recv_enabled
-        print "MIDI input:", self.app.config.midi_input_device
-        print "MIDI output:", self.app.config.midi_output_device
         print "MIDI jitterbuffer:", self.app.config.midi_jitterbuffer
-        self.midi_send_enabled_widget.set_active(self.app.config.midi_send_enabled)
-        self.midi_recv_enabled_widget.set_active(self.app.config.midi_recv_enabled)
-        _set_combobox_value(self.midi_input_device_widget, self.app.config.midi_input_device)
-        _set_combobox_value(self.midi_output_device_widget, self.app.config.midi_output_device)
+        self.midi_send_enabled_widget.set_active(_get_config("midi_send_enabled"))
+        self.midi_recv_enabled_widget.set_active(_get_config("midi_recv_enabled"))
+        _set_combobox_value(self.midi_input_device_widget, _get_config("midi_input_device"))
+        _set_combobox_value(self.midi_output_device_widget, _get_config("midi_output_device"))
         self.make_midi_widget_sensitive_or_not()
         self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
-        self._widgets_changed_by_user = True
 
-        # audio buffers:
-        input_buffer = self.app.config.audio_input_buffer
-        output_buffer = self.app.config.audio_output_buffer
-        print " * audio_input_buffer:", input_buffer
-        print " * audio_output_buffer:", output_buffer
-        self.audio_input_buffer_widget.set_value(input_buffer)
-        self.audio_output_buffer_widget.set_value(output_buffer)
+        # IMPORTANT: (to be done last)
+        self._widgets_changed_by_user = True
 
     def update_streaming_state(self):
         """
@@ -1094,7 +994,6 @@ class Gui(object):
             self.make_midi_widget_sensitive_or_not()
 
     def _update_rtcp_stats(self):
-        SHOW_COMMAND_LINES = True
         is_streaming = self.app.has_session()
         # update the audio and video summary:(even if the state has not just changed)
         if is_streaming:
@@ -1122,16 +1021,17 @@ class Gui(object):
                 """
                 Formats a bash command line for the summary.
                 """
-                words = cmd.split()
-                length = 0
-                text = ""
-                for word in words: 
-                    length += len(word)
-                    if length >= 40:
-                        text += "\n"
-                        length = 0
-                    text += word + " "
-                return _("Command %(command)s") % {"command": text}
+                text = cmd
+                #words = cmd.split()
+                #length = 0
+                #text = ""
+                #for word in words: 
+                #    length += len(word)
+                #    if length >= 40:
+                #        text += "\n"
+                #        length = 0
+                #    text += word + " "
+                return _("$ %(command)s") % {"command": text} 
 
             details = self.app.streamer_manager.session_details
             rtcp_stats = self.app.streamer_manager.rtcp_stats
@@ -1152,18 +1052,14 @@ class Gui(object):
             else:
                 _info_send_video += _("Disabled")
 
-
             #_info_send_video += _("jitter: %(jitter)d ns. packet loss: %(packetloss)2.2f%%.") % {# % is escaped with an other %
             #    "jitter": rtcp_stats["send"]["video"]["jitter"],
             #    "packetloss": _video_packetloss
             #    }
             #print("info send video: " + _info_send_video)
-            if SHOW_COMMAND_LINES:
-                if self.app.streamer_manager.sender is not None:
-                    _info_send_video += "\n"
-                    _info_send_video += _format_command_line(self.app.streamer_manager.sender.command)
-                    # TODO: separate video and audio if separate
             self.info_send_video_widget.set_text(_info_send_video)
+            
+            
             # send audio: --------------------------------
             _info_send_audio = ""
             if details["send"]["audio"]["enabled"]:
@@ -1197,12 +1093,6 @@ class Gui(object):
             else:
                 _info_recv_video += _("Disabled.")
                 
-
-            if SHOW_COMMAND_LINES:
-                if self.app.streamer_manager.receiver is not None:
-                    _info_recv_video += "\n"
-                    _info_recv_video += _format_command_line(self.app.streamer_manager.receiver.command)
-                    # TODO: separate video and audio if separate
             #print("info recv video: " + _info_recv_video)
             self.info_receive_video_widget.set_text(_info_recv_video)
             # recv audio: --------------------------------
@@ -1237,13 +1127,23 @@ class Gui(object):
                 
             self.info_receive_midi_widget.set_text(_info_recv_midi)
             self.info_send_midi_widget.set_text(_info_send_midi)
-        else:
+
+            if self.enable_debug:
+                _debug_text = ""
+                _debug_text += _("Command lines:") + "\n"
+                for command in self.app.streamer_manager.get_command_lines():
+                    _debug_text += _format_command_line(command) + "\n"
+                self.debug_textview_widget.get_buffer().set_text(unicode(_debug_text))
+            
+        else: # not streaming
             self.info_send_video_widget.set_text("")
             self.info_send_audio_widget.set_text("")
             self.info_receive_video_widget.set_text("")
             self.info_receive_audio_widget.set_text("")
             self.info_receive_midi_widget.set_text("")
             self.info_send_midi_widget.set_text("")
+            if self.enable_debug:
+                self.debug_textview_widget.get_buffer().set_text(u"")
         
     def update_local_ip(self):
         """
