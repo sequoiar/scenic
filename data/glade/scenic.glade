@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Wed Apr 14 12:40:17 2010 -->
+<!--Generated with glade3 3.4.5 on Wed Apr 14 15:07:24 2010 -->
 <glade-interface>
   <widget class="GtkDialog" id="confirm_dialog">
     <property name="border_width">5</property>
@@ -804,6 +804,8 @@
         </child>
         <child>
           <widget class="GtkScrolledWindow" id="scrolledwindow1">
+            <property name="width_request">640</property>
+            <property name="height_request">480</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
@@ -1303,7 +1305,7 @@
                         <property name="border_width">10</property>
                         <signal name="switch_page" handler="on_main_tabs_switch_page"/>
                         <child>
-                          <widget class="GtkTable" id="table2">
+                          <widget class="GtkTable" id="statistics_tab_contents">
                             <property name="visible">True</property>
                             <property name="n_rows">10</property>
                             <property name="n_columns">2</property>
@@ -1627,7 +1629,7 @@
                           </widget>
                         </child>
                         <child>
-                          <widget class="GtkHBox" id="hbox4">
+                          <widget class="GtkHBox" id="statistics_tab">
                             <property name="visible">True</property>
                             <child>
                               <widget class="GtkImage" id="info_image">
@@ -1642,7 +1644,7 @@
                                 <property name="xalign">0</property>
                                 <property name="yalign">0.20000000298023224</property>
                                 <property name="xpad">2</property>
-                                <property name="label" translatable="yes">Summary</property>
+                                <property name="label" translatable="yes">Statistics</property>
                               </widget>
                               <packing>
                                 <property name="expand">False</property>
@@ -1691,27 +1693,21 @@
                                                     <property name="n_rows">6</property>
                                                     <property name="n_columns">2</property>
                                                     <child>
-                                                      <widget class="GtkLabel" id="label188">
-                                                        <property name="visible">True</property>
-                                                        <property name="xalign">1</property>
-                                                        <property name="xpad">5</property>
-                                                        <property name="label" translatable="yes">Enabled:</property>
-                                                      </widget>
-                                                    </child>
-                                                    <child>
                                                       <widget class="GtkCheckButton" id="video_send_enabled">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
+                                                        <property name="label" translatable="yes">Enable</property>
                                                         <property name="use_underline">True</property>
                                                         <property name="xalign">1</property>
                                                         <property name="response_id">0</property>
                                                         <property name="draw_indicator">True</property>
                                                       </widget>
                                                       <packing>
-                                                        <property name="left_attach">1</property>
-                                                        <property name="right_attach">2</property>
                                                         <property name="x_padding">5</property>
                                                       </packing>
+                                                    </child>
+                                                    <child>
+                                                      <placeholder/>
                                                     </child>
                                                     <child>
                                                       <widget class="GtkLabel" id="video_input_source_label">
@@ -1975,24 +1971,18 @@ PAL</property>
                                               <widget class="GtkCheckButton" id="video_receive_enabled">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
+                                                <property name="label" translatable="yes">Enable</property>
                                                 <property name="use_underline">True</property>
                                                 <property name="xalign">1</property>
                                                 <property name="response_id">0</property>
                                                 <property name="draw_indicator">True</property>
                                               </widget>
                                               <packing>
-                                                <property name="left_attach">1</property>
-                                                <property name="right_attach">2</property>
                                                 <property name="x_padding">5</property>
                                               </packing>
                                             </child>
                                             <child>
-                                              <widget class="GtkLabel" id="label30">
-                                                <property name="visible">True</property>
-                                                <property name="xalign">1</property>
-                                                <property name="xpad">5</property>
-                                                <property name="label" translatable="yes">Enabled:</property>
-                                              </widget>
+                                              <placeholder/>
                                             </child>
                                             <child>
                                               <widget class="GtkLabel" id="label14">
@@ -2350,6 +2340,25 @@ Theora</property>
                                             <property name="n_columns">2</property>
                                             <property name="homogeneous">True</property>
                                             <child>
+                                              <widget class="GtkCheckButton" id="audio_send_enabled">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="label" translatable="yes">Enable</property>
+                                                <property name="use_underline">True</property>
+                                                <property name="xalign">1</property>
+                                                <property name="response_id">0</property>
+                                                <property name="draw_indicator">True</property>
+                                                <signal name="toggled" handler="on_audio_send_enabled_toggled"/>
+                                              </widget>
+                                              <packing>
+                                                <property name="y_options">GTK_EXPAND</property>
+                                                <property name="x_padding">5</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <placeholder/>
+                                            </child>
+                                            <child>
                                               <widget class="GtkHBox" id="hbox17">
                                                 <property name="visible">True</property>
                                                 <child>
@@ -2399,35 +2408,6 @@ Theora</property>
                                               <packing>
                                                 <property name="top_attach">2</property>
                                                 <property name="bottom_attach">3</property>
-                                                <property name="y_options"></property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <widget class="GtkCheckButton" id="audio_send_enabled">
-                                                <property name="visible">True</property>
-                                                <property name="can_focus">True</property>
-                                                <property name="use_underline">True</property>
-                                                <property name="xalign">1</property>
-                                                <property name="response_id">0</property>
-                                                <property name="draw_indicator">True</property>
-                                                <signal name="toggled" handler="on_audio_send_enabled_toggled"/>
-                                              </widget>
-                                              <packing>
-                                                <property name="left_attach">1</property>
-                                                <property name="right_attach">2</property>
-                                                <property name="x_padding">5</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <widget class="GtkLabel" id="label29">
-                                                <property name="visible">True</property>
-                                                <property name="xalign">1</property>
-                                                <property name="xpad">5</property>
-                                                <property name="ypad">5</property>
-                                                <property name="label" translatable="yes">Enabled:</property>
-                                                <property name="width_chars">12</property>
-                                              </widget>
-                                              <packing>
                                                 <property name="y_options"></property>
                                               </packing>
                                             </child>
@@ -2659,6 +2639,25 @@ JACK</property>
                                         <property name="n_rows">5</property>
                                         <property name="n_columns">2</property>
                                         <child>
+                                          <widget class="GtkCheckButton" id="audio_receive_enabled">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="label" translatable="yes">Enable</property>
+                                            <property name="use_underline">True</property>
+                                            <property name="xalign">1</property>
+                                            <property name="response_id">0</property>
+                                            <property name="draw_indicator">True</property>
+                                            <signal name="toggled" handler="on_audio_receive_enabled_toggled"/>
+                                          </widget>
+                                          <packing>
+                                            <property name="y_options"></property>
+                                            <property name="x_padding">5</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <placeholder/>
+                                        </child>
+                                        <child>
                                           <widget class="GtkHBox" id="hbox12">
                                             <property name="visible">True</property>
                                             <child>
@@ -2743,37 +2742,6 @@ JACK</property>
                                             <property name="bottom_attach">2</property>
                                             <property name="y_options"></property>
                                             <property name="x_padding">5</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkCheckButton" id="audio_receive_enabled">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">True</property>
-                                            <property name="use_underline">True</property>
-                                            <property name="xalign">1</property>
-                                            <property name="response_id">0</property>
-                                            <property name="draw_indicator">True</property>
-                                            <signal name="toggled" handler="on_audio_receive_enabled_toggled"/>
-                                          </widget>
-                                          <packing>
-                                            <property name="left_attach">1</property>
-                                            <property name="right_attach">2</property>
-                                            <property name="y_options"></property>
-                                            <property name="x_padding">5</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <widget class="GtkLabel" id="label6">
-                                            <property name="visible">True</property>
-                                            <property name="xalign">1</property>
-                                            <property name="xpad">5</property>
-                                            <property name="ypad">5</property>
-                                            <property name="label" translatable="yes">Enabled:</property>
-                                            <property name="width_chars">12</property>
-                                          </widget>
-                                          <packing>
-                                            <property name="x_options">GTK_FILL</property>
-                                            <property name="y_options"></property>
                                           </packing>
                                         </child>
                                         <child>
@@ -3884,6 +3852,62 @@ Vorbis</property>
                           <packing>
                             <property name="type">tab</property>
                             <property name="position">5</property>
+                            <property name="tab_fill">False</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkHBox" id="debug_tab_contents">
+                            <property name="visible">True</property>
+                            <child>
+                              <widget class="GtkScrolledWindow" id="scrolledwindow2">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+                                <child>
+                                  <widget class="GtkViewport" id="viewport3">
+                                    <property name="visible">True</property>
+                                    <property name="resize_mode">GTK_RESIZE_QUEUE</property>
+                                    <child>
+                                      <widget class="GtkTextView" id="debug_textview">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="editable">False</property>
+                                        <property name="wrap_mode">GTK_WRAP_WORD</property>
+                                        <property name="accepts_tab">False</property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                </child>
+                              </widget>
+                            </child>
+                          </widget>
+                          <packing>
+                            <property name="position">6</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <widget class="GtkHBox" id="hbox4">
+                            <property name="visible">True</property>
+                            <child>
+                              <widget class="GtkImage" id="image9">
+                                <property name="visible">True</property>
+                                <property name="stock">gtk-dialog-info</property>
+                              </widget>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="debug_tab">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Debug</property>
+                              </widget>
+                              <packing>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </widget>
+                          <packing>
+                            <property name="type">tab</property>
+                            <property name="position">6</property>
                             <property name="tab_fill">False</property>
                           </packing>
                         </child>
