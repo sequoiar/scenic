@@ -345,7 +345,8 @@ class Gui(object):
             print "Removing tab number %d." % (tab_num)
             self.main_tabs_widget.remove_page(tab_num)
 
-        if not enable_debug:
+        self.enable_debug = enable_debug
+        if not self.enable_debug: # hide the tab if not in debug
             # Removes the debug_tab 
             tab_num = self.main_tabs_widget.page_num(self.debug_tab_contents_widget)
             print "Removing tab number %d." % (tab_num)
@@ -377,6 +378,8 @@ class Gui(object):
         def _start_update_id():
             self._update_id_task.start(10.0, now=True)
         reactor.callLater(0, _start_update_id)
+
+        self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
         # The main app must call init_widgets_value
    
     #TODO: for the preview in the drawing area   
@@ -991,7 +994,6 @@ class Gui(object):
             self.make_midi_widget_sensitive_or_not()
 
     def _update_rtcp_stats(self):
-        SHOW_COMMAND_LINES = True
         is_streaming = self.app.has_session()
         # update the audio and video summary:(even if the state has not just changed)
         if is_streaming:
@@ -1019,15 +1021,16 @@ class Gui(object):
                 """
                 Formats a bash command line for the summary.
                 """
-                words = cmd.split()
-                length = 0
-                text = ""
-                for word in words: 
-                    length += len(word)
-                    if length >= 40:
-                        text += "\n"
-                        length = 0
-                    text += word + " "
+                text = cmd
+                #words = cmd.split()
+                #length = 0
+                #text = ""
+                #for word in words: 
+                #    length += len(word)
+                #    if length >= 40:
+                #        text += "\n"
+                #        length = 0
+                #    text += word + " "
                 return _("$ %(command)s") % {"command": text} 
 
             details = self.app.streamer_manager.session_details
@@ -1049,18 +1052,14 @@ class Gui(object):
             else:
                 _info_send_video += _("Disabled")
 
-
             #_info_send_video += _("jitter: %(jitter)d ns. packet loss: %(packetloss)2.2f%%.") % {# % is escaped with an other %
             #    "jitter": rtcp_stats["send"]["video"]["jitter"],
             #    "packetloss": _video_packetloss
             #    }
             #print("info send video: " + _info_send_video)
-            if SHOW_COMMAND_LINES:
-                for command in self.app.streamer_manager.get_command_lines():
-                    _info_send_video += "\n"
-                    _info_send_video += _format_command_line(command)
-                    # TODO: separate video and audio if separate
             self.info_send_video_widget.set_text(_info_send_video)
+            
+            
             # send audio: --------------------------------
             _info_send_audio = ""
             if details["send"]["audio"]["enabled"]:
@@ -1128,13 +1127,23 @@ class Gui(object):
                 
             self.info_receive_midi_widget.set_text(_info_recv_midi)
             self.info_send_midi_widget.set_text(_info_send_midi)
-        else:
+
+            if self.enable_debug:
+                _debug_text = ""
+                _debug_text += _("Command lines:") + "\n"
+                for command in self.app.streamer_manager.get_command_lines():
+                    _debug_text += _format_command_line(command) + "\n"
+                self.debug_textview_widget.get_buffer().set_text(unicode(_debug_text))
+            
+        else: # not streaming
             self.info_send_video_widget.set_text("")
             self.info_send_audio_widget.set_text("")
             self.info_receive_video_widget.set_text("")
             self.info_receive_audio_widget.set_text("")
             self.info_receive_midi_widget.set_text("")
             self.info_send_midi_widget.set_text("")
+            if self.enable_debug:
+                self.debug_textview_widget.get_buffer().set_text(u"")
         
     def update_local_ip(self):
         """
