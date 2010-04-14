@@ -333,7 +333,7 @@ class Gui(object):
         self.video_send_enabled_widget = widgets_tree.get_widget("video_send_enabled")
         self.video_receive_enabled_widget = widgets_tree.get_widget("video_receive_enabled")
 
-        self.audio_video_synchronized_widget.set_sensitive(False) # TODO
+        #self.audio_video_synchronized_widget.set_sensitive(False) # TODO
 
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
@@ -1021,7 +1021,7 @@ class Gui(object):
                         text += "\n"
                         length = 0
                     text += word + " "
-                return _("Command %(command)s") % {"command": text}
+                return _("$ %(command)s") % {"command": text} 
 
             details = self.app.streamer_manager.session_details
             rtcp_stats = self.app.streamer_manager.rtcp_stats
@@ -1049,9 +1049,9 @@ class Gui(object):
             #    }
             #print("info send video: " + _info_send_video)
             if SHOW_COMMAND_LINES:
-                if self.app.streamer_manager.sender is not None:
+                for command in self.app.streamer_manager.get_command_lines():
                     _info_send_video += "\n"
-                    _info_send_video += _format_command_line(self.app.streamer_manager.sender.command)
+                    _info_send_video += _format_command_line(command)
                     # TODO: separate video and audio if separate
             self.info_send_video_widget.set_text(_info_send_video)
             # send audio: --------------------------------
@@ -1087,12 +1087,6 @@ class Gui(object):
             else:
                 _info_recv_video += _("Disabled.")
                 
-
-            if SHOW_COMMAND_LINES:
-                if self.app.streamer_manager.receiver is not None:
-                    _info_recv_video += "\n"
-                    _info_recv_video += _format_command_line(self.app.streamer_manager.receiver.command)
-                    # TODO: separate video and audio if separate
             #print("info recv video: " + _info_recv_video)
             self.info_receive_video_widget.set_text(_info_recv_video)
             # recv audio: --------------------------------

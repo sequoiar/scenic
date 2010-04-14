@@ -434,6 +434,16 @@ class StreamerManager(object):
         if midi_send_enabled:
             self.midi_sender.start()
 
+    def get_command_lines(self):
+        """
+        Returns a list of all the current processes command lines.
+        @rettype: list
+        """
+        ret = []
+        for proc in self.get_all_streamer_process_managers():
+            ret.append(proc.command)
+        return ret
+
     def on_midi_stdout_line(self, process_manager, line):
         print process_manager.identifier, line
 
