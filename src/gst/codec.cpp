@@ -179,13 +179,19 @@ H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) :
 
     // numthreads should be 2 or 1.
     if (numThreads > 3) // don't hog all the cores
-        numThreads = 3;
+        numThreads--;
     else if (numThreads == 0)
         numThreads = 1;
 
     LOG_DEBUG("Using " << numThreads << " threads");
     g_object_set(encoder_, "threads", numThreads, NULL);
     // See gst-plugins-good/tests/examples/rtp/*h264*.sh
+    // if you use non-byte stream mode, the encoder willl need to add 
+    // three bytes to start and end, which the payerloader will promptly 
+    // remove (as the buffer size is givn on the buffer object). the
+    // default NALU stream is mostly useful when storing this on disk 
+    // i.e. (x264enc ! filesink)
+    // vbv-bufsize / vbv-maxrate = the number of seconds the client must buffer before playback
     g_object_set(encoder_, "byte-stream", TRUE, NULL);  
 
     // subme: subpixel motion estimation 1=fast, 6=best
