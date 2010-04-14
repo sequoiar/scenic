@@ -883,6 +883,7 @@ class Gui(object):
             self.audio_numchannels_widget,
             self.audio_output_buffer_widget,
             self.audio_input_buffer_widget,
+            self.audio_video_synchronized_widget,
             self.contact_list_widget,
             self.add_contact_widget,
             self.remove_contact_widget,
