@@ -460,12 +460,14 @@ class StreamerManager(object):
         self._set_state(process.STATE_STARTING)
         if send_audio_enabled or send_video_enabled:
             print "$", send_cmd
-            self.sender.start()
+            if normal_send_enabled:
+                self.sender.start()
             if extra_send_enabled:
                 self.extra_sender.start()
         if recv_audio_enabled or recv_video_enabled:
             print "$", recv_cmd
-            self.receiver.start()
+            if normal_recv_enabled:
+                self.receiver.start()
             if extra_recv_enabled:
                 self.extra_receiver.start()
         if midi_recv_enabled:
