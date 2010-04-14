@@ -506,13 +506,13 @@ class StreamerManager(object):
             elif "audio" in line:
                 self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
         else:
-            print "%9s stdout: %s" % (self.receiver.identifier, line)
+            print "%9s stdout: %s" % (process_manager.identifier, line)
 
     def on_receiver_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (self.receiver.identifier, line)
+        print "%9s stderr: %s" % (process_manager.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
     
