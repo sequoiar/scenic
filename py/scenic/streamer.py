@@ -520,7 +520,7 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
-        print "%9s stdout: %s" % (self.sender.identifier, line)
+        print "%9s stdout: %s" % (process_manager.identifier, line)
         try:
             if "PACKETS-LOST" in line:
                 if "video" in line:
@@ -560,7 +560,7 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (self.sender.identifier, line)
+        print "%9s stderr: %s" % (process_manager.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["send"].append(line)
 
