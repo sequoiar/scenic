@@ -105,8 +105,8 @@ def run():
     parser.add_option("-l", "--enable-logging", action="store_true", help="Enables logging to file.")
     parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s" % (LOG_FILE_NAME), default=LOG_FILE_NAME)
     parser.add_option("-f", "--fullscreen", action="store_true", help="Run in fullscreen mode")
-    parser.add_option("-M", "--moo", action="store_true", \
-        help="There is no easter egg in this program.")
+    parser.add_option("-M", "--moo", action="store_true", help="There is no easter egg in this program")
+    parser.add_option("-d", "--debug", action="store_true", help="Enables the debug tab in the user interface")
     (options, args) = parser.parse_args()
     kwargs = {}
     if options.moo:
@@ -118,7 +118,7 @@ def run():
     else:
         start_logging_to_stdout()
     try:
-        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, **kwargs)
+        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, **kwargs)
     except error.CannotListenError, e:
         print("There must be an other Scenic running.")
         print(str(e))

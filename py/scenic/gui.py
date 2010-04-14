@@ -193,7 +193,7 @@ class Gui(object):
      * Contains the main GTK window.
      * And some dialogs.
     """
-    def __init__(self, app, kiosk_mode=False, fullscreen=False):
+    def __init__(self, app, kiosk_mode=False, fullscreen=False, enable_debug=False):
         self.app = app
         self.kiosk_mode_on = kiosk_mode
         self._inviting_timeout_delayed = None
@@ -212,6 +212,7 @@ class Gui(object):
         self.main_window.set_icon_from_file(os.path.join(configure.PIXMAPS_DIR, 'scenic.png'))
         self.main_tabs_widget = widgets_tree.get_widget("mainTabs")
         self.system_tab_contents_widget = widgets_tree.get_widget("system_tab_contents")
+        self.debug_tab_contents_widget = widgets_tree.get_widget("debug_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
         
         # ------------------------------ dialogs:
@@ -341,6 +342,12 @@ class Gui(object):
         else:
             # Removes the sytem_tab 
             tab_num = self.main_tabs_widget.page_num(self.system_tab_contents_widget)
+            print "Removing tab number %d." % (tab_num)
+            self.main_tabs_widget.remove_page(tab_num)
+
+        if not enable_debug:
+            # Removes the debug_tab 
+            tab_num = self.main_tabs_widget.page_num(self.debug_tab_contents_widget)
             print "Removing tab number %d." % (tab_num)
             self.main_tabs_widget.remove_page(tab_num)
         
