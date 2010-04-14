@@ -121,7 +121,8 @@ def _set_combobox_choices(widget, choices=[]):
     for choice in choices:
         tree_model.append([choice])
     widget.set_model(tree_model)
-    _set_combobox_value(widget, previous_value)
+    if previous_value != " ": # we put empty spaces in glade as value, but this is not a real value, and we get rid of it.
+        _set_combobox_value(widget, previous_value)
 
 def _set_combobox_value(widget, value=None):
     """
@@ -142,7 +143,7 @@ def _set_combobox_value(widget, value=None):
         widget.set_active(index)
     else:
         widget.set_active(0) # FIXME: -1)
-        msg = "ComboBox widget %s doesn't have value %s." % (widget, value)
+        msg = "ComboBox widget %s doesn't have value \"%s\"." % (widget, value)
         print msg
 
 #videotestsrc legible name:
