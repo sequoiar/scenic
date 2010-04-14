@@ -34,8 +34,11 @@ class StreamerManager(object):
     """
     def __init__(self, app):
         self.app = app
-        self.sender = None
-        self.receiver = None
+        self.sender = None 
+        self.receiver = None 
+        self.extra_sender = None # extra sender/receiver used only if not synchronized
+        self.extra_receiver = None
+        
         self.midi_receiver = None
         self.midi_sender = None
         self.state = process.STATE_STOPPED
@@ -267,6 +270,10 @@ class StreamerManager(object):
         recv_audio_enabled = self.session_details["receive"]["audio"]["enabled"]
         midi_recv_enabled = self.session_details["receive"]["midi"]["enabled"]
         midi_send_enabled = self.session_details["send"]["midi"]["enabled"]
+        extra_send_enabled = not self.session_details["send"]["audio"]["synchronized"] and send_audio_enabled
+        extra_recv_enabled = not self.session_details["receive"]["audio"]["synchronized"] and recv_audio_enabled
+        normal_recv_enabled = recv_video_enabled or recv_audio_enabled and not extra_recv_enabled # if the self.sender and self.receiver are enabled
+        normal_send_enabled = send_video_enabled or send_audio_enabled and not extra_send_enabled
         if not send_audio_enabled and not send_video_enabled and not midi_send_enabled and not midi_recv_enabled and not recv_audio_enabled and not recv_video_enabled:
             raise RuntimeError("Everything is disabled, but the application is trying to start to stream. This should not happen.") # the programmer has done a mistake if we're here.
 
@@ -275,7 +282,7 @@ class StreamerManager(object):
         print "recv_video_enabled", recv_video_enabled
         print "recv_audio_enabled", recv_audio_enabled
         print "midi_recv_enabled", midi_recv_enabled 
-        print "midi_send_enabled", midi_send_enabled         
+        print "midi_send_enabled", midi_send_enabled
 
         # we store the arguments in lists
         milhouse_send_cmd_common = []
@@ -367,26 +374,54 @@ class StreamerManager(object):
         # TODO: not sync
         # TODO: if both disabled, do not start sender/receiver
         # ---- audio/video receiver ----
-        if recv_audio_enabled or recv_video_enabled:
-            milhouse_recv_cmd_final = milhouse_recv_cmd_common 
+        if recv_audio_enabled or recv_video_enabled: # receiver(s)
+            milhouse_recv_cmd_final = []
+            milhouse_recv_cmd_extra = []
+            
+            milhouse_recv_cmd_final.extend(milhouse_recv_cmd_common)
+            milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_common)
             milhouse_recv_cmd_final.extend(milhouse_recv_cmd_video)
-            milhouse_recv_cmd_final.extend(milhouse_recv_cmd_audio)
+            if extra_recv_enabled:
+                milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_audio)
+            else:
+                milhouse_recv_cmd_final.extend(milhouse_recv_cmd_audio)
             recv_cmd = " ".join(milhouse_recv_cmd_final)
-            self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
-            self.receiver.state_changed_signal.connect(self.on_process_state_changed)
-            self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
-            self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
+            extra_recv_cmd = " ".join(milhouse_recv_cmd_extra)
+            if normal_recv_enabled:
+                self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
+                self.receiver.state_changed_signal.connect(self.on_process_state_changed)
+                self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
+                self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
+            if extra_recv_enabled:
+                self.extra_receiver = process.ProcessManager(command=extra_recv_cmd, identifier="extra_receiver")
+                self.extra_receiver.state_changed_signal.connect(self.on_process_state_changed)
+                self.extra_receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
+                self.extra_receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
         # ---- audio/video sender ----
-        if send_audio_enabled or send_video_enabled:
-            milhouse_send_cmd_final = milhouse_send_cmd_common 
+        if send_audio_enabled or send_video_enabled: # sender(s)
+            milhouse_send_cmd_final = []
+            milhouse_send_cmd_extra = []
+            
+            milhouse_send_cmd_final.extend(milhouse_send_cmd_common)
+            milhouse_send_cmd_extra.extend(milhouse_send_cmd_common) # only used if we have to
             milhouse_send_cmd_final.extend(milhouse_send_cmd_video)
-            milhouse_send_cmd_final.extend(milhouse_send_cmd_audio)
+            if extra_send_enabled:
+                milhouse_send_cmd_extra.extend(milhouse_send_cmd_audio)
+            else:
+                milhouse_send_cmd_final.extend(milhouse_send_cmd_audio)
             send_cmd = " ".join(milhouse_send_cmd_final)
-            self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
-            self.sender.state_changed_signal.connect(self.on_process_state_changed)
-            self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
-            self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
-        
+            extra_send_cmd = " ".join(milhouse_send_cmd_extra)
+            if normal_send_enabled:
+                self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
+                self.sender.state_changed_signal.connect(self.on_process_state_changed)
+                self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
+                self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
+            if extra_send_enabled:
+                self.extra_sender = process.ProcessManager(command=extra_send_cmd, identifier="extra_sender")
+                self.extra_sender.state_changed_signal.connect(self.on_process_state_changed)
+                self.extra_sender.stdout_line_signal.connect(self.on_sender_stdout_line)
+                self.extra_sender.stderr_line_signal.connect(self.on_sender_stderr_line)
+                # FIXME: too much code duplication
         
         if midi_recv_enabled:
             midi_out_device = self.app.parse_midi_device_name(details["receive"]["midi"]["output_device"], is_input=False)
@@ -425,10 +460,16 @@ class StreamerManager(object):
         self._set_state(process.STATE_STARTING)
         if send_audio_enabled or send_video_enabled:
             print "$", send_cmd
-            self.sender.start()
+            if normal_send_enabled:
+                self.sender.start()
+            if extra_send_enabled:
+                self.extra_sender.start()
         if recv_audio_enabled or recv_video_enabled:
             print "$", recv_cmd
-            self.receiver.start()
+            if normal_recv_enabled:
+                self.receiver.start()
+            if extra_recv_enabled:
+                self.extra_receiver.start()
         if midi_recv_enabled:
             self.midi_receiver.start()
         if midi_send_enabled:
@@ -465,13 +506,13 @@ class StreamerManager(object):
             elif "audio" in line:
                 self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
         else:
-            print "%9s stdout: %s" % (self.receiver.identifier, line)
+            print "%9s stdout: %s" % (process_manager.identifier, line)
 
     def on_receiver_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (self.receiver.identifier, line)
+        print "%9s stderr: %s" % (process_manager.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
     
@@ -479,7 +520,7 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
-        print "%9s stdout: %s" % (self.sender.identifier, line)
+        print "%9s stdout: %s" % (process_manager.identifier, line)
         try:
             if "PACKETS-LOST" in line:
                 if "video" in line:
@@ -519,7 +560,7 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (self.sender.identifier, line)
+        print "%9s stderr: %s" % (process_manager.identifier, line)
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["send"].append(line)
 
@@ -535,14 +576,9 @@ class StreamerManager(object):
         @rtype: list
         """
         ret = []
-        if self.session_details["receive"]["audio"]["enabled"] or self.session_details["receive"]["video"]["enabled"]:
-            ret.append(self.receiver)
-        if self.session_details["send"]["audio"]["enabled"] or self.session_details["send"]["video"]["enabled"]:
-            ret.append(self.sender)
-        if self.session_details["receive"]["midi"]["enabled"]:
-            ret.append(self.midi_receiver)
-        if self.session_details["send"]["midi"]["enabled"]:
-            ret.append(self.midi_sender)
+        for proc in [self.receiver, self.extra_receiver, self.sender, self.extra_sender, self.midi_receiver, self.midi_sender]:
+            if proc is not None:
+                ret.append(proc)
         return ret
 
     def on_process_state_changed(self, process_manager, process_state):
@@ -604,6 +640,8 @@ class StreamerManager(object):
         # set all to None:
         self.sender = None
         self.receiver = None
+        self.extra_sender = None
+        self.extra_receiver = None
         self.midi_receiver = None
         self.midi_sender = None
         print "should all be None:", self.get_all_streamer_process_managers()
