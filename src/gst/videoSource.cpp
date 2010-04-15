@@ -175,9 +175,8 @@ VideoV4lSource::VideoV4lSource(const Pipeline &pipeline,
     }
 
     capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
-    gstlinkable::link(source_, capsFilter_);
-
     setCapsFilter(srcCaps());
+    gstlinkable::link(source_, capsFilter_);
 }
 
 
