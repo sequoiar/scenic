@@ -1,0 +1,29 @@
+<chapter lang=""><sect1><title>
+      <anchor id="Latency"/>Latency<ulink url="https://svn.sat.qc.ca/trac/miville/wiki/UsingScenic#Latency"> ¶</ulink>
+   </title>
+   <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/UsingScenic#Latency"> ¶</ulink>
+   <para>Latency refers to a period of delay (usually measured in milliseconds). This period of delay represent the time from the source sending a an information to the destination receiving it. In real-time system over a network there will always have latency. Scenic has been developed to minimize this latency but still, by example two musician playing over a network will always experience a delay between each other. </para>
+   <para>We speak of one-way latency when we calculate the delay from A to B. We speak of round-trip latency when we calculate the delay from A to B and then back to A. Round-trip latency has a great impact in by example, the dynamics of a conversation, or in any interactive system that require retro-action on the given input. For regular voice interaction a latency of 250 ms round-trip can be notice by an user. Both in audio and video. For musician a latency of even 60 ms can be notice and disturb the user if he/she is not used to it.. </para>
+   <para>Latency is a physical constraint and by using Scenic, specially for live performance, the user have too keep in mind that this delay exist and depend on the factor described below. </para>
+   <para>Concerning Scenic, there is two element that induce latency. </para>
+   <orderedlist>
+      <listitem>
+         <para>Latency as a result of the distance crossed by the data between point A and B. </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Latency as a result of data processing (Audio, Video, Network) This latency varies depending of many factor. </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Effect of latency on video </para>
+      </listitem>
+   </orderedlist>
+   <orderedlist>
+      <listitem>
+         <para>Effect of latency on audio </para>
+      </listitem>
+   </orderedlist>
+   <para/></sect1></chapter>
