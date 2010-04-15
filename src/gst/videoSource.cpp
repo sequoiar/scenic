@@ -201,6 +201,7 @@ std::string VideoV4lSource::srcCaps() const
     GstCaps *caps = gst_pad_get_caps(srcPad);
     GstStructure *structure = gst_caps_get_structure(caps, 0);
     const GValue *val = gst_structure_get_value(structure, "framerate");
+    LOG_INFO(gst_structure_to_string(structure));
     gint framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, 0)));
     gint framerate_denominator = gst_value_get_fraction_denominator((gst_value_list_get_value(val, 0)));
 
