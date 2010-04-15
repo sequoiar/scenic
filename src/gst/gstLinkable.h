@@ -24,6 +24,7 @@
 #define _GST_LINKABLE_H_
 
 #include <vector> 
+#include "except.h"
 
 class GstLinkableSource;
 class GstLinkableSink;
@@ -34,6 +35,15 @@ typedef std::vector<_GstElement *>::iterator GstIter;
 
 namespace gstlinkable
 {
+    class LinkExcept : public Except
+    {
+        public:
+            LinkExcept(const char* log_msg) : Except(log_msg)
+        { 
+            log_ = WARNING;
+        }
+    };
+
     bool link_pads(_GstPad *srcPad, _GstPad *sinkPad);
     void link(std::vector<_GstElement*> &sources, std::vector<_GstElement*> &sinks);
     void link(_GstElement *src, _GstElement *sink);

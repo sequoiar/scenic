@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 #include <boost/lexical_cast.hpp>
-#include <gst/interfaces/tuner.h>
 
 #include "util.h"
 
@@ -66,7 +65,7 @@ std::string VideoSource::defaultSrcCaps() const
     return capsStr.str();
 }
 
-std::string VideoSource::srcCaps() const
+std::string VideoSource::srcCaps(unsigned int /*framerateIndex*/) const
 {
     return defaultSrcCaps();
 }
@@ -192,26 +191,21 @@ std::string VideoV4lSource::deviceStr() const
 }
 
 
-std::string VideoV4lSource::srcCaps() const
+std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
 {
     std::ostringstream capsStr;
     GstStateChangeReturn ret = gst_element_set_state(source_, GST_STATE_READY);
     if (ret not_eq GST_STATE_CHANGE_SUCCESS)
-        THROW_ERROR("Could not change vl42src state to READY");
+        THROW_ERROR("Could not change v4l2src state to READY");
     GstPad *srcPad = gst_element_get_static_pad(source_, "src");
     GstCaps *caps = gst_pad_get_caps(srcPad);
     GstStructure *structure = gst_caps_get_structure(caps, 0);
     const GValue *val = gst_structure_get_value(structure, "framerate");
     LOG_INFO(gst_structure_to_string(structure));
-    gint framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, 0)));
-    gint framerate_denominator = gst_value_get_fraction_denominator((gst_value_list_get_value(val, 0)));
-    GstTunerNorm *norm = GST_TUNER_NORM(gst_tuner_get_norm(GST_TUNER(source_)));
-    if (norm) 
-    {
-        LOG_INFO(gst_value_get_fraction_numerator (&norm->framerate));
-        LOG_INFO(gst_value_get_fraction_denominator (&norm->framerate));
-        assert(0);
-    }
+    if (framerateIndex >= gst_value_list_get_size(val))
+        THROW_ERROR("Framerate index out of range");
+    gint framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, framerateIndex)));
+    gint framerate_denominator = gst_value_get_fraction_denominator((gst_value_list_get_value(val, framerateIndex)));
 
     gst_caps_unref(caps);
     gst_object_unref(srcPad);
@@ -261,7 +255,7 @@ VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSource
 }
 
 
-std::string VideoDc1394Source::srcCaps() const
+std::string VideoDc1394Source::srcCaps(unsigned int /*framerateIndex*/) const
 {
     typedef std::vector<std::string> ColourspaceList;
     std::ostringstream capsStr;

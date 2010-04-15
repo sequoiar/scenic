@@ -36,7 +36,7 @@ class VideoSource
 {
     public:
         ~VideoSource();
-        virtual std::string srcCaps() const;
+        virtual std::string srcCaps(unsigned framerateIndex = 0) const;
         void setCapsFilter(const std::string &srcCaps);
 
     protected:
@@ -100,7 +100,7 @@ class VideoV4lSource
         std::string expectedStandard_;
         std::string actualStandard_;
         std::string deviceStr() const;
-        std::string srcCaps() const;
+        std::string srcCaps(unsigned int framerateIndex = 0) const;
         bool willModifyCaptureResolution() const;
         _GstElement *srcElement() { return capsFilter_; }
 };
@@ -113,7 +113,7 @@ class VideoDc1394Source
     public:
         VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config);
     private:
-        std::string srcCaps() const;
+        std::string srcCaps(unsigned int framerateIndex = 0) const;
         _GstElement *srcElement() { return capsFilter_; }
 };
 

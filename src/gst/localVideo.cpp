@@ -58,7 +58,22 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     }
     else
     {
-        gstlinkable::link(*source_, *videoscale_);
+        bool linked = false;
+        int framerateIndex = 0;
+        while (not linked)
+        {
+            try 
+            {
+                gstlinkable::link(*source_, *videoscale_);
+                linked = true;
+            }
+            catch (const gstlinkable::LinkExcept &e)
+            {
+                LOG_WARNING("Link failed, trying another framerate");
+                ++framerateIndex;
+                source_->setCapsFilter(source_->srcCaps(framerateIndex));
+            }
+        }
     }
 
     if (videoflip_ != 0)
