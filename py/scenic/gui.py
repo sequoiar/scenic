@@ -529,7 +529,9 @@ class Gui(object):
             self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0] # FIXME: this var should be deprecated
             self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index] # FIXME: deprecate this!
             self.app.address_book.selected = self.selected_contact_index
-            self.update_invite_button_with_contact_name()
+            is_streaming = self.app.has_session()
+            if is_streaming: # XXX
+                self.update_invite_button_with_contact_name()
         else:
             # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(False)
@@ -961,10 +963,13 @@ class Gui(object):
 
     def update_invite_button_with_contact_name(self):
         contact = self.app.address_book.selected_contact
+        #is_streaming = self.app.has_session()
         if contact is None:
-            text = _("Please select a contact")
+            text = _("Invite") #Please select a contact")
+            self.invite_label_widget.set_sensitive(False)
         else:
-            text = _("Invite %(contact)s") % {"contact": contact["name"]}
+            text = _("Invite") # %(contact)s") % {"contact": contact["name"]}
+            self.invite_label_widget.set_sensitive(True)
         self.invite_label_widget.set_text(text)
 
     def make_midi_widget_sensitive_or_not(self):
