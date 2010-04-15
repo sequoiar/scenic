@@ -38,7 +38,8 @@ def run_once(executable, *args):
         print("Could not find executable %s" % (executable))
         return None
     else:
-        print("Calling %s %s" % (executable, list(args)))
+        env = configure.environ_without_custom()
+        print("Calling `%s %s` with ENV=%s" % (executable, list(args), env))
         d = utils.getProcessValue(executable, args, configure.environ_without_custom(), '.', reactor)
         d.addCallback(_cb)
         return d

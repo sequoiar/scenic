@@ -1413,8 +1413,10 @@ class Gui(object):
         Opens a web browser to the scenic web site.
         """
         print menu_item, "chosen"
-        url = ONLINE_HELP_URL 
-        webbrowser.open(url)
+        #url = ONLINE_HELP_URL 
+        #webbrowser.open(url)
+        docbook_file = os.path.join(configure.DOCBOOK_DIR, "installation-manual.xml") # TODO: change for the right one
+        process.run_once("yelp", docbook_file)
 
     # ---------------------- invitation dialogs -------------------
 
