@@ -75,7 +75,22 @@ void VideoSender::createSource(Pipeline &pipeline)
 void VideoSender::createCodec(Pipeline &pipeline)
 {
     tassert(encoder_ = remoteConfig_->createVideoEncoder(pipeline, videoConfig_->bitrate(), videoConfig_->quality()));
-    gstlinkable::link(*source_, *encoder_);
+    bool linked = false;
+    int framerateIndex = 0;
+    while (not linked)
+    {
+        try 
+        {
+            gstlinkable::link(*source_, *encoder_);
+            linked = true;
+        }
+        catch (const gstlinkable::LinkExcept &e)
+        {
+            LOG_WARNING("Link failed, trying another framerate");
+            ++framerateIndex;
+            source_->setCapsFilter(source_->srcCaps(framerateIndex));
+        }
+    }
 }
 
 

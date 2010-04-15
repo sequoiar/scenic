@@ -201,7 +201,7 @@ std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
     GstCaps *caps = gst_pad_get_caps(srcPad);
     GstStructure *structure = gst_caps_get_structure(caps, 0);
     const GValue *val = gst_structure_get_value(structure, "framerate");
-    LOG_INFO(gst_structure_to_string(structure));
+    LOG_DEBUG("Caps structure from v4l2src srcpad: " << gst_structure_to_string(structure));
     if (framerateIndex >= gst_value_list_get_size(val))
         THROW_ERROR("Framerate index out of range");
     gint framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, framerateIndex)));
