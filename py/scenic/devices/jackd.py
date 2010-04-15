@@ -94,7 +94,7 @@ def jackd_get_infos():
     # g = glob.glob('/dev/shm/jack-1002/*/*-0')
     # file("/proc/28923/cmdline").read()
     ret = []
-    i = 0
+    i = 0 # jackd number
     uid = os.getuid() # or os.geteuid() ?
     all = glob.glob("/dev/shm/jack-%d/*/*-0" % (uid))
     for running in all:
@@ -111,6 +111,10 @@ def jackd_get_infos():
             ret.append({}) # populate a dict
             ret[i]['name'] = name # probably 'default' or $JACK_DEFAULT_SERVER
             ret[i]['pid'] = pid
+            # adding some default values!! XXX
+            ret[i]["period"] = 1024
+            ret[i]["nperiods"] = 0 
+            ret[i]["rate"] = 48000
             filename = "/proc/%d/cmdline" % (pid)
             try:
                 f = file(filename, "r")
@@ -190,6 +194,12 @@ def jackd_get_infos():
                 ret[i]["cmdline"] = ""
                 for arg in cmdline[1:]:
                     ret[i]["cmdline"] += " " + arg
+            # if set to 0, it was not set in the CLI, so we set it to the default according to backend
+            if ret[i]["nperiods"] == 0:
+                if ret[i]["backend"] == "freebob":
+                    ret[i]["nperiods"] = 3
+                else:
+                    ret[i]["nperiods"] = 2
             i += 1 # very important...
     return ret
 
