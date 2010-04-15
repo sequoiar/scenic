@@ -28,10 +28,13 @@
 
 void gstlinkable::tryLink(GstElement *src, GstElement *sink)
 {
-    if (!gst_element_link(src, sink))
+    if (not gst_element_link(src, sink))
     {
-        THROW_ERROR("Failed to link " << GST_ELEMENT_NAME(src) 
-                << " to " << GST_ELEMENT_NAME(sink)); 
+        std::string msg("Failed to link ");
+        msg += GST_ELEMENT_NAME(src);
+        msg += " to ";
+        msg += GST_ELEMENT_NAME(sink); 
+        throw LinkExcept(msg.c_str());
     }
 }
 
