@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+   <!ENTITY legal SYSTEM "user/legal.xml">
+   <!ENTITY appversion "0.4.5">
+   <!ENTITY manrevision "2.1">
+   <!ENTITY date "April 2010">
+   <!ENTITY app "<application>Scenic</application>">
+   <!ENTITY Introduction SYSTEM "user/introduction.xml">
+   <!ENTITY Using_Scenic SYSTEM "user/using-scenic.xml">
+   <!ENTITY Setup_Overview SYSTEM "user/setup-overview.xml">
+   <!ENTITY Peripheral_Connection SYSTEM "user/peripheral-connection.xml">
+   <!ENTITY Staring_Devices SYSTEM "user/starting-devices.xml">
+   <!ENTITY Testing_Devices SYSTEM "user/testing-devices.xml">
+   <!ENTITY Starting_Scenic SYSTEM "user/starting-scenic.xml">
+   <!ENTITY Contact_Settings SYSTEM "user/contact-settings.xml">
+   <!ENTITY Audio_Settings SYSTEM "user/audio-settings.xml">
+   <!ENTITY Video_Settings SYSTEM "user/video-settings.xml">
+   <!ENTITY Network_Settings SYSTEM "user/network-settings.xml">
+   <!ENTITY Midi_Settings SYSTEM "user/midi-settings.xml">
+   <!ENTITY About SYSTEM "user/about.xml">
+   <!-- Information about the entities
+       The legal.xml file contains legal information, there is no need to edit the file. 
+       Use the appversion entity to specify the version of the application.
+       Use the manrevision entity to specify the revision number of this manual.
+       Use the date entity to specify the release date of this manual.
+       Use the app entity to specify the name of the application. -->
+
+]>
+
+<!-- =============Document Header ============================= -->
+<book id="User-Manual" lang="en">
+
+   &Introduction;
+   &Using_Scenic;
+   &Setup_Overview;
+   &Peripheral_Connection;
+   &Staring_Devices;
+   &Testing_Devices;
+   &Starting_Scenic;
+   &Contact_Settings;
+   &Audio_Settings;
+   &Video_Settings;
+   &Network_Settings;
+   &Midi_Settings;
+   &About;
+ 
+
+
+   &Command_Line;
+</book>   

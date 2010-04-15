@@ -1,0 +1,112 @@
+<bookinfo>
+   <title>&app; User Manual V&manrevision;</title>       
+      <copyright> 
+         <year>2009</year> 
+         <year>2010</year> 
+         <holder>Society for Arts and Technology</holder> 
+      </copyright> 
+<!-- translators: uncomment this
+  <copyright>
+   <year>2002</year>
+   <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+  </copyright>
+ -->
+
+<!-- An address can be added to the publisher information.  If a role is 
+     not specified, the publisher/author is the same for all versions of the 
+     document.  
+-->
+   <publisher> 
+      <publishername>Society for Arts and Technology</publishername> 
+   </publisher> 
+
+   <authorgroup> 
+      <author> 
+         <firstname>Philippe</firstname> 
+         <surname>Chevry</surname> 
+         <affiliation> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
+	         <address><email>scenic-users@sat.qc.ca</email> </address> 
+		   </affiliation> 
+      </author> 
+      <author> 
+		   <firstname>Simon</firstname> 
+		   <surname>Piette</surname> 
+		   <affiliation> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
+	  		   <address><email>scenic-users@sat.qc.ca</email></address> 
+		   </affiliation> 
+      </author>
+      <author> 
+         <firstname>Alexandre</firstname> 
+         <surname>Quessy</surname> 
+         <affiliation> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
+	         <address><email>scenic-users@sat.qc.ca</email> </address> 
+		   </affiliation> 
+      </author> 
+
+      <author> 
+         <firstname>Tristan</firstname> 
+         <surname>Matthiews</surname> 
+         <affiliation> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
+	         <address><email>scenic-users@sat.qc.ca</email> </address> 
+		   </affiliation> 
+      </author> 
+
+
+<!-- This is appropriate place for other contributors: translators,
+     maintainers,  etc. Commented out by default.
+     
+      <othercredit role="translator">
+		<firstname>Latin</firstname> 
+		<surname>Translator 1</surname> 
+		<affiliation> 
+	  		<orgname>Latin Translation Team</orgname> 
+	  		<address> <email>translator@gnome.org</email> </address> 
+		</affiliation>
+		<contrib>Latin translation</contrib>
+      </othercredit>
+-->
+   </authorgroup>
+<!-- According to GNU FDL, revision history is mandatory if you are -->
+<!-- modifying/reusing someone else's document.  If not, you can omit it. -->
+<!-- Remember to remove the &manrevision; entity from the revision entries other
+-->
+<!-- than the current revision. -->
+<!-- The revision numbering system for GNOME manuals is as follows: -->
+<!-- * the revision number consists of two components -->
+<!-- * the first component of the revision number reflects the release version of the GNOME desktop. -->
+<!-- * the second component of the revision number is a decimal unit that is incremented with each revision of the manual. -->
+<!-- For example, if the GNOME desktop release is V2.x, the first version of the manual that -->
+<!-- is written in that desktop timeframe is V2.0, the second version of the manual is V2.1, etc. -->
+<!-- When the desktop release version changes to V3.x, the revision number of the manual changes -->
+<!-- to V3.0, and so on. -->  
+   <revhistory>
+      <revision> 
+		<revnumber>&app; Installation Manual V&manrevision;</revnumber> 
+		<date>&date;</date> 
+		<revdescription> 
+	  	   <para role="author">Society for Arts and Technology
+	    	<email>scenic-users@sat.qc.ca</email>
+	  		</para>
+	  		<para role="publisher">Society for Arts and Technology</para>
+		</revdescription> 
+      </revision> 
+   </revhistory>
+
+   <releaseinfo>This manual describes version &appversion; of &app; Installation.</releaseinfo>
+
+<!-- Legal notice and info
+-->
+   &legal;
+   <legalnotice> 
+   <title>Feedback</title> 
+      <para>To report a bug or make a suggestion regarding the &app; application or
+      this manual, follow the directions in the <ulink url="http://mailman.sat.qc.ca/mailman/listinfo/scenic-users"
+	  type="help">&app; User Mailing ListPage</ulink>.</para>
+<!-- Translators may also add here feedback address for translations -->
+   </legalnotice>
+   
+</bookinfo> 
