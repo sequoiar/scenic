@@ -730,6 +730,8 @@ class Gui(object):
             """
             Sets a configuration entry value and prints it.
             """
+            if not hasattr(self.app.config, attribute_name):
+                raise RuntimeError("Config has no attribute %s" % (attribute_name))
             setattr(self.app.config, attribute_name, value)
             print " * %s: %s" % (attribute_name, getattr(self.app.config, attribute_name))
 
@@ -764,7 +766,7 @@ class Gui(object):
         _set_config("audio_video_synchronized", self.audio_video_synchronized_widget.get_active())
         _set_config("audio_source", AUDIO_SOURCES[_get_combobox_value(self.audio_source_widget)])
         _set_config("audio_codec", AUDIO_CODECS[_get_combobox_value(self.audio_codec_widget)])
-        _set_config("audio_numchannels", self.audio_numchannels_widget.get_value_as_int()) # spinbutton
+        _set_config("audio_channels", self.audio_numchannels_widget.get_value_as_int()) # spinbutton
         _set_config("audio_input_buffer", self.audio_input_buffer_widget.get_value_as_int())
         _set_config("audio_output_buffer", self.audio_output_buffer_widget.get_value_as_int())
         

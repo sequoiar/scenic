@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <boost/lexical_cast.hpp>
+#include <gst/interfaces/tuner.h>
 
 #include "util.h"
 
@@ -204,6 +205,13 @@ std::string VideoV4lSource::srcCaps() const
     LOG_INFO(gst_structure_to_string(structure));
     gint framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, 0)));
     gint framerate_denominator = gst_value_get_fraction_denominator((gst_value_list_get_value(val, 0)));
+    GstTunerNorm *norm = GST_TUNER_NORM(gst_tuner_get_norm(GST_TUNER(source_)));
+    if (norm) 
+    {
+        LOG_INFO(gst_value_get_fraction_numerator (&norm->framerate));
+        LOG_INFO(gst_value_get_fraction_denominator (&norm->framerate));
+        assert(0);
+    }
 
     gst_caps_unref(caps);
     gst_object_unref(srcPad);
