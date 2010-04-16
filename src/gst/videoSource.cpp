@@ -202,10 +202,23 @@ std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
     GstStructure *structure = gst_caps_get_structure(caps, 0);
     const GValue *val = gst_structure_get_value(structure, "framerate");
     LOG_DEBUG("Caps structure from v4l2src srcpad: " << gst_structure_to_string(structure));
-    if (framerateIndex >= gst_value_list_get_size(val))
-        THROW_ERROR("Framerate index out of range");
-    gint framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, framerateIndex)));
-    gint framerate_denominator = gst_value_get_fraction_denominator((gst_value_list_get_value(val, framerateIndex)));
+    gint framerate_numerator, framerate_denominator; 
+    if (GST_VALUE_HOLDS_LIST(val))
+    {
+        // trying another one
+        if (framerateIndex >= gst_value_list_get_size(val))
+            THROW_ERROR("Framerate index out of range");
+        framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, framerateIndex)));
+        framerate_denominator = gst_value_get_fraction_denominator((gst_value_list_get_value(val, framerateIndex)));
+    }
+    else
+    {
+        // FIXME: this is really bad, we should be iterating over framerates and resolutions until we find a good one
+        if (framerateIndex > 0)
+            LOG_ERROR("Caps parameters haven't been changed and have failed before");
+        framerate_numerator = gst_value_get_fraction_numerator(val);
+        framerate_denominator = gst_value_get_fraction_denominator(val);
+    }
 
     gst_caps_unref(caps);
     gst_object_unref(srcPad);
