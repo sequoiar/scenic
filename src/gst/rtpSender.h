@@ -55,6 +55,7 @@ class RtpSender
         static void sendCapsChanged(_GstPad *pad, _GParamSpec *pspec, RtpSender *context);
         static void onNewSSRC(_GstElement *rtpbin, unsigned int session, unsigned int ssrc, void *data);
         virtual void subParseSourceStats(_GstStructure *stats);
+        void deltaPacketLoss(_GstStructure *stats);
 };
 
 #endif // _RTP_SENDER_H_

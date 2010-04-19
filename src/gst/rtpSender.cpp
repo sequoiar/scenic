@@ -25,6 +25,7 @@
 #include <gst/gst.h>
 #include <algorithm>
 #include <sstream>
+#include <list>
 
 #include "pipeline.h"
 #include "gstLinkable.h"
@@ -133,6 +134,39 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     gst_object_unref(rtcpReceiverSrc);
 }
 
+// FIXME: flush vectors when we get new, smaller sent or loss values
+void RtpSender::deltaPacketLoss(GstStructure *stats)
+{
+    using std::string;
+    using std::map;
+    using std::list;
+    static map<string, list<gint32> > packetLoss;
+    static map<string, list<gint32> > packetsSent;
+
+    if (G_VALUE_HOLDS_INT(gst_structure_get_value(stats, "rb-packetslost")))
+        packetLoss[sessionName_].push_back(g_value_get_int(gst_structure_get_value(stats, "rb-packetslost")));
+    if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, "packets-sent")))
+        packetsSent[sessionName_].push_back(g_value_get_uint64(gst_structure_get_value(stats, "packets-sent")));
+    const size_t WINDOW_SIZE = 10;
+    while (packetLoss[sessionName_].size() > WINDOW_SIZE) // buffer is full
+        packetLoss[sessionName_].pop_front();  // pop oldest element
+    while (packetsSent[sessionName_].size() > WINDOW_SIZE) // buffer is full
+        packetsSent[sessionName_].pop_front();  // pop oldest element
+
+    const double deltaSent = packetsSent[sessionName_].back() - packetsSent[sessionName_].front();
+    LOG_DEBUG("DELTA PACKETS-SENT: " << deltaSent);
+    double deltaLoss = 0.0;
+    if (packetLoss[sessionName_].size() >= WINDOW_SIZE and
+            packetsSent[sessionName_].size() >= WINDOW_SIZE)
+    {
+        deltaLoss = packetLoss[sessionName_].back() - packetLoss[sessionName_].front();
+        if (deltaLoss >= 0.0)  // avoid bogus values
+            LOG_DEBUG("DELTA PACKET-LOSS: " << deltaLoss);
+        if (deltaSent > 0.0)
+            LOG_DEBUG("AVG PACKET-LOSS: " << 100 * (deltaLoss / deltaSent));
+    }
+}
+
 
 void RtpSender::subParseSourceStats(GstStructure *stats)
 {
@@ -145,10 +179,12 @@ void RtpSender::subParseSourceStats(GstStructure *stats)
             printStatsVal(sessionName_, "bitrate", "guint64", ":BITRATE: ", stats);
             printStatsVal(sessionName_, "octets-sent", "guint64", ":OCTETS-SENT:", stats);
             printStatsVal(sessionName_, "packets-sent", "guint64", ":PACKETS-SENT:", stats);
+            deltaPacketLoss(stats);
         }
         return; // otherwise we don't care about internal sources
     }
     printStatsVal(sessionName_, "rb-jitter", "guint32", ":JITTER: ", stats);
     printStatsVal(sessionName_, "rb-packetslost", "gint32", ":PACKETS-LOST: ", stats);
+    deltaPacketLoss(stats);
 }
 

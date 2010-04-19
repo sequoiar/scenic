@@ -106,9 +106,9 @@ void RtpBin::printStatsVal(const std::string &idStr,
         }
     }
     else
-        THROW_ERROR("Unexpected type");
+        LOG_WARNING("Unexpected type");
 
-    if (!paramStr.empty())
+    if (not paramStr.empty())
         LOG_INFO(idStr << paramStr);
 }
 
