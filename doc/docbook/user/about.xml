@@ -85,7 +85,7 @@
 <!-- to V3.0, and so on. -->  
    <revhistory>
       <revision> 
-		<revnumber>&app; Installation Manual V&manrevision;</revnumber> 
+		<revnumber>&app; User Manual V&manrevision;</revnumber> 
 		<date>&date;</date> 
 		<revdescription> 
 	  	   <para role="author">Society for Arts and Technology
@@ -96,7 +96,7 @@
       </revision> 
    </revhistory>
 
-   <releaseinfo>This manual describes version &appversion; of &app; Installation.</releaseinfo>
+   <releaseinfo>This manual describes version &appversion; of &app; User Manual.</releaseinfo>
 
 <!-- Legal notice and info
 -->

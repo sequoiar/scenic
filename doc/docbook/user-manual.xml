@@ -33,7 +33,6 @@
 <book id="User-Manual" lang="en">
 
    &Introduction;
-   &Using_Scenic;
    &Setup_Overview;
    &Peripheral_Connection;
    &Staring_Devices;

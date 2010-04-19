@@ -1,7 +1,3 @@
-<!-- ============= Document Body ============================= -->
-<!-- ============= Introduction ============================== -->
-<!-- Use the Introduction section to give a brief overview of what
-     the application is and what it does. -->
 <chapter id="Introduction"> 
 <title>Introduction</title> 
 
@@ -14,5 +10,7 @@ of users to participate in a network of learning, research and artistic
 creation anywhere in the world (bandwidth permitting).</para>
 
 <para>The &app; development project is a part of the SAT PropulseART research program that was created to facilitate the implementation of remote networking for audiovisual, stage and digital systems between cultural and educational venues and to promote research and creation through new communication technologies. </para>
-
+<sect1 id="UsingScenic">
+<title>Using Scenic</title>
+</sect1>
 </chapter>
