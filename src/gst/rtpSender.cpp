@@ -146,7 +146,10 @@ void RtpSender::deltaPacketLoss(GstStructure *stats)
     if (G_VALUE_HOLDS_INT(gst_structure_get_value(stats, "rb-packetslost")))
         packetLoss[sessionName_].push_back(g_value_get_int(gst_structure_get_value(stats, "rb-packetslost")));
     if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, "packets-sent")))
+    {
         packetsSent[sessionName_].push_back(g_value_get_uint64(gst_structure_get_value(stats, "packets-sent")));
+        return;
+    }
 
     const size_t WINDOW_SIZE = 10;
 
