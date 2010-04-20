@@ -573,9 +573,7 @@ class Application(object):
         # Turning the reason into readable i18n str.
         if message.has_key("reason"):
             reason = message["reason"]
-            if reason == communication.CANCEL_REASON_TIMEOUT:
-                txt += "\n\n" + _("The invitation expired.")
-            elif reason == communication.CANCEL_REASON_CANCELLED:
+            if reason == communication.CANCEL_REASON_CANCELLED:
                 txt += "\n\n" + _("The peer cancelled the invitation.")
         self.client.disconnect()
         self.gui.invited_dialog.hide()
@@ -843,7 +841,6 @@ class Application(object):
                 port = self.config.negotiation_port
                 
                 def _on_connected(proto):
-                    self.gui._schedule_inviting_timeout_delayed()
                     self.client.send(msg)
                     return proto
                 def _on_error(reason):
@@ -911,7 +908,6 @@ class Application(object):
         CANCEL cancels the invite on the remote host.
         """
         #TODO: add reason argument.
-        #CANCEL_REASON_TIMEOUT = "timed out"
         #CANCEL_REASON_CANCELLED = "cancelled"
         if self.client.is_connected():
             self.client.send({"msg":"CANCEL", "reason": reason, "sid":0})

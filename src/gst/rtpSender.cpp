@@ -147,24 +147,25 @@ void RtpSender::deltaPacketLoss(GstStructure *stats)
         packetLoss[sessionName_].push_back(g_value_get_int(gst_structure_get_value(stats, "rb-packetslost")));
     if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, "packets-sent")))
         packetsSent[sessionName_].push_back(g_value_get_uint64(gst_structure_get_value(stats, "packets-sent")));
-    const size_t WINDOW_SIZE = 10;
-    while (packetLoss[sessionName_].size() > WINDOW_SIZE) // buffer is full
-        packetLoss[sessionName_].pop_front();  // pop oldest element
-    while (packetsSent[sessionName_].size() > WINDOW_SIZE) // buffer is full
-        packetsSent[sessionName_].pop_front();  // pop oldest element
 
+    const size_t WINDOW_SIZE = 10;
+
+    // get difference between newest and oldest packetloss values
+    const double deltaLoss = packetLoss[sessionName_].back() - packetLoss[sessionName_].front();
     const double deltaSent = packetsSent[sessionName_].back() - packetsSent[sessionName_].front();
-    LOG_DEBUG("DELTA PACKETS-SENT: " << deltaSent);
-    double deltaLoss = 0.0;
-    if (packetLoss[sessionName_].size() >= WINDOW_SIZE and
-            packetsSent[sessionName_].size() >= WINDOW_SIZE)
+    // our old data is no longer valid, need to reset
+    if (deltaLoss < 0.0 or deltaSent < 0.0)
     {
-        deltaLoss = packetLoss[sessionName_].back() - packetLoss[sessionName_].front();
-        if (deltaLoss >= 0.0)  // avoid bogus values
-            LOG_DEBUG("DELTA PACKET-LOSS: " << deltaLoss);
-        if (deltaSent > 0.0)
-            LOG_DEBUG("AVG PACKET-LOSS: " << 100 * (deltaLoss / deltaSent));
+        packetLoss[sessionName_].resize(0);
+        packetsSent[sessionName_].resize(0);
     }
+    else if (deltaSent > 0.0)
+        LOG_INFO(sessionName_ << ":AVERAGE PACKET-LOSS:" << 100.0 * (deltaLoss / deltaSent) << "%");
+
+    while (packetLoss[sessionName_].size() > WINDOW_SIZE) // while buffer is overfull
+        packetLoss[sessionName_].pop_front();  // pop oldest element
+    while (packetsSent[sessionName_].size() > WINDOW_SIZE) // while buffer is overfull
+        packetsSent[sessionName_].pop_front();  // pop oldest element
 }
 
 

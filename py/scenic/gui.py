@@ -44,7 +44,6 @@ from scenic.devices import cameras
 from scenic.devices import networkinterfaces
 from scenic.internationalization import _
 
-INVITE_TIMEOUT = 10
 ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
 ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
 ALL_SUPPORTED_SIZE = [ # by milhouse video
@@ -196,7 +195,6 @@ class Gui(object):
     def __init__(self, app, kiosk_mode=False, fullscreen=False, enable_debug=False):
         self.app = app
         self.kiosk_mode_on = kiosk_mode
-        self._inviting_timeout_delayed = None
         widgets_tree = glade.get_widgets_tree()
         
         self._widgets_changed_by_user = True # if False, we are changing some widget's value programmatically.
@@ -1465,47 +1463,17 @@ class Gui(object):
         """
         Sends a CANCEL to the remote peer when invite contact window is closed.
         """
-        # unschedule this timeout as we don't care if our peer answered or not
-        self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_CANCELLED)
-        print("Inviting window is closed. ")
         self.hide_calling_dialog()
+        print("Inviting window is closed. ")
+        self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_CANCELLED)
         return True # don't let the delete-event propagate
 
     def hide_calling_dialog(self):
         """
         Hides the "calling_dialog" dialog.
         """
-        self._unschedule_inviting_timeout_delayed()
         if self.calling_dialog is not None:
             self.calling_dialog.hide()
-
-    def _unschedule_inviting_timeout_delayed(self):
-        """
-        Unschedules our offer timeout delayed call. 
-        """
-        if self._inviting_timeout_delayed is not None and self._inviting_timeout_delayed.active():
-            self._inviting_timeout_delayed.cancel()
-            self._inviting_timeout_delayed = None
-    
-    def _schedule_inviting_timeout_delayed(self):
-        """ 
-        Schedules our offer invite timeout function 
-        """
-        def _cl_offerer_invite_timed_out():
-            # in case of invite timeout, act as if we'd cancelled the invite ourselves
-            print("Inviting window time out. ")
-            self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_TIMEOUT)
-            self.on_invite_contact_cancelled()
-            self.hide_calling_dialog()
-            text = _("The invitation expired. \n\nThe remote peer did not answer quick enough.")
-            dialogs.ErrorDialog.create(text, parent=self.main_window)
-            # here we return false so that this callback is unregistered
-            return False
-
-        if self._inviting_timeout_delayed is None or not self._inviting_timeout_delayed.active():
-            self._inviting_timeout_delayed = reactor.callLater(INVITE_TIMEOUT, _cl_offerer_invite_timed_out)
-        else:
-            print("Warning: Already scheduled a timeout as we're already inviting a contact")
 
     def update_jackd_status(self):
         is_zombie = self.app.devices["jackd_is_zombie"]

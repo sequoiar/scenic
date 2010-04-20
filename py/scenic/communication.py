@@ -24,7 +24,6 @@ from scenic import sic
 from twisted.internet import reactor
 from twisted.internet import defer
 
-CANCEL_REASON_TIMEOUT = "timeout"
 CANCEL_REASON_CANCELLED = "cancelled"
 
 class Server(object):
