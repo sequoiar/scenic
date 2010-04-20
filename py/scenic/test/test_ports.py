@@ -22,7 +22,7 @@
 """
 Unit tests for the port allocator.
 """
-
+import socket
 from twisted.trial import unittest
 from scenic.ports import PortsAllocator
 from scenic.ports import PortsAllocatorError
@@ -68,3 +68,14 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             self.fail("Ports allocator should have overflown. Got value %d." % (value))
             pass
 
+    def test_03_allocate_busy_port(self):
+        # let's use a port
+        PORT = 11000
+        listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # SOCK_DGRAM ? 
+        listener.bind(("localhost", PORT)) # socket.gethostname()
+        
+        a = PortsAllocator(minimum=PORT, increment=2, maximum=PORT + 100)
+        num = a.allocate()
+        self._tst(PORT + 2, num) 
+        # that should have worked
+        listener.close()

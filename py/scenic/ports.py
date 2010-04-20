@@ -84,6 +84,7 @@ class PortsAllocator(object):
                 self.check_port(value)
             except PortsAllocatorError, e:
                 print('error: %s' % (e.message)) 
+                value += self.increment
             else:
                 chosen = True
         self.allocated.add(value)
