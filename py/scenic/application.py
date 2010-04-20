@@ -509,7 +509,6 @@ class Application(object):
          * jackd is not running
          * We already just got an INVITE and didn't answer yet.
         """
-        self._is_negotiating = True
         self.got_bye = False
         self._check_protocol_version(message)
         
@@ -536,6 +535,7 @@ class Application(object):
             print "REFUSING an INVITE, since we are already negotiating with some peer."
             _simply_refuse() # TODO: add reason
             return
+        self._is_negotiating = True
         
         def _check_cb(result):
             if not result:
