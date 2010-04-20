@@ -497,7 +497,6 @@ class Gui(object):
         """
         Called when the user switches to a different page.
         Pages names are : 
-         * contacts_tab_contents
          * video_tab_contents
          * audio_tab_contents
          * system_tab_contents
@@ -505,9 +504,7 @@ class Gui(object):
         """
         tab_widget = widget.get_nth_page(page_number)
         tab_name = tab_widget.get_name()
-        if tab_name == "contacts_tab_contents":
-            self.invite_contact_widget.grab_default()
-        elif tab_name == "video_tab_contents":
+        if tab_name == "video_tab_contents":
             self.app.poll_x11_devices()
             self.app.poll_camera_devices()
         elif tab_name == "audio_tab_contents":
@@ -518,9 +515,16 @@ class Gui(object):
             self.app.poll_midi_devices()
 
     def on_contact_list_changed(self, *args):
+        """
+        Called when the selected contact has changed. 
+        
+        We'll also call this when a new contact has just been added. 
+        """ 
+        print("on_contact_list_changed")
         # FIXME: what is args?
         tree_list, self.selected_contact_row = args[0].get_selected()
         if self.selected_contact_row:
+            print "yes, selected_contact_row"
             # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(True)
             self.remove_contact_widget.set_sensitive(True)
@@ -825,6 +829,9 @@ class Gui(object):
                 contact_markup = format_contact_markup(contact)
                 self.contact_tree.append([contact_markup])
             self.selection.select_path(self.app.address_book.selected)
+            self.edit_contact_widget.set_sensitive(True)
+            self.remove_contact_widget.set_sensitive(True)
+            self.invite_contact_widget.set_sensitive(True)
         else:
             self.edit_contact_widget.set_sensitive(False)
             self.remove_contact_widget.set_sensitive(False)
@@ -968,10 +975,8 @@ class Gui(object):
         #is_streaming = self.app.has_session()
         if contact is None:
             text = _("Invite") #Please select a contact")
-            self.invite_label_widget.set_sensitive(False)
         else:
             text = _("Invite") # %(contact)s") % {"contact": contact["name"]}
-            self.invite_label_widget.set_sensitive(True)
         self.invite_label_widget.set_text(text)
 
     def make_midi_widget_sensitive_or_not(self):
