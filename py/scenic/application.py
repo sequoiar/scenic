@@ -196,6 +196,7 @@ class Application(object):
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
+        self._is_negotiating = False
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = communication.Client()
@@ -440,9 +441,20 @@ class Application(object):
     # ------------------------- session occuring -------------
     def has_session(self):
         """
+        Checks if we are currently streaming with a peer or not.
         @rtype: bool
         """
         return self.streamer_manager.is_busy()
+
+    def has_negotiation_in_progress(self):
+        """
+        Checks if we are currently negotiating  with a peer or not.
+        @rtype: bool
+        """
+        ret =  self.get_last_message_received() == "INVITE" and self.get_last_message_sent() != "REFUSE" 
+        # FIXME: does not cover all the cases!
+        return ret
+    
     # -------------------- streamer ports -----------------
     def prepare_before_rtp_stream(self):
         #TODO: return a Deferred
@@ -451,6 +463,7 @@ class Application(object):
         self._allocate_ports()
         
     def cleanup_after_rtp_stream(self):
+        #FIXME: is this useful at all?
         self._free_ports()
     
     def _allocate_ports(self):
@@ -498,6 +511,7 @@ class Application(object):
          * jackd is not running
          * We already just got an INVITE and didn't answer yet.
         """
+        self._is_negotiating = True
         self.got_bye = False
         self._check_protocol_version(message)
         
@@ -520,10 +534,9 @@ class Application(object):
         
         if contact is not None:
             invited_by = contact["name"]
-
-        if self.get_last_message_received() == "INVITE" and self.get_last_message_sent() != "REFUSE": # FIXME: does that cover all cases?
-            _simply_refuse()
-            print("REFUSED an INVITE since we already got one from someone else.")
+        if self.has_negotiation_in_progress():
+            print "REFUSING an INVITE, since we are already negotiating with some peer."
+            _simply_refuse() # TODO: add reason
             return
         
         def _check_cb(result):
@@ -562,6 +575,7 @@ class Application(object):
         return ret
     
     def handle_cancel(self, message, addr):
+        self._is_negotiating = False
         # If had previously sent ACCEPT and receive CANCEL, abort the session.
         if self.get_last_message_sent() == "ACCEPT":
             self.cleanup_after_rtp_stream()
@@ -580,6 +594,7 @@ class Application(object):
         dialogs.ErrorDialog.create(txt, parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
+        self._is_negotiating = False
         if self.get_last_message_sent() == "CANCEL":
             self.send_bye() # If got ACCEPT, but had sent CANCEL, send BYE.
         else:
@@ -605,6 +620,7 @@ class Application(object):
         """
         Got REFUSE
         """
+        self._is_negotiating = False
         self.gui.hide_calling_dialog()
         self._free_ports()
         text = _("The contact refused to stream with you.\n\nIt may be caused by a ongoing session with an other peer or by technical problems.")
@@ -614,6 +630,7 @@ class Application(object):
         """
         Got ACK
         """
+        self._is_negotiating = False
         print("Got ACK. Starting streamers as answerer.")
         self.start_streamers(addr)
 
@@ -621,6 +638,7 @@ class Application(object):
         """
         Got BYE
         """
+        self._is_negotiating = False
         self.got_bye = True
         self.stop_streamers()
         if self.client.is_connected():
@@ -632,6 +650,7 @@ class Application(object):
         """
         Got OK
         """
+        self._is_negotiating = False
         print("received ok. Everything has an end.")
         print('disconnecting client')
         self.disconnect_client()
@@ -820,6 +839,7 @@ class Application(object):
         """
         Does the flight check. If OK, send an INVITE.
         """
+        self._is_negotiating = True
         contact = self.address_book.get_currently_selected_contact()
         if contact is None:
             dialogs.ErrorDialog.create(_("You must select a contact to invite."), parent=self.gui.main_window)
@@ -881,6 +901,7 @@ class Application(object):
             }
         msg.update(self._get_local_config_message_items())
         self.client.send(msg)
+        self._is_negotiating = False
 
     def get_last_message_sent(self):
         return self.client.last_message_sent
@@ -901,6 +922,7 @@ class Application(object):
         BYE stops the streaming on the remote host.
         """
         self.client.send({"msg":"BYE", "sid":0})
+        self._is_negotiating = False
     
     def send_cancel_and_disconnect(self, reason=""):
         """
@@ -913,6 +935,7 @@ class Application(object):
             self.client.send({"msg":"CANCEL", "reason": reason, "sid":0})
             self.client.disconnect()
         self.cleanup_after_rtp_stream()
+        self._is_negotiating = False
     
     def send_refuse_and_disconnect(self):
         """
@@ -921,6 +944,7 @@ class Application(object):
         """
         self.client.send({"msg":"REFUSE", "sid":0})
         self.client.disconnect()
+        self._is_negotiating = False
 
     # ------------------- streaming events handlers ----------------
     
