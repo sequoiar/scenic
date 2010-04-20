@@ -451,9 +451,7 @@ class Application(object):
         Checks if we are currently negotiating  with a peer or not.
         @rtype: bool
         """
-        ret =  self.get_last_message_received() == "INVITE" and self.get_last_message_sent() != "REFUSE" 
-        # FIXME: does not cover all the cases!
-        return ret
+        return self._is_negotiating
     
     # -------------------- streamer ports -----------------
     def prepare_before_rtp_stream(self):
