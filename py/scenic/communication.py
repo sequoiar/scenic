@@ -141,8 +141,8 @@ class Client(object):
         @param msg: dict
         @rtype: None
         """
+        self.last_message_sent = msg["msg"]
         if self.is_connected():
-            self.last_message_sent = msg["msg"]
             self.sic_sender.send_message(msg)
         else:
             error = "Not connected, cannot send message " + str(msg)

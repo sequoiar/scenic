@@ -137,8 +137,8 @@ class Config(saving.ConfigStateSaving):
         self.video_bitrate = 3.0
         self.video_jitterbuffer = 75
         # ----------- MIDI ----------------
-        self.midi_recv_enabled = True
-        self.midi_send_enabled = True
+        self.midi_recv_enabled = False
+        self.midi_send_enabled = False
         self.midi_input_device = "" # ID and name
         self.midi_output_device = "" # ID and name
         self.midi_jitterbuffer = 10 # ms
