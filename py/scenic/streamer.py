@@ -48,48 +48,6 @@ class StreamerManager(object):
         self.rtcp_stats = None # either None or a big dict
         self.error_messages = None # either None or a big dict
 
-    def _calculate_packet_loss(self):
-        """
-        Takes the last value and the current for packets lost and total packets.
-        Calculates the percent of packet loss : 
-
-        delta loss / delta sent
-        
-        Multiplied by 100 to get a percentage.
-        """
-        #TODO:
-        video_lost = self.rtcp_stats["send"]["video"]["packets-lost"]
-        video_sent = self.rtcp_stats["send"]["video"]["packets-sent"]
-        audio_lost = self.rtcp_stats["send"]["audio"]["packets-lost"]
-        audio_sent = self.rtcp_stats["send"]["audio"]["packets-sent"]
-        video_lost_previous = self.rtcp_stats["send"]["video"]["packets-lost-previous"]
-        video_sent_previous = self.rtcp_stats["send"]["video"]["packets-sent-previous"]
-        audio_lost_previous = self.rtcp_stats["send"]["audio"]["packets-lost-previous"]
-        audio_sent_previous = self.rtcp_stats["send"]["audio"]["packets-sent-previous"]
-        
-        if self.rtcp_stats["send"]["video"]["packets-lost-got-new"] and self.rtcp_stats["send"]["video"]["packets-sent-got-new"]:
-            self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = False
-            self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = False
-            diff_video_sent = float(video_sent - video_sent_previous)
-            if diff_video_sent != 0: # avoid division by zero
-                video_packets_loss = float(video_lost - video_lost_previous) / diff_video_sent * 100
-                if video_packets_loss >= 0.0:   # FIXME: temporary fix to avoid occasional bogus percentages
-                    self.rtcp_stats["send"]["video"]["packets-loss-percent"] =  video_packets_loss
-                    print("Video packet loss : %s" % (video_packets_loss))
-            self.rtcp_stats["send"]["video"]["packets-lost-previous"] = video_lost
-            self.rtcp_stats["send"]["video"]["packets-sent-previous"] = video_sent
-        if self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] and self.rtcp_stats["send"]["audio"]["packets-sent-got-new"]:
-            self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = False
-            self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = False
-            diff_audio_sent = float(audio_sent - audio_sent_previous)
-            if diff_audio_sent != 0: # avoid division by zero
-                audio_packets_loss = float(audio_lost - audio_lost_previous) / diff_audio_sent * 100
-                if audio_packets_loss >= 0.0:   # FIXME: temporary fix to avoid occasional bogus percentages
-                    self.rtcp_stats["send"]["audio"]["packets-loss-percent"] = audio_packets_loss
-                    print("Audio packet loss : %s" % (audio_packets_loss))
-            self.rtcp_stats["send"]["audio"]["packets-lost-previous"] = audio_lost
-            self.rtcp_stats["send"]["audio"]["packets-sent-previous"] = audio_sent
-
     def _gather_config_to_stream(self, addr):
         """
         Gathers all settings in a big dict.
@@ -214,11 +172,7 @@ class StreamerManager(object):
                 "video": {
                     "packets-lost": 0,
                     "packets-sent": 0,
-                    "packets-lost-previous": 0,
-                    "packets-sent-previous": 0,
-                    "packets-lost-got-new": False,
-                    "packets-sent-got-new": False,
-                    "packets-loss-percent": 0.0,
+                    "packet-loss-percent": 0.0,
                     "jitter": 0,
                     "bitrate": None,
                     "connected": False
@@ -226,11 +180,7 @@ class StreamerManager(object):
                 "audio": {
                     "packets-lost": 0,
                     "packets-sent": 0,
-                    "packets-lost-previous": 0,
-                    "packets-sent-previous": 0,
-                    "packets-lost-got-new": False,
-                    "packets-sent-got-new": False,
-                    "packets-loss-percent": 0.0,
+                    "packet-loss-percent": 0.0,
                     "jitter": 0,
                     "bitrate": None,
                     "connected": False
@@ -525,18 +475,19 @@ class StreamerManager(object):
             if "PACKETS-LOST" in line:
                 if "video" in line:
                     self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = True
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = True
                 #self._calculate_packet_loss()
-            if "PACKETS-SENT" in line:
+            elif "AVERAGE PACKET-LOSS" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["packet-loss-percent"] = int(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["packet-loss-percent"] = int(line.split(":")[-1])
+            elif "PACKETS-SENT" in line:
                 if "video" in line:
                     self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = True
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["packets-sent"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = True
                 #self._calculate_packet_loss()
             elif "JITTER" in line:
                 if "video" in line:

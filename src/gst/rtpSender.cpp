@@ -163,7 +163,7 @@ void RtpSender::deltaPacketLoss(GstStructure *stats)
         packetsSent[sessionName_].resize(0);
     }
     else if (deltaSent > 0.0)
-        LOG_INFO(sessionName_ << ":AVERAGE PACKET-LOSS:" << 100.0 * (deltaLoss / deltaSent) << "%");
+        LOG_INFO(sessionName_ << ":AVERAGE PACKET-LOSS(%):" << 100.0 * (deltaLoss / deltaSent));
 
     while (packetLoss[sessionName_].size() > WINDOW_SIZE) // while buffer is overfull
         packetLoss[sessionName_].pop_front();  // pop oldest element

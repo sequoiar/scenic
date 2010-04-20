@@ -1429,6 +1429,8 @@ class Gui(object):
         """
         if self.app.has_session():
             self.app.stop_streamers()
+        elif self.app.has_negotiation_in_progress():
+            print "has negotiation in progress"
         else:
             self.app.send_invite()
 
