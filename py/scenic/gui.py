@@ -1028,21 +1028,6 @@ class Gui(object):
                 """
                 return _("Audio buffer: %(buffer)d ms") % {"buffer": buffer_ms}
 
-            def _format_command_line(cmd):
-                """
-                Formats a bash command line for the summary.
-                """
-                text = cmd
-                #words = cmd.split()
-                #length = 0
-                #text = ""
-                #for word in words: 
-                #    length += len(word)
-                #    if length >= 40:
-                #        text += "\n"
-                #        length = 0
-                #    text += word + " "
-                return _("$ %(command)s") % {"command": text} 
 
             details = self.app.streamer_manager.session_details
             rtcp_stats = self.app.streamer_manager.rtcp_stats
@@ -1151,6 +1136,21 @@ class Gui(object):
         """
         Writes some information in the debug textview, if debugging is enabled. 
         """
+        def _format_command_line(cmd):
+            """
+            Formats a bash command line for the summary.
+            """
+            text = cmd
+            #words = cmd.split()
+            #length = 0
+            #text = ""
+            #for word in words: 
+            #    length += len(word)
+            #    if length >= 40:
+            #        text += "\n"
+            #        length = 0
+            #    text += word + " "
+            return _("$ %(command)s") % {"command": text} 
         if self.enable_debug:
             _debug_text = ""
             _debug_text += _("Command lines:") + "\n"
