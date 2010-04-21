@@ -38,6 +38,8 @@ def start_file_logging(full_path="/var/tmp/scenic/scenic.log"):
     """
     file_name = os.path.basename(full_path)
     directory = os.path.dirname(full_path)
+    if directory == '':
+        directory = os.getcwd()
     if not os.path.exists(directory):
         os.makedirs(directory)
     f = open(full_path, 'w') # erases previous file
