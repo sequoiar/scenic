@@ -807,7 +807,7 @@ class Application(object):
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
                 return deferred.callback(False)
                 
-            elif not self.devices["jackd_is_running"]:
+            elif not self.devices["jackd_is_running"] and self.config.audio_send_enabled or self.config.audio_recv_enabled:
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
                 return deferred.callback(False)
@@ -825,7 +825,7 @@ class Application(object):
                 deferred.callback(False)
             
             # "cameras": {}, # dict of dicts (only V4L2 cameras for now)
-            elif not self.devices["xvideo_is_present"]: #TODO: do not test if not receiving video
+            elif not self.devices["xvideo_is_present"] and self.config.video_recv_enabled:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X video extension is not present."), parent=self.gui.main_window)
                 deferred.callback(False)
             
