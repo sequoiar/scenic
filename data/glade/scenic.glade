@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Wed Apr 21 18:41:01 2010 -->
+<!--Generated with glade3 3.4.5 on Wed Apr 21 18:45:12 2010 -->
 <glade-interface>
   <widget class="GtkDialog" id="confirm_dialog">
     <property name="border_width">5</property>
@@ -1144,7 +1144,7 @@
                                             <property name="visible">True</property>
                                             <property name="xpad">5</property>
                                             <property name="ypad">5</property>
-                                            <property name="label" translatable="yes">Invite the selected contact</property>
+                                            <property name="label" translatable="yes">Invite</property>
                                             <property name="use_underline">True</property>
                                           </widget>
                                           <packing>
