@@ -110,7 +110,7 @@ class ProcessManager(object):
         self._child_running_time = None
         self.state = STATE_STOPPED
         self.command = command # string (bash)
-        self.time_before_sigkill = 5.0 # seconds
+        self.time_before_sigkill = 10.0 # seconds
         self.identifier = identifier # title
         self.env = {} # environment variables for the child process
         if env is not None:
