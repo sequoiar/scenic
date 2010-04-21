@@ -200,7 +200,7 @@ class Application(object):
         print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = communication.Client()
-        #self.client.connection_error_signal.connect(self.on_connection_error)
+        self.client.connection_error_signal.connect(self.on_connection_error)
         self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
@@ -228,6 +228,12 @@ class Application(object):
         @rtype: str
         """
         return _format_device_name_and_identifier(midi_device_dict["name"], str(midi_device_dict["number"]))
+    
+    def on_connection_error(self, err, mess):
+        """
+        Called by the communication.Client in case of an error.
+        """
+        self._is_negotiating = False #important
 
     def format_v4l2_device_name(self, device_dict):
         print "formatting v4l2 device name", device_dict
@@ -955,6 +961,8 @@ class Application(object):
                 # got_bye means our peer sent us a BYE, so we shouldn't send one back 
                 print("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
+        elif new_state == process.STATE_RUNNING:
+            self.gui.write_info_in_debug_tab()
             
     #def on_connection_error(self, err, msg):
     #    """

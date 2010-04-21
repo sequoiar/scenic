@@ -518,11 +518,11 @@ class Gui(object):
         
         We'll also call this when a new contact has just been added. 
         """ 
-        print("on_contact_list_changed")
+        #print("on_contact_list_changed")
         # FIXME: what is args?
         tree_list, self.selected_contact_row = args[0].get_selected()
         if self.selected_contact_row:
-            print "yes, selected_contact_row"
+            #print "yes, selected_contact_row"
             # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(True)
             self.remove_contact_widget.set_sensitive(True)
@@ -1139,13 +1139,6 @@ class Gui(object):
             self.info_receive_midi_widget.set_text(_info_recv_midi)
             self.info_send_midi_widget.set_text(_info_send_midi)
 
-            if self.enable_debug:
-                _debug_text = ""
-                _debug_text += _("Command lines:") + "\n"
-                for command in self.app.streamer_manager.get_command_lines():
-                    _debug_text += _format_command_line(command) + "\n"
-                self.debug_textview_widget.get_buffer().set_text(unicode(_debug_text))
-            
         else: # not streaming
             self.info_send_video_widget.set_text("")
             self.info_send_audio_widget.set_text("")
@@ -1153,8 +1146,21 @@ class Gui(object):
             self.info_receive_audio_widget.set_text("")
             self.info_receive_midi_widget.set_text("")
             self.info_send_midi_widget.set_text("")
-            if self.enable_debug:
-                self.debug_textview_widget.get_buffer().set_text(u"")
+
+    def write_info_in_debug_tab(self):
+        """
+        Writes some information in the debug textview, if debugging is enabled. 
+        """
+        if self.enable_debug:
+            _debug_text = ""
+            _debug_text += _("Command lines:") + "\n"
+            for command in self.app.streamer_manager.get_command_lines():
+                _debug_text += _format_command_line(command) + "\n"
+            self.debug_textview_widget.get_buffer().set_text(unicode(_debug_text))
+        else:
+            pass
+            #if self.enable_debug:
+            #    self.debug_textview_widget.get_buffer().set_text(u"")
         
     def update_local_ip(self):
         """
