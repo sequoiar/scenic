@@ -304,6 +304,7 @@ class Application(object):
         # Devices: X11 and XV
         def _callback(result):
             self.gui.update_widgets_with_saved_config()
+            self.poll_camera_devices() # we need to do it once more, to update the list of possible image size according to the selected video device
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_xvideo_extension(),
@@ -363,16 +364,17 @@ class Application(object):
             self.gui.update_camera_devices()
             if toggle_size_sensitivity:
                 self.gui.video_capture_size_widget.set_sensitive(True)
-            print("setting video_capture_size widget sensitive to true")
+            print("Done polling cameras. Setting video_capture_size widget sensitive to true.")
+            return cameras
         def _errback(reason):
             if toggle_size_sensitivity:
                 self.gui.video_capture_size_widget.set_sensitive(True)
-            print("setting video_capture_size widget sensitive to true")
+            print("Setting video_capture_size widget sensitive to true")
             return reason
         if toggle_size_sensitivity:
             self.gui.video_capture_size_widget.set_sensitive(False)
         deferred.addCallback(_callback)
-        print("setting video_capture_size widget sensitive to false")
+        print("Setting video_capture_size widget sensitive to false")
         deferred.addErrback(_errback)
         return deferred
 
@@ -388,6 +390,7 @@ class Application(object):
                 msg = _("It seems like the xvideo extension is not present. Video display is not possible.")
                 print(msg)
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+            return xvideo_is_present
         deferred.addCallback(_callback)
         return deferred
         
