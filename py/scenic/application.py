@@ -116,6 +116,7 @@ class Config(saving.ConfigStateSaving):
         self.audio_channels = 2
         self.audio_input_buffer = 15
         self.audio_output_buffer = 15
+        self.audio_jitterbuffer = 75
         # ------------- VIDEO -------------
         self.video_send_enabled = True
         self.video_recv_enabled = True

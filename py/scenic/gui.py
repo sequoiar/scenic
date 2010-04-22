@@ -283,6 +283,7 @@ class Gui(object):
         self.audio_jack_icon_widget = widgets_tree.get_widget("audio_jack_icon")
         self.audio_jack_state_widget = widgets_tree.get_widget("audio_jack_state")
         self.audio_numchannels_widget = widgets_tree.get_widget("audio_numchannels")
+        self.audio_jitterbuffer_widget = widgets_tree.get_widget("audio_jitterbuffer")
 
         self.jack_latency_widget = widgets_tree.get_widget("jack_latency")
         self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
@@ -771,6 +772,7 @@ class Gui(object):
         _set_config("audio_channels", self.audio_numchannels_widget.get_value_as_int()) # spinbutton
         _set_config("audio_input_buffer", self.audio_input_buffer_widget.get_value_as_int())
         _set_config("audio_output_buffer", self.audio_output_buffer_widget.get_value_as_int())
+        _set_config("audio_jitterbuffer", self.audio_jitterbuffer_widget.get_value_as_int()) # spinbutton
         
         # MIDI:
         _set_config("midi_send_enabled", self.midi_send_enabled_widget.get_active())
@@ -844,6 +846,7 @@ class Gui(object):
         self.audio_numchannels_widget.set_value(_get_config("audio_channels")) # spinbutton
         self.audio_input_buffer_widget.set_value(_get_config("audio_input_buffer"))
         self.audio_output_buffer_widget.set_value(_get_config("audio_output_buffer"))
+        self.audio_jitterbuffer_widget.set_value(_get_config("audio_jitterbuffer"))
         # source, codec
         audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
         print " * audio_source:", audio_source_readable
@@ -909,6 +912,7 @@ class Gui(object):
             self.midi_jitterbuffer_widget,
             self.audio_send_enabled_widget,
             self.audio_receive_enabled_widget,
+            self.audio_jitterbuffer_widget,
             self.video_send_enabled_widget,
             self.video_receive_enabled_widget,
             ]
@@ -1054,7 +1058,6 @@ class Gui(object):
             #    }
             #print("info send video: " + _info_send_video)
             self.info_send_video_widget.set_text(_info_send_video)
-            
             
             # send audio: --------------------------------
             _info_send_audio = ""
