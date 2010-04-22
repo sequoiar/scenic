@@ -23,6 +23,7 @@
 #ifndef _PIPELINE_H_
 #define _PIPELINE_H_
 
+#include <set>
 #include <vector>
 
 #include "noncopyable.h"
@@ -70,7 +71,7 @@ class Pipeline : boost::noncopyable
         void updateListeners(_GstMessage *msg);
 
         _GstElement *pipeline_;
-        std::vector<BusMsgHandler*> handlers_;
+        std::set<BusMsgHandler*> handlers_;
         unsigned sampleRate_;
         static const unsigned int SAMPLE_RATE = 48000;
 };
