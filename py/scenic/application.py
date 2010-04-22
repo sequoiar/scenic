@@ -538,6 +538,7 @@ class Application(object):
 
         def _simply_refuse():
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0})
+            self._is_negotiating = False
         
         if contact is not None:
             invited_by = contact["name"]
@@ -707,10 +708,12 @@ class Application(object):
             self.stop_streamers()
         else:
             self.streamer_manager.start(addr)
+        self._is_negotiating = False
 
     def stop_streamers(self):
         # TODO: return a deferred. 
         self.streamer_manager.stop()
+        self._is_negotiating = False
 
     def on_streamers_stopped(self, addr):
         """
@@ -885,6 +888,7 @@ class Application(object):
                     print(msg)
                     self.gui.hide_calling_dialog()
                     dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    self._is_negotiating = False
                     return None
                    
                 print("sending %s to %s:%s" % (msg, ip, port))

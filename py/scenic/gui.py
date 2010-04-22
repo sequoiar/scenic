@@ -333,8 +333,6 @@ class Gui(object):
         self.video_send_enabled_widget = widgets_tree.get_widget("video_send_enabled")
         self.video_receive_enabled_widget = widgets_tree.get_widget("video_receive_enabled")
 
-        #self.audio_video_synchronized_widget.set_sensitive(False) # TODO
-
         # switch to Kiosk mode if asked
         if self.kiosk_mode_on:
             self.main_window.set_decorated(False)
@@ -863,6 +861,7 @@ class Gui(object):
         _set_combobox_value(self.midi_output_device_widget, _get_config("midi_output_device"))
         self.make_midi_widget_sensitive_or_not()
         self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
+        self.make_audio_jitterbuffer_enabled_or_not()
 
         # IMPORTANT: (to be done last)
         self._widgets_changed_by_user = True
@@ -967,7 +966,10 @@ class Gui(object):
             if not is_streaming: # FIXME
                 #if self.video_preview_icon_widget.get_stock() == gtk.STOCK_MEDIA_STOP:
                 for widget in _video_widgets_to_toggle_sensitivity:
-                    widget.set_sensitive(True)
+                    if widget is self.audio_jitterbuffer_widget:
+                        self.make_audio_jitterbuffer_enabled_or_not()
+                    else:
+                        widget.set_sensitive(True)
             if self.preview_area_x_window_id is not None:
                 if self.preview_area_widget.window is not None:
                     self.preview_area_widget.window.clear()
@@ -1184,6 +1186,27 @@ class Gui(object):
             self.info_ip_widget.set_text(txt)
         deferred = networkinterfaces.list_network_interfaces_addresses()
         deferred.addCallback(_cb)
+
+    def on_audio_video_synchronized_toggled(self, *args):
+        """
+        Called when the user toggles on/off the synchronization of audio and video. 
+        """
+        #if self._widgets_changed_by_user:
+        self.make_audio_jitterbuffer_enabled_or_not()
+
+    def on_video_receive_enabled_toggled(self, *args):
+        self.make_audio_jitterbuffer_enabled_or_not()
+
+    def make_audio_jitterbuffer_enabled_or_not(self):
+        """
+        Checks if the audio_jitterbuffer button should be sensitive or not and sets it.
+        """
+        sync_enabled = self.audio_video_synchronized_widget.get_active()
+        video_recv_enabled = self.video_receive_enabled_widget.get_active()
+        if sync_enabled and video_recv_enabled:
+            self.audio_jitterbuffer_widget.set_sensitive(False)
+        else:
+            self.audio_jitterbuffer_widget.set_sensitive(True)
         
     def on_audio_codec_changed(self, widget):
         """

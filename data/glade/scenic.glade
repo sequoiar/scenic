@@ -1778,6 +1778,7 @@ Theora</property>
                                     <property name="xalign">1</property>
                                     <property name="response_id">0</property>
                                     <property name="draw_indicator">True</property>
+                                    <signal name="toggled" handler="on_video_receive_enabled_toggled"/>
                                   </widget>
                                   <packing>
                                     <property name="x_padding">5</property>
