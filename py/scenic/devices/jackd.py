@@ -195,6 +195,7 @@ def jackd_get_infos():
                 for arg in cmdline[1:]:
                     ret[i]["cmdline"] += " " + arg
             # if set to 0, it was not set in the CLI, so we set it to the default according to backend
+            print "i = ", i
             if ret[i]["nperiods"] == 0:
                 if ret[i]["backend"] == "freebob":
                     ret[i]["nperiods"] = 3
