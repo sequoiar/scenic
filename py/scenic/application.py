@@ -184,9 +184,11 @@ class Application(object):
     Main class of the application.
 
     The devices attributes is a very interesting dict. See the source code.
+    @param force_previous_device_settings: Whether we should load previous V4L2 input and norm or not.
     """
-    def __init__(self, kiosk_mode=False, fullscreen=False, log_file_name=None, enable_debug=False):
+    def __init__(self, kiosk_mode=False, fullscreen=False, log_file_name=None, enable_debug=False, force_previous_device_settings=True):
         self.config = Config()
+        self.force_previous_device_settings = force_previous_device_settings
         self.enable_debug = enable_debug
         self.log_file_name = log_file_name
         self.recv_video_port = None
@@ -303,17 +305,42 @@ class Application(object):
         # Devices: JACKD (every 5 seconds)
         self._jackd_watch_task.start(5, now=True)
         # Devices: X11 and XV
-        def _callback(result):
+        def _cb2(result):
             self.gui.update_widgets_with_saved_config()
-            self.poll_camera_devices() # we need to do it once more, to update the list of possible image size according to the selected video device
-        deferred_list = defer.DeferredList([
-            self.poll_x11_devices(), 
-            self.poll_xvideo_extension(),
-            self.poll_camera_devices(), 
-            self.poll_midi_devices()
-            ])
-        deferred_list.addCallback(_callback)
+            d = self.poll_camera_devices() # we need to do it once more, to update the list of possible image size according to the selected video device
+        #first_action = defer.DeferredList([
+        d = self._restore_v4l2_settings()
+        def _cb1(result):
+            deferred_list = defer.DeferredList([
+                self.poll_x11_devices(), 
+                self.poll_xvideo_extension(),
+                self.poll_camera_devices(), 
+                self.poll_midi_devices()
+                ])
+            deferred_list.addCallback(_cb2)
+        d.addCallback(_cb1)
 
+    def _restore_v4l2_settings(self):
+        """
+        Restores settings previously saved, if desired. 
+        @rettype: L{Deferred}
+        """
+        # if current video source is V4L2, set it to the previous input and norm, if self.
+        if not self.force_previous_device_settings:
+            return defer.succeed(True)
+        else:
+            if self.config.video_source != "v4l2src":
+                return defer.succeed(True)
+            else:
+                camera_name = self.config.video_device
+                standard_name = self.config.video_standard
+                input_number = self.conig.video_input
+                deferred_list = defer.DeferredList([
+                    cameras.set_v4l2_video_standard(device_name=camera_name, standard=standard_name),
+                    cameras.set_v4l2_input_number(device_name=camera_name, input_number=input_number)
+                    ])
+                return deferred_list
+        
     def poll_midi_devices(self):
         """
         Called once at startup, and then the GUI can call it.
