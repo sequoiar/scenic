@@ -399,7 +399,7 @@ class Gui(object):
         Called when toggled fullscreen.
         """
         self.is_fullscreen = event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN != 0
-        print('fullscreen %s' % (self.is_fullscreen))
+        #print('fullscreen %s' % (self.is_fullscreen))
         return True
     
     def on_main_window_deleted(self, *args):
