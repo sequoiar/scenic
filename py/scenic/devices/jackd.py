@@ -108,7 +108,7 @@ def jackd_get_infos():
         except ValueError:
             pass
         else:
-            ret.append({}) # populate a dict
+            ret[i] = {}
             ret[i]['name'] = name # probably 'default' or $JACK_DEFAULT_SERVER
             ret[i]['pid'] = pid
             # adding some default values!! XXX
