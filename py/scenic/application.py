@@ -811,7 +811,8 @@ class Application(object):
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
                 return deferred.callback(False)
                 
-            elif not self.devices["jackd_is_running"] and self.config.audio_send_enabled or self.config.audio_recv_enabled:
+            elif not self.devices["jackd_is_running"] and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
+                print "self.devices[\'jackd_is_running\'] = ", self.devices["jackd_is_running"]
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
                 return deferred.callback(False)
@@ -898,6 +899,7 @@ class Application(object):
                 # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
             else:
                 print("Cannot send INVITE.")
+                self._is_negotiating = False
 
         check_deferred = self.check_if_ready_to_stream(role="offerer")
         check_deferred.addCallback(_check_cb)

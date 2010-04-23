@@ -69,6 +69,10 @@ class StreamerManager(object):
         midi_input_device = self.app.config.midi_input_device
         midi_output_device = self.app.config.midi_output_device
         
+        audio_jitterbuffer = self.app.config.audio_jitterbuffer
+        if self.app.config.audio_video_synchronized and self.app.config.video_recv_enabled:
+            audio_jitterbuffer = self.app.config.video_jitterbuffer
+        
         print "remote_config:", remote_config
         
         self.session_details = {
@@ -149,7 +153,8 @@ class StreamerManager(object):
                     "port": self.app.recv_audio_port,
                     "sink": self.app.config.audio_sink,
                     "buffer": self.app.config.audio_output_buffer,
-                    "synchronized": self.app.config.audio_video_synchronized
+                    "synchronized": self.app.config.audio_video_synchronized,
+                    "jitterbuffer": audio_jitterbuffer
                 },
                 "midi": {
                     "enabled": midi_recv_enabled,
@@ -333,6 +338,7 @@ class StreamerManager(object):
             milhouse_recv_cmd_final.extend(milhouse_recv_cmd_video)
             if extra_recv_enabled:
                 milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_audio)
+                milhouse_recv_cmd_extra.extend(["--jitterbuffer", details["receive"]["audio"]["jitterbuffer"]])
             else:
                 milhouse_recv_cmd_final.extend(milhouse_recv_cmd_audio)
             recv_cmd = " ".join(milhouse_recv_cmd_final)
