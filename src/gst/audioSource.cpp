@@ -283,6 +283,8 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     GstCaps *caps = 0;
     caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
     tassert(caps);
+    //std::vector<GstAudioChannelPosition> pos(config_.numChannels(), GST_AUDIO_CHANNEL_POSITION_NONE);
+    //gst_audio_set_channel_positions(gst_caps_get_structure(caps, 0), pos.data());
     capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", caps, NULL);
 
