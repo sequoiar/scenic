@@ -86,9 +86,6 @@ def run():
     """
     from scenic import configure
     
-    if not os.environ.has_key('DISPLAY'):
-        print "You need an X11 display to run Scenic."
-        sys.exit(1)
     if not os.environ.has_key('GTK2_RC_FILES'):
         name = "Darklooks"
         file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
@@ -117,6 +114,9 @@ def run():
     if options.moo:
         moo()
         sys.exit(0)
+    if not os.environ.has_key('DISPLAY'):
+        print "You need an X11 display to run Scenic."
+        sys.exit(1)
     if options.enable_logging:
         start_file_logging(os.path.expanduser(options.log_file_name))
         kwargs["log_file_name"] = options.log_file_name
