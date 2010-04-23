@@ -793,6 +793,8 @@ class Application(object):
         """
         #TODO: poll X11 devices
         #TODO: poll xv extension
+        self.save_configuration()
+        self.prepare_before_rtp_stream()
         deferred = defer.Deferred()
         def _callback(result):
             # callback for the deferred list created below.
@@ -818,6 +820,7 @@ class Application(object):
                 return deferred.callback(False)
                 
             elif (not self.devices["jackd_is_running"]) and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
+                print "audio send/recv enabled:", self.config.audio_send_enabled, self.config.audio_recv_enabled
                 print "self.devices[\'jackd_is_running\'] = ", self.devices["jackd_is_running"]
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
@@ -843,13 +846,13 @@ class Application(object):
             else:
                 deferred.callback(True)
         
+        self._poll_jackd() # does not return a deferred for now... called in a looping call.
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_midi_devices(), 
             self.poll_xvideo_extension(),
             self.poll_camera_devices()
             ])
-        self._poll_jackd() # does not return a deferred for now... called in a looping call.
         deferred_list.addCallback(_callback)
         return deferred
 
@@ -868,7 +871,7 @@ class Application(object):
         def _check_cb(result):
             #TODO: use the Deferred it will return
             if result:
-                self.prepare_before_rtp_stream()
+                #self.prepare_before_rtp_stream()
                 msg = {
                     "msg":"INVITE",
                     "protocol": self.protocol_version,
@@ -913,7 +916,7 @@ class Application(object):
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
         #TODO: use the Deferred it will return
-        self.prepare_before_rtp_stream()
+        #self.prepare_before_rtp_stream()
         msg = {
             "msg":"ACCEPT", 
             "protocol": self.protocol_version,
