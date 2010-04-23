@@ -537,7 +537,7 @@ class Application(object):
         send_to_port = message["please_send_to_port"]
 
         def _simply_refuse(reason):
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason 'sid':0})
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason, 'sid':0})
             self._is_negotiating = False
         
         if contact is not None:
