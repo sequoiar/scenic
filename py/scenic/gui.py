@@ -610,7 +610,7 @@ class Gui(object):
             # THIS IS WHERE WE CREATE THE CONTACTS IN THE ADDRESSBOOK
             # TODO: move to a dedicated function in save.py or so.
             contact = {
-                "name": self.contact_name_widget.get_text(),
+                "name": self.contact_name_widget.get_text().strip(),
                 "address": addr,
                 "auto_accept": self.contact_auto_accept_widget.get_active(),
                 }
@@ -628,7 +628,7 @@ class Gui(object):
             self.edit_contact_window.hide()
 
         # Validate the address
-        addr = self.contact_addr_widget.get_text()
+        addr = self.contact_addr_widget.get_text().strip()
         if not network.validate_address(addr):
             dialogs.ErrorDialog.create(_("The address is not valid\n\nEnter a valid address\nExample: 192.0.32.10 or example.org"), parent=self.main_window)
             return
