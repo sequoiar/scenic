@@ -592,11 +592,15 @@ class Application(object):
         contact_name = ""
         if contact is not None:
             contact_name = contact["name"]
-        txt = _("Contact %(name)s invited you but cancelled his invitation.") % {"name": contact_name}
-        # Turning the reason into readable i18n str.
+        else:
+            contact_name = addr
+        if contact_name == "":
+            raise RuntimeError("No contact name to display to the user.")
         reason = message["reason"]
         if reason == communication.CANCEL_REASON_CANCELLED:
-            txt += "\n\n" + _("The peer cancelled the invitation.")
+            txt = _("Contact %(name)s invited you but cancelled his invitation.") % {"name": contact_name}
+        else:
+            raise RuntimeError("No reason for the cancellation.")
         self.client.disconnect()
         self.gui.invited_dialog.hide()
         dialogs.ErrorDialog.create(txt, parent=self.gui.main_window)
