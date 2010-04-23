@@ -85,6 +85,7 @@ def run():
     Main function of the application
     """
     from scenic import configure
+    from optparse import OptionParser
     
     if not os.environ.has_key('GTK2_RC_FILES'):
         name = "Darklooks"
@@ -93,13 +94,6 @@ def run():
         configure.custom_environment_variables["GTK2_RC_FILES"] = file_name
     if "/sbin" not in os.environ["PATH"]: # for ifconfig
         os.environ["PATH"] += ":/sbin"
-    
-    from optparse import OptionParser
-    from twisted.internet import gtk2reactor
-    gtk2reactor.install() # has to be done before importing reactor
-    from twisted.internet import reactor
-    from twisted.internet import error
-    from scenic import application
     
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(configure.VERSION))
@@ -110,13 +104,20 @@ def run():
     parser.add_option("-M", "--moo", action="store_true", help="There is no easter egg in this program")
     parser.add_option("-d", "--debug", action="store_true", help="Enables the debug tab in the user interface")
     (options, args) = parser.parse_args()
+    
+    if not os.environ.has_key('DISPLAY'):
+        print "You need an X11 display to run Scenic."
+        sys.exit(1)
+    
+    from twisted.internet import gtk2reactor
+    gtk2reactor.install() # has to be done before importing reactor
+    from twisted.internet import reactor
+    from twisted.internet import error
+    from scenic import application
     kwargs = {}
     if options.moo:
         moo()
         sys.exit(0)
-    if not os.environ.has_key('DISPLAY'):
-        print "You need an X11 display to run Scenic."
-        sys.exit(1)
     if options.enable_logging:
         start_file_logging(os.path.expanduser(options.log_file_name))
         kwargs["log_file_name"] = options.log_file_name
