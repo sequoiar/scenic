@@ -304,21 +304,22 @@ class Application(object):
             return
         # Devices: JACKD (every 5 seconds)
         self._jackd_watch_task.start(5, now=True)
+        # first, poll devices, next restore v4l2 settings, finally, update widgets and poll cameras again.
         # Devices: X11 and XV
         def _cb2(result):
             self.gui.update_widgets_with_saved_config()
             d = self.poll_camera_devices() # we need to do it once more, to update the list of possible image size according to the selected video device
         #first_action = defer.DeferredList([
-        d = self._restore_v4l2_settings()
         def _cb1(result):
-            deferred_list = defer.DeferredList([
-                self.poll_x11_devices(), 
-                self.poll_xvideo_extension(),
-                self.poll_camera_devices(), 
-                self.poll_midi_devices()
-                ])
-            deferred_list.addCallback(_cb2)
-        d.addCallback(_cb1)
+            d = self._restore_v4l2_settings()
+            d.addCallback(_cb2)
+        deferred_list = defer.DeferredList([
+            self.poll_x11_devices(), 
+            self.poll_xvideo_extension(),
+            self.poll_camera_devices(), 
+            self.poll_midi_devices()
+            ])
+        deferred_list.addCallback(_cb1)
 
     def _restore_v4l2_settings(self):
         """
@@ -332,14 +333,19 @@ class Application(object):
             if self.config.video_source != "v4l2src":
                 return defer.succeed(True)
             else:
-                camera_name = self.config.video_device
-                standard_name = self.config.video_standard
-                input_number = self.config.video_input
-                deferred_list = defer.DeferredList([
-                    cameras.set_v4l2_video_standard(device_name=camera_name, standard=standard_name),
-                    cameras.set_v4l2_input_number(device_name=camera_name, input_number=input_number)
-                    ])
-                return deferred_list
+                full_name = self.config.video_device
+                dev = self.parse_v4l2_device_name(full_name)
+                if dev is None:
+                    return defer.succeed(True)
+                else:
+                    camera_name = dev["name"]
+                    standard_name = self.config.video_standard
+                    input_number = self.config.video_input
+                    deferred_list = defer.DeferredList([
+                        cameras.set_v4l2_video_standard(device_name=camera_name, standard=standard_name),
+                        cameras.set_v4l2_input_number(device_name=camera_name, input_number=input_number)
+                        ])
+                    return deferred_list
         
     def poll_midi_devices(self):
         """
