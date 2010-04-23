@@ -334,7 +334,7 @@ class Application(object):
             else:
                 camera_name = self.config.video_device
                 standard_name = self.config.video_standard
-                input_number = self.conig.video_input
+                input_number = self.config.video_input
                 deferred_list = defer.DeferredList([
                     cameras.set_v4l2_video_standard(device_name=camera_name, standard=standard_name),
                     cameras.set_v4l2_input_number(device_name=camera_name, input_number=input_number)
