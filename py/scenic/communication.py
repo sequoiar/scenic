@@ -25,6 +25,9 @@ from twisted.internet import reactor
 from twisted.internet import defer
 
 CANCEL_REASON_CANCELLED = "cancelled"
+REFUSE_REASON_PROBLEMS = "technical problems"
+REFUSE_REASON_BUSY = "busy"
+REFUSE_REASON_REFUSED = "refused"
 
 class Server(object):
     """

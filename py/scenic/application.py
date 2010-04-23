@@ -536,21 +536,21 @@ class Application(object):
         invited_by = addr
         send_to_port = message["please_send_to_port"]
 
-        def _simply_refuse():
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0})
+        def _simply_refuse(reason):
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason 'sid':0})
             self._is_negotiating = False
         
         if contact is not None:
             invited_by = contact["name"]
         if self.has_negotiation_in_progress():
             print "REFUSING an INVITE, since we are already negotiating with some peer."
-            _simply_refuse() # TODO: add reason
+            _simply_refuse(communication.REFUSE_REASON_BUSY)
             return
         self._is_negotiating = True
         
         def _check_cb(result):
             if not result:
-                _simply_refuse() # TODO: add reason param: Technical problems.
+                _simply_refuse(communication.REFUSE_REASON_PROBLEMS)
             else:
                 # FIXME: the copy of dict should be more straightforward.
                 self.remote_config = {
@@ -594,10 +594,9 @@ class Application(object):
             contact_name = contact["name"]
         txt = _("Contact %(name)s invited you but cancelled his invitation.") % {"name": contact_name}
         # Turning the reason into readable i18n str.
-        if message.has_key("reason"):
-            reason = message["reason"]
-            if reason == communication.CANCEL_REASON_CANCELLED:
-                txt += "\n\n" + _("The peer cancelled the invitation.")
+        reason = message["reason"]
+        if reason == communication.CANCEL_REASON_CANCELLED:
+            txt += "\n\n" + _("The peer cancelled the invitation.")
         self.client.disconnect()
         self.gui.invited_dialog.hide()
         dialogs.ErrorDialog.create(txt, parent=self.gui.main_window)
@@ -625,14 +624,21 @@ class Application(object):
                 self.start_streamers(addr)
                 self.send_ack()
 
-    def handle_refuse(self):
+    def handle_refuse(self, message):
         """
         Got REFUSE
         """
+        reason = message["reason"]
         self._is_negotiating = False
         self.gui.hide_calling_dialog()
         self._free_ports()
-        text = _("The contact refused to stream with you.\n\nIt may be caused by a ongoing session with an other peer or by technical problems.")
+        if reason == communication.REFUSE_REASON_REFUSED:
+            text = _("The contact refused to stream with you.") 
+        elif reason == communication.REFUSE_REASON_PROBLEMS:
+            text = _("The contact cannot stream with you due to technical issues.")
+        elif reason == communication.REFUSE_REASON_BUSY:
+            text = _("The contact is busy. Cannot start a streaming session.")
+
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
@@ -675,7 +681,7 @@ class Application(object):
         elif msg == "ACCEPT":
             self.handle_accept(message, addr)
         elif msg == "REFUSE":
-            self.handle_refuse()
+            self.handle_refuse(message)
         elif msg == "ACK":
             self.handle_ack(addr)
         elif msg == "BYE":
@@ -953,10 +959,10 @@ class Application(object):
     
     def send_refuse_and_disconnect(self):
         """
-        Sends REFUSE 
+        Sends REFUSE since the user clicked no.
         REFUSE tells the offerer we can't have a session.
         """
-        self.client.send({"msg":"REFUSE", "sid":0})
+        self.client.send({"msg":"REFUSE", "reason":communication.REFUSE_REASON_REFUSED, "sid":0})
         self.client.disconnect()
         self._is_negotiating = False
 
