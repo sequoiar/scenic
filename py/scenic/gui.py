@@ -735,6 +735,9 @@ class Gui(object):
             """
             if not hasattr(self.app.config, attribute_name):
                 raise RuntimeError("Config has no attribute %s" % (attribute_name))
+            cast = type(getattr(self.app.config, attribute_name))
+            if type(value) is not cast:
+                raise RuntimeError("Wrong type for attribute %s." % (attribute_name))
             setattr(self.app.config, attribute_name, value)
             print " * %s: %s" % (attribute_name, getattr(self.app.config, attribute_name))
 
@@ -755,6 +758,8 @@ class Gui(object):
             #TODO: check if it is a v4l2 device.
             _set_config("video_source", "v4l2src")
             _set_config("video_device", video_source) # Using the name and id as a video_device
+            _set_config("video_input", self.v4l2_input_widget.get_active())  # we need to save it, but the restoration of the widget value is done when we poll the cameras
+            _set_config("video_standard", _get_combobox_value(self.v4l2_standard_widget)) # same as line above
         _set_config("video_codec", VIDEO_CODECS[_get_combobox_value(self.video_codec_widget)])
         _set_config("video_aspect_ratio", _get_combobox_value(self.aspect_ratio_widget))
         _set_config("video_fullscreen", self.video_fullscreen_widget.get_active())

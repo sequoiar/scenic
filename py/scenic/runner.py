@@ -102,6 +102,7 @@ def run():
     parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s" % (LOG_FILE_NAME), default=LOG_FILE_NAME)
     parser.add_option("-f", "--fullscreen", action="store_true", help="Run in fullscreen mode")
     parser.add_option("-M", "--moo", action="store_true", help="There is no easter egg in this program")
+    parser.add_option("-n", "--disable-v4l2-settings", action="store_true", help="Disables the state restoring for the V4L2 input number and video standard at startup")
     parser.add_option("-d", "--debug", action="store_true", help="Enables the debug tab in the user interface")
     (options, args) = parser.parse_args()
     
@@ -115,16 +116,19 @@ def run():
     from twisted.internet import error
     from scenic import application
     kwargs = {}
+    enable_v4l2_state_saving_restore = True
     if options.moo:
         moo()
         sys.exit(0)
     if options.enable_logging:
         start_file_logging(os.path.expanduser(options.log_file_name))
         kwargs["log_file_name"] = options.log_file_name
+    if options.disable_v4l2_settings:
+        v4l2_state_saving_restore = False
     else:
         start_logging_to_stdout()
     try:
-        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, **kwargs)
+        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restore, **kwargs)
     except error.CannotListenError, e:
         print("There must be an other Scenic running.")
         print(str(e))
