@@ -115,6 +115,14 @@ def run():
     from twisted.internet import reactor
     from twisted.internet import error
     from scenic import application
+    import gtk
+    
+    try:
+        gtk.gdk.Display(os.environ["DISPLAY"])
+    except RuntimeError, e:
+        print "Invalid X11 display: %s. \nYou need an X11 display to run Scenic." % (os.environ["DISPLAY"])
+        sys.exit(1)
+        
     kwargs = {}
     enable_v4l2_state_saving_restore = True
     if options.moo:
