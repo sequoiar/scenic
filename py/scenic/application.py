@@ -552,6 +552,14 @@ class Application(object):
          * jackd is not running
          * We already just got an INVITE and didn't answer yet.
         """
+        def _simply_refuse(reason):
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason, 'sid':0})
+            self._is_negotiating = False
+
+        if self.has_session():
+            _simply_refuse(communication.REFUSE_REASON_BUSY)
+            return
+        
         self.got_bye = False
         self._check_protocol_version(message)
         
@@ -568,10 +576,6 @@ class Application(object):
         contact = self._get_contact_by_addr(addr)
         invited_by = addr
         send_to_port = message["please_send_to_port"]
-
-        def _simply_refuse(reason):
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason, 'sid':0})
-            self._is_negotiating = False
         
         if contact is not None:
             invited_by = contact["name"]
@@ -675,7 +679,6 @@ class Application(object):
             text = _("The contact cannot stream with you due to technical issues.")
         elif reason == communication.REFUSE_REASON_BUSY:
             text = _("The contact is busy. Cannot start a streaming session.")
-
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
