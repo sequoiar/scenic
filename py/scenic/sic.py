@@ -54,6 +54,8 @@ class SICProtocol(basic.LineReceiver):
             d = json.loads(data.strip())
         except TypeError, e:
             print(str(e))
+        except ValueError, e:
+            print(str(e))
         else:
             self.factory.dict_received_signal(self, d)
 
