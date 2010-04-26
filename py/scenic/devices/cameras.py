@@ -31,6 +31,7 @@ from twisted.internet import reactor
 ugly_to_beautiful_camera_names = {
     "BT878 video (Osprey 210/220/230": "Osprey 210/220/230",
     "BT878 video (Osprey 100/150 (87": "Osprey 100/150",
+    "BT878 video (Hauppauge (bt878))": "Hauppauge WinTV",
     }
 
 def _beautify_camera_name(name):
