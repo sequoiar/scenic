@@ -533,8 +533,6 @@ class Gui(object):
             self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index] # FIXME: deprecate this!
             self.app.address_book.selected = self.selected_contact_index
             is_streaming = self.app.has_session()
-            if is_streaming: # XXX
-                self.update_invite_button_with_contact_name()
         else:
             # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(False)
@@ -542,6 +540,9 @@ class Gui(object):
             self.invite_contact_widget.set_sensitive(False)
             # no contact is selected
             self.app.address_book.selected_contact = None
+        if is_streaming: # XXX
+            self.update_invite_button_with_contact_name()
+            self.invite_contact_widget.set_sensitive(True)
 
     # ---------------------- slots for addressbook widgets events --------
     
