@@ -502,14 +502,16 @@ class Gui(object):
         tab_widget = widget.get_nth_page(page_number)
         tab_name = tab_widget.get_name()
         if tab_name == "video_tab_contents":
-            self.app.poll_x11_devices()
-            self.app.poll_camera_devices()
+            if not self.app.has_session():
+                self.app.poll_x11_devices()
+                self.app.poll_camera_devices()
         elif tab_name == "audio_tab_contents":
             pass
         elif tab_name == "system_tab_contents":
             self.network_admin_widget.grab_default()
         elif tab_name == "midi_tab_contents":
-            self.app.poll_midi_devices()
+            if not self.app.has_session():
+                self.app.poll_midi_devices()
 
     def on_contact_list_changed(self, *args):
         """
