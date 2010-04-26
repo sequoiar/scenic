@@ -937,6 +937,7 @@ class Gui(object):
             if is_streaming:
                 text = _("Stop streaming")
                 self.invite_label_widget.set_text(text)
+                self.invite_contact_widget.set_sensitive(True)
                 icon = gtk.STOCK_CONNECT
             else:
                 self.update_invite_button_with_contact_name()
