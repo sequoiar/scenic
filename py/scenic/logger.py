@@ -39,6 +39,8 @@ if version < 8:
 
 #TODO: Specify the level by output
 ENABLE_NON_BLOCKING_OUTPUT = False
+_SYSTEMWIDE_LOG_FILE_NAME = None
+SYSTEMWIDE_TO_FILE = False
 #LoggerClass = logging.getLoggerClass()
 
 # XXX: totally useless.
@@ -56,7 +58,7 @@ ENABLE_NON_BLOCKING_OUTPUT = False
 
 #logging.setLoggerClass(LoggerClass)
 
-def start(level="info", to_stdout=True, to_file=True, name="twisted", log_file_name="/tmp/default-log-file.log"):
+def start(level="info", to_stdout=True, to_file=False, name="twisted", log_file_name=None):
     """
     Starts the logging for a single module.
     
@@ -64,9 +66,8 @@ def start(level="info", to_stdout=True, to_file=True, name="twisted", log_file_n
     
     The first time this is called, don't give any argument. It will log everything with the name "twisted".
     
-    The programmer can choose the level from which to log.
-    Example : is level is INFO, the DEBUG messages (lower level) will not be displayed
-    but the CRITICAL ones will.
+    The programmer can choose the level from which to log, discarding any message with a lower level.
+    Example : If level is INFO, the DEBUG messages (lower level) will not be displayed but the CRITICAL ones will.
     
     @param level: debug, info, error, warning or critical
     @type level: str
@@ -74,6 +75,12 @@ def start(level="info", to_stdout=True, to_file=True, name="twisted", log_file_n
     @param to_file: Whether it should be printed to file.
     @param name: What string to prefix with.
     """
+    global _SYSTEMWIDE_LOG_FILE_NAME
+    global SYSTEMWIDE_TO_FILE
+    if log_file_name is not None:
+        _SYSTEMWIDE_LOG_FILE_NAME = log_file_name
+    if to_file:
+        SYSTEMWIDE_TO_FILE = True
     logger = logging.getLogger(name)
     formatter = logging.Formatter('%(asctime)s %(name)-8s %(levelname)-8s %(message)s')
     set_level(level, name)
@@ -83,9 +90,11 @@ def start(level="info", to_stdout=True, to_file=True, name="twisted", log_file_n
             fdesc.setNonBlocking(so_handler.stream) # NON-BLOCKING OUTPUT
         so_handler.setFormatter(formatter)
         logger.addHandler(so_handler)
-    if to_file:
+    if SYSTEMWIDE_TO_FILE:
+        if _SYSTEMWIDE_LOG_FILE_NAME is None:
+            raise RuntimeError("The log file name has not been set.")
         # file_handler = logging.FileHandler(log_file_name, mode='a', encoding='utf-8')
-        file_handler = logging.FileHandler(log_file_name) # not catching IOError that could occur.
+        file_handler = logging.FileHandler(_SYSTEMWIDE_LOG_FILE_NAME) # FIXME: not catching IOError that could occur.
         if ENABLE_NON_BLOCKING_OUTPUT: 
             fdesc.setNonBlocking(file_handler.stream) # NON-BLOCKING OUTPUT
         file_handler.setFormatter(formatter)
@@ -106,6 +115,8 @@ def set_level(level, logger='twisted'):
     """
     Sets the logging level for a single file. 
     """
+    # It is totally useless to be able to change dynamically the logging level.
+    #TODO: Merge with start()
     levels = {
         'critical':logging.CRITICAL, # 50
         'error':logging.ERROR, # 40
@@ -151,7 +162,7 @@ def debug(msg):
        
 if __name__ == "__main__":
     # Here is a simple test:
-    start('warning', True, True)
+    start('warning')
     critical('critical1é')
     error('error1')
     warning('warning1')
@@ -168,4 +179,4 @@ if __name__ == "__main__":
     except RuntimeError, e:
         print e.message
     stop()
-    
+
