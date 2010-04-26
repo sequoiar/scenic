@@ -19,7 +19,9 @@ scenic_PYTHON = application.py \
 	saving.py \
 	sic.py \
 	sig.py \
-	streamer.py
+	streamer.py \
+	logger.py \
+	twistedbackports.py
 
 clean-local:
 	rm -rf *.pyc
