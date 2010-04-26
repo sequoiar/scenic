@@ -338,7 +338,7 @@ class StreamerManager(object):
             milhouse_recv_cmd_final.extend(milhouse_recv_cmd_video)
             if extra_recv_enabled:
                 milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_audio)
-                milhouse_recv_cmd_extra.extend(["--jitterbuffer", str(details["receive"]["audio"]["jitterbuffer"]]))
+                milhouse_recv_cmd_extra.extend(["--jitterbuffer", str(details["receive"]["audio"]["jitterbuffer"])])
             else:
                 milhouse_recv_cmd_final.extend(milhouse_recv_cmd_audio)
             try:
