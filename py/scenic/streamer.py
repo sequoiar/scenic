@@ -338,11 +338,21 @@ class StreamerManager(object):
             milhouse_recv_cmd_final.extend(milhouse_recv_cmd_video)
             if extra_recv_enabled:
                 milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_audio)
-                milhouse_recv_cmd_extra.extend(["--jitterbuffer", details["receive"]["audio"]["jitterbuffer"]])
+                milhouse_recv_cmd_extra.extend(["--jitterbuffer", str(details["receive"]["audio"]["jitterbuffer"]]))
             else:
                 milhouse_recv_cmd_final.extend(milhouse_recv_cmd_audio)
-            recv_cmd = " ".join(milhouse_recv_cmd_final)
-            extra_recv_cmd = " ".join(milhouse_recv_cmd_extra)
+            try:
+                recv_cmd = " ".join(milhouse_recv_cmd_final)
+            except TypeError, e:
+                print e
+                print milhouse_recv_cmd_final
+                raise
+            try:
+                extra_recv_cmd = " ".join(milhouse_recv_cmd_extra)
+            except TypeError, e:
+                print e
+                print milhouse_recv_cmd_extra
+                raise
             if normal_recv_enabled:
                 self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
                 self.receiver.state_changed_signal.connect(self.on_process_state_changed)
