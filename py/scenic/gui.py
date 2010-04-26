@@ -942,6 +942,8 @@ class Gui(object):
             else:
                 self.update_invite_button_with_contact_name()
                 icon = gtk.STOCK_DISCONNECT
+                if len(self.app.address_book.contact_list) == 0: 
+                    self.invite_contact_widget.set_sensitive(False)
             self.invite_icon_widget.set_from_stock(icon, 4)
             
             # Toggle sensitivity of many widgets:

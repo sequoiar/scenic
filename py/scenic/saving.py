@@ -163,6 +163,8 @@ class AddressBook(object):
                 self.selected = data["selected"]
             except KeyError:
                 self.selected = None
+            except IndexError:
+                self.selected = None
             self.contact_list = data["contact_list"]
         else:
             print("No addressbook found.")
