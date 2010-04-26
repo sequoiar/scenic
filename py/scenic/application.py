@@ -552,6 +552,7 @@ class Application(object):
          * jackd is not running
          * We already just got an INVITE and didn't answer yet.
         """
+        send_to_port = message["please_send_to_port"]
         def _simply_refuse(reason):
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason, 'sid':0})
             self._is_negotiating = False
@@ -575,7 +576,6 @@ class Application(object):
         # check if the contact is in the addressbook
         contact = self._get_contact_by_addr(addr)
         invited_by = addr
-        send_to_port = message["please_send_to_port"]
         
         if contact is not None:
             invited_by = contact["name"]
