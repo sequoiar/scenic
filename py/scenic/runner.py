@@ -157,5 +157,6 @@ def run():
             reactor.run()
         except KeyboardInterrupt:
             pass
-            sys.exit(0)
+        log.info("Goodbye.")
+        sys.exit(0)
 

@@ -177,5 +177,5 @@ class AddressBook(object):
             "selected": self.selected,
             "contact_list": self.contact_list
             }
-        log.info("saving addressbook to %s" % (self.file_name))
+        log.info("Saving addressbook to %s" % (self.file_name))
         _save(self.file_name, data)

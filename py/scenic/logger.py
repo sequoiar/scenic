@@ -84,7 +84,7 @@ def start(level="info", name="twisted", to_stdout=None, to_file=None, log_file_n
     if to_file is True:
         SYSTEMWIDE_TO_FILE = True
     logger = logging.getLogger(name)
-    formatter = logging.Formatter('%(asctime)s %(name)-14s %(levelname)-8s %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
     set_level(level, name)
     if to_stdout is True or to_stdout is False:
         SYSTEMWIDE_TO_STDOUT = to_stdout

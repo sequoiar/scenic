@@ -478,7 +478,7 @@ class Application(object):
         def _later():
             d2 = self.disconnect_client()
             d2.addCallback(_cb)
-            log.info('stopping server')
+            log.info('Stopping the server if still running.')
         reactor.callLater(0.1, _later)
         d1 = self.server.close()
         d2 = self.gui.close_preview_if_running()

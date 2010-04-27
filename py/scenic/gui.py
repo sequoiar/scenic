@@ -501,6 +501,7 @@ class Gui(object):
         """
         tab_widget = widget.get_nth_page(page_number)
         tab_name = tab_widget.get_name()
+        log.debug("Switching to tab %s" % (tab_name))
         if tab_name == "video_tab_contents":
             if not self.app.has_session():
                 self.app.poll_x11_devices()
@@ -512,6 +513,7 @@ class Gui(object):
         elif tab_name == "midi_tab_contents":
             if not self.app.has_session():
                 self.app.poll_midi_devices()
+                log.debug("polling MIDI devices")
 
     def on_contact_list_changed(self, *args):
         """
