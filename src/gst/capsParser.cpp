@@ -13,7 +13,7 @@ int maxNumChannelsForCodec(const std::string &codec)
     if (codec == "mp3")
         result = 2;
     else if (codec == "raw")
-        result = 8;
+        result = 11;
     else if (codec == "vorbis")
         result = 24;
     else
