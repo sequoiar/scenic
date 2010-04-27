@@ -153,7 +153,8 @@ AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &op
     numChannels_(options["numchannels"].as<int>())
 { 
     // (before waiting on caps) but having it here is pretty gross
-    Jack::assertReady(pipeline);
+    if (sink_ == "jackaudiosink")
+        Jack::assertReady(pipeline);
 }
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
