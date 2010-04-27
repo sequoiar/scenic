@@ -39,8 +39,9 @@ if version < 8:
 
 #TODO: Specify the level by output
 ENABLE_NON_BLOCKING_OUTPUT = False
-_SYSTEMWIDE_LOG_FILE_NAME = None
+SYSTEMWIDE_LOG_FILE_NAME = None
 SYSTEMWIDE_TO_FILE = False
+SYSTEMWIDE_TO_STDOUT = True
 #LoggerClass = logging.getLoggerClass()
 
 # XXX: totally useless.
@@ -55,10 +56,9 @@ SYSTEMWIDE_TO_FILE = False
 #        LoggerClass.debug(self, msg, *args)
 #
 #logging.setLoggerClass(CoreLogger)
-
 #logging.setLoggerClass(LoggerClass)
 
-def start(level="info", to_stdout=True, to_file=False, name="twisted", log_file_name=None):
+def start(level="info", name="twisted", to_stdout=None, to_file=None, log_file_name=None):
     """
     Starts the logging for a single module.
     
@@ -71,30 +71,37 @@ def start(level="info", to_stdout=True, to_file=False, name="twisted", log_file_
     
     @param level: debug, info, error, warning or critical
     @type level: str
-    @param to_stdout: Whether it should be printed to stdout.
-    @param to_file: Whether it should be printed to file.
+    @param to_stdout: Whether it should be printed to stdout. (False to disable)
+    @param to_file: Whether it should be printed to file. (True to enable)
     @param name: What string to prefix with.
+    @rtype: L{twisted.python.logging.PythonLoggingObserver}
     """
-    global _SYSTEMWIDE_LOG_FILE_NAME
-    global SYSTEMWIDE_TO_FILE
+    global SYSTEMWIDE_TO_STDOUT
+    global SYSTEMWIDE_TO_FILE 
+    global SYSTEMWIDE_LOG_FILE_NAME
     if log_file_name is not None:
-        _SYSTEMWIDE_LOG_FILE_NAME = log_file_name
-    if to_file:
+        SYSTEMWIDE_LOG_FILE_NAME = log_file_name
+    if to_file is True:
         SYSTEMWIDE_TO_FILE = True
     logger = logging.getLogger(name)
-    formatter = logging.Formatter('%(asctime)s %(name)-8s %(levelname)-8s %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(name)-14s %(levelname)-8s %(message)s')
     set_level(level, name)
-    if to_stdout:
+    if to_stdout is True or to_stdout is False:
+        SYSTEMWIDE_TO_STDOUT = to_stdout
+    if to_file is True or to_file is False:
+        SYSTEMWIDE_TO_FILE = to_file
+    
+    if SYSTEMWIDE_TO_STDOUT:
         so_handler = logging.StreamHandler(sys.stdout)
         if ENABLE_NON_BLOCKING_OUTPUT: 
             fdesc.setNonBlocking(so_handler.stream) # NON-BLOCKING OUTPUT
         so_handler.setFormatter(formatter)
         logger.addHandler(so_handler)
     if SYSTEMWIDE_TO_FILE:
-        if _SYSTEMWIDE_LOG_FILE_NAME is None:
+        if SYSTEMWIDE_LOG_FILE_NAME is None:
             raise RuntimeError("The log file name has not been set.")
         # file_handler = logging.FileHandler(log_file_name, mode='a', encoding='utf-8')
-        file_handler = logging.FileHandler(_SYSTEMWIDE_LOG_FILE_NAME) # FIXME: not catching IOError that could occur.
+        file_handler = logging.FileHandler(SYSTEMWIDE_LOG_FILE_NAME) # FIXME: not catching IOError that could occur.
         if ENABLE_NON_BLOCKING_OUTPUT: 
             fdesc.setNonBlocking(file_handler.stream) # NON-BLOCKING OUTPUT
         file_handler.setFormatter(formatter)
@@ -102,6 +109,7 @@ def start(level="info", to_stdout=True, to_file=False, name="twisted", log_file_
     if name == 'twisted':
         observer = twisted_log.PythonLoggingObserver(name)
         observer.start()
+        logging.getLogger(name)
     else:
         return logging.getLogger(name)
 

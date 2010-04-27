@@ -28,6 +28,9 @@ from twisted.internet import defer
 from twisted.python import procutils
 from twisted.internet import reactor
 
+from scenic import logger
+log = logger.start(name="cameras", level="info")
+
 ugly_to_beautiful_camera_names = {
     "BT878 video (Osprey 210/220/230": "Osprey 210/220/230",
     "BT878 video (Osprey 100/150 (87": "Osprey 100/150",
@@ -119,13 +122,13 @@ def _parse_milhouse_list_cameras(text):
                 else:
                     # now, let's try to get an int out of it:
                     try:
-                        print input
+                        log.debug(input)
                         input = int(input)
                     except ValueError, e:
-                        print e
+                        log.error(e)
                         input = None
                     except TypeError, e:
-                        print e
+                        log.error(e)
                         input = None
                     else:
                         #print "  input", input

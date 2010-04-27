@@ -25,11 +25,13 @@ Some imports are in run().
 """
 import sys
 import os
-from twisted.python import log
 from twisted.python import logfile
+from scenic import logger
+
+log = None
 
 def start_logging_to_stdout():
-    log.startLogging(sys.stdout)
+    log = logger.start(level="info")
 
 def start_file_logging(full_path="/var/tmp/scenic/scenic.log"):
     """
@@ -44,9 +46,9 @@ def start_file_logging(full_path="/var/tmp/scenic/scenic.log"):
         os.makedirs(directory)
     f = open(full_path, 'w') # erases previous file
     f.close()
-    _log_file = logfile.DailyLogFile(file_name, directory)
-    log.startLogging(_log_file)
-    return _log_file.path
+
+    log = logger.start(level="info", to_file=True, log_file_name=full_path)
+    return full_path
 
 LOG_FILE_NAME = "~/.scenic/scenic.log"
 
@@ -138,8 +140,12 @@ def run():
     try:
         app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restore, **kwargs)
     except error.CannotListenError, e:
-        print("There must be an other Scenic running.")
+        log.error(str(e))
+        msg = "There must be an other Scenic running."
+        log.error(msg)
+        print(msg)
         print(str(e))
+        sys.exit(1)
     else:
         try:
             reactor.run()

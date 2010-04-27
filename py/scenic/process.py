@@ -14,6 +14,9 @@ from twisted.python import procutils
 from twisted.internet import utils
 from scenic import sig
 from scenic import configure
+from scenic import logger
+
+log = logger.start(name="process", level="info")
 
 # constants for the slave process
 STATE_STARTING = "STARTING"
@@ -35,11 +38,11 @@ def run_once(executable, *args):
     try:
         executable = procutils.which(executable)[0]
     except IndexError:
-        print("Could not find executable %s" % (executable))
+        log.error("Could not find executable %s" % (executable))
         return None
     else:
         env = configure.environ_without_custom()
-        print("Calling `%s %s` with ENV=%s" % (executable, list(args), env))
+        log.info("Calling `%s %s` with ENV=%s" % (executable, list(args), env))
         d = utils.getProcessValue(executable, args, configure.environ_without_custom(), '.', reactor)
         d.addCallback(_cb)
         return d
@@ -146,7 +149,7 @@ class ProcessManager(object):
                 proc.signalProcess(0)
             except (OSError, error.ProcessExitedAlready):
                 msg = "Lost process %s. Error sending it an empty signal." % (self.identifier)
-                print(msg)
+                log.error(msg)
                 return False
             else:
                 return True
@@ -195,15 +198,15 @@ class ProcessManager(object):
             if self.pid == pid:
                 if self.state == STATE_STOPPING:
                     msg = "Child process %s not dead." % (self.identifier)
-                    print msg
+                    log.info(msg)
                     try:
                         self._process_transport.signalProcess(signal.SIGKILL)
                     except OSError, e:
                         msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                        print msg # raise?
+                        log.error(msg) # raise?
                     except error.ProcessExitedAlready:
                         msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, "SIGKILL")
-                        print msg # raise ?
+                        log.error(msg) # raise ?
                 elif self.state == STATE_STOPPED:
                     msg = "Successfully killed process after least than the %f seconds. State is %s." % (self.time_before_sigkill, self.state)
                     self.log(msg)
@@ -222,17 +225,17 @@ class ProcessManager(object):
         else: # STOPPED
             msg = "Process is already stopped."
             self.set_child_state(STATE_STOPPED)
-            print msg # raise?
+            log.error(msg) # raise?
         if signal_to_send is not None:
             try:
                 self._process_transport.signalProcess(signal_to_send)
             except OSError, e:
                 msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                print msg # raise?
+                log.error(msg) # raise?
             except error.ProcessExitedAlready:
                 if signal_to_send == signal.SIGTERM:
                     msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, signal_to_send)
-                    print msg # raise ?
+                    log.error(msg) # raise ?
             else:
                 if signal_to_send == signal.SIGTERM:
                     self._delayed_kill = reactor.callLater(self.time_before_sigkill, _later_check, self.pid)
@@ -243,7 +246,11 @@ class ProcessManager(object):
         (through stdout)
         """
         if level >= self.log_level:
-            print "%9s process: %s" % (self.identifier, msg)
+            mess = "%9s process: %s" % (self.identifier, msg)
+            if level == logging.DEBUG:
+                log.debug(mess)
+            else:
+                log.info(mess)
 
     def _on_process_ended(self, exit_code):
         self._child_running_time = time.time() - self._time_child_started

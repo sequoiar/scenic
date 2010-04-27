@@ -1,5 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# 
+# Scenic
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Scenic is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 """
 Simple protocol using JSON over TCP.
 SIC Stands for "SIP Spelled Incorrectly".
@@ -24,8 +42,9 @@ from twisted.internet import protocol
 from twisted.internet import defer
 from twisted.protocols import basic
 from scenic import sig
+from scenic import logger
 
-VERBOSE = True
+log = logger.start(name="sic", level="info")
 
 class SICProtocol(basic.LineReceiver):
     """
@@ -40,22 +59,21 @@ class SICProtocol(basic.LineReceiver):
                 if not self.factory.connected_deferred.called:
                     self.factory.connected_deferred.callback(self)
             else:
-                print "SIC: No connected_deferred"
+                log.warning("SIC: No connected_deferred")
         else:
-            print "SIC: No factory"
+            log.warning("SIC: No factory")
 
     def lineReceived(self, data):
         """
         Received JSON.
         """
-        if VERBOSE:
-            print "SIC: Received:", data.strip()
+        log.debug("Received %s" % (data.strip()))
         try:
             d = json.loads(data.strip())
         except TypeError, e:
-            print(str(e))
+            log.error(str(e))
         except ValueError, e:
-            print(str(e))
+            log.error(str(e))
         else:
             self.factory.dict_received_signal(self, d)
 
@@ -64,8 +82,7 @@ class SICProtocol(basic.LineReceiver):
         Sends a dict serialized in JSON.
         :param d: dict
         """
-        if VERBOSE:
-            print "SIC: send_message", d
+        log.debug("SIC: send_message %s" % (d))
         if type(d) is not dict:
             raise TypeError("A dict is needed.")
         else:
@@ -77,7 +94,7 @@ class SICProtocol(basic.LineReceiver):
             ip = self.transport.getPeer().host
             return ip
         except AttributeError:
-            print "SIC: not connected"
+            log.error("SIC: not connected")
             return None
 
 class ClientFactory(protocol.ClientFactory):
@@ -86,7 +103,7 @@ class ClientFactory(protocol.ClientFactory):
         self.connected_deferred = defer.Deferred()
 
     def clientConnectionFailed(self, connector, reason):
-        print 'Connection failed. Reason:', reason
+        log.error('Connection failed. Reason: %s' % (reason))
         self.connected_deferred.errback(reason)
         return True
 
@@ -111,7 +128,6 @@ if __name__ == "__main__":
         print "SIC: Error trying to connect.", failure
         reactor.stop()
         
-    VERBOSE = True
     PORT_NUMBER = 15555
     s = ServerFactory()
     d = Dummy()

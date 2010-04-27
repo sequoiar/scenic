@@ -23,6 +23,9 @@ from scenic import sig
 from scenic import sic
 from twisted.internet import reactor
 from twisted.internet import defer
+from scenic import logger
+
+log = logger.start(name="communication", level="info")
 
 CANCEL_REASON_CANCELLED = "cancelled"
 REFUSE_REASON_PROBLEMS = "technical problems"
@@ -48,11 +51,12 @@ class Server(object):
             self._port_obj = reactor.listenTCP(self.port, self.server_factory)
             return self.server_factory.connected_deferred
         else:
-            print "Already listening", "!!!!!!!!!!"  # FIXME
+            log.error("Already listening !!!!!")
             return defer.succeed(True) #FIXME
     
     def on_dict_received(self, server_proto, d):
-        print "Communication: received", d
+        log.info("Received %s" % (d["msg"]))
+        log.debug("Received %s" % (d))
         msg = d
         addr = server_proto.get_peer_ip()
         self.remote_ip = addr
@@ -83,7 +87,7 @@ class Server(object):
             d.addCallback(_cb)
             return d
         else:
-            print "no server to close"
+            log.warning("no server to close")
             return defer.succeed(True) # FIXME!!!
 
     def is_listening(self):
@@ -110,12 +114,12 @@ class Client(object):
         @rtype: L{Deferred}
         """
         def _on_connected(proto):
-            print "connected"
+            log.info("Client is connected")
             self.sic_sender = proto
             return proto
         
         def _on_error(reason):
-            print "could not connect"
+            log.error("Client could not connect")
             self._connected = False
             self.sic_sender = None
             err = str(reason.getErrorMessage())
@@ -127,14 +131,14 @@ class Client(object):
             self.host = host
             self.port = port
             self.client_factory = sic.ClientFactory()
-            print 'trying to connect'
-            print self.host, self.port
+            log.debug('trying to connect client to %s %s' % (self.host, self.port))
+            
             self.clientPort = reactor.connectTCP(self.host, self.port, self.client_factory)
             self.client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
             return self.client_factory.connected_deferred
         else:
             msg = "client already connected to some host"
-            print msg, "!!!!!!!!!!!!!!!"
+            log.error(msg)
             #TODO: return failure?
             return defer.succeed(True) # FIXME
  
@@ -146,10 +150,11 @@ class Client(object):
         """
         self.last_message_sent = msg["msg"]
         if self.is_connected():
+            log.info("Sending %s" % (msg["msg"]))
             self.sic_sender.send_message(msg)
         else:
             error = "Not connected, cannot send message " + str(msg)
-            print(error)
+            log.error(error)
     
     def is_connected(self):
         return self.sic_sender is not None
@@ -174,11 +179,11 @@ def connect_send_and_disconnect(host, port, mess):
         clientPort.transport.loseConnection()
         d.callback(True)
     def _on_error(reason):
-        print reason
+        log.error(str(reason))
         d.errback(reason)
         return None
     client_factory = sic.ClientFactory()
-    print 'trying to connect to', host, port, 'to send message', mess
+    log.info('trying to connect to %s %s to send message %s' % (host, port, mess["msg"]))
     clientPort = reactor.connectTCP(host, port, client_factory)
     client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
     return d

@@ -27,6 +27,9 @@ from scenic import process
 from scenic import sig
 from scenic import dialogs
 from scenic.internationalization import _
+from scenic import logger
+
+log = logger.start(name="streamer", level="info")
 
 class StreamerManager(object):
     """
@@ -73,7 +76,7 @@ class StreamerManager(object):
         if self.app.config.audio_video_synchronized and self.app.config.video_recv_enabled:
             audio_jitterbuffer = self.app.config.video_jitterbuffer
         
-        print "remote_config:", remote_config
+        log.debug("remote_config: %s" % (remote_config))
         
         self.session_details = {
             "peer": {
@@ -168,7 +171,7 @@ class StreamerManager(object):
             self.session_details["send"]["video"]["device"] = None
         if self.session_details["send"]["video"]["codec"] == "theora":
             self.session_details["send"]["video"]["bitrate"] = None
-        print(str(self.session_details))
+        log.debug(str(self.session_details))
 
     def _prepare_stats_and_errors_dicts(self):
         # setting up
@@ -232,12 +235,12 @@ class StreamerManager(object):
         if not send_audio_enabled and not send_video_enabled and not midi_send_enabled and not midi_recv_enabled and not recv_audio_enabled and not recv_video_enabled:
             raise RuntimeError("Everything is disabled, but the application is trying to start to stream. This should not happen.") # the programmer has done a mistake if we're here.
 
-        print "send_video_enabled", send_video_enabled
-        print "send_audio_enabled", send_audio_enabled
-        print "recv_video_enabled", recv_video_enabled
-        print "recv_audio_enabled", recv_audio_enabled
-        print "midi_recv_enabled", midi_recv_enabled 
-        print "midi_send_enabled", midi_send_enabled
+        log.debug("send_video_enabled %s" % (send_video_enabled))
+        log.debug("send_audio_enabled %s" % (send_audio_enabled))
+        log.debug("recv_video_enabled %s" % (recv_video_enabled))
+        log.debug("recv_audio_enabled %s" % (recv_audio_enabled))
+        log.debug("midi_recv_enabled %s" % (midi_recv_enabled))
+        log.debug("midi_send_enabled %s" % (midi_send_enabled))
 
         # we store the arguments in lists
         milhouse_send_cmd_common = []
@@ -269,7 +272,7 @@ class StreamerManager(object):
             if details["send"]["video"]["source"] == "v4l2src":
                 dev = self.app.parse_v4l2_device_name(details["send"]["video"]["device"])
                 if dev is None:
-                    print "v4l2 device is not found !!!!"
+                    log.error("v4l2 device is not found !!!!")
                 else:
                     v4l2_dev_name = dev["name"]
                 milhouse_send_cmd_video.extend(["--videodevice", v4l2_dev_name])
@@ -344,14 +347,14 @@ class StreamerManager(object):
             try:
                 recv_cmd = " ".join(milhouse_recv_cmd_final)
             except TypeError, e:
-                print e
-                print milhouse_recv_cmd_final
+                log.error(e)
+                log.error(milhouse_recv_cmd_final)
                 raise
             try:
                 extra_recv_cmd = " ".join(milhouse_recv_cmd_extra)
             except TypeError, e:
-                print e
-                print milhouse_recv_cmd_extra
+                log.error(e)
+                log.error(milhouse_recv_cmd_extra)
                 raise
             if normal_recv_enabled:
                 self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
@@ -425,13 +428,13 @@ class StreamerManager(object):
         # starting
         self._set_state(process.STATE_STARTING)
         if send_audio_enabled or send_video_enabled:
-            print "$", send_cmd
+            log.info("$ %s" % (send_cmd))
             if normal_send_enabled:
                 self.sender.start()
             if extra_send_enabled:
                 self.extra_sender.start()
         if recv_audio_enabled or recv_video_enabled:
-            print "$", recv_cmd
+            log.info("$ %s" % (recv_cmd))
             if normal_recv_enabled:
                 self.receiver.start()
             if extra_recv_enabled:
@@ -452,10 +455,10 @@ class StreamerManager(object):
         return ret
 
     def on_midi_stdout_line(self, process_manager, line):
-        print process_manager.identifier, line
+        log.debug("%s %s" % (process_manager.identifier, line))
 
     def on_midi_stderr_line(self, process_manager, line):
-        print process_manager.identifier, line
+        log.error("%s %s" % (process_manager.identifier, line))
 
     def on_receiver_stdout_line(self, process_manager, line):
         """
@@ -472,13 +475,13 @@ class StreamerManager(object):
             elif "audio" in line:
                 self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
         else:
-            print "%9s stdout: %s" % (process_manager.identifier, line)
+            log.debug("%9s stdout: %s" % (process_manager.identifier, line))
 
     def on_receiver_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (process_manager.identifier, line)
+        log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
     
@@ -486,7 +489,7 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
-        print "%9s stdout: %s" % (process_manager.identifier, line)
+        log.debug("%9s stdout: %s" % (process_manager.identifier, line))
         try:
             if "PACKETS-LOST" in line:
                 if "video" in line:
@@ -521,13 +524,13 @@ class StreamerManager(object):
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["connected"] = True
         except ValueError, e:
-            print(e)
+            log.error(e)
 
     def on_sender_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (process_manager.identifier, line)
+        log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["send"].append(line)
 
@@ -553,7 +556,7 @@ class StreamerManager(object):
         Slot for the ProcessManager.state_changed_signal
         Calls stop() if one of the processes crashed.
         """
-        print process_manager, process_state
+        log.debug("%s %s" % (process_manager, process_state))
         if process_state == process.STATE_RUNNING:
             # As soon as one is running, set our state to running
             if self.state == process.STATE_STARTING:
@@ -565,17 +568,17 @@ class StreamerManager(object):
         elif process_state == process.STATE_STOPPED:
             # As soon as one crashes or is not able to start, stop all streamer processes.
             if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
-                print("A streamer process died. Stopping the local streamer manager.")
+                log.info("A streamer process died. Stopping the local streamer manager.")
                 self.stop() # sets self.state to STOPPING
             # Next, if all streamers are dead, we can say this manager is stopped
             if self.state == process.STATE_STOPPING:
                 one_is_left = False
                 for proc in self.get_all_streamer_process_managers():
                     if process_manager is not proc and proc.state != process.STATE_STOPPED:
-                        print("Streamer process %s is not dead, so we are not done stopping. Its state is %s." % (proc, proc.state))
+                        log.info("Streamer process %s is not dead, so we are not done stopping. Its state is %s." % (proc, proc.state))
                         one_is_left = True
                 if not one_is_left:
-                    print "Setting streamers manager to STOPPED"
+                    log.info("Setting streamers manager to STOPPED")
                     self._set_state(process.STATE_STOPPED)
 
     def on_stopped(self):
@@ -587,14 +590,15 @@ class StreamerManager(object):
         details = ""
         show_error_dialog = False
         #TODO: internationalize
-        print("All streamers are stopped.")
-        print("Error messages for this session: %s" % (self.error_messages))
+        log.info("All streamers are stopped.")
         if len(self.error_messages["send"]) != 0:
+            log.error("Error messages from the sender for this session: %s" % (self.error_messages["send"]))
             details += _("Errors from local sender:") + "\n"
             for line in self.error_messages["send"]:
                 details += " * " + line + "\n"
             show_error_dialog = True
         if len(self.error_messages["receive"]) != 0:
+            log.error("Error messages from the receiver for this session: %s" % (self.error_messages["receive"]))
             details += _("Errors from local receiver:") + "\n"
             for line in self.error_messages["receive"]:
                 details += " * " + line + "\n"
@@ -611,7 +615,7 @@ class StreamerManager(object):
         self.extra_receiver = None
         self.midi_receiver = None
         self.midi_sender = None
-        print "should all be None:", self.get_all_streamer_process_managers()
+        log.debug("Process managers should all be None: %s" % (self.get_all_streamer_process_managers()))
     
     def _set_state(self, new_state):
         """

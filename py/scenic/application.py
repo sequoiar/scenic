@@ -93,8 +93,11 @@ from scenic.devices import x11
 from scenic.devices import cameras
 from scenic.devices import midi
 from scenic import gui
+from scenic import logger
 from scenic import internationalization
 _ = internationalization._
+
+log = logger.start(level="info", name="application")
 
 class Config(saving.ConfigStateSaving):
     """
@@ -200,7 +203,7 @@ class Application(object):
         self.streamer_manager = StreamerManager(self)
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
         self._is_negotiating = False
-        print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
+        log.info("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = communication.Client()
         self.client.connection_error_signal.connect(self.on_connection_error)
@@ -239,7 +242,7 @@ class Application(object):
         self._is_negotiating = False #important
 
     def format_v4l2_device_name(self, device_dict):
-        print "formatting v4l2 device name", device_dict
+        log.debug("formatting v4l2 device name %s" % (device_dict))
         return _format_device_name_and_identifier(device_dict["card"], device_dict["name"])
 
     def parse_v4l2_device_name(self, formatted_name):
@@ -298,7 +301,7 @@ class Application(object):
         except error.CannotListenError, e:
             def _cb(result):
                 reactor.stop()
-            print("Cannot start SIC server. %s" % (e))
+            log.error("Cannot start SIC server. %s" % (e))
             deferred = dialogs.ErrorDialog.create(_("Is another Scenic running? Cannot bind to port %(port)d") % {"port": self.config.negotiation_port}, parent=self.gui.main_window)
             deferred.addCallback(_cb)
             return
@@ -363,8 +366,8 @@ class Application(object):
                     output_devices.append(device)
             self.devices["midi_input_devices"] = input_devices
             self.devices["midi_output_devices"] = output_devices
-            print("MIDI inputs: %s" % (input_devices))
-            print("MIDI outputs: %s" % (output_devices))
+            log.debug("MIDI inputs: %s" % (input_devices))
+            log.debug("MIDI outputs: %s" % (output_devices))
             self.gui.update_midi_devices()
         deferred.addCallback(_callback)
         return deferred
@@ -378,7 +381,7 @@ class Application(object):
         deferred = x11.list_x11_displays(verbose=False)
         def _callback(x11_displays):
             self.devices["x11_displays"] = x11_displays
-            print("displays: %s" % (x11_displays))
+            log.debug("displays: %s" % (x11_displays))
             self.gui.update_x11_devices()
         deferred.addCallback(_callback)
         return deferred
@@ -394,21 +397,21 @@ class Application(object):
         toggle_size_sensitivity = self.gui.video_capture_size_widget.get_property("sensitive")
         def _callback(cameras):
             self.devices["cameras"] = cameras
-            print("cameras: %s" % (cameras))
+            log.debug("cameras: %s" % (cameras))
             self.gui.update_camera_devices()
             if toggle_size_sensitivity:
                 self.gui.video_capture_size_widget.set_sensitive(True)
-            print("Done polling cameras. Setting video_capture_size widget sensitive to true.")
+            log.debug("Done polling cameras. Setting video_capture_size widget sensitive to true.")
             return cameras
         def _errback(reason):
             if toggle_size_sensitivity:
                 self.gui.video_capture_size_widget.set_sensitive(True)
-            print("Setting video_capture_size widget sensitive to true")
+            log.debug("Setting video_capture_size widget sensitive to true")
             return reason
         if toggle_size_sensitivity:
             self.gui.video_capture_size_widget.set_sensitive(False)
         deferred.addCallback(_callback)
-        print("Setting video_capture_size widget sensitive to false")
+        log.debug("Setting video_capture_size widget sensitive to false")
         deferred.addErrback(_errback)
         return deferred
 
@@ -422,7 +425,7 @@ class Application(object):
             self.devices["xvideo_is_present"] = xvideo_is_present
             if not xvideo_is_present:
                 msg = _("It seems like the xvideo extension is not present. Video display is not possible.")
-                print(msg)
+                log.error(msg)
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
             return xvideo_is_present
         deferred.addCallback(_callback)
@@ -438,9 +441,9 @@ class Application(object):
         try:
             jack_servers = jackd.jackd_get_infos() # returns a list of dicts
         except jackd.JackFrozenError, e:
-            print e 
+            log.error(str(e)) 
             msg = _("The JACK audio server seems frozen ! \n%s") % (e)
-            print(msg)
+            log.error(msg)
             #dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
             is_zombie = True
         else:
@@ -450,7 +453,7 @@ class Application(object):
             else:
                 is_running = True
         if self.devices["jackd_is_running"] != is_running:
-            print("Jackd server changed state: %s" % (jack_servers))
+            log.debug("Jackd server changed state: %s" % (jack_servers))
         self.devices["jackd_is_running"] = is_running
         self.devices["jackd_is_zombie"] = is_zombie
         self.devices["jack_servers"] = jack_servers
@@ -462,7 +465,7 @@ class Application(object):
         @rtype: L{DeferredList}
         """
         deferred = defer.Deferred()
-        print("The application is shutting down.")
+        log.info("The application is shutting down.")
         # TODO: stop streamers
         self.save_configuration()
         if self.client.is_connected():
@@ -470,12 +473,12 @@ class Application(object):
                 self.send_bye() # returns None
                 self.stop_streamers() # returns None
         def _cb(result):
-            print "done quitting."
+            log.debug("done quitting.")
             deferred.callback(True)
         def _later():
             d2 = self.disconnect_client()
             d2.addCallback(_cb)
-            print('stopping server')
+            log.info('stopping server')
         reactor.callLater(0.1, _later)
         d1 = self.server.close()
         d2 = self.gui.close_preview_if_running()
@@ -499,8 +502,7 @@ class Application(object):
     # -------------------- streamer ports -----------------
     def prepare_before_rtp_stream(self):
         #TODO: return a Deferred
-        self.gui.close_preview_if_running() # TODO: use its deferred
-        self.save_configuration()
+        #self.save_configuration()
         self._allocate_ports()
         
     def cleanup_after_rtp_stream(self):
@@ -519,7 +521,7 @@ class Application(object):
             try:
                 self.ports_allocator.free(port)
             except ports.PortsAllocatorError, e:
-                print(e)
+                log.error(e)
 
     def save_configuration(self):
         """
@@ -540,7 +542,7 @@ class Application(object):
         """
         # TODO: break if not compatible in a next release.
         if message["protocol"] != self.protocol_version:
-            print("WARNING: Remote peer uses %s and we use %s." % (message["protocol"], self.protocol_version))
+            log.warning("WARNING: Remote peer uses %s and we use %s." % (message["protocol"], self.protocol_version))
             return False
         else:
             return True
@@ -580,7 +582,7 @@ class Application(object):
         if contact is not None:
             invited_by = contact["name"]
         if self.has_negotiation_in_progress():
-            print "REFUSING an INVITE, since we are already negotiating with some peer."
+            log.info("REFUSING an INVITE, since we are already negotiating with some peer.")
             _simply_refuse(communication.REFUSE_REASON_BUSY)
             return
         self._is_negotiating = True
@@ -597,7 +599,7 @@ class Application(object):
                     }
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
                 if contact is not None and contact["auto_accept"]:
-                    print("Contact %s is on auto_accept. Accepting." % (invited_by))
+                    log.info("Contact %s is on auto_accept. Accepting." % (invited_by))
                     def _connected_cb(proto):
                         self.send_accept(addr)
                     connected_deferred.addCallback(_connected_cb)
@@ -658,10 +660,10 @@ class Application(object):
                 "midi": message["midi"]
                 }
             if self.streamer_manager.is_busy():
-                print("Got ACCEPT but we are busy. This is very strange")
+                log.error("Got ACCEPT but we are busy. This is very strange")
                 dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
             else:
-                print("Got ACCEPT. Starting streamers as initiator.")
+                log.info("Got ACCEPT. Starting streamers as initiator.")
                 self.start_streamers(addr)
                 self.send_ack()
 
@@ -686,7 +688,7 @@ class Application(object):
         Got ACK
         """
         self._is_negotiating = False
-        print("Got ACK. Starting streamers as answerer.")
+        log.info("Got ACK. Starting streamers as answerer.")
         self.start_streamers(addr)
 
     def handle_bye(self):
@@ -697,7 +699,7 @@ class Application(object):
         self.got_bye = True
         self.stop_streamers()
         if self.client.is_connected():
-            print('disconnecting client and sending BYE')
+            log.info('disconnecting client and sending BYE')
             self.client.send({"msg":"OK", "sid":0})
             self.disconnect_client()
 
@@ -706,13 +708,13 @@ class Application(object):
         Got OK
         """
         self._is_negotiating = False
-        print("received ok. Everything has an end.")
-        print('disconnecting client')
+        log.info("Received ok. We are done with this streaming session.")
+        log.debug('disconnecting client')
         self.disconnect_client()
 
     def on_server_receive_command(self, message, addr):
         msg = message["msg"]
-        print("Got %s from %s" % (msg, addr))
+        log.debug("Got %s from %s" % (msg, addr))
         # TODO: use prefixedMethods from twisted.
         if msg == "INVITE":
             self.handle_invite(message, addr)
@@ -729,7 +731,7 @@ class Application(object):
         elif msg == "OK":
             self.handle_ok()
         else:
-            print('WARNING: Unexpected message %s' % (msg))
+            log.warning('WARNING: Unexpected message %s' % (msg))
 
     # -------------------------- actions on streamer manager --------
 
@@ -765,7 +767,7 @@ class Application(object):
         """
         We call this when all streamers are stopped.
         """
-        print("on_streamers_stopped got called")
+        log.debug("on_streamers_stopped got called")
         self.cleanup_after_rtp_stream()
 
     # ---------------------- sending messages -----------
@@ -833,6 +835,7 @@ class Application(object):
         """
         #TODO: poll X11 devices
         #TODO: poll xv extension
+        self.gui.close_preview_if_running() # TODO: use its deferred
         self.save_configuration()
         self.prepare_before_rtp_stream()
         deferred = defer.Deferred()
@@ -860,8 +863,8 @@ class Application(object):
                 return deferred.callback(False)
                 
             elif (not self.devices["jackd_is_running"]) and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
-                print "audio send/recv enabled:", self.config.audio_send_enabled, self.config.audio_recv_enabled
-                print "self.devices[\'jackd_is_running\'] = ", self.devices["jackd_is_running"]
+                log.debug("audio send/recv enabled: %s %s" % (self.config.audio_send_enabled, self.config.audio_recv_enabled))
+                log.debug("self.devices[\'jackd_is_running\'] = %s" % (self.devices["jackd_is_running"]))
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
                 return deferred.callback(False)
@@ -935,19 +938,19 @@ class Application(object):
                         msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
                     else:
                         msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
-                    print(msg)
+                    log.error(msg)
                     self.gui.hide_calling_dialog()
                     dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
                     self._is_negotiating = False
                     return None
                    
-                print("sending %s to %s:%s" % (msg, ip, port))
+                log.debug("sending %s to %s:%s" % (msg, ip, port))
                 deferred = self.client.connect(ip, port)
                 deferred.addCallback(_on_connected).addErrback(_on_error)
                 self.gui.show_calling_dialog()
                 # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
             else:
-                print("Cannot send INVITE.")
+                log.error("Cannot send INVITE.")
                 self._is_negotiating = False
 
         check_deferred = self.check_if_ready_to_stream(role="offerer")
@@ -1018,7 +1021,7 @@ class Application(object):
         if new_state in [process.STATE_STOPPED]:
             if not self.got_bye:
                 # got_bye means our peer sent us a BYE, so we shouldn't send one back 
-                print("Local StreamerManager stopped. Sending BYE")
+                log.info("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
         elif new_state == process.STATE_RUNNING:
             self.gui.write_info_in_debug_tab()

@@ -23,6 +23,7 @@ Custom state saving tools for Scenic.
 """
 from scenic import configure
 import os
+from scenic import logger
 
 # JSON import:
 try:
@@ -38,14 +39,16 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
+log = logger.start(name="saving", level="info")
+
 def _create_directory_if_it_does_not_exist(dir_path):
     try:
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
-            print('mkdir %s' % (dir_path))
+            log.info('mkdir %s' % (dir_path))
     except OSError, e:
         msg = 'Error creating directories' % (dir_path, e.message)
-        print(msg)
+        log.error(msg)
         raise RuntimeError(msg)
 
 def _save(file_name, data):
@@ -64,8 +67,8 @@ def _save(file_name, data):
     except IOError, e:
         raise RuntimeError(e.message)
     else:
-        print("Writing data in JSON to %s" % (file_name))
-        print("%s" % (data))
+        log.debug("Writing data in JSON to %s" % (file_name))
+        log.debug("%s" % (data))
         json.dump(data, f, indent=4)
     if f is not None:
         f.close()
@@ -109,7 +112,7 @@ class ConfigStateSaving(object):
             "appname": configure.APPNAME, 
             "version": configure.VERSION
             }
-        print("Saving config to %s" % (self._config_path))
+        log.info("Saving config to %s" % (self._config_path))
         for key in sorted(self.__dict__.keys()): 
             value = self.__dict__[key]
             if key in exclude_list:
@@ -125,15 +128,15 @@ class ConfigStateSaving(object):
         self._config_path = _former_file_name
 
     def _load(self):
-        print("Loading configuration from %s" % (self._config_path))
+        log.info("Loading configuration from %s" % (self._config_path))
         data = _load(self._config_path)
-        print(str(data))
+        log.debug(str(data))
         for k in data["configuration"].keys():
             if hasattr(self, k):
                 cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
                 setattr(self, k, cast(data["configuration"][k]))
             else:
-                print("Found configuration key %s but it is not supported in this version of Scenic." % (k))
+                log.error("Found configuration key %s but it is not supported in this version of Scenic." % (k))
 
 class AddressBook(object):
     """
@@ -157,7 +160,7 @@ class AddressBook(object):
         Loads the data from the addressbook file and populate the "contact_list" and "selected" attributes.
         """
         if os.path.isfile(self.file_name):
-            print("Loading addressbook.")
+            log.info("Loading addressbook.")
             data = _load(self.file_name)
             try:
                 self.selected = data["selected"]
@@ -167,12 +170,12 @@ class AddressBook(object):
                 self.selected = None
             self.contact_list = data["contact_list"]
         else:
-            print("No addressbook found.")
+            log.error("No addressbook found.")
 
     def save(self):
         data = {
             "selected": self.selected,
             "contact_list": self.contact_list
             }
-        print "saving addressbook to %s" % (self.file_name)
+        log.info("saving addressbook to %s" % (self.file_name))
         _save(self.file_name, data)

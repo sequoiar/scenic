@@ -42,7 +42,10 @@ from scenic import network
 from scenic import communication
 from scenic.devices import cameras
 from scenic.devices import networkinterfaces
+from scenic import logger
 from scenic.internationalization import _
+
+log = logger.start(level="info", name="gui")
 
 ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
 ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
@@ -143,7 +146,7 @@ def _set_combobox_value(widget, value=None):
     else:
         widget.set_active(0) # FIXME: -1)
         msg = "ComboBox widget %s doesn't have value \"%s\"." % (widget, value)
-        print msg
+        log.debug(msg)
 
 #videotestsrc legible name:
 VIDEO_TEST_INPUT = "Color bars"
@@ -293,7 +296,7 @@ class Gui(object):
             """ Called when a plug is removed from socket, returns
                 True so that it can be reused
                 """
-            print "I (", widget, ") have just had a plug removed!"
+            log.debug("I (%s) have just had a plug removed!" % (widget))
             return True
         
         self.audio_levels_input_widget = widgets_tree.get_widget("audio_levels_input")
@@ -310,9 +313,6 @@ class Gui(object):
         out_socket.show()
         self.audio_levels_output_widget.add(out_socket)
         self.audio_levels_output_socket_id = out_socket.get_id()
-       #def _plug_added_cb(widget):
-       #    """ Called when a plug is added to socket """
-       #    print "I (", widget, ") have just had a plug inserted!"
 
         # system tab contents:
         self.network_admin_widget = widgets_tree.get_widget("network_admin")
@@ -339,19 +339,19 @@ class Gui(object):
         else:
             # Removes the sytem_tab 
             tab_num = self.main_tabs_widget.page_num(self.system_tab_contents_widget)
-            print "Removing tab number %d." % (tab_num)
+            log.debug("Removing tab number %d." % (tab_num))
             self.main_tabs_widget.remove_page(tab_num)
 
         self.enable_debug = enable_debug
         if not self.enable_debug: # hide the tab if not in debug
             # Removes the debug_tab 
             tab_num = self.main_tabs_widget.page_num(self.debug_tab_contents_widget)
-            print "Removing tab number %d." % (tab_num)
+            log.debug("Removing tab number %d." % (tab_num))
             self.main_tabs_widget.remove_page(tab_num)
         
         self.is_fullscreen = False
         if fullscreen:
-            print("Making the main window fullscreen.")
+            log.debug("Making the main window fullscreen.")
             self.toggle_fullscreen()
         
         # ------------------ contact list view
@@ -412,10 +412,10 @@ class Gui(object):
     def _confirm_and_quit(self):
         def _cb(result):
             if result:
-                print("Destroying the window.")
+                log.info("Destroying the window.")
                 self.main_window.destroy()
             else:
-                print("Not quitting.")
+                log.info("Not quitting.")
         # If you return FALSE in the "delete_event" signal handler,
         # GTK will emit the "destroy" signal. Returning TRUE means
         # you don't want the window to be destroyed.
@@ -432,7 +432,7 @@ class Gui(object):
     def on_main_window_destroyed(self, *args):
         # TODO: confirm dialog!
         if reactor.running:
-            print("reactor.stop()")
+            log.debug("reactor.stop()")
             reactor.stop()
 
     # --------------- slots for some widget events ------------
@@ -441,13 +441,13 @@ class Gui(object):
         # avoid bad xid errors
         gtk.gdk.display_get_default().sync()
         xid = self.preview_area_widget.window.xid
-        print("Preview area X Window ID: %s" % (xid))
+        log.debug("Preview area X Window ID: %s" % (xid))
         self.preview_area_x_window_id = xid
         self.preview_area_widget.window.set_background(gtk.gdk.Color(0, 0, 0)) # black
 
     def on_preview_manager_state_changed(self, manager, new_state):
         if new_state == process.STATE_STOPPED:
-            print("Making the preview button to False since the preview process died.")
+            log.debug("Making the preview button to False since the preview process died.")
             if self.preview_manager.is_busy(): # very unlikely
                 self.preview_manager.stop()
             self.video_preview_icon_widget.set_from_stock(gtk.STOCK_MEDIA_PLAY, 4)
@@ -482,7 +482,7 @@ class Gui(object):
         #TODO: stop it when starting to stream, if running
         #TODO: stop it when button is toggled to false.
         # It can be the user that pushed the button, or it can be toggled by the software.
-        print 'video_view_preview toggled', widget.get_active()
+        log.debug('video_view_preview toggled %s' % (widget.get_active()))
         if self._widgets_changed_by_user:
             if widget.get_active():
                 self.app.save_configuration() #gathers and saves
@@ -522,6 +522,7 @@ class Gui(object):
         #print("on_contact_list_changed")
         # FIXME: what is args?
         tree_list, self.selected_contact_row = args[0].get_selected()
+        is_streaming = self.app.has_session()
         if self.selected_contact_row:
             #print "yes, selected_contact_row"
             # make the edit, remove, invite buttons sensitive:
@@ -532,7 +533,6 @@ class Gui(object):
             self.selected_contact_index = tree_list.get_path(self.selected_contact_row)[0] # FIXME: this var should be deprecated
             self.app.address_book.selected_contact = self.app.address_book.contact_list[self.selected_contact_index] # FIXME: deprecate this!
             self.app.address_book.selected = self.selected_contact_index
-            is_streaming = self.app.has_session()
         else:
             # make the edit, remove, invite buttons sensitive:
             self.edit_contact_widget.set_sensitive(False)
@@ -592,7 +592,7 @@ class Gui(object):
         auto_accept = False
         if contact["auto_accept"]:
             auto_accept = True
-            print('auto accept should be true')
+            log.debug('auto accept should be true') # FIXME: why is this printed ?
         self.contact_auto_accept_widget.set_active(auto_accept)
         self.edit_contact_window.show() # addr
 
@@ -740,9 +740,9 @@ class Gui(object):
             if type(value) is not cast:
                 raise RuntimeError("Wrong type for attribute %s." % (attribute_name))
             setattr(self.app.config, attribute_name, value)
-            print " * %s: %s" % (attribute_name, getattr(self.app.config, attribute_name))
+            log.debug(" * %s: %s" % (attribute_name, getattr(self.app.config, attribute_name)))
 
-        print("Gathering configuration from the GUI widgets.")
+        log.debug("Gathering configuration from the GUI widgets.")
         # VIDEO:
         _set_config("video_send_enabled", self.video_send_enabled_widget.get_active())
         _set_config("video_recv_enabled", self.video_receive_enabled_widget.get_active())
@@ -796,11 +796,11 @@ class Gui(object):
         """
         def _get_config(attribute_name):
             value = getattr(self.app.config, attribute_name)
-            print " * %s: %s" % (attribute_name, value)
+            log.debug(" * %s: %s" % (attribute_name, value))
             return value
 
         self._widgets_changed_by_user = False
-        print("Changing widgets value according to configuration.")
+        log.debug("Changing widgets value according to configuration.")
         #print(self.app.config.__dict__)
         # VIDEO:
         self.video_send_enabled_widget.set_active(_get_config("video_send_enabled"))
@@ -820,11 +820,11 @@ class Gui(object):
         elif self.app.config.video_source == "v4l2src":
             video_source = self.app.config.video_device
         _set_combobox_value(self.video_source_widget, video_source)
-        print ' * video_source:', video_source
+        log.debug(' * video_source: %s' % (video_source))
         # VIDEO CODEC:
         video_codec = _get_key_for_value(VIDEO_CODECS, self.app.config.video_codec)
         _set_combobox_value(self.video_codec_widget, video_codec)
-        print ' * video_codec:', video_codec
+        log.debug(' * video_codec: %s' % (video_codec))
         
         # ADDRESSBOOK:
         # Init addressbook contact list:
@@ -855,14 +855,14 @@ class Gui(object):
         self.audio_jitterbuffer_widget.set_value(_get_config("audio_jitterbuffer"))
         # source, codec
         audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
-        print " * audio_source:", audio_source_readable
+        log.debug(" * audio_source: %s" % (audio_source_readable))
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
-        print " * audio_codec:", audio_codec
+        log.debug(" * audio_codec: %s" % (audio_codec))
         _set_combobox_value(self.audio_codec_widget, audio_codec)
         
         # MIDI:
-        print "MIDI jitterbuffer:", self.app.config.midi_jitterbuffer
+        log.debug("MIDI jitterbuffer: %s" % (self.app.config.midi_jitterbuffer))
         self.midi_send_enabled_widget.set_active(_get_config("midi_send_enabled"))
         self.midi_recv_enabled_widget.set_active(_get_config("midi_recv_enabled"))
         _set_combobox_value(self.midi_input_device_widget, _get_config("midi_input_device"))
@@ -933,7 +933,7 @@ class Gui(object):
         _contact_list_currently_sensitive = self.contact_list_widget.get_property("sensitive")
         streaming_state_has_changed = is_streaming == _contact_list_currently_sensitive
         if streaming_state_has_changed:
-            print("streaming state has changed to %s" % (is_streaming))
+            log.debug("streaming state has changed to %s" % (is_streaming))
             if is_streaming:
                 text = _("Stop streaming")
                 self.invite_label_widget.set_text(text)
@@ -948,7 +948,7 @@ class Gui(object):
             
             # Toggle sensitivity of many widgets:
             new_sensitivity = not is_streaming
-            print 'Got to change the sensitivity of many widgets to', new_sensitivity
+            log.debug('Got to change the sensitivity of many widgets to %s' % (new_sensitivity))
             for widget in _other_widgets_to_toggle_sensitivity:
                 widget.set_sensitive(new_sensitivity)
             for widget in _video_widgets_to_toggle_sensitivity:
@@ -996,7 +996,7 @@ class Gui(object):
 
     def make_midi_widget_sensitive_or_not(self):
         # make the MIDI widget insensitive if disabled
-        print("make_midi_widget_sensitive_or_not")
+        log.debug("make_midi_widget_sensitive_or_not")
         is_streaming = self.app.has_session()
         if not is_streaming:
             if not self.app.config.midi_send_enabled:
@@ -1260,7 +1260,7 @@ class Gui(object):
         Called once Application.poll_x11_devices has been run
         """
         x11_displays = [display["name"] for display in self.app.devices["x11_displays"]]
-        print("Updating X11 displays with values %s" % (x11_displays))
+        log.debug("Updating X11 displays with values %s" % (x11_displays))
         _set_combobox_choices(self.video_display_widget, x11_displays)
 
     def update_midi_devices(self):
@@ -1270,7 +1270,7 @@ class Gui(object):
         self._widgets_changed_by_user = False
         input_devices = [self.app.format_midi_device_name(device) for device in self.app.devices["midi_input_devices"]]
         output_devices = [self.app.format_midi_device_name(device) for device in self.app.devices["midi_output_devices"]]
-        print("Updating MIDI devices with values %s %s" % (input_devices, output_devices))
+        log.debug("Updating MIDI devices with values %s %s" % (input_devices, output_devices))
         _set_combobox_choices(self.midi_input_device_widget, input_devices)
         _set_combobox_choices(self.midi_output_device_widget, output_devices)
         self._widgets_changed_by_user = True
@@ -1282,7 +1282,7 @@ class Gui(object):
         self._widgets_changed_by_user = False
         video_sources = [self.app.format_v4l2_device_name(dev) for dev in self.app.devices["cameras"].values()]
         video_sources.insert(0, VIDEO_TEST_INPUT)
-        print("Updating video sources with values %s" % (video_sources))
+        log.debug("Updating video sources with values %s" % (video_sources))
         _set_combobox_choices(self.video_source_widget, video_sources)
         self.update_v4l2_inputs_size_and_norm()
         self._widgets_changed_by_user = True
@@ -1310,7 +1310,7 @@ class Gui(object):
             current_camera_name = _get_combobox_value(self.video_source_widget)
             cam = self.app.parse_v4l2_device_name(current_camera_name)
             if cam is None:
-                print "v4l2 device is none !!", current_camera_name
+                log.warning("v4l2 device is none !! %s" % (current_camera_name))
                 # INPUTS:
                 self.v4l2_input_widget.set_sensitive(False)
                 self.v4l2_input_widget.set_active(-1)
@@ -1340,7 +1340,7 @@ class Gui(object):
                     self.v4l2_standard_widget.set_active(-1)
                 #self.v4l2_standard_widget.set_sensitive(True)
                 # SIZE:
-                print "supported sizes: ", cam["supported_sizes"]
+                log.debug("supported sizes: %s" % (cam["supported_sizes"]))
                 _set_combobox_choices(self.video_capture_size_widget, cam["supported_sizes"]) # TODO: more test sizes
         # once done:
         self._widgets_changed_by_user = True
@@ -1378,12 +1378,12 @@ class Gui(object):
                     try:
                         cam = cameras[current_camera_name]
                     except KeyError, e:
-                        print("Camera %s disappeared !" % (current_camera_name))
+                        log.error("Camera %s disappeared !" % (current_camera_name))
                     else:
                         actual_standard = cam["standard"]
                         if actual_standard != standard_name:
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
-                            print(msg)
+                            log.error(msg)
                             dialogs.ErrorDialog.create(msg, parent=self.main_window)
                             
                             self._widgets_changed_by_user = False
@@ -1391,8 +1391,8 @@ class Gui(object):
                             self._widgets_changed_by_user = True
                             # Maybe we should show an error dialog in that case, or set the value to what it really is.
                         else:
-                            print("Successfully changed standard to %s for device %s." % (actual_standard, current_camera_name))
-                            print("Now polling cameras.")
+                            log.info("Successfully changed standard to %s for device %s." % (actual_standard, current_camera_name))
+                            log.debug("Now polling cameras.")
                     self.v4l2_standard_widget.set_sensitive(True)
                 
                 standard_name = _get_combobox_value(widget)
@@ -1414,15 +1414,15 @@ class Gui(object):
             try:
                 cam = cameras[current_camera_name]
             except KeyError, e:
-                print("Camera %s disappeared !" % (current_camera_name))
+                log.error("Camera %s disappeared !" % (current_camera_name))
             else:
                 actual_input = cam["input"]
                 if actual_input != input_number:
                     msg = _("Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s.") % {"current_input": actual_input, "desired_input": input_number, "device_name": current_camera_name}
-                    print(msg)
+                    log.error(msg)
                     # Maybe we should show an error dialog in that case, or set the value to what it really is.
                 else:
-                    print("Successfully changed input to %s for device %s." % (actual_input, current_camera_name))
+                    log.info("Successfully changed input to %s for device %s." % (actual_input, current_camera_name))
 
         def _cb(result):
             d2 = cameras.list_cameras()
@@ -1436,7 +1436,7 @@ class Gui(object):
                 #cam = self.app.devices["cameras"][input_name]
                 cam = self.app.parse_v4l2_device_name(current_camera_name)
                 if cam is None:
-                    print("No such v4l2 device: %s" % (input_name))
+                    log.error("No such v4l2 device: %s" % (input_name))
                 else:
                     input_number = cam["inputs"].index(input_name)
                     d = cameras.set_v4l2_input_number(device_name=cam["name"], input_number=input_number)
@@ -1451,16 +1451,14 @@ class Gui(object):
         """
         Quits the application.
         """
-        print menu_item, "chosen"
+        log.info("Menu item %s chosen" % (menu_item))
         self._confirm_and_quit()
     
     def on_help_menu_item_activated(self, menu_item):
         """
         Opens a web browser to the scenic web site.
         """
-        print menu_item, "chosen"
-        #url = ONLINE_HELP_URL 
-        #webbrowser.open(url)
+        log.info("Menu item %s chosen" % (menu_item))
         docbook_file = os.path.join(configure.DOCBOOK_DIR, "installation-manual.xml") # TODO: change for the right one
         process.run_once("yelp", docbook_file)
 
@@ -1473,7 +1471,7 @@ class Gui(object):
         if self.app.has_session():
             self.app.stop_streamers()
         elif self.app.has_negotiation_in_progress():
-            print "has negotiation in progress"
+            log.error("Invite button clicked but we have a negotiation in progress.")
         else:
             self.app.send_invite()
 
@@ -1509,7 +1507,7 @@ class Gui(object):
         Sends a CANCEL to the remote peer when invite contact window is closed.
         """
         self.hide_calling_dialog()
-        print("Inviting window is closed. ")
+        log.debug("Th user has closed the inviting window.")
         self.app.send_cancel_and_disconnect(reason=communication.CANCEL_REASON_CANCELLED)
         return True # don't let the delete-event propagate
 
@@ -1540,7 +1538,7 @@ class Gui(object):
             try:
                 latency = (j["period"] * j["nperiods"] / float(j["rate"])) * 1000 # ms
             except KeyError, e:
-                print 'Key %s is missing for the jack server process' % (e)
+                log.error('Key %s is missing for the jack server process' % (e))
             else:
                 self.jack_latency_widget.set_text("%4.2f ms" % (latency))
                 self.jack_sampling_rate_widget.set_text("%d Hz" % (j["rate"]))
@@ -1571,7 +1569,7 @@ class About(object):
         gtk.about_dialog_set_url_hook(self.show_website)
         self.about_dialog.set_website(PROJECT_WEBSITE)
         if not os.path.exists(self.icon_file):
-            print("Could not find icon file %s." % (self.icon_file))
+            log.error("Could not find icon file %s." % (self.icon_file))
         else:
             large_icon = gtk.gdk.pixbuf_new_from_file(self.icon_file)
             self.about_dialog.set_logo(large_icon)
