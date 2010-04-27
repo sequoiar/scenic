@@ -447,8 +447,9 @@ class Gui(object):
         if tab_name == "contacts_tab_contents":
             self.invite_contact_widget.grab_default()
         elif tab_name == "video_tab_contents":
-            self.app.poll_x11_devices()
-            self.app.poll_camera_devices()
+            if not self.app.has_session():
+                self.app.poll_x11_devices()
+                self.app.poll_camera_devices()
         elif tab_name == "audio_tab_contents":
             pass
         elif tab_name == "system_tab_contents":

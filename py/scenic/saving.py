@@ -133,7 +133,7 @@ class ConfigStateSaving(object):
                 cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
                 setattr(self, k, cast(data["configuration"][k]))
             else:
-                print("Found configuration key %s but there is no such key anymore." % (k))
+                print("Found configuration key %s but this options is not supported by this version of Scenic." % (k))
 
 class AddressBook(object):
     """
