@@ -83,6 +83,7 @@ class AudioSinkConfig
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *sinkName() const;
         const char *deviceName() const;
+        int numChannels() const;
         unsigned long long bufferTime() const;
 
     private:

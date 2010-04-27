@@ -110,7 +110,7 @@ class ReceiverConfig : public RemoteConfig
                 const std::string &caps); 
 
         VideoDecoder* createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const;
-        Decoder* createAudioDecoder(const Pipeline &pipeline) const;
+        Decoder* createAudioDecoder(const Pipeline &pipeline, int numChannels) const;
 
         const char *multicastInterface() const { return multicastInterface_.c_str(); }
         const char *caps() const { return caps_.c_str(); }

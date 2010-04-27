@@ -190,6 +190,10 @@ const char* AudioSinkConfig::deviceName() const
     return deviceName_.c_str();
 }
 
+int AudioSinkConfig::numChannels() const
+{
+    return numChannels_;
+}
 
 /// Returns buffer time, which must be an unsigned long long for gstreamer's audiosink to accept it safely
 unsigned long long AudioSinkConfig::bufferTime() const

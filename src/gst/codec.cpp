@@ -448,10 +448,22 @@ Pay* RawEncoder::createPayloader() const
 }
 
 /// Constructor
-RawDecoder::RawDecoder(const Pipeline &pipeline) :
+RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     Decoder(pipeline),
-    aconv_(pipeline_.makeElement("audioconvert", NULL))
-{}
+    aconv_(pipeline_.makeElement("audioconvert", NULL)),
+    // FIXME: SUPER GROSS HACK!!!! We should not need a capsfilter here, 
+    // something is broken in gst
+    capsfilter_(pipeline_.makeElement("capsfilter", NULL))
+{
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-float, channels=" << numChannels;
+    LOG_DEBUG("Raw decoder caps = " << capsStr.str());
+    GstCaps *caps = gst_caps_from_string(capsStr.str().c_str());
+    tassert(caps);
+    g_object_set(G_OBJECT(capsfilter_), "caps", caps, NULL);
+    gst_caps_unref(caps);
+    gstlinkable::link(aconv_, capsfilter_);
+}
 
 
 /// Destructor
