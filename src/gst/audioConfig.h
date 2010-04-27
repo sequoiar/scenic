@@ -70,7 +70,7 @@ class AudioSourceConfig
 class AudioSinkConfig
 {
     public:
-        AudioSinkConfig(const boost::program_options::variables_map &options);
+        AudioSinkConfig(Pipeline &pipeline, const boost::program_options::variables_map &options);
         
         AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }

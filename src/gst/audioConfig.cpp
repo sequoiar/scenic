@@ -124,22 +124,21 @@ bool AudioSourceConfig::locationExists() const
 
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) : 
+AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &options) : 
     sink_(options["audiosink"].as<std::string>()), 
     sinkName_(options["jack-client-name"].as<std::string>()),
     deviceName_(options["audiodevice"].as<std::string>()), 
     bufferTime_(options["audio-buffer-usec"].as<int>())
 {
+    if (sink_ == "jackaudiosink")
+        Jack::assertReady(pipeline);      // (before waiting on caps) but having it here is pretty gross
 }
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
 AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")
-    {
-        Jack::assertReady(pipeline);      // (before waiting on caps) but having it here is pretty gross
         return new AudioJackSink(pipeline, *this);
-    }
     else if (sink_ == "alsasink")
         return new AudioAlsaSink(pipeline, *this);
     else if (sink_ == "pulsesink")
