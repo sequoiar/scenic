@@ -109,7 +109,7 @@ def start(level="info", name="twisted", to_stdout=None, to_file=None, log_file_n
     if name == 'twisted':
         observer = twisted_log.PythonLoggingObserver(name)
         observer.start()
-        logging.getLogger(name)
+        return logging.getLogger(name)
     else:
         return logging.getLogger(name)
 

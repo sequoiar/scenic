@@ -31,6 +31,7 @@ from scenic import logger
 log = None
 
 def start_logging_to_stdout():
+    global log
     log = logger.start(level="info")
 
 def start_file_logging(full_path="/var/tmp/scenic/scenic.log"):
@@ -38,6 +39,7 @@ def start_file_logging(full_path="/var/tmp/scenic/scenic.log"):
     Starts logging the Master infos to a file.
     @rtype: str path to the log file
     """
+    global log
     file_name = os.path.basename(full_path)
     directory = os.path.dirname(full_path)
     if directory == '':
@@ -130,13 +132,16 @@ def run():
     if options.moo:
         moo()
         sys.exit(0)
+    
     if options.enable_logging:
         start_file_logging(os.path.expanduser(options.log_file_name))
         kwargs["log_file_name"] = options.log_file_name
-    if options.disable_v4l2_settings:
-        v4l2_state_saving_restore = False
     else:
         start_logging_to_stdout()
+    
+    if options.disable_v4l2_settings:
+        v4l2_state_saving_restore = False
+    
     try:
         app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restore, **kwargs)
     except error.CannotListenError, e:
@@ -148,7 +153,9 @@ def run():
         sys.exit(1)
     else:
         try:
+            # starting the application
             reactor.run()
         except KeyboardInterrupt:
             pass
             sys.exit(0)
+
