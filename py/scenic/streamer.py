@@ -464,18 +464,21 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
-        if "stream connected" in line:
-            if "audio" in line:
-                self.rtcp_stats["receive"]["audio"]["connected"] = True
-            elif "video" in line:
-                self.rtcp_stats["receive"]["video"]["connected"] = True
-        elif "BITRATE" in line:
-            if "video" in line:
-                self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
-            elif "audio" in line:
-                self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
-        else:
-            log.debug("%9s stdout: %s" % (process_manager.identifier, line))
+        try:
+            if "stream connected" in line:
+                if "audio" in line:
+                    self.rtcp_stats["receive"]["audio"]["connected"] = True
+                elif "video" in line:
+                    self.rtcp_stats["receive"]["video"]["connected"] = True
+            elif "BITRATE" in line:
+                if "video" in line:
+                    self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
+            else:
+                log.debug("%9s stdout: %s" % (process_manager.identifier, line))
+        except ValueError, e:
+            log.error("%s when parsing line '%s' from receiver" % (e, line))
 
     def on_receiver_stderr_line(self, process_manager, line):
         """
@@ -499,9 +502,9 @@ class StreamerManager(object):
                 #self._calculate_packet_loss()
             elif "AVERAGE PACKET-LOSS" in line:
                 if "video" in line:
-                    self.rtcp_stats["send"]["video"]["packet-loss-percent"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["video"]["packet-loss-percent"] = float(line.split(":")[-1])
                 elif "audio" in line:
-                    self.rtcp_stats["send"]["audio"]["packet-loss-percent"] = int(line.split(":")[-1])
+                    self.rtcp_stats["send"]["audio"]["packet-loss-percent"] = float(line.split(":")[-1])
             elif "PACKETS-SENT" in line:
                 if "video" in line:
                     self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
@@ -524,7 +527,7 @@ class StreamerManager(object):
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["connected"] = True
         except ValueError, e:
-            log.error(e)
+            log.error("%s when parsing line '%s' from sender" % (e, line))
 
     def on_sender_stderr_line(self, process_manager, line):
         """
