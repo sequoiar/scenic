@@ -16,7 +16,7 @@ from scenic import sig
 from scenic import configure
 from scenic import logger
 
-log = logger.start(name="process", level="debug")
+log = logger.start(name="process", level="info")
 
 _original_environment_variables = {}
 
