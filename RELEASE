@@ -31,3 +31,61 @@ This release is an other unstable version in the 0.5 series.
 
 Fixes in 0.5.1:
 
+Still TODO or make sure of:
+    #462: add 11 channels raw support for raw
+    #418: Cannot log to a single file
+    #423: add celt support for milhouse
+
+New features in scenic:
+    #411: Integrate user documentation in scenic
+    #445: Improve logging system with levels and categories
+    #391: Implement state saving for device settings (such as V4L2 input)
+    #437: if audio and video are desynchronized, they should each have independent ...
+    #421: Add a reason to when a remote peer refuses
+    #429: Strip white spaces from the address field
+    #401: Swap addressbook and summary widgets position in the GUI
+    #368: Display a detailled status window
+    #219: Be able to desynchronize audio and video
+    #305: User should be able to disable video/audio to send or receive
+
+
+Bug fixes in scenic : 
+    #475: yelp should not inherit the GTK theme
+    #447: Clicking on the Video tab while streaming create sound glitches
+    #456: scenic does not poll MIDI device everytime the user chooses the tab
+    #395: callee can't stop call if caller is not in her contact list
+    #460: Wrong error when calling a busy contact
+    #458: midi device detection does not refresh correctly
+    #448: Scenic should quit gracefully when DISPLAY is not set or invalid
+    #402: When invited by someone not in contact list, the "cancelled" message ...
+    #440: Must gather config options just before doing the pre-flight check
+    #399: Traceback when running trial to run test cases
+    #397: scenic traceback when clicking on MIDI tab
+    #403: Text lines in the summary should wrap
+    #439: When audio/video desynchronized, audio must have its own jitterbuffer ...
+    #408: Debug textview should be refreshed less often
+    #438: In pre-flight check, scenic always thinks that jackd is not running
+    #433: Increase timeout before SIGKILL for streamer processes.
+    #425: When you disable video reception (or the other side disable video ...
+    #426: V4L2 input and standard widgets are not populated at startup
+    #434: Scenic doesn't list resolutions supported by the camera at startup.
+    #414: Cannot select text in debug window for more than one second
+    #396: embedded preview isn't always correct size (gstreamer git versions-only)
+    #404: Sometimes scenic refuses all the time since it has already got an ...
+    #431: If a port is not available, scenic should increment the port number to ...
+    #424: When you don't have any contacts and add one, the invite label is still ...
+    #427: At first, all the streams should be enabled
+    #417: Framerate index out of range
+    #359: JACKD: Key 'period' is missing for the jack server process
+    #366: list-norms for v4l2 via GstTuner interface
+    #415: audio channels not respected in preview
+    #410: Remove contact name from the invite button
+    #406: midi / gui bug. Blocking the video cam usage on some laptop
+
+New features in milhouse:
+    #409: Find out if we can detect which fps works with which image size
+
+Bug fixes in milhouse: 
+    #463: samplerates != 48000 broken in 0.4.5 on receiver-side
+    #350: add audio-buffer setting in scenic
+    #393: replace GMainLoop instance with gtk_main and gtk_main_quit
