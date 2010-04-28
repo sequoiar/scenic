@@ -210,6 +210,7 @@ class ProcessManager(object):
         """
         Stops the child process
         """
+        from twisted.internet import reactor
         def _later_check(pid):
             if self.pid == pid:
                 if self.state == STATE_STOPPING:
