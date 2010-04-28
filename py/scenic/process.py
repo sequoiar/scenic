@@ -4,19 +4,27 @@
 Streamer Process management.
 """
 import os
+import copy
 import time
 import logging
 import signal
 from twisted.internet import error
 from twisted.internet import protocol
-from twisted.internet import reactor
 from twisted.python import procutils
 from twisted.internet import utils
 from scenic import sig
 from scenic import configure
 from scenic import logger
 
-log = logger.start(name="process", level="info")
+log = logger.start(name="process", level="debug")
+
+_original_environment_variables = {}
+
+def save_environment_variables(env):
+    global _original_environment_variables
+    _original_environment_variables = copy.deepcopy(env)
+    log.debug("Saved original env vars: %s" % (_original_environment_variables))
+    log.debug("ID of os.environ: %d. ID of saved env: %d" % (id(os.environ), id(_original_environment_variables)))
 
 # constants for the slave process
 STATE_STARTING = "STARTING"
@@ -32,6 +40,8 @@ def run_once(executable, *args):
     Runs a command, without looking at its output or return value.
     Returns a Deferred or None.
     """
+    from twisted.internet import reactor
+    global _original_environment_variables
     def _cb(result):
         #print(result)
         pass
@@ -41,9 +51,13 @@ def run_once(executable, *args):
         log.error("Could not find executable %s" % (executable))
         return None
     else:
-        env = configure.environ_without_custom()
-        log.info("Calling `%s %s` with ENV=%s" % (executable, list(args), env))
-        d = utils.getProcessValue(executable, args, configure.environ_without_custom(), '.', reactor)
+        env = _original_environment_variables
+        for k in ["GTK2_RC_FILES", "GTK_RC_FILES"]:
+            if env.has_key(k):
+                log.info("%s=%s" % (k, env[k]))
+        log.info("$ %s %s" % (executable, " ".join(list(args))))
+        log.debug("ENV=%s" % (env))
+        d = utils.getProcessValue(executable, args, env, '.', reactor)
         d.addCallback(_cb)
         return d
 
@@ -160,6 +174,8 @@ class ProcessManager(object):
         """
         Starts the child process
         """
+        global _original_environment_variables
+        from twisted.internet import reactor
         if self.state in [STATE_RUNNING, STATE_STARTING]:
             msg = "Child is already %s. Cannot start it." % (self.state)
             raise ProcessError(msg)
@@ -173,7 +189,7 @@ class ProcessManager(object):
         self.log("Will run command %s %s" % (self.identifier, str(self.command)))
         self._child_process = ProcessIO(self)
         environ = {}
-        environ.update(configure.environ_without_custom())
+        environ.update(_original_environment_variables)
         for key, val in self.env.iteritems():
             environ[key] = val
         self.set_child_state(STATE_STARTING)
@@ -289,3 +305,4 @@ class ProcessManager(object):
 
     def __str__(self):
         return "%s %s" % (self.identifier, id(self))
+

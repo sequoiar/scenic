@@ -478,7 +478,7 @@ class Application(object):
         def _later():
             d2 = self.disconnect_client()
             d2.addCallback(_cb)
-            log.info('Stopping the server if still running.')
+            log.info('Stopping the SIC sender if still connected.')
         reactor.callLater(0.1, _later)
         d1 = self.server.close()
         d2 = self.gui.close_preview_if_running()

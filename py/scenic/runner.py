@@ -25,7 +25,9 @@ Some imports are in run().
 """
 import sys
 import os
+import copy
 from twisted.python import logfile
+from optparse import OptionParser
 from scenic import logger
 
 log = None
@@ -89,15 +91,6 @@ def run():
     Main function of the application
     """
     from scenic import configure
-    from optparse import OptionParser
-    
-    if not os.environ.has_key('GTK2_RC_FILES'):
-        name = "Darklooks"
-        file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
-        os.environ["GTK2_RC_FILES"] = file_name # has to be done before gtk2reactor.install()
-        configure.custom_environment_variables["GTK2_RC_FILES"] = file_name
-    if "/sbin" not in os.environ["PATH"]: # for ifconfig
-        os.environ["PATH"] += ":/sbin"
     
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(configure.VERSION))
@@ -113,7 +106,21 @@ def run():
     if not os.environ.has_key('DISPLAY'):
         print "You need an X11 display to run Scenic."
         sys.exit(1)
+    if options.enable_logging:
+        start_file_logging(os.path.expanduser(options.log_file_name))
+        kwargs["log_file_name"] = options.log_file_name
+    else:
+        start_logging_to_stdout()
     
+    from scenic import process
+    process.save_environment_variables(os.environ)
+    if not os.environ.has_key('GTK2_RC_FILES'): # FIXME: is this check needed and desired?
+        name = "Darklooks"
+        file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
+        os.environ["GTK2_RC_FILES"] = file_name # has to be done before gtk2reactor.install()
+    if "/sbin" not in os.environ["PATH"]: # for ifconfig
+        os.environ["PATH"] += ":/sbin"
+
     from twisted.internet import gtk2reactor
     gtk2reactor.install() # has to be done before importing reactor
     from twisted.internet import reactor
@@ -124,7 +131,9 @@ def run():
     try:
         gtk.gdk.Display(os.environ["DISPLAY"])
     except RuntimeError, e:
-        print "Invalid X11 display: %s. \nYou need an X11 display to run Scenic." % (os.environ["DISPLAY"])
+        msg = "Invalid X11 display: %s. \nYou need an X11 display to run Scenic." % (os.environ["DISPLAY"])
+        log.error(msg)
+        print msg
         sys.exit(1)
         
     kwargs = {}
@@ -133,21 +142,15 @@ def run():
         moo()
         sys.exit(0)
     
-    if options.enable_logging:
-        start_file_logging(os.path.expanduser(options.log_file_name))
-        kwargs["log_file_name"] = options.log_file_name
-    else:
-        start_logging_to_stdout()
-    
     if options.disable_v4l2_settings:
         v4l2_state_saving_restore = False
     
     try:
         app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restore, **kwargs)
     except error.CannotListenError, e:
-        log.error(str(e))
         msg = "There must be an other Scenic running."
         log.error(msg)
+        log.error(str(e))
         print(msg)
         print(str(e))
         sys.exit(1)
@@ -159,4 +162,5 @@ def run():
             pass
         log.info("Goodbye.")
         sys.exit(0)
+
 

@@ -1453,14 +1453,14 @@ class Gui(object):
         """
         Quits the application.
         """
-        log.info("Menu item %s chosen" % (menu_item))
+        log.info("Menu item 'Quit' chosen")
         self._confirm_and_quit()
     
     def on_help_menu_item_activated(self, menu_item):
         """
         Opens a web browser to the scenic web site.
         """
-        log.info("Menu item %s chosen" % (menu_item))
+        log.info("Menu item 'Help' chosen")
         docbook_file = os.path.join(configure.DOCBOOK_DIR, "user-manual.xml")
         process.run_once("yelp", docbook_file)
 
