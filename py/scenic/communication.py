@@ -92,8 +92,6 @@ class Server(object):
 
     def is_listening(self):
         return self._port_obj is not None
-        
-        
 
 class Client(object):
     """
@@ -119,7 +117,7 @@ class Client(object):
             return proto
         
         def _on_error(reason):
-            log.error("Client could not connect")
+            log.error("Client could not connect to %s on port %s" % (host, port))
             self._connected = False
             self.sic_sender = None
             err = str(reason.getErrorMessage())
@@ -131,13 +129,13 @@ class Client(object):
             self.host = host
             self.port = port
             self.client_factory = sic.ClientFactory()
-            log.debug('trying to connect client to %s %s' % (self.host, self.port))
+            log.debug('Trying to connect client to %s on port %s' % (self.host, self.port))
             
             self.clientPort = reactor.connectTCP(self.host, self.port, self.client_factory)
             self.client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
             return self.client_factory.connected_deferred
         else:
-            msg = "client already connected to some host"
+            msg = "The client is already connected to some host."
             log.error(msg)
             #TODO: return failure?
             return defer.succeed(True) # FIXME
