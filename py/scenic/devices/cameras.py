@@ -19,7 +19,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 """
-Tools to lists avaliable cameras.
+Tools to lists available cameras.
+
+Uses milhouse --list-v4l2
 """
 import os
 import pprint
@@ -54,7 +56,7 @@ def _beautify_camera_name(name):
 
 def _parse_milhouse_list_cameras(text):
     """
-    Parses the output of `milhouse --list-cameras`
+    Parses the output of `milhouse --list-v4l2`
     Returns a dict of dict with keys "name", "size", "standard", "is_interlaced", "input", "inputs", "supported_sizes"
     For now, considers only V4L2 cameras.
     @rtype: list
@@ -163,7 +165,7 @@ def list_cameras():
         print("Error listing cameras: %s" % (reason))
     
     command_name = "milhouse"
-    args = ['--list-cameras']
+    args = ['--list-v4l2']
     try:
         executable = procutils.which(command_name)[0] # gets the executable
     except IndexError:

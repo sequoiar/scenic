@@ -1380,7 +1380,7 @@ class Gui(object):
                     try:
                         cam = cameras[current_camera_name]
                     except KeyError, e:
-                        log.error("Camera %s disappeared !" % (current_camera_name))
+                        log.error("Camera %s disappeared once changed standard!" % (current_camera_name))
                     else:
                         actual_standard = cam["standard"]
                         if actual_standard != standard_name:
@@ -1413,18 +1413,24 @@ class Gui(object):
         Calls `milhouse --videodevice /dev/videoX --v4l2-input N
         """
         def _cb2(cameras):
+            self.app.devices["cameras"] = cameras # important! needed by parse_v4l2_device_name
             try:
-                cam = cameras[current_camera_name]
+                cam = self.app.parse_v4l2_device_name(current_camera_name)
             except KeyError, e:
-                log.error("Camera %s disappeared !" % (current_camera_name))
+                log.error("Camera %s disappeared once changed input!" % (current_camera_name))
+                log.error("List of cameras: %s" % (cameras))
             else:
-                actual_input = cam["input"]
-                if actual_input != input_number:
-                    msg = _("Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s.") % {"current_input": actual_input, "desired_input": input_number, "device_name": current_camera_name}
-                    log.error(msg)
-                    # Maybe we should show an error dialog in that case, or set the value to what it really is.
+                if cam is None:
+                    log.error("Camera %s disappeared once changed input!" % (current_camera_name))
                 else:
-                    log.info("Successfully changed input to %s for device %s." % (actual_input, current_camera_name))
+                    log.debug("Cameras: %s" % (cameras))
+                    actual_input = cam["input"]
+                    if actual_input != desired_input_number:
+                        msg = _("Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s.") % {"current_input": actual_input, "desired_input": desired_input_number, "device_name": current_camera_name}
+                        log.error(msg)
+                        # Maybe we should show an error dialog in that case, or set the value to what it really is.
+                    else:
+                        log.info("Successfully changed input to %s for device %s." % (actual_input, current_camera_name))
 
         def _cb(result):
             d2 = cameras.list_cameras()
@@ -1440,8 +1446,8 @@ class Gui(object):
                 if cam is None:
                     log.error("No such v4l2 device: %s" % (input_name))
                 else:
-                    input_number = cam["inputs"].index(input_name)
-                    d = cameras.set_v4l2_input_number(device_name=cam["name"], input_number=input_number)
+                    desired_input_number = cam["inputs"].index(input_name)
+                    d = cameras.set_v4l2_input_number(device_name=cam["name"], input_number=desired_input_number)
                     d.addCallback(_cb)
 
     # -------------------------- menu items -----------------
