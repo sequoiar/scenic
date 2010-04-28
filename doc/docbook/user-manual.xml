@@ -9,7 +9,7 @@
    <!ENTITY app "<application>Scenic</application>">
    <!ENTITY Introduction SYSTEM "user/introduction.xml">
    <!ENTITY Using_Scenic SYSTEM "user/using-scenic.xml">
-   <!ENTITY Setup_Overview SYSTEM "user/setup-overview.xml">
+   <!ENTITY Setup_Overview SYSTEM "user/setup-overview.xml"> 
    <!ENTITY Peripheral_Connection SYSTEM "user/peripheral-connection.xml">
    <!ENTITY Staring_Devices SYSTEM "user/starting-devices.xml">
    <!ENTITY Testing_Devices SYSTEM "user/testing-devices.xml">
@@ -33,19 +33,16 @@
 <book id="User-Manual" lang="en">
 
    &Introduction;
-   &Setup_Overview;
-   &Peripheral_Connection;
-   &Staring_Devices;
-   &Testing_Devices;
-   &Starting_Scenic;
+   <!-- &Setup_Overview; -->
+   <!-- &Peripheral_Connection; -->
+   <!-- &Staring_Devices; -->
+   <!-- &Testing_Devices; -->
+   <!-- &Starting_Scenic; -->
    &Contact_Settings;
    &Audio_Settings;
    &Video_Settings;
-   &Network_Settings;
-   &Midi_Settings;
-   &About;
- 
-
-
-   &Command_Line;
+   <!-- &Network_Settings; -->
+   <!-- &Midi_Settings; -->
+   <!-- &About; -->
+   <!-- &Command_Line; -->
 </book>   
