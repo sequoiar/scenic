@@ -8,16 +8,19 @@
    <!ENTITY date "April 2010">
    <!ENTITY app "<application>Scenic</application>">
    <!ENTITY Introduction SYSTEM "user/introduction.xml">
+<<<<<<< .mine
+   <!ENTITY Before_Using_Scenic SYSTEM "user/before-using-scenic.xml">
+=======
    <!ENTITY Using_Scenic SYSTEM "user/using-scenic.xml">
    <!ENTITY Setup_Overview SYSTEM "user/setup-overview.xml"> 
    <!ENTITY Peripheral_Connection SYSTEM "user/peripheral-connection.xml">
    <!ENTITY Staring_Devices SYSTEM "user/starting-devices.xml">
    <!ENTITY Testing_Devices SYSTEM "user/testing-devices.xml">
    <!ENTITY Starting_Scenic SYSTEM "user/starting-scenic.xml">
+>>>>>>> .r5793
    <!ENTITY Contact_Settings SYSTEM "user/contact-settings.xml">
    <!ENTITY Audio_Settings SYSTEM "user/audio-settings.xml">
    <!ENTITY Video_Settings SYSTEM "user/video-settings.xml">
-   <!ENTITY Network_Settings SYSTEM "user/network-settings.xml">
    <!ENTITY Midi_Settings SYSTEM "user/midi-settings.xml">
    <!ENTITY About SYSTEM "user/about.xml">
    <!-- Information about the entities
@@ -33,16 +36,25 @@
 <book id="User-Manual" lang="en">
 
    &Introduction;
+<<<<<<< .mine
+   &Before_Using_Scenic;
+=======
    <!-- &Setup_Overview; -->
    <!-- &Peripheral_Connection; -->
    <!-- &Staring_Devices; -->
    <!-- &Testing_Devices; -->
    <!-- &Starting_Scenic; -->
+>>>>>>> .r5793
    &Contact_Settings;
    &Audio_Settings;
    &Video_Settings;
+<<<<<<< .mine
+   &Midi_Settings;
+   &About;
+=======
    <!-- &Network_Settings; -->
    <!-- &Midi_Settings; -->
    <!-- &About; -->
    <!-- &Command_Line; -->
+>>>>>>> .r5793
 </book>   

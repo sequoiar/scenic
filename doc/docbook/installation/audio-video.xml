@@ -389,7 +389,7 @@
 
       <mediaobject>
          <imageobject>
-            <imagedata fileref="fig/qjackctl_Soundcard.png" format="PNG"/>
+            <imagedata fileref="fig/qjackctl_soundcard.png" format="PNG"/>
          </imageobject>
       </mediaobject>
 
