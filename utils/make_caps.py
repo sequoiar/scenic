@@ -214,7 +214,7 @@ for profile_name, profile in profiles.iteritems():
 codec = 'raw'
 SAMPLERATES.append(96000)
 for rate in SAMPLERATES:
-    for channels in xrange(3, 12):
+    for channels in xrange(3, 9):
         profile_name = codec + '_%d_%d' % (channels, rate)
         profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
         profiles[profile_name].caps = 'application/x-rtp, media=(string)audio, clock-rate=(int)%d, encoding-name=(string)L16, encoding-params=(string)%d, channels=(int)%d, payload=(int)96' % (rate, channels, channels)

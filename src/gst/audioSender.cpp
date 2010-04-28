@@ -51,7 +51,7 @@ AudioSender::AudioSender(Pipeline &pipeline,
     }
     else if (remoteConfig_->codec() == "raw")
     {
-        static const int MAX_RAW_CHANNELS = 11;
+        static const int MAX_RAW_CHANNELS = 8;
         if (audioConfig_->numChannels() > MAX_RAW_CHANNELS) 
             THROW_CRITICAL("Raw currently only accepts " << MAX_RAW_CHANNELS << " channels or less, not " << audioConfig_->numChannels());
     }
