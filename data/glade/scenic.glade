@@ -2027,7 +2027,7 @@ JACK</property>
                                 <property name="n_rows">3</property>
                                 <property name="n_columns">3</property>
                                 <child>
-                                  <widget class="GtkCheckButton" id="audio_jack_disable_autoconnect">
+                                  <widget class="GtkCheckButton" id="audio_jack_enable_autoconnect">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="use_underline">True</property>
@@ -2050,7 +2050,7 @@ JACK</property>
                                     <property name="xalign">1</property>
                                     <property name="xpad">5</property>
                                     <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Disable jack autoconnect</property>
+                                    <property name="label" translatable="yes">Enable jack autoconnect</property>
                                     <property name="width_chars">12</property>
                                   </widget>
                                   <packing>
