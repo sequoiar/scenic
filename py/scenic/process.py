@@ -16,11 +16,17 @@ from scenic import sig
 from scenic import configure
 from scenic import logger
 
-log = logger.start(name="process", level="info")
+log = logger.start(name="process", level="debug")
 
+# this is used only for processes started using run_once
 _original_environment_variables = {}
 
 def save_environment_variables(env):
+    """
+    Saves the env vars at startup, which does not contain vars we ight override, such as GTK2_RC_FILES
+    
+    this is used only for processes started using run_once
+    """
     global _original_environment_variables
     _original_environment_variables = copy.deepcopy(env)
     log.debug("Saved original env vars: %s" % (_original_environment_variables))
@@ -66,6 +72,8 @@ class ProcessIO(protocol.ProcessProtocol):
     process IO
      
     Its stdout and stderr streams are logged to a file.    
+
+    Uses the save env vars as scenic, not the _original_environment_variables dict
     """
     def __init__(self, manager):
         """
@@ -121,6 +129,7 @@ class ProcessManager(object):
         @param identifier: Any string. 
         """
         #Used as a file name, so avoid spaces and exotic characters.
+        global _original_environment_variables
         self._process_transport = None
         self._child_process = None
         self._time_child_started = None
@@ -130,6 +139,7 @@ class ProcessManager(object):
         self.time_before_sigkill = 10.0 # seconds
         self.identifier = identifier # title
         self.env = {} # environment variables for the child process
+        self.env = copy.deepcopy(os.environ)
         if env is not None:
             self.env.update(env)
         self.pid = None
@@ -174,7 +184,6 @@ class ProcessManager(object):
         """
         Starts the child process
         """
-        global _original_environment_variables
         from twisted.internet import reactor
         if self.state in [STATE_RUNNING, STATE_STARTING]:
             msg = "Child is already %s. Cannot start it." % (self.state)
@@ -188,16 +197,13 @@ class ProcessManager(object):
         
         self.log("Will run command %s %s" % (self.identifier, str(self.command)))
         self._child_process = ProcessIO(self)
-        environ = {}
-        environ.update(_original_environment_variables)
-        for key, val in self.env.iteritems():
-            environ[key] = val
         self.set_child_state(STATE_STARTING)
         shell = "/bin/sh"
         if os.path.exists("/bin/bash"):
             shell = "/bin/bash"
+        log.debug("Environment: %s" % (self.env))
         self._time_child_started = time.time()
-        self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], environ)
+        self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], self.env)
         self.pid = self._process_transport.pid
         self.log("Spawned child %s with pid %s." % (self.identifier, self.pid))
     
