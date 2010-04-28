@@ -44,7 +44,7 @@ from twisted.protocols import basic
 from scenic import sig
 from scenic import logger
 
-log = logger.start(name="sic", level="info")
+log = logger.start(name="sic")
 
 class SICProtocol(basic.LineReceiver):
     """

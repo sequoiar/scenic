@@ -45,7 +45,7 @@ from scenic.devices import networkinterfaces
 from scenic import logger
 from scenic.internationalization import _
 
-log = logger.start(level="info", name="gui")
+log = logger.start(name="gui")
 
 ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
 ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""

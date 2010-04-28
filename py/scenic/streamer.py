@@ -29,7 +29,7 @@ from scenic import dialogs
 from scenic.internationalization import _
 from scenic import logger
 
-log = logger.start(name="streamer", level="info")
+log = logger.start(name="streamer")
 
 class StreamerManager(object):
     """

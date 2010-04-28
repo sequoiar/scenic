@@ -42,6 +42,7 @@ ENABLE_NON_BLOCKING_OUTPUT = False
 SYSTEMWIDE_LOG_FILE_NAME = None
 SYSTEMWIDE_TO_FILE = False
 SYSTEMWIDE_TO_STDOUT = True
+SYSTEMWIDE_LEVEL = "warning"
 #LoggerClass = logging.getLoggerClass()
 
 # XXX: totally useless.
@@ -58,7 +59,7 @@ SYSTEMWIDE_TO_STDOUT = True
 #logging.setLoggerClass(CoreLogger)
 #logging.setLoggerClass(LoggerClass)
 
-def start(level="info", name="twisted", to_stdout=None, to_file=None, log_file_name=None):
+def start(level=None, name="twisted", to_stdout=None, to_file=None, log_file_name=None):
     """
     Starts the logging for a single module.
     
@@ -79,13 +80,17 @@ def start(level="info", name="twisted", to_stdout=None, to_file=None, log_file_n
     global SYSTEMWIDE_TO_STDOUT
     global SYSTEMWIDE_TO_FILE 
     global SYSTEMWIDE_LOG_FILE_NAME
+    global SYSTEMWIDE_LEVEL
+    
     if log_file_name is not None:
         SYSTEMWIDE_LOG_FILE_NAME = log_file_name
     if to_file is True:
         SYSTEMWIDE_TO_FILE = True
+    if level is not None:
+        SYSTEMWIDE_LEVEL = level
     logger = logging.getLogger(name)
     formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
-    set_level(level, name)
+    set_level(SYSTEMWIDE_LEVEL, name)
     if to_stdout is True or to_stdout is False:
         SYSTEMWIDE_TO_STDOUT = to_stdout
     if to_file is True or to_file is False:

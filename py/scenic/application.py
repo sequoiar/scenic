@@ -97,7 +97,7 @@ from scenic import logger
 from scenic import internationalization
 _ = internationalization._
 
-log = logger.start(level="info", name="application")
+log = logger.start(name="application")
 
 class Config(saving.ConfigStateSaving):
     """

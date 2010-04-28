@@ -34,7 +34,7 @@ from scenic import sig
 from scenic import configure
 from scenic import logger
 
-log = logger.start(name="process", level="info")
+log = logger.start(name="process")
 
 # this is used only for processes started using run_once
 _original_environment_variables = {}

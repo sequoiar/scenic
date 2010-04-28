@@ -25,7 +25,7 @@ from twisted.internet import reactor
 from twisted.internet import defer
 from scenic import logger
 
-log = logger.start(name="communication", level="info")
+log = logger.start(name="communication")
 
 CANCEL_REASON_CANCELLED = "cancelled"
 REFUSE_REASON_PROBLEMS = "technical problems"

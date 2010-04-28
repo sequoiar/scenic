@@ -39,7 +39,7 @@ except AttributeError:
     sys.modules.pop('json') # get rid of the bad json module
     import simplejson as json
 
-log = logger.start(name="saving", level="info")
+log = logger.start(name="saving")
 
 def _create_directory_if_it_does_not_exist(dir_path):
     try:
