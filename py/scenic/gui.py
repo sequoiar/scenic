@@ -1461,7 +1461,7 @@ class Gui(object):
         Opens a web browser to the scenic web site.
         """
         log.info("Menu item %s chosen" % (menu_item))
-        docbook_file = os.path.join(configure.DOCBOOK_DIR, "installation-manual.xml") # TODO: change for the right one
+        docbook_file = os.path.join(configure.DOCBOOK_DIR, "user-manual.xml")
         process.run_once("yelp", docbook_file)
 
     # ---------------------- invitation dialogs -------------------
