@@ -82,7 +82,7 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
             ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
             ("list-cameras,H", po::bool_switch(), "list connected cameras")
-            ("list-v4l", po::bool_switch(), "list connected v4l devices")
+            ("list-v4l2", po::bool_switch(), "list connected V4L2 devices")
             ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture")
             ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture")
             ("display-width,P", po::value<int>(), "width for video on display"
