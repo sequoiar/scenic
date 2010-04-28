@@ -18,7 +18,7 @@
    <title>
       <anchor id="AspectRatio"/>Aspect Ratio</title>
    <para>The aspect ratio of an image is the ratio of the width of the image to its height. </para>
-   <para>Actually we support 4:3 and 16:9 </para>
+   <para>Currently we support 4:3 and 16:9 </para>
    <para>Select one of these depending of what ratio the receiver need to output. </para>
    <title>
       <anchor id="ImageSize"/>Image Size</title>
