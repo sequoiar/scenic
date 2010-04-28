@@ -35,7 +35,7 @@ po::options_description ProgramOptions::createDefaultOptions()
     {
         // TODO: maybe add groupings (audioreceiver, audiosender, videoreceiver, videosender)
         desc.add_options()
-            ("help,?", "produce help")
+            ("help,h", "produce help")
             ("receiver,r", po::bool_switch(), "this process is a receiver")
             ("sender,s", po::bool_switch(), "this process is a sender")
             ("address,i", po::value<string>()->default_value("127.0.0.1"), "provide ip address of remote host")
