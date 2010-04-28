@@ -108,9 +108,10 @@ def run():
         sys.exit(1)
     if options.enable_logging:
         start_file_logging(os.path.expanduser(options.log_file_name))
-        kwargs["log_file_name"] = options.log_file_name
+        log_file_name = options.log_file_name
     else:
         start_logging_to_stdout()
+        log_file_name = None
     
     from scenic import process
     process.save_environment_variables(os.environ)
@@ -136,7 +137,6 @@ def run():
         print msg
         sys.exit(1)
         
-    kwargs = {}
     enable_v4l2_state_saving_restore = True
     if options.moo:
         moo()
@@ -146,7 +146,7 @@ def run():
         v4l2_state_saving_restore = False
     
     try:
-        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restore, **kwargs)
+        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restore, log_file_name=log_file_name)
     except error.CannotListenError, e:
         msg = "There must be an other Scenic running."
         log.error(msg)
