@@ -1,0 +1,412 @@
+diff -Naurb gst-plugins-bad-0.10.17/ext/jack/gstjackaudiosink.c gst-plugins-bad-0.10.17mine/ext/jack/gstjackaudiosink.c
+--- gst-plugins-bad-0.10.17/ext/jack/gstjackaudiosink.c	2009-10-12 06:23:38.000000000 -0400
++++ gst-plugins-bad-0.10.17mine/ext/jack/gstjackaudiosink.c	2010-04-28 11:46:26.000000000 -0400
+@@ -160,9 +160,6 @@
+ 
+   ring_parent_class = g_type_class_peek_parent (klass);
+ 
+-  gobject_class->dispose = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_dispose);
+-  gobject_class->finalize = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_finalize);
+-
+   gstringbuffer_class->open_device =
+       GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_open_device);
+   gstringbuffer_class->close_device =
+@@ -319,22 +316,6 @@
+   buf->sample_rate = -1;
+ }
+ 
+-static void
+-gst_jack_ring_buffer_dispose (GObject * object)
+-{
+-  G_OBJECT_CLASS (ring_parent_class)->dispose (object);
+-}
+-
+-static void
+-gst_jack_ring_buffer_finalize (GObject * object)
+-{
+-  GstJackRingBuffer *ringbuffer;
+-
+-  ringbuffer = GST_JACK_RING_BUFFER_CAST (object);
+-
+-  G_OBJECT_CLASS (ring_parent_class)->finalize (object);
+-}
+-
+ /* the _open_device method should make a connection with the server
+  */
+ static gboolean
+@@ -662,6 +643,7 @@
+ GST_BOILERPLATE_FULL (GstJackAudioSink, gst_jack_audio_sink, GstBaseAudioSink,
+     GST_TYPE_BASE_AUDIO_SINK, _do_init);
+ 
++static void gst_jack_audio_sink_dispose (GObject * object);
+ static void gst_jack_audio_sink_set_property (GObject * object, guint prop_id,
+     const GValue * value, GParamSpec * pspec);
+ static void gst_jack_audio_sink_get_property (GObject * object, guint prop_id,
+@@ -695,10 +677,9 @@
+   gstbasesink_class = (GstBaseSinkClass *) klass;
+   gstbaseaudiosink_class = (GstBaseAudioSinkClass *) klass;
+ 
+-  gobject_class->get_property =
+-      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_get_property);
+-  gobject_class->set_property =
+-      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_set_property);
++  gobject_class->dispose = gst_jack_audio_sink_dispose;
++  gobject_class->get_property = gst_jack_audio_sink_get_property;
++  gobject_class->set_property = gst_jack_audio_sink_set_property;
+ 
+   g_object_class_install_property (gobject_class, PROP_CONNECT,
+       g_param_spec_enum ("connect", "Connect",
+@@ -733,6 +714,15 @@
+ }
+ 
+ static void
++gst_jack_audio_sink_dispose (GObject * object)
++{
++  GstJackAudioSink *sink = GST_JACK_AUDIO_SINK (object);
++
++  gst_caps_replace (&sink->caps, NULL);
++  G_OBJECT_CLASS (parent_class)->dispose (object);
++}
++
++static void
+ gst_jack_audio_sink_set_property (GObject * object, guint prop_id,
+     const GValue * value, GParamSpec * pspec)
+ {
+@@ -818,6 +808,7 @@
+         "rate", G_TYPE_INT, rate,
+         "channels", GST_TYPE_INT_RANGE, min, max, NULL);
+   }
++
+   GST_INFO_OBJECT (sink, "returning caps %" GST_PTR_FORMAT, sink->caps);
+ 
+   return gst_caps_ref (sink->caps);
+diff -Naurb gst-plugins-bad-0.10.17/ext/jack/gstjackaudiosrc.c gst-plugins-bad-0.10.17mine/ext/jack/gstjackaudiosrc.c
+--- gst-plugins-bad-0.10.17/ext/jack/gstjackaudiosrc.c	2009-10-12 06:23:38.000000000 -0400
++++ gst-plugins-bad-0.10.17mine/ext/jack/gstjackaudiosrc.c	2010-04-27 13:30:12.000000000 -0400
+@@ -80,6 +80,7 @@
+ 
+ #include "gstjackaudiosrc.h"
+ #include "gstjackringbuffer.h"
++#include "gstjackutil.h"
+ 
+ GST_DEBUG_CATEGORY_STATIC (gst_jack_audio_src_debug);
+ #define GST_CAT_DEFAULT gst_jack_audio_src_debug
+@@ -178,9 +179,6 @@
+ 
+   ring_parent_class = g_type_class_peek_parent (klass);
+ 
+-  gobject_class->dispose = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_dispose);
+-  gobject_class->finalize = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_finalize);
+-
+   gstringbuffer_class->open_device =
+       GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_open_device);
+   gstringbuffer_class->close_device =
+@@ -322,20 +320,6 @@
+   buf->sample_rate = -1;
+ }
+ 
+-static void
+-gst_jack_ring_buffer_dispose (GObject * object)
+-{
+-  G_OBJECT_CLASS (ring_parent_class)->dispose (object);
+-}
+-
+-static void
+-gst_jack_ring_buffer_finalize (GObject * object)
+-{
+-  GstJackRingBuffer *ringbuffer;
+-  ringbuffer = GST_JACK_RING_BUFFER_CAST (object);
+-  G_OBJECT_CLASS (ring_parent_class)->finalize (object);
+-}
+-
+ /* the _open_device method should make a connection with the server
+ */
+ static gboolean
+@@ -396,7 +380,6 @@
+   return TRUE;
+ }
+ 
+-
+ /* allocate a buffer and setup resources to process the audio samples of
+  * the format as specified in @spec.
+  *
+@@ -435,6 +418,8 @@
+   if (!gst_jack_audio_src_allocate_channels (src, channels))
+     goto out_of_ports;
+ 
++  gst_jack_set_layout_on_caps (&spec->caps, channels);
++  
+   buffer_size = jack_get_buffer_size (client);
+ 
+   /* the segment size in bytes, this is large enough to hold a buffer of 32bit floats
+@@ -664,6 +649,7 @@
+ GST_BOILERPLATE_FULL (GstJackAudioSrc, gst_jack_audio_src, GstBaseAudioSrc,
+     GST_TYPE_BASE_AUDIO_SRC, _do_init);
+ 
++static void gst_jack_audio_src_dispose (GObject * object);
+ static void gst_jack_audio_src_set_property (GObject * object, guint prop_id,
+     const GValue * value, GParamSpec * pspec);
+ static void gst_jack_audio_src_get_property (GObject * object, guint prop_id,
+@@ -706,10 +692,9 @@
+   gstbasesrc_class = (GstBaseSrcClass *) klass;
+   gstbaseaudiosrc_class = (GstBaseAudioSrcClass *) klass;
+ 
+-  gobject_class->set_property =
+-      GST_DEBUG_FUNCPTR (gst_jack_audio_src_set_property);
+-  gobject_class->get_property =
+-      GST_DEBUG_FUNCPTR (gst_jack_audio_src_get_property);
++  gobject_class->dispose = gst_jack_audio_src_dispose;
++  gobject_class->set_property = gst_jack_audio_src_set_property;
++  gobject_class->get_property = gst_jack_audio_src_get_property;
+ 
+   g_object_class_install_property (gobject_class, PROP_CONNECT,
+       g_param_spec_enum ("connect", "Connect",
+@@ -748,6 +733,15 @@
+ }
+ 
+ static void
++gst_jack_audio_src_dispose (GObject * object)
++{
++  GstJackAudioSrc *src = GST_JACK_AUDIO_SRC (object);
++
++  gst_caps_replace (&src->caps, NULL);
++  G_OBJECT_CLASS (parent_class)->dispose (object);
++}
++
++static void
+ gst_jack_audio_src_set_property (GObject * object, guint prop_id,
+     const GValue * value, GParamSpec * pspec)
+ {
+diff -Naurb gst-plugins-bad-0.10.17/ext/jack/gstjackringbuffer.h gst-plugins-bad-0.10.17mine/ext/jack/gstjackringbuffer.h
+--- gst-plugins-bad-0.10.17/ext/jack/gstjackringbuffer.h	2009-01-21 05:15:41.000000000 -0500
++++ gst-plugins-bad-0.10.17mine/ext/jack/gstjackringbuffer.h	2010-04-27 13:30:12.000000000 -0400
+@@ -73,8 +73,6 @@
+ static void gst_jack_ring_buffer_class_init(GstJackRingBufferClass * klass);
+ static void gst_jack_ring_buffer_init(GstJackRingBuffer * ringbuffer,
+     GstJackRingBufferClass * klass);
+-static void gst_jack_ring_buffer_dispose(GObject * object);
+-static void gst_jack_ring_buffer_finalize(GObject * object);
+ 
+ static GstRingBufferClass *ring_parent_class = NULL;
+ 
+diff -Naurb gst-plugins-bad-0.10.17/ext/jack/gstjackutil.c gst-plugins-bad-0.10.17mine/ext/jack/gstjackutil.c
+--- gst-plugins-bad-0.10.17/ext/jack/gstjackutil.c	1969-12-31 19:00:00.000000000 -0500
++++ gst-plugins-bad-0.10.17mine/ext/jack/gstjackutil.c	2010-04-27 13:30:12.000000000 -0400
+@@ -0,0 +1,114 @@
++/* GStreamer Jack utility functions
++ * Copyright (C) 2010 Tristan Matthews <tristan@sat.qc.ca>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Library General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Library General Public License for more details.
++ *
++ * You should have received a copy of the GNU Library General Public
++ * License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++ * Boston, MA 02111-1307, USA.
++ */
++
++#include "gstjackutil.h"
++#include <gst/audio/multichannel.h>
++
++static const GstAudioChannelPosition default_positions[8][8] = {
++  /* 1 channel */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_MONO,
++      },
++  /* 2 channels */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
++      },
++  /* 3 channels (2.1) */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_LFE, /* or FRONT_CENTER for 3.0? */
++      },
++  /* 4 channels (4.0 or 3.1?) */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
++      },
++  /* 5 channels */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
++      },
++  /* 6 channels */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
++        GST_AUDIO_CHANNEL_POSITION_LFE,
++      },
++  /* 7 channels */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
++        GST_AUDIO_CHANNEL_POSITION_LFE,
++        GST_AUDIO_CHANNEL_POSITION_REAR_CENTER,
++      },
++  /* 8 channels */
++  {
++        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
++        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
++        GST_AUDIO_CHANNEL_POSITION_LFE,
++        GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT,
++        GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT,
++      }
++};
++
++
++/* if channels are less than or equal to 8, we set a default layout,
++ * otherwise set layout to an array of GST_AUDIO_CHANNEL_POSITION_NONE */
++void
++gst_jack_set_layout_on_caps (GstCaps ** caps, gint channels)
++{
++  int c;
++  GValue pos = { 0 };
++  GValue chanpos = { 0 };
++  gst_caps_unref (*caps);
++
++  if (channels <= 8) {
++    g_assert (channels >= 1);
++    gst_audio_set_channel_positions (gst_caps_get_structure (*caps, 0),
++        default_positions[channels - 1]);
++  } else {
++    g_value_init (&chanpos, GST_TYPE_ARRAY);
++    g_value_init (&pos, GST_TYPE_AUDIO_CHANNEL_POSITION);
++    for (c = 0; c < channels; c++) {
++      g_value_set_enum (&pos, GST_AUDIO_CHANNEL_POSITION_NONE);
++      gst_value_array_append_value (&chanpos, &pos);
++    }
++    g_value_unset (&pos);
++    gst_structure_set_value (gst_caps_get_structure (*caps, 0),
++        "channel-positions", &chanpos);
++    g_value_unset (&chanpos);
++  }
++  gst_caps_ref (*caps);
++}
+diff -Naurb gst-plugins-bad-0.10.17/ext/jack/gstjackutil.h gst-plugins-bad-0.10.17mine/ext/jack/gstjackutil.h
+--- gst-plugins-bad-0.10.17/ext/jack/gstjackutil.h	1969-12-31 19:00:00.000000000 -0500
++++ gst-plugins-bad-0.10.17mine/ext/jack/gstjackutil.h	2010-04-27 13:30:12.000000000 -0400
+@@ -0,0 +1,30 @@
++/* GStreamer
++ * Copyright (C) 2010 Tristan Matthews <tristan@sat.qc.ca>
++ *
++ * gstjackutil.h:
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Library General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Library General Public License for more details.
++ *
++ * You should have received a copy of the GNU Library General Public
++ * License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++ * Boston, MA 02111-1307, USA.
++ */
++
++#ifndef _GST_JACK_UTIL_H_
++#define _GST_JACK_UTIL_H_
++
++#include <gst/gst.h>
++
++void
++gst_jack_set_layout_on_caps (GstCaps **caps, gint channels);
++
++#endif  // _GST_JACK_UTIL_H_
+diff -Naurb gst-plugins-bad-0.10.17/ext/jack/Makefile.am gst-plugins-bad-0.10.17mine/ext/jack/Makefile.am
+--- gst-plugins-bad-0.10.17/ext/jack/Makefile.am	2009-01-21 05:15:41.000000000 -0500
++++ gst-plugins-bad-0.10.17mine/ext/jack/Makefile.am	2010-04-27 13:30:12.000000000 -0400
+@@ -1,12 +1,12 @@
+ 
+ plugin_LTLIBRARIES = libgstjack.la
+ 
+-libgstjack_la_SOURCES = gstjack.c gstjackaudiosrc.c gstjackaudiosink.c gstjackaudioclient.c
++libgstjack_la_SOURCES = gstjackutil.c gstjack.c gstjackaudiosrc.c gstjackaudiosink.c gstjackaudioclient.c
+ libgstjack_la_CFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS)
+ libgstjack_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lgstaudio-$(GST_MAJORMINOR) $(JACK_LIBS)
+ libgstjack_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ libgstjack_la_LIBTOOLFLAGS = --tag=disable-static
+ 
+-noinst_HEADERS = gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h gstjackringbuffer.h
++noinst_HEADERS = gstjackutil.h gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h gstjackringbuffer.h
+ 
+ EXTRA_DIST = README
+diff -Naurb gst-plugins-bad-0.10.17/ext/jack/Makefile.in gst-plugins-bad-0.10.17mine/ext/jack/Makefile.in
+--- gst-plugins-bad-0.10.17/ext/jack/Makefile.in	2009-11-16 15:35:19.000000000 -0500
++++ gst-plugins-bad-0.10.17mine/ext/jack/Makefile.in	2010-04-27 13:30:12.000000000 -0400
+@@ -104,8 +104,8 @@
+ am__DEPENDENCIES_1 =
+ libgstjack_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+ 	$(am__DEPENDENCIES_1)
+-am_libgstjack_la_OBJECTS = libgstjack_la-gstjack.lo \
+-	libgstjack_la-gstjackaudiosrc.lo \
++am_libgstjack_la_OBJECTS = libgstjack_la-gstjackutil.lo \
++	libgstjack_la-gstjack.lo libgstjack_la-gstjackaudiosrc.lo \
+ 	libgstjack_la-gstjackaudiosink.lo \
+ 	libgstjack_la-gstjackaudioclient.lo
+ libgstjack_la_OBJECTS = $(am_libgstjack_la_OBJECTS)
+@@ -499,12 +499,12 @@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ plugin_LTLIBRARIES = libgstjack.la
+-libgstjack_la_SOURCES = gstjack.c gstjackaudiosrc.c gstjackaudiosink.c gstjackaudioclient.c
++libgstjack_la_SOURCES = gstjackutil.c gstjack.c gstjackaudiosrc.c gstjackaudiosink.c gstjackaudioclient.c
+ libgstjack_la_CFLAGS = $(GST_PLUGINS_BASE_CFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS)
+ libgstjack_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lgstaudio-$(GST_MAJORMINOR) $(JACK_LIBS)
+ libgstjack_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
+ libgstjack_la_LIBTOOLFLAGS = --tag=disable-static
+-noinst_HEADERS = gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h gstjackringbuffer.h
++noinst_HEADERS = gstjackutil.h gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h gstjackringbuffer.h
+ EXTRA_DIST = README
+ all: all-am
+ 
+@@ -584,6 +584,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjackaudioclient.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjackaudiosink.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjackaudiosrc.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjackutil.Plo@am__quote@
+ 
+ .c.o:
+ @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@@ -606,6 +607,13 @@
+ @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+ 
++libgstjack_la-gstjackutil.lo: gstjackutil.c
++@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(libgstjack_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstjack_la_CFLAGS) $(CFLAGS) -MT libgstjack_la-gstjackutil.lo -MD -MP -MF $(DEPDIR)/libgstjack_la-gstjackutil.Tpo -c -o libgstjack_la-gstjackutil.lo `test -f 'gstjackutil.c' || echo '$(srcdir)/'`gstjackutil.c
++@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libgstjack_la-gstjackutil.Tpo $(DEPDIR)/libgstjack_la-gstjackutil.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gstjackutil.c' object='libgstjack_la-gstjackutil.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(libgstjack_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstjack_la_CFLAGS) $(CFLAGS) -c -o libgstjack_la-gstjackutil.lo `test -f 'gstjackutil.c' || echo '$(srcdir)/'`gstjackutil.c
++
+ libgstjack_la-gstjack.lo: gstjack.c
+ @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(libgstjack_la_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstjack_la_CFLAGS) $(CFLAGS) -MT libgstjack_la-gstjack.lo -MD -MP -MF $(DEPDIR)/libgstjack_la-gstjack.Tpo -c -o libgstjack_la-gstjack.lo `test -f 'gstjack.c' || echo '$(srcdir)/'`gstjack.c
+ @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libgstjack_la-gstjack.Tpo $(DEPDIR)/libgstjack_la-gstjack.Plo
