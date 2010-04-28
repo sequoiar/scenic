@@ -290,6 +290,7 @@ class Gui(object):
 
         self.jack_latency_widget = widgets_tree.get_widget("jack_latency")
         self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
+        self.audio_jack_enable_autoconnect_widget = widgets_tree.get_widget("audio_jack_enable_autoconnect")
 
         # audio levels:
         def _plug_removed_cb(widget):
@@ -781,6 +782,7 @@ class Gui(object):
         _set_config("audio_input_buffer", self.audio_input_buffer_widget.get_value_as_int())
         _set_config("audio_output_buffer", self.audio_output_buffer_widget.get_value_as_int())
         _set_config("audio_jitterbuffer", self.audio_jitterbuffer_widget.get_value_as_int()) # spinbutton
+        _set_config("audio_jack_enable_autoconnect", self.audio_jack_enable_autoconnect_widget.get_active())
         
         # MIDI:
         _set_config("midi_send_enabled", self.midi_send_enabled_widget.get_active())
@@ -855,6 +857,7 @@ class Gui(object):
         self.audio_input_buffer_widget.set_value(_get_config("audio_input_buffer"))
         self.audio_output_buffer_widget.set_value(_get_config("audio_output_buffer"))
         self.audio_jitterbuffer_widget.set_value(_get_config("audio_jitterbuffer"))
+        self.audio_jack_enable_autoconnect_widget.set_active(_get_config("audio_jack_enable_autoconnect"))
         # source, codec
         audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
         log.debug(" * audio_source: %s" % (audio_source_readable))

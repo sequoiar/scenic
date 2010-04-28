@@ -110,6 +110,7 @@ class StreamerManager(object):
                     "source": self.app.config.audio_source,
                     "vumeter-id": self.app.gui.audio_levels_input_socket_id,
                     "buffer": self.app.config.audio_input_buffer,
+                    "jack_autoconnect": self.app.config.audio_jack_enable_autoconnect,
 
                     # Decided by remote peer:
                     "numchannels": remote_config["audio"]["numchannels"],
@@ -157,7 +158,8 @@ class StreamerManager(object):
                     "sink": self.app.config.audio_sink,
                     "buffer": self.app.config.audio_output_buffer,
                     "synchronized": self.app.config.audio_video_synchronized,
-                    "jitterbuffer": audio_jitterbuffer
+                    "jitterbuffer": audio_jitterbuffer,
+                    "jack_autoconnect": self.app.config.audio_jack_enable_autoconnect,
                 },
                 "midi": {
                     "enabled": midi_recv_enabled,
@@ -228,6 +230,7 @@ class StreamerManager(object):
         recv_audio_enabled = self.session_details["receive"]["audio"]["enabled"]
         midi_recv_enabled = self.session_details["receive"]["midi"]["enabled"]
         midi_send_enabled = self.session_details["send"]["midi"]["enabled"]
+        jack_autoconnect = self.session_details["send"]["audio"]["jack_autoconnect"] # either send or recv
         extra_send_enabled = not self.session_details["send"]["audio"]["synchronized"] and send_audio_enabled
         extra_recv_enabled = not self.session_details["receive"]["audio"]["synchronized"] and recv_audio_enabled
         normal_recv_enabled = recv_video_enabled or recv_audio_enabled and not extra_recv_enabled # if the self.sender and self.receiver are enabled
@@ -289,6 +292,10 @@ class StreamerManager(object):
                 '--vumeter-id', str(details["send"]["audio"]["vumeter-id"]),
                 '--audio-buffer', str(details["send"]["audio"]["buffer"])
                 ])
+            if not jack_autoconnect:
+                milhouse_send_cmd_audio.extend([
+                    "--disable-jack-autoconnect"
+                    ])
 
         # ------------------- recv ----------------
         milhouse_recv_cmd_common.extend([
@@ -326,6 +333,10 @@ class StreamerManager(object):
                 '--vumeter-id', str(details["receive"]["audio"]["vumeter-id"]),
                 '--audio-buffer', str(details["receive"]["audio"]["buffer"])
                 ])
+            if not jack_autoconnect:
+                milhouse_recv_cmd_audio.extend([
+                    "--disable-jack-autoconnect"
+                    ])
 
         self._prepare_stats_and_errors_dicts()
         # every element in the lists must be strings since we join them 

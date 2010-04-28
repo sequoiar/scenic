@@ -213,7 +213,7 @@ class ProcessManager(object):
             msg = "You must provide a command to be run."
             raise ProcessError(msg)
         
-        self.log("Will run command %s %s" % (self.identifier, str(self.command)))
+        self.log("$ %s %s" % (self.identifier, str(self.command)), logging.INFO)
         self._child_process = ProcessIO(self)
         self.set_child_state(STATE_STARTING)
         shell = "/bin/sh"

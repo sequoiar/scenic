@@ -38,6 +38,7 @@ class Preview(object):
         numchannels = self.app.config.audio_channels
         vumeter_id = self.app.gui.audio_levels_input_socket_id
         audio_buffer = self.app.config.audio_input_buffer
+        jack_autoconnect = self.app.config.audio_jack_enable_autoconnect
         window_title = _("Local preview")
         x_window_id = None
         if not self.app.config.preview_in_window:
@@ -46,8 +47,10 @@ class Preview(object):
             else:
                 x_window_id = self.app.gui.preview_area_x_window_id
         command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio, )
-        if self.app.devices["jackd_is_running"]: 
+        if self.app.devices["jackd_is_running"] and numchannels > 0: 
             command += " --localaudio --numchannels %s --vumeter-id %s --audio-buffer %s" % (numchannels, vumeter_id, audio_buffer)
+            if not jack_autoconnect:
+                command += " --disable-jack-autoconnect"
         #else:
         #    warning_message = "You should consider starting jackd."
         if x_window_id is not None:

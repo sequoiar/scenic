@@ -121,6 +121,7 @@ class Config(saving.ConfigStateSaving):
         self.audio_output_buffer = 15
         self.audio_jitterbuffer = 75
         self.audio_maximum_number_of_channels_in_raw = 64
+        self.audio_jack_enable_autoconnect = True
         # ------------- VIDEO -------------
         self.video_send_enabled = True
         self.video_recv_enabled = True
