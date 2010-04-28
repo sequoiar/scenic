@@ -203,7 +203,7 @@ short Milhouse::run(int argc, char **argv)
                 1 /* override current value if present */);
     }
 
-    if (options["list-v4l"].as<bool>())
+    if (options["list-v4l2"].as<bool>())
         return VideoSourceConfig::listV4lDevices();
     else if (options["list-cameras"].as<bool>())
         return VideoSourceConfig::listCameras();
