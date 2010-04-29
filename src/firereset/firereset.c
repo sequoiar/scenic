@@ -50,10 +50,10 @@ static int bus_reset_handler(struct raw1394_handle *handle, unsigned int gen)
 /**
  * Prints an help message.
  */
-void print_help(char *program_name)
+void print_help()
 {
     printf("Usage: firereset\n\n");
-    printf("Usage: %s\n", program_name);
+    printf("Usage: %s\n", "firereset");
     printf("Options:\n");
     printf("  -h, --help            Shows program's help message and exits.\n");
     printf("\n");
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
             printf("%s\n", PACKAGE_VERSION);
             return 0;
         }
-        print_help(argv[0]);
+        print_help();
         return 0;
     }
 

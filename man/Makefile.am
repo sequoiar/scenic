@@ -1,4 +1,4 @@
-man_MANS = milhouse.1 scenic.1 midistream.1
+man_MANS = milhouse.1 scenic.1 midistream.1 firereset.1
 EXTRA_DIST = $(man_MANS)
 MAINTAINERCLEANFILES = $(man_MANS)
 
@@ -16,3 +16,6 @@ scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  
 
 midistream.1: $(top_srcdir)/py/scripts/midistream.in $(top_srcdir)/py/rtpmidi/runner.py $(common_mandeps) $(top_srcdir)/man/midistream-man.txt
 	$(HELP2MAN) --include=midistream-man.txt --name="MIDI RTP Streaming Software" --no-info $(top_builddir)/py/scripts/midistream -o $@
+
+firereset.1: $(top_srcdir)/src/firereset/firereset.c $(top_srcdir)/man/firereset-man.txt
+	$(HELP2MAN) --include=firereset-man.txt --name="Firereset resets a ieee1394 bus to help in case of problems" --no-info $(top_builddir)/src/firereset/firereset -o $@
