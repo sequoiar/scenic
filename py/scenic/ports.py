@@ -24,6 +24,9 @@ Tools to help with choosing listening port numbers.
 
 # for port_is_avaiable
 import socket 
+from scenic import logger
+
+log = logger.start(name="ports")
 
 class PortsAllocatorError(Exception):
     """
@@ -83,7 +86,8 @@ class PortsAllocator(object):
             try:
                 self.check_port(value)
             except PortsAllocatorError, e:
-                print('error: %s' % (e.message)) 
+                log.error('error: %s' % (e.message)) 
+                value += self.increment
             else:
                 chosen = True
         self.allocated.add(value)

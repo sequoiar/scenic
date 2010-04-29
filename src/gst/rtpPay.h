@@ -50,16 +50,9 @@ class Pay : public RtpPay
 
     protected:
         Pay(const Pipeline &pipeline);
-        static const long long MAX_PTIME = 2000000LL;
-
-    private:
         // Use max-ptime to limit the amount of 
         // encoded media packets in an RTP packet. Reduces latency
-        void setMTU(unsigned long long mtu);
-        // hardcoded in gst-plugins-base/gst-libs/gst/rtp/gstbasertppayload.c
-        static const unsigned long long INIT_MTU = 1400;    
-        static const unsigned long long MIN_MTU = 28;    
-        static const unsigned long long MAX_MTU = 14000;
+        static const long long MAX_PTIME = 2000000LL;
 };
 
 

@@ -24,8 +24,6 @@
 #define _AUDIO_SENDER_H_
 
 #include "mediaBase.h"
-#include "audioConfig.h"
-#include "remoteConfig.h"
 #include "rtpSender.h"
 #include "busMsgHandler.h"
 #include "noncopyable.h"
@@ -33,6 +31,8 @@
 #include <boost/shared_ptr.hpp>
 
 class AudioSource;
+class AudioSourceConfig;
+class SenderConfig;
 class AudioLevel;
 class Pipeline;
 class Encoder;

@@ -144,24 +144,24 @@ bool AudioSourceConfig::locationExists() const
 
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) : 
+AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &options) : 
     sink_(options["audiosink"].as<std::string>()), 
     sinkName_(options["jack-client-name"].as<std::string>()),
     deviceName_(options["audiodevice"].as<std::string>()), 
     bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC),
     socketID_(options["vumeter-id"].as<unsigned long>()),
     numChannels_(options["numchannels"].as<int>())
-{
+{ 
+    // (before waiting on caps) but having it here is pretty gross
+    if (sink_ == "jackaudiosink")
+        Jack::assertReady(pipeline);
 }
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
 AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")
-    {
-        Jack::assertReady(pipeline);      // (before waiting on caps) but having it here is pretty gross
         return new AudioJackSink(pipeline, *this);
-    }
     else if (sink_ == "alsasink")
         return new AudioAlsaSink(pipeline, *this);
     else if (sink_ == "pulsesink")
@@ -190,6 +190,10 @@ const char* AudioSinkConfig::deviceName() const
     return deviceName_.c_str();
 }
 
+int AudioSinkConfig::numChannels() const
+{
+    return numChannels_;
+}
 
 /// Returns buffer time, which must be an unsigned long long for gstreamer's audiosink to accept it safely
 unsigned long long AudioSinkConfig::bufferTime() const

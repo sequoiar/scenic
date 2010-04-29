@@ -21,8 +21,6 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <gst/gst.h>
-#include <gtk/gtk.h>
 
 #include "util.h"
 
@@ -32,6 +30,8 @@
 #include "gst/audioFactory.h"
 #include "gst/messageDispatcher.h"
 #include "gst/pipeline.h"
+#include "gst/rtpReceiver.h"
+#include "gst/videoConfig.h"
 #include "playback.h"
 
 #include "milhouse.h"
@@ -142,6 +142,8 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
     {
         LOG_DEBUG("LOCAL AUDIO");
         localAudio = audiofactory::buildLocalAudio(pipeline, options);
+        if (options["disable-jack-autoconnect"].as<bool>())
+            MessageDispatcher::sendMessage("disable-jack-autoconnect");
     }
 
     playback.start();
@@ -203,7 +205,9 @@ short Milhouse::run(int argc, char **argv)
                 1 /* override current value if present */);
     }
 
-    if (options["list-cameras"].as<bool>())
+    if (options["list-v4l2"].as<bool>())
+        return VideoSourceConfig::listV4lDevices();
+    else if (options["list-cameras"].as<bool>())
         return VideoSourceConfig::listCameras();
 
     if (options.count("v4l2-standard"))
@@ -218,8 +222,8 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    gst_init(&argc, &argv);
-    gtk_init(&argc, &argv);
+    // wrapper so main doesn't need to know about gst and gtk
+    gutil::init_gst_gtk(argc, argv);
 
     bool enableLocalVideo = options["localvideo"].as<bool>();
     bool enableLocalAudio = options["localaudio"].as<bool>();

@@ -27,6 +27,9 @@ from scenic import process
 from scenic import sig
 from scenic import dialogs
 from scenic.internationalization import _
+from scenic import logger
+
+log = logger.start(name="streamer")
 
 class StreamerManager(object):
     """
@@ -34,11 +37,11 @@ class StreamerManager(object):
     """
     def __init__(self, app):
         self.app = app
-        # commands
-        self.milhouse_recv_cmd = None
-        self.milhouse_send_cmd = None
-        self.sender = None
-        self.receiver = None
+        self.sender = None 
+        self.receiver = None 
+        self.extra_sender = None # extra sender/receiver used only if not synchronized
+        self.extra_receiver = None
+        
         self.midi_receiver = None
         self.midi_sender = None
         self.state = process.STATE_STOPPED
@@ -47,48 +50,6 @@ class StreamerManager(object):
         self.session_details = None # either None or a big dict
         self.rtcp_stats = None # either None or a big dict
         self.error_messages = None # either None or a big dict
-
-    def _calculate_packet_loss(self):
-        """
-        Takes the last value and the current for packets lost and total packets.
-        Calculates the percent of packet loss : 
-
-        delta loss / delta sent
-        
-        Multiplied by 100 to get a percentage.
-        """
-        #TODO:
-        video_lost = self.rtcp_stats["send"]["video"]["packets-lost"]
-        video_sent = self.rtcp_stats["send"]["video"]["packets-sent"]
-        audio_lost = self.rtcp_stats["send"]["audio"]["packets-lost"]
-        audio_sent = self.rtcp_stats["send"]["audio"]["packets-sent"]
-        video_lost_previous = self.rtcp_stats["send"]["video"]["packets-lost-previous"]
-        video_sent_previous = self.rtcp_stats["send"]["video"]["packets-sent-previous"]
-        audio_lost_previous = self.rtcp_stats["send"]["audio"]["packets-lost-previous"]
-        audio_sent_previous = self.rtcp_stats["send"]["audio"]["packets-sent-previous"]
-        
-        if self.rtcp_stats["send"]["video"]["packets-lost-got-new"] and self.rtcp_stats["send"]["video"]["packets-sent-got-new"]:
-            self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = False
-            self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = False
-            diff_video_sent = float(video_sent - video_sent_previous)
-            if diff_video_sent != 0: # avoid division by zero
-                video_packets_loss = float(video_lost - video_lost_previous) / diff_video_sent * 100
-                if video_packets_loss >= 0.0:   # FIXME: temporary fix to avoid occasional bogus percentages
-                    self.rtcp_stats["send"]["video"]["packets-loss-percent"] =  video_packets_loss
-                    print("Video packet loss : %s" % (video_packets_loss))
-            self.rtcp_stats["send"]["video"]["packets-lost-previous"] = video_lost
-            self.rtcp_stats["send"]["video"]["packets-sent-previous"] = video_sent
-        if self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] and self.rtcp_stats["send"]["audio"]["packets-sent-got-new"]:
-            self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = False
-            self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = False
-            diff_audio_sent = float(audio_sent - audio_sent_previous)
-            if diff_audio_sent != 0: # avoid division by zero
-                audio_packets_loss = float(audio_lost - audio_lost_previous) / diff_audio_sent * 100
-                if audio_packets_loss >= 0.0:   # FIXME: temporary fix to avoid occasional bogus percentages
-                    self.rtcp_stats["send"]["audio"]["packets-loss-percent"] = audio_packets_loss
-                    print("Audio packet loss : %s" % (audio_packets_loss))
-            self.rtcp_stats["send"]["audio"]["packets-lost-previous"] = audio_lost
-            self.rtcp_stats["send"]["audio"]["packets-sent-previous"] = audio_sent
 
     def _gather_config_to_stream(self, addr):
         """
@@ -111,7 +72,11 @@ class StreamerManager(object):
         midi_input_device = self.app.config.midi_input_device
         midi_output_device = self.app.config.midi_output_device
         
-        print "remote_config:", remote_config
+        audio_jitterbuffer = self.app.config.audio_jitterbuffer
+        if self.app.config.audio_video_synchronized and self.app.config.video_recv_enabled:
+            audio_jitterbuffer = self.app.config.video_jitterbuffer
+        
+        log.debug("remote_config: %s" % (remote_config))
         
         self.session_details = {
             "peer": {
@@ -121,6 +86,9 @@ class StreamerManager(object):
             # ----------------- send ---------------
             "send": {
                 "video": {
+                    # Decided by both:
+                    "enabled": self.app.config.video_send_enabled and remote_config["video"]["recv_enabled"],
+                    
                     # Decided locally:
                     "source": self.app.config.video_source,
                     "device": self.app.config.video_device,
@@ -135,14 +103,20 @@ class StreamerManager(object):
                 },
                 
                 "audio": {
-                    # decided locally:
+                    # Decided by both:
+                    "enabled": self.app.config.audio_send_enabled and remote_config["audio"]["recv_enabled"],
+
+                    # Decided locally:
                     "source": self.app.config.audio_source,
                     "vumeter-id": self.app.gui.audio_levels_input_socket_id,
+                    "buffer": self.app.config.audio_input_buffer,
+                    "jack_autoconnect": self.app.config.audio_jack_enable_autoconnect,
 
                     # Decided by remote peer:
                     "numchannels": remote_config["audio"]["numchannels"],
                     "codec": remote_config["audio"]["codec"],
                     "port": remote_config["audio"]["port"], 
+                    "synchronized": remote_config["audio"]["synchronized"],
                 }, 
                 "midi": {
                     "enabled": midi_send_enabled,
@@ -153,6 +127,9 @@ class StreamerManager(object):
             # -------------------- recv ------------
             "receive": {
                 "video": {
+                    # Decided by both:
+                    "enabled": self.app.config.video_recv_enabled and remote_config["video"]["send_enabled"],
+
                     # decided locally:
                     "sink": self.app.config.video_sink,
                     "port": str(self.app.recv_video_port), #decided by the app
@@ -170,12 +147,19 @@ class StreamerManager(object):
                     "height": int(receive_height), # int
                 },
                 "audio": {
+                    # Decided by both:
+                    "enabled": self.app.config.audio_recv_enabled and remote_config["audio"]["send_enabled"],
+                    
                     # decided locally:
                     "numchannels": self.app.config.audio_channels, # int
                     "vumeter-id": self.app.gui.audio_levels_output_socket_id,
                     "codec": self.app.config.audio_codec, 
                     "port": self.app.recv_audio_port,
-                    "sink": self.app.config.audio_sink
+                    "sink": self.app.config.audio_sink,
+                    "buffer": self.app.config.audio_output_buffer,
+                    "synchronized": self.app.config.audio_video_synchronized,
+                    "jitterbuffer": audio_jitterbuffer,
+                    "jack_autoconnect": self.app.config.audio_jack_enable_autoconnect,
                 },
                 "midi": {
                     "enabled": midi_recv_enabled,
@@ -189,86 +173,16 @@ class StreamerManager(object):
             self.session_details["send"]["video"]["device"] = None
         if self.session_details["send"]["video"]["codec"] == "theora":
             self.session_details["send"]["video"]["bitrate"] = None
-        print(str(self.session_details))
-        
-    def start(self, host):
-        """
-        Starts the sender and receiver processes.
-        
-        @param host: str ip addr
-        Raises a RuntimeError if a sesison is already in progress.
-        """
-        if self.state != process.STATE_STOPPED:
-            raise RuntimeError("Cannot start streamers since they are %s." % (self.state)) # the programmer has done something wrong if we're here.
-        
-        self._gather_config_to_stream(host)
-        details = self.session_details
+        log.debug(str(self.session_details))
 
-        # ------------------ send ---------------
-        # every element in the lists must be strings since we join them .
-        # int elements are converted to str.
-        self.milhouse_send_cmd = [
-            "milhouse", 
-            '--sender', 
-            '--address', details["peer"]["address"],
-            '--videosource', details["send"]["video"]["source"],
-            '--videocodec', details["send"]["video"]["codec"],
-            '--videoport', str(details["send"]["video"]["port"]),
-            '--width', str(details["send"]["video"]["width"]), 
-            '--height', str(details["send"]["video"]["height"]),
-            '--aspect-ratio', str(details["send"]["video"]["aspect-ratio"]),
-            '--audiosource', details["send"]["audio"]["source"],
-            '--numchannels', str(details["send"]["audio"]["numchannels"]),
-            '--audiocodec', details["send"]["audio"]["codec"],
-            '--audioport', str(details["send"]["audio"]["port"]),
-            '--vumeter-id', str(details["send"]["audio"]["vumeter-id"])
-            ]
-        if details["send"]["video"]["source"] == "v4l2src":
-            dev = self.app.parse_v4l2_device_name(details["send"]["video"]["device"])
-            if dev is None:
-                print "v4l2 device is not found !!!!"
-            else:
-                v4l2_dev_name = dev["name"]
-            self.milhouse_send_cmd.extend(["--videodevice", v4l2_dev_name])
-        if details["send"]["video"]["codec"] != "theora":
-            self.milhouse_send_cmd.extend(['--videobitrate', str(int(details["send"]["video"]["bitrate"] * 1000000))])
-
-        # ------------------- recv ----------------
-        self.milhouse_recv_cmd = [
-            "milhouse",
-            '--receiver', 
-            '--address', details["peer"]["address"],
-            '--videosink', details["receive"]["video"]["sink"],
-            '--videocodec', details["receive"]["video"]["codec"],
-            '--videoport', str(details["receive"]["video"]["port"]),
-            '--jitterbuffer', str(details["receive"]["video"]["jitterbuffer"]),
-            '--width', str(details["receive"]["video"]["width"]),
-            '--height', str(details["receive"]["video"]["height"]),
-            '--aspect-ratio', details["receive"]["video"]["aspect-ratio"],
-            '--audiosink', details["receive"]["audio"]["sink"],
-            '--numchannels', str(details["receive"]["audio"]["numchannels"]),
-            '--audiocodec', details["receive"]["audio"]["codec"],
-            '--audioport', str(details["receive"]["audio"]["port"]),
-            '--vumeter-id', str(details["receive"]["audio"]["vumeter-id"]),
-            '--window-title', details["receive"]["video"]["window-title"],
-            '--display', details["receive"]["video"]["display"],
-            ]
-        if details["receive"]["video"]["fullscreen"]:
-            self.milhouse_recv_cmd.append('--fullscreen')
-        if details["receive"]["video"]["deinterlace"]:
-            self.milhouse_recv_cmd.append('--deinterlace')
-
+    def _prepare_stats_and_errors_dicts(self):
         # setting up
         self.rtcp_stats = {
             "send": {
                 "video": {
                     "packets-lost": 0,
                     "packets-sent": 0,
-                    "packets-lost-previous": 0,
-                    "packets-sent-previous": 0,
-                    "packets-lost-got-new": False,
-                    "packets-sent-got-new": False,
-                    "packets-loss-percent": 0.0,
+                    "packet-loss-percent": 0.0,
                     "jitter": 0,
                     "bitrate": None,
                     "connected": False
@@ -276,11 +190,7 @@ class StreamerManager(object):
                 "audio": {
                     "packets-lost": 0,
                     "packets-sent": 0,
-                    "packets-lost-previous": 0,
-                    "packets-sent-previous": 0,
-                    "packets-lost-got-new": False,
-                    "packets-sent-got-new": False,
-                    "packets-loss-percent": 0.0,
+                    "packet-loss-percent": 0.0,
                     "jitter": 0,
                     "bitrate": None,
                     "connected": False
@@ -301,22 +211,197 @@ class StreamerManager(object):
             "send": [], # list of strings
             "receive": [], # list of strings
             }
-        # every element in the lists must be strings since we join them 
-        # ---- audio/video receiver ----
-        recv_cmd = " ".join(self.milhouse_recv_cmd)
-        self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
-        self.receiver.state_changed_signal.connect(self.on_process_state_changed)
-        self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
-        self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
-        # ---- audio/video sender ----
-        send_cmd = " ".join(self.milhouse_send_cmd)
-        self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
-        self.sender.state_changed_signal.connect(self.on_process_state_changed)
-        self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
-        self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
         
+    def start(self, host):
+        """
+        Starts the sender and receiver processes.
+        
+        @param host: str ip addr
+        Raises a RuntimeError if a sesison is already in progress.
+        """
+        if self.state != process.STATE_STOPPED:
+            raise RuntimeError("Cannot start streamers since they are %s." % (self.state)) # the programmer has done something wrong if we're here.
+        
+        self._gather_config_to_stream(host)
+        details = self.session_details
+        send_video_enabled = self.session_details["send"]["video"]["enabled"]
+        send_audio_enabled = self.session_details["send"]["audio"]["enabled"]
+        recv_video_enabled = self.session_details["receive"]["video"]["enabled"]
+        recv_audio_enabled = self.session_details["receive"]["audio"]["enabled"]
         midi_recv_enabled = self.session_details["receive"]["midi"]["enabled"]
         midi_send_enabled = self.session_details["send"]["midi"]["enabled"]
+        jack_autoconnect = self.session_details["send"]["audio"]["jack_autoconnect"] # either send or recv
+        extra_send_enabled = not self.session_details["send"]["audio"]["synchronized"] and send_audio_enabled
+        extra_recv_enabled = not self.session_details["receive"]["audio"]["synchronized"] and recv_audio_enabled
+        normal_recv_enabled = recv_video_enabled or recv_audio_enabled and not extra_recv_enabled # if the self.sender and self.receiver are enabled
+        normal_send_enabled = send_video_enabled or send_audio_enabled and not extra_send_enabled
+        if not send_audio_enabled and not send_video_enabled and not midi_send_enabled and not midi_recv_enabled and not recv_audio_enabled and not recv_video_enabled:
+            raise RuntimeError("Everything is disabled, but the application is trying to start to stream. This should not happen.") # the programmer has done a mistake if we're here.
+
+        log.debug("send_video_enabled %s" % (send_video_enabled))
+        log.debug("send_audio_enabled %s" % (send_audio_enabled))
+        log.debug("recv_video_enabled %s" % (recv_video_enabled))
+        log.debug("recv_audio_enabled %s" % (recv_audio_enabled))
+        log.debug("midi_recv_enabled %s" % (midi_recv_enabled))
+        log.debug("midi_send_enabled %s" % (midi_send_enabled))
+
+        # we store the arguments in lists
+        milhouse_send_cmd_common = []
+        milhouse_send_cmd_audio = []
+        milhouse_send_cmd_video = []
+        milhouse_recv_cmd_common = []
+        milhouse_recv_cmd_audio = []
+        milhouse_recv_cmd_video = []
+
+        # ------------------ send ---------------
+        # every element in the lists must be strings since we join them .
+        # int elements are converted to str.
+        milhouse_send_cmd_common.extend([
+            "milhouse", 
+            '--sender', 
+            '--address', details["peer"]["address"]
+            ])
+
+        # send video:
+        if send_video_enabled:
+            milhouse_send_cmd_video.extend([
+                '--videosource', details["send"]["video"]["source"],
+                '--videocodec', details["send"]["video"]["codec"],
+                '--videoport', str(details["send"]["video"]["port"]),
+                '--width', str(details["send"]["video"]["width"]), 
+                '--height', str(details["send"]["video"]["height"]),
+                '--aspect-ratio', str(details["send"]["video"]["aspect-ratio"]),
+                ])
+            if details["send"]["video"]["source"] == "v4l2src":
+                dev = self.app.parse_v4l2_device_name(details["send"]["video"]["device"])
+                if dev is None:
+                    log.error("v4l2 device is not found !!!!")
+                else:
+                    v4l2_dev_name = dev["name"]
+                milhouse_send_cmd_video.extend(["--videodevice", v4l2_dev_name])
+            if details["send"]["video"]["codec"] != "theora":
+                milhouse_send_cmd_video.extend(['--videobitrate', str(int(details["send"]["video"]["bitrate"] * 1000000))])
+
+        # send audio:
+        if send_audio_enabled:
+            milhouse_send_cmd_audio.extend([
+                '--audiosource', details["send"]["audio"]["source"],
+                '--numchannels', str(details["send"]["audio"]["numchannels"]),
+                '--audiocodec', details["send"]["audio"]["codec"],
+                '--audioport', str(details["send"]["audio"]["port"]),
+                '--vumeter-id', str(details["send"]["audio"]["vumeter-id"]),
+                '--audio-buffer', str(details["send"]["audio"]["buffer"])
+                ])
+            if not jack_autoconnect:
+                milhouse_send_cmd_audio.extend([
+                    "--disable-jack-autoconnect"
+                    ])
+
+        # ------------------- recv ----------------
+        milhouse_recv_cmd_common.extend([
+            "milhouse",
+            '--receiver', 
+            '--address', details["peer"]["address"]
+            ])
+
+        # recv video:
+        if recv_video_enabled:
+            milhouse_recv_cmd_video.extend([
+                '--videosink', details["receive"]["video"]["sink"],
+                '--videocodec', details["receive"]["video"]["codec"],
+                '--videoport', str(details["receive"]["video"]["port"]),
+                '--jitterbuffer', str(details["receive"]["video"]["jitterbuffer"]),
+                '--width', str(details["receive"]["video"]["width"]),
+                '--height', str(details["receive"]["video"]["height"]),
+                '--aspect-ratio', details["receive"]["video"]["aspect-ratio"],
+                '--window-title', details["receive"]["video"]["window-title"],
+                '--display', details["receive"]["video"]["display"],
+                ])
+            if details["receive"]["video"]["fullscreen"]:
+                milhouse_recv_cmd_video.append('--fullscreen')
+            if details["receive"]["video"]["deinterlace"]:
+                milhouse_recv_cmd_video.append('--deinterlace')
+
+        # recv audio:
+        if recv_audio_enabled:
+            milhouse_recv_cmd_audio.extend([
+                # audio:
+                '--audiosink', details["receive"]["audio"]["sink"],
+                '--numchannels', str(details["receive"]["audio"]["numchannels"]),
+                '--audiocodec', details["receive"]["audio"]["codec"],
+                '--audioport', str(details["receive"]["audio"]["port"]),
+                '--vumeter-id', str(details["receive"]["audio"]["vumeter-id"]),
+                '--audio-buffer', str(details["receive"]["audio"]["buffer"])
+                ])
+            if not jack_autoconnect:
+                milhouse_recv_cmd_audio.extend([
+                    "--disable-jack-autoconnect"
+                    ])
+
+        self._prepare_stats_and_errors_dicts()
+        # every element in the lists must be strings since we join them 
+        # TODO: not sync
+        # TODO: if both disabled, do not start sender/receiver
+        # ---- audio/video receiver ----
+        if recv_audio_enabled or recv_video_enabled: # receiver(s)
+            milhouse_recv_cmd_final = []
+            milhouse_recv_cmd_extra = []
+            
+            milhouse_recv_cmd_final.extend(milhouse_recv_cmd_common)
+            milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_common)
+            milhouse_recv_cmd_final.extend(milhouse_recv_cmd_video)
+            if extra_recv_enabled:
+                milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_audio)
+                milhouse_recv_cmd_extra.extend(["--jitterbuffer", str(details["receive"]["audio"]["jitterbuffer"])])
+            else:
+                milhouse_recv_cmd_final.extend(milhouse_recv_cmd_audio)
+            try:
+                recv_cmd = " ".join(milhouse_recv_cmd_final)
+            except TypeError, e:
+                log.error(e)
+                log.error(milhouse_recv_cmd_final)
+                raise
+            try:
+                extra_recv_cmd = " ".join(milhouse_recv_cmd_extra)
+            except TypeError, e:
+                log.error(e)
+                log.error(milhouse_recv_cmd_extra)
+                raise
+            if normal_recv_enabled:
+                self.receiver = process.ProcessManager(command=recv_cmd, identifier="receiver")
+                self.receiver.state_changed_signal.connect(self.on_process_state_changed)
+                self.receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
+                self.receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
+            if extra_recv_enabled:
+                self.extra_receiver = process.ProcessManager(command=extra_recv_cmd, identifier="extra_receiver")
+                self.extra_receiver.state_changed_signal.connect(self.on_process_state_changed)
+                self.extra_receiver.stdout_line_signal.connect(self.on_receiver_stdout_line)
+                self.extra_receiver.stderr_line_signal.connect(self.on_receiver_stderr_line)
+        # ---- audio/video sender ----
+        if send_audio_enabled or send_video_enabled: # sender(s)
+            milhouse_send_cmd_final = []
+            milhouse_send_cmd_extra = []
+            
+            milhouse_send_cmd_final.extend(milhouse_send_cmd_common)
+            milhouse_send_cmd_extra.extend(milhouse_send_cmd_common) # only used if we have to
+            milhouse_send_cmd_final.extend(milhouse_send_cmd_video)
+            if extra_send_enabled:
+                milhouse_send_cmd_extra.extend(milhouse_send_cmd_audio)
+            else:
+                milhouse_send_cmd_final.extend(milhouse_send_cmd_audio)
+            send_cmd = " ".join(milhouse_send_cmd_final)
+            extra_send_cmd = " ".join(milhouse_send_cmd_extra)
+            if normal_send_enabled:
+                self.sender = process.ProcessManager(command=send_cmd, identifier="sender")
+                self.sender.state_changed_signal.connect(self.on_process_state_changed)
+                self.sender.stdout_line_signal.connect(self.on_sender_stdout_line)
+                self.sender.stderr_line_signal.connect(self.on_sender_stderr_line)
+            if extra_send_enabled:
+                self.extra_sender = process.ProcessManager(command=extra_send_cmd, identifier="extra_sender")
+                self.extra_sender.state_changed_signal.connect(self.on_process_state_changed)
+                self.extra_sender.stdout_line_signal.connect(self.on_sender_stdout_line)
+                self.extra_sender.stderr_line_signal.connect(self.on_sender_stderr_line)
+                # FIXME: too much code duplication
         
         if midi_recv_enabled:
             midi_out_device = self.app.parse_midi_device_name(details["receive"]["midi"]["output_device"], is_input=False)
@@ -353,43 +438,64 @@ class StreamerManager(object):
         
         # starting
         self._set_state(process.STATE_STARTING)
-        print "$", send_cmd
-        self.sender.start()
-        print "$", recv_cmd
-        self.receiver.start()
+        if send_audio_enabled or send_video_enabled:
+            log.info("$ %s" % (send_cmd))
+            if normal_send_enabled:
+                self.sender.start()
+            if extra_send_enabled:
+                self.extra_sender.start()
+        if recv_audio_enabled or recv_video_enabled:
+            log.info("$ %s" % (recv_cmd))
+            if normal_recv_enabled:
+                self.receiver.start()
+            if extra_recv_enabled:
+                self.extra_receiver.start()
         if midi_recv_enabled:
             self.midi_receiver.start()
         if midi_send_enabled:
             self.midi_sender.start()
 
+    def get_command_lines(self):
+        """
+        Returns a list of all the current processes command lines.
+        @rettype: list
+        """
+        ret = []
+        for proc in self.get_all_streamer_process_managers():
+            ret.append(proc.command)
+        return ret
+
     def on_midi_stdout_line(self, process_manager, line):
-        print process_manager.identifier, line
+        log.debug("%s %s" % (process_manager.identifier, line))
 
     def on_midi_stderr_line(self, process_manager, line):
-        print process_manager.identifier, line
+        log.error("%s %s" % (process_manager.identifier, line))
 
     def on_receiver_stdout_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stdout
         """
-        if "stream connected" in line:
-            if "audio" in line:
-                self.rtcp_stats["receive"]["audio"]["connected"] = True
-            elif "video" in line:
-                self.rtcp_stats["receive"]["video"]["connected"] = True
-        elif "BITRATE" in line:
-            if "video" in line:
-                self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
-            elif "audio" in line:
-                self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
-        else:
-            print "%9s stdout: %s" % (self.receiver.identifier, line)
+        try:
+            if "stream connected" in line:
+                if "audio" in line:
+                    self.rtcp_stats["receive"]["audio"]["connected"] = True
+                elif "video" in line:
+                    self.rtcp_stats["receive"]["video"]["connected"] = True
+            elif "BITRATE" in line:
+                if "video" in line:
+                    self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
+            else:
+                log.debug("%9s stdout: %s" % (process_manager.identifier, line))
+        except ValueError, e:
+            log.error("%s when parsing line '%s' from receiver" % (e, line))
 
     def on_receiver_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (self.receiver.identifier, line)
+        log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
     
@@ -397,23 +503,24 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
-        print "%9s stdout: %s" % (self.sender.identifier, line)
+        log.debug("%9s stdout: %s" % (process_manager.identifier, line))
         try:
             if "PACKETS-LOST" in line:
                 if "video" in line:
                     self.rtcp_stats["send"]["video"]["packets-lost"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["video"]["packets-lost-got-new"] = True
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["packets-lost"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["audio"]["packets-lost-got-new"] = True
                 #self._calculate_packet_loss()
-            if "PACKETS-SENT" in line:
+            elif "AVERAGE PACKET-LOSS" in line:
+                if "video" in line:
+                    self.rtcp_stats["send"]["video"]["packet-loss-percent"] = float(line.split(":")[-1])
+                elif "audio" in line:
+                    self.rtcp_stats["send"]["audio"]["packet-loss-percent"] = float(line.split(":")[-1])
+            elif "PACKETS-SENT" in line:
                 if "video" in line:
                     self.rtcp_stats["send"]["video"]["packets-sent"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["video"]["packets-sent-got-new"] = True
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["packets-sent"] = int(line.split(":")[-1])
-                    self.rtcp_stats["send"]["audio"]["packets-sent-got-new"] = True
                 #self._calculate_packet_loss()
             elif "JITTER" in line:
                 if "video" in line:
@@ -431,13 +538,13 @@ class StreamerManager(object):
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["connected"] = True
         except ValueError, e:
-            print(e)
+            log.error("%s when parsing line '%s' from sender" % (e, line))
 
     def on_sender_stderr_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stderr
         """
-        print "%9s stderr: %s" % (self.sender.identifier, line)
+        log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["send"].append(line)
 
@@ -452,11 +559,10 @@ class StreamerManager(object):
         Returns all the current streaming process managers for the current session.
         @rtype: list
         """
-        ret = [self.sender, self.receiver]
-        if self.session_details["receive"]["midi"]["enabled"]:
-            ret.append(self.midi_receiver)
-        if self.session_details["send"]["midi"]["enabled"]:
-            ret.append(self.midi_sender)
+        ret = []
+        for proc in [self.receiver, self.extra_receiver, self.sender, self.extra_sender, self.midi_receiver, self.midi_sender]:
+            if proc is not None:
+                ret.append(proc)
         return ret
 
     def on_process_state_changed(self, process_manager, process_state):
@@ -464,7 +570,7 @@ class StreamerManager(object):
         Slot for the ProcessManager.state_changed_signal
         Calls stop() if one of the processes crashed.
         """
-        print process_manager, process_state
+        log.debug("%s %s" % (process_manager, process_state))
         if process_state == process.STATE_RUNNING:
             # As soon as one is running, set our state to running
             if self.state == process.STATE_STARTING:
@@ -476,17 +582,17 @@ class StreamerManager(object):
         elif process_state == process.STATE_STOPPED:
             # As soon as one crashes or is not able to start, stop all streamer processes.
             if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
-                print("A streamer process died. Stopping the local streamer manager.")
+                log.info("A streamer process died. Stopping the local streamer manager.")
                 self.stop() # sets self.state to STOPPING
             # Next, if all streamers are dead, we can say this manager is stopped
             if self.state == process.STATE_STOPPING:
                 one_is_left = False
                 for proc in self.get_all_streamer_process_managers():
                     if process_manager is not proc and proc.state != process.STATE_STOPPED:
-                        print("Streamer process %s is not dead, so we are not done stopping. Its state is %s." % (proc, proc.state))
+                        log.info("Streamer process %s is not dead, so we are not done stopping. Its state is %s." % (proc, proc.state))
                         one_is_left = True
                 if not one_is_left:
-                    print "Setting streamers manager to STOPPED"
+                    log.info("Setting streamers manager to STOPPED")
                     self._set_state(process.STATE_STOPPED)
 
     def on_stopped(self):
@@ -498,14 +604,15 @@ class StreamerManager(object):
         details = ""
         show_error_dialog = False
         #TODO: internationalize
-        print("All streamers are stopped.")
-        print("Error messages for this session: %s" % (self.error_messages))
+        log.info("All streamers are stopped.")
         if len(self.error_messages["send"]) != 0:
+            log.error("Error messages from the sender for this session: %s" % (self.error_messages["send"]))
             details += _("Errors from local sender:") + "\n"
             for line in self.error_messages["send"]:
                 details += " * " + line + "\n"
             show_error_dialog = True
         if len(self.error_messages["receive"]) != 0:
+            log.error("Error messages from the receiver for this session: %s" % (self.error_messages["receive"]))
             details += _("Errors from local receiver:") + "\n"
             for line in self.error_messages["receive"]:
                 details += " * " + line + "\n"
@@ -514,9 +621,15 @@ class StreamerManager(object):
             msg = _("Some errors occured during the audio/video streaming session.")
             dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window, details=details)
         # TODO: should we set all our process managers to None
-        for proc in self.get_all_streamer_process_managers():
-            proc = None
-        print "should all be None:", self.get_all_streamer_process_managers()
+
+        # set all to None:
+        self.sender = None
+        self.receiver = None
+        self.extra_sender = None
+        self.extra_receiver = None
+        self.midi_receiver = None
+        self.midi_sender = None
+        log.debug("Process managers should all be None: %s" % (self.get_all_streamer_process_managers()))
     
     def _set_state(self, new_state):
         """

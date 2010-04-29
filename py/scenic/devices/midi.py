@@ -31,6 +31,10 @@ from twisted.internet import defer
 from twisted.internet import reactor
 from twisted.python import procutils
 
+from scenic import logger
+
+log = logger.start(name="midi")
+
 # $ miditream --list-devices
 # List of MIDI devices:
 #     Input devices:
@@ -56,7 +60,7 @@ def _parse_miditream_list_devices(text):
     midi_devices = []
     for line in text.splitlines():
         line = line.strip()
-        print line
+        log.debug(line)
         if line.startswith('*'):
             device = {
                 "is_input": False,
@@ -92,7 +96,7 @@ def list_midi_devices(verbose=True):
         
     def _eb(reason, deferred):
         deferred.errback(reason)
-        print("Error listing MIDI devices: %s" % (reason))
+        log.error("Error listing MIDI devices: %s" % (reason))
     
     command_name = "midistream"
     args = ['--list-devices']
@@ -100,7 +104,7 @@ def list_midi_devices(verbose=True):
         executable = procutils.which(command_name)[0] # gets the executable
     except IndexError:
         return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
-    print "$ %s %s" % (executable, args)
+    log.debug("$ %s %s" % (executable, args))
     d = utils.getProcessOutput(executable, args=args, env=os.environ, errortoo=True) # errortoo puts stderr in output
     d.addCallback(_cb, deferred)
     d.addErrback(_eb, deferred)

@@ -94,6 +94,7 @@ done
 
 RTPPATCH=$SCRIPT_PATH/rtpsource.diff
 DC1394PATCH=$SCRIPT_PATH/dc1394-iso-speed.diff
+JACKPATCH=$SCRIPT_PATH/jack.diff
 # Build!
 for module in $MODULES
 do
@@ -108,6 +109,10 @@ do
         patch --dry-run -p1 -i $DC1394PATCH
         if [ $? -eq 0 ]; then
             patch -p1 -i $DC1394PATCH
+        fi
+        patch --dry-run -p1 -i $JACKPATCH
+        if [ $? -eq 0 ]; then
+            patch -p1 -i $JACKPATCH
         fi
     elif [ ${module} == "$GST_GOOD" ]; then
         patch --dry-run -p1 -i $RTPPATCH

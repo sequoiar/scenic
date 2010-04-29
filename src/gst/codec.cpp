@@ -179,13 +179,19 @@ H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) :
 
     // numthreads should be 2 or 1.
     if (numThreads > 3) // don't hog all the cores
-        numThreads = 3;
+        numThreads--;
     else if (numThreads == 0)
         numThreads = 1;
 
     LOG_DEBUG("Using " << numThreads << " threads");
     g_object_set(encoder_, "threads", numThreads, NULL);
     // See gst-plugins-good/tests/examples/rtp/*h264*.sh
+    // if you use non-byte stream mode, the encoder willl need to add 
+    // three bytes to start and end, which the payerloader will promptly 
+    // remove (as the buffer size is givn on the buffer object). the
+    // default NALU stream is mostly useful when storing this on disk 
+    // i.e. (x264enc ! filesink)
+    // vbv-bufsize / vbv-maxrate = the number of seconds the client must buffer before playback
     g_object_set(encoder_, "byte-stream", TRUE, NULL);  
 
     // subme: subpixel motion estimation 1=fast, 6=best
@@ -442,10 +448,22 @@ Pay* RawEncoder::createPayloader() const
 }
 
 /// Constructor
-RawDecoder::RawDecoder(const Pipeline &pipeline) :
+RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     Decoder(pipeline),
-    aconv_(pipeline_.makeElement("audioconvert", NULL))
-{}
+    aconv_(pipeline_.makeElement("audioconvert", NULL)),
+    // FIXME: SUPER GROSS HACK!!!! We should not need a capsfilter here, 
+    // something is broken in gst
+    capsfilter_(pipeline_.makeElement("capsfilter", NULL))
+{
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-float, channels=" << numChannels;
+    LOG_DEBUG("Raw decoder caps = " << capsStr.str());
+    GstCaps *caps = gst_caps_from_string(capsStr.str().c_str());
+    tassert(caps);
+    g_object_set(G_OBJECT(capsfilter_), "caps", caps, NULL);
+    gst_caps_unref(caps);
+    gstlinkable::link(aconv_, capsfilter_);
+}
 
 
 /// Destructor

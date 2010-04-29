@@ -27,9 +27,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options.hpp>
 
-#include "audioSender.h"
-#include "audioReceiver.h"
-#include "localAudio.h"
+class AudioSender;
+class AudioReceiver;
+class LocalAudio;
 
 class Pipeline;
 

@@ -68,7 +68,7 @@ AudioReceiver::~AudioReceiver()
 
 void AudioReceiver::createCodec(Pipeline &pipeline)
 {
-    tassert(decoder_ = remoteConfig_->createAudioDecoder(pipeline));
+    tassert(decoder_ = remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels()));
     level_ = audioConfig_->createLevel(pipeline);
     if (level_ != 0)
             gstlinkable::link(*decoder_, *level_);

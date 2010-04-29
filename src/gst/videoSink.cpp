@@ -76,9 +76,6 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned lo
         // add listener for window-state-event to detect fullscreenness
         g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);
     }
-    else
-        if (!g_thread_supported())
-            g_thread_init(NULL);
 }
 
 
@@ -267,9 +264,7 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     if (!gst_structure_has_name(message->structure, "prepare-xwindow-id"))
         return false;
 
-    gdk_threads_enter();
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), getXWindow());
-    gdk_threads_leave();
 
     LOG_DEBUG("Got prepare-xwindow-id msg");
     return true;

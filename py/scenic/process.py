@@ -1,19 +1,54 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# 
+# Scenic
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Scenic is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 """
 Streamer Process management.
 """
 import os
+import copy
 import time
 import logging
 import signal
 from twisted.internet import error
 from twisted.internet import protocol
-from twisted.internet import reactor
 from twisted.python import procutils
 from twisted.internet import utils
 from scenic import sig
 from scenic import configure
+from scenic import logger
+
+log = logger.start(name="process")
+
+# this is used only for processes started using run_once
+_original_environment_variables = {}
+
+def save_environment_variables(env):
+    """
+    Saves the env vars at startup, which does not contain vars we ight override, such as GTK2_RC_FILES
+    
+    this is used only for processes started using run_once
+    """
+    global _original_environment_variables
+    _original_environment_variables = copy.deepcopy(env)
+    log.debug("Saved original env vars: %s" % (_original_environment_variables))
+    log.debug("ID of os.environ: %d. ID of saved env: %d" % (id(os.environ), id(_original_environment_variables)))
 
 # constants for the slave process
 STATE_STARTING = "STARTING"
@@ -29,17 +64,24 @@ def run_once(executable, *args):
     Runs a command, without looking at its output or return value.
     Returns a Deferred or None.
     """
+    from twisted.internet import reactor
+    global _original_environment_variables
     def _cb(result):
         #print(result)
         pass
     try:
         executable = procutils.which(executable)[0]
     except IndexError:
-        print("Could not find executable %s" % (executable))
+        log.error("Could not find executable %s" % (executable))
         return None
     else:
-        print("Calling %s %s" % (executable, list(args)))
-        d = utils.getProcessValue(executable, args, configure.environ_without_custom(), '.', reactor)
+        env = _original_environment_variables
+        for k in ["GTK2_RC_FILES", "GTK_RC_FILES"]:
+            if env.has_key(k):
+                log.info("%s=%s" % (k, env[k]))
+        log.info("$ %s %s" % (executable, " ".join(list(args))))
+        log.debug("ENV=%s" % (env))
+        d = utils.getProcessValue(executable, args, env, '.', reactor)
         d.addCallback(_cb)
         return d
 
@@ -48,6 +90,8 @@ class ProcessIO(protocol.ProcessProtocol):
     process IO
      
     Its stdout and stderr streams are logged to a file.    
+
+    Uses the save env vars as scenic, not the _original_environment_variables dict
     """
     def __init__(self, manager):
         """
@@ -103,15 +147,17 @@ class ProcessManager(object):
         @param identifier: Any string. 
         """
         #Used as a file name, so avoid spaces and exotic characters.
+        global _original_environment_variables
         self._process_transport = None
         self._child_process = None
         self._time_child_started = None
         self._child_running_time = None
         self.state = STATE_STOPPED
         self.command = command # string (bash)
-        self.time_before_sigkill = 5.0 # seconds
+        self.time_before_sigkill = 10.0 # seconds
         self.identifier = identifier # title
         self.env = {} # environment variables for the child process
+        self.env = copy.deepcopy(os.environ)
         if env is not None:
             self.env.update(env)
         self.pid = None
@@ -145,7 +191,7 @@ class ProcessManager(object):
                 proc.signalProcess(0)
             except (OSError, error.ProcessExitedAlready):
                 msg = "Lost process %s. Error sending it an empty signal." % (self.identifier)
-                print(msg)
+                log.error(msg)
                 return False
             else:
                 return True
@@ -156,6 +202,7 @@ class ProcessManager(object):
         """
         Starts the child process
         """
+        from twisted.internet import reactor
         if self.state in [STATE_RUNNING, STATE_STARTING]:
             msg = "Child is already %s. Cannot start it." % (self.state)
             raise ProcessError(msg)
@@ -166,18 +213,15 @@ class ProcessManager(object):
             msg = "You must provide a command to be run."
             raise ProcessError(msg)
         
-        self.log("Will run command %s %s" % (self.identifier, str(self.command)))
+        self.log("$ %s %s" % (self.identifier, str(self.command)), logging.INFO)
         self._child_process = ProcessIO(self)
-        environ = {}
-        environ.update(configure.environ_without_custom())
-        for key, val in self.env.iteritems():
-            environ[key] = val
         self.set_child_state(STATE_STARTING)
         shell = "/bin/sh"
         if os.path.exists("/bin/bash"):
             shell = "/bin/bash"
+        log.debug("Environment: %s" % (self.env))
         self._time_child_started = time.time()
-        self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], environ)
+        self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], self.env)
         self.pid = self._process_transport.pid
         self.log("Spawned child %s with pid %s." % (self.identifier, self.pid))
     
@@ -190,19 +234,20 @@ class ProcessManager(object):
         """
         Stops the child process
         """
+        from twisted.internet import reactor
         def _later_check(pid):
             if self.pid == pid:
                 if self.state == STATE_STOPPING:
                     msg = "Child process %s not dead." % (self.identifier)
-                    print msg
+                    log.info(msg)
                     try:
                         self._process_transport.signalProcess(signal.SIGKILL)
                     except OSError, e:
                         msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                        print msg # raise?
+                        log.error(msg) # raise?
                     except error.ProcessExitedAlready:
                         msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, "SIGKILL")
-                        print msg # raise ?
+                        log.error(msg) # raise ?
                 elif self.state == STATE_STOPPED:
                     msg = "Successfully killed process after least than the %f seconds. State is %s." % (self.time_before_sigkill, self.state)
                     self.log(msg)
@@ -221,17 +266,17 @@ class ProcessManager(object):
         else: # STOPPED
             msg = "Process is already stopped."
             self.set_child_state(STATE_STOPPED)
-            print msg # raise?
+            log.error(msg) # raise?
         if signal_to_send is not None:
             try:
                 self._process_transport.signalProcess(signal_to_send)
             except OSError, e:
                 msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                print msg # raise?
+                log.error(msg) # raise?
             except error.ProcessExitedAlready:
                 if signal_to_send == signal.SIGTERM:
                     msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, signal_to_send)
-                    print msg # raise ?
+                    log.error(msg) # raise ?
             else:
                 if signal_to_send == signal.SIGTERM:
                     self._delayed_kill = reactor.callLater(self.time_before_sigkill, _later_check, self.pid)
@@ -242,7 +287,11 @@ class ProcessManager(object):
         (through stdout)
         """
         if level >= self.log_level:
-            print "%9s process: %s" % (self.identifier, msg)
+            mess = "%9s process: %s" % (self.identifier, msg)
+            if level == logging.DEBUG:
+                log.debug(mess)
+            else:
+                log.info(mess)
 
     def _on_process_ended(self, exit_code):
         self._child_running_time = time.time() - self._time_child_started
@@ -281,3 +330,4 @@ class ProcessManager(object):
 
     def __str__(self):
         return "%s %s" % (self.identifier, id(self))
+

@@ -19,7 +19,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 """
-Tools to lists avaliable cameras.
+Tools to lists available cameras.
+
+Uses milhouse --list-v4l2
 """
 import os
 import pprint
@@ -28,9 +30,13 @@ from twisted.internet import defer
 from twisted.python import procutils
 from twisted.internet import reactor
 
+from scenic import logger
+log = logger.start(name="cameras")
+
 ugly_to_beautiful_camera_names = {
     "BT878 video (Osprey 210/220/230": "Osprey 210/220/230",
     "BT878 video (Osprey 100/150 (87": "Osprey 100/150",
+    "BT878 video (Hauppauge (bt878))": "Hauppauge WinTV",
     }
 
 def _beautify_camera_name(name):
@@ -50,7 +56,7 @@ def _beautify_camera_name(name):
 
 def _parse_milhouse_list_cameras(text):
     """
-    Parses the output of `milhouse --list-cameras`
+    Parses the output of `milhouse --list-v4l2`
     Returns a dict of dict with keys "name", "size", "standard", "is_interlaced", "input", "inputs", "supported_sizes"
     For now, considers only V4L2 cameras.
     @rtype: list
@@ -118,13 +124,13 @@ def _parse_milhouse_list_cameras(text):
                 else:
                     # now, let's try to get an int out of it:
                     try:
-                        print input
+                        log.debug(input)
                         input = int(input)
                     except ValueError, e:
-                        print e
+                        log.error(e)
                         input = None
                     except TypeError, e:
-                        print e
+                        log.error(e)
                         input = None
                     else:
                         #print "  input", input
@@ -159,7 +165,7 @@ def list_cameras():
         print("Error listing cameras: %s" % (reason))
     
     command_name = "milhouse"
-    args = ['--list-cameras']
+    args = ['--list-v4l2']
     try:
         executable = procutils.which(command_name)[0] # gets the executable
     except IndexError:

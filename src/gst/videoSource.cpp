@@ -65,7 +65,7 @@ std::string VideoSource::defaultSrcCaps() const
     return capsStr.str();
 }
 
-std::string VideoSource::srcCaps() const
+std::string VideoSource::srcCaps(unsigned int /*framerateIndex*/) const
 {
     return defaultSrcCaps();
 }
@@ -175,9 +175,8 @@ VideoV4lSource::VideoV4lSource(const Pipeline &pipeline,
     }
 
     capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
-    gstlinkable::link(source_, capsFilter_);
-
     setCapsFilter(srcCaps());
+    gstlinkable::link(source_, capsFilter_);
 }
 
 
@@ -192,22 +191,42 @@ std::string VideoV4lSource::deviceStr() const
 }
 
 
-std::string VideoV4lSource::srcCaps() const
+std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
 {
     std::ostringstream capsStr;
-
-    std::string capsSuffix;
-    if (actualStandard_ == "NTSC")
-        capsSuffix = "30000/1001"; // NTSC is drop frame
-    else if (actualStandard_ == "PAL")
-        capsSuffix = "25/1"; // PAL is not drop frame
+    GstStateChangeReturn ret = gst_element_set_state(source_, GST_STATE_READY);
+    if (ret not_eq GST_STATE_CHANGE_SUCCESS)
+        THROW_ERROR("Could not change v4l2src state to READY");
+    GstPad *srcPad = gst_element_get_static_pad(source_, "src");
+    GstCaps *caps = gst_pad_get_caps(srcPad);
+    GstStructure *structure = gst_caps_get_structure(caps, 0);
+    const GValue *val = gst_structure_get_value(structure, "framerate");
+    LOG_DEBUG("Caps structure from v4l2src srcpad: " << gst_structure_to_string(structure));
+    gint framerate_numerator, framerate_denominator; 
+    if (GST_VALUE_HOLDS_LIST(val))
+    {
+        // trying another one
+        if (framerateIndex >= gst_value_list_get_size(val))
+            THROW_ERROR("Framerate index out of range");
+        framerate_numerator = gst_value_get_fraction_numerator((gst_value_list_get_value(val, framerateIndex)));
+        framerate_denominator = gst_value_get_fraction_denominator((gst_value_list_get_value(val, framerateIndex)));
+    }
     else
     {
-        capsSuffix = boost::lexical_cast<std::string>(config_.framerate());
-        capsSuffix += "/1";
-        LOG_WARNING("Unsupported standard, " << actualStandard_
-                << "trying to add framerate " << capsSuffix << " to caps");
+        // FIXME: this is really bad, we should be iterating over framerates and resolutions until we find a good one
+        if (framerateIndex > 0)
+            LOG_ERROR("Caps parameters haven't been changed and have failed before");
+        framerate_numerator = gst_value_get_fraction_numerator(val);
+        framerate_denominator = gst_value_get_fraction_denominator(val);
     }
+
+    gst_caps_unref(caps);
+    gst_object_unref(srcPad);
+
+    // use default from gst
+    std::string capsSuffix = boost::lexical_cast<std::string>(framerate_numerator);
+    capsSuffix += "/";
+    capsSuffix += boost::lexical_cast<std::string>(framerate_denominator);
 
     if (v4l2util::isInterlaced(deviceStr()))
         capsSuffix +=", interlaced=true";
@@ -249,7 +268,7 @@ VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSource
 }
 
 
-std::string VideoDc1394Source::srcCaps() const
+std::string VideoDc1394Source::srcCaps(unsigned int /*framerateIndex*/) const
 {
     typedef std::vector<std::string> ColourspaceList;
     std::ostringstream capsStr;

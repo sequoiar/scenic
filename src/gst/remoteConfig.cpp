@@ -257,7 +257,7 @@ VideoDecoder * ReceiverConfig::createVideoDecoder(const Pipeline &pipeline, bool
 }
 
 
-Decoder * ReceiverConfig::createAudioDecoder(const Pipeline &pipeline) const
+Decoder * ReceiverConfig::createAudioDecoder(const Pipeline &pipeline, int numChannels) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
@@ -265,7 +265,7 @@ Decoder * ReceiverConfig::createAudioDecoder(const Pipeline &pipeline) const
     if (codec_ == "vorbis")
         return new VorbisDecoder(pipeline);
     else if (codec_ == "raw")
-        return new RawDecoder(pipeline);
+        return new RawDecoder(pipeline, numChannels);
     else if (codec_ == "mp3")
         return new MadDecoder(pipeline);
     else

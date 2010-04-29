@@ -6,6 +6,9 @@ Preview Process management.
 from scenic import sig
 from scenic import process
 from scenic.internationalization import _
+from scenic import logger
+
+log = logger.start(name="preview")
 
 class Preview(object):
     """
@@ -34,16 +37,22 @@ class Preview(object):
         aspect_ratio = self.app.config.video_aspect_ratio
         numchannels = self.app.config.audio_channels
         vumeter_id = self.app.gui.audio_levels_input_socket_id
+        audio_buffer = self.app.config.audio_input_buffer
+        jack_autoconnect = self.app.config.audio_jack_enable_autoconnect
         window_title = _("Local preview")
         x_window_id = None
         if not self.app.config.preview_in_window:
             if self.app.gui.preview_area_x_window_id is None:
-                print("WARNING: XID of the preview drawing area is None !")
+                log.error("XID of the preview drawing area is None !")
             else:
                 x_window_id = self.app.gui.preview_area_x_window_id
-        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio)
-        if self.app.devices["jackd_is_running"]: 
-            command += " --localaudio --numchannels %s --vumeter-id %s" % (numchannels, vumeter_id)
+        command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio, )
+        if self.app.devices["jackd_is_running"] and numchannels > 0: 
+            command += " --localaudio --numchannels %s --vumeter-id %s --audio-buffer %s" % (numchannels, vumeter_id, audio_buffer)
+            if not jack_autoconnect:
+                command += " --disable-jack-autoconnect"
+        #else:
+        #    warning_message = "You should consider starting jackd."
         if x_window_id is not None:
             command += " --x-window-id %d" % (x_window_id)
         else:
@@ -51,14 +60,14 @@ class Preview(object):
         if self.app.config.video_source != "videotestsrc":
             dev = self.app.parse_v4l2_device_name(self.app.config.video_device)
             if dev is None:
-                print "v4l2 device is not found !", self.app.config.video_device
+                log.error("v4l2 device is not found ! %s" % (self.app.config.video_device))
                 #FIXME: handle this
             video_device = dev["name"]
             command += " --videodevice %s" % (video_device)
         return command
         
     def start(self):
-        print("Starting the preview")
+        log.info("Starting the preview")
         if self.state != process.STATE_STOPPED:
             raise RuntimeError("Cannot start preview since it is %s." % (self.state)) # the programmer has done something wrong if we're here.
         else:
@@ -71,16 +80,16 @@ class Preview(object):
         self.process_manager.start()
 
     def on_stdout_line(self, process_manager, line):
-        print line
+        log.debug(line)
 
     def on_stderr_line(self, process_manager, line):
-        print line        
+        log.debug(line)
         
     def on_process_state_changed(self, process_manager, process_state):
         """
         Slot for the ProcessManager.state_changed_signal
         """
-        print "Preview:", process_manager, process_state
+        log.debug("Preview: %s %s" % (process_manager, process_state))
         if process_state == process.STATE_RUNNING:
             # As soon as it is running, set our state to running
             if self.state == process.STATE_STARTING:
@@ -106,13 +115,12 @@ class Preview(object):
         """
         Stops the preview process.
         """
-        print("Stopping the preview")
+        log.info("Stopping the preview")
         if self.state in [process.STATE_RUNNING, process.STATE_STARTING]:
             self._set_state(process.STATE_STOPPING)
             if self.process_manager is not None:
                 if self.process_manager.state != process.STATE_STOPPED and self.process_manager.state != process.STATE_STOPPING:
-                    print('stopping the preview process')
                     self.process_manager.stop()
         else:
-            print("Warning: preview state is %s" % (self.state))
+            log.debug("Warning: preview state is %s" % (self.state))
     

@@ -40,6 +40,7 @@ class VideoSourceConfig
         const char *source() const { return source_.c_str(); }
         std::string sourceString() const { return source_; }
         static int listCameras();
+        static int listV4lDevices();
         int bitrate() const { return bitrate_; }
         int quality() const { return quality_; }
 

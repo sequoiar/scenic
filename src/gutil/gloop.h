@@ -27,6 +27,7 @@ namespace gutil {
     /// ms to run - 0 is forever
     void runMainLoop(int ms);
     int killMainLoop(void *data = 0);
+    void init_gst_gtk(int argc, char **argv);
 }
 
 #endif // __GUTIL_H__

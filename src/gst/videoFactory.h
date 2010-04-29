@@ -27,11 +27,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options.hpp>
 
-#include "videoSender.h"
-#include "videoReceiver.h"
-#include "localVideo.h"
-
 class Pipeline;
+class VideoSender;
+class VideoReceiver;
+class LocalVideo;
 
 namespace videofactory
 {

@@ -1,4 +1,5 @@
 #!/bin/bash
 # This file is not included in the distributed package, nor installed
 # It is only useful for developers to simplify launching scenic.
-PYTHONPATH=.:${PYTHONPATH} ./scripts/midistream $@
+cd $(dirname $0)
+./scripts/midistream $@

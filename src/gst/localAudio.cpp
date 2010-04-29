@@ -25,6 +25,7 @@
 #include "localAudio.h"
 #include "pipeline.h"
 #include "audioSource.h"
+#include "audioConfig.h"
 #include "audioLevel.h"
 #include "dv1394.h"
 

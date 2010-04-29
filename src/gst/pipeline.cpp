@@ -25,7 +25,6 @@
 #include <gtk/gtk.h>
 #include <cstring>
 #include <string>
-#include <vector>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include "util.h"
@@ -417,29 +416,21 @@ GstElement *Pipeline::makeElement(const char *factoryName, const char *elementNa
 
 void Pipeline::subscribe(BusMsgHandler *obj)
 {
-    handlers_.push_back(obj);
+    handlers_.insert(obj);
 }
 
 
 /// Remove the busmsghandler from the list
 void Pipeline::unsubscribe(BusMsgHandler *obj)
 {
-    // find the busmsghandler in the list
-    std::vector<BusMsgHandler*>::iterator iter;
-    iter = std::find(handlers_.begin(), handlers_.end(), obj);
-
-    // make sure that we were able to find the handler 
-    if (iter == handlers_.end())
-        LOG_ERROR("Could not find this bus message handler in the list of bus message handlers");
-    else // remove it
-        handlers_.erase(iter);
+    handlers_.erase(obj);
 }
 
 
 void Pipeline::updateListeners(GstMessage *msg)
 {
     // TODO: are we guaranteed that these are in a callable state?
-    for (std::vector<BusMsgHandler*>::iterator iter = handlers_.begin(); 
+    for (std::set<BusMsgHandler*>::iterator iter = handlers_.begin(); 
             iter != handlers_.end(); ++iter)
         if ((*iter)->handleBusMsg(msg))
             break;

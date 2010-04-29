@@ -76,13 +76,14 @@ class AudioSourceConfig
 class AudioSinkConfig
 {
     public:
-        AudioSinkConfig(const boost::program_options::variables_map &options);
+        AudioSinkConfig(Pipeline &pipeline, const boost::program_options::variables_map &options);
         
         AudioLevel* createLevel(Pipeline &pipeline) const;
         AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *sinkName() const;
         const char *deviceName() const;
+        int numChannels() const;
         unsigned long long bufferTime() const;
 
     private:

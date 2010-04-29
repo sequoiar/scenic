@@ -23,6 +23,9 @@
 
 #include "util.h"
 #include "videoFactory.h"
+#include "videoSender.h"
+#include "videoReceiver.h"
+#include "localVideo.h"
 
 #include "videoConfig.h"
 #include "remoteConfig.h"

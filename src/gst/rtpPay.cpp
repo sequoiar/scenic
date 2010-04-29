@@ -41,17 +41,6 @@ Pay::~Pay()
 {
 }
 
-
-void Pay::setMTU(unsigned long long mtu)
-{
-    if (mtu < MIN_MTU or mtu > MAX_MTU)
-        THROW_ERROR("Invalid MTU " << mtu << ", must be in range [" 
-                << MIN_MTU << "-" << MAX_MTU << "]");
-
-    tassert(rtpPay_);
-    g_object_set(G_OBJECT(rtpPay_), "mtu", mtu, NULL);
-}
-
 Depay::Depay(const Pipeline &pipeline) : 
     RtpPay(pipeline)
 {}

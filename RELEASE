@@ -1,6 +1,6 @@
-Release notes for Scenic 0.5
+Release notes for Scenic 0.5.1
 
-This release adds many new experimental features. These features include MIDI transmission and VU meters. 
+This release is an other unstable version in the 0.5 series. Scenic offers now up to 64 audio channels if used with the patched version of the Gstreamer JACK elements. It offers the possibility to disable JACK autoconnect, for advanced users who might use jack.plumbing to do custom connections. The appearance of the graphical user interface has been much improved. The users can disable audio and video streams. Scenic now gives the reasons when the remote peer refuses. Scenic now offers a debug tab which shows the command taht were used to start the streamer processes. The logging system has been improved. Start scenic with --debug to see all the debug messages. 
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -25,52 +25,73 @@ This release adds many new experimental features. These features include MIDI tr
     needs milhouse 0.4.5
 
     Limitations:
-    * While milhouse supports many video and audio input types, Scenic
-    only supports a subset of them. 
+    * While milhouse supports many video and audio input types, Scenic only supports a subset of them. 
     * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from long term support of the new features of the 0.5 branch.
 
-Fixes in 0.5:
+New features and bug fixes in 0.5.1:
 
-#383: make VUMeter
-#398: make localaudio that pipes to a fakesink 
-#394: call gst_init and gtk_init as early as possible 
-#386: Cannot delete contacts 
-#381: audio channels widget max should be 24 
-#354: Merge all gui-interactive state variables 
-#384: Put name of selected contact in the invite button 
-#380: Preview button is not set to false when we stop the preview 
-#382: State saving for number of channels does not work for more than 8 channels 
-#352: Should be possible to select some devices with the same name 
-#293: Move the summary section out of the tabs in the GUI 
-#379: Cannot close the delete contact dialog 
-#378: Can't record audio fast enough audio messages sometimes 
-#376: milhouse --localvideo broken for dv 
-#161: ximagesink doesn't work with dv1394src 
-#375: error on cleanup of dv1394 
-#335: default audio-buffer is too big for on board sound 
-#374: convert "localhost" to 127.0.0.1 as temporary workaround for #143 
-#371: get vendor label for dv1394 
-#351: Build python doc with autotools 
-#360: Milhouse --list-cameras expects the dc1394 library? 
-#373: add README 
-#372: make shared_video compatible with AC_CHECK_LIB 
-#370: RELEASE not included in tarball by make dist 
-#356: when invite, gtkwarning gets posted 
-#355: at startup, midi widgets are sensitive even if midi is disabled 
-#328: improve gst element checking at configure-stage 
-#361: Check for all Python modules in the autotools 
-#355: at startup, midi widgets are sensitive even if midi is disabled 
-#365: Testing ticket workflow 
-#364: make distcheck broken by gst_check.py 
-#357: Add new png to makefile 
-#349: ./configure should check for python-portmidi 
-#342: Disable MIDI device widgets when MIDI is disabled 
-#341: Remove MIDI device number 
-#346: Add jitterbuffer controls for MIDI 
-#343: change MIDI tab icon 
-#345: midistream should handle SIGINT well 
-#292: Implement MIDI streaming in the GUI 
-#336: milhouse --list-cameras don't list dv1394 cameras 
-#340: midistream should accept domain names, not only IP addresses 
-#338: Cleanup in options parsing in midistream 
-#164: have receiver request caps from sender 
+New features in milhouse:
+    #451: Implement --list-v4l2
+    #409: Find out if we can detect which fps works with which image size
+    #422: Report packet loss percentage
+    #436: get >11 channels for raw audio
+    #461: The -h flag should be an alias of --help
+
+New features in scenic:
+    #484: implement disable JACK autoconnect in the GUI
+    #478: Create a user configuration entry for the maximum of raw channels
+    #471: Use --list-v4l2 in scenic
+    #462: add 11 channels support or more for raw
+    #411: Integrate user documentation in scenic
+    #445: Improve logging system with levels and categories
+    #391: Implement state saving for device settings (such as V4L2 input)
+    #437: if audio and video are desynchronized, they should each have independent ...
+    #421: Add a reason to when a remote peer refuses
+    #429: Strip white spaces from the address field
+    #401: Swap addressbook and summary widgets position in the GUI
+    #368: Display a detailled status window
+    #219: Be able to desynchronize audio and video
+    #305: User should be able to disable video/audio to send or receive
+
+Bug fixes in milhouse: 
+    #454: No jitter statistics appear on the receiver side
+    #463: samplerates != 48000 broken in 0.4.5 on receiver-side
+    #350: add audio-buffer setting in scenic
+    #393: replace GMainLoop instance with gtk_main and gtk_main_quit
+    #485: disable-jack-autoconnect doesnt work with localaudio
+
+Bug fixes in scenic : 
+    #449: Scenic tells us often that the v4l2 device disappeared
+    #480: Parsing error in average packet-loss
+    #475: yelp should not inherit the GTK theme
+    #447: Clicking on the Video tab while streaming create sound glitches
+    #456: scenic does not poll MIDI device everytime the user chooses the tab
+    #395: callee can't stop call if caller is not in her contact list
+    #460: Wrong error when calling a busy contact
+    #458: midi device detection does not refresh correctly
+    #448: Scenic should quit gracefully when DISPLAY is not set or invalid
+    #402: When invited by someone not in contact list, the "cancelled" message ...
+    #440: Must gather config options just before doing the pre-flight check
+    #399: Traceback when running trial to run test cases
+    #397: scenic traceback when clicking on MIDI tab
+    #403: Text lines in the summary should wrap
+    #439: When audio/video desynchronized, audio must have its own jitterbuffer ...
+    #408: Debug textview should be refreshed less often
+    #438: In pre-flight check, scenic always thinks that jackd is not running
+    #433: Increase timeout before SIGKILL for streamer processes.
+    #425: When you disable video reception (or the other side disable video ...
+    #426: V4L2 input and standard widgets are not populated at startup
+    #434: Scenic doesn't list resolutions supported by the camera at startup.
+    #414: Cannot select text in debug window for more than one second
+    #396: embedded preview isn't always correct size (gstreamer git versions-only)
+    #404: Sometimes scenic refuses all the time since it has already got an ...
+    #431: If a port is not available, scenic should increment the port number to ...
+    #424: When you don't have any contacts and add one, the invite label is still ...
+    #427: At first, all the streams should be enabled
+    #417: Framerate index out of range
+    #359: JACKD: Key 'period' is missing for the jack server process
+    #366: list-norms for v4l2 via GstTuner interface
+    #415: audio channels not respected in preview
+    #410: Remove contact name from the invite button
+    #406: midi / gui bug. Blocking the video cam usage on some laptop
+

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.60)
-AC_INIT(SCENIC, [0.5], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, [0.5.1], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -44,16 +44,12 @@ if test "x${have_glib}" = "xfalse" ; then
     AC_MSG_ERROR([Missing libglib2.0-dev])
 fi
 
-#Trying to set GTK+-2.0 using pkg-config
-PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=true, have_gtk=false)
-if test "x${have_gtk}" = "xfalse" ; then
-    AC_MSG_ERROR([Missing libgtk2.0-dev])
-fi
+AM_PATH_GTK_2_0([2.10.0],,AC_MSG_ERROR([Gtk+ 2.10.0 or higher required.]))
 
 #Trying to set GST_CFLAGS GST_LIBS using pkg-config
 PKG_CHECK_MODULES(GST, gstreamer-0.10, have_gstreamer=true, have_gstreamer=false)
 if test "x${have_gstreamer}" = "xfalse" ; then
-    AC_MSG_ERROR([Missing libgstreamer0.10-dev GStreamer not found.])
+    AC_MSG_ERROR([Missing libgstreamer0.10-dev, gstreamer not found.])
 fi
 
 #Trying to set GSTAUDIO using pkg-config
@@ -231,6 +227,11 @@ data/pixmaps/Makefile
 data/themes/Makefile
 data/themes/Darklooks/Makefile
 doc/Makefile
+doc/docbook/Makefile
+doc/docbook/fig/Makefile
+doc/docbook/user/Makefile
+doc/docbook/installation/Makefile
+doc/docbook/installation-manual.xml
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile

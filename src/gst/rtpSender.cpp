@@ -25,6 +25,7 @@
 #include <gst/gst.h>
 #include <algorithm>
 #include <sstream>
+#include <list>
 
 #include "pipeline.h"
 #include "gstLinkable.h"
@@ -133,6 +134,43 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     gst_object_unref(rtcpReceiverSrc);
 }
 
+// FIXME: flush vectors when we get new, smaller sent or loss values
+void RtpSender::deltaPacketLoss(GstStructure *stats)
+{
+    using std::string;
+    using std::map;
+    using std::list;
+    static map<string, list<gint32> > packetLoss;
+    static map<string, list<gint32> > packetsSent;
+
+    if (G_VALUE_HOLDS_INT(gst_structure_get_value(stats, "rb-packetslost")))
+        packetLoss[sessionName_].push_back(g_value_get_int(gst_structure_get_value(stats, "rb-packetslost")));
+    if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, "packets-sent")))
+    {
+        packetsSent[sessionName_].push_back(g_value_get_uint64(gst_structure_get_value(stats, "packets-sent")));
+        return;
+    }
+
+    const size_t WINDOW_SIZE = 10;
+
+    // get difference between newest and oldest packetloss values
+    const double deltaLoss = packetLoss[sessionName_].back() - packetLoss[sessionName_].front();
+    const double deltaSent = packetsSent[sessionName_].back() - packetsSent[sessionName_].front();
+    // our old data is no longer valid, need to reset
+    if (deltaLoss < 0.0 or deltaSent < 0.0)
+    {
+        packetLoss[sessionName_].resize(0);
+        packetsSent[sessionName_].resize(0);
+    }
+    else if (deltaSent > 0.0)
+        LOG_INFO(sessionName_ << ":AVERAGE PACKET-LOSS(%):" << 100.0 * (deltaLoss / deltaSent));
+
+    while (packetLoss[sessionName_].size() > WINDOW_SIZE) // while buffer is overfull
+        packetLoss[sessionName_].pop_front();  // pop oldest element
+    while (packetsSent[sessionName_].size() > WINDOW_SIZE) // while buffer is overfull
+        packetsSent[sessionName_].pop_front();  // pop oldest element
+}
+
 
 void RtpSender::subParseSourceStats(GstStructure *stats)
 {
@@ -145,10 +183,12 @@ void RtpSender::subParseSourceStats(GstStructure *stats)
             printStatsVal(sessionName_, "bitrate", "guint64", ":BITRATE: ", stats);
             printStatsVal(sessionName_, "octets-sent", "guint64", ":OCTETS-SENT:", stats);
             printStatsVal(sessionName_, "packets-sent", "guint64", ":PACKETS-SENT:", stats);
+            deltaPacketLoss(stats);
         }
         return; // otherwise we don't care about internal sources
     }
     printStatsVal(sessionName_, "rb-jitter", "guint32", ":JITTER: ", stats);
     printStatsVal(sessionName_, "rb-packetslost", "gint32", ":PACKETS-LOST: ", stats);
+    deltaPacketLoss(stats);
 }
 

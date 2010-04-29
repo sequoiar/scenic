@@ -27,6 +27,8 @@
 #include "audioSender.h"
 #include "audioLevel.h"
 #include "audioSource.h"
+#include "audioConfig.h"
+#include "remoteConfig.h"
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
@@ -45,12 +47,14 @@ validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
             throw std::range_error("MP3 only accepts 1 or 2 channels, not " +
                    lexical_cast<string>(aConfig.numChannels()));
     }
+#if 0
     else if (rConfig.codec() == "raw")
     {
-        if (aConfig.numChannels() > 8) 
-            throw std::range_error("Raw currently only accepts 8 channels or less, not " +
-                    lexical_cast<string>(aConfig.numChannels()));
+        if (aConfig.numChannels() > 11)
+            throw std::range_error("Raw only accepts 1-11 channels, not " +
+                   lexical_cast<string>(aConfig.numChannels()));
     }
+#endif
 }
 
 /// Constructor 

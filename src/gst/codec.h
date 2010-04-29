@@ -271,15 +271,16 @@ class RawEncoder : public Encoder
 class RawDecoder : public Decoder
 {
     public:
-        RawDecoder(const Pipeline &pipeline);
+        RawDecoder(const Pipeline &pipeline, int numChannels);
         ~RawDecoder();
 
     private:
         RtpPay* createDepayloader() const;
         _GstElement *aconv_;
+        _GstElement *capsfilter_;
 
         _GstElement *sinkElement() { return aconv_; }
-        _GstElement *srcElement() { return aconv_; }
+        _GstElement *srcElement() { return capsfilter_; }
 };
 
 

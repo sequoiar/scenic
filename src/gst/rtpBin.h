@@ -62,7 +62,7 @@ class RtpBin : boost::noncopyable
         void startPrintStatsCallback();
     
     private:
-        static const int REPORTING_PERIOD_MS = 2000;
+        static const int REPORTING_PERIOD_MS = 1000;
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static void parseSourceStats(_GObject * source, RtpBin *context);

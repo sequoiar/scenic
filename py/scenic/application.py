@@ -93,8 +93,11 @@ from scenic.devices import x11
 from scenic.devices import cameras
 from scenic.devices import midi
 from scenic import gui
+from scenic import logger
 from scenic import internationalization
 _ = internationalization._
+
+log = logger.start(name="application")
 
 class Config(saving.ConfigStateSaving):
     """
@@ -104,13 +107,24 @@ class Config(saving.ConfigStateSaving):
         # Default values
         self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
         self.smtpserver = "smtp.sat.qc.ca" 
+        # ----------- MISC --------------
+        self.email_info = "scenic@sat.qc.ca" 
         # ----------- AUDIO --------------
-        self.email_info = "scenic@sat.qc.ca"
+        self.audio_send_enabled = True
+        self.audio_recv_enabled = True
+        self.audio_video_synchronized = True # we configure what we receive
         self.audio_source = "jackaudiosrc"
         self.audio_sink = "jackaudiosink"
         self.audio_codec = "raw"
         self.audio_channels = 2
+        self.audio_input_buffer = 15
+        self.audio_output_buffer = 15
+        self.audio_jitterbuffer = 75
+        self.audio_maximum_number_of_channels_in_raw = 64
+        self.audio_jack_enable_autoconnect = True
         # ------------- VIDEO -------------
+        self.video_send_enabled = True
+        self.video_recv_enabled = True
         self.video_source = "v4l2src"
         self.video_device = "/dev/video0"
         self.video_deinterlace = False
@@ -175,9 +189,12 @@ class Application(object):
     Main class of the application.
 
     The devices attributes is a very interesting dict. See the source code.
+    @param force_previous_device_settings: Whether we should load previous V4L2 input and norm or not.
     """
-    def __init__(self, kiosk_mode=False, fullscreen=False, log_file_name=None):
+    def __init__(self, kiosk_mode=False, fullscreen=False, log_file_name=None, enable_debug=False, force_previous_device_settings=True):
         self.config = Config()
+        self.force_previous_device_settings = force_previous_device_settings
+        self.enable_debug = enable_debug
         self.log_file_name = log_file_name
         self.recv_video_port = None
         self.recv_audio_port = None
@@ -187,15 +204,16 @@ class Application(object):
         self.address_book = saving.AddressBook()
         self.streamer_manager = StreamerManager(self)
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
-        print("Starting SIC server on port %s" % (self.config.negotiation_port)) 
+        self._is_negotiating = False
+        log.info("Starting SIC server on port %s" % (self.config.negotiation_port)) 
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = communication.Client()
-        #self.client.connection_error_signal.connect(self.on_connection_error)
+        self.client.connection_error_signal.connect(self.on_connection_error)
         self.protocol_version = "SIC 0.1"
         self.got_bye = False 
         # starting the GUI:
         internationalization.setup_i18n()
-        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen)
+        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self.devices = {
             "x11_displays": [], # list of dicts
             "cameras": {}, # dict of dicts (only V4L2 cameras for now)
@@ -218,12 +236,22 @@ class Application(object):
         @rtype: str
         """
         return _format_device_name_and_identifier(midi_device_dict["name"], str(midi_device_dict["number"]))
+    
+    def on_connection_error(self, err, mess):
+        """
+        Called by the communication.Client in case of an error.
+        """
+        self._is_negotiating = False #important
 
     def format_v4l2_device_name(self, device_dict):
-        print "formatting v4l2 device name", device_dict
+        log.debug("formatting v4l2 device name %s" % (device_dict))
         return _format_device_name_and_identifier(device_dict["card"], device_dict["name"])
 
     def parse_v4l2_device_name(self, formatted_name):
+        """
+        Parses the name of a V4L2 device and returns a dict, or None if it doesn't exist.
+        @return: a dict or None
+        """
         ret = None
         name, identifier = _parse_device_name_and_identifier(formatted_name)
         key = "cameras"
@@ -279,23 +307,55 @@ class Application(object):
         except error.CannotListenError, e:
             def _cb(result):
                 reactor.stop()
-            print("Cannot start SIC server. %s" % (e))
+            log.error("Cannot start SIC server. %s" % (e))
             deferred = dialogs.ErrorDialog.create(_("Is another Scenic running? Cannot bind to port %(port)d") % {"port": self.config.negotiation_port}, parent=self.gui.main_window)
             deferred.addCallback(_cb)
             return
         # Devices: JACKD (every 5 seconds)
         self._jackd_watch_task.start(5, now=True)
+        # first, poll devices, next restore v4l2 settings, finally, update widgets and poll cameras again.
         # Devices: X11 and XV
-        def _callback(result):
+        def _cb2(result):
             self.gui.update_widgets_with_saved_config()
+            d = self.poll_camera_devices() # we need to do it once more, to update the list of possible image size according to the selected video device
+        #first_action = defer.DeferredList([
+        def _cb1(result):
+            d = self._restore_v4l2_settings()
+            d.addCallback(_cb2)
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_xvideo_extension(),
             self.poll_camera_devices(), 
             self.poll_midi_devices()
             ])
-        deferred_list.addCallback(_callback)
+        deferred_list.addCallback(_cb1)
 
+    def _restore_v4l2_settings(self):
+        """
+        Restores settings previously saved, if desired. 
+        @rettype: L{Deferred}
+        """
+        # if current video source is V4L2, set it to the previous input and norm, if self.
+        if not self.force_previous_device_settings:
+            return defer.succeed(True)
+        else:
+            if self.config.video_source != "v4l2src":
+                return defer.succeed(True)
+            else:
+                full_name = self.config.video_device
+                dev = self.parse_v4l2_device_name(full_name)
+                if dev is None:
+                    return defer.succeed(True)
+                else:
+                    camera_name = dev["name"]
+                    standard_name = self.config.video_standard
+                    input_number = self.config.video_input
+                    deferred_list = defer.DeferredList([
+                        cameras.set_v4l2_video_standard(device_name=camera_name, standard=standard_name),
+                        cameras.set_v4l2_input_number(device_name=camera_name, input_number=input_number)
+                        ])
+                    return deferred_list
+        
     def poll_midi_devices(self):
         """
         Called once at startup, and then the GUI can call it.
@@ -312,8 +372,8 @@ class Application(object):
                     output_devices.append(device)
             self.devices["midi_input_devices"] = input_devices
             self.devices["midi_output_devices"] = output_devices
-            print("MIDI inputs: %s" % (input_devices))
-            print("MIDI outputs: %s" % (output_devices))
+            log.debug("MIDI inputs: %s" % (input_devices))
+            log.debug("MIDI outputs: %s" % (output_devices))
             self.gui.update_midi_devices()
         deferred.addCallback(_callback)
         return deferred
@@ -327,7 +387,7 @@ class Application(object):
         deferred = x11.list_x11_displays(verbose=False)
         def _callback(x11_displays):
             self.devices["x11_displays"] = x11_displays
-            print("displays: %s" % (x11_displays))
+            log.debug("displays: %s" % (x11_displays))
             self.gui.update_x11_devices()
         deferred.addCallback(_callback)
         return deferred
@@ -343,20 +403,21 @@ class Application(object):
         toggle_size_sensitivity = self.gui.video_capture_size_widget.get_property("sensitive")
         def _callback(cameras):
             self.devices["cameras"] = cameras
-            print("cameras: %s" % (cameras))
+            log.debug("cameras: %s" % (cameras))
             self.gui.update_camera_devices()
             if toggle_size_sensitivity:
                 self.gui.video_capture_size_widget.set_sensitive(True)
-            print("setting video_capture_size widget sensitive to true")
+            log.debug("Done polling cameras. Setting video_capture_size widget sensitive to true.")
+            return cameras
         def _errback(reason):
             if toggle_size_sensitivity:
                 self.gui.video_capture_size_widget.set_sensitive(True)
-            print("setting video_capture_size widget sensitive to true")
+            log.debug("Setting video_capture_size widget sensitive to true")
             return reason
         if toggle_size_sensitivity:
             self.gui.video_capture_size_widget.set_sensitive(False)
         deferred.addCallback(_callback)
-        print("setting video_capture_size widget sensitive to false")
+        log.debug("Setting video_capture_size widget sensitive to false")
         deferred.addErrback(_errback)
         return deferred
 
@@ -370,8 +431,9 @@ class Application(object):
             self.devices["xvideo_is_present"] = xvideo_is_present
             if not xvideo_is_present:
                 msg = _("It seems like the xvideo extension is not present. Video display is not possible.")
-                print(msg)
+                log.error(msg)
                 dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+            return xvideo_is_present
         deferred.addCallback(_callback)
         return deferred
         
@@ -385,9 +447,9 @@ class Application(object):
         try:
             jack_servers = jackd.jackd_get_infos() # returns a list of dicts
         except jackd.JackFrozenError, e:
-            print e 
+            log.error(str(e)) 
             msg = _("The JACK audio server seems frozen ! \n%s") % (e)
-            print(msg)
+            log.error(msg)
             #dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
             is_zombie = True
         else:
@@ -397,7 +459,7 @@ class Application(object):
             else:
                 is_running = True
         if self.devices["jackd_is_running"] != is_running:
-            print("Jackd server changed state: %s" % (jack_servers))
+            log.debug("Jackd server changed state: %s" % (jack_servers))
         self.devices["jackd_is_running"] = is_running
         self.devices["jackd_is_zombie"] = is_zombie
         self.devices["jack_servers"] = jack_servers
@@ -409,7 +471,7 @@ class Application(object):
         @rtype: L{DeferredList}
         """
         deferred = defer.Deferred()
-        print("The application is shutting down.")
+        log.info("The application is shutting down.")
         # TODO: stop streamers
         self.save_configuration()
         if self.client.is_connected():
@@ -417,12 +479,12 @@ class Application(object):
                 self.send_bye() # returns None
                 self.stop_streamers() # returns None
         def _cb(result):
-            print "done quitting."
+            log.debug("done quitting.")
             deferred.callback(True)
         def _later():
             d2 = self.disconnect_client()
             d2.addCallback(_cb)
-            print('stopping server')
+            log.info('Stopping the SIC sender if still connected.')
         reactor.callLater(0.1, _later)
         d1 = self.server.close()
         d2 = self.gui.close_preview_if_running()
@@ -431,17 +493,26 @@ class Application(object):
     # ------------------------- session occuring -------------
     def has_session(self):
         """
+        Checks if we are currently streaming with a peer or not.
         @rtype: bool
         """
         return self.streamer_manager.is_busy()
+
+    def has_negotiation_in_progress(self):
+        """
+        Checks if we are currently negotiating  with a peer or not.
+        @rtype: bool
+        """
+        return self._is_negotiating
+    
     # -------------------- streamer ports -----------------
     def prepare_before_rtp_stream(self):
         #TODO: return a Deferred
-        self.gui.close_preview_if_running() # TODO: use its deferred
-        self.save_configuration()
+        #self.save_configuration()
         self._allocate_ports()
         
     def cleanup_after_rtp_stream(self):
+        #FIXME: is this useful at all?
         self._free_ports()
     
     def _allocate_ports(self):
@@ -456,7 +527,7 @@ class Application(object):
             try:
                 self.ports_allocator.free(port)
             except ports.PortsAllocatorError, e:
-                print(e)
+                log.error(e)
 
     def save_configuration(self):
         """
@@ -477,7 +548,7 @@ class Application(object):
         """
         # TODO: break if not compatible in a next release.
         if message["protocol"] != self.protocol_version:
-            print("WARNING: Remote peer uses %s and we use %s." % (message["protocol"], self.protocol_version))
+            log.warning("WARNING: Remote peer uses %s and we use %s." % (message["protocol"], self.protocol_version))
             return False
         else:
             return True
@@ -489,6 +560,15 @@ class Application(object):
          * jackd is not running
          * We already just got an INVITE and didn't answer yet.
         """
+        send_to_port = message["please_send_to_port"]
+        def _simply_refuse(reason):
+            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason, 'sid':0})
+            self._is_negotiating = False
+
+        if self.has_session():
+            _simply_refuse(communication.REFUSE_REASON_BUSY)
+            return
+        
         self.got_bye = False
         self._check_protocol_version(message)
         
@@ -504,22 +584,18 @@ class Application(object):
         # check if the contact is in the addressbook
         contact = self._get_contact_by_addr(addr)
         invited_by = addr
-        send_to_port = message["please_send_to_port"]
-
-        def _simply_refuse():
-            communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'sid':0})
         
         if contact is not None:
             invited_by = contact["name"]
-
-        if self.get_last_message_received() == "INVITE" and self.get_last_message_sent() != "REFUSE": # FIXME: does that cover all cases?
-            _simply_refuse()
-            print("REFUSED an INVITE since we already got one from someone else.")
+        if self.has_negotiation_in_progress():
+            log.info("REFUSING an INVITE, since we are already negotiating with some peer.")
+            _simply_refuse(communication.REFUSE_REASON_BUSY)
             return
+        self._is_negotiating = True
         
         def _check_cb(result):
             if not result:
-                _simply_refuse() # TODO: add reason param: Technical problems.
+                _simply_refuse(communication.REFUSE_REASON_PROBLEMS)
             else:
                 # FIXME: the copy of dict should be more straightforward.
                 self.remote_config = {
@@ -529,7 +605,7 @@ class Application(object):
                     }
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
                 if contact is not None and contact["auto_accept"]:
-                    print("Contact %s is on auto_accept. Accepting." % (invited_by))
+                    log.info("Contact %s is on auto_accept. Accepting." % (invited_by))
                     def _connected_cb(proto):
                         self.send_accept(addr)
                     connected_deferred.addCallback(_connected_cb)
@@ -553,6 +629,7 @@ class Application(object):
         return ret
     
     def handle_cancel(self, message, addr):
+        self._is_negotiating = False
         # If had previously sent ACCEPT and receive CANCEL, abort the session.
         if self.get_last_message_sent() == "ACCEPT":
             self.cleanup_after_rtp_stream()
@@ -560,19 +637,21 @@ class Application(object):
         contact_name = ""
         if contact is not None:
             contact_name = contact["name"]
-        txt = _("Contact %(name)s invited you but cancelled his invitation.") % {"name": contact_name}
-        # Turning the reason into readable i18n str.
-        if message.has_key("reason"):
-            reason = message["reason"]
-            if reason == communication.CANCEL_REASON_TIMEOUT:
-                txt += "\n\n" + _("The invitation expired.")
-            elif reason == communication.CANCEL_REASON_CANCELLED:
-                txt += "\n\n" + _("The peer cancelled the invitation.")
+        else:
+            contact_name = addr
+        if contact_name == "":
+            raise RuntimeError("No contact name to display to the user.")
+        reason = message["reason"]
+        if reason == communication.CANCEL_REASON_CANCELLED:
+            txt = _("Contact %(name)s invited you but cancelled his invitation.") % {"name": contact_name}
+        else:
+            raise RuntimeError("No reason for the cancellation.")
         self.client.disconnect()
         self.gui.invited_dialog.hide()
         dialogs.ErrorDialog.create(txt, parent=self.gui.main_window)
 
     def handle_accept(self, message, addr):
+        self._is_negotiating = False
         if self.get_last_message_sent() == "CANCEL":
             self.send_bye() # If got ACCEPT, but had sent CANCEL, send BYE.
         else:
@@ -587,37 +666,46 @@ class Application(object):
                 "midi": message["midi"]
                 }
             if self.streamer_manager.is_busy():
-                print("Got ACCEPT but we are busy. This is very strange")
+                log.error("Got ACCEPT but we are busy. This is very strange")
                 dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
             else:
-                print("Got ACCEPT. Starting streamers as initiator.")
+                log.info("Got ACCEPT. Starting streamers as initiator.")
                 self.start_streamers(addr)
                 self.send_ack()
 
-    def handle_refuse(self):
+    def handle_refuse(self, message):
         """
         Got REFUSE
         """
+        reason = message["reason"]
+        self._is_negotiating = False
         self.gui.hide_calling_dialog()
         self._free_ports()
-        text = _("The contact refused to stream with you.\n\nIt may be caused by a ongoing session with an other peer or by technical problems.")
+        if reason == communication.REFUSE_REASON_REFUSED:
+            text = _("The contact refused to stream with you.") 
+        elif reason == communication.REFUSE_REASON_PROBLEMS:
+            text = _("The contact cannot stream with you due to technical issues.")
+        elif reason == communication.REFUSE_REASON_BUSY:
+            text = _("The contact is busy. Cannot start a streaming session.")
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
         """
         Got ACK
         """
-        print("Got ACK. Starting streamers as answerer.")
+        self._is_negotiating = False
+        log.info("Got ACK. Starting streamers as answerer.")
         self.start_streamers(addr)
 
     def handle_bye(self):
         """
         Got BYE
         """
+        self._is_negotiating = False
         self.got_bye = True
         self.stop_streamers()
         if self.client.is_connected():
-            print('disconnecting client and sending BYE')
+            log.info('disconnecting client and sending BYE')
             self.client.send({"msg":"OK", "sid":0})
             self.disconnect_client()
 
@@ -625,13 +713,14 @@ class Application(object):
         """
         Got OK
         """
-        print("received ok. Everything has an end.")
-        print('disconnecting client')
+        self._is_negotiating = False
+        log.info("Received ok. We are done with this streaming session.")
+        log.debug('disconnecting client')
         self.disconnect_client()
 
     def on_server_receive_command(self, message, addr):
         msg = message["msg"]
-        print("Got %s from %s" % (msg, addr))
+        log.debug("Got %s from %s" % (msg, addr))
         # TODO: use prefixedMethods from twisted.
         if msg == "INVITE":
             self.handle_invite(message, addr)
@@ -640,7 +729,7 @@ class Application(object):
         elif msg == "ACCEPT":
             self.handle_accept(message, addr)
         elif msg == "REFUSE":
-            self.handle_refuse()
+            self.handle_refuse(message)
         elif msg == "ACK":
             self.handle_ack(addr)
         elif msg == "BYE":
@@ -648,22 +737,43 @@ class Application(object):
         elif msg == "OK":
             self.handle_ok()
         else:
-            print('WARNING: Unexpected message %s' % (msg))
+            log.warning('WARNING: Unexpected message %s' % (msg))
 
     # -------------------------- actions on streamer manager --------
 
+    def _check_if_all_disabled(self):
+        """
+        Checks if al the streams are disabled.
+        @rettype: bool
+        """
+        send_video = self.remote_config["video"]["recv_enabled"] and self.config.video_send_enabled
+        send_audio = self.remote_config["audio"]["recv_enabled"] and self.config.audio_send_enabled
+        recv_audio = self.remote_config["audio"]["send_enabled"] and self.config.audio_recv_enabled
+        recv_video = self.remote_config["video"]["send_enabled"] and self.config.video_recv_enabled
+        recv_midi = self.remote_config["midi"]["send_enabled"] and self.config.midi_recv_enabled
+        send_midi = self.remote_config["midi"]["recv_enabled"] and self.config.midi_send_enabled
+        return not send_video and not send_audio and not recv_audio and not recv_video and not send_midi and not recv_midi
+    
     def start_streamers(self, addr):
-        self.streamer_manager.start(addr)
+        if self._check_if_all_disabled():
+            error_msg = _("Cannot start streaming if all the streams are disabled.")
+            dialogs.ErrorDialog.create(error_msg, parent=self.gui.main_window)
+            self.send_bye()
+            self.stop_streamers()
+        else:
+            self.streamer_manager.start(addr)
+        self._is_negotiating = False
 
     def stop_streamers(self):
         # TODO: return a deferred. 
         self.streamer_manager.stop()
+        self._is_negotiating = False
 
     def on_streamers_stopped(self, addr):
         """
         We call this when all streamers are stopped.
         """
-        print("on_streamers_stopped got called")
+        log.debug("on_streamers_stopped got called")
         self.cleanup_after_rtp_stream()
 
     # ---------------------- sending messages -----------
@@ -696,6 +806,8 @@ class Application(object):
         """
         return {
             "video": {
+                "send_enabled": self.config.video_send_enabled,
+                "recv_enabled": self.config.video_recv_enabled,
                 "codec": self.config.video_codec,
                 "bitrate": self.config.video_bitrate, # float Mbps
                 "port": self.recv_video_port,
@@ -703,6 +815,9 @@ class Application(object):
                 "capture_size": self.config.video_capture_size 
                 },
             "audio": {
+                "synchronized": self.config.audio_video_synchronized,
+                "send_enabled": self.config.audio_send_enabled,
+                "recv_enabled": self.config.audio_recv_enabled,
                 "codec": self.config.audio_codec,
                 "numchannels": self.config.audio_channels,
                 "port": self.recv_audio_port
@@ -726,6 +841,9 @@ class Application(object):
         """
         #TODO: poll X11 devices
         #TODO: poll xv extension
+        self.gui.close_preview_if_running() # TODO: use its deferred
+        self.save_configuration()
+        self.prepare_before_rtp_stream()
         deferred = defer.Deferred()
         def _callback(result):
             # callback for the deferred list created below.
@@ -750,7 +868,9 @@ class Application(object):
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
                 return deferred.callback(False)
                 
-            elif not self.devices["jackd_is_running"]:
+            elif (not self.devices["jackd_is_running"]) and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
+                log.debug("audio send/recv enabled: %s %s" % (self.config.audio_send_enabled, self.config.audio_recv_enabled))
+                log.debug("self.devices[\'jackd_is_running\'] = %s" % (self.devices["jackd_is_running"]))
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
                 return deferred.callback(False)
@@ -768,20 +888,20 @@ class Application(object):
                 deferred.callback(False)
             
             # "cameras": {}, # dict of dicts (only V4L2 cameras for now)
-            elif not self.devices["xvideo_is_present"]: #TODO: do not test if not receiving video
+            elif not self.devices["xvideo_is_present"] and self.config.video_recv_enabled:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X video extension is not present."), parent=self.gui.main_window)
                 deferred.callback(False)
             
             else:
                 deferred.callback(True)
         
+        self._poll_jackd() # does not return a deferred for now... called in a looping call.
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_midi_devices(), 
             self.poll_xvideo_extension(),
             self.poll_camera_devices()
             ])
-        self._poll_jackd() # does not return a deferred for now... called in a looping call.
         deferred_list.addCallback(_callback)
         return deferred
 
@@ -789,6 +909,7 @@ class Application(object):
         """
         Does the flight check. If OK, send an INVITE.
         """
+        self._is_negotiating = True
         contact = self.address_book.get_currently_selected_contact()
         if contact is None:
             dialogs.ErrorDialog.create(_("You must select a contact to invite."), parent=self.gui.main_window)
@@ -799,7 +920,7 @@ class Application(object):
         def _check_cb(result):
             #TODO: use the Deferred it will return
             if result:
-                self.prepare_before_rtp_stream()
+                #self.prepare_before_rtp_stream()
                 msg = {
                     "msg":"INVITE",
                     "protocol": self.protocol_version,
@@ -810,7 +931,6 @@ class Application(object):
                 port = self.config.negotiation_port
                 
                 def _on_connected(proto):
-                    self.gui._schedule_inviting_timeout_delayed()
                     self.client.send(msg)
                     return proto
                 def _on_error(reason):
@@ -824,18 +944,20 @@ class Application(object):
                         msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
                     else:
                         msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
-                    print(msg)
+                    log.error(msg)
                     self.gui.hide_calling_dialog()
                     dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    self._is_negotiating = False
                     return None
                    
-                print("sending %s to %s:%s" % (msg, ip, port))
+                log.debug("sending %s to %s:%s" % (msg, ip, port))
                 deferred = self.client.connect(ip, port)
                 deferred.addCallback(_on_connected).addErrback(_on_error)
                 self.gui.show_calling_dialog()
                 # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
             else:
-                print("Cannot send INVITE.")
+                log.error("Cannot send INVITE.")
+                self._is_negotiating = False
 
         check_deferred = self.check_if_ready_to_stream(role="offerer")
         check_deferred.addCallback(_check_cb)
@@ -843,7 +965,7 @@ class Application(object):
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
         #TODO: use the Deferred it will return
-        self.prepare_before_rtp_stream()
+        #self.prepare_before_rtp_stream()
         msg = {
             "msg":"ACCEPT", 
             "protocol": self.protocol_version,
@@ -851,6 +973,7 @@ class Application(object):
             }
         msg.update(self._get_local_config_message_items())
         self.client.send(msg)
+        self._is_negotiating = False
 
     def get_last_message_sent(self):
         return self.client.last_message_sent
@@ -871,6 +994,7 @@ class Application(object):
         BYE stops the streaming on the remote host.
         """
         self.client.send({"msg":"BYE", "sid":0})
+        self._is_negotiating = False
     
     def send_cancel_and_disconnect(self, reason=""):
         """
@@ -878,20 +1002,21 @@ class Application(object):
         CANCEL cancels the invite on the remote host.
         """
         #TODO: add reason argument.
-        #CANCEL_REASON_TIMEOUT = "timed out"
         #CANCEL_REASON_CANCELLED = "cancelled"
         if self.client.is_connected():
             self.client.send({"msg":"CANCEL", "reason": reason, "sid":0})
             self.client.disconnect()
         self.cleanup_after_rtp_stream()
+        self._is_negotiating = False
     
     def send_refuse_and_disconnect(self):
         """
-        Sends REFUSE 
+        Sends REFUSE since the user clicked no.
         REFUSE tells the offerer we can't have a session.
         """
-        self.client.send({"msg":"REFUSE", "sid":0})
+        self.client.send({"msg":"REFUSE", "reason":communication.REFUSE_REASON_REFUSED, "sid":0})
         self.client.disconnect()
+        self._is_negotiating = False
 
     # ------------------- streaming events handlers ----------------
     
@@ -902,8 +1027,10 @@ class Application(object):
         if new_state in [process.STATE_STOPPED]:
             if not self.got_bye:
                 # got_bye means our peer sent us a BYE, so we shouldn't send one back 
-                print("Local StreamerManager stopped. Sending BYE")
+                log.info("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
+        elif new_state == process.STATE_RUNNING:
+            self.gui.write_info_in_debug_tab()
             
     #def on_connection_error(self, err, msg):
     #    """

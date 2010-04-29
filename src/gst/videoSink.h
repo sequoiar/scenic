@@ -87,7 +87,7 @@ class GtkVideoSink
 
 
 class XvImageSink
-: public GtkVideoSink, BusMsgHandler
+: public GtkVideoSink, private BusMsgHandler
 {
     public:
         XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid);

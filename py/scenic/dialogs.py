@@ -182,6 +182,7 @@ class ErrorDialog(object):
             expander = gtk.expander_new_with_mnemonic("Show more details")
             expander.set_spacing(6)
             details_label = gtk.Label()
+            details_label.set_selectable(True)
             details_label.set_text(details)
             expander.add(details_label)
             error_dialog.vbox.pack_start(expander, False, False)

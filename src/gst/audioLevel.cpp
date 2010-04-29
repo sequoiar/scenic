@@ -90,12 +90,6 @@ void AudioLevel::emitMessages(bool doEmit)
 }
 
 
-/// Converts from decibel to linear (0.0 to 1.0) scale. 
-double AudioLevel::dbToLinear(double db)
-{
-    return pow(10, db * 0.05);
-}
-
 void
 AudioLevel::setValue(gdouble peak, gdouble decayPeak, GtkWidget *vumeter)
 {

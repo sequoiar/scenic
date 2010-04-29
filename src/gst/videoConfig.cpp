@@ -159,6 +159,19 @@ int VideoSourceConfig::listCameras()
     return 0;
 }
 
+int VideoSourceConfig::listV4lDevices()
+{
+    try  // catch exceptions here because we're dealing with devices
+    {
+        v4l2util::listCameras();
+    }
+    catch (ErrorExcept &e)
+    {
+        LOG_DEBUG("Got exception " << e.what());
+    }
+    return 0;
+}
+
 void VideoSourceConfig::setStandard(const std::string &device, std::string standard)
 {
     // convert to upper case

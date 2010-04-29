@@ -41,26 +41,6 @@
 #define LOG_LEVEL INFO
 #endif
 
-bool logLevelIsValid(LogLevel level)
-{
-    switch (level)
-    {
-        case DEBUG:
-        case INFO:
-        case PRINT:
-        case WARNING:
-        case ERROR:
-        case THROW: 
-        case CRITICAL:
-        case ASSERT_FAIL:
-            return true;
-            break;
-        default:
-            return false;
-            break;
-    }
-}
-
 std::string logLevelStr(LogLevel level)
 {
     std::string lstr;

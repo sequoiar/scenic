@@ -85,7 +85,7 @@ gtk_vumeter_size_request (GtkWidget * widget, GtkRequisition * requisition)
   g_return_if_fail (GTK_IS_VUMETER (widget));
   g_return_if_fail (requisition != NULL);
 
-  requisition->width = 30;
+  requisition->width = 37;
   requisition->height = 100;
 }
 
@@ -196,6 +196,7 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     cairo_set_source_rgb (cr, 0.80, 0.80, 0.80); // text colour
 	char buf[32];
     gdouble max_text_width = 0;
+    static const gint TEXT_PADDING = 5;
     for (size_t i = 0; i < sizeof(db_points) / sizeof(db_points[0]); ++i)
     {
         snprintf(buf, sizeof(buf), "%d", db_points[i]);
@@ -203,17 +204,18 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
         max_text_width = std::max(te.width, max_text_width);
         gdouble vertical_offset = db_to_vertical_offset(widget, db_points[i]);
 
-        cairo_move_to (cr, widget->allocation.width -  te.width - te.x_bearing,
+        cairo_move_to (cr, widget->allocation.width - TEXT_PADDING -  te.width - te.x_bearing,
             vertical_offset - (te.height / 2) - te.y_bearing);
         cairo_show_text (cr, buf);
     }
 
     // draw dashes
+    static const int LEFT_PADDING = 2;
     const int DASH_SIZE = 4;
     cairo_set_line_width(cr, 1);
     for (int i = 4; i >= -50;)
     {
-        gdouble x = RECT_WIDTH;
+        gdouble x = RECT_WIDTH + 2 + LEFT_PADDING;
         gdouble y = db_to_vertical_offset(widget, i) + 0.5;
         cairo_move_to (cr, x + DASH_SIZE, y);
         cairo_line_to (cr, x, y);
@@ -225,15 +227,16 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     // green
     cairo_set_source_rgb (cr, 0.0, 1.0, 0.0);
     const gdouble green_rect_height = db_to_vertical_offset(widget, -18.0);
-    cairo_rectangle(cr, 0, green_rect_height /* top */,
+    static const int BOTTOM_PADDING = LEFT_PADDING;
+    cairo_rectangle(cr, LEFT_PADDING, green_rect_height /* top */,
             RECT_WIDTH, 
-            widget->allocation.height - green_rect_height/* bottom */);
+            widget->allocation.height - green_rect_height - BOTTOM_PADDING /* bottom */);
     cairo_fill(cr);
 
     // yellow 
     cairo_set_source_rgb (cr, 0.8, 1.0, 0.0);
     const gdouble yellow_rect_height = db_to_vertical_offset(widget, 0.0);
-    cairo_rectangle(cr, 0, yellow_rect_height /* top */,
+    cairo_rectangle(cr, LEFT_PADDING, yellow_rect_height /* top */,
             RECT_WIDTH,
             green_rect_height - yellow_rect_height/* bottom */);
     cairo_fill(cr);
@@ -241,7 +244,7 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     // red 
     cairo_set_source_rgb (cr, 1.0, 0.0, 0.0);
     const gdouble red_rect_height = db_to_vertical_offset(widget, 8.0);
-    cairo_rectangle(cr, 0, red_rect_height /* top */,
+    cairo_rectangle(cr, LEFT_PADDING, red_rect_height /* top */,
             RECT_WIDTH,
             yellow_rect_height - red_rect_height/* bottom */);
     cairo_fill(cr);
@@ -250,7 +253,7 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     // vumeter corresponding to the current amplitude
     cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
     cairo_rectangle(cr, 0, 0, /* top */
-            RECT_WIDTH,
+            RECT_WIDTH + LEFT_PADDING,
             db_to_vertical_offset(widget, GTK_VUMETER(widget)->peak));
     cairo_fill(cr);
 
@@ -263,15 +266,15 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
             cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
         else
             cairo_set_source_rgb(cr, 0.0, 1.0, 0.0);
-        cairo_move_to(cr, 0, decay_peak_height);
-        cairo_line_to(cr, RECT_WIDTH, decay_peak_height);
+        cairo_move_to(cr, LEFT_PADDING, decay_peak_height);
+        cairo_line_to(cr, RECT_WIDTH + LEFT_PADDING, decay_peak_height);
         cairo_stroke(cr);
     }
 
     cairo_destroy (cr);
 }
 
-    static void
+static void
 gtk_vumeter_destroy (GtkObject * object)
 {
     GtkVumeter *vumeter;

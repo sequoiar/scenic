@@ -33,7 +33,7 @@
 class Pipeline;
 
 class GLImageSink
-: public GtkVideoSink, BusMsgHandler
+: public GtkVideoSink, private BusMsgHandler
 {
     public:
         /// Constructor 

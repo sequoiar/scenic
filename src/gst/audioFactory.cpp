@@ -24,6 +24,9 @@
 #include "util.h"
 
 #include "audioFactory.h"
+#include "audioSender.h"
+#include "audioReceiver.h"
+#include "localAudio.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "capsParser.h"
@@ -55,7 +58,7 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
 
 shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, const po::variables_map &options)
 {
-    shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(options));
+    shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(pipeline, options));
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());

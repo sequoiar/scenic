@@ -24,8 +24,8 @@
 #ifndef _AUDIO_LEVEL_H_
 #define _AUDIO_LEVEL_H_
 
-#include <gdk/gdktypes.h>
 #include <vector>
+#include <gdk/gdktypes.h>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
 
@@ -40,7 +40,7 @@ class _GtkWidget;
  *  the rms value of each audio channel passing through it.
  */
 
-class AudioLevel : public GstLinkableFilter, BusMsgHandler
+class AudioLevel : public GstLinkableFilter, private BusMsgHandler
 {
     public:
         AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID);
@@ -55,10 +55,6 @@ class AudioLevel : public GstLinkableFilter, BusMsgHandler
         static void setValue(gdouble peak, gdouble decayPeak, _GtkWidget *vumeter);
         _GstElement *srcElement() { return level_; }
         _GstElement *sinkElement() { return level_; }
-
-        //void updateRms(double rmsDb, size_t channelIdx);
-
-        static double dbToLinear(double db);
 
         void print(const std::vector<double> &rmsValues) const;
 

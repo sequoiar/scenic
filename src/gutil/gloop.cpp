@@ -20,23 +20,26 @@
  *
  */
 
-#include <glib.h>
+#include <gst/gst.h>
+#include <gtk/gtk.h>
 #include "util.h"
 #include "gutil.h"
     
 // extend namespace gutil
 namespace gutil {
-    static GMainLoop *loop_ = 0;
     int checkSignal(gpointer data = NULL);
 }
 
-
 int gutil::killMainLoop(gpointer /*data*/)
 {
-    if (loop_ != 0)
-        g_main_loop_quit(loop_);
+    static bool called = false;
+    if (not called)
+    {
+        gtk_main_quit();
 
-    LOG_DEBUG("Quitting...");
+        LOG_DEBUG("Quitting...");
+        called = true;
+    }
     return FALSE;       // won't be called again
 }
 
@@ -44,7 +47,7 @@ int gutil::checkSignal(gpointer /*data*/)
 {
     if (signal_handlers::signalFlag())
     {
-        killMainLoop(NULL);
+        killMainLoop();
         return FALSE; // won't be called again
     }
 
@@ -54,19 +57,22 @@ int gutil::checkSignal(gpointer /*data*/)
 /// ms to run - 0 is forever
 void gutil::runMainLoop(int ms)
 {
-    loop_ = g_main_loop_new (NULL, FALSE);
     /// the gtk main loop will die after ms has elapsed
     if (ms != 0)
         g_timeout_add(ms, static_cast<GSourceFunc>(gutil::killMainLoop), NULL);
 
     // FIXME: this isn't very smart
     // poll signal status every quarter second
-    g_timeout_add(250 /*ms*/,
+    g_timeout_add(300 /*ms*/,
             static_cast<GSourceFunc>(gutil::checkSignal),
             NULL);
 
-    g_main_loop_run(loop_);
-    g_main_loop_unref(loop_);
-    loop_ = 0;
+    gtk_main();
+}
+
+void gutil::init_gst_gtk(int argc, char **argv)
+{
+    gst_init(&argc, &argv);
+    gtk_init(&argc, &argv);
 }
 

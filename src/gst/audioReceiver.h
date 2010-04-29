@@ -23,8 +23,6 @@
 #define _AUDIO_RECEIVER_H_
 
 #include "mediaBase.h"
-#include "audioConfig.h"
-#include "remoteConfig.h"
 #include "rtpReceiver.h"
 
 #include "noncopyable.h"
@@ -36,6 +34,8 @@ class RtpPay;
 class Decoder;
 class AudioLevel;
 class AudioSink;
+class AudioSinkConfig;
+class ReceiverConfig;
 
 /** 
  * An audio pipeline derived from ReceiverBase that receives audio over rtp,
