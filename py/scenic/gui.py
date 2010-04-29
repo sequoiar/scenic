@@ -360,7 +360,7 @@ class Gui(object):
         self.selection.connect("changed", self.on_contact_list_changed, None) 
         self.contact_tree = gtk.ListStore(str)
         self.contact_list_widget.set_model(self.contact_tree)
-        column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=False)
+        column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
         self.contact_list_widget.append_column(column)
         # TODO: those state variables interactive/not could be merged into a single one
         # preview:
