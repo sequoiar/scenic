@@ -527,7 +527,10 @@ class Application(object):
             try:
                 self.ports_allocator.free(port)
             except ports.PortsAllocatorError, e:
+                #pass
                 log.error(e)
+            else:
+                log.debug("Freed port number %s" % (port))
 
     def save_configuration(self):
         """
@@ -769,11 +772,12 @@ class Application(object):
         self.streamer_manager.stop()
         self._is_negotiating = False
 
-    def on_streamers_stopped(self, addr):
+    def on_streamers_stopped(self): 
         """
         We call this when all streamers are stopped.
         """
-        log.debug("on_streamers_stopped got called")
+        #We might want to add the address as a parameter, when we'll be connected to more than one peer.
+        log.debug("All streamers have stopped. Will now clean up.")
         self.cleanup_after_rtp_stream()
 
     # ---------------------- sending messages -----------
@@ -1029,6 +1033,7 @@ class Application(object):
                 # got_bye means our peer sent us a BYE, so we shouldn't send one back 
                 log.info("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
+            self.on_streamers_stopped()
         elif new_state == process.STATE_RUNNING:
             self.gui.write_info_in_debug_tab()
             
