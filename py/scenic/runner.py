@@ -95,10 +95,10 @@ def run():
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(configure.VERSION))
     parser.add_option("-k", "--kiosk", action="store_true", help="Run in kiosk mode")
-    parser.add_option("-l", "--enable-logging", action="store_true", help="Enables logging to file.")
-    parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s" % (LOG_FILE_NAME), default=LOG_FILE_NAME)
+    #parser.add_option("-l", "--enable-logging", action="store_true", help="Enables logging to file.")
+    #parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s" % (LOG_FILE_NAME), default=LOG_FILE_NAME)
     parser.add_option("-f", "--fullscreen", action="store_true", help="Run in fullscreen mode")
-    parser.add_option("-n", "--disable-v4l2-settings", action="store_true", help="Disables the state restoring for the V4L2 input number and video standard at startup")
+    parser.add_option("-n", "--disable-v4l2-settings-restoration", action="store_true", help="Disables the state restoring for the V4L2 input number and video standard at startup")
     parser.add_option("-v", "--verbose", action="store_true", help="Enables a verbose logging output with info level messages.")
     parser.add_option("-d", "--debug", action="store_true", help="Enables a very verbose logging output with debug level messages. Also add a debug tab in the user interface.")
     parser.add_option("-M", "--moo", action="store_true", help="There is no easter egg in this program")
@@ -112,12 +112,12 @@ def run():
         level = "info"
     if options.debug:
         level = "debug"
-    if options.enable_logging:
-        start_file_logging(level, os.path.expanduser(options.log_file_name))
-        log_file_name = options.log_file_name
-    else:
-        start_logging_to_stdout(level)
-        log_file_name = None
+    #if options.enable_logging:
+    #    start_file_logging(level, os.path.expanduser(options.log_file_name))
+    #    log_file_name = options.log_file_name
+    #else:
+    start_logging_to_stdout(level)
+    log_file_name = None
     
     from scenic import process
     process.save_environment_variables(os.environ)
@@ -144,16 +144,16 @@ def run():
         print msg
         sys.exit(1)
         
-    enable_v4l2_state_saving_restore = True
+    enable_v4l2_state_saving_restoration = True
     if options.moo:
         moo()
         sys.exit(0)
     
-    if options.disable_v4l2_settings:
-        v4l2_state_saving_restore = False
+    if options.disable_v4l2_settings_restoration:
+        v4l2_state_saving_restoration = False
     
     try:
-        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restore, log_file_name=log_file_name)
+        app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restoration, log_file_name=log_file_name)
     except error.CannotListenError, e:
         msg = "There must be an other Scenic running."
         log.error(msg)
