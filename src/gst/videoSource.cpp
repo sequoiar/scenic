@@ -108,7 +108,8 @@ VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConf
         VideoSource(pipeline, config),
         identity_(pipeline_.makeElement("identity", NULL))
 {
-    tassert(config_.locationExists());
+    if (not config_.locationExists())
+        THROW_ERROR("File \"" << config_.location() << "\" does not exist");
     g_object_set(identity_, "silent", TRUE, NULL);
 
     GstElement * queue = FileSource::acquireVideo(pipeline, config_.location());

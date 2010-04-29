@@ -171,7 +171,8 @@ const int AudioFileSource::LOOP_INFINITE = -1;
 AudioFileSource::AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), BusMsgHandler(&pipeline), aconv_(0), loopCount_(0) 
 {
-    tassert(config_.locationExists());
+    if (not config_.locationExists())
+        THROW_ERROR("File \"" << config_.location() << "\" does not exist");
 
     aconv_ = AudioSource::pipeline_.makeElement("audioconvert", NULL);
 
