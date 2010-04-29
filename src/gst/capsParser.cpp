@@ -3,6 +3,7 @@
 #include "util.h"
 #include <iostream>
 #include <string>
+#include <climits>
 #include <boost/lexical_cast.hpp>
 
 #include "caps.h"
@@ -13,7 +14,7 @@ int maxNumChannelsForCodec(const std::string &codec)
     if (codec == "mp3")
         result = 2;
     else if (codec == "raw")
-        result = 128;
+        result = INT_MAX;
     else if (codec == "vorbis")
         result = 24;
     else
