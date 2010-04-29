@@ -31,12 +31,18 @@ This release is an other unstable version in the 0.5 series.
 
 Fixes in 0.5.1:
 
-Still TODO or make sure of:
-    #462: add 11 channels raw support for raw
-    #418: Cannot log to a single file
-    #423: add celt support for milhouse
+New features in milhouse:
+    #451: Implement --list-v4l2
+    #409: Find out if we can detect which fps works with which image size
+    #422: Report packet loss percentage
+    #436: get >11 channels for raw audio
+    #461: The -h flag should be an alias of --help
 
 New features in scenic:
+    #484: implement disable JACK autoconnect in the GUI
+    #478: Create a user configuration entry for the maximum of raw channels
+    #471: Use --list-v4l2 in scenic
+    #462: add 11 channels support or more for raw
     #411: Integrate user documentation in scenic
     #445: Improve logging system with levels and categories
     #391: Implement state saving for device settings (such as V4L2 input)
@@ -48,8 +54,15 @@ New features in scenic:
     #219: Be able to desynchronize audio and video
     #305: User should be able to disable video/audio to send or receive
 
+Bug fixes in milhouse: 
+    #454: No jitter statistics appear on the receiver side
+    #463: samplerates != 48000 broken in 0.4.5 on receiver-side
+    #350: add audio-buffer setting in scenic
+    #393: replace GMainLoop instance with gtk_main and gtk_main_quit
 
 Bug fixes in scenic : 
+    #449: Scenic tells us often that the v4l2 device disappeared
+    #480: Parsing error in average packet-loss
     #475: yelp should not inherit the GTK theme
     #447: Clicking on the Video tab while streaming create sound glitches
     #456: scenic does not poll MIDI device everytime the user chooses the tab
@@ -82,10 +95,3 @@ Bug fixes in scenic :
     #410: Remove contact name from the invite button
     #406: midi / gui bug. Blocking the video cam usage on some laptop
 
-New features in milhouse:
-    #409: Find out if we can detect which fps works with which image size
-
-Bug fixes in milhouse: 
-    #463: samplerates != 48000 broken in 0.4.5 on receiver-side
-    #350: add audio-buffer setting in scenic
-    #393: replace GMainLoop instance with gtk_main and gtk_main_quit
