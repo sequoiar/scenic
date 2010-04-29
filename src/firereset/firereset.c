@@ -82,8 +82,10 @@ int main(int argc, char **argv)
         return 0;
     }
     
-    // TODO: add a --device argument (-d) which would change the envrionment variable 
-    // int setenv(const char *envname, const char *envval, int overwrite);
+#if 0
+    TODO: add a --device argument (-d) which would change the envrionment variable 
+    int setenv(const char *envname, const char *envval, int overwrite);
+#endif
 
     handle = raw1394_new_handle();
     if (handle == 0)
