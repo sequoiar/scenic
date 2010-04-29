@@ -60,8 +60,10 @@ void gstlinkable::link(GstLinkableSource &src, GstElement *sink)
     GstElement *srcElement = src.srcElement();
     //FIXME: this conditional is a hack to deal with leaf classes that don't implement srcElement
     //and/or sinkElement
-    if (srcElement)
+    if (srcElement != 0)
         tryLink(srcElement, sink);
+    else
+        LOG_DEBUG("Source element is 0");
 }
 
 
@@ -141,5 +143,3 @@ bool gstlinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
 
     return linkOk;
 }
-
-

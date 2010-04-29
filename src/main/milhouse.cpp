@@ -142,6 +142,8 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
     {
         LOG_DEBUG("LOCAL AUDIO");
         localAudio = audiofactory::buildLocalAudio(pipeline, options);
+        if (options["disable-jack-autoconnect"].as<bool>())
+            MessageDispatcher::sendMessage("disable-jack-autoconnect");
     }
 
     playback.start();
