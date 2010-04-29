@@ -25,8 +25,7 @@ This release is an other unstable version in the 0.5 series. Scenic offers now u
     needs milhouse 0.4.5
 
     Limitations:
-    * While milhouse supports many video and audio input types, Scenic
-    only supports a subset of them. 
+    * While milhouse supports many video and audio input types, Scenic only supports a subset of them. 
     * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from long term support of the new features of the 0.5 branch.
 
 New features and bug fixes in 0.5.1:
