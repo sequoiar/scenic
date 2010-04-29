@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Version=1.0
 Type=Application
-Exec=scenic -l
+Exec=scenic
 Icon=scenic
 X-GNOME-DocPath=
 Terminal=false

@@ -51,7 +51,7 @@ class PortsAllocator(object):
         bind to this port in between when this check happens and when
         we bind to the port.
         
-        :param port: int
+        @param port: int
         Raises a PortsAllocatorError if port is not available.
         """
         #TODO: return bool
@@ -102,6 +102,14 @@ class PortsAllocator(object):
             raise PortsAllocatorError("Value %d not in allocated ports set." % (value))
         self.allocated.remove(value)
 
+    def free_all(self):
+        """
+        Frees all allocated ports.
+        @rettype: list of integers.
+        """
+        ret = list(self.allocated)
+        self.allocated = set()
+        return ret
         
     def allocate_many(self, num=1):
         """
@@ -116,7 +124,7 @@ class PortsAllocator(object):
     def free_many(self, values):
         """
         Frees many allocated ports at a time.
-        :param values: list of integers.
+        @param values: list of integers.
         """
         for value in values:
             self.free(value)

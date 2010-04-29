@@ -33,10 +33,10 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             self.fail("Expected value %s but got %s." % (expected, value))
 
     def test_01_add_remove(self):
-        a = PortsAllocator(minimum=2000, increment=2, maximum=2010)
+        a = PortsAllocator(minimum=22000, increment=2, maximum=22010)
 
         # value = 2000; value < 2012; value += 2
-        for value in xrange(2000, 2012, 2):
+        for value in xrange(22000, 22012, 2):
             self._tst(value, a.allocate())
         try:
             value = a.allocate()
@@ -45,7 +45,7 @@ class Test_01_Ports_Allocator(unittest.TestCase):
         else:
             self.fail("Ports allocator should have overflown. Got value %d." % (value))
         # value = 2000; value < 2012; value += 2
-        for value in xrange(2000, 2012, 2):
+        for value in xrange(22000, 22012, 2):
             a.free(value)
         try:
             a.free(100)
@@ -55,7 +55,7 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             self.fail("Trying to free value %d should have raised an error." % (100))
             
     def test_02_add_many(self):
-        a = PortsAllocator(minimum=2000, increment=2, maximum=2010)
+        a = PortsAllocator(minimum=22000, increment=2, maximum=22010)
         values = a.allocate_many(6)
         a.free_many(values)
         values = a.allocate_many(3)
@@ -66,11 +66,10 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             pass
         else:
             self.fail("Ports allocator should have overflown. Got value %d." % (value))
-            pass
 
     def test_03_allocate_busy_port(self):
         # let's use a port
-        PORT = 11000
+        PORT = 31000
         listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # SOCK_DGRAM ? 
         listener.bind(("localhost", PORT)) # socket.gethostname()
         
