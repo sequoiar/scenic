@@ -1,6 +1,6 @@
 Release notes for Scenic 0.5.1
 
-This release is an other unstable version in the 0.5 series. 
+This release is an other unstable version in the 0.5 series. Scenic offers now up to 64 audio channels if used with the patched version of the Gstreamer JACK elements. It offers the possibility to disable JACK autoconnect, for advanced users who might use jack.plumbing to do custom connections. The appearance of the graphical user interface has been much improved. The users can disable audio and video streams. Scenic now gives the reasons when the remote peer refuses. Scenic now offers a debug tab which shows the command taht were used to start the streamer processes. The logging system has been improved. Start scenic with --debug to see all the debug messages. 
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -29,7 +29,7 @@ This release is an other unstable version in the 0.5 series.
     only supports a subset of them. 
     * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from long term support of the new features of the 0.5 branch.
 
-Fixes in 0.5.1:
+New features and bug fixes in 0.5.1:
 
 New features in milhouse:
     #451: Implement --list-v4l2
