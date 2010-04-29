@@ -31,7 +31,7 @@ from twisted.python import procutils
 from twisted.internet import reactor
 
 from scenic import logger
-log = logger.start(name="cameras", level="info")
+log = logger.start(name="cameras")
 
 ugly_to_beautiful_camera_names = {
     "BT878 video (Osprey 210/220/230": "Osprey 210/220/230",

@@ -33,7 +33,7 @@ from twisted.python import procutils
 
 from scenic import logger
 
-log = logger.start(name="midi", level="info")
+log = logger.start(name="midi")
 
 # $ miditream --list-devices
 # List of MIDI devices:
