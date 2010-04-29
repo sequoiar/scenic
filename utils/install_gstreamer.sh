@@ -106,16 +106,16 @@ do
     tar xjf ${module}.tar.bz2
     pushd ${module}
     if [ ${module} == "$GST_BAD" ]; then
-        patch --dry-run -p1 -i $DC1394PATCH
+        patch -f --dry-run -p1 -i $DC1394PATCH
         if [ $? -eq 0 ]; then
             patch -p1 -i $DC1394PATCH
         fi
-        patch --dry-run -p1 -i $JACKPATCH
+        patch -f --dry-run -p1 -i $JACKPATCH
         if [ $? -eq 0 ]; then
             patch -p1 -i $JACKPATCH
         fi
     elif [ ${module} == "$GST_GOOD" ]; then
-        patch --dry-run -p1 -i $RTPPATCH
+        patch -f --dry-run -p1 -i $RTPPATCH
         if [ $? -eq 0 ]; then
             patch -p1 -i $RTPPATCH
         fi
