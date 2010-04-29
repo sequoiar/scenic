@@ -1063,18 +1063,20 @@ class Gui(object):
                     }
                 _info_send_video += _format_bitrate(rtcp_stats["send"]["video"]["bitrate"])
                 _info_send_video += "\n"
-                #_video_packetloss = rtcp_stats["send"]["video"]["packets-loss-percent"]
-                _info_send_video += _("Jitter: %(jitter)d ns") % {# % is escaped with an other %
+                _info_send_video += _("Jitter: %(jitter)d ns") % { # % is escaped with an other %
                     "jitter": rtcp_stats["send"]["video"]["jitter"]
                     }
+                # % is escaped with an other %
+                _info_send_video += "\n" + _("Packet loss: %(packetloss)2.2f%%") % {
+                    "packetloss": rtcp_stats["send"]["video"]["packet-loss-percent"]
+                    }
+                _info_send_video += "\n" + _("Packets lost: %(packetslost)d") % {
+                    "packetslost": rtcp_stats["send"]["video"]["packets-lost"]
+                    }
+                log.debug("info send video: %s" % (_info_send_video.replace("\n", " ")))
             else:
                 _info_send_video += _("Disabled")
 
-            #_info_send_video += _("jitter: %(jitter)d ns. packet loss: %(packetloss)2.2f%%.") % {# % is escaped with an other %
-            #    "jitter": rtcp_stats["send"]["video"]["jitter"],
-            #    "packetloss": _video_packetloss
-            #    }
-            #print("info send video: " + _info_send_video)
             self.info_send_video_widget.set_text(_info_send_video)
             
             # send audio: --------------------------------

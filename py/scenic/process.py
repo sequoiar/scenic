@@ -247,7 +247,7 @@ class ProcessManager(object):
                         log.error(msg) # raise?
                     except error.ProcessExitedAlready:
                         msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, "SIGKILL")
-                        log.error(msg) # raise ?
+                        log.warning(msg) # raise ?
                 elif self.state == STATE_STOPPED:
                     msg = "Successfully killed process after least than the %f seconds. State is %s." % (self.time_before_sigkill, self.state)
                     self.log(msg)
