@@ -26,14 +26,19 @@
  */
 
 #include <stdio.h>
+#include <string.h> /* for strcmp */
+#include <stdlib.h> /* for getenv */
 #include <libraw1394/raw1394.h>
+#include "../config.h" /* for PACKAGE_VERSION */
 
+/**
+ * Callback for when raw1394_reset_bus_new() is called.
+ *
+ * It's a success if it has been called.
+ */
 static int bus_reset_handler(struct raw1394_handle *handle, unsigned int gen)
 {
-    /**
-     * Callback for when raw1394_reset_bus_new() is called.
-     */
-    printf("INFO: Bus reset occurred.\nnew generation number: %d, %d nodes on the bus, local ID: %d\a\n",
+    printf("INFO: Bus reset occurred.\nINFO: New generation number: %d, \nINFO: %d nodes on the bus\nINFO: local ID: %d\a\n",
         gen, 
         raw1394_get_nodecount(handle), 
         raw1394_get_local_id(handle) & 0x3f);
@@ -42,7 +47,9 @@ static int bus_reset_handler(struct raw1394_handle *handle, unsigned int gen)
     raw1394_update_generation(handle, gen);
     return 0;
 }
-
+/**
+ * Prints an help message.
+ */
 void print_help(char *program_name)
 {
     printf("Usage: firereset\n\n");
@@ -52,6 +59,9 @@ void print_help(char *program_name)
     printf("\n");
     printf("Resets the Firewire (ieee1394) bus under GNU/Linux.\n");
     printf("Use at your own risks.\n");
+    printf("\n");
+    printf("The default device node is /dev/raw1394, but one can override the default by \nsetting environment variable RAW1394DEV. However, if RAW1394DEV points to a \nnon-existant or invalid device node, then it also attempts to open the default \ndevice node. \n");
+    
 }
 
 int main(int argc, char **argv)
@@ -63,6 +73,11 @@ int main(int argc, char **argv)
     
     if (argc >= 2)
     {
+        if (strcmp(argv[1], "--help") != 0)
+        {
+            printf("%s\n", PACKAGE_VERSION);
+            return 0;
+        }
         print_help(argv[0]);
         return 0;
     }
@@ -70,12 +85,16 @@ int main(int argc, char **argv)
     handle = raw1394_new_handle();
     if (handle == 0)
     {
-        printf("ERROR: could not get handle to firewire bus.\n");
-        printf("ERROR: Is raw1394 module loaded ? Is your user in the 'disk' group ?\n");
+        printf("ERROR: Could not get a handle to the firewire bus.\n");
+        printf("ERROR: Is the raw1394 module loaded? Is your user in the 'disk' group?\n");
         printf("FAILURE.\n");
         return 1;
     }
-    printf("INFO: current generation number (driver): %d.\n", raw1394_get_generation(handle));
+    /*
+    *  If RAW1394DEV points to a non-existant or invalid device node, then it also attempts to open the default device node. 
+    */
+    printf("INFO: $RAW1394DEV=%s\n", getenv("RAW1394DEV"));
+    printf("INFO: Current generation number (driver): %d.\n", raw1394_get_generation(handle));
     raw1394_set_bus_reset_handler(handle, bus_reset_handler);
     fprintf(stdout, "INFO: using adapter %d.\n", adapter_number);
     if (raw1394_set_port(handle, adapter_number) < 0) 
