@@ -59,6 +59,7 @@ Bug fixes in milhouse:
     #463: samplerates != 48000 broken in 0.4.5 on receiver-side
     #350: add audio-buffer setting in scenic
     #393: replace GMainLoop instance with gtk_main and gtk_main_quit
+    #485: disable-jack-autoconnect doesnt work with localaudio
 
 Bug fixes in scenic : 
     #449: Scenic tells us often that the v4l2 device disappeared
