@@ -1,7 +1,9 @@
 <chapter id="contact-settings">
 <title>Contact Settings</title>
 
-<sect1><para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
+<sect1>
+<title> Adding and Deleting Contacts</title>
+<para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
    <orderedlist>
       <listitem>
          <para>Add a new contact: to add a connection, click +. To remove a connection, click -. </para>
