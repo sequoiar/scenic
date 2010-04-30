@@ -1,20 +1,15 @@
 <chapter id="audio-settings">
-<title>Audio Settings</title>
-<sect1>
-<title>Audio Input</title>
-</sect1>
-
-<sect1>
-<title>Audio Latency</title>
-</sect1>
-
-
-<sect1>
-<title>Audio Channel</title>
-</sect1>
-
-
-<sect1>
-<title>Audio Synchronization</title>
-</sect1>
+  <title>Audio Settings</title>
+  <sect1>
+    <title>Audio Input</title>
+  </sect1>
+  <sect1>
+    <title>Audio Latency</title>
+  </sect1>
+  <sect1>
+    <title>Audio Channel</title>
+  </sect1>
+  <sect1>
+    <title>Audio Synchronization</title>
+  </sect1>
 </chapter>
