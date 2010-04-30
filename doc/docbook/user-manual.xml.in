@@ -3,7 +3,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
    <!ENTITY legal SYSTEM "user/legal.xml">
-   <!ENTITY appversion "0.4.5">
+   <!ENTITY appversion "@PACKAGE_VERSION@">
    <!ENTITY manrevision "2.1">
    <!ENTITY date "April 2010">
    <!ENTITY app "<application>Scenic</application>">

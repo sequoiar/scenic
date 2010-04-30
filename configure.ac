@@ -230,6 +230,7 @@ doc/Makefile
 doc/docbook/Makefile
 doc/docbook/fig/Makefile
 doc/docbook/user/Makefile
+doc/docbook/user-manual.xml
 doc/docbook/installation/Makefile
 doc/docbook/installation-manual.xml
 man/Makefile
