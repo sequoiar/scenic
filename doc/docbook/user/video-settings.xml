@@ -1,5 +1,14 @@
 <chapter id="video-settings">
-<title>Video Settings</title>
+    <title>Video Settings</title>
+    <para>
+        This chapter describes how to setup your video settings in Scenic. How course, Scenic can transmit video to a remote peer. 
+    </para>
+    <para> 
+        Each peer configures its video capture size and chooses the right device. Some devices have have many input, such as S-Video, composite, etc. Next, when using analog capture device, the video standard can be PAL or NTSC. Finally, the aspect ratio can be 4:3 or 16:9, depending on if the image source provides square pixels or rectangle pixels. Commonly used values are 16:9 for 704x480 and 4:3 for 640x480
+    </para>
+    <para>
+        Scenic is designed so that configuring the video codec must be done by the receiver. This way, the receiver can fine tune the quality of the image it receives. Choose h.263 for low bandwidth or low CPU setup. Use Theora for a patent-free experience. Use MPEG4 for most situation. Use h.264 to use all the CPU power you have. On the receiver's side, the operator can also choose to display the window in full screen on a specific display. This is also where the user chooses the jitter buffer for the video stream. Increase it to prevent poor image quality in case of packets loss. Increasing the jitter buffer add mores latency, so it is better to have a sane network with close to no packets loss, instead of increasing this value.
+    </para>
 <sect1><title>
       <anchor id="SendingVideo"/>Sending Video</title><para>This part defines what you will send to your contact </para>
    <sect2>
@@ -8,14 +17,14 @@
    <para>The preview option will show you the video you are actually capturing, (The one you will send to the receiver) This enable you to validate that you are actually capturing a video feed. This is also use full to </para>
    </sect2>
    <sect2>
-   <title>
-      <anchor id="VideoSource"/>Video Source</title>
-   <para>Here you can choose witch video source you want to use to send. Color Bar </para>
+      <title> <anchor id="VideoSource"/>Video Source</title>
+      <para>Here you can choose witch video source you want to use to send. To make a color test, you can use the Color bars. </para>
    </sect2>
    <sect2>
-   <title>
-      <anchor id="VideoInput"/>Video Input</title>
-   <para>Ex: /dev/video0 </para>
+   <title><anchor id="VideoInput"/>Video Input</title>
+      <para>
+         
+      </para>
    </sect2>
    <sect2>
    <title>
@@ -135,23 +144,25 @@
    </informaltable>
    </sect2>
    <sect2>
-   <title>
-      <anchor id="Fullscreen"/>Fullscreen</title>
-   <para>You have an option to automatically pop-up the video display in fullscreen </para>
-   <para>Short key: </para>
-   <para>Press Esc or f to toggle on and off the full screen on your video output display. </para>
+      <title> <anchor id="Fullscreen"/>Fullscreen</title>
+      <para>
+        You have an option to automatically launch the receiver's window in fullscreen. Once the receiver's window is running, you can press the Escape (or F) key to toggle on and off the fullscreen mode. 
+      </para>
    </sect2>
    <sect2>
-   <title>
-      <anchor id="X11Display"/>X11 Display</title>
+      <title><anchor id="X11Display"/>X11 Display</title>
+      <para>
+        Useful to display the video on another monitor. 
+      </para>
    </sect2>
    <sect2>
-   <title>
-      <anchor id="Deinterlace"/>Deinterlace</title>
+   <title><anchor id="Deinterlace"/>Deinterlace</title>
+        <para>
+            Deinterlacing makes a nicer image when the source is analog, but it adds latency. You should never use it if the remote video source is a Web cam. 
+        </para>
    </sect2>
    <sect2>
-   <title>
-      <anchor id="JitterBuffer"/>Jitter Buffer</title>
+   <title> <anchor id="JitterBuffer"/>Jitter Buffer</title>
    <orderedlist>
       <listitem>
          <para>Video flexibility and format: flexible video streams (codec, size, datarate), h264, mpeg4, h263, theora in SD format </para>
@@ -193,5 +204,6 @@
          <para>Video display: Possibility to set on witch display the video is output </para>
       </listitem>
    </orderedlist>
-</sect2></sect1>
+    </sect2>
+</sect1>
 </chapter>
