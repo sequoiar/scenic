@@ -29,6 +29,7 @@
 #include "audioLevel.h"
 #include "audioSink.h"
 #include "jackUtils.h"
+#include "pipeline.h"
 
 static const int USEC_PER_MILLISEC = 1000;
 namespace po = boost::program_options;
@@ -83,6 +84,8 @@ unsigned long long AudioSourceConfig::bufferTime() const
 /// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 {
+    if (Jack::is_running())
+        pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
     if (source_ == "audiotestsrc")
         return new AudioTestSource(pipeline, *this);
     else if (source_ == "filesrc")
@@ -155,6 +158,8 @@ AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &op
     // (before waiting on caps) but having it here is pretty gross
     if (sink_ == "jackaudiosink")
         Jack::assertReady(pipeline);
+    else if (Jack::is_running())
+        pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
 }
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
