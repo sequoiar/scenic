@@ -1,285 +1,198 @@
 <chapter id="before-using-scenic">
-  <title>Before Using Scenic</title>
-  <sect1>
-    <title>Equipment list:</title>
-    <orderedlist>
+<title>Before Using Scenic</title>
+   <sect1>
+   <title>Equipment list:</title>
+   <orderedlist>
       <listitem>
-        <para>1 x PC Intel QuadCore 2.4 GHz 4 GB RAM, 2 PCI slots,
-        Ubuntu Linux Desktop i386 8.04.</para>
+         <para>1 x PC Intel QuadCore 2.4 GHz 4 GB RAM, 2 PCI slots, Ubuntu Linux Desktop i386 8.04.</para>
       </listitem>
       <listitem>
-        <para>1 x video capture card supported under Linux.</para>
+         <para>1 x video capture card supported under Linux.</para>
       </listitem>
       <listitem>
-        <para>1 x sound card</para>
+         <para>1 x sound card</para>
       </listitem>
       <listitem>
-        <para>1(+) video camera(s) with A/V output.</para>
+         <para>1(+) video camera(s) with A/V output. </para>
       </listitem>
       <listitem>
-        <para>1(+) set(s) of headphones.</para>
+         <para>1(+) set(s) of headphones. </para>
       </listitem>
       <listitem>
-        <para>1(+) microphone(s).</para>
+         <para>1(+) microphone(s). </para>
       </listitem>
       <listitem>
-        <para>1 x audio mixer with at least two audio subgroups, so
-        you can have one mix for local output and one mix to
-        send.</para>
+         <para>1 x audio mixer with at least two audio subgroups, so you can have one mix for local output and one mix to send. </para>
       </listitem>
       <listitem>
-        <para>Ethernet connector (10/100).</para>
+         <para>Ethernet connector (10/100). </para>
       </listitem>
       <listitem>
-        <para>Network connection devices (hub, firewall,
-        etc...).</para>
+         <para>Network connection devices (hub, firewall, etc...). </para>
       </listitem>
-    </orderedlist>
-  </sect1>
-  <sect1>
-    <title>Standalone Setup:</title>
-    <para>Here is a view of a standalone setup.</para>
-    <para>
+   </orderedlist>
+   </sect1>
+   <sect1>
+   <title>Standalone Setup:</title>
+   <para>Here is a view of a standalone setup. </para>
+   <para>
       <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/hardware_setup_01.jpg"
-      width="11.925cm" depth="15.417cm" />
-    </para>
-  </sect1>
-  <sect1>
-    <title>Point to point setup</title>
-    <para>This kind of setup refer to the communication between two
-    Scenic system, both connected on a research/high-bandwidth
-    setup.</para>
-  </sect1>
-  <sect1>
-    <title>Unidirectional setup</title>
-    <para>
+                     width="11.925cm"
+                     depth="15.417cm"/> 
+   </para>
+   </sect1>
+   <sect1>
+   <title>Point to point setup</title>
+   <para>This kind of setup refer to the communication between two Scenic system, both connected on a research/high-bandwidth setup. </para>
+   </sect1>
+   <sect1>
+   <title>Unidirectional setup</title>
+   <para>
       <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/unidirectional_setup.png"
-      width="20.788cm" depth="14.729cm" />
-    </para>
-  </sect1>
-  <sect1>
-    <title>Bidirectional setup</title>
-    <para>Two groups of performance artists located in two separate
-    venues interact directly with each other using live audio and
-    video transmission. The performance in Room 1 is captured
-    through cameras and microphones and sent to be broadcast in
-    Room 2 and vice versa.</para>
-    <para>
+                     width="20.788cm"
+                     depth="14.729cm"/> 
+   </para>
+   </sect1>
+   <sect1>
+   <title>Bidirectional setup</title>
+   <para>Two groups of performance artists located in two separate venues interact directly with each other using live audio and video transmission. The performance in Room 1 is captured through cameras and microphones and sent to be broadcast in Room 2 and vice versa. </para>
+   <para>
       <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/bidirectional_setup.png"
-      width="19.598cm" depth="13.883cm" />
-    </para>
-  </sect1>
-  <sect1>
-    <title>Peripheral Connection</title>
-    <para />
-    <sect1 id="ctxtnav">
-      <para />
-    </sect1>
-    <sect1 id="content">
-      <title>
-      <anchor id="Scenicdependsonmanyperipherals" />Scenic depends
-      on many peripherals</title>
-      <para>It is really important to verify that you have
-      peripheral that are supported by Scenic. For this refer to
-      our 
-      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
-      Hardware Requirements</ulink>page.</para>
-      <para>Is is also necessary to ascertain that all peripheral
-      are properly configure and connected.</para>
-      <para>Here is an overview of the various peripheral used in a
-      Scenic setup and what is important to</para>
-      <title>
-      <anchor id="Audioinput" />Audio input</title>
-      <para>The usual audio input is a microphone. This microphone
-      is then connected in the input of an audio mixer and then to
-      a sound card. This Sound card is then connected to the
-      computer.</para>
-      <title>
-      <anchor id="Audiooutput" />Audio output</title>
-      <para>The usual direct audio output is speakers or
-      headphones.</para>
-      <title>
-      <anchor id="VideoInput" />Video Input</title>
-      <para>The usual direct video input is a video camera.</para>
-      <title>
-      <anchor id="VideoOutput" />Video Output</title>
-      <para>The usual direct video output is a projection screen
-      and an control monitor.</para>
-      <title>
-      <anchor id="Mouse" />Mouse</title>
-      <title>
-      <anchor id="Keyboard" />Keyboard</title>
-    </sect1>
-    <sect1>
-      <title>
-      <anchor id="Scenicdependsonmanyperipherals" />Scenic depends
-      on many peripherals</title>
-      <para>It is really important to verify that you have
-      peripheral that are supported by Scenic. For this refer to
-      our 
-      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
-      Hardware Requirements</ulink>page.</para>
-      <para>Is is also necessary to ascertain that all peripheral
-      are properly configure and connected.</para>
-      <para>Here is an overview of the various peripheral used in a
-      Scenic setup and what is important to</para>
-      <sect2>
-        <title>
-        <anchor id="Audioinput" />Audio input</title>
-        <para>The usual audio input is a microphone. This
-        microphone is then connected in the input of an audio mixer
-        and then to a sound card. This Sound card is then connected
-        to the computer.</para>
-      </sect2>
-      <sect2>
-        <title>
-        <anchor id="Audiooutput" />Audio output</title>
-        <para>The usual direct audio output is speakers or
-        headphones.</para>
-      </sect2>
-      <sect2>
-        <title>
-        <anchor id="VideoInput" />Video Input</title>
-        <para>The usual direct video input is a video
-        camera.</para>
-      </sect2>
-      <sect2>
-        <title>
-        <anchor id="VideoOutput" />Video Output</title>
-        <para>The usual direct video output is a projection screen
-        and an control monitor.</para>
-      </sect2>
-      <sect2>
-        <title>
-        <anchor id="Mouse" />Mouse</title>
-      </sect2>
-      <sect2>
-        <title>
-        <anchor id="Keyboard" />Keyboard</title>
-        <para />
-      </sect2>
-    </sect1>
-  </sect1>
-  <sect1>
-    <title>Starting the computer and its peripheral</title>
-    <para>With audio and video systems, the order used to powering
-    up all device is really important.</para>
-    <orderedlist>
+                     width="19.598cm"
+                     depth="13.883cm"/> 
+   </para></sect1>
+
+   <sect1>
+   <title>Peripheral Connection</title>
+   <para/><sect1 id="ctxtnav"><para/></sect1><sect1 id="content"><title>
+      <anchor id="Scenicdependsonmanyperipherals"/>Scenic depends on many peripherals</title>
+   <para>It is really important to verify that you have peripheral that are supported by Scenic. For this refer to our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">Hardware Requirements</ulink> page. </para>
+   <para>Is is also necessary to ascertain that all peripheral are properly configure and connected. </para>
+   <para>Here is an overview of the various peripheral used in a Scenic setup and what is important to </para>
+   <title>
+      <anchor id="Audioinput"/>Audio input</title>
+   <para>The usual audio input is a microphone. This microphone is then connected in the input of an audio mixer and then to a sound card. This Sound card is then connected to the computer. </para>
+   <title>
+      <anchor id="Audiooutput"/>Audio output</title>
+   <para>The usual direct audio output is speakers or headphones. </para>
+   <title>
+      <anchor id="VideoInput"/>Video Input</title>
+   <para>The usual direct video input is a video camera. </para>
+   <title>
+      <anchor id="VideoOutput"/>Video Output</title>
+   <para>The usual direct video output is a projection screen and an control monitor. </para>
+   <title>
+      <anchor id="Mouse"/>Mouse</title>
+   <title>
+      <anchor id="Keyboard"/>Keyboard</title></sect1><sect1><title>
+      <anchor id="Scenicdependsonmanyperipherals"/>Scenic depends on many peripherals</title>
+   <para>It is really important to verify that you have peripheral that are supported by Scenic. For this refer to our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">Hardware Requirements</ulink> page. </para>
+   <para>Is is also necessary to ascertain that all peripheral are properly configure and connected. </para>
+   <para>Here is an overview of the various peripheral used in a Scenic setup and what is important to </para><sect2><title>
+      <anchor id="Audioinput"/>Audio input</title>
+   <para>The usual audio input is a microphone. This microphone is then connected in the input of an audio mixer and then to a sound card. This Sound card is then connected to the computer. </para></sect2><sect2><title>
+      <anchor id="Audiooutput"/>Audio output</title>
+   <para>The usual direct audio output is speakers or headphones. </para></sect2><sect2><title>
+      <anchor id="VideoInput"/>Video Input</title>
+   <para>The usual direct video input is a video camera. </para></sect2><sect2><title>
+      <anchor id="VideoOutput"/>Video Output</title>
+   <para>The usual direct video output is a projection screen and an control monitor. </para></sect2><sect2><title>
+      <anchor id="Mouse"/>Mouse</title></sect2><sect2><title>
+      <anchor id="Keyboard"/>Keyboard</title>
+   <para/></sect2></sect1>
+
+   </sect1>
+   <sect1>
+   <title>Starting the computer and its peripheral</title>
+   <para>With audio and video systems, the order used to powering up all device is really important. </para>
+   <orderedlist>
       <listitem>
-        <para>Connect only, the mouse, keyboard and control
-        monitor.</para>
+         <para>Connect only, the mouse, keyboard and control monitor. </para>
       </listitem>
       <listitem>
-        <para>Connect the network cable on the network
-        interface</para>
+         <para>Connect the network cable on the network interface </para>
       </listitem>
       <listitem>
-        <para>Verify that you have sufficient power to supply your
-        hardware. We strongly recommend the use of an UPS to
-        regulate your power.</para>
+         <para>Verify that you have sufficient power to supply your hardware. We strongly recommend the use of an UPS to regulate your power. </para>
       </listitem>
       <listitem>
-        <para>Power up the computer.</para>
+         <para>Power up the computer. </para>
       </listitem>
       <listitem>
-        <para>Verify that you log in the appropriate
-        session.</para>
+         <para>Verify that you log in the appropriate session. </para>
       </listitem>
       <listitem>
-        <para>Configure your network: 
-        <ulink url="https://help.ubuntu.com/community/NetworkAdmin">
-        https://help.ubuntu.com/community/NetworkAdmin</ulink></para>
+         <para>Configure your network: <ulink url="https://help.ubuntu.com/community/NetworkAdmin">https://help.ubuntu.com/community/NetworkAdmin</ulink> 
+         </para>
       </listitem>
       <listitem>
-        <para>Verify that your ip address is functional: In a
-        terminal</para>
-        <para>ifconfig</para>
+         <para>Verify that your ip address is functional: In a terminal </para>
+         <para>ifconfig</para>
       </listitem>
       <listitem>
-        <para>You should see your address in the second line of
-        your connected network interface:</para>
-        <para>eth0 &#160; &#160; &#160;Link encap:Ethernet
-        &#160;HWaddr 00:30:1b:b4:af:a1 &#160;</para>
-        <para>&#160; &#160; &#160; &#160; &#160; inet addr:
-        192.168.0.100 Bcast:192.168.0.255
-        &#160;Mask:255.255.255.0</para>
+         <para>You should see your address in the second line of your connected network interface: </para>
+         <para>eth0      Link encap:Ethernet  HWaddr 00:30:1b:b4:af:a1  </para>
+         <para>          inet addr: 192.168.0.100 Bcast:192.168.0.255  Mask:255.255.255.0</para>
       </listitem>
-    </orderedlist>
-    <para>
+   </orderedlist>
+   <para>
       <inlinegraphic fileref="http://svn.sat.qc.ca/trac/scenic/raw-attachment/wiki/ImageSource/Connection_information1.png"
-      width="7.797cm" depth="4.517cm" />
-    </para>
-    <para>
+                     width="7.797cm"
+                     depth="4.517cm"/> 
+   </para>
+   <para>
       <inlinegraphic fileref="http://svn.sat.qc.ca/trac/scenic/raw-attachment/wiki/ImageSource/Connection_Information2.png"
-      width="8.829cm" depth="9.782cm" />
-    </para>
-    <orderedlist>
+                     width="8.829cm"
+                     depth="9.782cm"/> 
+   </para>
+   <orderedlist>
       <listitem>
-        <para>Then use ping</para>
-        <para>ping www.google.com</para>
+         <para>Then use ping </para>
+         <para>ping www.google.com</para>
       </listitem>
       <listitem>
-        <para>You should see something like this:</para>
-        <para>PING www.l.google.com (74.125.93.104) 56(84) bytes of
-        data.</para>
-        <para>64 bytes from qw-in-f104.google.com (74.125.93.104):
-        icmp_seq=1 ttl=239 time=36.2 ms</para>
-        <para>64 bytes from qw-in-f104.google.com (74.125.93.104):
-        icmp_seq=2 ttl=239 time=37.3 ms</para>
-        <para>64 bytes from qw-in-f104.google.com (74.125.93.104):
-        icmp_seq=3 ttl=239 time=36.4 ms</para>
-        <para>64 bytes from qw-in-f104.google.com (74.125.93.104):
-        icmp_seq=4 ttl=239 time=36.1 ms</para>
-        <para>--- www.l.google.com ping statistics ---</para>
-        <para>4 packets transmitted, 4 received, 0% packet loss,
-        time 3003ms</para>
-        <para>rtt min/avg/max/mdev = 36.174/36.557/37.322/0.494
-        ms</para>
+         <para>You should see something like this: </para>
+         <para>PING www.l.google.com (74.125.93.104) 56(84) bytes of data.</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=1 ttl=239 time=36.2 ms</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=2 ttl=239 time=37.3 ms</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=3 ttl=239 time=36.4 ms</para>
+         <para>64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=4 ttl=239 time=36.1 ms</para>
+         <para>--- www.l.google.com ping statistics ---</para>
+         <para>4 packets transmitted, 4 received, 0% packet loss, time 3003ms</para>
+         <para>rtt min/avg/max/mdev = 36.174/36.557/37.322/0.494 ms</para>
       </listitem>
       <listitem>
-        <para>Open a terminal
-        /Application/Accessories/Terminal</para>
+         <para>Open a terminal /Application/Accessories/Terminal </para>
       </listitem>
       <listitem>
-        <para>Verify that you are on the realtime kernel:</para>
+         <para>Verify that you are on the realtime kernel: </para>
       </listitem>
       <listitem>
-        <para>Type in a terminal</para>
-        <para>uname -r</para>
+         <para>Type in a terminal </para>
+         <para>uname -r</para>
       </listitem>
       <listitem>
-        <para>You should see the -rt extension: 2.6.24-26-rt If
-        not, you have to restart the computer. At the beginning of
-        the reboot, you will see a grub window, press ESC and then
-        select the kernel with the -rt extension.</para>
+         <para>You should see the -rt extension: 2.6.24-26-rt If not, you have to restart the computer. At the beginning of the reboot, you will see a grub window, press ESC and then select the kernel with the -rt extension. </para>
       </listitem>
       <listitem>
-        <para>Now you can close the computer.</para>
+         <para>Now you can close the computer. </para>
       </listitem>
       <listitem>
-        <para>Connect all the audio and video device following our 
-        <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">
-        Hardware Setup</ulink>page.</para>
+         <para>Connect all the audio and video device following our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">Hardware Setup</ulink> page. </para>
       </listitem>
       <listitem>
-        <para>While connecting the device, be aware that if you
-        have two video output, you need to connect both of the
-        output before powering up the computer again so that both
-        devices are detected.</para>
+         <para>While connecting the device, be aware that if you have two video output, you need to connect both of the output before powering up the computer again so that both devices are detected. </para>
       </listitem>
       <listitem>
-        <para>Next, configure and test your audio and video
-        following our 
-        <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
-        TestAudiovisualInputOutput</ulink>page.</para>
+         <para>Next, configure and test your audio and video following our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">TestAudiovisualInputOutput</ulink> page. </para>
       </listitem>
-    </orderedlist>
-    <para />
-  </sect1>
-  <sect1>
-    <title>Testing devices</title>
-  </sect1>
-  <sect1>
-    <title>Starting Scenic</title>
-  </sect1>
+   </orderedlist>
+   <para/>
+   </sect1>
+   <sect1>
+   <title>Testing devices</title>
+   </sect1>
+   <sect1>
+   <title>Starting Scenic</title>
+   </sect1>
 </chapter>

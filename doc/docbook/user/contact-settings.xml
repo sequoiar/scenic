@@ -1,47 +1,39 @@
 <chapter id="contact-settings">
-  <title>Contact Settings</title>
-  <sect1>
-    <title>Adding and Deleting Contacts</title>
-    <para>This section of the interface allows users to add, remove
-    and configure contacts. You need to create a contact on both
-    machine, remote and local.</para>
-    <orderedlist>
+<title>Contact Settings</title>
+
+<sect1>
+<title> Adding and Deleting Contacts</title>
+<para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
+   <orderedlist>
       <listitem>
-        <para>Add a new contact: to add a connection, click +. To
-        remove a connection, click -.</para>
+         <para>Add a new contact: to add a connection, click +. To remove a connection, click -. </para>
       </listitem>
-    </orderedlist>
-    <para>
+   </orderedlist>
+   <para>
       <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/AddContact.png"
-      width="17.217cm" depth="13.539cm" />
-    </para>
-    <para>Now a pop-up window will appear with the appropriate
-    contact field:</para>
-    <para>
+                     width="17.217cm"
+                     depth="13.539cm"/> 
+   </para>
+   <para>Now a pop-up window will appear with the appropriate contact field: </para>
+   <para>
       <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/ContactPopup.png"
-      width="2.068cm" depth="1.07cm" />
-    </para>
-    <orderedlist>
+                     width="2.068cm"
+                     depth="1.07cm"/> 
+   </para>
+   <orderedlist>
       <listitem>
-        <para>Name: insert the name of your contact in the field
-        Name:.</para>
+         <para>Name: insert the name of your contact in the field Name:. </para>
       </listitem>
-    </orderedlist>
-    <orderedlist>
+   </orderedlist>
+   <orderedlist>
       <listitem>
-        <para>Address: insert the contact's IP address in the field
-        IP Address:.</para>
+         <para>Address: insert the contact's IP address in the field IP Address:. </para>
       </listitem>
-    </orderedlist>
-    <orderedlist>
+   </orderedlist>
+   <orderedlist>
       <listitem>
-        <para>Auto Accept: check this option if you want the remote
-        user to connect without requiring authentication each
-        time.</para>
+         <para>Auto Accept: check this option if you want the remote user to connect without requiring authentication each time. </para>
       </listitem>
-    </orderedlist>
-    <para>On the contact window, you can see a summary of the
-    current settings for this particular contact.</para>
-  </sect1>
-  <para />
+   </orderedlist>
+   <para>On the contact window, you can see a summary of the current settings for this particular contact. </para></sect1><para/>
 </chapter>
