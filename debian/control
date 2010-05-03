@@ -2,19 +2,19 @@ Source: scenic
 Section: python
 Priority: optional
 Maintainer: Alexandre Quessy <alexandre@quessy.net>
-Build-Depends:, cdbs, debhelper, (>= 5.0.38), python, (>= 2.4), python-twisted, python-gtk2, help2man, automake, build-essential, libtool, libgtk2.0-dev, lbjack-dev, python-dev, lame, gettext, bison, flex, x264, vorbis-tools, ffmpeg, doxygen, python-twisted, python-simplejson, libbz2-dev, liboil0.3-dev, libglew1.5-dev, libx264-dev, libxv-dev, libiec61883-dev, libvorbis-dev, libasound2-dev, libpulse-dev, libdv4-dev, libid3tag0-dev, libmad0-dev, python-gtk2-dev, libxml2-dev, libtheora-dev, libmp3lame-dev, libboost-dev, libboost-thread-dev, libboost-system-dev, libboost-program-options-dev, libasio-dev, libboost-iostreams-dev, libboost-filesystem-dev, libglu1-mesa-dev, libavc1394-dev, libraw1394-dev
+Build-Depends:, cdbs, debhelper, (>= 5.0.38), python, (>= 2.4), python-twisted, python-gtk2, help2man, automake, build-essential, libtool, libgtk2.0-dev, lbjack-dev, python-dev, lame, gettext, bison, flex, x264, vorbis-tools, ffmpeg, doxygen, python-twisted, python-simplejson, libbz2-dev, liboil0.3-dev, libglew1.5-dev, libx264-dev, libxv-dev, libiec61883-dev, libvorbis-dev, libasound2-dev, libpulse-dev, libdv4-dev, libid3tag0-dev, libmad0-dev, python-gtk2-dev, libxml2-dev, libtheora-dev, libmp3lame-dev, libboost-dev, libboost-thread-dev, libboost-system-dev, libboost-program-options-dev, libasio-dev, libboost-iostreams-dev, libboost-filesystem-dev, libglu1-mesa-dev, libavc1394-dev, libraw1394-dev, libgstreamer0.10-dev (>= 0.10.23), gstreamer0.10-plugins-good, gstreamer0.10-plugins-ugly (>= 0.10.14), python-gst0.10 (>= 0.10.17), libdc1394-22-dev
 
 XS-Python-Version: >= 2.4
 Standards-Version: 3.8.0
 Homepage: http://scenic.sat.qc.ca/
-
 Package: scenic
 Architecture: all
 XB-Python-Version: ${python:Versions}
-Depends: ${misc:Depends}, python (>= 2.4), python-twisted, python-gtk2, python-twisted, python-simplejson, jackd, lame, gettext, bison, flex, x264, vorbis-tools, ffmpeg, doxygen, libbz2, liboil0.3, libglew1.5, libx264, libxv, libiec61883, libvorbis, libasound2, libpulse, libdv4, libid3tag0, libmad0, python-gtk2, libxml2, libtheora, libmp3lame, libboost, libboost-thread, libboost-system, libboost-program-options, libasio, libboost-iostreams, libboost-filesystem, libglu1-mesa, libavc1394, libraw1394
+Depends: ${misc:Depends}, python (>= 2.4), python-twisted, python-gtk2, python-twisted, python-simplejson, jackd, lame, gettext, bison, flex, x264, vorbis-tools, ffmpeg, doxygen, libbz2, liboil0.3, libglew1.5, libx264, libxv, libiec61883, libvorbis, libasound2, libpulse, libdv4, libid3tag0, libmad0, python-gtk2, libxml2, libtheora, libmp3lame, libboost, libboost-thread, libboost-system, libboost-program-options, libasio, libboost-iostreams, libboost-filesystem, libglu1-mesa, libavc1394, libraw1394, libgstreamer0.10-0 (>= 0.10.23), gstreamer0.10-plugins-good, gstreamer0.10-plugins-ugly (>= 0.10.14), python-gst0.10 (>= 0.10.17), libdc1394-22
+
 Suggests: python-portmidi, qjackctl, linux-rt, linux-headers-rt
 Description: High-quality audio/video streaming for live performances.
  .
- Scenic  is  software  suite for transmission and reception of your fine
- audio-visual content. It is an interface to the  milhouse  command-line
+ Scenic is software suite for transmission and reception of your fine
+ audio-visual content. It is an interface to the milhouse command-line
  Gstreamer-based software.
