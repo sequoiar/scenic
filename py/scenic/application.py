@@ -199,6 +199,7 @@ class Application(object):
         self.recv_video_port = None
         self.recv_audio_port = None
         self.recv_midi_port = None
+        self._midi_is_supported = True
         self.remote_config = {} # dict
         self.ports_allocator = ports.PortsAllocator()
         self.address_book = saving.AddressBook()
@@ -236,6 +237,9 @@ class Application(object):
         @rtype: str
         """
         return _format_device_name_and_identifier(midi_device_dict["name"], str(midi_device_dict["number"]))
+
+    def midi_is_supported(self):
+        return self._midi_is_supported
     
     def on_connection_error(self, err, mess):
         """
@@ -303,6 +307,13 @@ class Application(object):
         """
         reactor.addSystemEventTrigger("before", "shutdown", self.before_shutdown)
         try:
+            import pypm
+        except ImportError:
+            log.warning("MIDI support has not been found. You should install python-portmidi for MIDI support.")
+            self._midi_is_supported = False
+        else:
+            log.info("MIDI support has been detected. Using PyPortMidi version %s" % (pypm.__version__))
+        try:
             self.server.start_listening()
         except error.CannotListenError, e:
             def _cb(result):
@@ -361,22 +372,25 @@ class Application(object):
         Called once at startup, and then the GUI can call it.
         @rtype: L{Deferred}
         """
-        deferred = midi.list_midi_devices()
-        def _callback(midi_devices):
-            input_devices = []
-            output_devices = []
-            for device in midi_devices:
-                if device["is_input"]:
-                    input_devices.append(device)
-                else:
-                    output_devices.append(device)
-            self.devices["midi_input_devices"] = input_devices
-            self.devices["midi_output_devices"] = output_devices
-            log.debug("MIDI inputs: %s" % (input_devices))
-            log.debug("MIDI outputs: %s" % (output_devices))
-            self.gui.update_midi_devices()
-        deferred.addCallback(_callback)
-        return deferred
+        if self._midi_is_supported:
+            deferred = midi.list_midi_devices()
+            def _callback(midi_devices):
+                input_devices = []
+                output_devices = []
+                for device in midi_devices:
+                    if device["is_input"]:
+                        input_devices.append(device)
+                    else:
+                        output_devices.append(device)
+                self.devices["midi_input_devices"] = input_devices
+                self.devices["midi_output_devices"] = output_devices
+                log.debug("MIDI inputs: %s" % (input_devices))
+                log.debug("MIDI outputs: %s" % (output_devices))
+                self.gui.update_midi_devices()
+            deferred.addCallback(_callback)
+            return deferred
+        else:
+            return defer.succeed(None)
 
     def poll_x11_devices(self):
         """

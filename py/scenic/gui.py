@@ -785,11 +785,16 @@ class Gui(object):
         _set_config("audio_jack_enable_autoconnect", self.audio_jack_enable_autoconnect_widget.get_active())
         
         # MIDI:
-        _set_config("midi_send_enabled", self.midi_send_enabled_widget.get_active())
-        _set_config("midi_recv_enabled", self.midi_recv_enabled_widget.get_active())
-        _set_config("midi_input_device", _get_combobox_value(self.midi_input_device_widget))
-        _set_config("midi_output_device", _get_combobox_value(self.midi_output_device_widget))
-        _set_config("midi_jitterbuffer", self.midi_jitterbuffer_widget.get_value_as_int())
+        if not self.app.midi_is_supported():
+            log.info("MIDI is not supported, since python-portmidi is not found.")
+            _set_config("midi_send_enabled", False)
+            _set_config("midi_recv_enabled", False)
+        else:
+            _set_config("midi_send_enabled", self.midi_send_enabled_widget.get_active())
+            _set_config("midi_recv_enabled", self.midi_recv_enabled_widget.get_active())
+            _set_config("midi_input_device", _get_combobox_value(self.midi_input_device_widget))
+            _set_config("midi_output_device", _get_combobox_value(self.midi_output_device_widget))
+            _set_config("midi_jitterbuffer", self.midi_jitterbuffer_widget.get_value_as_int())
         
     def update_widgets_with_saved_config(self):
         """
@@ -865,16 +870,21 @@ class Gui(object):
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
         log.debug(" * audio_codec: %s" % (audio_codec))
         _set_combobox_value(self.audio_codec_widget, audio_codec)
+        self.make_audio_jitterbuffer_enabled_or_not()
         
         # MIDI:
         log.debug("MIDI jitterbuffer: %s" % (self.app.config.midi_jitterbuffer))
-        self.midi_send_enabled_widget.set_active(_get_config("midi_send_enabled"))
-        self.midi_recv_enabled_widget.set_active(_get_config("midi_recv_enabled"))
-        _set_combobox_value(self.midi_input_device_widget, _get_config("midi_input_device"))
-        _set_combobox_value(self.midi_output_device_widget, _get_config("midi_output_device"))
+        if self.app.midi_is_supported():
+            self.midi_send_enabled_widget.set_active(_get_config("midi_send_enabled"))
+            self.midi_recv_enabled_widget.set_active(_get_config("midi_recv_enabled"))
+            _set_combobox_value(self.midi_input_device_widget, _get_config("midi_input_device"))
+            _set_combobox_value(self.midi_output_device_widget, _get_config("midi_output_device"))
+            self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
+        else:
+            self.midi_send_enabled_widget.set_active(False)
+            self.midi_recv_enabled_widget.set_active(False)
         self.make_midi_widget_sensitive_or_not()
-        self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
-        self.make_audio_jitterbuffer_enabled_or_not()
+            
 
         # IMPORTANT: (to be done last)
         self._widgets_changed_by_user = True
@@ -1002,19 +1012,26 @@ class Gui(object):
     def make_midi_widget_sensitive_or_not(self):
         # make the MIDI widget insensitive if disabled
         log.debug("make_midi_widget_sensitive_or_not")
-        is_streaming = self.app.has_session()
-        if not is_streaming:
-            if not self.app.config.midi_send_enabled:
-                self.midi_input_device_widget.set_sensitive(False)
-            else:
-                self.midi_input_device_widget.set_sensitive(True)
-                
-            if not self.app.config.midi_recv_enabled:
-                self.midi_output_device_widget.set_sensitive(False)
-                self.midi_jitterbuffer_widget.set_sensitive(False)
-            else:
-                self.midi_output_device_widget.set_sensitive(True)
-                self.midi_jitterbuffer_widget.set_sensitive(True)
+        if self.app.midi_is_supported():
+            is_streaming = self.app.has_session()
+            if not is_streaming:
+                if not self.app.config.midi_send_enabled:
+                    self.midi_input_device_widget.set_sensitive(False)
+                else:
+                    self.midi_input_device_widget.set_sensitive(True)
+                    
+                if not self.app.config.midi_recv_enabled:
+                    self.midi_output_device_widget.set_sensitive(False)
+                    self.midi_jitterbuffer_widget.set_sensitive(False)
+                else:
+                    self.midi_output_device_widget.set_sensitive(True)
+                    self.midi_jitterbuffer_widget.set_sensitive(True)
+        else:
+            self.midi_recv_enabled_widget.set_sensitive(False)
+            self.midi_send_enabled_widget.set_sensitive(False)
+            self.midi_input_device_widget.set_sensitive(False)
+            self.midi_output_device_widget.set_sensitive(False)
+            self.midi_jitterbuffer_widget.set_sensitive(False)
 
     def on_midi_send_enabled_toggled(self, *args):
         if self._widgets_changed_by_user:
