@@ -32,7 +32,7 @@ try:
     from rtpmidi.protocols.rtp.rtp_control import RTPControl
     from rtpmidi import utils
 except ImportError, e:
-    print "Import error %s" % (str(e))
+    # print "Import error %s" % (str(e))
     imported_midi = False
 else:
     imported_midi = True

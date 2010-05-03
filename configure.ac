@@ -151,7 +151,8 @@ fi
 
 AX_PYTHON_MODULE([pypm], [])
 AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
-        [AC_MSG_ERROR([Requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home])])
+    [AC_MSG_WARN([Requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home])])
+    # We install midistream anyways, but the MIDI support is checked by Scenic and will be disabled if pypm if not found at runtime.
 
 AX_PYTHON_MODULE([twisted], [Fatal])
 AX_PYTHON_MODULE([gtk], [Fatal])
