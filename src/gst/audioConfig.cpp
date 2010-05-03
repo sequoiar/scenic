@@ -66,10 +66,7 @@ static int maxRawChannels()
     GstPad *srcPad = gst_element_get_static_pad(element, "src");
     GstCaps *srcCaps;
     while ((srcCaps = gst_pad_get_negotiated_caps(srcPad)) == NULL)
-    {
         LOG_DEBUG("not ready\n");
-        g_usleep(1000);
-    }
     GstStructure *structure = gst_caps_get_structure(srcCaps, 0);
     gint result;
     if (not gst_structure_has_field(structure, "channel-positions"))
