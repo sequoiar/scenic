@@ -1,6 +1,6 @@
 <chapter lang=""><sect1><title>
       <anchor id="PacketLoss"/>Packet Loss</title>
-   <para>Packet loss occurs when one or more packets of data traveling across a network fail to reach their destination. Packet loss have maybe the greatest impact on the quality of a Scenic session. when a packet is lost, this mean that the receptor will not have this data. The effect is easily perceptible. </para>
-   <para>Effect of packet loss on audio signal. Noise in the sound: Metallic sound effect, tics and pops. Loss of part of the audio signal, like when loosing your signal using a cell phone. </para>
-   <para>Effect of packet loss on video signal Drop Frame. Pixel </para>
+   <para>Packet loss occurs when one or more packets of data traveling across a network fails to reach their destination. Packet loss has arguably the greatest impact on the quality of a Scenic session. When a packet is lost, this means that the recepient will not have this data. The effect is easily perceptible. </para>
+   <para>Effects of packet loss on audio signal. Distortions in the sound: Metallic sound effect, tics and pops. Loss of part of the audio signal, not unlike losing your signal while using a cell phone. </para>
+   <para>Effects of packet loss on video signal include dropped frames, missing pixels and other artifacts. </para>
    <para/></sect1></chapter>
