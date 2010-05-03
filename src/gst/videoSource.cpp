@@ -240,6 +240,9 @@ std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
         << ", framerate="
         << capsSuffix;
     LOG_DEBUG("V4l2src caps are " << capsStr.str());
+    ret = gst_element_set_state(source_, GST_STATE_NULL);
+    if (ret not_eq GST_STATE_CHANGE_SUCCESS)
+        THROW_ERROR("Could not change v4l2src state to NULL");
 
     return capsStr.str();
 }

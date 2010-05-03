@@ -52,13 +52,49 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
                 lexical_cast<string>(numChannels_));
 }
 
+static int maxRawChannels()
+{
+    if (not Jack::is_running())
+    {
+        LOG_WARNING("Jack is not running");
+        return INT_MAX;
+    }
+
+    GstElement *fakePipeline = gst_parse_launch("jackaudiosrc connect=0 name=fakejackaudiosrc ! fakesink silent=true", 0);
+    gst_element_set_state(fakePipeline, GST_STATE_PAUSED);
+    GstElement *element = gst_bin_get_by_name(GST_BIN(fakePipeline), "fakejackaudiosrc");
+    GstPad *srcPad = gst_element_get_static_pad(element, "src");
+    GstCaps *srcCaps;
+    while ((srcCaps = gst_pad_get_negotiated_caps(srcPad)) == NULL)
+    {
+        LOG_DEBUG("not ready\n");
+        g_usleep(1000);
+    }
+    GstStructure *structure = gst_caps_get_structure(srcCaps, 0);
+    gint result;
+    if (not gst_structure_has_field(structure, "channel-positions"))
+    {
+        result = 8;
+        LOG_DEBUG("jackaudiosrc does not set channel-positions, so the maximum number of channels we can send is " << result);
+    }
+    else
+    {
+        result = INT_MAX;
+        LOG_DEBUG("jackaudiosrc sets channel-positions, so the maximum number of channels we can send is " << result);
+    }
+
+    gst_caps_unref(srcCaps);
+    gst_object_unref(srcPad);
+    return result;
+}
+
 int AudioSourceConfig::maxChannels(const std::string &codec)
 {
     int result;
     if (codec == "mp3")
         result = 2;
     else if (codec == "raw")
-        result = INT_MAX;
+        result = maxRawChannels();
     else if (codec == "vorbis")
         result = 256;
     else

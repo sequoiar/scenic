@@ -211,11 +211,6 @@ short Milhouse::run(int argc, char **argv)
         return VideoSourceConfig::listV4lDevices();
     else if (options["list-cameras"].as<bool>())
         return VideoSourceConfig::listCameras();
-    else if (options["max-channels"].as<bool>())
-    { 
-        audiofactory::printMaxChannels(options["audiocodec"].as<std::string>());
-        return 0;
-    }
     else if (options.count("v4l2-standard"))
     {
         VideoSourceConfig::setStandard(options["videodevice"].as<std::string>(), options["v4l2-standard"].as<std::string>());
@@ -229,6 +224,12 @@ short Milhouse::run(int argc, char **argv)
 
     // wrapper so main doesn't need to know about gst and gtk
     gutil::init_gst_gtk(argc, argv);
+
+    if (options["max-channels"].as<bool>())
+    { 
+        audiofactory::printMaxChannels(options["audiocodec"].as<std::string>());
+        return 0;
+    }
 
     bool enableLocalVideo = options["localvideo"].as<bool>();
     bool enableLocalAudio = options["localaudio"].as<bool>();
