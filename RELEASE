@@ -31,10 +31,11 @@ This release is an other unstable version in the 0.5 series. This version contai
 New features and bug fixes in 0.5.2:
 
 New features in milhouse:
-    #474 Add the --verbose option to scenic
+    #197 Audio sync with sharedVideoBuffer
 
 New features in scenic:
-    #197 Audio sync with sharedVideoBuffer
+    #474 Add the --verbose option to scenic
+    #490 Make python-portmidi not mandatory
 
 Bug fixes in milhouse: 
     #482 audiotestsrc sample rate is fixed at 48000
@@ -44,5 +45,4 @@ Bug fixes in milhouse:
 Bug fixes in scenic : 
     #488 The port allocator is not called to free ports
     #489 scenic.desktop always crashes
-
 
