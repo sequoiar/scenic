@@ -36,6 +36,7 @@ New features in milhouse:
 New features in scenic:
     #474 Add the --verbose option to scenic
     #490 Make python-portmidi not mandatory
+    #469 Scenic don't detect jack sample rate mismatch when using RAW codec for audio
 
 Bug fixes in milhouse: 
     #482 audiotestsrc sample rate is fixed at 48000
