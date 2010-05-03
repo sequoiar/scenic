@@ -620,6 +620,13 @@ class Application(object):
                     "video": message["video"],
                     "midi": message["midi"]
                     }
+                if self.config.audio_recv_enabled or self.config.audio_send_enabled:
+                    if message["audio"]["sampling_rate"] != self.get_local_sampling_rate():
+                        msg = _("A mismatch in the sampling rate of JACK with remote peer has been detected.\nLocal sampling rate is %(local)s, whereas remote sampling rate is %(remote)s.") % {"local": self.get_local_sampling_rate(), "remote": message["audio"]["sampling_rate"]}
+                        log.error(msg)
+                        dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                        _simply_refuse(communication.REFUSE_REASON_PROBLEMS)
+                        return
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
                 if contact is not None and contact["auto_accept"]:
                     log.info("Contact %s is on auto_accept. Accepting." % (invited_by))
@@ -817,6 +824,17 @@ class Application(object):
         else: 
             return defer.succeed(True)
     
+    def get_local_sampling_rate(self):
+        """
+        Returns JACK's sampling rate or None.
+        """
+        ret = None
+        if self.devices["jackd_is_running"]:
+            ret = self.devices["jack_servers"][0]["rate"]
+        log.debug("Local sampling rate is %s" % (ret))
+        return ret
+        # XXX
+    
     def _get_local_config_message_items(self):
         """
         Returns a dict with keys 'audio', 'midi' and 'video' to send to remote peer.
@@ -838,7 +856,8 @@ class Application(object):
                 "recv_enabled": self.config.audio_recv_enabled,
                 "codec": self.config.audio_codec,
                 "numchannels": self.config.audio_channels,
-                "port": self.recv_audio_port
+                "port": self.recv_audio_port, 
+                "sampling_rate": self.get_local_sampling_rate()
                 },
             "midi": {
                 "port": self.recv_midi_port,
