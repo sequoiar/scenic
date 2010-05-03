@@ -100,12 +100,6 @@ int AudioSourceConfig::maxChannels(const std::string &codec)
 }
 
 
-void AudioSourceConfig::printMaxChannels(const std::string &codec)
-{
-    LOG_PRINT(maxChannels(codec) << "\n");
-}
-
-
 int AudioSourceConfig::bitrate() const
 {
     return bitrate_;

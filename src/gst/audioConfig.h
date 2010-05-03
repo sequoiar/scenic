@@ -39,8 +39,7 @@ class AudioSourceConfig
 {
     public:
         
-        AudioSourceConfig(const boost::program_options::variables_map &options);     
-        static void printMaxChannels(const std::string &codec);
+        AudioSourceConfig(const boost::program_options::variables_map &options);
         static int maxChannels(const std::string &codec);
         
         const char *source() const;
