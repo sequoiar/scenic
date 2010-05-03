@@ -205,18 +205,23 @@ short Milhouse::run(int argc, char **argv)
                 1 /* override current value if present */);
     }
 
+    // maybe just have a separate function that checks for all these standalone 
+    // calls and quits instead of all here
     if (options["list-v4l2"].as<bool>())
         return VideoSourceConfig::listV4lDevices();
     else if (options["list-cameras"].as<bool>())
         return VideoSourceConfig::listCameras();
-
-    if (options.count("v4l2-standard"))
+    else if (options["max-channels"].as<bool>())
+    { 
+        audiofactory::printMaxChannels(options["audiocodec"].as<std::string>());
+        return 0;
+    }
+    else if (options.count("v4l2-standard"))
     {
         VideoSourceConfig::setStandard(options["videodevice"].as<std::string>(), options["v4l2-standard"].as<std::string>());
         return 0;
     }
-
-    if (options.count("v4l2-input"))
+    else if (options.count("v4l2-input"))
     {
         VideoSourceConfig::setInput(options["videodevice"].as<std::string>(), options["v4l2-input"].as<int>());
         return 0;

@@ -47,8 +47,29 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
 {
     using boost::lexical_cast;
     using std::string;
-    if(numChannels_ < 1)
-        throw std::range_error("Invalid number of channels=" + lexical_cast<string>(numChannels_));
+    if (numChannels_ < 1)
+        throw std::range_error("Invalid number of channels=" + 
+                lexical_cast<string>(numChannels_));
+}
+
+int AudioSourceConfig::maxChannels(const std::string &codec)
+{
+    int result;
+    if (codec == "mp3")
+        result = 2;
+    else if (codec == "raw")
+        result = INT_MAX;
+    else if (codec == "vorbis")
+        result = 256;
+    else
+        LOG_ERROR("Invalid codec " << codec);
+    return result;
+}
+
+
+void AudioSourceConfig::printMaxChannels(const std::string &codec)
+{
+    LOG_PRINT(maxChannels(codec) << "\n");
 }
 
 
@@ -205,4 +226,3 @@ unsigned long long AudioSinkConfig::bufferTime() const
 {
     return bufferTime_;
 }
-
