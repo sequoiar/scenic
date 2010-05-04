@@ -1,15 +1,21 @@
-<chapter id="Introduction"> 
-    <title>Introduction</title> 
-    <para>&app; is an on stage telepresence system that allows for real time 
-    transmission of audiovisual data over any IP network. Telepresence systems 
-    can be used in various artistic contexts, so that two different creative 
-    spaces can communicate with each other or present a combined performance. 
-    &app; provides different performance schemes that allow a maximum number 
-    of users to participate in a network of learning, research and artistic 
-    creation anywhere in the world (bandwidth permitting).</para>
-
-    <para>The &app; development project is a part of the SAT PropulseART research program that was created to facilitate the implementation of remote networking for audiovisual, stage and digital systems between cultural and educational venues and to promote research and creation through new communication technologies. </para>
-    <sect1 id="UsingScenic">
-        <title>Using Scenic</title>
-    </sect1>
+<chapter id="Introduction">
+  <title>Introduction</title>
+  <para>&app; is an on stage telepresence system that allows for
+  real time transmission of audio, video and control data over any
+  IP network. Telepresence systems can be used in various artistic
+  contexts, so that two different creative spaces can communicate
+  with each other or present a combined performance. &app; provides
+  different performance schemes that allow a maximum number of
+  users to participate in a network of learning, research and
+  artistic creation anywhere in the world (bandwidth
+  permitting).</para>
+  <para>The &app; development project is a part of the SAT
+  PropulseART research program that was created to facilitate the
+  implementation of remote networking for audiovisual, stage and
+  digital systems between cultural and educational venues and to
+  promote research and creation through new communication
+  technologies.</para>
+  <sect1 id="UsingScenic">
+    <title>Using Scenic</title>
+  </sect1>
 </chapter>
