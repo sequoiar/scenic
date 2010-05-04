@@ -120,7 +120,6 @@ class Config(saving.ConfigStateSaving):
         self.audio_input_buffer = 15
         self.audio_output_buffer = 15
         self.audio_jitterbuffer = 75
-        self.audio_maximum_number_of_channels_in_raw = 64
         self.audio_jack_enable_autoconnect = True
         # ------------- VIDEO -------------
         self.video_send_enabled = True
@@ -227,6 +226,7 @@ class Application(object):
             "midi_output_devices": [],
             }
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
+        self.max_channels_in_raw = None
         reactor.callLater(0, self._start_the_application)
     
     def format_midi_device_name(self, midi_device_dict):
@@ -337,7 +337,8 @@ class Application(object):
             self.poll_x11_devices(), 
             self.poll_xvideo_extension(),
             self.poll_camera_devices(), 
-            self.poll_midi_devices()
+            self.poll_midi_devices(),
+            self.poll_milhouse_maxchannels()
             ])
         deferred_list.addCallback(_cb1)
 
@@ -450,6 +451,18 @@ class Application(object):
             return xvideo_is_present
         deferred.addCallback(_callback)
         return deferred
+    
+    def poll_milhouse_maxchannels(self):
+        """
+        Called once at startup.
+        @rtype: Deferred
+        """
+        deferred = self.streamer_manager.get_max_channels_in_raw()
+        def _callback(channels):
+            self.max_channels_in_raw = channels
+        deferred.addCallback(_callback)
+        return deferred
+
         
     def _poll_jackd(self):
         """

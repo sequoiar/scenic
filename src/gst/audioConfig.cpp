@@ -52,7 +52,10 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
                 lexical_cast<string>(numChannels_));
 }
 
-static int maxRawChannels()
+// anonymous namespace to hide this function
+namespace {
+
+int maxRawChannels()
 {
     if (not Jack::is_running())
     {
@@ -83,6 +86,8 @@ static int maxRawChannels()
     gst_caps_unref(srcCaps);
     gst_object_unref(srcPad);
     return result;
+}
+
 }
 
 int AudioSourceConfig::maxChannels(const std::string &codec)

@@ -1253,9 +1253,9 @@ class Gui(object):
         if _get_combobox_value(self.audio_codec_widget) == "MP3":
             max_channels = 2
         elif _get_combobox_value(self.audio_codec_widget) == "Raw":
-            max_channels = self.app.config.audio_maximum_number_of_channels_in_raw  
+            max_channels = self.app.max_channels_in_raw
         elif _get_combobox_value(self.audio_codec_widget) == "Vorbis":
-            max_channels = 24 
+            max_channels = 256
         # update range and clamp numchannels to new range 
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 

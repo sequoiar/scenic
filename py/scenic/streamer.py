@@ -24,10 +24,15 @@ Manages local streamer processes.
 """
 
 from scenic import process
+import subprocess
 from scenic import sig
 from scenic import dialogs
 from scenic.internationalization import _
 from scenic import logger
+from twisted.python import procutils
+from twisted.internet import defer
+from twisted.internet import utils
+import os
 
 log = logger.start(name="streamer")
 
@@ -50,6 +55,33 @@ class StreamerManager(object):
         self.session_details = None # either None or a big dict
         self.rtcp_stats = None # either None or a big dict
         self.error_messages = None # either None or a big dict
+
+    def get_max_channels_in_raw(self):
+        """
+        Calls deferred with an int as argument
+        @rtype: Deferred
+        """
+        def _cb(text, deferred):
+            for i in text.splitlines():
+                if "raw supports up to " in i:
+                    ret = int(i.split()[-2])
+            deferred.callback(ret)
+            
+        def _eb(reason, deferred):
+            deferred.errback(reason)
+            print("Error getting max channels: %s" % (reason))
+        
+        command_name = "milhouse"
+        args = ['--max-channels']
+        try:
+            executable = procutils.which(command_name)[0] # gets the executable
+        except IndexError:
+            return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+        deferred = defer.Deferred()
+        d = utils.getProcessOutput(executable, args=args, env=os.environ, errortoo=True) # errortoo puts stderr in output
+        d.addCallback(_cb, deferred)
+        d.addErrback(_eb, deferred)
+        return deferred
 
     def _gather_config_to_stream(self, addr):
         """
