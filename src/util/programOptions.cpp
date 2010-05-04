@@ -100,8 +100,8 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("v4l2-input", po::value<int>(), "set v4l2 input (0,1,2)")
             ("x-window-id", po::value<unsigned long>()->default_value(0), "set x-window-id to display video in an existing window")
             ("vumeter-id", po::value<unsigned long>()->default_value(0), "id of the socket where the vumeters will be displayed")
-            ("max-channels", po::bool_switch(), "print the max number of channels milhouse can send for a "
-             "given audiocodec")
+            ("max-channels", po::bool_switch(), "print the maximum number of channels milhouse can send for the "
+             "selected audiocodec")
             ;
 
         descriptionInitialized = true;

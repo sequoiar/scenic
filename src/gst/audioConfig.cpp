@@ -83,8 +83,10 @@ int maxRawChannels()
         LOG_DEBUG("jackaudiosrc sets channel-positions, so the maximum number of channels we can send is " << result);
     }
 
+    gst_element_set_state(fakePipeline, GST_STATE_NULL);
     gst_caps_unref(srcCaps);
     gst_object_unref(srcPad);
+    gst_object_unref(GST_OBJECT(fakePipeline));
     return result;
 }
 
