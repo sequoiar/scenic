@@ -487,7 +487,10 @@ class Gui(object):
         if self._widgets_changed_by_user:
             if widget.get_active():
                 self.app.save_configuration() #gathers and saves
-                self.preview_manager.start()
+                try:
+                    self.preview_manager.start()
+                except RuntimeError, e:
+                    log.warning("The user starts/stops very quickly the preview. " + str(e))
             else:
                 self.preview_manager.stop()
 
