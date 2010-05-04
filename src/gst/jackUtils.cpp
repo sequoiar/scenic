@@ -83,9 +83,6 @@ bool Jack::is_running()
             case JackFailure:   
                 THROW_ERROR("Overall operation failed.");
                 break;
-            case JackBackendError:
-                THROW_ERROR("Jack backend error.");
-                break;
             case JackClientZombie:
                 THROW_ERROR("Client is being shutdown against its will.");
                 break;

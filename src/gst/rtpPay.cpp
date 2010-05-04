@@ -156,6 +156,7 @@ L16Depay::L16Depay(const Pipeline &pipeline) : Depay(pipeline)
 MpaPay::MpaPay(const Pipeline &pipeline) : Pay(pipeline)
 {
     rtpPay_ = pipeline_.makeElement("rtpmpapay", NULL);
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
 
