@@ -83,9 +83,6 @@ bool Jack::is_running()
             case JackFailure:   
                 THROW_ERROR("Overall operation failed.");
                 break;
-            case JackClientZombie:
-                THROW_ERROR("Client is being shutdown against its will.");
-                break;
             default:
                 THROW_ERROR("Overall operation failed for unknown reason.");
                 break;
