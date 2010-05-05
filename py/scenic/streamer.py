@@ -205,17 +205,27 @@ class StreamerManager(object):
             self.session_details["send"]["video"]["device"] = None
         if self.session_details["send"]["video"]["codec"] == "theora":
             self.session_details["send"]["video"]["bitrate"] = None
+        
         # limit to max numchannels if in raw
+        # ...according to remote's max
         if self.session_details["receive"]["audio"]["codec"] == "raw":
             if self.session_details["receive"]["audio"]["numchannels"] > remote_config["audio"]["max_channels_in_raw"]:
                 num =  remote_config["audio"]["max_channels_in_raw"]
                 self.session_details["receive"]["audio"]["numchannels"] = num
-                log.error("Limiting the number of channels to receive to %d since remote peer only support up to that much." % (num))
+                msg = _("Limiting the number of audio channels to receive to %(number)d since remote peer only support up to that much.\nDecrease it to get rid of this message.") % {"number": num}
+                log.error(msg)
+                self.app.gui.show_error_dialog(msg)
+        # ...according to local's max
         if self.session_details["send"]["audio"]["codec"] == "raw":
             if self.session_details["send"]["audio"]["numchannels"] > self.app.max_channels_in_raw:
                 num = self.app.max_channels_in_raw
                 self.session_details["send"]["audio"]["numchannels"] = num
-                log.error("Limiting the number of channels to send to %d since we only support up to that much." % (num))
+                msg = _("Limiting the number of audio channels to send to %(number)d since we only support up to that much.\nDecrease it to get rid of this message.") % {"number": num}
+                details = _("Update your jackaudiosrc Gstreamer element.")
+                log.error(msg)
+                log.error(details)
+                self.app.gui.show_error_dialog(msg, details=details)
+        
         log.debug(str(self.session_details))
 
     def _prepare_stats_and_errors_dicts(self):
@@ -662,7 +672,7 @@ class StreamerManager(object):
             show_error_dialog = True
         if show_error_dialog:
             msg = _("Some errors occured during the audio/video streaming session.")
-            dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window, details=details)
+            self.app.gui.show_error_dialog(msg, details=details)
         # TODO: should we set all our process managers to None
 
         # set all to None:

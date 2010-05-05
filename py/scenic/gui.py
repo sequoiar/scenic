@@ -639,7 +639,7 @@ class Gui(object):
         # Validate the address
         addr = self.contact_addr_widget.get_text().strip()
         if not network.validate_address(addr):
-            dialogs.ErrorDialog.create(_("The address is not valid\n\nEnter a valid address\nExample: 192.0.32.10 or example.org"), parent=self.main_window)
+            self.show_error_dialog(_("The address is not valid\n\nEnter a valid address\nExample: 192.0.32.10 or example.org"))
             return
         # save it.
         _when_valid_save()
@@ -724,7 +724,7 @@ class Gui(object):
                 try:
                     server.sendmail(fromaddr, toaddrs, msg)
                 except:
-                    dialogs.ErrorDialog.create(_("Could not send info.\nCheck your internet connection."), parent=self.main_window)
+                    self.show_error_dialog(_("Could not send info.\nCheck your internet connection."))
                 server.quit()
         
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
@@ -1411,7 +1411,7 @@ class Gui(object):
                         if actual_standard != standard_name:
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             log.error(msg)
-                            dialogs.ErrorDialog.create(msg, parent=self.main_window)
+                            self.show_error_dialog(msg, parent=self.main_window)
                             
                             self._widgets_changed_by_user = False
                             _set_combobox_value(self.v4l2_standard_widget, actual_standard)
@@ -1507,6 +1507,13 @@ class Gui(object):
             log.error("Invite button clicked but we have a negotiation in progress.")
         else:
             self.app.send_invite()
+    
+    def show_error_dialog(self, text, details=None):
+        """
+        Simply shows an error dialog. 
+        @rettype: L{Deferred}
+        """
+        return dialogs.ErrorDialog.create(text, parent=self.main_window, details=details)
 
     def show_confirm_dialog(self, text, callback=None):
         """
