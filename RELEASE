@@ -1,6 +1,6 @@
 Release notes for Scenic 0.5.2
 
-This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. We created an Ubuntu package and the python-portmidi module is not mandatory anymore. We fixed bug related to sampling rate mismatch and increased the maximum number of raw audio channels when using the properly patched gst-plugins-bad elements. 
+This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. We created an Ubuntu package and the python-portmidi module is not mandatory anymore. We fixed bug related to sampling rate mismatch and increased the maximum number of raw audio channels when using the properly patched gst-plugins-bad elements. Error messages are also a lot more verbose, to help the user debugging.
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -44,6 +44,7 @@ Bug fixes in milhouse:
     #482 audiotestsrc sample rate is fixed at 48000
     #487 when filesource location isn't valid, the error message is horrible
     #196 Need to drop frames in sharedVideoBuffer
+    #496 Create man page for jack-info
 
 Bug fixes in scenic : 
     #488 The port allocator is not called to free ports
@@ -54,3 +55,4 @@ Bug fixes in scenic :
     #486 If the python midi doesn't work, MIDI should be disabled
     #443 An error should be shown if midistream does not work
     #493 preview complains about STOPPING state
+    #494 Improve the reason messages on offerer's side
