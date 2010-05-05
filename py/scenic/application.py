@@ -899,6 +899,7 @@ class Application(object):
         """
         #TODO: poll X11 devices
         #TODO: poll xv extension
+        log.debug("Check if ready to stream. - Pre-flight check.")
         self.gui.close_preview_if_running() # TODO: use its deferred
         self.save_configuration()
         self.prepare_before_rtp_stream()
