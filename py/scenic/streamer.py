@@ -205,6 +205,17 @@ class StreamerManager(object):
             self.session_details["send"]["video"]["device"] = None
         if self.session_details["send"]["video"]["codec"] == "theora":
             self.session_details["send"]["video"]["bitrate"] = None
+        # limit to max numchannels if in raw
+        if self.session_details["recv"]["audio"]["codec"] == "raw":
+            if self.session_details["recv"]["audio"]["numchannels"] > remote_config["audio"]["max_channels_in_raw"]:
+                num =  remote_config["audio"]["max_channels_in_raw"]
+                self.session_details["recv"]["audio"]["numchannels"] = num
+                log.error("Limiting the number of channels to receive to %d since remote peer only support up to that much." % (num))
+        if self.session_details["send"]["audio"]["codec"] == "raw":
+            if self.session_details["send"]["audio"]["numchannels"] > self.app.max_channels_in_raw:
+                num = self.app.max_channels_in_raw
+                self.session_details["send"]["audio"]["numchannels"] = num
+                log.error("Limiting the number of channels to send to %d since we only support up to that much." % (num))
         log.debug(str(self.session_details))
 
     def _prepare_stats_and_errors_dicts(self):

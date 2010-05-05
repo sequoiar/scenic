@@ -870,6 +870,7 @@ class Application(object):
                 "recv_enabled": self.config.audio_recv_enabled,
                 "codec": self.config.audio_codec,
                 "numchannels": self.config.audio_channels,
+                "max_channels_in_raw": self.max_channels_in_raw, #useful to tell remote peer how many we can send
                 "port": self.recv_audio_port, 
                 "sampling_rate": self.get_local_sampling_rate()
                 },
