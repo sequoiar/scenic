@@ -723,14 +723,14 @@ class Application(object):
         self._free_ports()
         if reason == communication.REFUSE_REASON_REFUSED:
             text = _("The contact refused to stream with you.") 
-        elif reason == communication.REFUSE_REASON_PROBLEMS:
-            text = _("The contact cannot stream with you due to technical issues.")
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH:
             text = _("The contact cannot stream with you since its JACK sampling rate is not the same as yours.")
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING:
             text = _("The contact cannot stream with you since its JACK server is not running.")
         elif reason == communication.REFUSE_REASON_BUSY:
             text = _("The contact is busy. Cannot start a streaming session.")
+        elif reason == communication.REFUSE_REASON_PROBLEMS or reason is False:
+            text = _("The contact cannot stream with you due to technical issues.")
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
