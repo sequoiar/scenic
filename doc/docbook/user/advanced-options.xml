@@ -19,13 +19,12 @@
     <title>Command line tools</title>
     <para>Here are a few command-line tools that come with Scenic. See their manual page for more informations. For example, to read the manual page of Milhouse, type "man milhouse" in a terminal.</para>
     <orderedlist>
-      <listitem>dc-ctl</listitem>
-      <listitem>midistream</listitem>
-      <listitem>scenic</listitem>
-      <listitem>milhouse</listitem>
-      <listitem>firereset</listitem>
-      <listitem>jack-info</listitem>
-      <listitem>dc-ctl</listitem>
+      <listitem>dc-ctl: Controls DC ieee1394 (Firewire) cameras.</listitem>
+      <listitem>midistream: Streams MIDI notes and controls over RTP.</listitem>
+      <listitem>scenic: Graphical user interface to stream audio, video and MIDI over RTP.</listitem>
+      <listitem>milhouse: Streams audio and video over RTP.</listitem>
+      <listitem>firereset: Resets a ieee1394 (Firewire) bus.</listitem>
+      <listitem>jack-info: Prints informations about the running JACK servers.</listitem>
     </orderedlist>
 </sect1>
 </chapter>
