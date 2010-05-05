@@ -625,9 +625,9 @@ class Application(object):
         self._is_negotiating = True
         
         def _check_cb(result):
-            if not result:
+            if result is False:
                 _simply_refuse(communication.REFUSE_REASON_PROBLEMS)
-            else:
+            elif result is True:
                 # FIXME: the copy of dict should be more straightforward.
                 self.remote_config = {
                     "audio": message["audio"],
@@ -639,7 +639,7 @@ class Application(object):
                         msg = _("A mismatch in the sampling rate of JACK with remote peer has been detected.\nLocal sampling rate is %(local)s, whereas remote sampling rate is %(remote)s.") % {"local": self.get_local_sampling_rate(), "remote": message["audio"]["sampling_rate"]}
                         log.error(msg)
                         dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
-                        _simply_refuse(communication.REFUSE_REASON_PROBLEMS)
+                        _simply_refuse(communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH)
                         return
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
                 if contact is not None and contact["auto_accept"]:
@@ -651,6 +651,8 @@ class Application(object):
                     text = _("<b><big>%(invited_by)s is inviting you.</big></b>\n\nDo you accept?" % {"invited_by": invited_by})
                     dialog_deferred = self.gui.show_invited_dialog(text)
                     dialog_deferred.addCallback(_on_contact_request_dialog_response)
+            else:
+                _simply_refuse(result) # passing it the reason
         
         flight_check_deferred = self.check_if_ready_to_stream(role="answerer")
         flight_check_deferred.addCallback(_check_cb)
@@ -723,6 +725,10 @@ class Application(object):
             text = _("The contact refused to stream with you.") 
         elif reason == communication.REFUSE_REASON_PROBLEMS:
             text = _("The contact cannot stream with you due to technical issues.")
+        elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH:
+            text = _("The contact cannot stream with you since its JACK sampling rate is not the same as yours.")
+        elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING:
+            text = _("The contact cannot stream with you since its JACK server is not running.")
         elif reason == communication.REFUSE_REASON_BUSY:
             text = _("The contact is busy. Cannot start a streaming session.")
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
@@ -887,7 +893,7 @@ class Application(object):
         
         Checks if ready to stream. 
         Will pop up error dialog if there are errors.
-        Calls the deferred with a result that is True of False.
+        Calls the deferred with a result that either True (ok) False (technical problems) or one of the communication.REFUSE_REASON_* constant value.
         @rtype: L{Deferred}
         @param role: Either "offerer" or "answerer".
         """
@@ -914,18 +920,18 @@ class Application(object):
                 
             if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared!") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
-                return deferred.callback(False)
+                return deferred.callback(communication.REFUSE_REASON_DISPLAY_NOT_FOUND)
             
             elif self.config.video_source == "v4l2src" and self.parse_v4l2_device_name(self.config.video_device) is None: #TODO: do not test if not sending video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
-                return deferred.callback(False)
+                return deferred.callback(communication.REFUSE_REASON_CAMERA_NOT_FOUND)
                 
             elif (not self.devices["jackd_is_running"]) and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
                 log.debug("audio send/recv enabled: %s %s" % (self.config.audio_send_enabled, self.config.audio_recv_enabled))
                 log.debug("self.devices[\'jackd_is_running\'] = %s" % (self.devices["jackd_is_running"]))
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
-                return deferred.callback(False)
+                return deferred.callback(commuication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING)
             
             elif self.streamer_manager.is_busy():
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
@@ -933,16 +939,16 @@ class Application(object):
             
             elif self.config.midi_recv_enabled and self.parse_midi_device_name(self.config.midi_output_device, is_input=False) is None:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI output device %(device)s disappeared!") % {"device": self.config.midi_output_device}, parent=self.gui.main_window)
-                deferred.callback(False)
+                deferred.callback(communication.REFUSE_REASON_MIDI_DEVICE_NOT_FOUND)
             
             elif self.config.midi_send_enabled and self.parse_midi_device_name(self.config.midi_input_device, is_input=True) is None:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI input device %(device)s disappeared!") % {"device": self.config.midi_input_device}, parent=self.gui.main_window)
-                deferred.callback(False)
+                deferred.callback(communication.REFUSE_REASON_MIDI_DEVICE_NOT_FOUND)
             
             # "cameras": {}, # dict of dicts (only V4L2 cameras for now)
             elif not self.devices["xvideo_is_present"] and self.config.video_recv_enabled:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X video extension is not present."), parent=self.gui.main_window)
-                deferred.callback(False)
+                deferred.callback(communication.REFUSE_REASON_XVIDEO_NOT_FOUND)
             
             else:
                 deferred.callback(True)
@@ -971,7 +977,7 @@ class Application(object):
             
         def _check_cb(result):
             #TODO: use the Deferred it will return
-            if result:
+            if result is True:
                 #self.prepare_before_rtp_stream()
                 msg = {
                     "msg":"INVITE",
