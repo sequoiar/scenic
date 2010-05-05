@@ -23,9 +23,14 @@
 
 #include <stdio.h>
 #include <jack/jack.h>
+#include <getopt.h>
+#include <string.h>
+#include <stdlib.h>
+#include "config.h"
 
-int main()
+int main(int argc, char **argv)
 {
+    int arg_num;
     int i;
     const char **ports;
     jack_nframes_t period;
@@ -33,6 +38,20 @@ int main()
 
     jack_client_t *client;
     jack_status_t status;
+    for (arg_num = 0; arg_num < argc; arg_num++)
+    {
+        if (strncmp(argv[arg_num], "--help", strlen("--help")) == 0)
+        {
+            printf("  --help                                 Show help and exit\n");
+            printf("  --version                              Show version and exit\n");
+            exit(0);
+        } else if (strncmp(argv[arg_num], "--version", strlen("--version")) == 0)
+        {
+            printf("%s\n", PACKAGE_VERSION);
+            exit(0);
+        }
+    }
+    
     client = jack_client_open("jack-info", JackNoStartServer, &status);
 	if (client == NULL) 
     {

@@ -1,4 +1,4 @@
-man_MANS = milhouse.1 scenic.1 midistream.1 firereset.1
+man_MANS = milhouse.1 scenic.1 midistream.1 firereset.1 jack-info.1
 EXTRA_DIST = $(man_MANS)
 MAINTAINERCLEANFILES = $(man_MANS)
 
@@ -19,3 +19,7 @@ midistream.1: $(top_srcdir)/py/scripts/midistream.in $(top_srcdir)/py/rtpmidi/ru
 
 firereset.1: $(top_srcdir)/src/firereset/firereset.c $(top_srcdir)/man/firereset-man.txt
 	$(HELP2MAN) --include=firereset-man.txt --name="Firereset resets a ieee1394 bus to help in case of problems" --no-info $(top_builddir)/src/firereset/firereset -o $@
+
+jack-info.1: $(top_srcdir)/utils/jack-info/jack_info.c $(top_srcdir)/man/jack-info-man.txt
+	$(HELP2MAN) --include=jack-info-man.txt --name="Prints informations about the running JACK servers" --no-info $(top_builddir)/utils/jack-info/jack-info -o $@
+
