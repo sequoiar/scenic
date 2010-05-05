@@ -931,7 +931,7 @@ class Application(object):
                 log.debug("self.devices[\'jackd_is_running\'] = %s" % (self.devices["jackd_is_running"]))
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
-                return deferred.callback(commuication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING)
+                return deferred.callback(communication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING)
             
             elif self.streamer_manager.is_busy():
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
