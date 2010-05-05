@@ -42,12 +42,24 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     emitMessages_(true)
 {
     static const int SPACING = 1;
-    GtkWidget *hbox = gtk_hbox_new(FALSE/*homogenous spacing*/, SPACING);
+    static const int ROWS = 2;
+    GtkWidget *table = gtk_table_new(ROWS, numChannels, FALSE/*homogenous spacing*/);
+    gtk_table_set_col_spacings(GTK_TABLE(table), SPACING);
 
     for (int i = 0; i < numChannels; ++i)
     {
         vumeters_.push_back(gtk_vumeter_new());
-        gtk_box_pack_start(GTK_BOX(hbox), vumeters_[i], FALSE, FALSE, 0);
+        gtk_table_attach(GTK_TABLE(table), vumeters_[i], i, i + 1, 0, 1, 
+                static_cast<GtkAttachOptions>(GTK_SHRINK | GTK_FILL), 
+                static_cast<GtkAttachOptions>(GTK_EXPAND | GTK_FILL), 0, 0);
+        GtkWidget *label = gtk_label_new(0);
+        char *markup;
+
+        markup = g_markup_printf_escaped ("<span weight=\"bold\">%d</span>", i + 1);
+        gtk_label_set_markup (GTK_LABEL (label), markup);
+        g_free (markup);
+        gtk_table_attach(GTK_TABLE(table), label, i, i + 1, 1, ROWS, GTK_SHRINK,
+                GTK_SHRINK, 0, 0);
     }
 
     /* make window */
@@ -59,7 +71,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     g_object_set(scrolled, "hscrollbar-policy", GTK_POLICY_AUTOMATIC, NULL);
     GtkWidget *viewport = gtk_viewport_new(0, 0);
     g_object_set(viewport, "shadow-type", GTK_SHADOW_NONE, NULL);
-    gtk_container_add(GTK_CONTAINER(viewport), hbox);
+    gtk_container_add(GTK_CONTAINER(viewport), table);
     gtk_container_add(GTK_CONTAINER(scrolled), viewport);
     gtk_container_add(GTK_CONTAINER (plug), scrolled);
     /* show window and log its id */
