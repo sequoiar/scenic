@@ -1013,7 +1013,8 @@ class Application(object):
                         msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
                     log.error(msg)
                     self.gui.hide_calling_dialog()
-                    dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    if self._is_negotiating:
+                        dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
                     self._is_negotiating = False
                     return None
                    
