@@ -27,13 +27,14 @@ from scenic import logger
 
 log = logger.start(name="communication")
 
+# these value should all be readable
 CANCEL_REASON_CANCELLED = "cancelled"
 REFUSE_REASON_PROBLEMS = "technical problems"
 REFUSE_REASON_BUSY = "busy"
 REFUSE_REASON_REFUSED = "refused"
 REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING = "jackd is not running"
 REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH = "jackd rate mismatch"
-REFUSE_REASON_XVIDEO_NOT_FOUND = "xvideo not found"
+REFUSE_REASON_XVIDEO_NOT_FOUND = "xvideo extension not found"
 REFUSE_REASON_MIDI_DEVICE_NOT_FOUND = "midi device not found"
 REFUSE_REASON_CAMERA_NOT_FOUND = "v4l2 device not found"
 REFUSE_REASON_DISPLAY_NOT_FOUND = "x11 display not found"

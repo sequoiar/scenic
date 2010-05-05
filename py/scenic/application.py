@@ -1015,7 +1015,7 @@ class Application(object):
                 self.gui.show_calling_dialog()
                 # window will be hidden when we receive ACCEPT or REFUSE, or when we cancel
             else:
-                log.error("Cannot send INVITE.")
+                log.error("Cannot send INVITE. Reason is : %s" % (result))
                 self._is_negotiating = False
 
         check_deferred = self.check_if_ready_to_stream(role="offerer")
