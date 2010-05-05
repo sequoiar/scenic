@@ -30,7 +30,7 @@
     cabaret entertainment form.</para>
   </sect1>
   <sect1 id="UsingScenic">
-    <title>Using Scenic</title>
+    <title>Telepresence and Real Wold's Issues</title>
     <sect2 id="performance-issues">
       <title>Performance Issues</title>
       <para>When planning a show, it is important to consider the
@@ -93,5 +93,12 @@
       Shoot nice images and the result is more likely to be
       neat.</para>
     </sect2>
+  </sect1>
+  <sect1 id="quick-overview">
+    <title>Quick Overview</title>
+    <para>In a nut shell, once Scenic is installed and the computer is properly connected to the Internet and accessible from remote computers, it is time to launch Scenic and try it out. The first thing to do is to add a contact in your address book. You must give it a name and an IP address corresponding to the remote's computer IP address. Each peer can see its own local IP address in the statistics tab. Each peer can then give its IP address to the other person.</para>
+    <para>Next, it is time to configure what to send and receive to and from the remote peer. Scenic can transmit one video stream bi-directional, one MIDI stream and has many audio channels your hardware supports, when your software is properly installed. For each of them, you can enable or disable sending and receiving by clicking on the check button in the "Sending" and "Receiving" section in the "Video", "Audio" and "MIDI" tabs. For a stream to be enabled, both peer must enable it. If one of the peer disables sending or receiving a video signal, it does not occur in that direction.</para>
+    <para>In each of these three tabs, there are settings that allow you to fine tune the quality, source and destination of the streams. The codec informations are decided in the receiver's side. The source is, of course, decided in the sender's side.</para>
+    <para>The "Statistics" tab offers you informations and statistics about the current streams, when a streaming session is in progress. It also gives you your local IP address and your peer's IP address.</para>
   </sect1>
 </chapter>

@@ -1,6 +1,7 @@
 userdir = $(datadir)/scenic/docbook/user
 user_DATA = \
     about.xml \
+    advanced-options.xml \
     audio-settings.xml \
     before-using-scenic.xml \
     contact-settings.xml \

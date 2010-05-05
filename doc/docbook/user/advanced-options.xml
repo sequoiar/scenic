@@ -1,0 +1,31 @@
+<chapter id="advanced-options">
+<title>Advanced options</title>
+<para>In this chapter, we will explain miscellaneous options and features that power users might want to use.</para>
+<sect1>
+    <title>Using Scenic in the kiosk mode</title>
+    <para>The kiosk mode is useful when Scenic is the only software that runs at startup. It contains a system tab with buttons for tasks such as upgrading the Debian or Ubuntu packages, and rebooting the computer.</para>
+    <para>To launch Scenic in the kiosk mode, use the "--kiosk" flag from a terminal. It is best used with the "--fullscreen" flag.</para>
+</sect1>
+<sect1>
+    <title>Activating the debug mode</title>
+    <para>Sometimes some problems might occur, since Scenic uses a lot of devices and libraries. Problems might be difficult to trouble shoot. To get more informations about what is happening, you can launch Scenic in the debug mode. To do so, launch it from a terminal with the "--debug" flag. Here is how to do it on a Ubuntu GNU/Linux:</para>
+    <orderedlist>
+      <listitem>In the "Application" menu, choose "Accessories" and then "Terminal".</listitem>
+      <listitem>Type "scenic --debug" and press enter.</listitem>
+    </orderedlist>
+    <para>You can now see a lot of details about what happens under the hood of Scenic. You can copy some of this text to the clipboard in order to send it to someone that could help you to fix the issues you are facing. In the Gnome terminal that comes with Ubuntu GNU/Linux, you can copy the selected text by pressing Control-Shift-C.</para>
+</sect1>
+<sect1>
+    <title>Command line tools</title>
+    <para>Here are a few command-line tools that come with Scenic. See their manual page for more informations. For example, to read the manual page of Milhouse, type "man milhouse" in a terminal.</para>
+    <orderedlist>
+      <listitem>dc-ctl</listitem>
+      <listitem>midistream</listitem>
+      <listitem>scenic</listitem>
+      <listitem>milhouse</listitem>
+      <listitem>firereset</listitem>
+      <listitem>jack-info</listitem>
+      <listitem>dc-ctl</listitem>
+    </orderedlist>
+</sect1>
+</chapter>
