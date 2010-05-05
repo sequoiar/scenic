@@ -23,9 +23,7 @@
 
 #include <stdio.h>
 #include <jack/jack.h>
-#include <getopt.h>
 #include <string.h>
-#include <stdlib.h>
 #include "config.h"
 
 int main(int argc, char **argv)
@@ -44,11 +42,12 @@ int main(int argc, char **argv)
         {
             printf("  --help                                 Show help and exit\n");
             printf("  --version                              Show version and exit\n");
-            exit(0);
-        } else if (strncmp(argv[arg_num], "--version", strlen("--version")) == 0)
+            return 0;
+        } 
+        else if (strncmp(argv[arg_num], "--version", strlen("--version")) == 0)
         {
-            printf("%s\n", PACKAGE_VERSION);
-            exit(0);
+            printf("jack-info %s\n", PACKAGE_VERSION);
+            return 0;
         }
     }
     
