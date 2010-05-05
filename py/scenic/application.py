@@ -722,15 +722,23 @@ class Application(object):
         self.gui.hide_calling_dialog()
         self._free_ports()
         if reason == communication.REFUSE_REASON_REFUSED:
-            text = _("The contact refused to stream with you.") 
+            text = _("The remote peer refused to stream with you.") 
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH:
-            text = _("The contact cannot stream with you since its JACK sampling rate is not the same as yours.")
+            text = _("The remote peer cannot stream with you since its JACK sampling rate is not the same as yours.")
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING:
-            text = _("The contact cannot stream with you since its JACK server is not running.")
+            text = _("The remote peer cannot stream with you since its JACK server is not running.")
         elif reason == communication.REFUSE_REASON_BUSY:
-            text = _("The contact is busy. Cannot start a streaming session.")
+            text = _("The remote peer is busy. Cannot start a streaming session.")
+        elif reason == communication.REFUSE_REASON_XVIDEO_NOT_FOUND:
+            text = _("The remote peer cannot stream with you since its xvideo extension could not be found.")
+        elif reason == communication.REFUSE_REASON_MIDI_DEVICE_NOT_FOUND:
+            text = _("The remote peer cannot stream with you since its MIDI device could not be found.")
+        elif reason == communication.REFUSE_REASON_CAMERA_NOT_FOUND:
+            text = _("The remote peer cannot stream with you since its video capture device could not be found.")
+        elif reason == communication.REFUSE_REASON_DISPLAY_NOT_FOUND:
+            text = _("The remote peer cannot stream with you since its X11 display could not be found.")
         elif reason == communication.REFUSE_REASON_PROBLEMS or reason is False:
-            text = _("The contact cannot stream with you due to technical issues.")
+            text = _("The remote peer cannot stream with you due to technical issues.")
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
 
     def handle_ack(self, addr):
