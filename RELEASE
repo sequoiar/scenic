@@ -44,7 +44,6 @@ Bug fixes in milhouse:
     #482 audiotestsrc sample rate is fixed at 48000
     #487 when filesource location isn't valid, the error message is horrible
     #196 Need to drop frames in sharedVideoBuffer
-    #496 Create man page for jack-info
 
 Bug fixes in scenic : 
     #488 The port allocator is not called to free ports
@@ -57,4 +56,5 @@ Bug fixes in scenic :
     #493 preview complains about STOPPING state
     #494 Improve the reason messages on offerer's side
     #469 Scenic don't detect jack sample rate mismatch when using RAW codec for audio
+    #496 Create man page for jack-info
 
