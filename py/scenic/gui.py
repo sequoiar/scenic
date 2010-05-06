@@ -107,7 +107,7 @@ def _get_combobox_value(widget):
     try:
         tree_model_row = tree_model[index]
     except IndexError, e:
-        raise RuntimeError("ComboBox widget %s doesn't have value with index %s." % (widget, index))
+        raise RuntimeError("Cannot get ComboBox's value. Its tree model %s doesn't have row number %s." % (widget, index))
     #except TypeError, e:
     #    raise RuntimeError("%s is not a ComboBox widget" % (widget))
     return tree_model_row[0] 
@@ -118,7 +118,11 @@ def _set_combobox_choices(widget, choices=[]):
     """
     #XXX: combo boxes in the glade file must have a space as a value to have a tree iter
     #TODO When we change a widget value, its changed callback is called...
-    previous_value = _get_combobox_value(widget)
+    try:
+        previous_value = _get_combobox_value(widget)
+    except RuntimeError, e:
+        log.error(str(e))
+        previous_value = " "
     tree_model = gtk.ListStore(str)
     for choice in choices:
         tree_model.append([choice])

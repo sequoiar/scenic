@@ -10,7 +10,10 @@ import Queue
 
 #Utils
 import time
-import pypm
+try:
+    import pypm
+except ImportError:
+    from pygame import pypm
 
 #Midi Commands
 NOTE_ON = 0x90

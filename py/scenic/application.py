@@ -309,9 +309,13 @@ class Application(object):
         try:
             import pypm
         except ImportError:
-            log.warning("MIDI support has not been found. You should install python-portmidi for MIDI support.")
-            self._midi_is_supported = False
-        else:
+            try:
+                from pygame import pypm # we can use the pygame.pypm, it is the same as python-portmidi's
+            except ImportError:
+                log.warning("MIDI support has not been found. You should install python-portmidi for MIDI support.")
+                self._midi_is_supported = False
+                pypm = None
+        if self._midi_is_supported:
             log.info("MIDI support has been detected. Using PyPortMidi version %s" % (pypm.__version__))
         try:
             self.server.start_listening()

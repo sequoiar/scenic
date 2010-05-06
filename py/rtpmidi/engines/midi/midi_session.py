@@ -34,7 +34,10 @@ from twisted.internet import task
 #midi import
 from rtpmidi.engines.midi.midi_in import MidiIn
 from rtpmidi.engines.midi.midi_out import MidiOut
-import pypm
+try:
+    import pypm
+except ImportError:
+    from pygame import pypm
 from time import time
 
 #Constants

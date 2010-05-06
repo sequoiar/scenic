@@ -25,7 +25,10 @@ from twisted.internet import reactor
 from twisted.internet import task
 from twisted.internet import defer
 import time
-import pypm
+try:
+    import pypm
+except ImportError:
+    from pygame import pypm
 
 # FIXME: what are those two vars?
 INPUT = 0

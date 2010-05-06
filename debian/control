@@ -48,6 +48,7 @@ Build-Depends:
  python-gst0.10 (>= 0.10.17),
  python-gtk2,
  python-gtk2-dev,
+ python-pygame,
  python-simplejson,
  python-twisted,
  vorbis-tools,
