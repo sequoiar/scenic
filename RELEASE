@@ -33,12 +33,13 @@ New features and bug fixes in 0.5.2:
 New features in milhouse:
     #197 Audio sync with sharedVideoBuffer
     #491 milhouse should report max number of channels it can send
+    #497 show channel number under vumeter
 
 New features in scenic:
     #474 Add the --verbose option to scenic
     #490 Make python-portmidi not mandatory
     #476 add an option to disable to auto connect to jack ports in scenic
-    #506 Show warnings to the user
+    #506 Show milhouse's warnings to the user
 
 Bug fixes in milhouse: 
     #482 audiotestsrc sample rate is fixed at 48000
@@ -55,6 +56,6 @@ Bug fixes in scenic :
     #443 An error should be shown if midistream does not work
     #493 preview complains about STOPPING state
     #494 Improve the reason messages on offerer's side
-    #469 Scenic don't detect jack sample rate mismatch when using RAW codec for audio
+    #469 Scenic don't detect jack sample rate mismatch in RAW
     #496 Create man page for jack-info
 
