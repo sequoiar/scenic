@@ -55,6 +55,7 @@ class StreamerManager(object):
         self.session_details = None # either None or a big dict
         self.rtcp_stats = None # either None or a big dict
         self.error_messages = None # either None or a big dict
+        self.warnings = None # either None or a big dict
 
     def get_max_channels_in_raw(self):
         """
@@ -261,6 +262,10 @@ class StreamerManager(object):
             }
         }
         self.error_messages = {
+            "send": [], # list of strings
+            "receive": [], # list of strings
+            }
+        self.warnings = {
             "send": [], # list of strings
             "receive": [], # list of strings
             }
@@ -528,6 +533,10 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
+        
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
         try:
             if "stream connected" in line:
                 if "audio" in line:
@@ -540,7 +549,7 @@ class StreamerManager(object):
                 elif "audio" in line:
                     self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
             else:
-                log.debug("%9s stdout: %s" % (process_manager.identifier, line))
+                log.debug("%s stdout: %s" % (process_manager.identifier, line))
         except ValueError, e:
             log.error("%s when parsing line '%s' from receiver" % (e, line))
 
@@ -551,12 +560,18 @@ class StreamerManager(object):
         log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
     
     def on_sender_stdout_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stdout
         """
-        log.debug("%9s stdout: %s" % (process_manager.identifier, line))
+        log.debug("%s stdout: %s" % (process_manager.identifier, line))
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
         try:
             if "PACKETS-LOST" in line:
                 if "video" in line:
@@ -600,6 +615,9 @@ class StreamerManager(object):
         log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["send"].append(line)
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
 
     def is_busy(self):
         """
@@ -659,17 +677,25 @@ class StreamerManager(object):
         #TODO: internationalize
         log.info("All streamers are stopped.")
         if len(self.error_messages["send"]) != 0:
+            show_error_dialog = True
             log.error("Error messages from the sender for this session: %s" % (self.error_messages["send"]))
             details += _("Errors from local sender:") + "\n"
             for line in self.error_messages["send"]:
                 details += " * " + line + "\n"
-            show_error_dialog = True
+            if len(self.warnings["send"]) != 0:
+                details += _("Warnings from local sender:") + "\n"
+                for line in self.warnings["send"]:
+                    details += " * " + line + "\n"
         if len(self.error_messages["receive"]) != 0:
+            show_error_dialog = True
             log.error("Error messages from the receiver for this session: %s" % (self.error_messages["receive"]))
             details += _("Errors from local receiver:") + "\n"
             for line in self.error_messages["receive"]:
                 details += " * " + line + "\n"
-            show_error_dialog = True
+            if len(self.warnings["receive"]) != 0:
+                details += _("Warnings from local receiver:") + "\n"
+                for line in self.warnings["send"]:
+                    details += " * " + line + "\n"
         if show_error_dialog:
             msg = _("Some errors occured during the audio/video streaming session.")
             self.app.gui.show_error_dialog(msg, details=details)
@@ -682,7 +708,7 @@ class StreamerManager(object):
         self.extra_receiver = None
         self.midi_receiver = None
         self.midi_sender = None
-        log.debug("Process managers should all be None: %s" % (self.get_all_streamer_process_managers()))
+        log.debug("Done stopping steaming")
     
     def _set_state(self, new_state):
         """
@@ -709,3 +735,4 @@ class StreamerManager(object):
                 if proc is not None:
                     if proc.state != process.STATE_STOPPED and proc.state != process.STATE_STOPPING:
                         proc.stop()
+
