@@ -694,7 +694,7 @@ class StreamerManager(object):
                 details += " * " + line + "\n"
             if len(self.warnings["receive"]) != 0:
                 details += _("Warnings from local receiver:") + "\n"
-                for line in self.warnings["send"]:
+                for line in self.warnings["receive"]:
                     details += " * " + line + "\n"
         if show_error_dialog:
             msg = _("Some errors occured during the audio/video streaming session.")
