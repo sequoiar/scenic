@@ -463,6 +463,7 @@ class Application(object):
         """
         deferred = self.streamer_manager.get_max_channels_in_raw()
         def _callback(channels):
+            log.info("Max number of channels for raw audio: %s" % (channels))
             self.max_channels_in_raw = channels
             self.gui.audio_numchannels_widget.set_range(1, channels)
         deferred.addCallback(_callback)
