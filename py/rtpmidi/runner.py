@@ -32,8 +32,9 @@ try:
     from rtpmidi.protocols.rtp.rtp_control import RTPControl
     from rtpmidi import utils
 except ImportError, e:
-    print "Import error %s" % (str(e))
+    # print "Import error %s" % (str(e))
     imported_midi = False
+    print e
 else:
     imported_midi = True
 
@@ -126,7 +127,8 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
     (options, args) = parser.parse_args()
 
     if not imported_midi:
-        print "MIDI module cannot run, importing rtp modules was not successful"
+        print "MIDI module cannot run, importing rtp modules was not successful."
+        print "You should install either python-portmidi on python-pygame."
         sys.exit(1)
 
     config = Config()

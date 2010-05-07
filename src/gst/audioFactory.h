@@ -24,6 +24,7 @@
 #ifndef _AUDIO_FACTORY_H_
 #define _AUDIO_FACTORY_H_
 
+#include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options.hpp>
 
@@ -35,6 +36,7 @@ class Pipeline;
 
 namespace audiofactory
 {
+    void printMaxChannels(const std::string &codec);
     boost::shared_ptr<AudioSender> buildAudioSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
     boost::shared_ptr<AudioReceiver> buildAudioReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
     boost::shared_ptr<LocalAudio> buildLocalAudio(Pipeline &pipeline, const boost::program_options::variables_map &options);

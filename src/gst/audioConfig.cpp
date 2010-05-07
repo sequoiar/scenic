@@ -29,6 +29,7 @@
 #include "audioLevel.h"
 #include "audioSink.h"
 #include "jackUtils.h"
+#include "pipeline.h"
 
 static const int USEC_PER_MILLISEC = 1000;
 namespace po = boost::program_options;
@@ -46,8 +47,63 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
 {
     using boost::lexical_cast;
     using std::string;
-    if(numChannels_ < 1)
-        throw std::range_error("Invalid number of channels=" + lexical_cast<string>(numChannels_));
+    if (numChannels_ < 1)
+        throw std::range_error("Invalid number of channels=" + 
+                lexical_cast<string>(numChannels_));
+}
+
+// anonymous namespace to hide this function
+namespace {
+
+int maxRawChannels()
+{
+    if (not Jack::is_running())
+    {
+        LOG_WARNING("Jack is not running");
+        return INT_MAX;
+    }
+
+    GstElement *fakePipeline = gst_parse_launch("jackaudiosrc connect=0 name=fakejackaudiosrc ! fakesink silent=true", 0);
+    gst_element_set_state(fakePipeline, GST_STATE_PAUSED);
+    GstElement *element = gst_bin_get_by_name(GST_BIN(fakePipeline), "fakejackaudiosrc");
+    GstPad *srcPad = gst_element_get_static_pad(element, "src");
+    GstCaps *srcCaps;
+    while ((srcCaps = gst_pad_get_negotiated_caps(srcPad)) == NULL)
+        LOG_DEBUG("not ready\n");
+    GstStructure *structure = gst_caps_get_structure(srcCaps, 0);
+    gint result;
+    if (not gst_structure_has_field(structure, "channel-positions"))
+    {
+        result = 8;
+        LOG_DEBUG("jackaudiosrc does not set channel-positions, so the maximum number of channels we can send is " << result);
+    }
+    else
+    {
+        result = INT_MAX;
+        LOG_DEBUG("jackaudiosrc sets channel-positions, so the maximum number of channels we can send is " << result);
+    }
+
+    gst_element_set_state(fakePipeline, GST_STATE_NULL);
+    gst_caps_unref(srcCaps);
+    gst_object_unref(srcPad);
+    gst_object_unref(GST_OBJECT(fakePipeline));
+    return result;
+}
+
+}
+
+int AudioSourceConfig::maxChannels(const std::string &codec)
+{
+    int result;
+    if (codec == "mp3")
+        result = 2;
+    else if (codec == "raw")
+        result = maxRawChannels();
+    else if (codec == "vorbis")
+        result = 256;
+    else
+        LOG_ERROR("Invalid codec " << codec);
+    return result;
 }
 
 
@@ -83,6 +139,8 @@ unsigned long long AudioSourceConfig::bufferTime() const
 /// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 {
+    if (Jack::is_running())
+        pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
     if (source_ == "audiotestsrc")
         return new AudioTestSource(pipeline, *this);
     else if (source_ == "filesrc")
@@ -155,6 +213,8 @@ AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &op
     // (before waiting on caps) but having it here is pretty gross
     if (sink_ == "jackaudiosink")
         Jack::assertReady(pipeline);
+    else if (Jack::is_running())
+        pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
 }
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
@@ -200,4 +260,3 @@ unsigned long long AudioSinkConfig::bufferTime() const
 {
     return bufferTime_;
 }
-

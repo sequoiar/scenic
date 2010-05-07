@@ -1,16 +1,104 @@
-<chapter id="Introduction"> 
-<title>Introduction</title> 
-
-<para>&app; is an on stage telepresence system that allows for real time 
-transmission of audiovisual data over any IP network. Telepresence systems 
-can be used in various artistic contexts, so that two different creative 
-spaces can communicate with each other or present a combined performance. 
-&app; provides different performance schemes that allow a maximum number 
-of users to participate in a network of learning, research and artistic 
-creation anywhere in the world (bandwidth permitting).</para>
-
-<para>The &app; development project is a part of the SAT PropulseART research program that was created to facilitate the implementation of remote networking for audiovisual, stage and digital systems between cultural and educational venues and to promote research and creation through new communication technologies. </para>
-<sect1 id="UsingScenic">
-<title>Using Scenic</title>
-</sect1>
+<chapter id="Introduction">
+  <title>Introduction</title>
+  <para>&app; is an on stage telepresence system that allows for
+  real time transmission of audio, video and control data over any
+  IP network. Telepresence systems can be used in various artistic
+  contexts, so that two different creative spaces can communicate
+  with each other or present a combined performance. &app; provides
+  different performance schemes that allow a maximum number of
+  users to participate in a network of learning, research and
+  artistic creation anywhere in the world (bandwidth
+  permitting).</para>
+  <para>The &app; development project is a part of the SAT
+  PropulseART research program that was created to facilitate the
+  implementation of remote networking for audiovisual, stage and
+  digital systems between cultural and educational venues and to
+  promote research and creation through new communication
+  technologies.</para>
+  <sect1 is="art-direction">
+    <title>Thinking About the Art Direction</title>
+    <para>When preparing a show that includes live telepresence,
+    there are thinkgs to consider that can help a lot to improve
+    the general quality of the performance. First, live arts that
+    involve the body as a whole are generally more interesting to
+    look at than those in which the body is rather static, not
+    moving. Next, planning many short numbers separated by the
+    comments of a master of ceremony can help the public to figure
+    out what is actually going on with the telepresence. Otherwise,
+    newcomers might now understand at all that some of the images
+    are steamed live from an other city. This is similar to the 
+    cabaret entertainment form.</para>
+  </sect1>
+  <sect1 id="UsingScenic">
+    <title>Telepresence and Real Wold's Issues</title>
+    <sect2 id="performance-issues">
+      <title>Performance Issues</title>
+      <para>When planning a show, it is important to consider the
+      limitations that are inherent to the computers and hardware.
+      For example, it is more efficient for a computer to output
+      only a single video image, rather than many. This single
+      image can be splitted with hardware splitters that introduce
+      close to no latency to the system. This is valid for both
+      digital and analog video signals.</para>
+    </sect2>
+    <sect2 id="audio-feedback">
+      <title>Fighting Against Audio Feedback</title>
+      <para>When sending and receiving audio signals in a context
+      of telepresence, serious audio feedback can occur. The
+      symptoms consist most often in very loud high-pitched tones.
+      The quickest way to fix this is to turn off the microphones
+      or the speakers. It is possible to take some precautions to
+      avoid these undesirable problems.</para>
+      <para>When planning the scenography for a show, the easiest
+      way to avoid audio feedback is to use headphones for playing
+      back the audio that is received from the remote peer. If not
+      possible, one could consider using musical instruments that
+      use pickups, rather than microphones. Otherwise, using very
+      directional microphones, or some that have a very short
+      range, can solve this issue. In any case, avoid directing the
+      micrphones towards the speakers.</para>
+      <para>To help fighting against audio feedback, you can plan
+      to use a limiter, a gate or a compressor in your audio
+      processing chain. Of course, this does not replace the
+      hardware precautions listed above.</para>
+    </sect2>
+    <sect2 id="projections-and-lighting">
+      <title>Video Projections and Lighting</title>
+      <para>A few common issues are commonly encountered in shows
+      involving both video projections and lighting. Of course,
+      both consist in light, and are best seen in a dark
+      environment, since that makes sures the light on dark ratio
+      is at its most. Using both video and lighting at the same
+      time increases the general brightness in the room which
+      decreases the possible dynamic range of light and shade. When
+      planning a show, one should locate the lights as far as
+      possible from the video displays in avoid to avoid light
+      spills on it.</para>
+      <para>When lighting a subject to be captured by a video
+      camera, it is best to light it well. That means lighting it
+      enough, so that the camera does not need to add to the image
+      a lot of gain, which decreases the image quality. That also
+      means using a well-known technique, such as the three points
+      lighting. This technique consists in a key light, a fill
+      light and a back light. The fill light decreases the shadow
+      created by the strong key light. The back light is useful for
+      lighting the shoulders and head of the subject. That detaches
+      it from the background. Two back lights can be used.</para>
+      <para>Using a dark background can also help to make the image
+      easier to recognize. The subject can be dressed up in light
+      colours. That makes it easier to recognize.</para>
+      <para>It is safe to think that a better image is easier for a
+      computer to compress. That will result in a smaller
+      bandwidth. The general rule is: garbage in, garbage out.
+      Shoot nice images and the result is more likely to be
+      neat.</para>
+    </sect2>
+  </sect1>
+  <sect1 id="quick-overview">
+    <title>Quick Overview</title>
+    <para>In a nut shell, once Scenic is installed and the computer is properly connected to the Internet and accessible from remote computers, it is time to launch Scenic and try it out. The first thing to do is to add a contact in your address book. You must give it a name and an IP address corresponding to the remote's computer IP address. Each peer can see its own local IP address in the statistics tab. Each peer can then give its IP address to the other person.</para>
+    <para>Next, it is time to configure what to send and receive to and from the remote peer. Scenic can transmit one video stream bi-directional, one MIDI stream and has many audio channels your hardware supports, when your software is properly installed. For each of them, you can enable or disable sending and receiving by clicking on the check button in the "Sending" and "Receiving" section in the "Video", "Audio" and "MIDI" tabs. For a stream to be enabled, both peer must enable it. If one of the peer disables sending or receiving a video signal, it does not occur in that direction.</para>
+    <para>In each of these three tabs, there are settings that allow you to fine tune the quality, source and destination of the streams. The codec informations are decided in the receiver's side. The source is, of course, decided in the sender's side.</para>
+    <para>The "Statistics" tab offers you informations and statistics about the current streams, when a streaming session is in progress. It also gives you your local IP address and your peer's IP address.</para>
+  </sect1>
 </chapter>

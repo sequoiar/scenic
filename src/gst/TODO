@@ -7,7 +7,6 @@ provide info
 
 HELLO_WORLD:
 -change v4l capture thread's sched policy to RR, as per the examples in gstreamer/tests/examples/streams
--integrate MIDI
 -get non blocking input from command-line
 -use more message passing, try mike's approach of path=ClassName, args[0]=handler_method, args[1-n]...
 -Get rid of singletons, rather have an application space all the necessary objects can listen.

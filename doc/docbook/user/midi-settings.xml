@@ -1,4 +1,17 @@
 <chapter id="midi-settings">
 <title>Midi Settings</title>
+<para>In this chapter, we will explain you how to configure your MIDI input and output device so that you can stream MIDI notes and controls.</para>
+<sect1>
+    <title>Enabling MIDI sending and receiving</title>
+    <para>To use the MIDI streaming feature, both peer must enable sending and/or receiving. Check the checkbox to enable it. Uncheck it to disable it.</para>
+</sect1>
+<sect1>
+    <title>Choosing the MIDI input and output devices</title>
+    <para>To send some MIDI notes and controls to the remote peer, you must choose a MIDI device to poll. Simply choose it from the drop-down menu in the "sending" frame of the MIDI tab.</para>
+    <para>In the same manner, choose a MIDI output device in the "output" frame of the MIDI tab.</para>
+</sect1>
+<sect1>
+    <title>Configuring the MIDI jitter buffer</title>
+    <para>The MIDI jitter buffer is a buffer that protects you from the variation in latency. This will prevent the notes from being heard in an irregular flow, creating beats that do not match what the remote musican had played. Increase this number (in milliseconds) in case of high network jitter.</para>
+</sect1>
 </chapter>
-

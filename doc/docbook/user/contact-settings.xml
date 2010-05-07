@@ -1,37 +1,36 @@
 <chapter id="contact-settings">
 <title>Contact Settings</title>
-
-<sect1><para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
+<para>In this chapter, we will explain how to use the address book that is in Scenic. To invite a remote peer to stream with you, you must add its IP address in your address book. You can give it a name so that it is easy to know with who you are streaming. When this is in your address book, you can invite it.</para>
+<sect1>
+<title>Adding and Deleting Contacts</title>
+<para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
    <orderedlist>
       <listitem>
          <para>Add a new contact: to add a connection, click +. To remove a connection, click -. </para>
       </listitem>
    </orderedlist>
    <para>
-      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/AddContact.png"
-                     width="17.217cm"
-                     depth="13.539cm"/> 
+      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/AddContact.png" width="17.217cm" depth="13.539cm"/> 
    </para>
    <para>Now a pop-up window will appear with the appropriate contact field: </para>
    <para>
-      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/ContactPopup.png"
-                     width="2.068cm"
-                     depth="1.07cm"/> 
+      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/ContactPopup.png" width="2.068cm" depth="1.07cm"/> 
    </para>
    <orderedlist>
       <listitem>
          <para>Name: insert the name of your contact in the field Name:. </para>
       </listitem>
-   </orderedlist>
-   <orderedlist>
       <listitem>
          <para>Address: insert the contact's IP address in the field IP Address:. </para>
       </listitem>
-   </orderedlist>
-   <orderedlist>
       <listitem>
          <para>Auto Accept: check this option if you want the remote user to connect without requiring authentication each time. </para>
       </listitem>
    </orderedlist>
-   <para>On the contact window, you can see a summary of the current settings for this particular contact. </para></sect1><para/>
+   <para>On the contact window, you can see a summary of the current settings for this particular contact. </para>
+</sect1>
+<sect1>
+<title>Inviting a remote peer to stream</title>
+<para>To invite a contact, simply click on its name in the address book and press the "Invite" button.</para>
+</sect1>
 </chapter>

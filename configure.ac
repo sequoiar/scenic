@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.60)
-AC_INIT(SCENIC, [0.5.1], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, [0.5.2], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -151,7 +151,8 @@ fi
 
 AX_PYTHON_MODULE([pypm], [])
 AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
-        [AC_MSG_ERROR([Requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home])])
+    [AC_MSG_WARN([Requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home])])
+    # We install midistream anyways, but the MIDI support is checked by Scenic and will be disabled if pypm if not found at runtime.
 
 AX_PYTHON_MODULE([twisted], [Fatal])
 AX_PYTHON_MODULE([gtk], [Fatal])
@@ -230,6 +231,7 @@ doc/Makefile
 doc/docbook/Makefile
 doc/docbook/fig/Makefile
 doc/docbook/user/Makefile
+doc/docbook/user-manual.xml
 doc/docbook/installation/Makefile
 doc/docbook/installation-manual.xml
 man/Makefile

@@ -36,7 +36,7 @@ std::map<std::string, FileSource*> FileSource::fileSources_;
 FileSource::FileSource(const Pipeline &pipeline, const std::string & location) :
     pipeline_(pipeline),
     filesrc_(pipeline_.makeElement("filesrc", NULL)),
-    decodebin_(pipeline_.makeElement("decodebin", NULL)),
+    decodebin_(pipeline_.makeElement("decodebin2", NULL)),
     videoQueue_(0), 
     audioQueue_(0)
 {

@@ -134,7 +134,7 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     gst_object_unref(rtcpReceiverSrc);
 }
 
-// FIXME: flush vectors when we get new, smaller sent or loss values
+
 void RtpSender::deltaPacketLoss(GstStructure *stats)
 {
     using std::string;

@@ -107,7 +107,7 @@ def _get_combobox_value(widget):
     try:
         tree_model_row = tree_model[index]
     except IndexError, e:
-        raise RuntimeError("ComboBox widget %s doesn't have value with index %s." % (widget, index))
+        raise RuntimeError("Cannot get ComboBox's value. Its tree model %s doesn't have row number %s." % (widget, index))
     #except TypeError, e:
     #    raise RuntimeError("%s is not a ComboBox widget" % (widget))
     return tree_model_row[0] 
@@ -118,7 +118,11 @@ def _set_combobox_choices(widget, choices=[]):
     """
     #XXX: combo boxes in the glade file must have a space as a value to have a tree iter
     #TODO When we change a widget value, its changed callback is called...
-    previous_value = _get_combobox_value(widget)
+    try:
+        previous_value = _get_combobox_value(widget)
+    except RuntimeError, e:
+        log.error(str(e))
+        previous_value = " "
     tree_model = gtk.ListStore(str)
     for choice in choices:
         tree_model.append([choice])
@@ -487,7 +491,10 @@ class Gui(object):
         if self._widgets_changed_by_user:
             if widget.get_active():
                 self.app.save_configuration() #gathers and saves
-                self.preview_manager.start()
+                try:
+                    self.preview_manager.start()
+                except RuntimeError, e:
+                    log.warning("The user starts/stops very quickly the preview. " + str(e))
             else:
                 self.preview_manager.stop()
 
@@ -636,7 +643,7 @@ class Gui(object):
         # Validate the address
         addr = self.contact_addr_widget.get_text().strip()
         if not network.validate_address(addr):
-            dialogs.ErrorDialog.create(_("The address is not valid\n\nEnter a valid address\nExample: 192.0.32.10 or example.org"), parent=self.main_window)
+            self.show_error_dialog(_("The address is not valid\n\nEnter a valid address\nExample: 192.0.32.10 or example.org"))
             return
         # save it.
         _when_valid_save()
@@ -721,7 +728,7 @@ class Gui(object):
                 try:
                     server.sendmail(fromaddr, toaddrs, msg)
                 except:
-                    dialogs.ErrorDialog.create(_("Could not send info.\nCheck your internet connection."), parent=self.main_window)
+                    self.show_error_dialog(_("Could not send info.\nCheck your internet connection."))
                 server.quit()
         
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
@@ -785,11 +792,16 @@ class Gui(object):
         _set_config("audio_jack_enable_autoconnect", self.audio_jack_enable_autoconnect_widget.get_active())
         
         # MIDI:
-        _set_config("midi_send_enabled", self.midi_send_enabled_widget.get_active())
-        _set_config("midi_recv_enabled", self.midi_recv_enabled_widget.get_active())
-        _set_config("midi_input_device", _get_combobox_value(self.midi_input_device_widget))
-        _set_config("midi_output_device", _get_combobox_value(self.midi_output_device_widget))
-        _set_config("midi_jitterbuffer", self.midi_jitterbuffer_widget.get_value_as_int())
+        if not self.app.midi_is_supported():
+            log.info("MIDI is not supported, since python-portmidi is not found.")
+            _set_config("midi_send_enabled", False)
+            _set_config("midi_recv_enabled", False)
+        else:
+            _set_config("midi_send_enabled", self.midi_send_enabled_widget.get_active())
+            _set_config("midi_recv_enabled", self.midi_recv_enabled_widget.get_active())
+            _set_config("midi_input_device", _get_combobox_value(self.midi_input_device_widget))
+            _set_config("midi_output_device", _get_combobox_value(self.midi_output_device_widget))
+            _set_config("midi_jitterbuffer", self.midi_jitterbuffer_widget.get_value_as_int())
         
     def update_widgets_with_saved_config(self):
         """
@@ -865,16 +877,21 @@ class Gui(object):
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
         log.debug(" * audio_codec: %s" % (audio_codec))
         _set_combobox_value(self.audio_codec_widget, audio_codec)
+        self.make_audio_jitterbuffer_enabled_or_not()
         
         # MIDI:
         log.debug("MIDI jitterbuffer: %s" % (self.app.config.midi_jitterbuffer))
-        self.midi_send_enabled_widget.set_active(_get_config("midi_send_enabled"))
-        self.midi_recv_enabled_widget.set_active(_get_config("midi_recv_enabled"))
-        _set_combobox_value(self.midi_input_device_widget, _get_config("midi_input_device"))
-        _set_combobox_value(self.midi_output_device_widget, _get_config("midi_output_device"))
+        if self.app.midi_is_supported():
+            self.midi_send_enabled_widget.set_active(_get_config("midi_send_enabled"))
+            self.midi_recv_enabled_widget.set_active(_get_config("midi_recv_enabled"))
+            _set_combobox_value(self.midi_input_device_widget, _get_config("midi_input_device"))
+            _set_combobox_value(self.midi_output_device_widget, _get_config("midi_output_device"))
+            self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
+        else:
+            self.midi_send_enabled_widget.set_active(False)
+            self.midi_recv_enabled_widget.set_active(False)
         self.make_midi_widget_sensitive_or_not()
-        self.midi_jitterbuffer_widget.set_value(self.app.config.midi_jitterbuffer)
-        self.make_audio_jitterbuffer_enabled_or_not()
+            
 
         # IMPORTANT: (to be done last)
         self._widgets_changed_by_user = True
@@ -1002,19 +1019,26 @@ class Gui(object):
     def make_midi_widget_sensitive_or_not(self):
         # make the MIDI widget insensitive if disabled
         log.debug("make_midi_widget_sensitive_or_not")
-        is_streaming = self.app.has_session()
-        if not is_streaming:
-            if not self.app.config.midi_send_enabled:
-                self.midi_input_device_widget.set_sensitive(False)
-            else:
-                self.midi_input_device_widget.set_sensitive(True)
-                
-            if not self.app.config.midi_recv_enabled:
-                self.midi_output_device_widget.set_sensitive(False)
-                self.midi_jitterbuffer_widget.set_sensitive(False)
-            else:
-                self.midi_output_device_widget.set_sensitive(True)
-                self.midi_jitterbuffer_widget.set_sensitive(True)
+        if self.app.midi_is_supported():
+            is_streaming = self.app.has_session()
+            if not is_streaming:
+                if not self.app.config.midi_send_enabled:
+                    self.midi_input_device_widget.set_sensitive(False)
+                else:
+                    self.midi_input_device_widget.set_sensitive(True)
+                    
+                if not self.app.config.midi_recv_enabled:
+                    self.midi_output_device_widget.set_sensitive(False)
+                    self.midi_jitterbuffer_widget.set_sensitive(False)
+                else:
+                    self.midi_output_device_widget.set_sensitive(True)
+                    self.midi_jitterbuffer_widget.set_sensitive(True)
+        else:
+            self.midi_recv_enabled_widget.set_sensitive(False)
+            self.midi_send_enabled_widget.set_sensitive(False)
+            self.midi_input_device_widget.set_sensitive(False)
+            self.midi_output_device_widget.set_sensitive(False)
+            self.midi_jitterbuffer_widget.set_sensitive(False)
 
     def on_midi_send_enabled_toggled(self, *args):
         if self._widgets_changed_by_user:
@@ -1063,18 +1087,20 @@ class Gui(object):
                     }
                 _info_send_video += _format_bitrate(rtcp_stats["send"]["video"]["bitrate"])
                 _info_send_video += "\n"
-                #_video_packetloss = rtcp_stats["send"]["video"]["packets-loss-percent"]
-                _info_send_video += _("Jitter: %(jitter)d ns") % {# % is escaped with an other %
+                _info_send_video += _("Jitter: %(jitter)d ns") % { # % is escaped with an other %
                     "jitter": rtcp_stats["send"]["video"]["jitter"]
                     }
+                # % is escaped with an other %
+                _info_send_video += "\n" + _("Packet loss: %(packetloss)2.2f%%") % {
+                    "packetloss": rtcp_stats["send"]["video"]["packet-loss-percent"]
+                    }
+                _info_send_video += "\n" + _("Packets lost: %(packetslost)d") % {
+                    "packetslost": rtcp_stats["send"]["video"]["packets-lost"]
+                    }
+                log.debug("info send video: %s" % (_info_send_video.replace("\n", " ")))
             else:
                 _info_send_video += _("Disabled")
 
-            #_info_send_video += _("jitter: %(jitter)d ns. packet loss: %(packetloss)2.2f%%.") % {# % is escaped with an other %
-            #    "jitter": rtcp_stats["send"]["video"]["jitter"],
-            #    "packetloss": _video_packetloss
-            #    }
-            #print("info send video: " + _info_send_video)
             self.info_send_video_widget.set_text(_info_send_video)
             
             # send audio: --------------------------------
@@ -1234,9 +1260,9 @@ class Gui(object):
         if _get_combobox_value(self.audio_codec_widget) == "MP3":
             max_channels = 2
         elif _get_combobox_value(self.audio_codec_widget) == "Raw":
-            max_channels = self.app.config.audio_maximum_number_of_channels_in_raw  
+            max_channels = self.app.max_channels_in_raw
         elif _get_combobox_value(self.audio_codec_widget) == "Vorbis":
-            max_channels = 24 
+            max_channels = 256
         # update range and clamp numchannels to new range 
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
@@ -1389,7 +1415,7 @@ class Gui(object):
                         if actual_standard != standard_name:
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             log.error(msg)
-                            dialogs.ErrorDialog.create(msg, parent=self.main_window)
+                            self.show_error_dialog(msg, parent=self.main_window)
                             
                             self._widgets_changed_by_user = False
                             _set_combobox_value(self.v4l2_standard_widget, actual_standard)
@@ -1485,6 +1511,13 @@ class Gui(object):
             log.error("Invite button clicked but we have a negotiation in progress.")
         else:
             self.app.send_invite()
+    
+    def show_error_dialog(self, text, details=None):
+        """
+        Simply shows an error dialog. 
+        @rettype: L{Deferred}
+        """
+        return dialogs.ErrorDialog.create(text, parent=self.main_window, details=details)
 
     def show_confirm_dialog(self, text, callback=None):
         """

@@ -1,326 +1,296 @@
-<chapter id="video settings">
-<title>Video Settings</title>
-<sect1><title>
-      <anchor id="SendingVideoSide"/>Sending Video Side</title><sect1 id="content"><para>This part defines what you will send to your contact </para>
-   <title>
-      <anchor id="Preview"/>Preview</title>
-   <para>The preview option will show you the video you are actually capturing, (The one you will send to the receiver) This enable you to validate that you are actually capturing a video feed. This is also use full to </para>
-   <title>
-      <anchor id="VideoSource"/>Video Source</title>
-   <para>Here you can choose witch video source you want to use to send. Color Bar </para>
-   <title>
-      <anchor id="VideoInput"/>Video Input</title>
-   <para>Ex: /dev/video0 </para>
-   <title>
-      <anchor id="VideoStandard"/>Video Standard</title>
-   <para>PAL: Phase Alternate Line, is an analogue television encoding system used in broadcast television systems in large parts of the world. Many European country uses this standard. NTSC: National Television System Committee, is the analog television system used in most of North America, South America, Japan, South Korea, Taiwan, Burma, and some Pacific island nations and territories. </para>
-   <para>Note that this settings need to be the same as the one in your capture device (Camera, camcorder, etc..). </para>
-   <title>
-      <anchor id="AspectRatio"/>Aspect Ratio</title>
-   <para>The aspect ratio of an image is the ratio of the width of the image to its height. </para>
-   <para>Currently we support 4:3 and 16:9 </para>
-   <para>Select one of these depending of what ratio the receiver need to output. </para>
-   <title>
-      <anchor id="ImageSize"/>Image Size</title>
-   <title>
-      <anchor id="ReceivingSide"/>Receiving Side</title>
-   <title>
-      <anchor id="VideoCodec"/>Video Codec</title>
-   <title>
-      <anchor id="VideoBitrate"/>Video Bitrate</title>
-   <para>Video bitrate is the number of bits of video data that are conveyed or processed per unit of time. It is expressed in Mega bits per second. Video bitrate capabilities varies depending of the video codec used: </para>
-   <para>video: high-bandwidth (H.264), medium-bw (MPEG-4), low-bw (H.263) </para>
-   <informaltable frame="all">
-      <tgroup cols="5"><tbody><row>
-            <entry>
-               <para>Name </para>
-            </entry>
-            <entry>
-               <para>Codec </para>
-            </entry>
-            <entry>
-               <para>Minimum Bitrate </para>
-            </entry>
-            <entry>
-               <para>Maximum Bitrate </para>
-            </entry>
-            <entry>
-               <para>Notes </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>High-Bandwidth H.264 Video </para>
-            </entry>
-            <entry>
-               <para>h264 </para>
-            </entry>
-            <entry>
-               <para>2 Mbps </para>
-            </entry>
-            <entry>
-               <para>16 Mbps, seems to be limited only by CPU </para>
-            </entry>
-            <entry>
-               <para>Most CPU-intensive (though scales to multiple cores) and most latency. </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Medium-Bandwidth MPEG-4 Video </para>
-            </entry>
-            <entry>
-               <para>mpeg4 </para>
-            </entry>
-            <entry>
-               <para>100 kbps (will go to 500 kbps with motion) </para>
-            </entry>
-            <entry>
-               <para>4Mbps (generally will be stay at 3Mbps without a lot of motion) </para>
-            </entry>
-            <entry>
-               <para>Preferable tradeoff for CPU-cost + Latency vs. Quality. </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Low-Bandwidth H.263 Video </para>
-            </entry>
-            <entry>
-               <para>h263 </para>
-            </entry>
-            <entry>
-               <para>500 kbps </para>
-            </entry>
-            <entry>
-               <para>4Mbps </para>
-            </entry>
-            <entry>
-               <para>Bitrate variable, depends largely on image source material. Doesn't like sudden, extreme changes in light (results in stuttering). Least CPU-intensive, lowest latency, reasonable quality at higher bitrate. </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Low-Bandwidth Theora Video </para>
-            </entry>
-            <entry>
-               <para>theora </para>
-            </entry>
-            <entry>
-               <para>videoquality=5 </para>
-            </entry>
-            <entry>
-               <para>videoquality=45 </para>
-            </entry>
-            <entry>
-               <para>Quality engine is much more reliable than using the bitrate setting. Tends to stutter with static, homogenous source material (i.e. camera pointed at wall) for low quality setting. </para>
-            </entry>
-         </row></tbody></tgroup>
-   </informaltable>
-   <title>
-      <anchor id="Fullscreen"/>Fullscreen</title>
-   <para>You have an option to automatically pop-up the video display in fullscreen </para>
-   <para>Short key: </para>
-   <para>Press Esc or f to toggle on and off the full screen on your video output display. </para>
-   <title>
-      <anchor id="X11Display"/>X11 Display</title>
-   <title>
-      <anchor id="Deinterlace"/>Deinterlace</title>
-   <title>
-      <anchor id="JitterBuffer"/>Jitter Buffer</title>
-   <orderedlist>
-      <listitem>
-         <para>Video flexibility and format: flexible video streams (codec, size, datarate), h264, mpeg4, h263, theora in SD format </para>
-      </listitem>
-      <listitem>
-         <para>Video input: Support video4linux2, DV, IIDC, file and possibility to select the video input. </para>
-      </listitem>
-      <listitem>
-         <para>Video standard: Possibility to use PAL or NTSC </para>
-      </listitem>
-      <listitem>
-         <para>Video framerate: Capacity to ajust the video framerate to 15, 25 and 30 fps </para>
-      </listitem>
-      <listitem>
-         <para>Video deinterlace: Possibility to deinterlace video on reception </para>
-      </listitem>
-      <listitem>
-         <para>Video scaling: Possibility to scale the video output up to 2046x2046 </para>
-      </listitem>
-      <listitem>
-         <para>Video aspect ratio: Possibility to adjust the aspect ratio to 4:3 or 16:9 </para>
-      </listitem>
-      <listitem>
-         <para>Video image size: Select witch size your video image is. </para>
-      </listitem>
-      <listitem>
-         <para>Video preview: Possibility to view the capture content before sending it. </para>
-      </listitem>
-      <listitem>
-         <para>Video latency: Under 100ms </para>
-      </listitem>
-      <listitem>
-         <para>Video flip: Possibility to flip the image, horizontally, vertically and rotate. </para>
-      </listitem>
-      <listitem>
-         <para>Video full screen: Option to display the video output in full screen </para>
-      </listitem>
-      <listitem>
-         <para>Video display: Possibility to set on witch display the video is output </para>
-      </listitem>
-   </orderedlist></sect1><sect2><title>
-      <anchor id="Preview"/>Preview</title>
-   <para>The preview option will show you the video you are actually capturing, (The one you will send to the receiver) This enable you to validate that you are actually capturing a video feed. This is also use full to </para></sect2><sect2><title>
-      <anchor id="VideoSource"/>Video Source</title>
-   <para>Here you can choose witch video source you want to use to send. Color Bar </para></sect2><sect2><title>
-      <anchor id="VideoInput"/>Video Input</title>
-   <para>Ex: /dev/video0 </para></sect2><sect2><title>
-      <anchor id="VideoStandard"/>Video Standard</title>
-   <para>PAL: Phase Alternate Line, is an analogue television encoding system used in broadcast television systems in large parts of the world. Many European country uses this standard. NTSC: National Television System Committee, is the analog television system used in most of North America, South America, Japan, South Korea, Taiwan, Burma, and some Pacific island nations and territories. </para>
-   <para>Note that this settings need to be the same as the one in your capture device (Camera, camcorder, etc..). </para></sect2><sect2><title>
-      <anchor id="AspectRatio"/>Aspect Ratio</title>
-   <para>The aspect ratio of an image is the ratio of the width of the image to its height. </para>
-   <para>Actually we support 4:3 and 16:9 </para>
-   <para>Select one of these depending of what ratio the receiver need to output. </para></sect2><sect2><title>
-      <anchor id="ImageSize"/>Image Size</title></sect2></sect1><sect1><title>
-      <anchor id="ReceivingSide"/>Receiving Side</title><sect2><title>
-      <anchor id="VideoCodec"/>Video Codec</title></sect2><sect2><title>
-      <anchor id="VideoBitrate"/>Video Bitrate</title>
-   <para>Video bitrate is the number of bits of video data that are conveyed or processed per unit of time. It is expressed in Mega bits per second. Video bitrate capabilities varies depending of the video codec used: </para>
-   <para>video: high-bandwidth (H.264), medium-bw (MPEG-4), low-bw (H.263) </para>
-   <informaltable frame="all">
-      <tgroup cols="5"><tbody><row>
-            <entry>
-               <para>Name </para>
-            </entry>
-            <entry>
-               <para>Codec </para>
-            </entry>
-            <entry>
-               <para>Minimum Bitrate </para>
-            </entry>
-            <entry>
-               <para>Maximum Bitrate </para>
-            </entry>
-            <entry>
-               <para>Notes </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>High-Bandwidth H.264 Video </para>
-            </entry>
-            <entry>
-               <para>h264 </para>
-            </entry>
-            <entry>
-               <para>2 Mbps </para>
-            </entry>
-            <entry>
-               <para>16 Mbps, seems to be limited only by CPU </para>
-            </entry>
-            <entry>
-               <para>Most CPU-intensive (though scales to multiple cores) and most latency. </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Medium-Bandwidth MPEG-4 Video </para>
-            </entry>
-            <entry>
-               <para>mpeg4 </para>
-            </entry>
-            <entry>
-               <para>100 kbps (will go to 500 kbps with motion) </para>
-            </entry>
-            <entry>
-               <para>4Mbps (generally will be stay at 3Mbps without a lot of motion) </para>
-            </entry>
-            <entry>
-               <para>Preferable tradeoff for CPU-cost + Latency vs. Quality. </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Low-Bandwidth H.263 Video </para>
-            </entry>
-            <entry>
-               <para>h263 </para>
-            </entry>
-            <entry>
-               <para>500 kbps </para>
-            </entry>
-            <entry>
-               <para>4Mbps </para>
-            </entry>
-            <entry>
-               <para>Bitrate variable, depends largely on image source material. Doesn't like sudden, extreme changes in light (results in stuttering). Least CPU-intensive, lowest latency, reasonable quality at higher bitrate. </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Low-Bandwidth Theora Video </para>
-            </entry>
-            <entry>
-               <para>theora </para>
-            </entry>
-            <entry>
-               <para>videoquality=5 </para>
-            </entry>
-            <entry>
-               <para>videoquality=45 </para>
-            </entry>
-            <entry>
-               <para>Quality engine is much more reliable than using the bitrate setting. Tends to stutter with static, homogenous source material (i.e. camera pointed at wall) for low quality setting. </para>
-            </entry>
-         </row></tbody></tgroup>
-   </informaltable></sect2><sect2><title>
-      <anchor id="Fullscreen"/>Fullscreen</title>
-   <para>You have an option to automatically pop-up the video display in fullscreen </para>
-   <para>Short key: </para>
-   <para>Press Esc or f to toggle on and off the full screen on your video output display. </para></sect2><sect2><title>
-      <anchor id="X11Display"/>X11 Display</title></sect2><sect2><title>
-      <anchor id="Deinterlace"/>Deinterlace</title></sect2><sect2><title>
-      <anchor id="JitterBuffer"/>Jitter Buffer</title>
-   <orderedlist>
-      <listitem>
-         <para>Video flexibility and format: flexible video streams (codec, size, datarate), h264, mpeg4, h263, theora in SD format </para>
-      </listitem>
-      <listitem>
-         <para>Video input: Support video4linux2, DV, IIDC, file and possibility to select the video input. </para>
-      </listitem>
-      <listitem>
-         <para>Video standard: Possibility to use PAL or NTSC </para>
-      </listitem>
-      <listitem>
-         <para>Video framerate: Capacity to ajust the video framerate to 15, 25 and 30 fps </para>
-      </listitem>
-      <listitem>
-         <para>Video deinterlace: Possibility to deinterlace video on reception </para>
-      </listitem>
-      <listitem>
-         <para>Video scaling: Possibility to scale the video output up to 2046x2046 </para>
-      </listitem>
-      <listitem>
-         <para>Video aspect ratio: Possibility to adjust the aspect ratio to 4:3 or 16:9 </para>
-      </listitem>
-      <listitem>
-         <para>Video image size: Select witch size your video image is. </para>
-      </listitem>
-      <listitem>
-         <para>Video preview: Possibility to view the capture content before sending it. </para>
-      </listitem>
-      <listitem>
-         <para>Video latency: Under 100ms </para>
-      </listitem>
-      <listitem>
-         <para>Video flip: Possibility to flip the image, horizontally, vertically and rotate. </para>
-      </listitem>
-      <listitem>
-         <para>Video full screen: Option to display the video output in full screen </para>
-      </listitem>
-      <listitem>
-         <para>Video display: Possibility to set on witch display the video is output </para>
-      </listitem>
-   </orderedlist>
-   <para/></sect2></sect1></chapter>
+<chapter id="video-settings">
+  <title>Video Settings</title>
+  <para>This chapter describes how to setup your video settings in
+  Scenic. How course, Scenic can transmit video to a remote
+  peer.</para>
+  <para>Each peer configures its video capture size and chooses the
+  right device. Next, when using analog capture device, the video
+  standard can be PAL or NTSC.</para>
+  <para>Scenic is designed so that configuring the video codec must
+  be done by the receiver. This way, the receiver can fine tune the
+  quality of the image it receives. On the receiver's side, the
+  operator can also choose to display the window in full screen on
+  a specific display. This is also where the user chooses the
+  jitter buffer for the video stream. Increase it to prevent poor
+  image quality in case of packets loss. Increasing the jitter
+  buffer add mores latency, so it is better to have a sane network
+  with close to no packets loss, instead of increasing this
+  value.</para>
+  <sect1>
+    <title>
+    <anchor id="SendingVideo" />Sending Video</title>
+    <para>In this section, it is possible to configure the video
+    image that will be sent to your remote peer.</para>
+    <sect2>
+      <title>
+      <anchor id="Preview" />Preview</title>
+      <para>The preview option will show you the video you are
+      actually capturing, (The one you will send to the receiver)
+      This enable you to validate that you are actually capturing a
+      video feed.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="VideoSource" />Video Source</title>
+      <para>Here you can choose witch video source you want to use
+      to send. To make a color test, you can use the Color bars.
+      Scenic detects which supported video devices are connected to
+      your computer, and lists them there. It tries to detect them
+      every tiem the user switches to the video tab, and when
+      trying to initiate a streaming session with a peer. That
+      means that if you don't see a video device you have just
+      plugged, you could try switching to an other tab, and
+      switching back to the video tab, to see if it is
+      detected.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="VideoInput" />Video Input</title>
+      <para>Some devices have many input, such as S-Video,
+      composite, etc. In this case, you must choose the input to
+      which the camera is connected to.</para>
+      <para>If using an analog video capture card, S-Video is
+      generally preferable over a composite input, since it offers
+      a better image quality, especially for colors. A component
+      input is even better. S-Video is an analog video signal that
+      carries video data as two separate signals: luma (luminance)
+      and chroma (color). This differs from composite video, which
+      carries picture information as a single lower-quality signal,
+      and component video, which carries picture information as
+      three separate higher-quality signals.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="VideoStandard" />Video Standard</title>
+      <para>When using an analog video capture card, this
+      configuration entry must be set accordingly to the video
+      standard of the camera. Most of the Americas, Japan, South
+      Korea, Taiwan, Burma, and some Pacific island nations and
+      territories use NTSC. The rest of the world use PAL</para>
+      <para>PAL: Phase Alternate Line, is an analogue television
+      encoding system used in broadcast television systems in large
+      parts of the world. Many European country uses this standard.
+      NTSC: National Television System Committee, is the analog
+      television system used in most of North America, South
+      America, Japan, South Korea, Taiwan, Burma, and some Pacific
+      island nations and territories.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="AspectRatio" />Aspect Ratio</title>
+      <para>The aspect ratio of an image is the ratio of the width
+      of the image to its height. Scenic currently supports 4:3 and
+      16:9. Finally, the aspect ratio can be 4:3 or 16:9, depending
+      on if the image source provides square pixels or rectangle
+      pixels. Commonly used values are 16:9 for 704x480 and 4:3 for
+      640x480</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="ImageSize" />Image Size</title>
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>
+    <anchor id="ReceivingSide" />Receiving Side</title>
+    <sect2>
+      <title>
+      <anchor id="VideoCodec" />Video Codec</title>
+      <para>Choose h.263 for low bandwidth or low CPU setup. Use
+      Theora for a patent-free experience. Use MPEG4 for most
+      situation. Use h.264 to use all the CPU power you
+      have.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="VideoBitrate" />Video Bitrate</title>
+      <para>Video bitrate is the number of bits of video data that
+      are conveyed or processed per unit of time. It is expressed
+      in Mega bits per second. Video bitrate capabilities varies
+      depending of the video codec used:</para>
+      <para>video: high-bandwidth (H.264), medium-bw (MPEG-4),
+      low-bw (H.263)</para>
+      <informaltable frame="all">
+        <tgroup cols="5">
+          <tbody>
+            <row>
+              <entry>
+                <para>Name</para>
+              </entry>
+              <entry>
+                <para>Codec</para>
+              </entry>
+              <entry>
+                <para>Minimum Bitrate</para>
+              </entry>
+              <entry>
+                <para>Maximum Bitrate</para>
+              </entry>
+              <entry>
+                <para>Notes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>High-Bandwidth H.264 Video</para>
+              </entry>
+              <entry>
+                <para>h264</para>
+              </entry>
+              <entry>
+                <para>2 Mbps</para>
+              </entry>
+              <entry>
+                <para>16 Mbps, seems to be limited only by
+                CPU</para>
+              </entry>
+              <entry>
+                <para>Most CPU-intensive (though scales to multiple
+                cores) and most latency.</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Medium-Bandwidth MPEG-4 Video</para>
+              </entry>
+              <entry>
+                <para>mpeg4</para>
+              </entry>
+              <entry>
+                <para>100 kbps (will go to 500 kbps with
+                motion)</para>
+              </entry>
+              <entry>
+                <para>4Mbps (generally will be stay at 3Mbps
+                without a lot of motion)</para>
+              </entry>
+              <entry>
+                <para>Preferable tradeoff for CPU-cost + Latency
+                vs. Quality.</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Low-Bandwidth H.263 Video</para>
+              </entry>
+              <entry>
+                <para>h263</para>
+              </entry>
+              <entry>
+                <para>500 kbps</para>
+              </entry>
+              <entry>
+                <para>4Mbps</para>
+              </entry>
+              <entry>
+                <para>Bitrate variable, depends largely on image
+                source material. Doesn't like sudden, extreme
+                changes in light (results in stuttering). Least
+                CPU-intensive, lowest latency, reasonable quality
+                at higher bitrate.</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Low-Bandwidth Theora Video</para>
+              </entry>
+              <entry>
+                <para>theora</para>
+              </entry>
+              <entry>
+                <para>videoquality=5</para>
+              </entry>
+              <entry>
+                <para>videoquality=45</para>
+              </entry>
+              <entry>
+                <para>Quality engine is much more reliable than
+                using the bitrate setting. Tends to stutter with
+                static, homogenous source material (i.e. camera
+                pointed at wall) for low quality setting.</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="Fullscreen" />Fullscreen</title>
+      <para>You have an option to automatically launch the
+      receiver's window in fullscreen. Once the receiver's window
+      is running, you can press the Escape (or F) key to toggle on
+      and off the fullscreen mode.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="X11Display" />X11 Display</title>
+      <para>Useful to display the video on another monitor.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="Deinterlace" />Deinterlace</title>
+      <para>Deinterlacing makes a nicer image when the source is
+      analog, but it adds latency. You should never use it if the
+      remote video source is a Web cam.</para>
+    </sect2>
+    <sect2>
+      <title>
+      <anchor id="JitterBuffer" />Jitter Buffer</title>
+      <orderedlist>
+        <listitem>
+          <para>Video flexibility and format: flexible video
+          streams (codec, size, datarate), h264, mpeg4, h263,
+          theora in SD format</para>
+        </listitem>
+        <listitem>
+          <para>Video input: Support video4linux2, DV, IIDC, file
+          and possibility to select the video input.</para>
+        </listitem>
+        <listitem>
+          <para>Video standard: Possibility to use PAL or
+          NTSC</para>
+        </listitem>
+        <listitem>
+          <para>Video framerate: Capacity to ajust the video
+          framerate to 15, 25 and 30 fps</para>
+        </listitem>
+        <listitem>
+          <para>Video deinterlace: Possibility to deinterlace video
+          on reception</para>
+        </listitem>
+        <listitem>
+          <para>Video scaling: Possibility to scale the video
+          output up to 2046x2046</para>
+        </listitem>
+        <listitem>
+          <para>Video aspect ratio: Possibility to adjust the
+          aspect ratio to 4:3 or 16:9</para>
+        </listitem>
+        <listitem>
+          <para>Video image size: Select witch size your video
+          image is.</para>
+        </listitem>
+        <listitem>
+          <para>Video preview: Possibility to view the capture
+          content before sending it.</para>
+        </listitem>
+        <listitem>
+          <para>Video latency: Under 100ms</para>
+        </listitem>
+        <listitem>
+          <para>Video flip: Possibility to flip the image,
+          horizontally, vertically and rotate.</para>
+        </listitem>
+        <listitem>
+          <para>Video full screen: Option to display the video
+          output in full screen</para>
+        </listitem>
+        <listitem>
+          <para>Video display: Possibility to set on witch display
+          the video is output</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
+  </sect1>
+</chapter>

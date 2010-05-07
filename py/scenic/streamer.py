@@ -24,10 +24,15 @@ Manages local streamer processes.
 """
 
 from scenic import process
+import subprocess
 from scenic import sig
 from scenic import dialogs
 from scenic.internationalization import _
 from scenic import logger
+from twisted.python import procutils
+from twisted.internet import defer
+from twisted.internet import utils
+import os
 
 log = logger.start(name="streamer")
 
@@ -50,6 +55,34 @@ class StreamerManager(object):
         self.session_details = None # either None or a big dict
         self.rtcp_stats = None # either None or a big dict
         self.error_messages = None # either None or a big dict
+        self.warnings = None # either None or a big dict
+
+    def get_max_channels_in_raw(self):
+        """
+        Calls deferred with an int as argument
+        @rtype: Deferred
+        """
+        def _cb(text, deferred):
+            for i in text.splitlines():
+                if "raw supports up to " in i:
+                    ret = int(i.split()[-2])
+            deferred.callback(ret)
+            
+        def _eb(reason, deferred):
+            deferred.errback(reason)
+            print("Error getting max channels: %s" % (reason))
+        
+        command_name = "milhouse"
+        args = ['--max-channels']
+        try:
+            executable = procutils.which(command_name)[0] # gets the executable
+        except IndexError:
+            return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+        deferred = defer.Deferred()
+        d = utils.getProcessOutput(executable, args=args, env=os.environ, errortoo=True) # errortoo puts stderr in output
+        d.addCallback(_cb, deferred)
+        d.addErrback(_eb, deferred)
+        return deferred
 
     def _gather_config_to_stream(self, addr):
         """
@@ -173,6 +206,27 @@ class StreamerManager(object):
             self.session_details["send"]["video"]["device"] = None
         if self.session_details["send"]["video"]["codec"] == "theora":
             self.session_details["send"]["video"]["bitrate"] = None
+        
+        # limit to max numchannels if in raw
+        # ...according to remote's max
+        if self.session_details["receive"]["audio"]["codec"] == "raw":
+            if self.session_details["receive"]["audio"]["numchannels"] > remote_config["audio"]["max_channels_in_raw"]:
+                num =  remote_config["audio"]["max_channels_in_raw"]
+                self.session_details["receive"]["audio"]["numchannels"] = num
+                msg = _("Limiting the number of audio channels to receive to %(number)d since remote peer only support up to that much.\nDecrease it to get rid of this message.") % {"number": num}
+                log.error(msg)
+                self.app.gui.show_error_dialog(msg)
+        # ...according to local's max
+        if self.session_details["send"]["audio"]["codec"] == "raw":
+            if self.session_details["send"]["audio"]["numchannels"] > self.app.max_channels_in_raw:
+                num = self.app.max_channels_in_raw
+                self.session_details["send"]["audio"]["numchannels"] = num
+                msg = _("Limiting the number of audio channels to send to %(number)d since we only support up to that much.\nDecrease it to get rid of this message.") % {"number": num}
+                details = _("Update your jackaudiosrc Gstreamer element.")
+                log.error(msg)
+                log.error(details)
+                self.app.gui.show_error_dialog(msg, details=details)
+        
         log.debug(str(self.session_details))
 
     def _prepare_stats_and_errors_dicts(self):
@@ -208,6 +262,10 @@ class StreamerManager(object):
             }
         }
         self.error_messages = {
+            "send": [], # list of strings
+            "receive": [], # list of strings
+            }
+        self.warnings = {
             "send": [], # list of strings
             "receive": [], # list of strings
             }
@@ -475,6 +533,10 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
+        
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
         try:
             if "stream connected" in line:
                 if "audio" in line:
@@ -487,7 +549,7 @@ class StreamerManager(object):
                 elif "audio" in line:
                     self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
             else:
-                log.debug("%9s stdout: %s" % (process_manager.identifier, line))
+                log.debug("%s stdout: %s" % (process_manager.identifier, line))
         except ValueError, e:
             log.error("%s when parsing line '%s' from receiver" % (e, line))
 
@@ -498,12 +560,18 @@ class StreamerManager(object):
         log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
     
     def on_sender_stdout_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stdout
         """
-        log.debug("%9s stdout: %s" % (process_manager.identifier, line))
+        log.debug("%s stdout: %s" % (process_manager.identifier, line))
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
         try:
             if "PACKETS-LOST" in line:
                 if "video" in line:
@@ -547,6 +615,9 @@ class StreamerManager(object):
         log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["send"].append(line)
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings["receive"].append(line)
 
     def is_busy(self):
         """
@@ -606,20 +677,28 @@ class StreamerManager(object):
         #TODO: internationalize
         log.info("All streamers are stopped.")
         if len(self.error_messages["send"]) != 0:
+            show_error_dialog = True
             log.error("Error messages from the sender for this session: %s" % (self.error_messages["send"]))
             details += _("Errors from local sender:") + "\n"
             for line in self.error_messages["send"]:
                 details += " * " + line + "\n"
-            show_error_dialog = True
+            if len(self.warnings["send"]) != 0:
+                details += _("Warnings from local sender:") + "\n"
+                for line in self.warnings["send"]:
+                    details += " * " + line + "\n"
         if len(self.error_messages["receive"]) != 0:
+            show_error_dialog = True
             log.error("Error messages from the receiver for this session: %s" % (self.error_messages["receive"]))
             details += _("Errors from local receiver:") + "\n"
             for line in self.error_messages["receive"]:
                 details += " * " + line + "\n"
-            show_error_dialog = True
+            if len(self.warnings["receive"]) != 0:
+                details += _("Warnings from local receiver:") + "\n"
+                for line in self.warnings["receive"]:
+                    details += " * " + line + "\n"
         if show_error_dialog:
             msg = _("Some errors occured during the audio/video streaming session.")
-            dialogs.ErrorDialog.create(msg, parent=self.app.gui.main_window, details=details)
+            self.app.gui.show_error_dialog(msg, details=details)
         # TODO: should we set all our process managers to None
 
         # set all to None:
@@ -629,7 +708,7 @@ class StreamerManager(object):
         self.extra_receiver = None
         self.midi_receiver = None
         self.midi_sender = None
-        log.debug("Process managers should all be None: %s" % (self.get_all_streamer_process_managers()))
+        log.debug("Done stopping steaming")
     
     def _set_state(self, new_state):
         """
@@ -656,3 +735,4 @@ class StreamerManager(object):
                 if proc is not None:
                     if proc.state != process.STATE_STOPPED and proc.state != process.STATE_STOPPING:
                         proc.stop()
+

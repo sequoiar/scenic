@@ -84,7 +84,7 @@ bool Jack::is_running()
                 THROW_ERROR("Overall operation failed.");
                 break;
             default:
-                THROW_ERROR("Overall operation mysteriously failed.");
+                THROW_ERROR("Overall operation failed for unknown reason.");
                 break;
         }
     }

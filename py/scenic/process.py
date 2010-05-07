@@ -244,10 +244,10 @@ class ProcessManager(object):
                         self._process_transport.signalProcess(signal.SIGKILL)
                     except OSError, e:
                         msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                        log.error(msg) # raise?
+                        log.warning(msg) 
                     except error.ProcessExitedAlready:
                         msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, "SIGKILL")
-                        log.error(msg) # raise ?
+                        log.warning(msg) 
                 elif self.state == STATE_STOPPED:
                     msg = "Successfully killed process after least than the %f seconds. State is %s." % (self.time_before_sigkill, self.state)
                     self.log(msg)
@@ -272,11 +272,11 @@ class ProcessManager(object):
                 self._process_transport.signalProcess(signal_to_send)
             except OSError, e:
                 msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                log.error(msg) # raise?
+                log.warning(msg) 
             except error.ProcessExitedAlready:
                 if signal_to_send == signal.SIGTERM:
                     msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, signal_to_send)
-                    log.error(msg) # raise ?
+                    log.warning(msg) 
             else:
                 if signal_to_send == signal.SIGTERM:
                     self._delayed_kill = reactor.callLater(self.time_before_sigkill, _later_check, self.pid)

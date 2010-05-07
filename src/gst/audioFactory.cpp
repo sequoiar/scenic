@@ -35,6 +35,11 @@
 using boost::shared_ptr;
 namespace po = boost::program_options;
 
+void audiofactory::printMaxChannels(const std::string &codec)
+{
+    LOG_PRINT(codec << " supports up to " << 
+            AudioSourceConfig::maxChannels(codec) << " channels\n");
+}
 
 shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const po::variables_map &options)
 {
