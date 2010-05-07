@@ -1,5 +1,5 @@
-scenic (0.5.2-0) lucid; urgency=low
+scenic (0.5.2) lucid; urgency=low
 
   * Initial packaging.
 
- -- Alexandre Quessy <alexandre@quessy.net>  Thu, 06 May 2010 16:49:04 -0400
+ -- Alexandre Quessy <alexandre@quessy.net>  Fri, 07 May 2010 12:05:39 -0400
