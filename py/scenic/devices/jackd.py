@@ -145,7 +145,7 @@ def jackd_get_infos():
                             arg_name = 'backend'
                             cast = str
                     
-                    elif backend == 'freebob': # freebob arguments
+                    elif backend == 'freebob' or backend == "firewire": # freebob arguments
                         #Default values for freebob:
                         #-p, --period    Frames per period (default: 1024)
                         #-n, --nperiods  Number of periods of playback latency (default: 3)
