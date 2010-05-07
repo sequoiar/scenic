@@ -1,3 +1,9 @@
+scenic (0.5.3) lucid; urgency=low
+
+  * Fixing a few things in the Debian packaging.
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Fri, 07 May 2010 14:11:21 -0400
+
 scenic (0.5.2) lucid; urgency=low
 
   * Initial packaging.
