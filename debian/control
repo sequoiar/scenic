@@ -18,6 +18,7 @@ Build-Depends:
  gstreamer0.10-plugins-ugly (>= 0.10.14),
  gstreamer0.10-plugins-ugly-multiverse,
  help2man,
+ jackd,
  lame,
  libjack-dev,
  libasound2-dev,
@@ -53,6 +54,7 @@ Build-Depends:
  python-simplejson,
  python-twisted,
  vorbis-tools,
+ x11-utils,
  x264
 Standards-Version: 3.8.0
 Homepage: http://scenic.sat.qc.ca/
@@ -107,6 +109,7 @@ Depends:
  python-simplejson,
  python-twisted,
  vorbis-tools,
+ x11-utils,
  x264
 Recommends:
  linux-headers-rt,
