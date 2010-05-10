@@ -1,6 +1,6 @@
 <chapter id="hardware-setup">
   <title>Hardware Setup</title>
-  <para>&amp;app; require the use of many devices. In this chapter,
+  <para>&amp;app; requires the use of many devices. In this chapter,
   we will have an overview of what kind of device are generaly use.
   We will also give some idea on how to connect these devices. What
   problem the you could face and how to troubleshoot them.</para>
@@ -14,13 +14,13 @@
         format="JPG" />
       </imageobject>
       <textobject>
-        <phrase>Generic Sheme</phrase>
+        <phrase>Generic Scheme</phrase>
       </textobject>
     </mediaobject>
     <para>Audio Input:</para>
     <itemizedlist>
       <listitem>
-        <para>Microphone in mic entry (or other audio
+        <para>Microphone in mic input (or other audio
         inputs)</para>
       </listitem>
       <listitem>

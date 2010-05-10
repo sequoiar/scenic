@@ -5,6 +5,7 @@ Maintainer: Alexandre Quessy <alexandre@quessy.net>
 Build-Depends:
  automake,
  bison,
+ bash-completion,
  build-essential,
  cdbs,
  debhelper (>= 5.0.38),
@@ -14,10 +15,15 @@ Build-Depends:
  gettext,
  gstreamer0.10-plugins-bad,
  libgstreamer-plugins-base0.10-dev,
+ gstreamer0.10-alsa,
+ gstreamer0.10-ffmpeg,
  gstreamer0.10-plugins-good,
  gstreamer0.10-plugins-ugly (>= 0.10.14),
  gstreamer0.10-plugins-ugly-multiverse,
+ gstreamer0.10-pulseaudio,
+ gstreamer0.10-x,
  help2man,
+ jackd,
  lame,
  libjack-dev,
  libasound2-dev,
@@ -53,6 +59,7 @@ Build-Depends:
  python-simplejson,
  python-twisted,
  vorbis-tools,
+ x11-utils,
  x264
 Standards-Version: 3.8.0
 Homepage: http://scenic.sat.qc.ca/
@@ -61,18 +68,23 @@ Package: scenic
 Architecture: any
 Depends:
  ${misc:Depends},
+ bash-completion,
  bison,
  doxygen,
  ffmpeg,
  flex,
  gettext,
  gstreamer0.10-0,
+ gstreamer0.10-alsa,
+ gstreamer0.10-ffmpeg,
  gstreamer0.10-plugins-bad,
  gstreamer0.10-plugins-bad-multiverse,
  gstreamer0.10-plugins-base0.10,
  gstreamer0.10-plugins-good,
  gstreamer0.10-plugins-ugly (>= 0.10.14),
  gstreamer0.10-plugins-ugly-multiverse,
+ gstreamer0.10-pulseaudio,
+ gstreamer0.10-x,
  jackd,
  lame,
  libasound2,
@@ -107,6 +119,7 @@ Depends:
  python-simplejson,
  python-twisted,
  vorbis-tools,
+ x11-utils,
  x264
 Recommends:
  linux-headers-rt,

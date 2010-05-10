@@ -17,13 +17,12 @@
       <para>Here we will configure all the settings related to the video input and output</para>
       <sect2>
       <title>Video Output</title>
-         <para>First thing, make sure you have the Xvideo extension actived in the Xorg server: </para>
+         <para>First, make sure you have the Xvideo extension actived in the X11 display: </para>
          <programlisting>xvinfo | grep -i adaptor</programlisting>
-         <para>The output should NOT be "no adaptors present". If it's not activated, you may have to use a proprietary driver. See <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">NvidiaSettings</ulink> or <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/AtiConfig">AtiConfig</ulink> for Nvidia and ATI cards respectively. </para>
-         <para>Then, what we want now is two video output. One for your monitor screen and one other for your projector or video mixer. </para>
+         <para>The output should NOT contain "no adaptors present". If it's not activated, you may have to use a proprietary driver. See <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">NvidiaSettings</ulink> or <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/AtiConfig">AtiConfig</ulink> for Nvidia and ATI cards respectively. </para>
+         <para>Next, what we want now is two video outputs. One for your monitor screen and one for your projector or video mixer.</para>
          <para>For the nvidia graphic card, we have to detect both output. The first output (your monitor) is usually set to a 1024x768 resolution and the second output (VGA, or S-video Output) is usually set to a resolution of 800x600. Note that those resolution can vary from one setup to an other. </para>
          <para>For this, follow our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">NvidiaSettings</ulink> instructions. </para>
-   
          <para>Set the local machine display to output the video from the remote machine on the wanted monitor or TV. </para>   
          <para>The environment variable DISPLAY tells all X clients where to display their windows. </para>
          <para>Ex: export DISPLAY=:0.0 will display the video on your local default screen. export DISPLAY=:0.1 will display the video on your second screen. </para>
@@ -50,8 +49,8 @@
       </sect2>
       <sect2>
       <title>Video Test</title>
-         <para>In &app;, you can easily preview video4linux2 devices in the Video tab. Other input drivers cannot be used at the moment in &app;, but milhouse support them: </para>
-         <para>Choose the videosource according to this table: </para>
+         <para>In &app;, you can easily preview video4linux2 video devices in the "Video" tab. Other input drivers cannot be used at the moment in &app;, but milhouse supports them: </para>
+         <para>Choose the video source according to this table: </para>
          <informaltable frame="all">
          <tgroup cols="2"><tbody><row>
             <entry>
@@ -66,7 +65,7 @@
                <para>v4lsrc</para>
             </entry>
             <entry>
-               <para>video4linux (v1) devices </para>
+               <para>video4linux (v1) devices - Only supported on the command line</para>
             </entry>
          </row>
          <row>
@@ -74,7 +73,7 @@
                <para>dv139src</para>
             </entry>
             <entry>
-               <para>DV cameras and decks </para>
+               <para>DV cameras and decks  - Only supported on the command line</para>
             </entry>
          </row>
          <row>
@@ -82,36 +81,37 @@
                <para>dc1394src</para>
             </entry>
             <entry>
-               <para>IIDC 1.31 cameras </para>
+               <para>IIDC 1.31 cameras  - Only supported on the command line</para>
             </entry>
          </row></tbody></tgroup>
    </informaltable>
    <programlisting>milhouse --localhost --videosource v4l2src</programlisting>
-   <para>You can add different options such as: </para>
+   <para>You can add several options such as: </para>
    <orderedlist>
       <listitem>
-         <para>--aspect-ratio </para>
+         <para>--aspect-ratio</para>
       </listitem>
       <listitem>
-         <para>--width </para>
+         <para>--width</para>
       </listitem>
       <listitem>
-         <para>--height </para>
+         <para>--height</para>
       </listitem>
       <listitem>
-         <para>--fullscreen </para>
+         <para>--fullscreen</para>
       </listitem>
       <listitem>
-         <para>--flip-video </para>
+         <para>--flip-video</para>
       </listitem>
    </orderedlist>
-   <para/></sect2></sect1>
+   <para/></sect2>
+</sect1>
 
 <sect1><title>Audio Settings</title>
    <para>First verify that you have an appropriate sound card on our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">HardwareRequirements</ulink>. </para><sect2><title>Firewire sound card</title>
          <para>Verify that your soundcard is detected For firewire soundcard: </para>
          <programlisting>ls -l /dev/*1394*</programlisting>
-         <para>If the device does not appear try </para>
+         <para>If the device does not appear try this: </para>
          <programlisting>sudo modprobe raw1394</programlisting>
          <para>The current user must be part of the disk group. If that is not the case, then the system administrator must add the "user" to the "disk" group (as shown above) </para>
    </sect2><sect2><title>For PCI soundcard</title>
@@ -123,7 +123,7 @@
             <imagedata fileref="fig/qjackctl.png" format="PNG"/>
          </imageobject>
       </mediaobject>
-         <para>Then click on setup button </para>
+         <para>Then, click on setup button.</para>
    <para>Here is an examples of qjackctl realtime setup configuration: </para>
    <informaltable frame="all">
       <tgroup cols="3"><tbody><row>

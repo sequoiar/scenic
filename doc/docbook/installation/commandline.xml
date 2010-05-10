@@ -1,403 +1,465 @@
 <chapter>
-   <title>Scenic in command line</title> 
-   <para>The use of Scenic in command line is a powerfull tool with many options not implemented yet in the Scenic GUI.</para>
-   <para>The actual name of Scenic commandline is "milhouse".</para>
-   <para>For more complex setup than what Scenic can currently support, we suggest you to use <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> as a launching script. Look at some examples in <ulink url="https://svn.sat.qc.ca/trac/miville/browser/trunk/utils">trunk/utils/</ulink></para>
-
-   <sect1>
-      <title>Start the sound server</title>
-      <para> The sound server is an application used to manage the soundcard. Choosing which soundcard to use, seleting the input and output and defining the audio quality. It usually runs as a background process. </para>
-      <para>Follow our <link linkend='AV_Configuration'>Audio settings page </link>to start the sound server.</para>
-   </sect1>
-   <sect1>
-   <title>Start the receivers</title>
-      <para>Set the local_machine display </para>
-      <programlisting>export DISPLAY=:0.0</programlisting>
-      <para>Execute program on the local machine with the following parameters: </para>
-      <programlisting>milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 <para> --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 </para>--numchannels 2</programlisting>
-      <para>Set the remote_machine display </para>
-      <programlisting>export DISPLAY=:0.0</programlisting>
-      <para>Execute program on the remote machine with the following parameters:</para>
-      <programlisting>milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4<para> --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000</para> --numchannels 2</programlisting>
-   </sect1>
-   <sect1>
-   <title>Start the senders</title>
-      <para>Execute program on local machine with the following parameters: </para>
-      <programlisting>milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030<para> --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2</para> --audioport 10000</programlisting>
-      <para>Execute program on remote machine with the following parameters: </para>
-      <programlisting>milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030<para> --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2</para> --audioport 10000</programlisting>
-      <para>A video window showing live video should appear on one of your designated screens. It is movable by holding down the -alt- key and dragging the window. Pressing 'F' will toggle full screen mode.</para>
-      <para>You should also see the audio connections appear in qjackctl. The outputs are now routable to your speakers or other applications. </para>
-      <para>You should now have video and audio input fully working on both sides. </para>
-      <para>To stop milhouse type ctrl-c in the used terminal or type qq in the video screen </para>
-   <para/>
-   </sect1>
-   <sect1>
-   <title>Milhouse Help</title>
-      <para>Type milhouse --help to have informations on the various available option </para>
-      <programlisting>milhouse --help</programlisting>
-      <para/>
-      <informaltable frame="all">
-         <tgroup cols="2"><tbody><row>
+  <title>Scenic in command line</title>
+  <para>The use of Scenic in command line is a powerful tool with
+  many options not implemented yet in the Scenic GUI. The actual
+  name of Scenic commandline is "milhouse". For more complex setup
+  than what Scenic can currently support, we suggest you to use 
+  <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink>as a
+  launching script. Look at some examples in 
+  <ulink url="https://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
+  trunk/utils/</ulink>. You should look at the manual page of both
+  these tools to know more about them.</para>
+  <sect1>
+    <title>Start the sound server</title>
+    <para>The sound server is an application used to manage the
+    soundcard. Choosing which soundcard to use, seleting the input
+    and output and defining the audio quality. It usually runs as a
+    background process.</para>
+    <para>Follow our 
+    <link linkend='AV_Configuration'>Audio settings page</link>to
+    start the sound server.</para>
+  </sect1>
+  <sect1>
+    <title>Launch the receivers</title>
+    <para>Here is a short explanation on how to start the milhouse receivers to receive audio and video streams.</para>
+    <para>Set the local_machine display</para>
+    <programlisting>export DISPLAY=:0.0</programlisting>
+    <para>Run the program on the local machine with the following
+    parameters:</para>
+    <programlisting>milhouse --receiver --address remote_ip_address
+    --videosink xvimagesink --videocodec mpeg4 
+    <para>--videoport 10030 --audiosink jackaudiosink --audiocodec
+    raw --audioport 10000</para>--numchannels 2</programlisting>
+    <para>Set the remote_machine display</para>
+    <programlisting>export DISPLAY=:0.0</programlisting>
+    <para>Execute program on the remote machine with the following
+    parameters:</para>
+    <programlisting>milhouse --receiver --address local_ip_address
+    --videosink xvimagesink --videocodec mpeg4
+    <para>--videoport 10030 --audiosink jackaudiosink --audiocodec
+    raw --audioport 10000</para>--numchannels 2</programlisting>
+  </sect1>
+  <sect1>
+    <title>Launch the senders</title>
+    <para>The next step is to launch the milhouse sender processes. Of course, that should be on a different computer.</para>
+    <para>Execute program on local machine with the following
+    parameters:</para>
+    <programlisting>milhouse --sender --address remote_ip_address
+    --videocodec mpeg4 --videoport 10030
+    <para>--videosource v4l2src --audiosource jackaudiosrc
+    --audiocodec raw &#160;-c 2</para>--audioport
+    10000</programlisting>
+    <para>Execute program on remote machine with the following
+    parameters:</para>
+    <programlisting>milhouse --sender --address local_ip_address
+    --videocodec mpeg4 --videoport 10030
+    <para>--videosource v4l2src --audiosource jackaudiosrc
+    --audiocodec raw &#160;-c 2</para>--audioport
+    10000</programlisting>
+    <para>A video window displaying the live video stream should appear on one of
+    your designated screens. It is movable by holding down the
+    -alt- key and dragging the window. Pressing 'F' or Escape will toggle
+    full screen mode.</para>
+    <para>You should also see the audio connections appear in
+    qjackctl. The outputs are now routable to your speakers or
+    other applications.</para>
+    <para>You should now have video and audio input fully working
+    on both sides.</para>
+    <para>To stop milhouse type Control-c in the used terminal or type
+    Control-q in the video window.</para>
+  </sect1>
+  <sect1>
+    <title>Milhouse Help</title>
+    <para>Type milhouse --help to have informations on the different
+    options available.</para>
+    <programlisting>milhouse --help</programlisting>
+    <informaltable frame="all">
+      <tgroup cols="2">
+        <tbody>
+          <row>
             <entry>
-               <para>Help Options:</para>
+              <para>Help Options:</para>
             </entry>
             <entry>
-               <para/>
+              <para />
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-?, --help </para>
+              <para>-?, --help</para>
             </entry>
             <entry>
-               <para>produce help </para>
+              <para>produce help</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-r, --receiver</para>
+              <para>-r, --receiver</para>
             </entry>
             <entry>
-               <para>this process is a receiver </para>
+              <para>this process is a receiver</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-s, --sender</para>
+              <para>-s, --sender</para>
             </entry>
             <entry>
-               <para>this process is a sender </para>
+              <para>this process is a sender</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-i, --address</para>
+              <para>-i, --address</para>
             </entry>
             <entry>
-               <para>provide ip address of remote host address </para>
+              <para>provide ip address of remote host
+              address</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-v, --videocodec</para>
+              <para>-v, --videocodec</para>
             </entry>
             <entry>
-               <para>videocodec (mpeg4, h264, h263, theora) </para>
+              <para>videocodec (mpeg4, h264, h263, theora)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-a, --audiocodec</para>
+              <para>-a, --audiocodec</para>
             </entry>
             <entry>
-               <para>audiocodec (raw, vorbis, mp3) </para>
+              <para>audiocodec (raw, vorbis, mp3)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-k, --videosink</para>
+              <para>-k, --videosink</para>
             </entry>
             <entry>
-               <para>video output (xvimagesink, glimagesink, sharedvideosink, ximagesink) </para>
+              <para>video output (xvimagesink, glimagesink,
+              sharedvideosink, ximagesink)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-l, --audiosink</para>
+              <para>-l, --audiosink</para>
             </entry>
             <entry>
-               <para>audio output (jackaudiosink, alsasink, pulsesink) </para>
+              <para>audio output (jackaudiosink, alsasink,
+              pulsesink)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-t, --audioport</para>
+              <para>-t, --audioport</para>
             </entry>
             <entry>
-               <para>audioport number (1024-65535) </para>
+              <para>audioport number (1024-65535)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-p, --videoport</para>
+              <para>-p, --videoport</para>
             </entry>
             <entry>
-               <para>videoport number (1024-65535) </para>
+              <para>videoport number (1024-65535)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-f, --fullscreen</para>
+              <para>-f, --fullscreen</para>
             </entry>
             <entry>
-               <para>display video in fullscreen </para>
+              <para>display video in fullscreen</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-B, --shared-video-id</para>
+              <para>-B, --shared-video-id</para>
             </entry>
             <entry>
-               <para>name for shared video buffer output (only applies to sharedvideosink) </para>
+              <para>name for shared video buffer output (only
+              applies to sharedvideosink)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-o, --deinterlace</para>
+              <para>-o, --deinterlace</para>
             </entry>
             <entry>
-               <para>deinterlace video (receiver side only) </para>
+              <para>deinterlace video (receiver side only)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-d, --videodevice</para>
+              <para>-d, --videodevice</para>
             </entry>
             <entry>
-               <para>name of videodevice (/dev/video0, /dev/video1) </para>
+              <para>name of videodevice (/dev/video0,
+              /dev/video1)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-q, --audiodevice</para>
+              <para>-q, --audiodevice</para>
             </entry>
             <entry>
-               <para>name of audiodevice (hw:0, hw:2, plughw:0, plughw:2) </para>
+              <para>name of audiodevice (hw:0, hw:2, plughw:0,
+              plughw:2)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>--videolocation</para>
+              <para>--videolocation</para>
             </entry>
             <entry>
-               <para>video file location &lt;filename&gt; (only applies when videosource=filesrc) </para>
+              <para>video file location &lt;filename&gt; (only
+              applies when videosource=filesrc)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>--audiolocation</para>
+              <para>--audiolocation</para>
             </entry>
             <entry>
-               <para>audio file location &lt;filename&gt; (only applies when audiosource=filesrc) </para>
+              <para>audio file location &lt;filename&gt; (only
+              applies when audiosource=filesrc)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-n, --screen</para>
+              <para>-n, --screen</para>
             </entry>
             <entry>
-               <para>xinerama screen num (0, 1) </para>
+              <para>xinerama screen num (0, 1)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-w, --version</para>
+              <para>-w, --version</para>
             </entry>
             <entry>
-               <para>outputs version number </para>
+              <para>outputs version number</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-c, --numchannels</para>
+              <para>-c, --numchannels</para>
             </entry>
             <entry>
-               <para>The numbers of audio channels to use. </para>
+              <para>The numbers of audio channels to use.</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-x, --videobitrate</para>
+              <para>-x, --videobitrate</para>
             </entry>
             <entry>
-               <para>videobitrate: The amount of video data being encoded; expressed in bits per second </para>
+              <para>videobitrate: The amount of video data being
+              encoded; expressed in bits per second</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-e, --audiosource</para>
+              <para>-e, --audiosource</para>
             </entry>
             <entry>
-               <para>audio input (jackaudiosrc, alsasrc, pulsesrc) </para>
+              <para>audio input (jackaudiosrc, alsasrc,
+              pulsesrc)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-u, --videosource</para>
+              <para>-u, --videosource</para>
             </entry>
             <entry>
-               <para>video input (v4l2src, v4lsrc, dv1394src) </para>
+              <para>video input (v4l2src, v4lsrc, dv1394src)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-z, --timeout</para>
+              <para>-z, --timeout</para>
             </entry>
             <entry>
-               <para>time in ms to wait before quitting, 0 means run indefinitely </para>
+              <para>time in ms to wait before quitting, 0 means run
+              indefinitely</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-b, --audio-buffer-usec</para>
+              <para>-b, --audio-buffer-usec</para>
             </entry>
             <entry>
-               <para>length of receiver's audio buffer in microseconds, must be &gt; 11333 </para>
+              <para>length of receiver's audio buffer in
+              microseconds, must be &gt; 11333</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-g, --jitterbuffer</para>
+              <para>-g, --jitterbuffer</para>
             </entry>
             <entry>
-               <para>length of receiver's rtp jitterbuffers in milliseconds, must be &gt;= 1 </para>
+              <para>length of receiver's rtp jitterbuffers in
+              milliseconds, must be &gt;= 1</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-G, --camera-number</para>
+              <para>-G, --camera-number</para>
             </entry>
             <entry>
-               <para>camera id for dc1394src (0,1) </para>
+              <para>camera id for dc1394src (0,1)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-U, --camera-guid</para>
+              <para>-U, --camera-guid</para>
             </entry>
             <entry>
-               <para>camera guid for dc1394src </para>
+              <para>camera guid for dc1394src</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-I, --mulitcast-interface</para>
+              <para>-I, --mulitcast-interface</para>
             </entry>
             <entry>
-               <para>interface to use for mutlicast (eth0, eth1) </para>
+              <para>interface to use for mutlicast (eth0,
+              eth1)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-j, --enable-controls</para>
+              <para>-j, --enable-controls</para>
             </entry>
             <entry>
-               <para>enable gui controls for jitterbuffer </para>
+              <para>enable gui controls for jitterbuffer</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-J, --disable-jack-autoconnect</para>
+              <para>-J, --disable-jack-autoconnect</para>
             </entry>
             <entry>
-               <para>prevent milhouse's jack audio ports don't connect on startup </para>
+              <para>prevent milhouse's jack audio ports don't
+              connect on startup</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-O, --jack-client-name</para>
+              <para>-O, --jack-client-name</para>
             </entry>
             <entry>
-               <para>name of jack-client </para>
+              <para>name of jack-client</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-C, --negotiate-caps</para>
+              <para>-C, --negotiate-caps</para>
             </entry>
             <entry>
-               <para>force rtp media capabilities (caps) to be communicated over tcp </para>
+              <para>force rtp media capabilities (caps) to be
+              communicated over tcp</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-D, --debug</para>
+              <para>-D, --debug</para>
             </entry>
             <entry>
-               <para>level of logging verbosity (critical=1, error=2, warning=3, info=4, debug=5, gst-debug=6) </para>
+              <para>level of logging verbosity (critical=1,
+              error=2, warning=3, info=4, debug=5,
+              gst-debug=6)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-W, --window-title</para>
+              <para>-W, --window-title</para>
             </entry>
             <entry>
-               <para>title for video output window </para>
+              <para>title for video output window</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-F, --framerate</para>
+              <para>-F, --framerate</para>
             </entry>
             <entry>
-               <para>framerate for video capture (15,30) </para>
+              <para>framerate for video capture (15,30)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-H, --list-cameras</para>
+              <para>-H, --list-cameras</para>
             </entry>
             <entry>
-               <para>list connected cameras </para>
+              <para>list connected cameras</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-N, --width</para>
+              <para>-N, --width</para>
             </entry>
             <entry>
-               <para>width for video capture, must be specified for sender and receiver </para>
+              <para>width for video capture, must be specified for
+              sender and receiver</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-Y, --height</para>
+              <para>-Y, --height</para>
             </entry>
             <entry>
-               <para>height for video capture, must be specified for sender and receiver </para>
+              <para>height for video capture, must be specified for
+              sender and receiver</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-P, --display-width</para>
+              <para>-P, --display-width</para>
             </entry>
             <entry>
-               <para>width for video on display (may scale input) </para>
+              <para>width for video on display (may scale
+              input)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-Q, --display-height</para>
+              <para>-Q, --display-height</para>
             </entry>
             <entry>
-               <para>height for video on display (may scale output) </para>
+              <para>height for video on display (may scale
+              output)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-M, --grayscale</para>
+              <para>-M, --grayscale</para>
             </entry>
             <entry>
-               <para>force dc1394 capture to grayscale </para>
+              <para>force dc1394 capture to grayscale</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>-A, --aspect-ratio</para>
+              <para>-A, --aspect-ratio</para>
             </entry>
             <entry>
-               <para>picture aspect ratio (4:3, 16:9) </para>
+              <para>picture aspect ratio (4:3, 16:9)</para>
             </entry>
-         </row>
-         <row>
+          </row>
+          <row>
             <entry>
-               <para>--localvideo</para>
+              <para>--localvideo</para>
             </entry>
             <entry>
-               <para>display local video only </para>
+              <para>display local video only</para>
             </entry>
-         </row></tbody></tgroup>
-   </informaltable>
-   </sect1>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </sect1>
 </chapter>

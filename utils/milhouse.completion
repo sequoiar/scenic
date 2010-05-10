@@ -12,9 +12,14 @@ _milhouse()
         else
             case "$prev" in
             --videosource ) COMPREPLY=($(compgen -W "videotestsrc v4l2src v4lsrc dc1394src dv1394src filesrc" -- $cur ) ) ;;
+            --videosink )   COMPREPLY=($(compgen -W "xvimagesink ximagesink glimagesink sharedvideosink" -- $cur ) ) ;;
+            --videocodec )  COMPREPLY=($(compgen -W "mpeg4 h263 h264 theora" -- $cur ) ) ;;
             --videodevice ) COMPREPLY=($(compgen -W "$(milhouse --list-cameras | awk '/Video4/ { sub(/:/, "");print $3 }')" -- $cur ) ) ;;
             --audiosource ) COMPREPLY=($(compgen -W "audiotestsrc jackaudiosrc alsasrc pulsesrc filesrc" -- $cur ) ) ;;
+            --audiocodec )  COMPREPLY=($(compgen -W "raw mp3 vorbis" -- $cur ) ) ;;
+            --flip-video )  COMPREPLY=($(compgen -W "none clockwise rotate-180 counterclockwise horizontal-flip vertical-flip upper-left-diagonal upper-right-diagonal" -- $cur ) ) ;;
             --aspect-ratio ) COMPREPLY=($(compgen -W "4:3 16:9" -- $cur ) ) ;;
+            --debug )       COMPREPLY=($(compgen -W "critical error warning info debug gst-debug" -- $cur ) ) ;;
             *) ;;
             esac
         fi

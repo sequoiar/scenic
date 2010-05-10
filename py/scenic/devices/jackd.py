@@ -37,6 +37,11 @@ import glob
 import pprint
 from twisted.internet import reactor
 from twisted.python import failure
+from scenic import logger
+
+log = logger.start(name="jackd")
+
+SUPPORTED_BACKENDS = ['alsa', 'freebob', 'firewire'] # supported backends so far. #TODO: add more
 
 def double_fork(args):
     """
@@ -97,16 +102,16 @@ def jackd_get_infos():
     i = 0 # jackd number
     uid = os.getuid() # or os.geteuid() ?
     all = glob.glob("/dev/shm/jack-%d/*/*-0" % (uid))
-    for running in all:
-        sp = running.split('/')
+    for filename in all:
+        sp = filename.split('/')
         try:
             name = sp[4] # probably 'default'
             pid = sp[5].split('-')[3]
             pid = int(pid)
-        except IndexError:
-            pass
+        except IndexError, e:
+            log.error(str(e))
         except ValueError:
-            pass
+            log.error(str(e))
         else:
             ret.append({})
             ret[i]['name'] = name # probably 'default' or $JACK_DEFAULT_SERVER
@@ -125,6 +130,7 @@ def jackd_get_infos():
                     os.kill(pid, 0) # test if process is running
                 except OSError, e:
                     pass # it is running
+                    log.warning("jackd process %s is not running" % (pid))
                     ret.pop()
                 else:
                     msg = "Jackd seems frozen. IOError : (trying to read %s) PID %s is still alive. %s" % (filename, pid, e)
@@ -133,7 +139,6 @@ def jackd_get_infos():
                 _state_printed_jackd_is_frozen = False 
                 # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'
                 cmdline = s.split('\x00') # ['/usr/bin/jackd', '-dalsa', '-dhw:0', '-r44100', '-p1024', '-n2', '2', '']
-                backends = ['alsa', 'freebob'] # supported backends so far. #TODO: add more
                 backend = None
                 for arg in cmdline:
                     arg_name = None
@@ -145,7 +150,7 @@ def jackd_get_infos():
                             arg_name = 'backend'
                             cast = str
                     
-                    elif backend == 'freebob': # freebob arguments
+                    elif backend == 'freebob' or backend == "firewire": # freebob arguments
                         #Default values for freebob:
                         #-p, --period    Frames per period (default: 1024)
                         #-n, --nperiods  Number of periods of playback latency (default: 3)
@@ -187,9 +192,12 @@ def jackd_get_infos():
                         else:
                             # All the arguments after having specified a backend (-d alsa) are arguments specific for this backend.
                             if arg_name == 'backend':
-                                for b in backends:
-                                    if val == b:
-                                        backend = b
+                                if val in SUPPORTED_BACKENDS:
+                                    for b in SUPPORTED_BACKENDS:
+                                        if val == b:
+                                            backend = b
+                                else:
+                                    log.warning("The %s jackd backend is not supported. Its options are not well parsed by Scenic." % (val))
                 # now, the command line args used to start jackd (as a string)
                 ret[i]["cmdline"] = ""
                 for arg in cmdline[1:]:
@@ -197,8 +205,11 @@ def jackd_get_infos():
             # if set to 0, it was not set in the CLI, so we set it to the default according to backend
             if len(ret) > 0:
                 #print "i = ", i
+                # TODO: do a for loop for each detected device.
                 if ret[i]["nperiods"] == 0:
                     if ret[i]["backend"] == "freebob":
+                        ret[i]["nperiods"] = 3
+                    elif ret[i]["backend"] == "firewire":
                         ret[i]["nperiods"] = 3
                     else:
                         ret[i]["nperiods"] = 2

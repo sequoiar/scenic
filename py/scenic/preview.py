@@ -1,5 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# 
+# Scenic
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Scenic is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Scenic. If not, see <http://www.gnu.org/licenses/>.
+
 """
 Preview Process management.
 """
@@ -19,6 +38,8 @@ class Preview(object):
         self.process_manager = None #process.ProcessManager(identifier="preview")
         self.state = process.STATE_STOPPED
         self.state_changed_signal = sig.Signal()
+        self.error_messages = None # either None or a list
+        self.warnings = None # either None or a list
             
     def is_busy(self):
         """
@@ -72,6 +93,8 @@ class Preview(object):
             raise RuntimeError("Cannot start preview since it is %s." % (self.state)) # the programmer has done something wrong if we're here.
         else:
             command = self._create_command()
+        self.error_messages = []
+        self.warnings = []
         self.process_manager = process.ProcessManager(command=command, identifier="preview")
         self.process_manager.stdout_line_signal.connect(self.on_stdout_line)
         self.process_manager.stderr_line_signal.connect(self.on_stderr_line)
@@ -81,9 +104,17 @@ class Preview(object):
 
     def on_stdout_line(self, process_manager, line):
         log.debug(line)
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings.append(line)
 
     def on_stderr_line(self, process_manager, line):
         log.debug(line)
+        if "CRITICAL" in line or "ERROR" in line:
+            self.error_messages.append(line)
+        if "WARNING" in line:
+            log.warning(line)
+            self.warnings.append(line)
         
     def on_process_state_changed(self, process_manager, process_state):
         """
@@ -108,8 +139,27 @@ class Preview(object):
         if self.state != new_state:
             self.state_changed_signal(self, new_state)
             self.state = new_state
+            if new_state == process.STATE_STOPPED:
+                self.on_stopped()
         else:
             raise RuntimeError("Setting state to %s, which is already the current state." % (self.state))
+
+    def on_stopped(self):
+        show_error_dialog = False
+        details = ""
+        if len(self.error_messages) != 0:
+            show_error_dialog = True
+            log.error("Error messages from the preview : %s" % (self.error_messages))
+            details += _("Errors from local preview:") + "\n"
+            for line in self.error_messages:
+                details += " * " + line + "\n"
+            if len(self.warnings) != 0:
+                details += _("Warnings from local preview:") + "\n"
+                for line in self.warnings:
+                    details += " * " + line + "\n"
+        if show_error_dialog:
+            msg = _("Some errors occured while looking at the local preview.")
+            self.app.gui.show_error_dialog(msg, details=details)
             
     def stop(self):
         """

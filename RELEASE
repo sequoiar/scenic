@@ -1,6 +1,6 @@
-Release notes for Scenic 0.5.2
+Release notes for Scenic 0.5.4
 
-This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. We created an Ubuntu package and the python-portmidi module is not mandatory anymore. We fixed bug related to sampling rate mismatch and increased the maximum number of raw audio channels when using the properly patched gst-plugins-bad elements. Error messages are also a lot more verbose, to help the user debugging.
+This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. 
 
     Upgrading:
     * Be sure to uninstall your previous miville or scenic before installing
@@ -28,34 +28,18 @@ This release is an other unstable version in the 0.5 series. This version contai
     * While milhouse supports many video and audio input types, Scenic only supports a subset of them. 
     * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from long term support of the new features of the 0.5 branch.
 
-New features and bug fixes in 0.5.2:
+New features and bug fixes in 0.5.4:
 
 New features in milhouse:
-    #197 Audio sync with sharedVideoBuffer
-    #491 milhouse should report max number of channels it can send
-    #497 show channel number under vumeter
 
 New features in scenic:
-    #474 Add the --verbose option to scenic
-    #490 Make python-portmidi not mandatory
-    #476 add an option to disable to auto connect to jack ports in scenic
-    #506 Show milhouse's warnings to the user
+    #515 Include installation manual in the help menu and in packaging
+    #508 Install the bash completion file with the debian package
+    #500 Show errors when the preview crashes
 
 Bug fixes in milhouse: 
-    #482 audiotestsrc sample rate is fixed at 48000
-    #487 when filesource location isn't valid, the error message is horrible
-    #196 Need to drop frames in sharedVideoBuffer
 
 Bug fixes in scenic : 
-    #488 The port allocator is not called to free ports
-    #489 scenic.desktop always crashes
-    #492 maximum number of channels sent with raw must be negotiated
-    #473 Lots of docbook documents not found
-    #472 Use 2 spaces for indentation in user manual
-    #486 If the python midi doesn't work, MIDI should be disabled
-    #443 An error should be shown if midistream does not work
-    #493 preview complains about STOPPING state
-    #494 Improve the reason messages on offerer's side
-    #469 Scenic don't detect jack sample rate mismatch in RAW
-    #496 Create man page for jack-info
-
+    #510 Latency calculation is wrong with the firewire jackd driver
+    #467 Logging to file is broken
+    #363 Sometimes the video preview crashes
