@@ -33,7 +33,10 @@ New features and bug fixes in 0.5.4:
 New features in milhouse:
 
 New features in scenic:
+    #515 Include installation manual in the help menu and in packaging
+    #508 Install the bash completion file with the debian package
 
 Bug fixes in milhouse: 
 
 Bug fixes in scenic : 
+    #510 Latency calculation is wrong with the firewire jackd driver
