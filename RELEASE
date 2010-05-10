@@ -1,4 +1,4 @@
-Release notes for Scenic 0.5.4
+Release notes for Scenic 0.5.5
 
 This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. 
 
@@ -33,13 +33,7 @@ New features and bug fixes in 0.5.4:
 New features in milhouse:
 
 New features in scenic:
-    #515 Include installation manual in the help menu and in packaging
-    #508 Install the bash completion file with the debian package
-    #500 Show errors when the preview crashes
 
 Bug fixes in milhouse: 
 
 Bug fixes in scenic : 
-    #510 Latency calculation is wrong with the firewire jackd driver
-    #467 Logging to file is broken
-    #363 Sometimes the video preview crashes
