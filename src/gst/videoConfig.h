@@ -98,7 +98,6 @@ class VideoSinkConfig
         int effectiveDisplayWidth() const;
         int effectiveDisplayHeight() const;
         const std::string sink_;
-        const int screenNum_;
         bool doDeinterlace_;
         const std::string sharedVideoId_;
         const int displayWidth_;

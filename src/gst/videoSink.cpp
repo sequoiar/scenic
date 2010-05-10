@@ -50,12 +50,11 @@ bool GtkVideoSink::hasWindow() const
     return xid_ == 0;
 }
         
-GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid) : 
+GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) : 
     VideoSink(pipeline), 
     xid_(xid),
     isFullscreen_(false),
     window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0), 
-    screen_num_(screen_num), 
     drawingArea_(hasWindow() ? gtk_drawing_area_new() : 0),
 	vbox_(hasWindow() ? gtk_vbox_new(FALSE, 0) : 0),
 	hbox_(hasWindow() ? gtk_hbox_new(FALSE, 0) : 0),
@@ -270,12 +269,13 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid) : 
-    GtkVideoSink(pipeline, screenNum, xid),
+XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned long xid) : 
+    GtkVideoSink(pipeline, xid),
     BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
+    //g_object_set(sink_, "display", display, NULL);
     if (hasWindow())
     {
         LOG_DEBUG("Setting default window size to " << width << "x" << height);

@@ -53,7 +53,7 @@ class GtkVideoSink
 : public VideoSink, MessageHandler
 {
     public:
-        GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid);
+        GtkVideoSink(const Pipeline &pipeline, unsigned long xid);
         void createControl();
         virtual ~GtkVideoSink(){};
         void showWindow();
@@ -66,7 +66,6 @@ class GtkVideoSink
     protected:
         void toggleFullscreen() { toggleFullscreen(window_); }
         _GtkWidget *window_;
-        int screen_num_;
         _GtkWidget *drawingArea_;
         _GtkWidget *vbox_;
         _GtkWidget *hbox_;
@@ -90,7 +89,7 @@ class XvImageSink
 : public GtkVideoSink, private BusMsgHandler
 {
     public:
-        XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid);
+        XvImageSink(Pipeline &pipeline, int width, int height, unsigned long xid);
         bool handleBusMsg(_GstMessage *msg);
 
     private:

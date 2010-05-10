@@ -37,15 +37,11 @@ class GLImageSink
 {
     public:
         /// Constructor 
-        GLImageSink(Pipeline &pipeline, int width, int height, int screen_num, unsigned long xid);
+        GLImageSink(Pipeline &pipeline, int width, int height, unsigned long xid);
         bool handleBusMsg(_GstMessage *msg);
 
     private:
-
-        /** 
-         * Destructor */
         ~GLImageSink();
-
         _GstElement *sinkElement() { return sink_; }
 
         /** 

@@ -75,8 +75,8 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_num, unsigned long xid) : 
-    GtkVideoSink(pipeline, screen_num, xid), 
+GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, unsigned long xid) : 
+    GtkVideoSink(pipeline, xid), 
     BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
