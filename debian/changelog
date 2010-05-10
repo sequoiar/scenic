@@ -1,3 +1,16 @@
+scenic (0.5.4.1) lucid; urgency=low
+
+  * Fixed issues with dependencies in packagin.
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Mon, 10 May 2010 15:40:06 -0400
+
+scenic (0.5.4) lucid; urgency=low
+
+  * New upstream version. 
+  * Added some missing dependencies of Gstreamer elements for the packaging.
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Mon, 10 May 2010 15:21:08 -0400
+
 scenic (0.5.3) lucid; urgency=low
 
   * Fixing a few things in the Debian packaging.
