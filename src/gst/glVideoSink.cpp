@@ -82,7 +82,11 @@ GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height,
 {
     sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
-    g_object_set(G_OBJECT(sink_), "display", display.c_str(), NULL);
+    if (not display.empty())
+    {
+        g_object_set(G_OBJECT(sink_), "display", display.c_str(), NULL);
+        updateDisplay(display);
+    }
 
     if (hasWindow())
     {

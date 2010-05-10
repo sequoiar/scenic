@@ -48,7 +48,17 @@ bool GtkVideoSink::hasWindow() const
 {
     return xid_ == 0;
 }
+
+void GtkVideoSink::updateDisplay(const std::string &display)
+{
+    GdkDisplay *disp = gdk_display_open(display.c_str());
+    if (disp == 0)
+        THROW_ERROR("Could not open display " << display);
+    /// FIXME: should be able to get other screens than 0
+    gtk_window_set_screen(GTK_WINDOW(window_), gdk_display_get_screen(disp, 0));
+}
         
+
 GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) : 
     VideoSink(pipeline), 
     xid_(xid),
@@ -274,7 +284,11 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned lon
 {
     sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
-    g_object_set(sink_, "display", display.c_str(), NULL);
+    if (not display.empty())
+    {
+        g_object_set(sink_, "display", display.c_str(), NULL);
+        updateDisplay(display);
+    }
     if (hasWindow())
     {
         LOG_DEBUG("Setting default window size to " << width << "x" << height);
@@ -312,7 +326,8 @@ XImageSink::XImageSink(const Pipeline &pipeline, const std::string &display) :
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
     sink_ = pipeline_.makeElement("ximagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
-    g_object_set(sink_, "display", display.c_str(), NULL);
+    if (not display.empty())
+        g_object_set(sink_, "display", display.c_str(), NULL);
 
     gstlinkable::link(colorspc_, sink_);
 }

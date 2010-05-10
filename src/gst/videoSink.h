@@ -58,6 +58,9 @@ class GtkVideoSink
         virtual ~GtkVideoSink(){};
         void showWindow();
 
+    protected:
+        void updateDisplay(const std::string &display);
+
     private:     /// other member vars depend on xid
         unsigned long xid_;
         virtual bool handleMessage(const std::string &path, const std::string &arguments);
@@ -110,12 +113,9 @@ class XImageSink
 
     private:
         ~XImageSink();
-
         _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;
 };
-
-
 
 #endif //_VIDEO_SINK_H_
 
