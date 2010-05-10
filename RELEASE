@@ -35,6 +35,7 @@ New features in milhouse:
 New features in scenic:
     #515 Include installation manual in the help menu and in packaging
     #508 Install the bash completion file with the debian package
+    #500 Show errors when the preview crashes
 
 Bug fixes in milhouse: 
 
