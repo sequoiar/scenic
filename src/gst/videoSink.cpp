@@ -55,7 +55,7 @@ void GtkVideoSink::updateDisplay(const std::string &display)
     if (disp == 0)
         THROW_ERROR("Could not open display " << display);
     /// FIXME: should be able to get other screens than 0
-    gtk_window_set_screen(GTK_WINDOW(window_), gdk_display_get_screen(disp, 0));
+    gtk_window_set_screen(GTK_WINDOW(window_), gdk_display_get_default_screen(disp));
 }
         
 
