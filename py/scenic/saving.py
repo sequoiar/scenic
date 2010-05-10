@@ -94,6 +94,7 @@ class ConfigStateSaving(object):
     """
     def __init__(self, config_file_path):
         self._config_path = config_file_path
+        self._unknown_options = {} # from future versions so that we don't erase them
         if os.path.isfile(self._config_path):
             self._load()
         else:
@@ -106,7 +107,7 @@ class ConfigStateSaving(object):
         Saves the configuration options to a file.
         The attributes of this object.
         """
-        exclude_list = ["_config_path"] # some attributes not to save
+        exclude_list = ["_config_path", "_unknown_options"] # some attributes not to save
         data = {
             "configuration": {}, 
             "appname": configure.APPNAME, 
@@ -119,6 +120,10 @@ class ConfigStateSaving(object):
                 pass #print("Excluding attribute %s since it is in the exclude list." % (key))
             else:
                 data["configuration"][key] = value
+        for key in sorted(self._unknown_options.keys()):
+            value = self._unknown_options[key]
+            data["configuration"][key] = value
+            log.debug("Saving unknown option %s with value %s" % (key, value))
         _save(self._config_path, data)
 
     def save_as(self, file_name):
@@ -136,7 +141,9 @@ class ConfigStateSaving(object):
                 cast = type(getattr(self, k)) # a little cast, to get rid of unicode which should be strings.
                 setattr(self, k, cast(data["configuration"][k]))
             else:
-                log.error("Found configuration key %s but it is not supported in this version of Scenic." % (k))
+                value = data["configuration"][k]
+                log.error("Found configuration key %s but it is not supported in this version of Scenic. Its value is %s." % (k, value))
+                self._unknown_options[k] = value
 
 class AddressBook(object):
     """
