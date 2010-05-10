@@ -95,8 +95,8 @@ def run():
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(configure.VERSION))
     parser.add_option("-k", "--kiosk", action="store_true", help="Run in kiosk mode")
-    #parser.add_option("-l", "--enable-logging", action="store_true", help="Enables logging to file.")
-    #parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s" % (LOG_FILE_NAME), default=LOG_FILE_NAME)
+    parser.add_option("-l", "--enable-logging", action="store_true", help="Enables logging to file.")
+    parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s. Logging must be enabled for this option value to be useful." % (LOG_FILE_NAME), default=LOG_FILE_NAME)
     parser.add_option("-f", "--fullscreen", action="store_true", help="Run in fullscreen mode")
     parser.add_option("-n", "--disable-v4l2-settings-restoration", action="store_true", help="Disables the state restoring for the V4L2 input number and video standard at startup")
     parser.add_option("-v", "--verbose", action="store_true", help="Enables a verbose logging output with info level messages.")
@@ -112,11 +112,11 @@ def run():
         level = "info"
     if options.debug:
         level = "debug"
-    #if options.enable_logging:
-    #    start_file_logging(level, os.path.expanduser(options.log_file_name))
-    #    log_file_name = options.log_file_name
-    #else:
-    start_logging_to_stdout(level)
+    if options.enable_logging:
+        start_file_logging(level, os.path.expanduser(options.log_file_name))
+        log_file_name = options.log_file_name
+    else:
+        start_logging_to_stdout(level)
     log_file_name = None
     
     from scenic import process
