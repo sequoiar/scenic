@@ -198,13 +198,6 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    if (options.count("display"))
-    {
-        setenv("DISPLAY", 
-                options["display"].as<std::string>().c_str(), 
-                1 /* override current value if present */);
-    }
-
     // maybe just have a separate function that checks for all these standalone 
     // calls and quits instead of all here
     if (options["list-v4l2"].as<bool>())

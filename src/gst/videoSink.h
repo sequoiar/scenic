@@ -53,10 +53,13 @@ class GtkVideoSink
 : public VideoSink, MessageHandler
 {
     public:
-        GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid);
+        GtkVideoSink(const Pipeline &pipeline, unsigned long xid);
         void createControl();
         virtual ~GtkVideoSink(){};
         void showWindow();
+
+    protected:
+        void updateDisplay(const std::string &display);
 
     private:     /// other member vars depend on xid
         unsigned long xid_;
@@ -66,7 +69,6 @@ class GtkVideoSink
     protected:
         void toggleFullscreen() { toggleFullscreen(window_); }
         _GtkWidget *window_;
-        int screen_num_;
         _GtkWidget *drawingArea_;
         _GtkWidget *vbox_;
         _GtkWidget *hbox_;
@@ -90,7 +92,8 @@ class XvImageSink
 : public GtkVideoSink, private BusMsgHandler
 {
     public:
-        XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid);
+        XvImageSink(Pipeline &pipeline, int width, int height, 
+                unsigned long xid, const std::string &display);
         bool handleBusMsg(_GstMessage *msg);
 
     private:
@@ -106,16 +109,13 @@ class XImageSink
 : public VideoSink
 {
     public: 
-        XImageSink(const Pipeline &pipeline); 
+        XImageSink(const Pipeline &pipeline, const std::string &display);
 
     private:
         ~XImageSink();
-
         _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;
 };
-
-
 
 #endif //_VIDEO_SINK_H_
 
