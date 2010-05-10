@@ -5,6 +5,7 @@ Maintainer: Alexandre Quessy <alexandre@quessy.net>
 Build-Depends:
  automake,
  bison,
+ bash-completion,
  build-essential,
  cdbs,
  debhelper (>= 5.0.38),
@@ -63,6 +64,7 @@ Package: scenic
 Architecture: any
 Depends:
  ${misc:Depends},
+ bash-completion,
  bison,
  doxygen,
  ffmpeg,
