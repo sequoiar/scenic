@@ -37,3 +37,4 @@ New features in scenic:
 Bug fixes in milhouse: 
 
 Bug fixes in scenic : 
+    #518 Newer configuration options are erased when we run an older version
