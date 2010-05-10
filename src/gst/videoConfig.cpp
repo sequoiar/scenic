@@ -242,7 +242,8 @@ VideoSinkConfig::VideoSinkConfig(const boost::program_options::variables_map &op
     displayHeight_(std::min(static_cast<int>(options.count("display-height") ? 
                     options["display-height"].as<int>() : options["height"].as<int>()), VideoScale::MAX_SCALE)),
     flipMethod_(options["flip-video"].as<std::string>()),
-    xid_(options["x-window-id"].as<unsigned long>())
+    xid_(options["x-window-id"].as<unsigned long>()), 
+    display_(options.count("videodisplay") ? options["videodisplay"].as<std::string>() : "")
 {}
 
 
@@ -273,12 +274,12 @@ int VideoSinkConfig::effectiveDisplayHeight() const
 VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_);
+        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_);
     else if (sink_ == "ximagesink")
-        return new XImageSink(pipeline);
+        return new XImageSink(pipeline, display_);
 #ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
-        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_);
+        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_);
 #endif
     else if (sink_ == "sharedvideosink")
         return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);

@@ -37,7 +37,7 @@ class GLImageSink
 {
     public:
         /// Constructor 
-        GLImageSink(Pipeline &pipeline, int width, int height, unsigned long xid);
+        GLImageSink(Pipeline &pipeline, int width, int height, unsigned long xid, const std::string &display);
         bool handleBusMsg(_GstMessage *msg);
 
     private:

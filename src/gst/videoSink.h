@@ -89,7 +89,8 @@ class XvImageSink
 : public GtkVideoSink, private BusMsgHandler
 {
     public:
-        XvImageSink(Pipeline &pipeline, int width, int height, unsigned long xid);
+        XvImageSink(Pipeline &pipeline, int width, int height, 
+                unsigned long xid, const std::string &display);
         bool handleBusMsg(_GstMessage *msg);
 
     private:
@@ -105,7 +106,7 @@ class XImageSink
 : public VideoSink
 {
     public: 
-        XImageSink(const Pipeline &pipeline); 
+        XImageSink(const Pipeline &pipeline, const std::string &display);
 
     private:
         ~XImageSink();
