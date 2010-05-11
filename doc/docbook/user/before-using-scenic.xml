@@ -61,7 +61,7 @@
     <title>Unidirectional setup</title>
     <mediaobject>
       <imageobject>
-        <inlinegraphic fileref="fig/unidirectional_setup.png" />
+        <imagedata fileref="fig/unidirectional_setup.png" />
       </imageobject>
     </mediaobject>
   </sect1>
@@ -74,7 +74,7 @@
     Room 2 and vice versa.</para>
     <mediaobject>
       <imageobject>
-      <inlinegraphic fileref="fig/bidirectional_setup.png" />
+      <imagedata fileref="fig/bidirectional_setup.png" />
       </imageobject>
     </mediaobject>
   </sect1>
@@ -109,7 +109,7 @@
     </sect2>
   </sect1>
   <sect1>
-    <title>Turning on the computer and its peripheral</title>
+    <title>Turning on the computer and its peripherals</title>
     <para>With audio and video systems, the order used to powering
     up all device is really important.</para>
     <orderedlist>
@@ -153,15 +153,24 @@
         &#160;Mask:255.255.255.0</para>
       </listitem>
     </orderedlist>
+    
     <para>
-      <inlinegraphic fileref="http://svn.sat.qc.ca/trac/scenic/raw-attachment/wiki/ImageSource/Connection_information1.png"
-      width="7.797cm" depth="4.517cm" />
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/connection_information_1.png" />
+      </imageobject>
+    </mediaobject>
     </para>
+    
     <para>
-      <inlinegraphic fileref="http://svn.sat.qc.ca/trac/scenic/raw-attachment/wiki/ImageSource/Connection_Information2.png"
-      width="8.829cm" depth="9.782cm" />
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/connection_information_2.png" />
+      </imageobject>
+    </mediaobject>
     </para>
-    <orderedlist>
+    
+    <unorderedlist>
       <listitem>
         <para>Use ping to make sure that you are connected to the Internet.</para>
         <para>Type "ping www.google.com" in a terminal and press Return.</para>
@@ -221,7 +230,7 @@
         <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
         TestAudiovisualInputOutput</ulink>page.</para>
       </listitem>
-    </orderedlist>
+    </unorderedlist>
     <para />
   </sect1>
   <sect1>
