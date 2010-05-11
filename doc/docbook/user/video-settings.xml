@@ -86,8 +86,9 @@
       640x480</para>
     </sect2>
     <sect2>
-      <title>
-      <anchor id="ImageSize" />Image Size</title>
+      <title><anchor id="ImageSize" />Image Size</title>
+      <para>This drop-down menu offers you a list of image size to choose for the video image to capture. A bigger image needs more bandwidth if you want it to be too much compressed. </para>
+      <para>Since the bandwidth is decided on the receiver's side, both peers should agree on an image size and quality to avoid getting an ugly image or using too much bandwidth for no reason.</para>
     </sect2>
   </sect1>
   <sect1>
