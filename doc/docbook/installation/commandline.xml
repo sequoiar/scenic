@@ -21,7 +21,8 @@
   </sect1>
   <sect1>
     <title>Launch the receivers</title>
-    <para>Here is a short explanation on how to start the milhouse receivers to receive audio and video streams.</para>
+    <para>Here is a short explanation on how to start the milhouse
+    receivers to receive audio and video streams.</para>
     <para>Set the local_machine display</para>
     <programlisting>export DISPLAY=:0.0</programlisting>
     <para>Run the program on the local machine with the following
@@ -35,43 +36,44 @@
     <para>Execute program on the remote machine with the following
     parameters:</para>
     <programlisting>milhouse --receiver --address local_ip_address
-    --videosink xvimagesink --videocodec mpeg4
+    --videosink xvimagesink --videocodec mpeg4 
     <para>--videoport 10030 --audiosink jackaudiosink --audiocodec
     raw --audioport 10000</para>--numchannels 2</programlisting>
   </sect1>
   <sect1>
     <title>Launch the senders</title>
-    <para>The next step is to launch the milhouse sender processes. Of course, that should be on a different computer.</para>
+    <para>The next step is to launch the milhouse sender processes.
+    Of course, that should be on a different computer.</para>
     <para>Execute program on local machine with the following
     parameters:</para>
     <programlisting>milhouse --sender --address remote_ip_address
-    --videocodec mpeg4 --videoport 10030
+    --videocodec mpeg4 --videoport 10030 
     <para>--videosource v4l2src --audiosource jackaudiosrc
     --audiocodec raw &#160;-c 2</para>--audioport
     10000</programlisting>
     <para>Execute program on remote machine with the following
     parameters:</para>
     <programlisting>milhouse --sender --address local_ip_address
-    --videocodec mpeg4 --videoport 10030
+    --videocodec mpeg4 --videoport 10030 
     <para>--videosource v4l2src --audiosource jackaudiosrc
     --audiocodec raw &#160;-c 2</para>--audioport
     10000</programlisting>
-    <para>A video window displaying the live video stream should appear on one of
-    your designated screens. It is movable by holding down the
-    -alt- key and dragging the window. Pressing 'F' or Escape will toggle
-    full screen mode.</para>
+    <para>A video window displaying the live video stream should
+    appear on one of your designated screens. It is movable by
+    holding down the -alt- key and dragging the window. Pressing
+    'F' or Escape will toggle full screen mode.</para>
     <para>You should also see the audio connections appear in
     qjackctl. The outputs are now routable to your speakers or
     other applications.</para>
     <para>You should now have video and audio input fully working
     on both sides.</para>
-    <para>To stop milhouse type Control-c in the used terminal or type
-    Control-q in the video window.</para>
+    <para>To stop milhouse type Control-c in the used terminal or
+    type Control-q in the video window.</para>
   </sect1>
   <sect1>
     <title>Milhouse Help</title>
-    <para>Type milhouse --help to have informations on the different
-    options available.</para>
+    <para>Type milhouse --help to have informations on the
+    different options available.</para>
     <programlisting>milhouse --help</programlisting>
     <informaltable frame="all">
       <tgroup cols="2">

@@ -53,6 +53,14 @@
           </row>
           <row>
             <entry>
+              <para>Ubuntu 10.04 (Lucid)</para>
+            </entry>
+            <entry>
+              <para>Working, still in testing</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
               <para>Debian 5.0.4 (Lenny)</para>
             </entry>
             <entry>
@@ -89,7 +97,7 @@
     <para />
     <para>&app; need various package to be installed. You can have
     a detailed view of the required library and dependency on our 
-    <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/LibraryPackage">
+    <ulink url="https://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
     Library and Package</ulink>page. To install the required these
     libraries and their dependencies run the following command in
     the terminal:</para>
@@ -153,6 +161,35 @@
       </tgroup>
     </table>
     <para />
+    <para>
+      <emphasis role="strong">For Ubuntu 10.04 (Lucid) install our scenic packages</emphasis>
+    </para>
+    <para>note that to use more than 8 audio channel in raw, you need to install our scenic-dependency package, wich will compile gstreamer</para>
+    <table>
+      <tgroup cols="1">
+        <tbody>
+          <row>
+            <entry>To install the scenic package:</entry>
+          </row>
+          <row>
+            <entry></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    
+    <table>
+      <tgroup cols="1">
+        <tbody>
+          <row>
+            <entry>To install the scenic-dependency package</entry>
+          </row>
+          <row>
+            <entry></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
     <para>
       <emphasis role="strong">For Debian 5.0.4 (lenny) install the
       following package:</emphasis>

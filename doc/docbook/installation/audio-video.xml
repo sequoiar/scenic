@@ -1,488 +1,605 @@
 <chapter id="AV_Configuration">
-<title>Configure audio and video</title>
-<para>First verify that you have all required dependencies at our <link linkend='software_installation'>Software Installation</link> page.</para> 
-   <sect1>
-   <title>Setting A/V Transmission</title>
-      <para>Then add your username to the different groups: </para>
-      <para>Add your user to the video group </para>
-      <programlisting>sudo gpasswd -a "username" video</programlisting>
-      <para>Add your user to the audio group </para>
-      <programlisting>sudo gpasswd -a "username" audio</programlisting>
-      <para>For firewire-based hardware (DV, IIDC, freebob/ffado) </para>
-      <programlisting>sudo gpasswd -a "username" disk</programlisting>
-      <para>To be in effect, you have to log out, then log in. </para>
-   </sect1>
-   <sect1>
-   <title>Video Settings</title>
-      <para>Here we will configure all the settings related to the video input and output</para>
-      <sect2>
+  <title>Configure audio and video</title>
+  <para>First verify that you have all required dependencies at our
+  
+  <link linkend='software_installation'>Software
+  Installation</link>page.</para>
+  <sect1>
+    <title>Setting A/V Transmission</title>
+    <para>Then add your username to the different groups:</para>
+    <para>Add your user to the video group</para>
+    <programlisting>sudo gpasswd -a "username"
+    video</programlisting>
+    <para>Add your user to the audio group</para>
+    <programlisting>sudo gpasswd -a "username"
+    audio</programlisting>
+    <para>For firewire-based hardware (DV, IIDC,
+    freebob/ffado)</para>
+    <programlisting>sudo gpasswd -a "username"
+    disk</programlisting>
+    <para>To be in effect, you have to log out, then log in.</para>
+  </sect1>
+  <sect1>
+    <title>Video Settings</title>
+    <para>Here we will configure all the settings related to the
+    video input and output</para>
+    <sect2>
       <title>Video Output</title>
-         <para>First, make sure you have the Xvideo extension actived in the X11 display: </para>
-         <programlisting>xvinfo | grep -i adaptor</programlisting>
-         <para>The output should NOT contain "no adaptors present". If it's not activated, you may have to use a proprietary driver. See <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">NvidiaSettings</ulink> or <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/AtiConfig">AtiConfig</ulink> for Nvidia and ATI cards respectively. </para>
-         <para>Next, what we want now is two video outputs. One for your monitor screen and one for your projector or video mixer.</para>
-         <para>For the nvidia graphic card, we have to detect both output. The first output (your monitor) is usually set to a 1024x768 resolution and the second output (VGA, or S-video Output) is usually set to a resolution of 800x600. Note that those resolution can vary from one setup to an other. </para>
-         <para>For this, follow our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">NvidiaSettings</ulink> instructions. </para>
-         <para>Set the local machine display to output the video from the remote machine on the wanted monitor or TV. </para>   
-         <para>The environment variable DISPLAY tells all X clients where to display their windows. </para>
-         <para>Ex: export DISPLAY=:0.0 will display the video on your local default screen. export DISPLAY=:0.1 will display the video on your second screen. </para>
-         <programlisting>export DISPLAY=:0.0</programlisting>
-         <para/>
-      </sect2>
-      <sect2>
-      <title>Video Input</title>
-         <para>&app; can capture video from a video capture card through v4l2, from IIDC camera or DV camera (also called iLink). DV cameras and decks have a high latency (often between 150 and 250ms) and should not be the video input of choise for low latency requirements. </para>
-      <para><emphasis role="strong">Video4Linux</emphasis></para>>
-         <para> Plug in the video camera, for this, refer to our <link linkend='hardware_requirements'>Hardware Setup Page</link> </para> 
-         <para>Now we will modify our video settings for your specific needs. </para>
-      <para><emphasis role="strong">Firewire (DV or IIDC) Video Input</emphasis></para>
-         <para>* The current user must be part of the disk and video groups. If that is not the case, then the system administrator must add the "user" to the "disk" group (as shown above) </para>
-         <para>On Karmic Koala, you have to fix devices attribution for raw1394. Create a udev rule to change group of /dev/raw1394 device: </para>
-         <programlisting>echo 'KERNEL=="raw1394", NAME="raw1394", GROUP="disk"' | sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
-         <programlisting>sudo /etc/init.d/udev restart</programlisting>
-         <para>Furthermore, on all distributions, it is advisable to load the raw1394 module even if no dc1394 cameras are present so that calls to libdc (i.e. milhouse --list-cameras) won't error out. To do this, add raw1394 to the /etc/modules file: </para>
-         <programlisting>sudo modprobe raw1394</programlisting>
-         <programlisting>echo "raw1394" | sudo tee -a /etc/modules</programlisting>
-         <para>See <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">this bug report</ulink> for further information. </para>
-         <para>You can test the DV camera with: </para>
-         <para>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</para>
-      </sect2>
-      <sect2>
+      <para>First, make sure you have the Xvideo extension actived
+      in the X11 display:</para>
+      <programlisting>xvinfo | grep -i adaptor</programlisting>
+      <para>The output should NOT contain "no adaptors present". If
+      it's not activated, you may have to use a proprietary driver.
+      See 
+      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">
+      NvidiaSettings</ulink>or 
+      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/AtiConfig">
+      AtiConfig</ulink>for Nvidia and ATI cards
+      respectively.</para>
+      <para>Next, what we want now is two video outputs. One for
+      your monitor screen and one for your projector or video
+      mixer.</para>
+      <para>For the nvidia graphic card, we have to detect both
+      output. The first output (your monitor) is usually set to a
+      1024x768 resolution and the second output (VGA, or S-video
+      Output) is usually set to a resolution of 800x600. Note that
+      those resolution can vary from one setup to an other.</para>
+      <para>For this, follow our 
+      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">
+      NvidiaSettings</ulink>instructions.</para>
+      <para>Set the local machine display to output the video from
+      the remote machine on the wanted monitor or TV.</para>
+      <para>The environment variable DISPLAY tells all X clients
+      where to display their windows.</para>
+      <para>Ex: export DISPLAY=:0.0 will display the video on your
+      local default screen. export DISPLAY=:0.1 will display the
+      video on your second screen.</para>
+      <programlisting>export DISPLAY=:0.0</programlisting>
+      <para />
+    </sect2>
+    <sect2>
+    <title>Video Input</title>
+    <para>&app; can capture video from a video capture card through
+    v4l2, from IIDC camera or DV camera (also called iLink). DV
+    cameras and decks have a high latency (often between 150 and
+    250ms) and should not be the video input of choise for low
+    latency requirements.</para>
+    <para>
+      <emphasis role="strong">Video4Linux</emphasis>
+    </para>&gt; 
+    <para>Plug in the video camera, for this, refer to our 
+    <link linkend='hardware_requirements'>Hardware Setup
+    Page</link></para>
+    <para>Now we will modify our video settings for your specific
+    needs.</para>
+    <para>
+      <emphasis role="strong">Firewire (DV or IIDC) Video
+      Input</emphasis>
+    </para>
+    <para>* The current user must be part of the disk and video
+    groups. If that is not the case, then the system administrator
+    must add the "user" to the "disk" group (as shown above)</para>
+    <para>On Karmic Koala, you have to fix devices attribution for
+    raw1394. Create a udev rule to change group of /dev/raw1394
+    device:</para>
+    <programlisting>echo 'KERNEL=="raw1394", NAME="raw1394",
+    GROUP="disk"' | sudo tee -a
+    /etc/udev/rules.d/99-raw1394.rules</programlisting>
+    <programlisting>sudo /etc/init.d/udev restart</programlisting>
+    <para>Furthermore, on all distributions, it is advisable to
+    load the raw1394 module even if no dc1394 cameras are present
+    so that calls to libdc (i.e. milhouse --list-cameras) won't
+    error out. To do this, add raw1394 to the /etc/modules
+    file:</para>
+    <programlisting>sudo modprobe raw1394</programlisting>
+    <programlisting>echo "raw1394" | sudo tee -a
+    /etc/modules</programlisting>
+    <para>See 
+    <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
+    this bug report</ulink>for further information.</para>
+    <para>You can test the DV camera with:</para>
+    <para>gst-launch dv1394src ! dvdemux ! dvdec !
+    xvimagesink</para></sect2>
+    <sect2>
       <title>Video Test</title>
-         <para>In &app;, you can easily preview video4linux2 video devices in the "Video" tab. Other input drivers cannot be used at the moment in &app;, but milhouse supports them: </para>
-         <para>Choose the video source according to this table: </para>
-         <informaltable frame="all">
-         <tgroup cols="2"><tbody><row>
-            <entry>
-               <para>v4l2src</para>
-            </entry>
-            <entry>
-               <para>video4linux2 devices </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>v4lsrc</para>
-            </entry>
-            <entry>
-               <para>video4linux (v1) devices - Only supported on the command line</para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>dv139src</para>
-            </entry>
-            <entry>
-               <para>DV cameras and decks  - Only supported on the command line</para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>dc1394src</para>
-            </entry>
-            <entry>
-               <para>IIDC 1.31 cameras  - Only supported on the command line</para>
-            </entry>
-         </row></tbody></tgroup>
-   </informaltable>
-   <programlisting>milhouse --localhost --videosource v4l2src</programlisting>
-   <para>You can add several options such as: </para>
-   <orderedlist>
-      <listitem>
-         <para>--aspect-ratio</para>
-      </listitem>
-      <listitem>
-         <para>--width</para>
-      </listitem>
-      <listitem>
-         <para>--height</para>
-      </listitem>
-      <listitem>
-         <para>--fullscreen</para>
-      </listitem>
-      <listitem>
-         <para>--flip-video</para>
-      </listitem>
-   </orderedlist>
-   <para/></sect2>
-</sect1>
-
-<sect1><title>Audio Settings</title>
-   <para>First verify that you have an appropriate sound card on our <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">HardwareRequirements</ulink>. </para><sect2><title>Firewire sound card</title>
-         <para>Verify that your soundcard is detected For firewire soundcard: </para>
-         <programlisting>ls -l /dev/*1394*</programlisting>
-         <para>If the device does not appear try this: </para>
-         <programlisting>sudo modprobe raw1394</programlisting>
-         <para>The current user must be part of the disk group. If that is not the case, then the system administrator must add the "user" to the "disk" group (as shown above) </para>
-   </sect2><sect2><title>For PCI soundcard</title>
-   <para>For pci soundcard with alsa driver, verify that your soundcard is detected: </para>
-   <programlisting>aplay -l</programlisting></sect2></sect1><sect1><title>Configuring the sound server</title><sect2><title>Configuration of jackd</title>
-         <para>Now start the jackd sound server using qjackctl situated in Applications/Sound &amp; Video/Jack Control </para>
+      <para>In &app;, you can easily preview video4linux2 video
+      devices in the "Video" tab. Other input drivers cannot be
+      used at the moment in &app;, but milhouse supports
+      them:</para>
+      <para>Choose the video source according to this table:</para>
+      <informaltable frame="all">
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>
+                <para>v4l2src</para>
+              </entry>
+              <entry>
+                <para>video4linux2 devices</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>v4lsrc</para>
+              </entry>
+              <entry>
+                <para>video4linux (v1) devices - Only supported on
+                the command line</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>dv139src</para>
+              </entry>
+              <entry>
+                <para>DV cameras and decks - Only supported on the
+                command line</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>dc1394src</para>
+              </entry>
+              <entry>
+                <para>IIDC 1.31 cameras - Only supported on the
+                command line</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <programlisting>milhouse --localhost --videosource
+      v4l2src</programlisting>
+      <para>You can add several options such as:</para>
+      <orderedlist>
+        <listitem>
+          <para>--aspect-ratio</para>
+        </listitem>
+        <listitem>
+          <para>--width</para>
+        </listitem>
+        <listitem>
+          <para>--height</para>
+        </listitem>
+        <listitem>
+          <para>--fullscreen</para>
+        </listitem>
+        <listitem>
+          <para>--flip-video</para>
+        </listitem>
+      </orderedlist>
+      <para />
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>Audio Settings</title>
+    <para>First verify that you have an appropriate sound card on
+    our 
+    <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
+    HardwareRequirements</ulink>.</para>
+    <sect2>
+      <title>Firewire sound card</title>
+      <para>Verify that your soundcard is detected For firewire
+      soundcard:</para>
+      <programlisting>ls -l /dev/*1394*</programlisting>
+      <para>If the device does not appear try this:</para>
+      <programlisting>sudo modprobe raw1394</programlisting>
+      <para>The current user must be part of the disk group. If
+      that is not the case, then the system administrator must add
+      the "user" to the "disk" group (as shown above)</para>
+    </sect2>
+    <sect2>
+      <title>For PCI soundcard</title>
+      <para>For pci soundcard with alsa driver, verify that your
+      soundcard is detected:</para>
+      <programlisting>aplay -l</programlisting>
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>Configuring the sound server</title>
+    <sect2>
+      <title>Configuration of jackd</title>
+      <para>Now start the jackd sound server using qjackctl
+      situated in Applications/Sound &amp; Video/Jack
+      Control</para>
       <mediaobject>
-         <imageobject>
-            <imagedata fileref="fig/qjackctl.png" format="PNG"/>
-         </imageobject>
+        <imageobject>
+          <imagedata fileref="fig/qjackctl.png" format="PNG" />
+        </imageobject>
       </mediaobject>
-         <para>Then, click on setup button.</para>
-   <para>Here is an examples of qjackctl realtime setup configuration: </para>
-   <informaltable frame="all">
-      <tgroup cols="3"><tbody><row>
-            <entry>
-               <para>Parameter</para>
-            </entry>
-            <entry>
-               <para>Value </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Realtime</para>
-            </entry>
-            <entry>
-               <para>Yes </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Priority</para>
-            </entry>
-            <entry>
-               <para>Default </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Frames/Period</para>
-            </entry>
-            <entry>
-               <para>64 </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Sample Rate</para>
-            </entry>
-            <entry>
-               <para>48000 </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Periods/Buffer</para>
-            </entry>
-            <entry>
-               <para>2 </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Port Maximum</para>
-            </entry>
-            <entry>
-               <para>256 </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Timeout (msec)</para>
-            </entry>
-            <entry>
-               <para>500 </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Interface</para>
-            </entry>
-            <entry>
-               <para>Default </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Audio</para>
-            </entry>
-            <entry>
-               <para>Duplex</para>
-            </entry>
-            <entry>
-               <para>freebob/ffa </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Input Latency</para>
-            </entry>
-            <entry>
-               <para>Default </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Output Latency</para>
-            </entry>
-            <entry>
-               <para>Default </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Latency</para>
-            </entry>
-            <entry>
-               <para>2.67 msec </para>
-            </entry>
-            <entry>
-               <para/>
-            </entry>
-         </row></tbody></tgroup>
-   </informaltable>
-   <para>On your qjackctl setup page you will have first to adjust all parameter for your specific sound card. Those parameter are shown on the jack settings table below. </para>
-   <para>Note that these settings also depends of your computer specification and can varies from one setup to an other. </para>
-   <para>Here is a table of all tested soundcard with there appropriate jack settings. </para>
-   <informaltable frame="all">
-      <tgroup cols="6"><tbody><row>
-            <entry>
-               <para>Soundcard</para>
-            </entry>
-            <entry>
-               <para>-d backen</para>
-            </entry>
-            <entry>
-               <para>-r sample rate</para>
-            </entry>
-            <entry>
-               <para>- p frames/period</para>
-            </entry>
-            <entry>
-               <para>-n periods/buffer</para>
-            </entry>
-            <entry>
-               <para>Latency </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>
-                  <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/MaudioDelta">MaudioDelta</ulink> 1010 (regular or LT)</para>
-            </entry>
-            <entry>
-               <para>-d alsa </para>
-            </entry>
-            <entry>
-               <para>-r 48000 </para>
-            </entry>
-            <entry>
-               <para>-p 64 </para>
-            </entry>
-            <entry>
-               <para>-n 2 </para>
-            </entry>
-            <entry>
-               <para>2.67 msec </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>
-                  <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/EdirolFirewire">EdirolFirewire</ulink> Fa101</para>
-            </entry>
-            <entry>
-               <para>-d freebob </para>
-            </entry>
-            <entry>
-               <para>-r 48000 </para>
-            </entry>
-            <entry>
-               <para>-p 64 </para>
-            </entry>
-            <entry>
-               <para>-n 2 </para>
-            </entry>
-            <entry>
-               <para>2.67 msec </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Intel HDAudio</para>
-            </entry>
-            <entry>
-               <para>-d alsa </para>
-            </entry>
-            <entry>
-               <para>-r 48000 </para>
-            </entry>
-            <entry>
-               <para>-p 512 </para>
-            </entry>
-            <entry>
-               <para>-n 4</para>
-            </entry>
-            <entry>
-               <para>16 msec </para>
-            </entry>
-         </row></tbody></tgroup>
-   </informaltable>
-   <para>where -v is verbose, -R is realtime mode, -dalsa sets the backend to ALSA (should use -dfreebob instead for any firewire cards), -r 48000 sets the sample rate to 48000 samples/sec, -p64 sets the frames/period to 64, and -n2 sets the periods/buffer to 2. </para>
-   <para>If you use ALSA, you may run in the problem of the order of module loading. To solve, use ALSA names instead of index (hw:0) to specify the card. Here's how to: </para>
-   <para>To select the appropriate soundcard, first verify the name of the sound card to use with asoundconf </para>
-   <para>Here is an examples of asoundconf output: </para>
-   <programlisting>
-   asoundconf list
-   Names of available sound cards:
-   Intel
-   Bt878
-   M2496</programlisting>
-   <para>Copy the name of the sound card and paste it in your .asoundrc file situated in your /home/$USER directory. Ex: Here i want to use the M2496 soundcard. </para>
-   <para>
-   ex:</para> 
-   <programlisting>
-   gedit .asoundrc
-   </programlisting>
-   <para>.asoundrc file with m2496 name added</para>
-   <programlisting>
-   pcm.m2496 {
-       type hw
-       card M2496
-   }
-   ctl.m2496 {
-       type hw
-       card M2496
-   }
-   </programlisting>
-   <para>Now you just have to add the name of the soundcard in the qjackctl interface field . For example, the m2496: </para>
-   <para>
-
-      <mediaobject>
-         <imageobject>
-            <imagedata fileref="fig/qjackctl_soundcard.png" format="PNG"/>
-         </imageobject>
-      </mediaobject>
-
-   </para>
-   <orderedlist>
-      <listitem>
-         <para>Click on the Options tab. </para>
-      </listitem>
-   </orderedlist>
-   <para>Verify that only the following options are selected: </para>
-   <informaltable frame="all">
-      <tgroup cols="2"><tbody><row>
-            <entry>
-               <para>Parameter</para>
-            </entry>
-            <entry>
-               <para>Value </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Capture Standard Output</para>
-            </entry>
-            <entry>
-               <para>Yes </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>XRUN detection regex</para>
-            </entry>
-            <entry>
-               <para>xrun of at least ([0-9|\.]+) msecs </para>
-            </entry>
-         </row></tbody></tgroup>
-   </informaltable>
-   <orderedlist>
-      <listitem>
-         <para>Click on the Misc tab. </para>
-      </listitem>
-   </orderedlist>
-   <para>Verify that only the following "Misc" options are selected: </para>
-   <informaltable frame="all">
-      <tgroup cols="2"><tbody><row>
-            <entry>
-               <para>Parameter</para>
-            </entry>
-            <entry>
-               <para>Value </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Start JACK audio server on application startup</para>
-            </entry>
-            <entry>
-               <para>Yes </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Save JACK audio server configuration to:</para>
-            </entry>
-            <entry>
-               <para>.jackdrc </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Confirm server shutdown</para>
-            </entry>
-            <entry>
-               <para>Yes </para>
-            </entry>
-         </row>
-         <row>
-            <entry>
-               <para>Enable ALSA Sequencer support</para>
-            </entry>
-            <entry>
-               <para>Yes </para>
-            </entry>
-         </row></tbody></tgroup>
-   </informaltable>
-   <para>NOTE: If you get an error message, reboot the computer and try again. </para>
-   <para/>
-   <orderedlist>
-      <listitem>
-         <para>Now start the sound server by clicking on "Start". </para>
-      </listitem>
-   </orderedlist></sect2></sect1><sect1><title>Sound check</title>
-         <para>Then you can start an audio test with: </para>
-         <programlisting>gst-launch audiotestsrc ! jackaudiosink</programlisting>
-   <para>This will produce a sine wave. You should also see the audio connections appear in qjackctl. The outputs are now routable to your speakers or other applications. </para>
-   <para/></sect1></chapter>
-
+      <para>Then, click on setup button.</para>
+      <para>Here is an examples of qjackctl realtime setup
+      configuration:</para>
+      <informaltable frame="all">
+        <tgroup cols="3">
+          <tbody>
+            <row>
+              <entry>
+                <para>Parameter</para>
+              </entry>
+              <entry>
+                <para>Value</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Realtime</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Priority</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Frames/Period</para>
+              </entry>
+              <entry>
+                <para>64</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Sample Rate</para>
+              </entry>
+              <entry>
+                <para>48000</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Periods/Buffer</para>
+              </entry>
+              <entry>
+                <para>2</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Port Maximum</para>
+              </entry>
+              <entry>
+                <para>256</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Timeout (msec)</para>
+              </entry>
+              <entry>
+                <para>500</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Interface</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Audio</para>
+              </entry>
+              <entry>
+                <para>Duplex</para>
+              </entry>
+              <entry>
+                <para>freebob/ffa</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Input Latency</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Output Latency</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Latency</para>
+              </entry>
+              <entry>
+                <para>2.67 msec</para>
+              </entry>
+              <entry>
+                <para />
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>On your qjackctl setup page you will have first to
+      adjust all parameter for your specific sound card. Those
+      parameter are shown on the jack settings table below.</para>
+      <para>Note that these settings also depends of your computer
+      specification and can varies from one setup to an
+      other.</para>
+      <para>Here is a table of all tested soundcard with there
+      appropriate jack settings.</para>
+      <informaltable frame="all">
+        <tgroup cols="6">
+          <tbody>
+            <row>
+              <entry>
+                <para>Soundcard</para>
+              </entry>
+              <entry>
+                <para>-d backen</para>
+              </entry>
+              <entry>
+                <para>-r sample rate</para>
+              </entry>
+              <entry>
+                <para>- p frames/period</para>
+              </entry>
+              <entry>
+                <para>-n periods/buffer</para>
+              </entry>
+              <entry>
+                <para>Latency</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/MaudioDelta">
+                MaudioDelta</ulink>1010 (regular or LT)</para>
+              </entry>
+              <entry>
+                <para>-d alsa</para>
+              </entry>
+              <entry>
+                <para>-r 48000</para>
+              </entry>
+              <entry>
+                <para>-p 64</para>
+              </entry>
+              <entry>
+                <para>-n 2</para>
+              </entry>
+              <entry>
+                <para>2.67 msec</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/EdirolFirewire">
+                EdirolFirewire</ulink>Fa101</para>
+              </entry>
+              <entry>
+                <para>-d freebob</para>
+              </entry>
+              <entry>
+                <para>-r 48000</para>
+              </entry>
+              <entry>
+                <para>-p 64</para>
+              </entry>
+              <entry>
+                <para>-n 2</para>
+              </entry>
+              <entry>
+                <para>2.67 msec</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Intel HDAudio</para>
+              </entry>
+              <entry>
+                <para>-d alsa</para>
+              </entry>
+              <entry>
+                <para>-r 48000</para>
+              </entry>
+              <entry>
+                <para>-p 512</para>
+              </entry>
+              <entry>
+                <para>-n 4</para>
+              </entry>
+              <entry>
+                <para>16 msec</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>where -v is verbose, -R is realtime mode, -dalsa sets
+      the backend to ALSA (should use -dfreebob instead for any
+      firewire cards), -r 48000 sets the sample rate to 48000
+      samples/sec, -p64 sets the frames/period to 64, and -n2 sets
+      the periods/buffer to 2.</para>
+      <para>If you use ALSA, you may run in the problem of the
+      order of module loading. To solve, use ALSA names instead of
+      index (hw:0) to specify the card. Here's how to:</para>
+      <para>To select the appropriate soundcard, first verify the
+      name of the sound card to use with asoundconf</para>
+      <para>Here is an examples of asoundconf output:</para>
+      <programlisting>asoundconf list Names of available sound
+      cards: Intel Bt878 M2496</programlisting>
+      <para>Copy the name of the sound card and paste it in your
+      .asoundrc file situated in your /home/$USER directory. Ex:
+      Here i want to use the M2496 soundcard.</para>
+      <para>ex:</para>
+      <programlisting>gedit .asoundrc</programlisting>
+      <para>.asoundrc file with m2496 name added</para>
+      <programlisting>pcm.m2496 { &#160; &#160; type hw &#160;
+      &#160; card M2496 } ctl.m2496 { &#160; &#160; type hw &#160;
+      &#160; card M2496 }</programlisting>
+      <para>Now you just have to add the name of the soundcard in
+      the qjackctl interface field . For example, the m2496:</para>
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="fig/qjackctl_soundcard.png"
+            format="PNG" />
+          </imageobject>
+        </mediaobject>
+      </para>
+      <orderedlist>
+        <listitem>
+          <para>Click on the Options tab.</para>
+        </listitem>
+      </orderedlist>
+      <para>Verify that only the following options are
+      selected:</para>
+      <informaltable frame="all">
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>
+                <para>Parameter</para>
+              </entry>
+              <entry>
+                <para>Value</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Capture Standard Output</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>XRUN detection regex</para>
+              </entry>
+              <entry>
+                <para>xrun of at least ([0-9|\.]+) msecs</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <orderedlist>
+        <listitem>
+          <para>Click on the Misc tab.</para>
+        </listitem>
+      </orderedlist>
+      <para>Verify that only the following "Misc" options are
+      selected:</para>
+      <informaltable frame="all">
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>
+                <para>Parameter</para>
+              </entry>
+              <entry>
+                <para>Value</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Start JACK audio server on application
+                startup</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Save JACK audio server configuration
+                to:</para>
+              </entry>
+              <entry>
+                <para>.jackdrc</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Confirm server shutdown</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Enable ALSA Sequencer support</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>NOTE: If you get an error message, reboot the computer
+      and try again.</para>
+      <para />
+      <orderedlist>
+        <listitem>
+          <para>Now start the sound server by clicking on
+          "Start".</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>Sound check</title>
+    <para>Then you can start an audio test with:</para>
+    <programlisting>gst-launch audiotestsrc !
+    jackaudiosink</programlisting>
+    <para>This will produce a sine wave. You should also see the
+    audio connections appear in qjackctl. The outputs are now
+    routable to your speakers or other applications.</para>
+    <para />
+  </sect1>
+</chapter>
