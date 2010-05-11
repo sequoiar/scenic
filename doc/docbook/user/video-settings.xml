@@ -94,6 +94,7 @@
   <sect1>
     <title>
     <anchor id="ReceivingSide" />Receiving Side</title>
+    <para>In Scenic, each peer decides the quality of the video that he receives. This means choosing the video codec, the bitrate and the jitter buffer. It is also possible to choose to start the receiver in full screen, and to show it on a secondary display.</para>
     <sect2>
       <title>
       <anchor id="VideoCodec" />Video Codec</title>
