@@ -170,7 +170,7 @@
     </mediaobject>
     </para>
     
-    <unorderedlist>
+    <orderedlist>
       <listitem>
         <para>Use ping to make sure that you are connected to the Internet.</para>
         <para>Type "ping www.google.com" in a terminal and press Return.</para>
@@ -230,7 +230,7 @@
         <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
         TestAudiovisualInputOutput</ulink>page.</para>
       </listitem>
-    </unorderedlist>
+    </orderedlist>
     <para />
   </sect1>
   <sect1>
