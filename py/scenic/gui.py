@@ -1064,7 +1064,7 @@ class Gui(object):
                     if bitrate < BITS_PER_MBIT:
                         divisor = BITS_PER_KBIT
                         prefix = "K"
-                    return " " + _("%2.2f %sbits/s") % (bitrate / divisor, prefix)
+                    return " " + _("%(bitrate)2.2f %(prefix)sbits/s") % {"bitrate": bitrate / divisor, "prefix": prefix}
                 else:
                     return ""
 
