@@ -33,6 +33,7 @@ New features in milhouse:
 New features in scenic:
     #520 Translate to french
     #314 i18n procedure with gettext and glade should be documented
+    #513 Add the "Installation Manual" item in the Help menu
 
 Bug fixes in milhouse: 
     #495 Not receiving vumeters because of display variable being set to non 
