@@ -30,7 +30,7 @@ import gettext
 from scenic import configure
 from scenic import logger
 
-log = logger.start(name="application")
+log = logger.start(name="i18n")
 
 _ = gettext.gettext
 
@@ -43,5 +43,5 @@ def setup_i18n():
     gtk.glade.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
     gtk.glade.textdomain(configure.APPNAME)
 
-    log.info("i18n has been setup with app name %s and domain %s." % (configure.APPNAME, configure.LOCALE_DIR))
-    log.info("Domain is %s" % (gettext.textdomain()))
+    log.debug("i18n has been setup with domain %s and path %s." % (gettext.textdomain(), configure.LOCALE_DIR))
+
