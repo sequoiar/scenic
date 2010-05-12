@@ -37,10 +37,20 @@
         <para>On the receiver's side, you must choose an output for the audio - the "--audiosink" argument - and specify the audio and video codecs, like for the sender (or use the defaults listed in milhouse --help).</para>
         <para>We will create a Milhouse sender and receiver on the same computer. The IP address for the local host is always 127.0.0.1. The resulting commands that you should type in a terminal are the following:</para>
         <para>
-        milhouse --sender --address 127.0.0.1 --videoport 10030 --audiosource audiotestsrc --numchannels 2 --audioport 10000
+        milhouse --sender --address 127.0.0.1 --videoport 10030 --videosource videotestsrc --videocodec mpeg4 --audiosource audiotestsrc --numchannels 2 --audioport 10000 --audiocodec raw
         </para>
         <para>
-        milhouse --receiver --address 127.0.0.1 --videoport  10030 --audioport 10000 --numchannels 2 --audiosink jackaudiosink
+        milhouse --receiver --address 127.0.0.1 --videoport 10030 --videocodec mpeg4 --audioport 10000 --numchannels 2 --audiocodec raw --audiosink jackaudiosink
+        </para>
+        <para>
+        To simplify, milhouse has defaults which will cover many of the above arguments, i.e.:
+
+        </para>
+        <para>
+        milhouse --sender --videoport 10030 --audiosource audiotestsrc --audioport 10000
+        </para>
+        <para>
+        milhouse --receiver --videoport 10030 --audioport 10000
         </para>
         <para>
               The milhouse command can also be used to change some properties
