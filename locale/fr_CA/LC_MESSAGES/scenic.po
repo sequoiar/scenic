@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
 "Report-Msgid-Bugs-To: scenic@sat.qc.ca\n"
 "POT-Creation-Date: 2010-05-12 11:11-0400\n"
-"PO-Revision-Date: 2010-05-12 12:24-0500\n"
+"PO-Revision-Date: 2010-05-12 13:00-0500\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -517,7 +517,7 @@ msgstr "Dans un fenêtre"
 
 #: ../data/glade/scenic.glade:967
 msgid "<b>Local Video Preview</b>"
-msgstr ""
+msgstr "<b>Aperçu video local</b>"
 
 #: ../data/glade/scenic.glade:1039
 msgid "Add a new contact"
