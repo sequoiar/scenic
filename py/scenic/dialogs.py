@@ -95,7 +95,7 @@ class GladeDialogFactory(object):
                 self._dialog.destroy()
             self._dialog = None
         else:
-            print("Dialog %s is already destroyed."  % (self.name))
+            pass #print("Dialog %s is already destroyed."  % (self.name))
         
     def _on_delete_event(self, *args):
         if not self._terminating:
@@ -130,7 +130,7 @@ class ConfirmDialog(GladeDialogFactory):
         Calls the deferred with True of False as a result.
         """
         result = response_id == gtk.RESPONSE_OK or response_id == gtk.RESPONSE_YES
-        print("RESULT %s" % (result))
+        pass #print("RESULT %s" % (result))
         self._terminate(result)
 
 class InvitedDialog(GladeDialogFactory):
@@ -153,7 +153,7 @@ class InvitedDialog(GladeDialogFactory):
         Calls the deferred with True of False as a result.
         """
         result = response_id == gtk.RESPONSE_OK or response_id == gtk.RESPONSE_YES
-        print("RESULT %s" % (result))
+        pass #print("RESULT %s" % (result))
         self._terminate(result)
 
 class ErrorDialog(object):
@@ -186,7 +186,7 @@ class ErrorDialog(object):
             details_label.set_text(details)
             expander.add(details_label)
             error_dialog.vbox.pack_start(expander, False, False)
-            print("Added details in the error dialog: %s" % (details))
+            pass #print("Added details in the error dialog: %s" % (details))
         self._delayed_id = None
         if timeout is not None:
             self._delayed_id = reactor.callLater(timeout, self._timeout, error_dialog)
@@ -196,7 +196,7 @@ class ErrorDialog(object):
         error_dialog.show_all()
 
     def _timeout(self, error_dialog):
-        print("error dialog timeout. Closing it.")
+        pass #print("error dialog timeout. Closing it.")
         self.terminate(error_dialog)
 
     @staticmethod
@@ -211,16 +211,16 @@ class ErrorDialog(object):
         return d
 
     def on_close(self, dialog, *params):
-        print("on_close %s %s" % (dialog, params))
+        pass #print("on_close %s %s" % (dialog, params))
 
     def on_response(self, dialog, response_id, *params):
         #print("on_response %s %s %s" % (dialog, response_id, params))
         if response_id == gtk.RESPONSE_DELETE_EVENT:
-            print("Deleted")
+            pass #print("Deleted")
         elif response_id == gtk.RESPONSE_CANCEL:
-            print("Cancelled")
+            pass #print("Cancelled")
         elif response_id == gtk.RESPONSE_OK:
-            print("Accepted")
+            pass #print("Accepted")
         self.terminate(dialog)
 
     def terminate(self, dialog):
@@ -260,18 +260,18 @@ class YesNoDialog(object):
         return d
 
     def on_close(self, dialog, *params):
-        print("on_close %s %s" % (dialog, params))
+        pass #print("on_close %s %s" % (dialog, params))
 
     def on_response(self, dialog, response_id, *params):
-        print("on_response %s %s %s" % (dialog, response_id, params))
+        pass #print("on_response %s %s %s" % (dialog, response_id, params))
         if response_id == gtk.RESPONSE_DELETE_EVENT:
-            print("Deleted")
+            pass #print("Deleted")
             self.terminate(dialog, False)
         elif response_id == gtk.RESPONSE_NO:
-            print("Cancelled")
+            pass #print("Cancelled")
             self.terminate(dialog, False)
         elif response_id == gtk.RESPONSE_YES:
-            print("Accepted")
+            pass #print("Accepted")
             self.terminate(dialog, True)
 
     def terminate(self, dialog, answer):
