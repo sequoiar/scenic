@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
 "Report-Msgid-Bugs-To: scenic@sat.qc.ca\n"
 "POT-Creation-Date: 2010-05-12 11:11-0400\n"
-"PO-Revision-Date: 2010-05-12 13:00-0500\n"
+"PO-Revision-Date: 2010-05-12 14:38-0500\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +40,8 @@ msgid ""
 "A mismatch in the sampling rate of JACK with remote peer has been detected.\n"
 "Local sampling rate is %(local)s, whereas remote sampling rate is %(remote)s."
 msgstr ""
+"Les taux d'échantillonage audio de chacun des serveurs JACK ne concordent pas. \n"
+"Le taux local est de %(local)s, alors que celui du contact distant est de %(remote)s."
 
 #: ../py/scenic/application.py:656
 #, python-format
@@ -48,15 +50,18 @@ msgid ""
 "\n"
 "Do you accept?"
 msgstr ""
+"<b><big>%(invited_by)s vous invite.</big></b>\n"
+"\n"
+"Acceptez-vous ?"
 
 #: ../py/scenic/application.py:691
 #, python-format
 msgid "Contact %(name)s invited you but cancelled his invitation."
-msgstr ""
+msgstr "Le contact %(name)s vous a invité, puis a annulé son invitation."
 
 #: ../py/scenic/application.py:715
 msgid "Got an acceptation from a remote peer, but a streaming session is already in progress."
-msgstr ""
+msgstr "Vous avez reçu une acceptation à transmettre d'un contact distant, mais vous êtes déjà engagé dans une session de trasmission."
 
 #: ../py/scenic/application.py:730
 msgid "The remote peer refused to stream with you."
@@ -76,23 +81,23 @@ msgstr "Le contact distant est occupé. Impossible de transmettre avec lui."
 
 #: ../py/scenic/application.py:738
 msgid "The remote peer cannot stream with you since its xvideo extension could not be found."
-msgstr ""
+msgstr "Le contact ne peut pas transmettre avec vous car il n'a pas l'extenxion xvideo."
 
 #: ../py/scenic/application.py:740
 msgid "The remote peer cannot stream with you since its MIDI device could not be found."
-msgstr ""
+msgstr "Le contact ne peut pas transmettre avec vous car son appareil MIDI est introuvable."
 
 #: ../py/scenic/application.py:742
 msgid "The remote peer cannot stream with you since its video capture device could not be found."
-msgstr ""
+msgstr "Le contact ne peut pas transmettre avec vous car son appareil de capture vidéo est introuvable."
 
 #: ../py/scenic/application.py:744
 msgid "The remote peer cannot stream with you since its X11 display could not be found."
-msgstr ""
+msgstr "Le contact ne peut pas transmettre avec vous car son moniteur X11 est introuvable."
 
 #: ../py/scenic/application.py:746
 msgid "The remote peer cannot stream with you due to technical issues."
-msgstr ""
+msgstr "Le contact ne peut pas transmettre avec vous car des problèmes techniques sont survenus."
 
 #: ../py/scenic/application.py:816
 msgid "Cannot start streaming if all the streams are disabled."
@@ -109,12 +114,12 @@ msgstr "Impossible d'accepter une invitation."
 #: ../py/scenic/application.py:936
 #, python-format
 msgid "The X11 display %(display)s disappeared!"
-msgstr ""
+msgstr "Le moniteur X11 %(display)s a disparu !"
 
 #: ../py/scenic/application.py:940
 #, python-format
 msgid "The video source %(camera)s disappeared!"
-msgstr ""
+msgstr "La source vidéo %(camera)s a disparu !"
 
 #: ../py/scenic/application.py:947
 msgid "JACK is not running."
@@ -127,12 +132,12 @@ msgstr "Une session est déjà en cours."
 #: ../py/scenic/application.py:955
 #, python-format
 msgid "The MIDI output device %(device)s disappeared!"
-msgstr ""
+msgstr "L'appareil d'entrée MIDI %(device)s a disparu !"
 
 #: ../py/scenic/application.py:959
 #, python-format
 msgid "The MIDI input device %(device)s disappeared!"
-msgstr ""
+msgstr "L'appareil de sortie MIDI %(device)s a disparu !"
 
 #: ../py/scenic/application.py:964
 msgid "The X video extension is not present."
@@ -149,6 +154,9 @@ msgid ""
 "\n"
 "Scenic is not listening on port %(port)d of host %(ip)s."
 msgstr ""
+"Impossible d'inviter le contact %(name)s. \n"
+"\n"
+"Scenic ne semble pas écouter sur le %(port)d de son hôte %(ip)s."
 
 #: ../py/scenic/application.py:1014
 #: ../py/scenic/application.py:1016
@@ -158,6 +166,9 @@ msgid ""
 "\n"
 "Host %(ip)s is unreachable."
 msgstr ""
+"Impossible d'inviter le contact %(name)s. \n"
+"\n"
+"L'hôte %(ip)s est innateignable."
 
 #: ../py/scenic/application.py:1018
 #, python-format
@@ -167,11 +178,15 @@ msgid ""
 "Error trying to connect to %(ip)s:%(port)s:\n"
 " %(reason)s"
 msgstr ""
+"Impossible d'inviter le contact %(name)s. \n"
+"\n"
+"Une erreur est survenue en contactant %(ip)s:%(port)s:\n"
+" %(reason)s"
 
 #: ../py/scenic/glade.py:46
 #, python-format
 msgid "Error : Could not find the Glade file %(filename)s. Exitting."
-msgstr ""
+msgstr "Erreur : Le fichier Glade %(filename)s est introuvable. Nous devons quitter."
 
 #: ../py/scenic/gui.py:64
 msgid ""
@@ -193,10 +208,27 @@ msgid ""
 "You should have received a copy of the GNU General Public License\n"
 "along with Scenic.  If not, see <http://www.gnu.org/licenses/>."
 msgstr ""
+"Scenic\n"
+"Copyright (C) 2009 Société des arts technologiques (SAT)\n"
+"http://www.sat.qc.ca\n"
+"Tous droits réservés.\n"
+"\n"
+"Ce programme est libre, vous pouvez le redistribuer et/ou le \n"
+"modifier selon les termes de la Licence Publique Générale GNU \n"
+"publiée par la Free Software Foundation (version 2 ou bien toute \n"
+"autre version ultérieure choisie par vous).Ce programme est distribué car potentiellement utile, mais SANS \n"
+"AUCUNE GARANTIE, ni explicite ni implicite, y compris les garanties \n"
+"de commercialisation ou d'adaptation dans un but spécifique. \n"
+"Reportez-vous à la Licence Publique Générale GNU pour plus de \n"
+"détails.\n"
+"\n"
+"Vous devez avoir reçu une copie de la Licence Publique Générale \n"
+"GNU en même temps que ce programme ; si ce n'est pas le cas, \n"
+"voir <http://www.gnu.org/licenses/>. "
 
 #: ../py/scenic/gui.py:91
 msgid "Copyright 2009-2010 Society for Arts and Technology"
-msgstr ""
+msgstr "Copyright (C) 2009 Société des arts technologiques"
 
 #: ../py/scenic/gui.py:192
 msgid "Automatically accept invitations"
@@ -243,6 +275,9 @@ msgid ""
 "\n"
 "Are you sure you want to shutdown the computer now?"
 msgstr ""
+"<b><big>Eteindre l'ordinateur?</big></b>\n"
+"\n"
+"Souhaitez-vous vraiment éteindre l'ordinateur maintenant ?"
 
 #: ../py/scenic/gui.py:678
 msgid ""
@@ -250,12 +285,17 @@ msgid ""
 "\n"
 "Are you sure you want to reboot the computer now?"
 msgstr ""
+"<b><big>Redémarrer l'ordinateur?</big></b>\n"
+"\n"
+"Souhaitez-vous vraiment redémarrer l'ordinateur maintenant ?"
 
 #: ../py/scenic/gui.py:731
 msgid ""
 "Could not send info.\n"
 "Check your internet connection."
 msgstr ""
+"Impossible d'envoyer les informations.\n"
+"Veuillez vérifier votre connexion à Internet."
 
 #: ../py/scenic/gui.py:734
 msgid ""
@@ -263,6 +303,9 @@ msgid ""
 "\n"
 "Are you sure you want to send your computer settings to the administrator of scenic?"
 msgstr ""
+"<b><big>Envoyer votre configuration ?</big></b>\n"
+"\n"
+"Souhaitez-vous vraiment envoyer votre configuration aux développeurs de Scenic ?"
 
 #: ../py/scenic/gui.py:960
 msgid "Stop streaming"
@@ -345,7 +388,7 @@ msgstr "Réception MIDI en cours"
 #: ../py/scenic/gui.py:1162
 #, python-format
 msgid "Jitter buffer: %(jitterbuffer)d ms"
-msgstr ""
+msgstr "Tampon de variation de latence : %(jitterbuffer)d ms"
 
 #: ../py/scenic/gui.py:1166
 msgid "Sending MIDI"
@@ -363,12 +406,12 @@ msgstr "Lignes de commanes:"
 #: ../py/scenic/gui.py:1416
 #, python-format
 msgid "Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s."
-msgstr ""
+msgstr "La tentative de changer le standard vidéo de %(current_standard)s à %(desired_standard)s pour l'appareil %(device_name)s a échoué."
 
 #: ../py/scenic/gui.py:1458
 #, python-format
 msgid "Could not change V4L2 input from %(current_input)s to %(desired_input)s for device %(device_name)s."
-msgstr ""
+msgstr "La tentative de changer l'entrée vidéo de %(current_input)s à %(desired_input)s pour l'appareil %(device_name)s a échoué."
 
 #: ../py/scenic/gui.py:1578
 msgid "<b>Zombie</b>"
@@ -404,7 +447,7 @@ msgstr "Des erreurs sont survenues durant le visionnement de l'aperçu local."
 msgid ""
 "Limiting the number of audio channels to receive to %(number)d since remote peer only support up to that much.\n"
 "Decrease it to get rid of this message."
-msgstr ""
+msgstr "Nous limitons le nombre de canaux audio en réception à %(number)d car c'est le maximum que peut supporter le contact distant."
 
 #: ../py/scenic/streamer.py:224
 #, python-format
@@ -412,6 +455,8 @@ msgid ""
 "Limiting the number of audio channels to send to %(number)d since we only support up to that much.\n"
 "Decrease it to get rid of this message."
 msgstr ""
+"Nous limitons le nombre de canaux audio en envoi à %(number)d car c'est le maximum que vous pouvez supporter.\n"
+"Réduisez ce chiffre pour ne plus voir ce message."
 
 #: ../py/scenic/streamer.py:225
 msgid "Update your jackaudiosrc Gstreamer element."
@@ -497,11 +542,11 @@ msgstr "Scenic"
 
 #: ../data/glade/scenic.glade:748
 msgid "_File"
-msgstr ""
+msgstr "_Fichier"
 
 #: ../data/glade/scenic.glade:769
 msgid "_Help"
-msgstr ""
+msgstr "_Aide"
 
 #: ../data/glade/scenic.glade:795
 msgid "Installation Manual"
