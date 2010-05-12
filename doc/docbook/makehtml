@@ -1,0 +1,6 @@
+#!/bin/bash
+mkdir -p html/installation-manual
+mkdir -p html/fig
+cp -r fig/*.{png,jpg} html/fig
+cd html/installation-manual
+xsltproc --noout -o index.html  /usr/share/xml/gnome/xslt/docbook/html/db2html.xsl ../../installation-manual.xml
