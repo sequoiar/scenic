@@ -32,6 +32,7 @@ New features in milhouse:
 
 New features in scenic:
     #520 Translate to french
+    #314 i18n procedure with gettext and glade should be documented
 
 Bug fixes in milhouse: 
     #495 Not receiving vumeters because of display variable being set to non 
@@ -40,4 +41,6 @@ Bug fixes in milhouse:
 
 Bug fixes in scenic: 
     #518 Newer configuration options are erased when we run an older version
+    #519 Messages from the application modules are logged twice
+    #405 Document ports to open
 

@@ -234,6 +234,23 @@
     <para />
   </sect1>
   <sect1>
+    <title>Be reached from the Internet</title>
+    <para>To stream with Scenic, both peer must make sure their 
+    computer are reachable for the other computer. That means each
+    peer must be able to send data to the other peer. </para>
+    <para>The easiest way to make this happen, is to have a public
+    IP address, and all ports open to the Internet - with no 
+    firewall. An other solution would be to use a VPN.</para>
+    <para>If you are using behind a router, one thing that you 
+    can do it to configure your router to forward specific ports 
+    to the computer running Scenic. The port forwarding must be
+    done for both TCP/IP and UDP/IP on the port 17446, as well 
+    as for the whole range of 10000 to at least 11000.</para>
+    <para>The port 17446 is the communication port of Scenic. 
+    Scenic allocates port number from 10000 and up for the 
+    receiving streamers. </para>
+  </sect1>
+  <sect1>
     <title>Testing the Devices</title>
     <para>Before trying to do any live audio and video streaming,
     one should make sure his devices are properly pluged-in and
