@@ -39,6 +39,7 @@ Bug fixes in milhouse:
     #495 Not receiving vumeters because of display variable being set to non 
          default when audio and video are synchronized
     #517 Milhouse in audio-only should not require a DISPLAY to be set
+    #324 Milhouse lacks a tutorial
 
 Bug fixes in scenic: 
     #518 Newer configuration options are erased when we run an older version
