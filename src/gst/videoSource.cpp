@@ -162,6 +162,7 @@ VideoV4lSource::VideoV4lSource(const Pipeline &pipeline,
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
     if (!v4l2util::checkStandard(expectedStandard_, actualStandard_, deviceStr()))
+        if (not actualStandard_.empty())
         LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard "
                 << expectedStandard_ << ", it is " << actualStandard_);
 
