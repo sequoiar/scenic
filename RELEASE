@@ -28,13 +28,16 @@ This release is an other unstable version in the 0.5 series. This version contai
     * While milhouse supports many video and audio input types, Scenic only supports a subset of them. 
     * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from long term support of the new features of the 0.5 branch.
 
-New features and bug fixes in 0.5.4:
-
 New features in milhouse:
 
 New features in scenic:
+    #520 Translate to french
 
 Bug fixes in milhouse: 
+    #495 Not receiving vumeters because of display variable being set to non 
+         default when audio and video are synchronized
+    #517 Milhouse in audio-only should not require a DISPLAY to be set
 
-Bug fixes in scenic : 
+Bug fixes in scenic: 
     #518 Newer configuration options are erased when we run an older version
+
