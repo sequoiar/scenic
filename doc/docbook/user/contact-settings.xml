@@ -10,11 +10,19 @@
       </listitem>
    </orderedlist>
    <para>
-      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/AddContact.png" width="17.217cm" depth="13.539cm"/> 
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/click_on_add_contact.png" format="PNG" /> 
+      </imageobject>
+    </mediaobject>
    </para>
    <para>Now a pop-up window will appear with the appropriate contact field: </para>
    <para>
-      <inlinegraphic fileref="https://svn.sat.qc.ca/trac/miville/raw-attachment/wiki/ImageSource/ContactPopup.png" width="2.068cm" depth="1.07cm"/> 
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/add_contact_edit_dialog.png" format="PNG" /> 
+      </imageobject>
+    </mediaobject>
    </para>
    <orderedlist>
       <listitem>

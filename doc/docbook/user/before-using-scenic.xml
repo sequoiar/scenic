@@ -85,8 +85,8 @@
       <para>It is really important to verify that you have
       peripheral that are supported by Scenic. For this refer to
       our 
-      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
-      Hardware Requirements</ulink>page.</para>
+      <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
+      Hardware Requirements</ulink> page.</para>
       <para>Is is also necessary to make sure that all peripheral
       are properly configure and connected.</para>
       <para>Here is an overview of the various peripheral used in a
@@ -135,8 +135,8 @@
       </listitem>
       <listitem>
         <para>Configure your network: 
-        <ulink url="https://help.ubuntu.com/community/NetworkAdmin">
-        https://help.ubuntu.com/community/NetworkAdmin</ulink></para>
+        <ulink url="http://help.ubuntu.com/community/NetworkAdmin">
+        http://help.ubuntu.com/community/NetworkAdmin</ulink></para>
       </listitem>
       <listitem>
         <para>Verify that your IP address is functional: In a
@@ -215,8 +215,8 @@
       </listitem>
       <listitem>
         <para>Connect all the audio and video device following our 
-        <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">
-        Hardware Setup</ulink>page.</para>
+        <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">
+        Hardware Setup</ulink> page.</para>
       </listitem>
       <listitem>
         <para>While connecting the device, be aware that if you
@@ -227,8 +227,8 @@
       <listitem>
         <para>Next, configure and test your audio and video
         following our 
-        <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
-        TestAudiovisualInputOutput</ulink>page.</para>
+        <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
+        TestAudiovisualInputOutput</ulink> page.</para>
       </listitem>
     </orderedlist>
     <para />

@@ -26,7 +26,9 @@
       <listitem>firereset: Resets a ieee1394 (Firewire) bus.</listitem>
       <listitem>jack-info: Prints informations about currently running JACK servers.</listitem>
     </orderedlist>
-    <sect2>
+    <para>The next section is dedicated to the Milhouse command-line streamer.</para>
+</sect1>
+    <sect1>
         <title>Using Milhouse, the command-line streamer</title>
         <para>Here is a quick introduction to using Milhouse, an application for audio-video streaming over RTP.</para>
         <para>Milhouse is a simple tool that can do a lot of things. For example, it can list the cameras and video capture devices found on your computer. It can also change video settings for a V4L2 (Video4Linux2) device, such as its video standard and its selected video input number. Milhouse also supports DV cameras and DC cameras, two kinds of cameras using ieee1394 (Firewire) to send their digital video signal to the computer. Those two types of cameras are not yet supported by the Scenic graphical user interface. This is one of the reasons why an advanced user might prefer to use the Milhouse command line tool instead of the Scenic graphical user interface.</para>
@@ -75,6 +77,5 @@
         <para>
        milhouse --v4l2-input 1
         </para>
-    </sect2>
 </sect1>
 </chapter>
