@@ -93,6 +93,7 @@ fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 
+GNOME_DOC_INIT(0.12.2, , AC_MSG_WARN(["DocBook Documentation will not be converted to HTML."]))
 dnl check for python
 AM_PATH_PYTHON([2.5])
 
