@@ -34,157 +34,159 @@
       installation 
       <sect1 id="nvidia-settings">
         <para>How to install Nvidia drivers in Ubuntu</para>
-          <para>Ubuntu doesn't include Nvidia drivers by default.</para>
-          <orderedlist>
-            <listitem>
-              <para>First, go to System &gt; Administration &gt;
-              Hardware Drivers</para>
-            </listitem>
-            <listitem>
-              <para>You'll then see that Nvidia drivers are not in
-              use. Check (or tick) the box underneath Enabled to
-              enable the drivers.</para>
-            </listitem>
-            <listitem>
-              <para>You'll then be asked (after a brief explanation
-              about desktop effects) if you want to enable the
-              driver. Click Enable Driver.</para>
-            </listitem>
-            <listitem>
-              <para>Wait for the installer file to download.</para>
-            </listitem>
-            <listitem>
-              <para>Wait for the drivers to be installed.</para>
-            </listitem>
-            <listitem>
-              <para>Then, click Close once the changes have been
-              applied.</para>
-            </listitem>
-            <listitem>
-              <para>You'll then see that the drivers are enabled
-              and will be available for use upon a reboot.</para>
-            </listitem>
-          </orderedlist>
-          <para>The typical video setup used is to have two video
-          output. Both of these output are from your graphic card.
-          One output is going to your monitor and the second is
-          going to a projector or a video mixer. As shown in the
-          General Setup part of the 
-          <link linkend="hardware-setup">Hardware Setup</link>page.
-          To make this setup we have to configure your xorg.conf
-          with the nvidia-settings application situated in
-          System/Administration/Nvidia X Server Settings Here are
-          the configuration step to follow:</para>
-        
-          <orderedlist>
-            <listitem>Physically connecting your video output </listitem>
-           <listitem>Starting your computer </listitem>
-          <listitem>Starting nvidia-settings </listitem> 
-          <listitem>Configuring your computer monitor </listitem>
-          <listitem>Configuring your Second video output (Projector or video mixer)</listitem> </orderedlist>
-          <title>Physically connecting your video output</title>
-              <para>First be sure to connect both output: The
-              Monitor Output and the TV (VGA Or S-Video output)
-              before starting your computer. If your both output
-              are not connected when starting the computer,the
-              nvidia-settings will not be able to detect the second
-              output.</para>
-          <para>Note that for the s-video output (The graphic card
-          s-video connector), the nvidia-settings application will
-          only detect a regular s-video cable. If you have any
-          composite cable or adaptor, don't use it for this
-          configuration part.</para>
-          <para>You can use a regular S-Video Cable and connect the
-          s-video output from the graphic card to the s-video input
-          of your capture card.</para>
-          <title>Starting your computer</title>
-          <para>When your both output are connected, you can start
-          your computer.</para>
-          <title>Starting nvidia-settings</title>
-              <para>Install your graphic card driver. Go to
-              System/Administration/Hardware Driver and enable the
-              Nvidia driver.</para>
-          <orderedlist>
-            <listitem>
-              <para>Now install nvidia-setting</para>
-            </listitem>
-          </orderedlist>
-          <para>sudo aptitude install nvidia-settings</para>
-          <orderedlist>
-            <listitem>
-              <para>Now open nvidia-settings situated in
-              System/Administration/Nvidia X Server Settings and
-              click on "X Sever Display configuration"</para>
-            </listitem>
-          </orderedlist>
-          <orderedlist>
-            <listitem>
-              <para>Verify that Enable Xinerama si NOT
-              selected</para>
-            </listitem>
-          </orderedlist>
-          <title>Configuring your computer monitor</title>
-          <orderedlist>
-            <listitem>
-              <para>Click on the first monitor layout and verify
-              that your "Configuration" option is set to "separate
-              X screen" then set the display settings for this
-              monitor ex: 1024x768</para>
-            </listitem>
-          </orderedlist>
-          
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="fig/nvidia_settings-1.1.png" format="PNG" />
-        </imageobject>
-      </mediaobject>
-          <orderedlist>
-            <listitem>
-              <para>Then on the X-Screen Tab, set the position to
-              absolute +0+0</para>
-            </listitem>
-          </orderedlist>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="fig/nvidia_settings-1.2.png" format="PNG" />
-        </imageobject>
-      </mediaobject>
-          <title>Configuring your Second video output (Projector or
-          video mixer)</title>
-          <orderedlist>
-            <listitem>
-              <para>Now click on the second output layout and
-              verify that your "Configuration" option is set to
-              "separate X screen" then set the display settings for
-              this monitor ex: 800x600</para>
-            </listitem>
-          </orderedlist>
-                  
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="fig/nvidia_settings-2.1.png" format="PNG" />
-        </imageobject>
-      </mediaobject>
-          <orderedlist>
-            <listitem>
-              <para>Then on the X-Screen Tab for the second output
-              (TV, S-video or VGA)</para>
-            </listitem>
-          </orderedlist>
-            
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="fig/nvidia_settings-2.2.png" format="PNG" />
-        </imageobject>
-      </mediaobject>
-          <orderedlist>
-            <listitem>
-              <para>Now you can click apply, a pop up window will
-              ask if you want to apply what is possible. Click
-              yes</para>
-            </listitem>
-          </orderedlist>
-          <para />
+        <para>Ubuntu doesn't include Nvidia drivers by
+        default.</para>
+        <orderedlist>
+          <listitem>
+            <para>First, go to System &gt; Administration &gt;
+            Hardware Drivers</para>
+          </listitem>
+          <listitem>
+            <para>You'll then see that Nvidia drivers are not in
+            use. Check (or tick) the box underneath Enabled to
+            enable the drivers.</para>
+          </listitem>
+          <listitem>
+            <para>You'll then be asked (after a brief explanation
+            about desktop effects) if you want to enable the
+            driver. Click Enable Driver.</para>
+          </listitem>
+          <listitem>
+            <para>Wait for the installer file to download.</para>
+          </listitem>
+          <listitem>
+            <para>Wait for the drivers to be installed.</para>
+          </listitem>
+          <listitem>
+            <para>Then, click Close once the changes have been
+            applied.</para>
+          </listitem>
+          <listitem>
+            <para>You'll then see that the drivers are enabled and
+            will be available for use upon a reboot.</para>
+          </listitem>
+        </orderedlist>
+        <para>The typical video setup used is to have two video
+        output. Both of these output are from your graphic card.
+        One output is going to your monitor and the second is going
+        to a projector or a video mixer. As shown in the General
+        Setup part of the 
+        <link linkend="hardware-setup">Hardware Setup</link>page.
+        To make this setup we have to configure your xorg.conf with
+        the nvidia-settings application situated in
+        System/Administration/Nvidia X Server Settings Here are the
+        configuration step to follow:</para>
+        <orderedlist>
+          <listitem>Physically connecting your video
+          output</listitem>
+          <listitem>Starting your computer</listitem>
+          <listitem>Starting nvidia-settings</listitem>
+          <listitem>Configuring your computer monitor</listitem>
+          <listitem>Configuring your Second video output (Projector
+          or video mixer)</listitem>
+        </orderedlist>
+        <title>Physically connecting your video output</title>
+        <para>First be sure to connect both output: The Monitor
+        Output and the TV (VGA Or S-Video output) before starting
+        your computer. If your both output are not connected when
+        starting the computer,the nvidia-settings will not be able
+        to detect the second output.</para>
+        <para>Note that for the s-video output (The graphic card
+        s-video connector), the nvidia-settings application will
+        only detect a regular s-video cable. If you have any
+        composite cable or adaptor, don't use it for this
+        configuration part.</para>
+        <para>You can use a regular S-Video Cable and connect the
+        s-video output from the graphic card to the s-video input
+        of your capture card.</para>
+        <title>Starting your computer</title>
+        <para>When your both output are connected, you can start
+        your computer.</para>
+        <title>Starting nvidia-settings</title>
+        <para>Install your graphic card driver. Go to
+        System/Administration/Hardware Driver and enable the Nvidia
+        driver.</para>
+        <orderedlist>
+          <listitem>
+            <para>Now install nvidia-setting</para>
+          </listitem>
+        </orderedlist>
+        <para>sudo aptitude install nvidia-settings</para>
+        <orderedlist>
+          <listitem>
+            <para>Now open nvidia-settings situated in
+            System/Administration/Nvidia X Server Settings and
+            click on "X Sever Display configuration"</para>
+          </listitem>
+        </orderedlist>
+        <orderedlist>
+          <listitem>
+            <para>Verify that Enable Xinerama si NOT
+            selected</para>
+          </listitem>
+        </orderedlist>
+        <title>Configuring your computer monitor</title>
+        <orderedlist>
+          <listitem>
+            <para>Click on the first monitor layout and verify that
+            your "Configuration" option is set to "separate X
+            screen" then set the display settings for this monitor
+            ex: 1024x768</para>
+          </listitem>
+        </orderedlist>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="fig/nvidia_settings-1.1.png"
+            format="PNG" />
+          </imageobject>
+        </mediaobject>
+        <orderedlist>
+          <listitem>
+            <para>Then on the X-Screen Tab, set the position to
+            absolute +0+0</para>
+          </listitem>
+        </orderedlist>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="fig/nvidia_settings-1.2.png"
+            format="PNG" />
+          </imageobject>
+        </mediaobject>
+        <title>Configuring your Second video output (Projector or
+        video mixer)</title>
+        <orderedlist>
+          <listitem>
+            <para>Now click on the second output layout and verify
+            that your "Configuration" option is set to "separate X
+            screen" then set the display settings for this monitor
+            ex: 800x600</para>
+          </listitem>
+        </orderedlist>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="fig/nvidia_settings-2.1.png"
+            format="PNG" />
+          </imageobject>
+        </mediaobject>
+        <orderedlist>
+          <listitem>
+            <para>Then on the X-Screen Tab for the second output
+            (TV, S-video or VGA)</para>
+          </listitem>
+        </orderedlist>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="fig/nvidia_settings-2.2.png"
+            format="PNG" />
+          </imageobject>
+        </mediaobject>
+        <orderedlist>
+          <listitem>
+            <para>Now you can click apply, a pop up window will ask
+            if you want to apply what is possible. Click yes</para>
+          </listitem>
+        </orderedlist>
+        <para />
       </sect1>for Nvidia and ATI cards respectively.</para>
       <para>Next, what we want now is two video outputs. One for
       your monitor screen and one for your projector or video
@@ -342,8 +344,8 @@
     <title>Audio Settings</title>
     <para>First verify that you have an appropriate sound card on
     our 
-    <link linkend='hardware-requirements'>
-    Hardware Requirements </link>.</para>
+    <link linkend='hardware-requirements'>Hardware
+    Requirements</link>.</para>
     <sect2>
       <title>Firewire sound card</title>
       <para>Verify that your soundcard is detected For firewire
@@ -387,9 +389,6 @@
               <entry>
                 <para>Value</para>
               </entry>
-              <entry>
-                <para />
-              </entry>
             </row>
             <row>
               <entry>
@@ -397,9 +396,6 @@
               </entry>
               <entry>
                 <para>Yes</para>
-              </entry>
-              <entry>
-                <para />
               </entry>
             </row>
             <row>
@@ -409,9 +405,6 @@
               <entry>
                 <para>Default</para>
               </entry>
-              <entry>
-                <para />
-              </entry>
             </row>
             <row>
               <entry>
@@ -419,9 +412,6 @@
               </entry>
               <entry>
                 <para>64</para>
-              </entry>
-              <entry>
-                <para />
               </entry>
             </row>
             <row>
@@ -431,9 +421,6 @@
               <entry>
                 <para>48000</para>
               </entry>
-              <entry>
-                <para />
-              </entry>
             </row>
             <row>
               <entry>
@@ -441,9 +428,6 @@
               </entry>
               <entry>
                 <para>2</para>
-              </entry>
-              <entry>
-                <para />
               </entry>
             </row>
             <row>
@@ -453,9 +437,6 @@
               <entry>
                 <para>256</para>
               </entry>
-              <entry>
-                <para />
-              </entry>
             </row>
             <row>
               <entry>
@@ -464,9 +445,6 @@
               <entry>
                 <para>500</para>
               </entry>
-              <entry>
-                <para />
-              </entry>
             </row>
             <row>
               <entry>
@@ -474,9 +452,6 @@
               </entry>
               <entry>
                 <para>Default</para>
-              </entry>
-              <entry>
-                <para />
               </entry>
             </row>
             <row>
@@ -497,9 +472,6 @@
               <entry>
                 <para>Default</para>
               </entry>
-              <entry>
-                <para />
-              </entry>
             </row>
             <row>
               <entry>
@@ -508,9 +480,6 @@
               <entry>
                 <para>Default</para>
               </entry>
-              <entry>
-                <para />
-              </entry>
             </row>
             <row>
               <entry>
@@ -518,9 +487,6 @@
               </entry>
               <entry>
                 <para>2.67 msec</para>
-              </entry>
-              <entry>
-                <para />
               </entry>
             </row>
           </tbody>
