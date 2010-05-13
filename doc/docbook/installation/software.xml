@@ -5,12 +5,12 @@
   libraries and development packages, and a build of the most
   recent release of the &app; software.</para>
   <para>The computers must meet these 
-  <link linkend='hardware_requirements'>minimum
-  requirements</link>.</para>
+  <link linkend='hardware-requirements'>minimum
+  requirements </link>.</para>
   <para>Note that prior to using &app; you also need to meet the 
-  <link linkend='network_test'>required network
-  specification</link></para>
-  <sect1>
+  <link linkend='network-test'>required network
+  specification </link></para>
+  <sect1 id="os-installation">
     <title>Operating System Installation</title>
     <para>&app; operates on the Linux based desktop operating
     system and is tested on the following Linux
@@ -82,13 +82,13 @@
     <para>To install Ubuntu, please follow the instructions found
     on the 
     <ulink url="http://www.ubuntu.com/getubuntu">Get
-    Ubuntu</ulink>page.</para>
+    Ubuntu </ulink>page. </para>
     <para>To install Debian, please follow the instructions found
     on the 
     <ulink url="http://www.debian.org/distrib/">Get
-    Debian</ulink>page.</para>
+    Debian </ulink>page. </para>
   </sect1>
-  <sect1>
+  <sect1 id="lib-package-installation">
     <title>Libraries and Development Packages Installation</title>
     <para>Before performing the scenic installation, please perform
     an update of your linux distribution:</para>
@@ -97,8 +97,8 @@
     <para />
     <para>&app; need various package to be installed. You can have
     a detailed view of the required library and dependency on our 
-    <ulink url="https://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
-    Library and Package</ulink>page. To install the required these
+    <ulink url="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
+    Library and Package </ulink>page. To install the required these
     libraries and their dependencies run the following command in
     the terminal:</para>
     <para>
@@ -128,7 +128,7 @@
     </table>
     <para>You must download the debian sid iperf 
     <ulink url="http://packages.debian.org/sid/iperf">
-    version</ulink>2.0.4-3 or 2.0.4-4 on your desktop and install
+    version </ulink> 2.0.4-3 or 2.0.4-4 on your desktop and install
     it on both computers. Double click on the package to start the
     Ubuntu package manager installation process, or install it as
     root with dpkg -i ./iperf_2.0.4-3_i386.deb .</para>
@@ -233,24 +233,24 @@
       again.</emphasis>
     </para>
   </sect1>
-  <sect1>
-    <title>Installing the midi component</title>
+  <sect1 id="midi-component-installationi">
+    <title>Installing the midi component </title>
     <para>The midi component in &app; is available on the unstable
     branch (0.5). You can skip this if you install &app; 0.4.x and
     you don't want to stream midi, even with the command
     line.</para>
     <para>Install the python-portmidi package: 
     <ulink url="https://bitbucket.org/aalex/pyportmidi/downloads/">
-    https://bitbucket.org/aalex/pyportmidi/downloads/</ulink>Note:
+    https://bitbucket.org/aalex/pyportmidi/downloads/ </ulink>Note:
     this package contains patches unavailable with the python
     bindings that comes with portmidi.</para>
     <para></para>
   </sect1>
-  <sect1>
-    <title>Building &app;</title>
+  <sect1 id="building-scenic">
+    <title>Building &app; </title>
     <para>To get the latest &app; version, go to 
     <ulink url="http://scenic.sat.qc.ca/download">
-    http://scenic.sat.qc.ca/download</ulink></para>
+    http://scenic.sat.qc.ca/download </ulink></para>
     <para>Extract the tarball and cd into it:</para>
     <programlisting>tar xzj scenic-0.4.x.tar.gz</programlisting>
     <programlisting>cd scenic-0.4.x</programlisting>
@@ -271,7 +271,6 @@
       <emphasis role="strong">Next, compile scenic:</emphasis>
     </para>
     <programlisting>cd scenic</programlisting>
-    <programlisting>./configure &amp;&amp; make &amp;&amp; sudo
-    make install</programlisting>
+    <programlisting>./configure &amp;&amp; make &amp;&amp; sudo make install</programlisting>
   </sect1>
 </chapter>

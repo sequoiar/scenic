@@ -1,12 +1,12 @@
-<chapter id="network_test">
+<chapter id="network-test">
   <title>Network Testing</title>
   <para>The use of &app; require specific network capabilities. In
   this chapter we will determine what this capabilites are. We will
   also give you tools how tho evaluate and improve the quality of
   your network.</para>
-  <sect1>
-    <title>Minimum Network Requirements</title>
-    <sect2>
+  <sect1 id="network-requirements">
+    <title>Network Requirements</title>
+    <sect2 id="network-speed">
       <title>Network speed</title>
       <para>Network speed and performance are of the utmost
       importance. To ensure that the network can handle the &app;
@@ -17,7 +17,7 @@
       <para>Bandwidth: 3.5Mbps video + 1.6Mbps audio = &gt; 5Mbps +
       20%</para>
     </sect2>
-    <sect2>
+    <sect2 id="network-bandwith">
       <title>Network bandwidth</title>
       <para>Network bandwidth is a measure of available or consumed
       data communication resources expressed in bits or multiples
@@ -29,8 +29,8 @@
       add to this a 20% leeway and also consider additional network
       usage such as chat, skype, web browsing and so on.</para>
     </sect2>
-    <sect2>
-      <title>Latency</title>
+    <sect2 id="network-latency">
+      <title>Network Latency</title>
       <para>Latency is the time taken for a sent packet of data to
       be received at the other end. It includes the time to encode
       the packet for transmission and transmit it, the time for
@@ -50,7 +50,7 @@
       <para />
       <para>Across continents: 200ms</para>
     </sect2>
-    <sect2>
+    <sect2 id="jitter">
       <title>Jitter</title>
       <para>Jitter, in the context of computer networks, is a
       measure of the variability over time of the packet latency
@@ -63,7 +63,7 @@
       1%.</para>
       <para>Jitter: &lt;1%</para>
     </sect2>
-    <sect2>
+    <sect2 id="packet-loss">
       <title>Packet Loss</title>
       <para>Packet loss occurs when one or more packets of data
       traveling across a computer network fail to reach their
@@ -78,7 +78,7 @@
       <para>&gt;1% = significant impact</para>
     </sect2>
   </sect1>
-  <sect1>
+  <sect1 id="local-network-test">
     <title>Local Network Testing</title>
     <para>You must download the debian sid iperf version 2.0.4-3 or
     2.0.4-4 on your desktop and install it on both computer. Double
@@ -127,7 +127,7 @@
     respectively 15M, 30M, 60M, 80M. If you detect packet loss,
     please refer to our troubleshooting section.</programlisting>
   </sect1>
-  <sect1>
+  <sect1 id="bidirectional-network-test">
     <title>Bidirectional Local Network Testing</title>
     <para>This iperf bidirectional test evaluates network
     performances in the the context of bidirectional video and
@@ -147,7 +147,7 @@
     <programlisting>iperf &#160;-c ''server ip address'' -b 30M
     -u</programlisting>
   </sect1>
-  <sect1>
+  <sect1 id="remote-network-test">
     <title>Remote Network Testing</title>
     <para>Perform a traceroute starting from your computer to the
     remote computer. This will show you the route taken by the
@@ -166,9 +166,9 @@
       </mediaobject>
     </para>
   </sect1>
-  <sect1>
+  <sect1 id="network-testing-tools">
     <title>Useful network testing tools</title>
-    <sect2>
+    <sect2 id="ping">
       <title>Ping</title>
       <para>Ping will be used here to test the latency over the
       network.</para>

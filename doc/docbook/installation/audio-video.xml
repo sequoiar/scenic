@@ -3,20 +3,17 @@
   <para>First verify that you have all required dependencies at our
   
   <link linkend='software-installation'>Software
-  Installation</link>page.</para>
+  Installation </link>page.</para>
   <sect1 id="av-transmission">
     <title>Setting A/V Transmission</title>
     <para>Then add your username to the different groups:</para>
     <para>Add your user to the video group</para>
-    <programlisting>sudo gpasswd -a "username"
-    video</programlisting>
+    <programlisting>sudo gpasswd -a "username" video</programlisting>
     <para>Add your user to the audio group</para>
-    <programlisting>sudo gpasswd -a "username"
-    audio</programlisting>
+    <programlisting>sudo gpasswd -a "username" audio</programlisting>
     <para>For firewire-based hardware (DV, IIDC,
     freebob/ffado)</para>
-    <programlisting>sudo gpasswd -a "username"
-    disk</programlisting>
+    <programlisting>sudo gpasswd -a "username" disk</programlisting>
     <para>To be in effect, you have to log out, then log in.</para>
   </sect1>
   <sect1 id="video-settings">
@@ -31,7 +28,7 @@
       <para>The output should NOT contain "no adaptors present". If
       it's not activated, you may have to use a proprietary driver.
       See the following instruction for Nvidia or ATI driver
-      installation 
+      installation
       <sect1 id="nvidia-settings">
         <para>How to install Nvidia drivers in Ubuntu</para>
         <para>Ubuntu doesn't include Nvidia drivers by
@@ -71,7 +68,7 @@
         One output is going to your monitor and the second is going
         to a projector or a video mixer. As shown in the General
         Setup part of the 
-        <link linkend="hardware-setup">Hardware Setup</link>page.
+        <link linkend="hardware-setup">Hardware Setup </link>page.
         To make this setup we have to configure your xorg.conf with
         the nvidia-settings application situated in
         System/Administration/Nvidia X Server Settings Here are the
@@ -211,7 +208,6 @@
       <para>If you're using the fglrx driver, you may have to
       enable the XVideo extension with the aticonfig command (part
       of the xorg-driver-fglrx package).</para>
-      <sect1 id="content">
         <para>sudo aticonfig --overlay-type=Xv</para>
         <para>Alternatively, you can manually add those lines in
         the Device section of the fglrx driver in the
@@ -223,7 +219,6 @@
         <para>Note: As now, it's unclear which ATI cards properly
         supports Xvideo. Feel free to share your
         experiences.</para>
-      </sect1>
       <para />
     </sect2>
     <sect2 id="video-input">
@@ -237,7 +232,7 @@
       <emphasis role="strong">Video4Linux</emphasis>
     </para>&gt; 
     <para>Plug in the video camera, for this, refer to our 
-    <link linkend='hardware_requirements'>Hardware Setup
+    <link linkend='hardware_requirements'>Hardware Setup 
     Page</link></para>
     <para>Now we will modify our video settings for your specific
     needs.</para>
@@ -269,7 +264,7 @@
     <para>You can test the DV camera with:</para>
     <para>gst-launch dv1394src ! dvdemux ! dvdec !
     xvimagesink</para></sect2>
-    <sect2>
+    <sect2 id="video-test">
       <title>Video Test</title>
       <para>In &app;, you can easily preview video4linux2 video
       devices in the "Video" tab. Other input drivers cannot be
@@ -345,8 +340,8 @@
     <para>First verify that you have an appropriate sound card on
     our 
     <link linkend='hardware-requirements'>Hardware
-    Requirements</link>.</para>
-    <sect2>
+    Requirements </link>.</para>
+    <sect2 id="firewire-sound-card">
       <title>Firewire sound card</title>
       <para>Verify that your soundcard is detected For firewire
       soundcard:</para>
@@ -357,7 +352,7 @@
       that is not the case, then the system administrator must add
       the "user" to the "disk" group (as shown above)</para>
     </sect2>
-    <sect2>
+    <sect2 id="pci-sound-card">
       <title>For PCI soundcard</title>
       <para>For pci soundcard with alsa driver, verify that your
       soundcard is detected:</para>
