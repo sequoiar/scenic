@@ -6,7 +6,7 @@
 <para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
    <orderedlist>
       <listitem>
-         <para>Add a new contact: to add a connection, click +. To remove a connection, click -. </para>
+         <para>Add a new contact: to add a connection, click the button with the plus "+" sign. To remove a connection, click the button with the minus "-" sign. </para>
       </listitem>
    </orderedlist>
    <para>
@@ -16,7 +16,7 @@
       </imageobject>
     </mediaobject>
    </para>
-   <para>Now a pop-up window will appear with the appropriate contact field: </para>
+   <para>Next, a dialog will appear with the appropriate contact field: </para>
    <para>
     <mediaobject>
       <imageobject>
@@ -32,13 +32,14 @@
          <para>Address: insert the contact's IP address in the field IP Address:. </para>
       </listitem>
       <listitem>
-         <para>Auto Accept: check this option if you want the remote user to connect without requiring authentication each time. </para>
+         <para>Auto Accept: check this option if you want to accept every invitations from the remote user. This will not ask you any confirmation each time. This can make things a lot easier when there is only one person that controls both sides. Beware that your privacy may be a concern, since when the Scenic application is running, this peer can start a streaming session, and look and listen at what is happening on your side.</para>
       </listitem>
    </orderedlist>
    <para>On the contact window, you can see a summary of the current settings for this particular contact. </para>
 </sect1>
 <sect1>
-<title>Inviting a remote peer to stream</title>
-<para>To invite a contact, simply click on its name in the address book and press the "Invite" button.</para>
-</sect1>
+    <title>Inviting a remote peer to stream</title>
+    <para>To invite a contact, simply click on its name in the address book and click on the "Invite" button.</para>
+    <para>When one receives an invitation, a dialog appears, asking the user if he agrees to start a streaming session. If the user accepts, the streaming starts. This step can be skipped by enabling the "Auto accept" option for a contact, as described above.</para>
+    </sect1>
 </chapter>
