@@ -38,22 +38,26 @@
         <para>If you want to stream video, you must specify a video source for the sender, using its "--videosource" option. A common value is "v4l2src", for a V4L2 source. In this case, you might want to specify a video device, such as "/dev/video0", using the "--videodevice" option. An other useful value for the "--videosource" is "videotestsrc", for test color bars.</para>
         <para>On the receiver's side, you must choose an output for the audio - the "--audiosink" argument - and specify the audio and video codecs, like for the sender (or use the defaults listed in milhouse --help).</para>
         <para>We will create a Milhouse sender and receiver on the same computer. The IP address for the local host is always 127.0.0.1. The resulting commands that you should type in a terminal are the following:</para>
-        <para>
-        milhouse --sender --address 127.0.0.1 --videoport 10030 --videosource videotestsrc --videocodec mpeg4 --audiosource audiotestsrc --numchannels 2 --audioport 10000 --audiocodec raw
-        </para>
-        <para>
-        milhouse --receiver --address 127.0.0.1 --videoport 10030 --videocodec mpeg4 --audioport 10000 --numchannels 2 --audiocodec raw --audiosink jackaudiosink
-        </para>
+        <programlisting> <![CDATA[
+milhouse --sender --address 127.0.0.1 --videoport 10030 --videosource videotestsrc \
+    --videocodec mpeg4 --audiosource audiotestsrc --numchannels 2 --audioport 10000 \
+    --audiocodec raw</para>
+            ]]> </programlisting>
+        <programlisting> <![CDATA[
+milhouse --receiver --address 127.0.0.1 --videoport 10030 --videocodec mpeg4 \
+    --audioport 10000 --numchannels 2 --audiocodec raw \
+    --audiosink jackaudiosink
+            ]]> </programlisting>
         <para>
         To simplify, milhouse has defaults which will cover many of the above arguments, i.e.:
 
         </para>
-        <para>
-        milhouse --sender --videoport 10030 --audiosource audiotestsrc --audioport 10000
-        </para>
-        <para>
-        milhouse --receiver --videoport 10030 --audioport 10000
-        </para>
+        <programlisting> <![CDATA[
+milhouse --sender --videoport 10030 --audiosource audiotestsrc --audioport 10000
+            ]]> </programlisting>
+        <programlisting> <![CDATA[
+milhouse --receiver --videoport 10030 --audioport 10000
+            ]]> </programlisting>
         <para>
               The milhouse command can also be used to change some properties
               of a V4L2 video device, such as the resolution and the video standard.
@@ -62,20 +66,20 @@
         <para>
               To change the video standard to NTSC:
         </para>
-        <para>
-       milhouse --v4l2-standard NTSC
-        </para>
+        <programlisting> <![CDATA[
+milhouse --v4l2-standard NTSC
+            ]]> </programlisting>
         <para>
               To list cameras:
         </para>
-        <para>
-       milhouse --list-cameras
-        </para>
+        <programlisting> <![CDATA[
+milhouse --list-cameras
+            ]]> </programlisting>
         <para>
               To choose an input for a V4L2 device:
         </para>
-        <para>
-       milhouse --v4l2-input 1
-        </para>
+        <programlisting> <![CDATA[
+milhouse --v4l2-input 1
+             ]]> </programlisting>
 </sect1>
 </chapter>
