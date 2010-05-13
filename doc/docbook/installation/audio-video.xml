@@ -1,10 +1,10 @@
-<chapter id="AV_Configuration">
+<chapter id="av-configuration">
   <title>Configure audio and video</title>
   <para>First verify that you have all required dependencies at our
   
-  <link linkend='software_installation'>Software
+  <link linkend='software-installation'>Software
   Installation</link>page.</para>
-  <sect1>
+  <sect1 id="av-transmission">
     <title>Setting A/V Transmission</title>
     <para>Then add your username to the different groups:</para>
     <para>Add your user to the video group</para>
@@ -19,23 +19,173 @@
     disk</programlisting>
     <para>To be in effect, you have to log out, then log in.</para>
   </sect1>
-  <sect1>
+  <sect1 id="video-settings">
     <title>Video Settings</title>
     <para>Here we will configure all the settings related to the
     video input and output</para>
-    <sect2>
+    <sect2 id="video-output">
       <title>Video Output</title>
       <para>First, make sure you have the Xvideo extension actived
       in the X11 display:</para>
       <programlisting>xvinfo | grep -i adaptor</programlisting>
       <para>The output should NOT contain "no adaptors present". If
       it's not activated, you may have to use a proprietary driver.
-      See 
-      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">
-      NvidiaSettings</ulink>or 
-      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/AtiConfig">
-      AtiConfig</ulink>for Nvidia and ATI cards
-      respectively.</para>
+      See the following instruction for Nvidia or ATI driver
+      installation 
+      <sect1 id="nvidia-settings">
+        <para>How to install Nvidia drivers in Ubuntu</para>
+          <para>Ubuntu doesn't include Nvidia drivers by default.</para>
+          <orderedlist>
+            <listitem>
+              <para>First, go to System &gt; Administration &gt;
+              Hardware Drivers</para>
+            </listitem>
+            <listitem>
+              <para>You'll then see that Nvidia drivers are not in
+              use. Check (or tick) the box underneath Enabled to
+              enable the drivers.</para>
+            </listitem>
+            <listitem>
+              <para>You'll then be asked (after a brief explanation
+              about desktop effects) if you want to enable the
+              driver. Click Enable Driver.</para>
+            </listitem>
+            <listitem>
+              <para>Wait for the installer file to download.</para>
+            </listitem>
+            <listitem>
+              <para>Wait for the drivers to be installed.</para>
+            </listitem>
+            <listitem>
+              <para>Then, click Close once the changes have been
+              applied.</para>
+            </listitem>
+            <listitem>
+              <para>You'll then see that the drivers are enabled
+              and will be available for use upon a reboot.</para>
+            </listitem>
+          </orderedlist>
+          <para>The typical video setup used is to have two video
+          output. Both of these output are from your graphic card.
+          One output is going to your monitor and the second is
+          going to a projector or a video mixer. As shown in the
+          General Setup part of the 
+          <link linkend="hardware-setup">Hardware Setup</link>page.
+          To make this setup we have to configure your xorg.conf
+          with the nvidia-settings application situated in
+          System/Administration/Nvidia X Server Settings Here are
+          the configuration step to follow:</para>
+        
+          <orderedlist>
+            <listitem>Physically connecting your video output </listitem>
+           <listitem>Starting your computer </listitem>
+          <listitem>Starting nvidia-settings </listitem> 
+          <listitem>Configuring your computer monitor </listitem>
+          <listitem>Configuring your Second video output (Projector or video mixer)</listitem> </orderedlist>
+          <title>Physically connecting your video output</title>
+              <para>First be sure to connect both output: The
+              Monitor Output and the TV (VGA Or S-Video output)
+              before starting your computer. If your both output
+              are not connected when starting the computer,the
+              nvidia-settings will not be able to detect the second
+              output.</para>
+          <para>Note that for the s-video output (The graphic card
+          s-video connector), the nvidia-settings application will
+          only detect a regular s-video cable. If you have any
+          composite cable or adaptor, don't use it for this
+          configuration part.</para>
+          <para>You can use a regular S-Video Cable and connect the
+          s-video output from the graphic card to the s-video input
+          of your capture card.</para>
+          <title>Starting your computer</title>
+          <para>When your both output are connected, you can start
+          your computer.</para>
+          <title>Starting nvidia-settings</title>
+              <para>Install your graphic card driver. Go to
+              System/Administration/Hardware Driver and enable the
+              Nvidia driver.</para>
+          <orderedlist>
+            <listitem>
+              <para>Now install nvidia-setting</para>
+            </listitem>
+          </orderedlist>
+          <para>sudo aptitude install nvidia-settings</para>
+          <orderedlist>
+            <listitem>
+              <para>Now open nvidia-settings situated in
+              System/Administration/Nvidia X Server Settings and
+              click on "X Sever Display configuration"</para>
+            </listitem>
+          </orderedlist>
+          <orderedlist>
+            <listitem>
+              <para>Verify that Enable Xinerama si NOT
+              selected</para>
+            </listitem>
+          </orderedlist>
+          <title>Configuring your computer monitor</title>
+          <orderedlist>
+            <listitem>
+              <para>Click on the first monitor layout and verify
+              that your "Configuration" option is set to "separate
+              X screen" then set the display settings for this
+              monitor ex: 1024x768</para>
+            </listitem>
+          </orderedlist>
+          
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="fig/nvidia_settings-1.1.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+          <orderedlist>
+            <listitem>
+              <para>Then on the X-Screen Tab, set the position to
+              absolute +0+0</para>
+            </listitem>
+          </orderedlist>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="fig/nvidia_settings-1.2.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+          <title>Configuring your Second video output (Projector or
+          video mixer)</title>
+          <orderedlist>
+            <listitem>
+              <para>Now click on the second output layout and
+              verify that your "Configuration" option is set to
+              "separate X screen" then set the display settings for
+              this monitor ex: 800x600</para>
+            </listitem>
+          </orderedlist>
+                  
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="fig/nvidia_settings-2.1.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+          <orderedlist>
+            <listitem>
+              <para>Then on the X-Screen Tab for the second output
+              (TV, S-video or VGA)</para>
+            </listitem>
+          </orderedlist>
+            
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="fig/nvidia_settings-2.2.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+          <orderedlist>
+            <listitem>
+              <para>Now you can click apply, a pop up window will
+              ask if you want to apply what is possible. Click
+              yes</para>
+            </listitem>
+          </orderedlist>
+          <para />
+      </sect1>for Nvidia and ATI cards respectively.</para>
       <para>Next, what we want now is two video outputs. One for
       your monitor screen and one for your projector or video
       mixer.</para>
@@ -44,9 +194,6 @@
       1024x768 resolution and the second output (VGA, or S-video
       Output) is usually set to a resolution of 800x600. Note that
       those resolution can vary from one setup to an other.</para>
-      <para>For this, follow our 
-      <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/NvidiaSettings">
-      NvidiaSettings</ulink>instructions.</para>
       <para>Set the local machine display to output the video from
       the remote machine on the wanted monitor or TV.</para>
       <para>The environment variable DISPLAY tells all X clients
@@ -57,7 +204,27 @@
       <programlisting>export DISPLAY=:0.0</programlisting>
       <para />
     </sect2>
-    <sect2>
+    <sect2 id="ati-settings">
+      <title>ATI Settings</title>
+      <para>If you're using the fglrx driver, you may have to
+      enable the XVideo extension with the aticonfig command (part
+      of the xorg-driver-fglrx package).</para>
+      <sect1 id="content">
+        <para>sudo aticonfig --overlay-type=Xv</para>
+        <para>Alternatively, you can manually add those lines in
+        the Device section of the fglrx driver in the
+        /etc/X11/xorg.conf file. After Driver "fglrx" , add:</para>
+        <para>&#160; &#160; &#160; &#160; Option &#160; &#160;
+        &#160;"VideoOverlay" "on"</para>
+        <para>&#160; &#160; &#160; &#160; Option &#160; &#160;
+        &#160;"OpenGLOverlay" "off"</para>
+        <para>Note: As now, it's unclear which ATI cards properly
+        supports Xvideo. Feel free to share your
+        experiences.</para>
+      </sect1>
+      <para />
+    </sect2>
+    <sect2 id="video-input">
     <title>Video Input</title>
     <para>&app; can capture video from a video capture card through
     v4l2, from IIDC camera or DV camera (also called iLink). DV
@@ -171,12 +338,12 @@
       <para />
     </sect2>
   </sect1>
-  <sect1>
+  <sect1 id="audio-settings">
     <title>Audio Settings</title>
     <para>First verify that you have an appropriate sound card on
     our 
-    <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
-    HardwareRequirements</ulink>.</para>
+    <link linkend='hardware-requirements'>
+    Hardware Requirements </link>.</para>
     <sect2>
       <title>Firewire sound card</title>
       <para>Verify that your soundcard is detected For firewire
@@ -195,9 +362,9 @@
       <programlisting>aplay -l</programlisting>
     </sect2>
   </sect1>
-  <sect1>
+  <sect1 id="sound-server">
     <title>Configuring the sound server</title>
-    <sect2>
+    <sect2 id="jackd-configuration">
       <title>Configuration of jackd</title>
       <para>Now start the jackd sound server using qjackctl
       situated in Applications/Sound &amp; Video/Jack
@@ -592,7 +759,7 @@
       </orderedlist>
     </sect2>
   </sect1>
-  <sect1>
+  <sect1 id="sound-check">
     <title>Sound check</title>
     <para>Then you can start an audio test with:</para>
     <programlisting>gst-launch audiotestsrc !
