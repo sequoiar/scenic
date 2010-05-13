@@ -36,7 +36,7 @@
         <para>How to install Nvidia drivers in Ubuntu</para>
         <para>Ubuntu doesn't include Nvidia drivers by
         default.</para>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>First, go to System &gt; Administration &gt;
             Hardware Drivers</para>
@@ -65,7 +65,7 @@
             <para>You'll then see that the drivers are enabled and
             will be available for use upon a reboot.</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <para>The typical video setup used is to have two video
         output. Both of these output are from your graphic card.
         One output is going to your monitor and the second is going
@@ -76,7 +76,7 @@
         the nvidia-settings application situated in
         System/Administration/Nvidia X Server Settings Here are the
         configuration step to follow:</para>
-        <orderedlist>
+        <itemizedlist>
           <listitem>Physically connecting your video
           output</listitem>
           <listitem>Starting your computer</listitem>
@@ -84,7 +84,7 @@
           <listitem>Configuring your computer monitor</listitem>
           <listitem>Configuring your Second video output (Projector
           or video mixer)</listitem>
-        </orderedlist>
+        </itemizedlist>
         <title>Physically connecting your video output</title>
         <para>First be sure to connect both output: The Monitor
         Output and the TV (VGA Or S-Video output) before starting
@@ -106,46 +106,46 @@
         <para>Install your graphic card driver. Go to
         System/Administration/Hardware Driver and enable the Nvidia
         driver.</para>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>Now install nvidia-setting</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <para>sudo aptitude install nvidia-settings</para>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>Now open nvidia-settings situated in
             System/Administration/Nvidia X Server Settings and
             click on "X Sever Display configuration"</para>
           </listitem>
-        </orderedlist>
-        <orderedlist>
+        </itemizedlist>
+        <itemizedlist>
           <listitem>
             <para>Verify that Enable Xinerama si NOT
             selected</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <title>Configuring your computer monitor</title>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>Click on the first monitor layout and verify that
             your "Configuration" option is set to "separate X
             screen" then set the display settings for this monitor
             ex: 1024x768</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-1.1.png"
             format="PNG" />
           </imageobject>
         </mediaobject>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>Then on the X-Screen Tab, set the position to
             absolute +0+0</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-1.2.png"
@@ -154,38 +154,38 @@
         </mediaobject>
         <title>Configuring your Second video output (Projector or
         video mixer)</title>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>Now click on the second output layout and verify
             that your "Configuration" option is set to "separate X
             screen" then set the display settings for this monitor
             ex: 800x600</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-2.1.png"
             format="PNG" />
           </imageobject>
         </mediaobject>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>Then on the X-Screen Tab for the second output
             (TV, S-video or VGA)</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-2.2.png"
             format="PNG" />
           </imageobject>
         </mediaobject>
-        <orderedlist>
+        <itemizedlist>
           <listitem>
             <para>Now you can click apply, a pop up window will ask
             if you want to apply what is possible. Click yes</para>
           </listitem>
-        </orderedlist>
+        </itemizedlist>
         <para />
       </sect1>for Nvidia and ATI cards respectively.</para>
       <para>Next, what we want now is two video outputs. One for
@@ -320,7 +320,7 @@
       <programlisting>milhouse --localhost --videosource
       v4l2src</programlisting>
       <para>You can add several options such as:</para>
-      <orderedlist>
+      <itemizedlist>
         <listitem>
           <para>--aspect-ratio</para>
         </listitem>
@@ -336,7 +336,7 @@
         <listitem>
           <para>--flip-video</para>
         </listitem>
-      </orderedlist>
+      </itemizedlist>
       <para />
     </sect2>
   </sect1>
@@ -526,8 +526,7 @@
             <row>
               <entry>
                 <para>
-                <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/MaudioDelta">
-                MaudioDelta</ulink>1010 (regular or LT)</para>
+                MaudioDelta 1010 (regular or LT)</para>
               </entry>
               <entry>
                 <para>-d alsa</para>
@@ -548,8 +547,7 @@
             <row>
               <entry>
                 <para>
-                <ulink url="https://svn.sat.qc.ca/trac/miville/wiki/EdirolFirewire">
-                EdirolFirewire</ulink>Fa101</para>
+                EdirolFirewire Fa101</para>
               </entry>
               <entry>
                 <para>-d freebob</para>
@@ -622,11 +620,11 @@
           </imageobject>
         </mediaobject>
       </para>
-      <orderedlist>
+      <itemizedlist>
         <listitem>
           <para>Click on the Options tab.</para>
         </listitem>
-      </orderedlist>
+      </itemizedlist>
       <para>Verify that only the following options are
       selected:</para>
       <informaltable frame="all">
@@ -659,11 +657,11 @@
           </tbody>
         </tgroup>
       </informaltable>
-      <orderedlist>
+      <itemizedlist>
         <listitem>
           <para>Click on the Misc tab.</para>
         </listitem>
-      </orderedlist>
+      </itemizedlist>
       <para>Verify that only the following "Misc" options are
       selected:</para>
       <informaltable frame="all">
@@ -717,12 +715,12 @@
       <para>NOTE: If you get an error message, reboot the computer
       and try again.</para>
       <para />
-      <orderedlist>
+      <itemizedlist>
         <listitem>
           <para>Now start the sound server by clicking on
           "Start".</para>
         </listitem>
-      </orderedlist>
+      </itemizedlist>
     </sect2>
   </sect1>
   <sect1 id="sound-check">
