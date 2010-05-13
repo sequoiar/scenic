@@ -26,8 +26,8 @@ class TcpConnection : public boost::enable_shared_from_this<TcpConnection>
     private:
         TcpConnection(boost::asio::io_service& io_service, const std::string &message);
 
-        void handle_write(const boost::system::error_code& /*error*/,
-                size_t /*bytes_transferred*/);
+        void handle_write(const boost::system::error_code& error,
+                size_t bytes_transferred);
 
         boost::asio::ip::tcp::socket socket_;
         std::string message_;
