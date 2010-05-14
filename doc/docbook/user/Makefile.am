@@ -9,5 +9,6 @@ user_DATA = \
     introduction.xml \
     legal.xml \
     midi-settings.xml \
+    preview.xml \
     video-settings.xml
 EXTRA_DIST = $(user_DATA)
