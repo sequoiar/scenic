@@ -94,6 +94,7 @@ fi
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 
 GNOME_DOC_INIT(0.12.2, , AC_MSG_WARN(["DocBook Documentation will not be converted to HTML."]))
+
 dnl check for python
 AM_PATH_PYTHON([2.5])
 
@@ -182,6 +183,10 @@ AS_IF([test "x${XVINFO}" = "xno"],
 AC_CHECK_PROG(JACKD, jackd, yes, no)
 AS_IF([test "x${JACKD}" = "xno"],
     [AC_MSG_ERROR([Requires jackd])])
+
+AC_CHECK_PROG(YELP, yelp, yes, no)
+AS_IF([test "x${YELP}" = "xno"],
+    [AC_MSG_ERROR([Requires yelp])])
 
 # Check for gst-plugins that we use
 GST_CHECK=$srcdir/utils/gst_check.py
