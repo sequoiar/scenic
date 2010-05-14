@@ -142,7 +142,7 @@ class ConfigStateSaving(object):
                 setattr(self, k, cast(data["configuration"][k]))
             else:
                 value = data["configuration"][k]
-                log.error("Found configuration key %s but it is not supported in this version of Scenic. Its value is %s." % (k, value))
+                log.warning("Found configuration key %s but it is not supported in this version of Scenic. Its value is %s." % (k, value))
                 self._unknown_options[k] = value
 
 class AddressBook(object):

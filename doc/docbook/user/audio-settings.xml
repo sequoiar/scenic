@@ -1,20 +1,20 @@
 <chapter id="audio-settings">
 <title>Audio Settings</title>
+<para>This chapter will cover the audio settings in &app;.</para>
+
 <sect1>
-<title>Audio Input</title>
+    <title>Audio Input</title>
 </sect1>
 
 <sect1>
-<title>Audio Latency</title>
+    <title>Audio Latency</title>
 </sect1>
 
-
 <sect1>
-<title>Audio Channel</title>
+    <title>Audio Channel</title>
 </sect1>
 
-
 <sect1>
-<title>Audio Synchronization</title>
+    <title>Audio Synchronization</title>
 </sect1>
 </chapter>

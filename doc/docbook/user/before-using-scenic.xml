@@ -42,7 +42,10 @@
       </listitem>
     </orderedlist>
   </sect1>
-  <sect1 id="standalone-setup">
+  <sect1 id="common-setups">
+    <title>Common Setups</title>
+    <para>The following setup description are common ways to use &app;.</para>
+  <sect2 id="standalone-setup">
     <title>Standalone Setup</title>
     <para>Here is an overview of a standalone setup.</para>
     <mediaobject>
@@ -50,22 +53,22 @@
         <imagedata fileref="fig/hardware_setup_01.jpg" format="JPG" />
       </imageobject>
     </mediaobject>
-  </sect1>
-  <sect1>
+  </sect2>
+  <sect2>
     <title>Point to point setup</title>
     <para>This kind of setup refer to the communication between two
     Scenic system, both connected on a research/high-bandwidth
     setup.</para>
-  </sect1>
-  <sect1>
+  </sect2>
+  <sect2>
     <title>Unidirectional setup</title>
     <mediaobject>
       <imageobject>
         <imagedata fileref="fig/unidirectional_setup.png" />
       </imageobject>
     </mediaobject>
-  </sect1>
-  <sect1>
+  </sect2>
+  <sect2>
     <title>Bidirectional setup</title>
     <para>Two groups of performance artists located in two separate
     venues interact directly with each other using live audio and
@@ -77,11 +80,12 @@
       <imagedata fileref="fig/bidirectional_setup.png" />
       </imageobject>
     </mediaobject>
+  </sect2>
   </sect1>
   <sect1>
     <title>Peripheral Connection</title>
     <sect2 id="contents">
-      <title>Scenic depends on many peripherals</title>
+      <title>&app; depends on many peripherals</title>
       <para>It is really important to verify that you have
       peripheral that are supported by Scenic. For this refer to
       our 
@@ -194,8 +198,7 @@
         ms</para>
       </listitem>
       <listitem>
-        <para>Open a terminal
-        /Application/Accessories/Terminal</para>
+        <para>Open a terminal by choosing the <menuchoice><guimenu>Application</guimenu><guimenuitem>Accessories</guimenuitem><guimenuitem>Terminal</guimenuitem></menuchoice> menu item.</para>
       </listitem>
       <listitem>
         <para>Verify that you are on the realtime kernel:</para>
@@ -262,12 +265,14 @@
     problems.</para>
   </sect1>
   <sect1>
-    <title>Starting Scenic</title>
-    <para>If you want to stream audio, you must run the JACK audio
-    server. There is a simple graphical user interface for JACK
-    that is called JACK Control. You can launch it by choosing it
-    in the "Audio/Video" submenu in the "Applications" menu.</para>
-    <para>To launch Scenic, choose it from the "Internet" submenu
-    of the "Applications" menu. You should be ready to go!</para>
+    <title>Lauching the <application>JACK</application> Audio Server</title>
+    <para>If you want to stream audio, you must run the <application>JACK</application> audio
+    server. There is a simple graphical user interface for <application>JACK</application>
+    that is called <application>JACK Control</application>. 
+    You can launch it by choosing the <menuchoice><guimenu>Application</guimenu><guimenuitem>Audio/Video</guimenuitem><guimenuitem>JACK Control</guimenuitem></menuchoice> menu item.</para>
+  </sect1>
+  <sect1>
+    <title>Lauching &app;</title>
+    <para>To launch Scenic, choose the <menuchoice><guimenu>Application</guimenu><guimenuitem>Internet</guimenuitem><guimenuitem>Scenic</guimenuitem></menuchoice> menu item. You should be ready to go!</para>
   </sect1>
 </chapter>

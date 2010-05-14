@@ -7,37 +7,39 @@
     <para>To launch Scenic in kiosk mode, use the "--kiosk" flag from a terminal. It is best used with the "--fullscreen" flag.</para>
 </sect1>
 <sect1>
-    <title>Activating debug mode</title>
-    <para>Scenic supports a wide variety of devices and libraries. The tradeoff for this greater flexibility is a greater number of potential pitfalls, which may be difficult to troubleshoot. To get more information about what is happening behind the scenes, you can launch Scenic in debug mode. To do so, launch it from a terminal with the "--debug" flag. Here is how to do it in Ubuntu GNU/Linux:</para>
+    <title>Activating the debug mode</title>
+    <para>&app; supports a wide variety of devices and libraries. The tradeoff for this greater flexibility is a greater number of potential pitfalls, which may be difficult to troubleshoot. To get more information about what is happening behind the scenes, you can launch Scenic in debug mode. To do so, launch it from a terminal with the "--debug" flag. Here is how to do it in Ubuntu GNU/Linux:</para>
     <orderedlist>
-      <listitem>In the "Application" menu, choose "Accessories" and then "Terminal".</listitem>
+      <listitem>Choose the <menuchoice><guimenu>Application</guimenu><guimenuitem>Accessories</guimenuitem><guimenuitem>Terminal</guimenuitem></menuchoice> menu item..</listitem>
       <listitem>Type "scenic --debug" and press enter.</listitem>
     </orderedlist>
     <para>You can now see more detailed information about what happens under the hood of Scenic. You can copy some of this text to the clipboard in order to paste it into an email to the Scenic developers. In the Gnome terminal that comes with Ubuntu GNU/Linux, you can copy the selected text by pressing Control-Shift-C.</para>
 </sect1>
 <sect1>
     <title>Command line tools</title>
-    <para>Here are a few command-line tools that come with Scenic. See their manual page for more informations. For example, to read the manual page of Milhouse, type "man milhouse" in a terminal.</para>
+    <para>Here are a few command-line tools that come with Scenic. See their manual page for more informations. For example, to read the manual page of <application>Milhouse</application>, type "man milhouse" in a terminal.</para>
     <orderedlist>
       <listitem>dc-ctl: Controls DC ieee1394 (Firewire) cameras.</listitem>
-      <listitem>midistream: Streams MIDI notes and controls over RTP.</listitem>
-      <listitem>scenic: Graphical user interface to stream audio, video and MIDI over RTP.</listitem>
-      <listitem>milhouse: Streams audio and video over RTP.</listitem>
-      <listitem>firereset: Resets a ieee1394 (Firewire) bus.</listitem>
+      <listitem><ulink type="help" url="man://midistream">midistream</ulink>: Streams MIDI notes and controls over RTP.</listitem>
+      <listitem><ulink type="help" url="man://scenic">scenic</ulink>: Graphical user interface to stream audio, video and MIDI over RTP.</listitem>
+      <listitem><ulink type="help" url="man://milhouse">milhouse</ulink>: Streams audio and video over RTP.</listitem>
+      <listitem><ulink type="help" url="man://firereset">firereset</ulink>: Resets a ieee1394 (Firewire) bus.</listitem>
       <listitem>jack-info: Prints informations about currently running JACK servers.</listitem>
     </orderedlist>
-    <para>The next section is dedicated to the Milhouse command-line streamer.</para>
+    <para>The next section is dedicated to the <application>Milhouse</application> command-line streamer.</para>
 </sect1>
     <sect1>
-        <title>Using Milhouse, the command-line streamer</title>
-        <para>Here is a quick introduction to using Milhouse, an application for audio-video streaming over RTP.</para>
-        <para>Milhouse is a simple tool that can do a lot of things. For example, it can list the cameras and video capture devices found on your computer. It can also change video settings for a V4L2 (Video4Linux2) device, such as its video standard and its selected video input number. Milhouse also supports DV cameras and DC cameras, two kinds of cameras using ieee1394 (Firewire) to send their digital video signal to the computer. Those two types of cameras are not yet supported by the Scenic graphical user interface. This is one of the reasons why an advanced user might prefer to use the Milhouse command line tool instead of the Scenic graphical user interface.</para>
-        <para>Above all, Milhouse is an audio-video streamer. Its main purpose is to transmit digital video and audio signals over the Internet. As a streamer, it can be used in either of it modes: as a sender or a receiver. To choose its mode, simply give it the command-line option "--receiver" or "--sender".</para>
-        <para>To create a streaming session with Milhouse, you must launch a sender and a receiver. You must give each of them the IP address of the other one. That is what the "--address" command line option is for.</para>
+        <title>Using <application>Milhouse</application>, the command-line streamer</title>
+        <para>Here is a quick introduction to using <application>Milhouse</application>, an application for audio-video streaming over RTP.</para>
+        <para><application>Milhouse</application> is a simple tool that can do a lot of things. For example, it can list the cameras and video capture devices found on your computer. It can also change video settings for a V4L2 (Video4Linux2) device, such as its video standard and its selected video input number. <application>Milhouse</application> also supports DV cameras and DC cameras, two kinds of cameras using ieee1394 (Firewire) to send their digital video signal to the computer. Those two types of cameras are not yet supported by the Scenic graphical user interface. This is one of the reasons why an advanced user might prefer to use the <application>Milhouse</application> command line tool instead of the Scenic graphical user interface.</para>
+        <para>Above all, <application>Milhouse</application> is an audio-video streamer. Its main purpose is to transmit digital video and audio signals over the Internet. As a streamer, it can be used in either of it modes: as a sender or a receiver. To choose its mode, simply give it the command-line option "--receiver" or "--sender".</para>
+        <sect2>
+            <title>Using <application>Milhouse</application> as a sender or a receiver</title>
+        <para>To create a streaming session with <application>Milhouse</application>, you must launch a sender and a receiver. You must give each of them the IP address of the other one. That is what the "--address" command line option is for.</para>
         <para>If you want to stream audio, the sender is the one that captures the audio signal from its audio source. You must choose a value for its "--audiosource" option. A common value would be "jackaudiosrc", for the JACK audio server. An other common value is "audiotestsrc", a test source that generates simple tones.</para>
         <para>If you want to stream video, you must specify a video source for the sender, using its "--videosource" option. A common value is "v4l2src", for a V4L2 source. In this case, you might want to specify a video device, such as "/dev/video0", using the "--videodevice" option. An other useful value for the "--videosource" is "videotestsrc", for test color bars.</para>
         <para>On the receiver's side, you must choose an output for the audio - the "--audiosink" argument - and specify the audio and video codecs, like for the sender (or use the defaults listed in milhouse --help).</para>
-        <para>We will create a Milhouse sender and receiver on the same computer. The IP address for the local host is always 127.0.0.1. The resulting commands that you should type in a terminal are the following:</para>
+        <para>We will create a <application>Milhouse</application> sender and receiver on the same computer. The IP address for the local host is always 127.0.0.1. The resulting commands that you should type in a terminal are the following:</para>
         <programlisting> <![CDATA[
 milhouse --sender --address 127.0.0.1 --videoport 10030 --videosource videotestsrc \
     --videocodec mpeg4 --audiosource audiotestsrc --numchannels 2 --audioport 10000 \
@@ -58,6 +60,9 @@ milhouse --sender --videoport 10030 --audiosource audiotestsrc --audioport 10000
         <programlisting> <![CDATA[
 milhouse --receiver --videoport 10030 --audioport 10000
             ]]> </programlisting>
+        </sect2>
+        <sect2>
+            <title>Other uses</title>
         <para>
               The milhouse command can also be used to change some properties
               of a V4L2 video device, such as the resolution and the video standard.
@@ -81,5 +86,6 @@ milhouse --list-cameras
         <programlisting> <![CDATA[
 milhouse --v4l2-input 1
              ]]> </programlisting>
+        </sect2>
 </sect1>
 </chapter>
