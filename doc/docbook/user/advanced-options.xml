@@ -13,7 +13,7 @@
       <listitem>Choose the <menuchoice><guimenu>Application</guimenu><guimenuitem>Accessories</guimenuitem><guimenuitem>Terminal</guimenuitem></menuchoice> menu item.</listitem>
       <listitem>Type "scenic --debug" and press enter.</listitem>
     </orderedlist>
-        <programlisting> <![CDATA[ scenic --debug ]]> </programlisting>
+        <programlisting>  scenic --debug  </programlisting>
     <para>You can now see more detailed information about what happens under the hood of &app;. You can copy some of this text to the clipboard in order to paste it into an email to the &app; developers. In the <application>Terminal</application> that comes with <application>Ubuntu GNU/Linux</application>, you can copy the selected text by pressing <keycombo><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>C</keycap></keycombo>. 
     </para>
 </sect1>
@@ -29,7 +29,7 @@
       <listitem>jack-info: Prints informations about currently running JACK servers.</listitem>
     </orderedlist>
 <para>See their manual page for more informations. For example, to read the manual page of <application>Milhouse</application>, type "man milhouse" in a terminal. Press the <keycombo><keycap>Up</keycap></keycombo> and <keycombo><keycap>Down</keycap></keycombo> arrows to scroll up and down. Press <keycombo><keycap>Q</keycap></keycombo> to quit the manual page reader.</para>
-        <programlisting> <![CDATA[ man milhouse ]]> </programlisting>
+        <programlisting>man milhouse  </programlisting>
     <para>The next section is dedicated to the <application>Milhouse</application> command-line streamer.</para>
 </sect1>
     <sect1>
@@ -44,23 +44,18 @@
         <para>If you want to stream video, you must specify a video source for the sender, using its "--videosource" option. A common value is "v4l2src", for a V4L2 source. In this case, you might want to specify a video device, such as "/dev/video0", using the "--videodevice" option. An other useful value for the "--videosource" is "videotestsrc", for test color bars.</para>
         <para>On the receiver's side, you must choose an output for the audio - the "--audiosink" argument - and specify the audio and video codecs, like for the sender (or use the defaults listed in milhouse --help).</para>
         <para>We will create a <application>Milhouse</application> sender and receiver on the same computer. The IP address for the local host is always 127.0.0.1. The resulting commands that you should type in a terminal are the following:</para>
-        <programlisting> <![CDATA[ milhouse --sender --address 127.0.0.1 --videoport 10030 --videosource videotestsrc \
+        <programlisting>milhouse --sender --address 127.0.0.1 --videoport 10030 --videosource videotestsrc \
     --videocodec mpeg4 --audiosource audiotestsrc --numchannels 2 --audioport 10000 \
-    --audiocodec raw</para>
-            ]]> </programlisting>
-        <programlisting> <![CDATA[ milhouse --receiver --address 127.0.0.1 --videoport 10030 --videocodec mpeg4 \
+    --audiocodec raw  </programlisting>
+        <programlisting>milhouse --receiver --address 127.0.0.1 --videoport 10030 --videocodec mpeg4 \
     --audioport 10000 --numchannels 2 --audiocodec raw \
-    --audiosink jackaudiosink
-            ]]> </programlisting>
+    --audiosink jackaudiosink  </programlisting>
         <para>
         To simplify, milhouse has defaults which will cover many of the above arguments, i.e.:
 
         </para>
-        <programlisting> <![CDATA[ milhouse --sender --videoport 10030 --audiosource audiotestsrc --audioport 10000
-            ]]> </programlisting>
-        <programlisting> <![CDATA[
-milhouse --receiver --videoport 10030 --audioport 10000
-            ]]> </programlisting>
+        <programlisting>milhouse --sender --videoport 10030 --audiosource audiotestsrc --audioport 10000  </programlisting>
+        <programlisting>milhouse --receiver --videoport 10030 --audioport 10000  </programlisting>
         </sect2>
         <sect2>
             <title>Other uses</title>
@@ -72,18 +67,15 @@ milhouse --receiver --videoport 10030 --audioport 10000
         <para>
               To change the video standard to NTSC:
         </para>
-        <programlisting> <![CDATA[ milhouse --v4l2-standard NTSC
-            ]]> </programlisting>
+        <programlisting>milhouse --v4l2-standard NTSC</programlisting>
         <para>
               To list cameras:
         </para>
-        <programlisting> <![CDATA[ milhouse --list-cameras
-            ]]> </programlisting>
+        <programlisting>milhouse --list-cameras  </programlisting>
         <para>
               To choose an input for a V4L2 device:
         </para>
-        <programlisting> <![CDATA[ milhouse --v4l2-input 1
-             ]]> </programlisting>
+        <programlisting>milhouse --v4l2-input 1  </programlisting>
         </sect2>
 </sect1>
 </chapter>

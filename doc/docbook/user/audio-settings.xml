@@ -3,18 +3,42 @@
 <para>This chapter will cover the audio settings in &app;.</para>
 
 <sect1>
-    <title>Audio Input</title>
+    <title>Sending Audio</title>
+    <para>Right now, &app; only supports either capturing the sound from the <application>JACK</application> audio server, or from a test source. In the "Sending" section of the "Audio" tab, choose the desired source in in "Audio Source" combo box.</para>
 </sect1>
 
 <sect1>
-    <title>Audio Latency</title>
+    <title>Receiving Audio</title>
+    <sect2>
+        <title>Synchronization with the video stream</title>
+        <para>The audio stream can be synchronized with the video stream, or its timing can be independant. Turning off this option usually results in hearing the sound before seeing the video. It can be suitable for musicians who want a latency that is as low as possible for the audio.</para>
+    </sect2>
+    <sect2>
+        <title>Number of channels</title>
+        <para>The maximum of audio channels depends on the chosen audio codec. It is 2 for MP3, 24 vor Vorbis and as much as your hardware supports for Raw audio, if you have the proper version of some Gstreamer plugins installed.</para>
+    </sect2>
+    <sect2>
+        <title>Audio codec</title>
+        <para>The audio signals can be compressed or not. If it is not, it is said to be "raw" audio, and it is the best quality possible, since it is the same digital information as when it is captured from your audio input device.</para>
+        <para>If you want to decrease the bandwidth that it used by the audio, choose to compress it. Note that this will increase the latency. There are two supported codec: Vorbis and MP3. Vorbis is a free high-quality audio codec. Mp3 has more limitations, since the number of channels is limited to 2, and is protected by a patent. The Vorbis codec involves more latency than the MP3 codec, though.</para>
+    </sect2>
 </sect1>
 
 <sect1>
-    <title>Audio Channel</title>
+    <title>Informations about the <application>JACK</application> audio server</title>
+    <sect2>
+        <title>The Estimated <application>JACK</application> Latency</title>
+        <para>This information is given to you as a tool to estimate latency. To decrease this, you must configure the <application>JACK</application> audio server with better settings. That means to decrease the number of frames per period and the number of periods per buffer. Note that you need a good audio card to benefit from a low latency with <application>JACK</application>.</para>
+    </sect2>
+    <sect2>
+        <title>Auto connecting <application>JACK</application> ports</title>
+        <para>Leave it enabled if you want to hear some audio signals when starting to stream. Otherwise, it is left to the user to connect the <application>JACK</application> ports of <application>Milhouse</application> to and from the audio device's ports. If you want to do some custom routing of the audio channels, we recommend to use <application>jack.plumbing</application> to do so.</para>
+    </sect2>
 </sect1>
 
 <sect1>
-    <title>Audio Synchronization</title>
+    <title>Advanced audio options</title>
+    <para>The input and output audio buffer size is the size of the buffer between the Gstreamer element and the <application>JACK</application> audio server.</para>
 </sect1>
+
 </chapter>

@@ -82,12 +82,12 @@
     </mediaobject>
   </sect2>
   </sect1>
-  <sect1>
+  <sect1 id="connecting-devices">
     <title>Connecting the devices</title>
-    <sect2 id="contents">
+    <sect2>
       <title>&app; is usually used with many audio, video and MIDI devices.</title>
       <para>It is really important to verify that you have
-      devices that are supported by &app; and more generally by <application>GNU/Linux<application>. Please refer to
+      devices that are supported by &app; and more generally by <application>GNU/Linux</application>. Please refer to
       our 
       <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
       Hardware Requirements</ulink> page to know more about supported devices.</para>
