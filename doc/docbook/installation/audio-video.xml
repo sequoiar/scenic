@@ -108,7 +108,7 @@
             <para>Now install nvidia-setting</para>
           </listitem>
         </itemizedlist>
-        <para>sudo aptitude install nvidia-settings</para>
+        <para><programlisting>sudo aptitude install nvidia-settings</programlisting></para>
         <itemizedlist>
           <listitem>
             <para>Now open nvidia-settings situated in
@@ -208,7 +208,7 @@
       <para>If you're using the fglrx driver, you may have to
       enable the XVideo extension with the aticonfig command (part
       of the xorg-driver-fglrx package).</para>
-        <para>sudo aticonfig --overlay-type=Xv</para>
+        <para><programlisting>sudo aticonfig --overlay-type=Xv</programlisting></para>
         <para>Alternatively, you can manually add those lines in
         the Device section of the fglrx driver in the
         /etc/X11/xorg.conf file. After Driver "fglrx" , add:</para>
@@ -246,9 +246,8 @@
     <para>On Karmic Koala, you have to fix devices attribution for
     raw1394. Create a udev rule to change group of /dev/raw1394
     device:</para>
-    <programlisting>echo 'KERNEL=="raw1394", NAME="raw1394",
-    GROUP="disk"' | sudo tee -a
-    /etc/udev/rules.d/99-raw1394.rules</programlisting>
+    <programlisting>echo 'KERNEL=="raw1394", NAME="raw1394", GROUP="disk"' | 
+sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
     <programlisting>sudo /etc/init.d/udev restart</programlisting>
     <para>Furthermore, on all distributions, it is advisable to
     load the raw1394 module even if no dc1394 cameras are present
@@ -256,14 +255,12 @@
     error out. To do this, add raw1394 to the /etc/modules
     file:</para>
     <programlisting>sudo modprobe raw1394</programlisting>
-    <programlisting>echo "raw1394" | sudo tee -a
-    /etc/modules</programlisting>
+    <programlisting>echo "raw1394" | sudo tee -a /etc/modules</programlisting>
     <para>See 
     <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
-    this bug report</ulink>for further information.</para>
+    this bug report </ulink>for further information.</para>
     <para>You can test the DV camera with:</para>
-    <para>gst-launch dv1394src ! dvdemux ! dvdec !
-    xvimagesink</para></sect2>
+    <para>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</para></sect2>
     <sect2 id="video-test">
       <title>Video Test</title>
       <para>In &app;, you can easily preview video4linux2 video
@@ -312,8 +309,7 @@
           </tbody>
         </tgroup>
       </informaltable>
-      <programlisting>milhouse --localhost --videosource
-      v4l2src</programlisting>
+      <programlisting>milhouse --localhost --videosource v4l2src</programlisting>
       <para>You can add several options such as:</para>
       <itemizedlist>
         <listitem>

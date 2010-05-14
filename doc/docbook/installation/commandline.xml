@@ -27,8 +27,7 @@
     <programlisting>export DISPLAY=:0.0</programlisting>
     <para>Run the program on the local machine with the following
     parameters:</para>
-    <programlisting>milhouse --receiver --address remote_ip_address
-    --videosink xvimagesink --videocodec mpeg4 
+    <programlisting>milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 
     <para>--videoport 10030 --audiosink jackaudiosink --audiocodec
     raw --audioport 10000</para>--numchannels 2</programlisting>
     <para>Set the remote_machine display</para>
@@ -81,9 +80,6 @@
           <row>
             <entry>
               <para>Help Options:</para>
-            </entry>
-            <entry>
-              <para />
             </entry>
           </row>
           <row>

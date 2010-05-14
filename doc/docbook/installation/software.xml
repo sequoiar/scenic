@@ -1,4 +1,4 @@
-<chapter id="software_installation">
+<chapter id="software-installation">
   <title>Software Installation</title>
   <para>A standard &app; installation always requires at least two
   computers with identical linux operating systems, the required
@@ -88,7 +88,7 @@
     <ulink url="http://www.debian.org/distrib/">Get
     Debian </ulink>page. </para>
   </sect1>
-  <sect1 id="lib-package-installation">
+  <sect1 id="lib-packages-installation">
     <title>Libraries and Development Packages Installation</title>
     <para>Before performing the scenic installation, please perform
     an update of your linux distribution:</para>
@@ -109,19 +109,7 @@
       <tgroup cols="1">
         <tbody>
           <row>
-            <entry>sudo aptitude -R install linux-rt
-            linux-headers-rt qjackctl build-essential subversion
-            cvs git-core automake libtool libgtk2.0-dev libjack-dev
-            python-dev libglu1-mesa-dev libavc1394-dev
-            libraw1394-dev gettext gtk-doc-tools libbz2-dev
-            liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264
-            vorbis-tools ffmpeg libx264-dev libxv-dev
-            libiec61883-dev libvorbis-dev liblame-dev
-            libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev
-            libmad0-dev python-gtk2-dev lame libxml2-dev
-            python-twisted python-nevow doxygen libtheora-dev
-            python-setuptools help2man python-simplejson
-            python-pexpect gnome-themes-extra</entry>
+            <entry> sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev liblame-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect gnome-themes-extra </entry>
           </row>
         </tbody>
       </tgroup>
@@ -140,22 +128,7 @@
       <tgroup cols="1">
         <tbody>
           <row>
-            <entry>sudo aptitude -R install linux-rt
-            linux-headers-rt qjackctl build-essential subversion
-            cvs git-core automake libtool libgtk2.0-dev libjack-dev
-            python-dev libglu1-mesa-dev libavc1394-dev
-            libraw1394-dev gettext gtk-doc-tools libbz2-dev
-            liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264
-            vorbis-tools ffmpeg libx264-dev libxv-dev
-            libiec61883-dev libvorbis-dev libasound2-dev
-            libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev
-            python-gtk2-dev lame libxml2-dev python-twisted
-            python-nevow doxygen libtheora-dev python-setuptools
-            help2man python-simplejson python-pexpect iperf
-            libmp3lame-dev gnome-themes-extras libboost-dev
-            libboost-thread-dev libboost-system-dev
-            libboost-program-options-dev libasio-dev
-            libboost-iostreams-dev libboost-filesystem-dev</entry>
+            <entry>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect iperf libmp3lame-dev gnome-themes-extras libboost-dev libboost-thread-dev libboost-system-dev libboost-program-options-dev libasio-dev libboost-iostreams-dev libboost-filesystem-dev</entry>
           </row>
         </tbody>
       </tgroup>
@@ -171,9 +144,6 @@
           <row>
             <entry>To install the scenic package:</entry>
           </row>
-          <row>
-            <entry></entry>
-          </row>
         </tbody>
       </tgroup>
     </table>
@@ -183,9 +153,6 @@
         <tbody>
           <row>
             <entry>To install the scenic-dependency package</entry>
-          </row>
-          <row>
-            <entry></entry>
           </row>
         </tbody>
       </tgroup>
@@ -198,21 +165,7 @@
       <tgroup cols="1">
         <tbody>
           <row>
-            <entry>sudo aptitude -R install qjackctl
-            build-essential subversion cvs git-core automake
-            libtool libgtk2.0-dev libjack-dev python-dev
-            libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext
-            gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev
-            bison flex vorbis-tools ffmpeg libxv-dev
-            libiec61883-dev libvorbis-dev libasound2-dev
-            libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev
-            python-gtk2-dev libxml2-dev python-twisted doxygen
-            python-setuptools help2man python-simplejson iperf
-            gnome-themes-extras libboost1.35-dev jackd
-            libboost-program-options1.35-dev
-            libboost-thread1.35-dev libboost-system1.35-dev
-            libboost-iostreams1.35-dev
-            libboost-filesystem1.35-dev</entry>
+            <entry>sudo aptitude -R install qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev bison flex vorbis-tools ffmpeg libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev libxml2-dev python-twisted doxygen python-setuptools help2man python-simplejson iperf gnome-themes-extras libboost1.35-dev jackd libboost-program-options1.35-dev libboost-thread1.35-dev libboost-system1.35-dev libboost-iostreams1.35-dev libboost-filesystem1.35-dev</entry>
           </row>
         </tbody>
       </tgroup>
@@ -224,10 +177,8 @@
     </para>
     <para>When your rt kernel is installed, execute the following
     commands (to get audio server to run in real time):</para>
-    <programlisting>sudo su -c 'echo @audio - rtprio 20 &gt;&gt;
-    /etc/security/limits.conf'</programlisting>
-    <programlisting>sudo su -c 'echo @audio - memlock 250000
-    &gt;&gt; /etc/security/limits.conf'</programlisting>
+    <programlisting>sudo su -c 'echo @audio - rtprio 20 &gt;&gt; /etc/security/limits.conf'</programlisting>
+    <programlisting>sudo su -c 'echo @audio - memlock 250000 &gt;&gt; /etc/security/limits.conf'</programlisting>
     <para>
       <emphasis role="strong">Then finally, logout and login
       again.</emphasis>
