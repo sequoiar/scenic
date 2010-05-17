@@ -2,7 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.60)
-AC_INIT(SCENIC, [0.5.5], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
+# version should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, [0.5.5], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -194,7 +195,7 @@ GST_CHECK=$srcdir/utils/gst_check.py
 AS_IF([! $PYTHON $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed])])
 
 # see /usr/share/aclocal/gst-element-check-0.10.m4
-#AM_GST_ELEMENT_CHECK(["xvimagesink"], [AC_MSG_NOTICE([OK])],  [AC_MSG_ERROR([Requires wvimagesink])])
+#AM_GST_ELEMENT_CHECK(["xvimagesink"], [AC_MSG_NOTICE([OK])],  [AC_MSG_ERROR([Requires xvimagesink])])
 
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
