@@ -1,3 +1,9 @@
+scenic (0.5.6) lucid; urgency=low
+
+  * New upstream release.
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Mon, 17 May 2010 18:02:14 -0400
+
 scenic (0.5.5) lucid; urgency=low
 
   * New upstream release.
