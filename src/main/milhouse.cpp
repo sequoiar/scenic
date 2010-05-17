@@ -198,13 +198,6 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    if (options.count("display"))
-    {
-        setenv("DISPLAY", 
-                options["display"].as<std::string>().c_str(), 
-                1 /* override current value if present */);
-    }
-
     // maybe just have a separate function that checks for all these standalone 
     // calls and quits instead of all here
     if (options["list-v4l2"].as<bool>())
@@ -222,6 +215,9 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
+    if (options["dump-pipeline"].as<bool>())
+        setenv("GST_DEBUG_DUMP_DOT_DIR", ".", 0 /* don't override current value if present*/);
+
     // wrapper so main doesn't need to know about gst and gtk
     gutil::init_gst_gtk(argc, argv);
 
@@ -230,7 +226,7 @@ short Milhouse::run(int argc, char **argv)
         audiofactory::printMaxChannels(options["audiocodec"].as<std::string>());
         return 0;
     }
-
+    
     bool enableLocalVideo = options["localvideo"].as<bool>();
     bool enableLocalAudio = options["localaudio"].as<bool>();
     if (enableLocalVideo or enableLocalAudio)

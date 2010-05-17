@@ -50,7 +50,6 @@ class Preview(object):
     def _create_command(self):
         """
         Looks in the settings, and returns a bash command to run for the preview.
-        Note that the preview doesn't use the display option, which sets the X11 DISPLAY.
         The preview is only for video, no sound.
         @rtype: str
         """
@@ -77,7 +76,7 @@ class Preview(object):
         if x_window_id is not None:
             command += " --x-window-id %d" % (x_window_id)
         else:
-            command += " --display %s" % (self.app.config.video_display) # xid does not work if DISPLAY is set to an other display.
+            command += " --videodisplay %s" % (self.app.config.video_display) # xid does not work if DISPLAY is set to an other display.
         if self.app.config.video_source != "videotestsrc":
             dev = self.app.parse_v4l2_device_name(self.app.config.video_device)
             if dev is None:

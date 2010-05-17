@@ -1,0 +1,14 @@
+<chapter id="audio-levels">
+<title>The audio levels</title>
+<para>This chapter is about the audio levels in &app;. The audio levels are a measure of the amplitude of the digital audio wave. &app; offers audio levels for every channels it sends and every channel it receives.</para>
+<sect1>
+    <title>Reading levels</title>
+    <para>The audio levels are expressed in dB, (decibels) where 0 dB is the maximum signal that is possible to be output by the audio card. Every step of -6 dB means that the signal is decreased by 50% of the peak-to-peak amplitude. That means that -12 dB has an amplitude that is 25% of 0 dB.</para>
+</sect1>
+<sect1>
+    <title>How to avoid the wave to be clipped</title>
+    <para>When an audio signal reaches 0 dB, it is clipped by either the ADC (input device) or the DAC. (output device) You should avoid such as high audio level. To do so, decrease the audio level of the audio source.</para>
+    <para>Some devices can help you to limit the audio level, but they might introduce undesired audio artefacts. Those devices include limiters, compressors and other types of devices.</para>
+</sect1>
+
+</chapter>

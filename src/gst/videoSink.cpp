@@ -36,7 +36,6 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
-#include <X11/extensions/Xinerama.h>
 
 
 void VideoSink::destroySink()
@@ -49,13 +48,22 @@ bool GtkVideoSink::hasWindow() const
 {
     return xid_ == 0;
 }
+
+void GtkVideoSink::updateDisplay(const std::string &display)
+{
+    GdkDisplay *disp = gdk_display_open(display.c_str());
+    if (disp == 0)
+        THROW_ERROR("Could not open display " << display);
+    /// FIXME: should be able to get other screens than 0
+    gtk_window_set_screen(GTK_WINDOW(window_), gdk_display_get_default_screen(disp));
+}
         
-GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, int screen_num, unsigned long xid) : 
+
+GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) : 
     VideoSink(pipeline), 
     xid_(xid),
     isFullscreen_(false),
     window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0), 
-    screen_num_(screen_num), 
     drawingArea_(hasWindow() ? gtk_drawing_area_new() : 0),
 	vbox_(hasWindow() ? gtk_vbox_new(FALSE, 0) : 0),
 	hbox_(hasWindow() ? gtk_hbox_new(FALSE, 0) : 0),
@@ -270,12 +278,17 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, int screenNum, unsigned long xid) : 
-    GtkVideoSink(pipeline, screenNum, xid),
+XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned long xid, const std::string &display) : 
+    GtkVideoSink(pipeline, xid),
     BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
+    if (not display.empty())
+    {
+        g_object_set(sink_, "display", display.c_str(), NULL);
+        updateDisplay(display);
+    }
     if (hasWindow())
     {
         LOG_DEBUG("Setting default window size to " << width << "x" << height);
@@ -306,13 +319,15 @@ XvImageSink::~XvImageSink()
 }
 
 
-XImageSink::XImageSink(const Pipeline &pipeline) : 
+XImageSink::XImageSink(const Pipeline &pipeline, const std::string &display) : 
     VideoSink(pipeline),
     colorspc_(pipeline_.makeElement("ffmpegcolorspace", NULL)) 
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
     sink_ = pipeline_.makeElement("ximagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
+    if (not display.empty())
+        g_object_set(sink_, "display", display.c_str(), NULL);
 
     gstlinkable::link(colorspc_, sink_);
 }

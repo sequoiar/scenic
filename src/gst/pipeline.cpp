@@ -310,6 +310,7 @@ void Pipeline::start() const
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     tassert(checkStateChange(getBus(), ret)); // set it to playing
     LOG_DEBUG("Now playing");
+    GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(pipeline_), GST_DEBUG_GRAPH_SHOW_ALL, "milhouse");
 }
 
 

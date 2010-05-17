@@ -75,12 +75,18 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
     return true;
 }
 
-GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, int screen_num, unsigned long xid) : 
-    GtkVideoSink(pipeline, screen_num, xid), 
+GLImageSink::GLImageSink(Pipeline &pipeline, int width, int height, 
+        unsigned long xid, const std::string &display) :
+    GtkVideoSink(pipeline, xid), 
     BusMsgHandler(&pipeline)
 {
     sink_ = VideoSink::pipeline_.makeElement("glimagesink", NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+    if (not display.empty())
+    {
+        g_object_set(G_OBJECT(sink_), "display", display.c_str(), NULL);
+        updateDisplay(display);
+    }
 
     if (hasWindow())
     {

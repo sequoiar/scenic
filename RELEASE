@@ -1,45 +1,58 @@
-Release notes for Scenic 0.5.4
+Release notes for Scenic 0.5.5
 
-This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. 
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes preparing the 0.6 stable series. 
 
     Upgrading:
-    * Be sure to uninstall your previous miville or scenic before installing
-    scenic.
-    * In the older source directory, use "make uninstall" as root to
-    uninstall previous installations.
-    * Don't forget to run ldconfig after installation.
-    * As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
-    again or simply apply the utils/rtpsource.diff patch to
-    gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
-    https://bugzilla.gnome.org/show_bug.cgi?id=611213
-    This fix adds receiver side bitrate estimation. Note that milhouse
-    will function fine without it, as will scenic.
-    * Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
-    Install them with aptitude. 
+    *   Be sure to uninstall your previous miville or scenic before installing
+        scenic.
+    *   In the older source directory, use "make uninstall" as root to
+        uninstall previous installations.
+    *   Don't forget to run ldconfig after installation.
+    *   As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
+        again or simply apply the utils/rtpsource.diff patch to
+        gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
+        https://bugzilla.gnome.org/show_bug.cgi?id=611213
+        This fix adds receiver side bitrate estimation. Note that milhouse
+        will function fine without it, as will scenic.
+    *   Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
+        Install them with aptitude. 
 
     Backward compatibility:
-    Each release in the 0.4 series should be interoperable with each other.
+        Each release in the 0.4 series should be interoperable with each other.
 
     Milhouse dependency for Scenic
-    Scenic always needs the same version of milhouse, eg. scenic 0.4.5
-    needs milhouse 0.4.5
+        Scenic always needs the same version of milhouse, eg. scenic 0.4.5
+        needs milhouse 0.4.5
 
     Limitations:
-    * While milhouse supports many video and audio input types, Scenic only supports a subset of them. 
-    * Each release version in the 0.5 branch is considered unstable and will not be supported in the future. Each version is not interoperable with any other version of the unstable 0.5 branch. Wait for the next release in the 0.6 branch to benefit from long term support of the new features of the 0.5 branch.
-
-New features and bug fixes in 0.5.4:
+    *   While milhouse supports many video and audio input types, Scenic only 
+        supports a subset of them. 
+    *   Each release version in the 0.5 branch is considered unstable and will 
+        not be supported in the future. Each version is not interoperable with 
+        any other version of the unstable 0.5 branch. Wait for the next release 
+        in the 0.6 branch to benefit from long term support of the new features 
+        of the 0.5 branch.
 
 New features in milhouse:
+    *   Dump pipeline into a graphviz file
 
 New features in scenic:
-    #515 Include installation manual in the help menu and in packaging
-    #508 Install the bash completion file with the debian package
-    #500 Show errors when the preview crashes
+    *   #520 Translate to french
+    *   #314 i18n procedure with gettext and glade should be documented
+    *   #513 Add the "Installation Manual" item in the Help menu
 
 Bug fixes in milhouse: 
+    *   #495 Not receiving vumeters because of display variable being set to non 
+        default when audio and video are synchronized
+    *   #517 Milhouse in audio-only should not require a DISPLAY to be set
+    *   #324 Milhouse lacks a tutorial
+    *   Don't toggle frequency for audiotestsrc as it is not designed to handle 
+        this and it produces artifacts, especially in MP3.
 
-Bug fixes in scenic : 
-    #510 Latency calculation is wrong with the firewire jackd driver
-    #467 Logging to file is broken
-    #363 Sometimes the video preview crashes
+Bug fixes in scenic: 
+    *   #518 Newer configuration options are erased when we run an older version
+    *   #519 Messages from the application modules are logged twice
+    *   #405 Document ports to open
+    *   #441 Widgets must have tooltips
+

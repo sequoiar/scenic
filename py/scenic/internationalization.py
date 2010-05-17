@@ -28,11 +28,20 @@ Provides the _(...) function.
 import gtk.glade
 import gettext
 from scenic import configure
+from scenic import logger
+
+log = logger.start(name="i18n")
 
 _ = gettext.gettext
 
 def setup_i18n():
+    """
+    Bind the domain to the locale directory localedir. More concretely, gettext will look for binary .mo  files for the given domain using the path (on Unix): localedir/language/LC_MESSAGES/domain.mo, where languages is searched for in the environment variables LANGUAGE, LC_ALL, LC_MESSAGES, and LANG  respectively.
+    """
     gettext.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
     gettext.textdomain(configure.APPNAME)
     gtk.glade.bindtextdomain(configure.APPNAME, configure.LOCALE_DIR)
     gtk.glade.textdomain(configure.APPNAME)
+
+    log.debug("i18n has been setup with domain %s and path %s." % (gettext.textdomain(), configure.LOCALE_DIR))
+

@@ -9,3 +9,5 @@ base=$(dirname $0)/..
 
 rsync -rv --delete $base/doc/html/ $target/doxygen/
 rsync -rv --delete $base/doc/pythondocs/ $target/epydocs/
+rsync -rv --delete $base/doc/docbook/html/installation-manual/ $target/installation-manual/
+rsync -rv --delete $base/doc/docbook/html/user-manual/ $target/user-manual/

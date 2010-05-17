@@ -13,5 +13,7 @@
 <sect1>
     <title>Configuring the MIDI jitter buffer</title>
     <para>The MIDI jitter buffer is a buffer that protects you from the variation in latency. This will prevent the notes from being heard in an irregular flow, creating beats that do not match what the remote musican had played. Increase this number (in milliseconds) in case of high network jitter.</para>
+    <para>If you want to synchronize the audio, video and MIDI streams, it is possible to get to a satisfying result by increasing the jitter buffer for the MIDI stream until the result sounds correct. Of course, the "Synchronize audio and video" option must be on to do so.</para>
+    <para>The total latency for a stream is the result of the addition of the latency of its input device, encoder if there is one, RTP payloader, the network devices, the RTP depayloader, the decoder and the output device. Making sure the MIDI stream is totally synchronized with the audio and video streams is impossible, but it is likely that you can get a satisfying result.</para>
 </sect1>
 </chapter>

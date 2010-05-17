@@ -15,6 +15,19 @@
   digital systems between cultural and educational venues and to
   promote research and creation through new communication
   technologies.</para>
+  <sect1 is="functional-overview">
+    <title>Functional Overview</title>
+    <para>This section gives a quick overview of the various
+    functional components of Scenic.</para>
+    <para>Scenic is a software suite which consists in the Scenic
+    software itself, a user graphical interface, and some command
+    line utilities. The milhouse utility is what is actually used
+    to send and receive audio and video over the Internet. The
+    midistream utility is used to send and receive MIDI over the
+    Internet. Scenic also allows you to manage a list of contacts,
+    and to choose the video input and the settings for the
+    streaming sessions.</para>
+  </sect1>
   <sect1 is="art-direction">
     <title>Thinking About the Art Direction</title>
     <para>When preparing a show that includes live telepresence,
@@ -26,7 +39,7 @@
     comments of a master of ceremony can help the public to figure
     out what is actually going on with the telepresence. Otherwise,
     newcomers might now understand at all that some of the images
-    are steamed live from an other city. This is similar to the 
+    are steamed live from an other city. This is similar to the
     cabaret entertainment form.</para>
   </sect1>
   <sect1 id="UsingScenic">
@@ -95,10 +108,33 @@
     </sect2>
   </sect1>
   <sect1 id="quick-overview">
-    <title>Quick Overview</title>
-    <para>In a nut shell, once Scenic is installed and the computer is properly connected to the Internet and accessible from remote computers, it is time to launch Scenic and try it out. The first thing to do is to add a contact in your address book. You must give it a name and an IP address corresponding to the remote's computer IP address. Each peer can see its own local IP address in the statistics tab. Each peer can then give its IP address to the other person.</para>
-    <para>Next, it is time to configure what to send and receive to and from the remote peer. Scenic can transmit one video stream bi-directional, one MIDI stream and has many audio channels your hardware supports, when your software is properly installed. For each of them, you can enable or disable sending and receiving by clicking on the check button in the "Sending" and "Receiving" section in the "Video", "Audio" and "MIDI" tabs. For a stream to be enabled, both peer must enable it. If one of the peer disables sending or receiving a video signal, it does not occur in that direction.</para>
-    <para>In each of these three tabs, there are settings that allow you to fine tune the quality, source and destination of the streams. The codec informations are decided in the receiver's side. The source is, of course, decided in the sender's side.</para>
-    <para>The "Statistics" tab offers you informations and statistics about the current streams, when a streaming session is in progress. It also gives you your local IP address and your peer's IP address.</para>
+    <title>Quick How-To</title>
+    <para>In a nut shell, once Scenic is installed and the computer
+    is properly connected to the Internet and accessible from
+    remote computers, it is time to launch Scenic and try it out.
+    The first thing to do is to add a contact in your address book.
+    You must give it a name and an IP address corresponding to the
+    remote's computer IP address. Each peer can see its own local
+    IP address in the statistics tab. Each peer can then give its
+    IP address to the other person.</para>
+    <para>Next, it is time to configure what to send and receive to
+    and from the remote peer. Scenic can transmit one video stream
+    bi-directional, one MIDI stream and has many audio channels
+    your hardware supports, when your software is properly
+    installed. For each of them, you can enable or disable sending
+    and receiving by clicking on the check button in the "Sending"
+    and "Receiving" section in the "Video", "Audio" and "MIDI"
+    tabs. For a stream to be enabled, both peer must enable it. If
+    one of the peer disables sending or receiving a video signal,
+    it does not occur in that direction.</para>
+    <para>In each of these three tabs, there are settings that
+    allow you to fine tune the quality, source and destination of
+    the streams. The codec informations are decided in the
+    receiver's side. The source is, of course, decided in the
+    sender's side.</para>
+    <para>The "Statistics" tab offers you informations and
+    statistics about the current streams, when a streaming session
+    is in progress. It also gives you your local IP address and
+    your peer's IP address.</para>
   </sect1>
 </chapter>

@@ -86,13 +86,15 @@
       640x480</para>
     </sect2>
     <sect2>
-      <title>
-      <anchor id="ImageSize" />Image Size</title>
+      <title><anchor id="ImageSize" />Image Size</title>
+      <para>This drop-down menu offers you a list of image size to choose for the video image to capture. A bigger image needs more bandwidth if you want it to be too much compressed. </para>
+      <para>Since the bandwidth is decided on the receiver's side, both peers should agree on an image size and quality to avoid getting an ugly image or using too much bandwidth for no reason.</para>
     </sect2>
   </sect1>
   <sect1>
     <title>
-    <anchor id="ReceivingSide" />Receiving Side</title>
+    <anchor id="ReceivingVideo" />Receiving Video</title>
+    <para>In Scenic, each peer decides the quality of the video that he receives. This means choosing the video codec, the bitrate and the jitter buffer. It is also possible to choose to start the receiver in full screen, and to show it on a secondary display.</para>
     <sect2>
       <title>
       <anchor id="VideoCodec" />Video Codec</title>

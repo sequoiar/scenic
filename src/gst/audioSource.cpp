@@ -134,8 +134,8 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
 
     gst_caps_unref(caps);
 
-    static const int PERIOD_MS = 1000;
-    callback_ = g_timeout_add(PERIOD_MS, timedCallback, this);
+    //static const int PERIOD_MS = 1000;
+    //callback_ = g_timeout_add(PERIOD_MS, timedCallback, this);
 }
 
 
@@ -161,7 +161,7 @@ void AudioTestSource::toggle_frequency()
 /// Destructor 
 AudioTestSource::~AudioTestSource()
 {
-    g_source_remove(callback_);
+    //g_source_remove(callback_);
 }
 
 

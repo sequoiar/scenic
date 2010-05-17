@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.60)
-AC_INIT(SCENIC, [0.5.4], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
+AC_INIT(SCENIC, [0.5.5], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])  # should always be .1 greater than last tag, unless this is a tag
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -93,6 +93,8 @@ fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 
+GNOME_DOC_INIT(0.12.2, , AC_MSG_WARN(["DocBook Documentation will not be converted to HTML."]))
+
 dnl check for python
 AM_PATH_PYTHON([2.5])
 
@@ -182,10 +184,17 @@ AC_CHECK_PROG(JACKD, jackd, yes, no)
 AS_IF([test "x${JACKD}" = "xno"],
     [AC_MSG_ERROR([Requires jackd])])
 
+AC_CHECK_PROG(YELP, yelp, yes, no)
+AS_IF([test "x${YELP}" = "xno"],
+    [AC_MSG_ERROR([Requires yelp])])
+
 # Check for gst-plugins that we use
 GST_CHECK=$srcdir/utils/gst_check.py
 # PYTHON defined in ax_python_module
 AS_IF([! $PYTHON $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed])])
+
+# see /usr/share/aclocal/gst-element-check-0.10.m4
+#AM_GST_ELEMENT_CHECK(["xvimagesink"], [AC_MSG_NOTICE([OK])],  [AC_MSG_ERROR([Requires wvimagesink])])
 
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])

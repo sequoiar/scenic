@@ -1,12 +1,12 @@
 <chapter id="hardware-setup">
   <title>Hardware Setup</title>
-  <para>&amp;app; requires the use of many devices. In this chapter,
+  <para>&app; requires the use of many devices. In this chapter,
   we will have an overview of what kind of device are generaly use.
   We will also give some idea on how to connect these devices. What
   problem the you could face and how to troubleshoot them.</para>
   <sect1 id="generic-sheme">
     <title>Generic connection sheme</title>
-    <para>The diagram below illustrate a generic &amp;app;
+    <para>The diagram below illustrate a generic &app;
     connection sheme:</para>
     <mediaobject>
       <imageobject>

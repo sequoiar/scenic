@@ -15,6 +15,7 @@
    <!ENTITY Network_Test SYSTEM "installation/network.xml">
    <!ENTITY Command_Line SYSTEM "installation/commandline.xml">
    <!ENTITY About SYSTEM "installation/about.xml">
+   <!ENTITY Glossary SYSTEM "glossary.xml">
    <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
        Use the appversion entity to specify the version of the application.
@@ -35,4 +36,5 @@
    &Audio_Video;
    &Network_Test;
    &Command_Line;
+   &Glossary;
 </book>   
