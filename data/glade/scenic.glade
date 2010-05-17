@@ -869,6 +869,8 @@
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
                                             <property name="response_id">0</property>
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">Open a window with the selected video source</property>
                                             <signal name="toggled" handler="on_video_view_preview_toggled"/>
                                             <child>
                                               <widget class="GtkAlignment" id="alignment42">
@@ -1036,7 +1038,7 @@
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Add a new contact</property>
+                                    <property name="tooltip_text">Add a new contact</property>
                                     <property name="focus_on_click">False</property>
                                     <property name="response_id">0</property>
                                     <signal name="clicked" handler="on_add_contact_clicked"/>
@@ -1058,7 +1060,7 @@
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Delete this contact</property>
+                                    <property name="tooltip_text">Delete this contact</property>
                                     <property name="focus_on_click">False</property>
                                     <property name="response_id">0</property>
                                     <signal name="clicked" handler="on_remove_contact_clicked"/>
@@ -1082,7 +1084,7 @@
                                     <property name="can_default">True</property>
                                     <property name="receives_default">True</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Edit this contact</property>
+                                    <property name="tooltip_text">Edit the selected contact</property>
                                     <property name="response_id">0</property>
                                     <signal name="clicked" handler="on_edit_contact_clicked"/>
                                     <child>
@@ -1130,7 +1132,7 @@
                                     <property name="has_default">True</property>
                                     <property name="receives_default">True</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip" translatable="yes">Click this button to make a call</property>
+                                    <property name="tooltip_text">Click this button to make a call</property>
                                     <property name="response_id">0</property>
                                     <signal name="clicked" handler="on_invite_contact_clicked"/>
                                     <child>
@@ -1281,6 +1283,8 @@
                                         <property name="visible">True</property>
                                         <property name="items" translatable="yes">4:3
 16:9</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Picture aspect ratio. Commonly used values are 16:9 for 704x480 and 4:3 for 640x480</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1362,6 +1366,8 @@ PAL</property>
                                       <widget class="GtkComboBox" id="v4l2_input">
                                         <property name="visible">True</property>
                                         <property name="items" translatable="yes">Default</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Some devices have many inputs. Choose which one.</property>
                                         <signal name="changed" handler="on_v4l2_input_changed"/>
                                       </widget>
                                     </child>
@@ -1413,6 +1419,8 @@ PAL</property>
                                         <property name="visible">True</property>
                                         <property name="wrap_width">1</property>
                                         <property name="items" translatable="yes">Color bars</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Select your camera or capture device</property>
                                         <signal name="changed" handler="on_video_source_changed"/>
                                       </widget>
                                     </child>
@@ -1580,6 +1588,8 @@ PAL</property>
                                         <property name="xalign">1</property>
                                         <property name="response_id">0</property>
                                         <property name="draw_indicator">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Fullscreen can be toggled with the 'F' key</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1616,6 +1626,8 @@ PAL</property>
                                         <property name="items" translatable="yes">:0.0
 :0.1
 </property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Useful to display the video on another monitor</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1655,6 +1667,8 @@ PAL</property>
 MPEG4
 h.264
 Theora</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Choose h.263 for low bandwidth or low CPU setup. Use Theora for a patent-free experience. Use MPEG4 for most situation. Use h.264 to use all the CPU power you have.</property>
                                         <signal name="changed" handler="on_video_codec_changed"/>
                                       </widget>
                                     </child>
@@ -1709,6 +1723,8 @@ Theora</property>
                                         <property name="xalign">1</property>
                                         <property name="response_id">0</property>
                                         <property name="draw_indicator">True</property>
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">Deinterlace makes a nicer image when the source is analog, but it adds latency.</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1737,6 +1753,8 @@ Theora</property>
                                             <property name="width_chars">6</property>
                                             <property name="adjustment">50 50 1000 1 10 0</property>
                                             <property name="numeric">True</property>
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                           </widget>
                                         </child>
                                       </widget>
@@ -1904,6 +1922,9 @@ Theora</property>
                                         <property name="wrap_width">1</property>
                                         <property name="items" translatable="yes">Test sound
 JACK</property>
+
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Use a tone for testing. Receiving audio is always on Jack.</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -2097,6 +2118,8 @@ JACK</property>
                                         <property name="xalign">0</property>
                                         <property name="label" translatable="yes">&lt;b&gt;Running&lt;/b&gt;</property>
                                         <property name="use_markup">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Open qjackctl to start jack daemon.</property>
                                       </widget>
                                       <packing>
                                         <property name="position">1</property>
@@ -2107,7 +2130,8 @@ JACK</property>
                                 <child>
                                   <widget class="GtkLabel" id="jack_latency">
                                     <property name="visible">True</property>
-                                    <property name="tooltip" translatable="yes">JACK output latency in milliseconds, calculated based on the period, rate and buffer settings. </property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text" translatable="yes">JACK output latency in milliseconds, calculated based on the period, rate and buffer settings. This is the latency of the audio system only.</property>
                                     <property name="xalign">0</property>
                                     <property name="xpad">5</property>
                                     <property name="ypad">5</property>
@@ -2330,6 +2354,8 @@ JACK</property>
                                     <property name="items" translatable="yes">Raw
 MP3
 Vorbis</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text">RAW will gives the most quality and less latency. MP3 works only with 2 audio channels. Vorbis is good for many channels but adds latency.</property>
                                     <signal name="changed" handler="on_audio_codec_changed"/>
                                   </widget>
                                 </child>
@@ -2893,6 +2919,8 @@ Vorbis</property>
                                         <property name="right_padding">5</property>
                                         <child>
                                           <widget class="GtkSpinButton" id="midi_jitterbuffer">
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="adjustment">5 5 2000 1 10 0</property>
@@ -4186,6 +4214,8 @@ Jitter: 1238 ns</property>
                             <property name="visible">True</property>
                             <property name="items" translatable="yes">NTSC
 PAL</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text">Most of the Americas, Japan, South Korea, Taiwan, Burma, and some Pacific island nations and territories use NTSC. The rest of the world use PAL</property>
                           </widget>
                         </child>
                       </widget>
@@ -4207,6 +4237,8 @@ PAL</property>
                           <widget class="GtkComboBox" id="v4l2_input2">
                             <property name="visible">True</property>
                             <property name="items" translatable="yes">Default</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text">Select your camera or capture device</property>
                           </widget>
                         </child>
                       </widget>
