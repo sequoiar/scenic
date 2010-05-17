@@ -1,81 +1,608 @@
 <chapter id="advanced-options">
-<title>Advanced options</title>
-<para>In this chapter, we will explain miscellaneous options and features that power users might want to use.</para>
-<sect1>
+  <title>Advanced options</title>
+  <para>In this chapter, we will explain miscellaneous options and
+  features that power users might want to use.</para>
+  <sect1 id="kiosk-mode">
     <title>Using &app; in kiosk mode</title>
-    <para>Kiosk mode is useful when &app; is the only software that runs at startup. It contains a system tab with buttons for tasks such as upgrading the Debian or Ubuntu packages, and rebooting the computer.</para>
-    <para>To launch &app; in kiosk mode, use the "--kiosk" flag from a terminal. It is best used with the "--fullscreen" flag.</para>
-</sect1>
-<sect1>
+    <para>Kiosk mode is useful when &app; is the only software that
+    runs at startup. It contains a system tab with buttons for
+    tasks such as upgrading the Debian or Ubuntu packages, and
+    rebooting the computer.</para>
+    <para>To launch &app; in kiosk mode, use the "--kiosk" flag
+    from a terminal. It is best used with the "--fullscreen"
+    flag.</para>
+  </sect1>
+  <sect1 id="debug-mode">
     <title>Activating the debug mode</title>
-    <para>&app; supports a wide variety of devices and libraries. The tradeoff for this greater flexibility is a greater number of potential pitfalls, which may be difficult to troubleshoot. To get more information about what is happening behind the scenes, you can launch &app; in debug mode. To do so, launch it from a terminal with the "--debug" flag. Here is how to do it in Ubuntu GNU/Linux:</para>
+    <para>&app; supports a wide variety of devices and libraries.
+    The tradeoff for this greater flexibility is a greater number
+    of potential pitfalls, which may be difficult to troubleshoot.
+    To get more information about what is happening behind the
+    scenes, you can launch &app; in debug mode. To do so, launch it
+    from a terminal with the "--debug" flag. Here is how to do it
+    in Ubuntu GNU/Linux:</para>
     <orderedlist>
-      <listitem>Choose the <menuchoice><guimenu>Application</guimenu><guimenuitem>Accessories</guimenuitem><guimenuitem>Terminal</guimenuitem></menuchoice> menu item.</listitem>
+      <listitem>Choose the 
+      <menuchoice>
+        <guimenu>Application</guimenu>
+        <guimenuitem>Accessories</guimenuitem>
+        <guimenuitem>Terminal</guimenuitem>
+      </menuchoice>menu item.</listitem>
       <listitem>Type "scenic --debug" and press enter.</listitem>
     </orderedlist>
-        <programlisting>  scenic --debug  </programlisting>
-    <para>You can now see more detailed information about what happens under the hood of &app;. You can copy some of this text to the clipboard in order to paste it into an email to the &app; developers. In the <application>Terminal</application> that comes with <application>Ubuntu GNU/Linux</application>, you can copy the selected text by pressing <keycombo><keycap>Ctrl</keycap><keycap>Shift</keycap><keycap>C</keycap></keycombo>. 
-    </para>
-</sect1>
-<sect1>
+    <programlisting>scenic --debug</programlisting>
+    <para>You can now see more detailed information about what
+    happens under the hood of &app;. You can copy some of this text
+    to the clipboard in order to paste it into an email to the
+    &app; developers. In the 
+    <application>Terminal</application>that comes with 
+    <application>Ubuntu GNU/Linux</application>, you can copy the
+    selected text by pressing 
+    <keycombo>
+      <keycap>Ctrl</keycap>
+      <keycap>Shift</keycap>
+      <keycap>C</keycap>
+    </keycombo>.</para>
+  </sect1>
+  <sect1 id="command-line-tootls">
     <title>Command line tools</title>
-    <para>Here are a few command-line tools that come with &app;. </para>
+    <para>Here are a few command-line tools that come with
+    &app;.</para>
     <orderedlist>
-      <listitem>dc-ctl: Controls DC ieee1394 (Firewire) cameras.</listitem>
-      <listitem>midistream: Streams MIDI notes and controls over RTP.</listitem>
-      <listitem>scenic: Graphical user interface to stream audio, video and MIDI over RTP.</listitem>
-      <listitem>milhouse: Streams audio and video over RTP.</listitem>
-      <listitem>firereset: Resets a ieee1394 (Firewire) bus.</listitem>
-      <listitem>jack-info: Prints informations about currently running JACK servers.</listitem>
+      <listitem>dc-ctl: Controls DC ieee1394 (Firewire)
+      cameras.</listitem>
+      <listitem>midistream: Streams MIDI notes and controls over
+      RTP.</listitem>
+      <listitem>scenic: Graphical user interface to stream audio,
+      video and MIDI over RTP.</listitem>
+      <listitem>milhouse: Streams audio and video over
+      RTP.</listitem>
+      <listitem>firereset: Resets a ieee1394 (Firewire)
+      bus.</listitem>
+      <listitem>jack-info: Prints informations about currently
+      running JACK servers.</listitem>
     </orderedlist>
-<para>See their manual page for more informations. For example, to read the manual page of <application>Milhouse</application>, type "man milhouse" in a terminal. Press the <keycombo><keycap>Up</keycap></keycombo> and <keycombo><keycap>Down</keycap></keycombo> arrows to scroll up and down. Press <keycombo><keycap>Q</keycap></keycombo> to quit the manual page reader.</para>
-        <programlisting>man milhouse  </programlisting>
-    <para>The next section is dedicated to the <application>Milhouse</application> command-line streamer.</para>
-</sect1>
-    <sect1>
-        <title>Using <application>Milhouse</application>, the command-line streamer</title>
-        <para>Here is a quick introduction to using <application>Milhouse</application>, an application for audio-video streaming over RTP.</para>
-        <para><application>Milhouse</application> is a simple tool that can do a lot of things. For example, it can list the cameras and video capture devices found on your computer. It can also change video settings for a V4L2 (Video4Linux2) device, such as its video standard and its selected video input number. <application>Milhouse</application> also supports DV cameras and DC cameras, two kinds of cameras using ieee1394 (Firewire) to send their digital video signal to the computer. Those two types of cameras are not yet supported by the &app; graphical user interface. This is one of the reasons why an advanced user might prefer to use the <application>Milhouse</application> command line tool instead of the &app; graphical user interface.</para>
-        <para>Above all, <application>Milhouse</application> is an audio-video streamer. Its main purpose is to transmit digital video and audio signals over the Internet. As a streamer, it can be used in either of it modes: as a sender or a receiver. To choose its mode, simply give it the command-line option "--receiver" or "--sender".</para>
-        <sect2>
-            <title>Using <application>Milhouse</application> as a sender or a receiver</title>
-        <para>To create a streaming session with <application>Milhouse</application>, you must launch a sender and a receiver. You must give each of them the IP address of the other one. That is what the "--address" command line option is for.</para>
-        <para>If you want to stream audio, the sender is the one that captures the audio signal from its audio source. You must choose a value for its "--audiosource" option. A common value would be "jackaudiosrc", for the JACK audio server. An other common value is "audiotestsrc", a test source that generates simple tones.</para>
-        <para>If you want to stream video, you must specify a video source for the sender, using its "--videosource" option. A common value is "v4l2src", for a V4L2 source. In this case, you might want to specify a video device, such as "/dev/video0", using the "--videodevice" option. An other useful value for the "--videosource" is "videotestsrc", for test color bars.</para>
-        <para>On the receiver's side, you must choose an output for the audio - the "--audiosink" argument - and specify the audio and video codecs, like for the sender (or use the defaults listed in milhouse --help).</para>
-        <para>We will create a <application>Milhouse</application> sender and receiver on the same computer. The IP address for the local host is always 127.0.0.1. The resulting commands that you should type in a terminal are the following:</para>
-        <programlisting>milhouse --sender --address 127.0.0.1 --videoport 10030 --videosource videotestsrc \
-    --videocodec mpeg4 --audiosource audiotestsrc --numchannels 2 --audioport 10000 \
-    --audiocodec raw  </programlisting>
-        <programlisting>milhouse --receiver --address 127.0.0.1 --videoport 10030 --videocodec mpeg4 \
-    --audioport 10000 --numchannels 2 --audiocodec raw \
-    --audiosink jackaudiosink  </programlisting>
-        <para>
-        To simplify, milhouse has defaults which will cover many of the above arguments, i.e.:
+    <para>See their manual page for more informations. For example,
+    to read the manual page of 
+    <application>Milhouse</application>, type "man milhouse" in a
+    terminal. Press the 
+    <keycombo>
+      <keycap>Up</keycap>
+    </keycombo>and 
+    <keycombo>
+      <keycap>Down</keycap>
+    </keycombo>arrows to scroll up and down. Press 
+    <keycombo>
+      <keycap>Q</keycap>
+    </keycombo>to quit the manual page reader.</para>
+    <programlisting>man milhouse</programlisting>
+    <para>The next section is dedicated to the 
+    <application>Milhouse</application>command-line
+    streamer.</para>
+  </sect1>
+  <sect1 id="using-milhouse">
+    <title>Using 
+    <application>Milhouse</application></title>
+    <para>Milhouse command line is a powerful tool with many
+    options not implemented yet in the Scenic GUI. For more complex
+    setup than what Scenic can currently support, we suggest you to
+    use 
+    <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink>as a
+    launching script. Look at some examples in 
+    <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
+    trunk/utils/</ulink>. You should look at the manual page of
+    both these tools to know more about them.</para>
+    <para>Here is a quick introduction to using 
+    <application>Milhouse</application>, an application for
+    audio-video streaming over RTP.</para>
+    <para>
+    <application>Milhouse</application>is a simple tool that can do
+    a lot of things. For example, it can list the cameras and video
+    capture devices found on your computer. It can also change
+    video settings for a V4L2 (Video4Linux2) device, such as its
+    video standard and its selected video input number. 
+    <application>Milhouse</application>also supports DV cameras and
+    DC cameras, two kinds of cameras using ieee1394 (Firewire) to
+    send their digital video signal to the computer. Those two
+    types of cameras are not yet supported by the &app; graphical
+    user interface. This is one of the reasons why an advanced user
+    might prefer to use the 
+    <application>Milhouse</application>command line tool instead of
+    the &app; graphical user interface.</para>
+    <para>Above all, 
+    <application>Milhouse</application>is an audio-video streamer.
+    Its main purpose is to transmit digital video and audio signals
+    over the Internet. As a streamer, it can be used in either of
+    it modes: as a sender or a receiver. To choose its mode, simply
+    give it the command-line option "--receiver" or
+    "--sender".</para>
+    <sect1 id="milhouse-send-receive">
+      <title>using 
+      <application>milhouse</application>as a sender or a
+      receiver</title>
+      <para>To create a streaming session with 
+      <application>Milhouse</application>, you must launch a sender
+      and a receiver. You must give each of them the IP address of
+      the other one. That is what the "--address" command line
+      option is for.</para>
+      <para>If you want to stream audio, the sender is the one that
+      captures the audio signal from its audio source. You must
+      choose a value for its "--audiosource" option. A common value
+      would be "jackaudiosrc", for the JACK audio server. An other
+      common value is "audiotestsrc", a test source that generates
+      simple tones.</para>
+      <para>If you want to stream video, you must specify a video
+      source for the sender, using its "--videosource" option. A
+      common value is "v4l2src", for a V4L2 source. In this case,
+      you might want to specify a video device, such as
+      "/dev/video0", using the "--videodevice" option. An other
+      useful value for the "--videosource" is "videotestsrc", for
+      test color bars.</para>
+      <para>On the receiver's side, you must choose an output for
+      the audio - the "--audiosink" argument - and specify the
+      audio and video codecs, like for the sender (or use the
+      defaults listed in milhouse --help).</para>
+      <para>We will create a 
+      <application>Milhouse</application>sender and receiver on two separate computer.</para> 
 
-        </para>
-        <programlisting>milhouse --sender --videoport 10030 --audiosource audiotestsrc --audioport 10000  </programlisting>
-        <programlisting>milhouse --receiver --videoport 10030 --audioport 10000  </programlisting>
-        </sect2>
-        <sect2>
-            <title>Other uses</title>
-        <para>
-              The milhouse command can also be used to change some properties
-              of a V4L2 video device, such as the resolution and the video standard.
-              The milhouse command should exit immediately once done.
-        </para>
-        <para>
-              To change the video standard to NTSC:
-        </para>
-        <programlisting>milhouse --v4l2-standard NTSC</programlisting>
-        <para>
-              To list cameras:
-        </para>
-        <programlisting>milhouse --list-cameras  </programlisting>
-        <para>
-              To choose an input for a V4L2 device:
-        </para>
-        <programlisting>milhouse --v4l2-input 1  </programlisting>
-        </sect2>
-</sect1>
+    </sect1>
+    <sect1 id="milhouse-receivers">
+      <title>Launch the receivers</title>
+      <para>Here is a short explanation on how to start the
+      milhouse receivers to receive audio and video streams.</para>
+      <para>Set the local_machine display</para>
+      <programlisting>export DISPLAY=:0.0</programlisting>
+      <para>Run the program on the local machine with the following
+      parameters:</para>
+      <programlisting>milhouse --receiver --address
+      remote_ip_address --videosink xvimagesink --videocodec mpeg4 
+      <para>--videoport 10030 --audiosink jackaudiosink
+      --audiocodec raw --audioport 10000</para>--numchannels
+      2</programlisting>
+      <para>Set the remote_machine display</para>
+      <programlisting>export DISPLAY=:0.0</programlisting>
+      <para>Execute program on the remote machine with the
+      following parameters:</para>
+      <programlisting>milhouse --receiver --address
+      local_ip_address --videosink xvimagesink --videocodec mpeg4 
+      <para>--videoport 10030 --audiosink jackaudiosink
+      --audiocodec raw --audioport 10000</para>--numchannels
+      2</programlisting>
+    </sect1>
+    <sect1 id="milhouse-senders">
+      <title>launch the senders</title>
+      <para>the next step is to launch the milhouse sender
+      processes. of course, that should be on a different
+      computer.</para>
+      <para>execute program on local machine with the following
+      parameters:</para>
+      <programlisting>milhouse --sender --address remote_ip_address
+      --videocodec mpeg4 --videoport 10030 
+      <para>--videosource v4l2src --audiosource jackaudiosrc
+      --audiocodec raw &#160;-c 2</para>--audioport
+      10000</programlisting>
+      <para>execute program on remote machine with the following
+      parameters:</para>
+      <programlisting>milhouse --sender --address local_ip_address
+      --videocodec mpeg4 --videoport 10030 
+      <para>--videosource v4l2src --audiosource jackaudiosrc
+      --audiocodec raw &#160;-c 2</para>--audioport
+      10000</programlisting>
+      <para>a video window displaying the live video stream should
+      appear on one of your designated screens. it is movable by
+      holding down the -alt- key and dragging the window. pressing
+      'f' or escape will toggle full screen mode.</para>
+      <para>you should also see the audio connections appear in
+      qjackctl. the outputs are now routable to your speakers or
+      other applications.</para>
+      <para>you should now have video and audio input fully working
+      on both sides.</para>
+      <para>to stop milhouse type control-c in the used terminal or
+      type control-q in the video window.</para>
+    </sect1>
+  </sect1>
+  <sect1 id="milhouse-help">
+    <title>Milhouse Help</title>
+    <para>Type milhouse --help to have informations on the
+    different options available.</para>
+    <programlisting>milhouse --help</programlisting>
+    <informaltable frame="all">
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry>
+              <para>Help Options:</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-?, --help</para>
+            </entry>
+            <entry>
+              <para>produce help</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-r, --receiver</para>
+            </entry>
+            <entry>
+              <para>this process is a receiver</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-s, --sender</para>
+            </entry>
+            <entry>
+              <para>this process is a sender</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-i, --address</para>
+            </entry>
+            <entry>
+              <para>provide ip address of remote host
+              address</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-v, --videocodec</para>
+            </entry>
+            <entry>
+              <para>videocodec (mpeg4, h264, h263, theora)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-a, --audiocodec</para>
+            </entry>
+            <entry>
+              <para>audiocodec (raw, vorbis, mp3)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-k, --videosink</para>
+            </entry>
+            <entry>
+              <para>video output (xvimagesink, glimagesink,
+              sharedvideosink, ximagesink)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-l, --audiosink</para>
+            </entry>
+            <entry>
+              <para>audio output (jackaudiosink, alsasink,
+              pulsesink)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-t, --audioport</para>
+            </entry>
+            <entry>
+              <para>audioport number (1024-65535)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-p, --videoport</para>
+            </entry>
+            <entry>
+              <para>videoport number (1024-65535)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-f, --fullscreen</para>
+            </entry>
+            <entry>
+              <para>display video in fullscreen</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-B, --shared-video-id</para>
+            </entry>
+            <entry>
+              <para>name for shared video buffer output (only
+              applies to sharedvideosink)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-o, --deinterlace</para>
+            </entry>
+            <entry>
+              <para>deinterlace video (receiver side only)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-d, --videodevice</para>
+            </entry>
+            <entry>
+              <para>name of videodevice (/dev/video0,
+              /dev/video1)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-q, --audiodevice</para>
+            </entry>
+            <entry>
+              <para>name of audiodevice (hw:0, hw:2, plughw:0,
+              plughw:2)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>--videolocation</para>
+            </entry>
+            <entry>
+              <para>video file location &lt;filename&gt; (only
+              applies when videosource=filesrc)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>--audiolocation</para>
+            </entry>
+            <entry>
+              <para>audio file location &lt;filename&gt; (only
+              applies when audiosource=filesrc)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-n, --screen</para>
+            </entry>
+            <entry>
+              <para>xinerama screen num (0, 1)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-w, --version</para>
+            </entry>
+            <entry>
+              <para>outputs version number</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-c, --numchannels</para>
+            </entry>
+            <entry>
+              <para>The numbers of audio channels to use.</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-x, --videobitrate</para>
+            </entry>
+            <entry>
+              <para>videobitrate: The amount of video data being
+              encoded; expressed in bits per second</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-e, --audiosource</para>
+            </entry>
+            <entry>
+              <para>audio input (jackaudiosrc, alsasrc,
+              pulsesrc)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-u, --videosource</para>
+            </entry>
+            <entry>
+              <para>video input (v4l2src, v4lsrc, dv1394src)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-z, --timeout</para>
+            </entry>
+            <entry>
+              <para>time in ms to wait before quitting, 0 means run
+              indefinitely</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-b, --audio-buffer-usec</para>
+            </entry>
+            <entry>
+              <para>length of receiver's audio buffer in
+              microseconds, must be &gt; 11333</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-g, --jitterbuffer</para>
+            </entry>
+            <entry>
+              <para>length of receiver's rtp jitterbuffers in
+              milliseconds, must be &gt;= 1</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-G, --camera-number</para>
+            </entry>
+            <entry>
+              <para>camera id for dc1394src (0,1)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-U, --camera-guid</para>
+            </entry>
+            <entry>
+              <para>camera guid for dc1394src</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-I, --mulitcast-interface</para>
+            </entry>
+            <entry>
+              <para>interface to use for mutlicast (eth0,
+              eth1)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-j, --enable-controls</para>
+            </entry>
+            <entry>
+              <para>enable gui controls for jitterbuffer</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-J, --disable-jack-autoconnect</para>
+            </entry>
+            <entry>
+              <para>prevent milhouse's jack audio ports don't
+              connect on startup</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-O, --jack-client-name</para>
+            </entry>
+            <entry>
+              <para>name of jack-client</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-C, --negotiate-caps</para>
+            </entry>
+            <entry>
+              <para>force rtp media capabilities (caps) to be
+              communicated over tcp</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-D, --debug</para>
+            </entry>
+            <entry>
+              <para>level of logging verbosity (critical=1,
+              error=2, warning=3, info=4, debug=5,
+              gst-debug=6)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-W, --window-title</para>
+            </entry>
+            <entry>
+              <para>title for video output window</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-F, --framerate</para>
+            </entry>
+            <entry>
+              <para>framerate for video capture (15,30)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-H, --list-cameras</para>
+            </entry>
+            <entry>
+              <para>list connected cameras</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-N, --width</para>
+            </entry>
+            <entry>
+              <para>width for video capture, must be specified for
+              sender and receiver</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-Y, --height</para>
+            </entry>
+            <entry>
+              <para>height for video capture, must be specified for
+              sender and receiver</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-P, --display-width</para>
+            </entry>
+            <entry>
+              <para>width for video on display (may scale
+              input)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-Q, --display-height</para>
+            </entry>
+            <entry>
+              <para>height for video on display (may scale
+              output)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-M, --grayscale</para>
+            </entry>
+            <entry>
+              <para>force dc1394 capture to grayscale</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>-A, --aspect-ratio</para>
+            </entry>
+            <entry>
+              <para>picture aspect ratio (4:3, 16:9)</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>--localvideo</para>
+            </entry>
+            <entry>
+              <para>display local video only</para>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </sect1>
+  <sect1>
+    <title>Other uses</title>
+    <para>The milhouse command can also be used to change some
+    properties of a V4L2 video device, such as the resolution and
+    the video standard. The milhouse command should exit
+    immediately once done.</para>
+    <para>To change the video standard to NTSC:</para>
+    <programlisting>milhouse --v4l2-standard NTSC</programlisting>
+    <para>To list cameras:</para>
+    <programlisting>milhouse --list-cameras</programlisting>
+    <para>To choose an input for a V4L2 device:</para>
+    <programlisting>milhouse --v4l2-input 1</programlisting>
+  </sect1>
 </chapter>
