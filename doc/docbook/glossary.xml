@@ -1,17 +1,66 @@
-<glossary role="auto"><title>Scenic Glossary</title>
-<para>
-This glossary gives descriptions on various terms and words used in telepresence
-</para>
-
-<!-- ... -->
-<glossentry id="latency"><glossterm>Latency</glossterm>
-<glossdef><para>
-Latency refers to a period of delay (usually measured in milliseconds). This period of delay represent the time from the source sending a an information to the destination receiving it. In real-time system over a network there will always have latency. Scenic has been developed to minimize this latency but still, by example two musician playing over a network will always experience a delay between each other. </para>
-   <para>We speak of one-way latency when we calculate the delay from A to B. We speak of round-trip latency when we calculate the delay from A to B and then back to A. Round-trip latency has a great impact in by example, the dynamics of a conversation, or in any interactive system that require retro-action on the given input. For regular voice interaction a latency of 250 ms round-trip can be notice by an user. Both in audio and video. For musician a latency of even 60 ms can be notice and disturb the user if he/she is not used to it.. </para>
-   <para>Latency is a physical constraint and by using Scenic, specially for live performance, the user have too keep in mind that this delay exist and depend on the factor described below. </para>
-   <para>Concerning Scenic, there is two element that induce latency. </para>
-
-</glossdef>
-</glossentry>
-<!-- ... -->
+<glossary role="auto">
+  <title>Scenic Glossary</title>
+  <para>This glossary gives descriptions on various terms and words
+  used in telepresence</para>
+  <glossentry id="bandwith">
+    <glossterm>Bandwidth</glossterm>
+    <glossdef>
+      <para>Network bandwidth is a measure of available or consumed
+      data communication resources expressed in bits or multiples
+      of it (kbps, Mbps etc).</para>
+    </glossdef>
+  </glossentry>
+  <glossentry id="jitter">
+    <glossterm>Jitter</glossterm>
+    <glossdef>
+      <para>Jitter is the term used to express variation in
+      latency. Jitter, in the context of computer networks, is a
+      measure of the variability over time of the packet latency
+      across a network. Packet jitter is expressed as an average of
+      the deviation from the network mean latency (see above).
+      Packet jitter is quite important as it can increase the
+      overall rate of latency, it must therefore be taken into
+      account in order to calculate the total latency. Jitter has a
+      signifcant effect on the quality of video and audio
+      streams.</para>
+    </glossdef>
+  </glossentry>
+  <glossentry id="latency">
+    <glossterm>Latency</glossterm>
+    <glossdef>
+      <para>Latency refers to a period of delay (usually measured
+      in milliseconds). This period of delay represent the time
+      from the source sending a an information to the destination
+      receiving it. In real-time system over a network there will
+      always have latency. Scenic has been developed to minimize
+      this latency but still, by example two musician playing over
+      a network will always experience a delay between each
+      other.</para> 
+      <para>Latency is the time taken for a sent packet of data to
+      be received at the other end. It includes the time to encode
+      the packet for transmission and transmit it, the time for
+      that data to traverse the network equipment between the
+      nodes, and the time to receive and decode the data.</para>
+      <para>We speak of one-way latency when we calculate the delay
+      from A to B. We speak of round-trip latency when we calculate
+      the delay from A to B and then back to A. Round-trip latency
+      has a great impact in by example, the dynamics of a
+      conversation, or in any interactive system that require
+      retro-action on the given input. For regular voice
+      interaction a latency of 250 ms round-trip can be notice by
+      an user. Both in audio and video. For musician a latency of
+      even 60 ms can be notice and disturb the user if he/she is
+      not used to it..</para>
+    </glossdef>
+  </glossentry>
+  <glossentry id="packet-loss">
+    <glossterm>Packet Loss</glossterm>
+    <glossdef>
+      <para>Packet loss occurs when one or more packets of data
+      traveling across a computer network fail to reach their
+      destination. Packet loss causes important signal distortions
+      that are always noticeable, regardless of the packet loss
+      percentage.</para>
+    </glossdef>
+  </glossentry>
 </glossary>

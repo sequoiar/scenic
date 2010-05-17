@@ -1,4 +1,0 @@
-<chapter lang=""><sect1><title>
-      <anchor id="Variationinlatency"/>Variation in latency</title>
-   <para>Jitter is the term used to express variation in latency. It is expressed in terms of percentage of latency. Jitter has a signifcant effect on the quality of video and audio streams. Scenic requires that the jitter never exceed 1%. If jitter is wor the visual output will be affected, experiencing glitch in the video, missing blocks or parts of images, etc. In Scenic, an option to avoid the effect of the jitter is to increase the jitter buffer. Notice that while this option will greatly ameliorate the video output quality, there is a trade off: Increasing the jitter buffer value will also increase the latency of the video. </para>
-   <para/></sect1></chapter>

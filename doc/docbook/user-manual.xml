@@ -3,7 +3,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
    <!ENTITY legal SYSTEM "user/legal.xml">
-   <!ENTITY appversion "@PACKAGE_VERSION@">
+   <!ENTITY appversion "0.5.5">
    <!ENTITY manrevision "2.1">
    <!ENTITY date "April 2010">
    <!ENTITY app "<application>Scenic</application>">
@@ -15,7 +15,6 @@
    <!ENTITY Midi_Settings SYSTEM "user/midi-settings.xml">
    <!ENTITY Advanced_Options SYSTEM "user/advanced-options.xml">
    <!ENTITY About SYSTEM "user/about.xml">
-   <!ENTITY Glossary SYSTEM "glossary.xml">
    <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
        Use the appversion entity to specify the version of the application.
@@ -28,7 +27,6 @@
 <!-- =============Document Header ============================= -->
 <book id="User-Manual" lang="en">
 
-   &About;
    &Introduction;
    &Before_Using_Scenic;
    &Contact_Settings;
@@ -36,5 +34,5 @@
    &Video_Settings;
    &Midi_Settings;
    &Advanced_Options;
-   &Glossary;
+   &About;
 </book>   
