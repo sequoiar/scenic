@@ -7,7 +7,7 @@ fi
 target="$1"
 base=$(dirname $0)/..
 
-rsync -rv --delete $base/doc/html/ $target/doxygen/
-rsync -rv --delete $base/doc/pythondocs/ $target/epydocs/
-rsync -rv --delete $base/doc/docbook/html/installation-manual/ $target/installation-manual/
-rsync -rv --delete $base/doc/docbook/html/user-manual/ $target/user-manual/
+rsync -rlv --delete $base/doc/html/ $target/doxygen/
+rsync -rlv --delete $base/doc/pythondocs/ $target/epydocs/
+rsync -rlv --delete $base/doc/docbook/html/installation-manual/ $target/installation-manual/
+rsync -rlv --delete $base/doc/docbook/html/user-manual/ $target/user-manual/
