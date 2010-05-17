@@ -13,7 +13,6 @@
    <!ENTITY Software_Installation SYSTEM "installation/software.xml">
    <!ENTITY Audio_Video SYSTEM "installation/audio-video.xml">
    <!ENTITY Network_Test SYSTEM "installation/network.xml">
-   <!ENTITY Command_Line SYSTEM "installation/commandline.xml">
    <!ENTITY About SYSTEM "installation/about.xml">
    <!ENTITY Glossary SYSTEM "glossary.xml">
    <!-- Information about the entities
@@ -35,6 +34,5 @@
    &Software_Installation;
    &Audio_Video;
    &Network_Test;
-   &Command_Line;
    &Glossary;
 </book>   
