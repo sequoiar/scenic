@@ -62,7 +62,8 @@ Build-Depends:
  python-twisted,
  vorbis-tools,
  x11-utils,
- x264
+ x264,
+ yelp
 Standards-Version: 3.8.0
 Homepage: http://scenic.sat.qc.ca/
 
@@ -122,7 +123,8 @@ Depends:
  python-twisted,
  vorbis-tools,
  x11-utils,
- x264
+ x264,
+ yelp
 Recommends:
  gstreamer0.10-tools,
  linux-headers-rt,
