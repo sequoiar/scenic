@@ -1,7 +1,7 @@
 <chapter id="preview">
 <title>Local Preview</title>
 <para>This chapter is about the local preview in &app;. It is useful to give you an idea of what you will send to a remote peer before to actually start the streaming session.</para>
-<sect1>
+<sect1 id="start-stop-preview">
     <title>Starting and stopping the preview</title>
     <para>Click on the "Preview" button to start it. Press again to stop it. If you start a streaming session, it will automatically be closed.</para>
     <para>The preview consists in a window that can be either separate or embedded in the &app; window. &app; will also display the audio levels for your local audio input.</para>
