@@ -1,4 +1,4 @@
-Release notes for Scenic 0.5.7
+Release notes for Scenic 0.5.8
 
 This release is an other unstable version in the 0.5 series. This version 
 contains bugfixes preparing the 0.6 stable series. 
@@ -41,4 +41,3 @@ New features in scenic:
 Bug fixes in milhouse: 
 
 Bug fixes in scenic: 
-    *   The user manual was not working at all.
