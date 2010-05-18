@@ -1,4 +1,4 @@
-Release notes for Scenic 0.5.5
+Release notes for Scenic 0.5.7
 
 This release is an other unstable version in the 0.5 series. This version 
 contains bugfixes preparing the 0.6 stable series. 
@@ -35,24 +35,10 @@ contains bugfixes preparing the 0.6 stable series.
         of the 0.5 branch.
 
 New features in milhouse:
-    *   Dump pipeline into a graphviz file
 
 New features in scenic:
-    *   #520 Translate to french
-    *   #314 i18n procedure with gettext and glade should be documented
-    *   #513 Add the "Installation Manual" item in the Help menu
 
 Bug fixes in milhouse: 
-    *   #495 Not receiving vumeters because of display variable being set to non 
-        default when audio and video are synchronized
-    *   #517 Milhouse in audio-only should not require a DISPLAY to be set
-    *   #324 Milhouse lacks a tutorial
-    *   Don't toggle frequency for audiotestsrc as it is not designed to handle 
-        this and it produces artifacts, especially in MP3.
 
 Bug fixes in scenic: 
-    *   #518 Newer configuration options are erased when we run an older version
-    *   #519 Messages from the application modules are logged twice
-    *   #405 Document ports to open
-    *   #441 Widgets must have tooltips
-
+    *   The user manual was not working at all.

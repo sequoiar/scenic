@@ -1,6 +1,10 @@
 SUBDIRS = fig installation user
 docbookdir = $(datadir)/scenic/docbook
-docbook_DATA = installation-manual.xml user-manual.xml
+docbook_DATA = \
+	glossary.xml \
+	installation-manual.xml \
+	user-manual.xml
+
 EXTRA_DIST = $(docbook_DATA)
 
 html-local:

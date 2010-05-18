@@ -11,4 +11,5 @@ user_DATA = \
     midi-settings.xml \
     preview.xml \
     video-settings.xml
+
 EXTRA_DIST = $(user_DATA)
