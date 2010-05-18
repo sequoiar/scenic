@@ -1,11 +1,11 @@
 <chapter id="av-configuration">
-  <title>Configure audio and video</title>
+  <title>System Audio and Video Configuration</title>
   <para>First verify that you have all required dependencies at our
   
   <link linkend='software-installation'>Software
   Installation </link>page.</para>
   <sect1 id="av-transmission">
-    <title>Setting A/V Transmission</title>
+    <title>System A/V Device Acces</title>
     <para>Then add your username to the different groups:</para>
     <para>Add your user to the video group</para>
     <programlisting>sudo gpasswd -a "username" video</programlisting>
@@ -17,11 +17,11 @@
     <para>To be in effect, you have to log out, then log in.</para>
   </sect1>
   <sect1 id="video-settings">
-    <title>Video Settings</title>
+    <title>System Video Settings</title>
     <para>Here we will configure all the settings related to the
     video input and output</para>
     <sect2 id="video-output">
-      <title>Video Output</title>
+      <title>System Video Output</title>
       <para>First, make sure you have the Xvideo extension actived
       in the X11 display:</para>
       <programlisting>xvinfo | grep -i adaptor</programlisting>
@@ -222,7 +222,7 @@
       <para />
     </sect2>
     <sect2 id="video-input">
-    <title>Video Input</title>
+    <title>System Video Input</title>
     <para>&app; can capture video from a video capture card through
     v4l2, from IIDC camera or DV camera (also called iLink). DV
     cameras and decks have a high latency (often between 150 and
@@ -332,7 +332,7 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
     </sect2>
   </sect1>
   <sect1 id="audio-settings">
-    <title>Audio Settings</title>
+    <title>System Audio Settings</title>
     <para>First verify that you have an appropriate sound card on
     our 
     <link linkend='hardware-requirements'>Hardware
@@ -356,7 +356,7 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
     </sect2>
   </sect1>
   <sect1 id="sound-server">
-    <title>Configuring the sound server</title>
+    <title>System Sound Server Configuration</title>
     <sect2 id="jackd-configuration">
       <title>Configuration of jackd</title>
       <para>Now start the jackd sound server using qjackctl
@@ -715,7 +715,7 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
     </sect2>
   </sect1>
   <sect1 id="sound-check">
-    <title>Sound check</title>
+    <title>System Sound check</title>
     <para>Then you can start an audio test with:</para>
     <programlisting>gst-launch audiotestsrc !
     jackaudiosink</programlisting>

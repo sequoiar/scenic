@@ -50,7 +50,7 @@
       <para />
       <para>Across continents: 200ms</para>
     </sect2>
-    <sect2 id="jitter">
+    <sect2 id="minimum-jitter">
       <title>Jitter</title>
       <para>Jitter, in the context of computer networks, is a
       measure of the variability over time of the packet latency
@@ -63,7 +63,7 @@
       1%.</para>
       <para>Jitter: &lt;1%</para>
     </sect2>
-    <sect2 id="packet-loss">
+    <sect2 id="minimum-packet-loss">
       <title>Packet Loss</title>
       <para>Packet loss occurs when one or more packets of data
       traveling across a computer network fail to reach their
