@@ -95,7 +95,10 @@ optional_plugins = ["dc1394src", "dv1394src", "dvdemux", "dvdec", "alsasrc", "al
 
 for plugin in gst_plugins:
     if gst.element_factory_find(plugin) is None: 
-        print("Error: plugin " + plugin + " is NOT installed")
+        if plugin in optional_plugins:
+            print("Warning: optional plugin " + plugin + " is NOT installed")
+        else:
+            print("Error: required plugin " + plugin + " is NOT installed")
         missing_plugins.append(plugin)
     else:
         if VERBOSE:
@@ -109,10 +112,8 @@ if len(missing_plugins) == 0:
         print("All " + str(len(gst_plugins)) + " necessary plugins installed")
     sys.exit(0)
 else:
-    print("The following gstreamer plugins need to be installed: ")
     missing_critical = False
     for plugin in missing_plugins:
-        print(plugin)
         if plugin not in optional_plugins:
             missing_critical = True
     print("You may have to install the corresponding development headers \
