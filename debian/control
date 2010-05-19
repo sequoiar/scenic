@@ -21,7 +21,6 @@ Build-Depends:
  gstreamer0.10-pulseaudio,
  gstreamer0.10-x,
  help2man,
- jackd,
  libasound2-dev,
  libavc1394-dev,
  libboost1.40-all-dev,
@@ -54,11 +53,12 @@ Build-Depends:
  python-pygame,
  python-simplejson,
  python-twisted,
- vorbis-tools,
- x11-utils,
- yelp
+ vorbis-tools
+# yelp
+# jackd,
 # libmp3lame-dev,
 # libx264-dev,
+# x11-utils,
 Standards-Version: 3.8.4
 Homepage: http://scenic.sat.qc.ca/
 

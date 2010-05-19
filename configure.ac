@@ -154,7 +154,7 @@ fi
 
 AX_PYTHON_MODULE([pypm], [])
 AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
-    [AC_MSG_WARN([Requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home])])
+    [AC_MSG_WARN([The Scenic graphical user interface requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home or is python-pygame 1.9 and above.])])
     # We install midistream anyways, but the MIDI support is checked by Scenic and will be disabled if pypm if not found at runtime.
 
 AX_PYTHON_MODULE([twisted], [Fatal])
@@ -165,29 +165,29 @@ AX_PYTHON_MODULE([simplejson], [])
 
 AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"], 
     AS_IF([test "x${HAVE_PYMOD_SIMPLEJSON}" = "xno"],
-        [AC_MSG_ERROR([Requires one of json or simplejson])]))
+        [AC_MSG_ERROR([The Scenic graphical user interface requires one of json or simplejson])]))
 
 # check for programs
 # Maybe $PATH does not contain /sbin
 AC_CHECK_PROG(IFCONFIG, ifconfig, yes, no, "${PATH}:/sbin")
 AS_IF([test "x${IFCONFIG}" = "xno"],
-    [AC_MSG_ERROR([Requires ifconfig])])
+    [AC_MSG_WARN([The Scenic graphical user interface requires ifconfig])])
 
 AC_CHECK_PROG(XDPYINFO, xdpyinfo, yes, no)
 AS_IF([test "x${XDPYINFO}" = "xno"],
-    [AC_MSG_ERROR([Requires xdpyinfo])])
+    [AC_MSG_WARN([The Scenic graphical user interface requires xdpyinfo])])
 
 AC_CHECK_PROG(XVINFO, xvinfo, yes, no)
 AS_IF([test "x${XVINFO}" = "xno"],
-    [AC_MSG_ERROR([Requires xvinfo])])
+    [AC_MSG_WARN([The Scenic graphical user interface requires xvinfo])])
 
 AC_CHECK_PROG(JACKD, jackd, yes, no)
 AS_IF([test "x${JACKD}" = "xno"],
-    [AC_MSG_ERROR([Requires jackd])])
+    [AC_MSG_WARN([The Scenic graphical user interface requires jackd])])
 
 AC_CHECK_PROG(YELP, yelp, yes, no)
 AS_IF([test "x${YELP}" = "xno"],
-    [AC_MSG_ERROR([Requires yelp])])
+    [AC_MSG_WARN([The Scenic graphical user interface requires yelp])])
 
 # Check for gst-plugins that we use
 GST_CHECK=$srcdir/utils/gst_check.py
