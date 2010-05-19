@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Alexandre Quessy <alexandre@quessy.net>
 Build-Depends:
  automake,
+ bash,
  bash-completion,
  bison,
  cdbs,
@@ -61,6 +62,7 @@ Package: scenic
 Architecture: any
 Depends:
  ${misc:Depends},
+ bash,
  bash-completion,
  bison,
  doxygen,
