@@ -11,6 +11,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wno-portability])
 
+AC_SUBST([BUILD_TIME], ["`date +%F\ %T\ %Z`"])
+
 # Check for C and C++ compilers
 AC_PROG_CXX
 AC_PROG_CC
