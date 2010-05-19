@@ -592,7 +592,7 @@
       </tgroup>
     </informaltable>
   </sect1>
-  <sect1>
+  <sect1 id="other-uses">
     <title>Other uses</title>
     <para>The milhouse command can also be used to change some
     properties of a V4L2 video device, such as the resolution and

@@ -1,3 +1,16 @@
+scenic (0.5.8.1) unstable; urgency=low
+
+  * Fine tuning the packaging for Debian.
+  * Switch to dpkg-source 3.0 (quilt) format
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Wed, 19 May 2010 07:48:53 -0400
+
+scenic (0.5.8) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Tue, 18 May 2010 09:48:26 -0400
+
 scenic (0.5.7) lucid; urgency=low
 
   * New upstream release.

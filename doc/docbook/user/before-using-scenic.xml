@@ -54,13 +54,13 @@
       </imageobject>
     </mediaobject>
   </sect2>
-  <sect2>
+  <sect2 id="point-to-point">
     <title>Point to point setup</title>
     <para>This kind of setup refer to the communication between two
     &app; systems, both connected on a research/high-bandwidth
     setup.</para>
   </sect2>
-  <sect2>
+  <sect2 id="unidirectional-setup">
     <title>Unidirectional setup</title>
     <mediaobject>
       <imageobject>
@@ -68,7 +68,7 @@
       </imageobject>
     </mediaobject>
   </sect2>
-  <sect2>
+  <sect2 id="bidirectional-setup">
     <title>Bidirectional setup</title>
     <para>Two groups of performance artists located in two separate
     venues interact directly with each other using live audio and
@@ -84,10 +84,11 @@
   </sect1>
   <sect1 id="connecting-devices">
     <title>Connecting the devices</title>
-    <sect2>
-      <title>&app; is usually used with many audio, video and MIDI devices.</title>
+    <sect2 id="supported-devices">
+      <title> Supported Devices </title>
+      &app; is usually used with many audio, video and MIDI devices.
       <para>It is really important to verify that you have
-      devices that are supported by &app; and more generally by <application>GNU/Linux</application>. Please refer to
+      devices that are supported by &app; and more generally by <application> GNU/Linux</application>. Please refer to
       our 
       <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
       Hardware Requirements</ulink> page to know more about supported devices.</para>
@@ -95,34 +96,34 @@
       are properly configured and connected.</para>
       <para>Here is an overview of the various peripheral used in a
       &app; setup and what is important to keep in mind.</para>
-    <sect3>
+    <sect3 id="audio-input">
       <title>Audio input</title>
       <para>The most common audio input is a microphone. This microphone
       is then connected to the input of an audio mixer and then to
       a sound card. This Sound card is then connected to the
       computer.</para>
-    </sect3>
-    <sect3>
+    </sect3>"
+    <sect3 id="audio-output">
       <title>Audio output</title>
       <para>The usual direct audio output is a speaker or
       headphones. Sometimes, there will be an audio mixer between the sound card and the actual speakers.</para>
     </sect3>
-    <sect3>
+    <sect3 id="video-input">
       <title>Video Input</title>
       <para>The usual direct video input is a video camera. A video capture card must be used to capture a video signal if it is analog. Some USB Web camera are also supported by &app;.</para>
     </sect3>
-    <sect3>
+    <sect3 id="vide-output">
       <title>Video Output</title>
       <para>The usual direct video output is a projection screen
       and an control monitor.</para>
     </sect3>
-    <sect3>
-      <title>Keyboard and mouse</title>
-      <para>Of course, it is easier to use a computer when it has those devices.</para>
+    <sect3 id="controll-devices">
+      <title>Controll Devices</title>
+      <para>Of course, it is easier to use a computer when it has those devices. keyboard, mouse, touch-screen, wii-mote, etc... Before using non regular controller, be shure that they  </para>
     </sect3>
     </sect2>
   </sect1>
-  <sect1>
+  <sect1 id="turning-on">
     <title>Turning on the computer and its devices</title>
     <para>With audio and video systems, the order used to powering
     up each device is very important.</para>
@@ -246,7 +247,7 @@
     </orderedlist>
     <para />
   </sect1>
-  <sect1>
+  <sect1 id="internet-connection">
     <title>Be reached from the Internet</title>
     <para>To stream with &app;, both peer must make sure their 
     computer are reachable for the other computer. That means each
@@ -263,7 +264,7 @@
     &app; allocates port number from 10000 and up for the 
     receiving streamers. </para>
   </sect1>
-  <sect1>
+  <sect1 id="testing-devices">
     <title>Testing the Devices</title>
     <para>Before trying to do any live audio and video streaming,
     one should make sure his devices are properly pluged-in and
@@ -274,14 +275,14 @@
     things might be obvious, but they are a common source of
     problems.</para>
   </sect1>
-  <sect1>
+  <sect1 id="sound-server">
     <title>Lauching the <application>JACK</application> Audio Server</title>
     <para>If you want to stream audio, you must run the <application>JACK</application> audio
     server. There is a simple graphical user interface for <application>JACK</application>
     that is called <application>JACK Control</application>. 
     You can launch it by choosing the <menuchoice><guimenu>Application</guimenu><guimenuitem>Audio/Video</guimenuitem><guimenuitem>JACK Control</guimenuitem></menuchoice> menu item.</para>
   </sect1>
-  <sect1>
+  <sect1 id="launching-scenic">
     <title>Lauching &app;</title>
     <para>To launch &app;, choose the <menuchoice><guimenu>Application</guimenu><guimenuitem>Internet</guimenuitem><guimenuitem>&app;</guimenuitem></menuchoice> menu item. You should be ready to go!</para>
   </sect1>

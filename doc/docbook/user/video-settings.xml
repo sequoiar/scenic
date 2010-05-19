@@ -16,22 +16,19 @@
   buffer add mores latency, so it is better to have a sane network
   with close to no packets loss, instead of increasing this
   value.</para>
-  <sect1>
-    <title>
-    <anchor id="SendingVideo" />Sending Video</title>
+  <sect1 id="sending-video">
+    <title>Sending Video</title>
     <para>In this section, it is possible to configure the video
     image that will be sent to your remote peer.</para>
-    <sect2>
-      <title>
-      <anchor id="Preview" />Preview</title>
+    <sect2 id="video-preview">
+      <title>Video Preview</title>
       <para>The preview option will show you the video you are
       actually capturing, (The one you will send to the receiver)
       This enable you to validate that you are actually capturing a
       video feed.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="VideoSource" />Video Source</title>
+    <sect2 id="video-source">
+      <title>Video Source</title>
       <para>Here you can choose witch video source you want to use
       to send. To make a color test, you can use the Color bars.
       Scenic detects which supported video devices are connected to
@@ -43,9 +40,8 @@
       switching back to the video tab, to see if it is
       detected.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="VideoInput" />Video Input</title>
+    <sect2 id="video-in">
+      <title>Video Input</title>
       <para>Some devices have many input, such as S-Video,
       composite, etc. In this case, you must choose the input to
       which the camera is connected to.</para>
@@ -59,9 +55,8 @@
       and component video, which carries picture information as
       three separate higher-quality signals.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="VideoStandard" />Video Standard</title>
+    <sect2 id="video-standard">
+      <title>Video Standard</title>
       <para>When using an analog video capture card, this
       configuration entry must be set accordingly to the video
       standard of the camera. Most of the Americas, Japan, South
@@ -75,9 +70,8 @@
       America, Japan, South Korea, Taiwan, Burma, and some Pacific
       island nations and territories.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="AspectRatio" />Aspect Ratio</title>
+    <sect2 id="aspect-ratio">
+      <title>Aspect Ratio</title>
       <para>The aspect ratio of an image is the ratio of the width
       of the image to its height. Scenic currently supports 4:3 and
       16:9. Finally, the aspect ratio can be 4:3 or 16:9, depending
@@ -85,27 +79,24 @@
       pixels. Commonly used values are 16:9 for 704x480 and 4:3 for
       640x480</para>
     </sect2>
-    <sect2>
-      <title><anchor id="ImageSize" />Image Size</title>
+    <sect2 id="image-size">
+      <title>Image Size</title>
       <para>This drop-down menu offers you a list of image size to choose for the video image to capture. A bigger image needs more bandwidth if you want it to be too much compressed. </para>
       <para>Since the bandwidth is decided on the receiver's side, both peers should agree on an image size and quality to avoid getting an ugly image or using too much bandwidth for no reason.</para>
     </sect2>
   </sect1>
-  <sect1>
-    <title>
-    <anchor id="ReceivingVideo" />Receiving Video</title>
+  <sect1 id="receiving-video">
+    <title>Receiving Video</title>
     <para>In Scenic, each peer decides the quality of the video that he receives. This means choosing the video codec, the bitrate and the jitter buffer. It is also possible to choose to start the receiver in full screen, and to show it on a secondary display.</para>
-    <sect2>
-      <title>
-      <anchor id="VideoCodec" />Video Codec</title>
+    <sect2 id="video-codec">
+      <title>Video Codec</title>
       <para>Choose h.263 for low bandwidth or low CPU setup. Use
       Theora for a patent-free experience. Use MPEG4 for most
       situation. Use h.264 to use all the CPU power you
       have.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="VideoBitrate" />Video Bitrate</title>
+    <sect2 id="video-bitrate">
+      <title>Video Bitrate</title>
       <para>Video bitrate is the number of bits of video data that
       are conveyed or processed per unit of time. It is expressed
       in Mega bits per second. Video bitrate capabilities varies
@@ -216,83 +207,25 @@
         </tgroup>
       </informaltable>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="Fullscreen" />Fullscreen</title>
+    <sect2 id="fullscreen">
+      <title>Fullscreen</title>
       <para>You have an option to automatically launch the
       receiver's window in fullscreen. Once the receiver's window
       is running, you can press the Escape (or F) key to toggle on
       and off the fullscreen mode.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="X11Display" />X11 Display</title>
+    <sect2 id="x11-display">
+      <title>X11 Display</title>
       <para>Useful to display the video on another monitor.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="Deinterlace" />Deinterlace</title>
+    <sect2 id="deinterlace">
+      <title>Deinterlace</title>
       <para>Deinterlacing makes a nicer image when the source is
       analog, but it adds latency. You should never use it if the
       remote video source is a Web cam.</para>
     </sect2>
-    <sect2>
-      <title>
-      <anchor id="JitterBuffer" />Jitter Buffer</title>
-      <orderedlist>
-        <listitem>
-          <para>Video flexibility and format: flexible video
-          streams (codec, size, datarate), h264, mpeg4, h263,
-          theora in SD format</para>
-        </listitem>
-        <listitem>
-          <para>Video input: Support video4linux2, DV, IIDC, file
-          and possibility to select the video input.</para>
-        </listitem>
-        <listitem>
-          <para>Video standard: Possibility to use PAL or
-          NTSC</para>
-        </listitem>
-        <listitem>
-          <para>Video framerate: Capacity to ajust the video
-          framerate to 15, 25 and 30 fps</para>
-        </listitem>
-        <listitem>
-          <para>Video deinterlace: Possibility to deinterlace video
-          on reception</para>
-        </listitem>
-        <listitem>
-          <para>Video scaling: Possibility to scale the video
-          output up to 2046x2046</para>
-        </listitem>
-        <listitem>
-          <para>Video aspect ratio: Possibility to adjust the
-          aspect ratio to 4:3 or 16:9</para>
-        </listitem>
-        <listitem>
-          <para>Video image size: Select witch size your video
-          image is.</para>
-        </listitem>
-        <listitem>
-          <para>Video preview: Possibility to view the capture
-          content before sending it.</para>
-        </listitem>
-        <listitem>
-          <para>Video latency: Under 100ms</para>
-        </listitem>
-        <listitem>
-          <para>Video flip: Possibility to flip the image,
-          horizontally, vertically and rotate.</para>
-        </listitem>
-        <listitem>
-          <para>Video full screen: Option to display the video
-          output in full screen</para>
-        </listitem>
-        <listitem>
-          <para>Video display: Possibility to set on witch display
-          the video is output</para>
-        </listitem>
-      </orderedlist>
+    <sect2 id="video-jitter-buffer">
+      <title>Video Jitter Buffer</title>
     </sect2>
   </sect1>
 </chapter>

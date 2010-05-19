@@ -1,4 +1,4 @@
-<chapter id="Introduction">
+<chapter id="introduction">
   <title>Introduction</title>
   <para>&app; is an on stage telepresence system that allows for
   real time transmission of audio, video and control data over any
@@ -28,7 +28,7 @@
     and to choose the video input and the settings for the
     streaming sessions.</para>
   </sect1>
-  <sect1 is="art-direction">
+  <sect1 id="art-direction">
     <title>Thinking About the Art Direction</title>
     <para>When preparing a show that includes live telepresence,
     there are thinkgs to consider that can help a lot to improve
@@ -42,7 +42,7 @@
     are steamed live from an other city. This is similar to the
     cabaret entertainment form.</para>
   </sect1>
-  <sect1 id="UsingScenic">
+  <sect1 id="using-scenic">
     <title>Telepresence and Real Wold's Issues</title>
     <sect2 id="performance-issues">
       <title>Performance Issues</title>

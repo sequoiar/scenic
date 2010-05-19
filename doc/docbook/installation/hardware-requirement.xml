@@ -17,9 +17,6 @@
       <entry>
       <ulink url="http://www.linuxhardware.org">
       <citetitle>linuxhardware.org</citetitle></ulink></entry> 
-      <entry>
-      <ulink url="http://www.linuxhardware.org">
-      <citetitle>linuxhardware.org</citetitle></ulink></entry> 
     <para>We recommend the following computer specification:</para>
     <table>
       <title>High Performance Computer Specification</title>
@@ -329,8 +326,8 @@
               <entry>Status</entry>
             </row>
             <row>
-              <entry>USB Logitech Quickcam</entry>
-              <entry>All v4l2 supported</entry>
+              <entry>USB V4L2 Supported</entry>
+              <entry> <ulink url="http://www.ideasonboard.org/uvc/#devices"> List of V4L2 supported devices</ulink></entry>
             </row>
             <row>
               <entry>DV Pointgrey FL2G</entry>
@@ -477,5 +474,6 @@
         etc...)</para>
       </listitem>
     </itemizedlist>
+    <para> Please refer to our <link linkend="network-requirements">Network Requirement Page</link></para>
   </sect1>
 </chapter>
