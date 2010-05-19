@@ -1,5 +1,5 @@
 # ===========================================================================
-#              http://autoconf-archive.cryp.to/ax_check_glu.html
+#       http://www.gnu.org/software/autoconf-archive/ax_check_glu.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -22,13 +22,9 @@
 #   (*)(...)" rather than the standard "GLvoid (*)()". If the former
 #   condition is detected, this macro defines "HAVE_VARARGS_GLU_TESSCB".
 #
-# LAST MODIFICATION
+# LICENSE
 #
-#   2008-10-07
-#
-# COPYLEFT
-#
-#   Copyright (c) 2008 Braden McDaniel <braden@endoframe.com>
+#   Copyright (c) 2009 Braden McDaniel <braden@endoframe.com>
 #
 #   This program is free software; you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -52,9 +48,11 @@
 #   all other use of the material that constitutes the Autoconf Macro.
 #
 #   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Macro Archive. When you make and
-#   distribute a modified version of the Autoconf Macro, you may extend this
-#   special exception to the GPL to apply to your modified version as well.
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 8
 
 AC_DEFUN([AX_CHECK_GLU],
 [AC_REQUIRE([AX_CHECK_GL])dnl
@@ -68,6 +66,9 @@ CPPFLAGS="${ax_save_CPPFLAGS}"
 
 m4_define([AX_CHECK_GLU_PROGRAM],
           [AC_LANG_PROGRAM([[
+# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
+#   include <windows.h>
+# endif
 # ifdef HAVE_GL_GLU_H
 #   include <GL/glu.h>
 # elif defined(HAVE_OPENGL_GLU_H)
@@ -149,3 +150,4 @@ AS_IF([test X$ax_cv_varargs_glu_tesscb = Xyes],
       [AC_DEFINE([HAVE_VARARGS_GLU_TESSCB], [1],
                  [Use nonstandard varargs form for the GLU tesselator callback])])])
 ])
+
