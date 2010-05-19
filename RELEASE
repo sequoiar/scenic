@@ -1,7 +1,10 @@
-Release notes for Scenic 0.5.8
+Release notes for Scenic 0.5.9
 
 This release is an other unstable version in the 0.5 series. This version 
 contains bugfixes preparing the 0.6 stable series. 
+
+We are working on the packaging, so version 0.5.5 and up should contain no 
+new features - only big fixes or progress in the packaging.
 
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
