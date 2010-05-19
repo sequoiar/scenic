@@ -59,7 +59,7 @@ Build-Depends:
  yelp
 # libmp3lame-dev,
 # libx264-dev,
-Standards-Version: 3.8.0
+Standards-Version: 3.8.4
 Homepage: http://scenic.sat.qc.ca/
 
 Package: scenic
