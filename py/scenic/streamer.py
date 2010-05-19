@@ -63,6 +63,7 @@ class StreamerManager(object):
         @rtype: Deferred
         """
         def _cb(text, deferred):
+            ret = 8
             for i in text.splitlines():
                 if "raw supports up to " in i:
                     ret = int(i.split()[-2])
