@@ -54,11 +54,6 @@ Build-Depends:
  python-simplejson,
  python-twisted,
  vorbis-tools
-# yelp
-# jackd,
-# libmp3lame-dev,
-# libx264-dev,
-# x11-utils,
 Standards-Version: 3.8.4
 Homepage: http://scenic.sat.qc.ca/
 
