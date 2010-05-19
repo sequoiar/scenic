@@ -82,6 +82,9 @@ from twisted.internet import defer
 from twisted.internet import error
 from twisted.internet import task
 from twisted.internet import reactor
+import pygst
+pygst.require('0.10')
+import gst
 from scenic import communication
 from scenic import saving
 from scenic import process # just for constants
@@ -98,6 +101,28 @@ from scenic import internationalization
 _ = internationalization._
 
 log = logger.start(name="application")
+
+def is_codec_supported(codec):
+    """
+    Checks if a codec is supported by the Gstreamer elements found on the system.
+    """
+    _elements = {
+        "mp3": ["lamemp3enc", "mp3parse", "mad"],
+        "theora": ["theoraenc", "theoradec"],
+        "h263": ["ffenc_h263p"],
+        "h264": ["x264enc"],
+        "mpeg4": ["ffenc_mpeg4"]
+        }
+    if not _elements.has_key(codec):
+        return True
+    else:
+        needed = _elements[codec]
+        ret = True
+        for element in needed:
+            if gst.element_factory_find(element) is None: 
+                log.error("Gstreamer element %s is NOT installed." % (element))
+                ret = False
+        return ret
 
 class Config(saving.ConfigStateSaving):
     """
@@ -931,6 +956,9 @@ class Application(object):
             midi_input_devices = [device["name"] for device in self.devices["midi_input_devices"]]
             midi_output_devices = [device["name"] for device in self.devices["midi_output_devices"]]
             cameras = self.devices["cameras"].keys()
+
+#TODO: if video receive is enabled and video codec is not supported: error
+#TODO: if audio receive is enabled and audio codec is not supported: error
                 
             if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared!") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
@@ -939,7 +967,7 @@ class Application(object):
             elif self.config.video_source == "v4l2src" and self.parse_v4l2_device_name(self.config.video_device) is None: #TODO: do not test if not sending video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
                 return deferred.callback(communication.REFUSE_REASON_CAMERA_NOT_FOUND)
-                
+
             elif (not self.devices["jackd_is_running"]) and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
                 log.debug("audio send/recv enabled: %s %s" % (self.config.audio_send_enabled, self.config.audio_recv_enabled))
                 log.debug("self.devices[\'jackd_is_running\'] = %s" % (self.devices["jackd_is_running"]))
