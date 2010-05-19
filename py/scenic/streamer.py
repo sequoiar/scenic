@@ -63,10 +63,13 @@ class StreamerManager(object):
         @rtype: Deferred
         """
         def _cb(text, deferred):
-            ret = 8
+            ret = None
             for i in text.splitlines():
                 if "raw supports up to " in i:
                     ret = int(i.split()[-2])
+            if ret is None:
+                log.error("Could not figure out how many channels in raw are supported.")
+                ret = 8
             deferred.callback(ret)
             
         def _eb(reason, deferred):
