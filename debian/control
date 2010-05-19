@@ -51,11 +51,9 @@ Build-Depends:
  python-epydoc,
  python-gst0.10 (>= 0.10.17),
  python-gtk2,
- python-gtk2-dev,
  python-pygame,
  python-simplejson,
- python-twisted,
- vorbis-tools
+ python-twisted
 Standards-Version: 3.8.4
 Homepage: http://scenic.sat.qc.ca/
 
@@ -109,7 +107,6 @@ Depends:
  python-pygame,
  python-simplejson,
  python-twisted,
- vorbis-tools,
  x11-utils,
  yelp
 # libmp3lame0,
