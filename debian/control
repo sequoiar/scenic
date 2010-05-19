@@ -24,7 +24,7 @@ Build-Depends:
  jackd,
  libasound2-dev,
  libavc1394-dev,
- libboost-all-dev,
+ libboost1.40-all-dev,
  libbz2-dev,
  libdc1394-22-dev,
  libdv4-dev,
