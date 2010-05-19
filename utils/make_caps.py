@@ -212,7 +212,7 @@ for profile_name, profile in profiles.iteritems():
     try:
         profile = generate_caps(profile_name, profile)
     except glib.GError, e:
-        print e
+        pass
 
 # generate caps by hand for raw because its more stable than getting them from a pipeline
 codec = 'raw'
