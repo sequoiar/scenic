@@ -20,6 +20,7 @@
 #
 
 import sys
+import glib
 try:
     import pygst
     pygst.require('0.10')
@@ -208,7 +209,10 @@ for rate in SAMPLERATES:
             profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
 
 for profile_name, profile in profiles.iteritems():
-    profile = generate_caps(profile_name, profile)
+    try:
+        profile = generate_caps(profile_name, profile)
+    except glib.GError, e:
+        print e
 
 # generate caps by hand for raw because its more stable than getting them from a pipeline
 codec = 'raw'
