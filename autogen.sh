@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # could be replaced with autoreconf -fivI m4 (verbose, force rebuild of ltmain, .in files, etc.)
-autoreconf --install
+autoreconf --force --install --verbose
 
 if [ $! != 0 ]; then 
     exit 1
