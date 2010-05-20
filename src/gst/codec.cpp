@@ -385,14 +385,18 @@ RtpPay* TheoraDecoder::createDepayloader() const
 
 /// Constructor 
 CeltEncoder::CeltEncoder(const Pipeline &pipeline, int /*bitrate*/) 
-    : Encoder(pipeline, "celtenc")
+    : Encoder(pipeline, "celtenc"),
+    audioconvert_(pipeline.makeElement("audioconvert", 0))
 {
+    gstlinkable::link(audioconvert_, encoder_);
     /// FIXME: check and set bitrate
 }
 
 /// Destructor 
 CeltEncoder::~CeltEncoder() 
-{}
+{
+    pipeline_.remove(&audioconvert_);
+}
 
 /// Creates an RtpCeltPay 
 Pay* CeltEncoder::createPayloader() const
@@ -401,8 +405,17 @@ Pay* CeltEncoder::createPayloader() const
 }
 
 CeltDecoder::CeltDecoder(const Pipeline &pipeline) :
-    Decoder(pipeline, "celtdec")
-{}
+    Decoder(pipeline, "celtdec"),
+    audioconvert_(pipeline_.makeElement("audioconvert", 0))
+{
+    gstlinkable::link(decoder_, audioconvert_);
+}
+
+/// Destructor 
+CeltDecoder::~CeltDecoder() 
+{
+    pipeline_.remove(&audioconvert_);
+}
 
 /// Creates an RtpCeltDepay 
 RtpPay* CeltDecoder::createDepayloader() const

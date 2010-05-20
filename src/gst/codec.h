@@ -236,6 +236,8 @@ class CeltEncoder : public Encoder
     private:
         ~CeltEncoder();
         Pay* createPayloader() const;
+        _GstElement *sinkElement() { return audioconvert_; }
+        _GstElement *audioconvert_;
 };
 
 /// Decoder that decodes vorbis into raw audio using the celt decoder.
@@ -244,7 +246,10 @@ class CeltDecoder : public Decoder
     public: 
         CeltDecoder(const Pipeline &pipeline);
     private: 
+        ~CeltDecoder();
+        _GstElement* srcElement() { return audioconvert_; }
         RtpPay* createDepayloader() const;
+        _GstElement *audioconvert_;
 };
 
 /// Encoder that encodes raw audio using the vorbis encoder.
