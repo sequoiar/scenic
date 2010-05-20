@@ -495,9 +495,15 @@ LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality)
     allowedBitrates += 7, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320;
 
     if (quality >= MIN_QUALITY and quality <= MAX_QUALITY)
+    {
+        g_object_set(encoder_, "target", "quality", NULL);
         g_object_set(encoder_, "quality", std::fabs(SCALE - (quality * SCALE)), NULL);
+    }
     else if (std::find(allowedBitrates.begin(), allowedBitrates.end(), bitrate) != allowedBitrates.end())
-        g_object_set(encoder_, "bitrate", bitrate, NULL);
+    {
+        g_object_set(encoder_, "target", "quality", NULL);
+        g_object_set(encoder_, "bitrate", "bitrate", NULL);
+    }
     else if (bitrate > 0) // 0 means unused, so ignore it
     {
         std::ostringstream str;
