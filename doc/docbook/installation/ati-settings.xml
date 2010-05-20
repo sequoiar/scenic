@@ -1,5 +1,5 @@
 <appendix id="ati-settings">
-  <title>Ati Settings</title>
+  <title>Appendix: Ati Settings</title>
       <para>If you're using the fglrx driver, you may have to
       enable the XVideo extension with the aticonfig command (part
       of the xorg-driver-fglrx package).</para>

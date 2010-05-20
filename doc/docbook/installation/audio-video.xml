@@ -28,12 +28,13 @@
      <para> Video output usally mean using a graphic card</para> 
       <para> It is really important to configure the video ouput the right way if not, you will find yourself in front of a black screen</para>
 
-    <para>For nvidia graphic card follow our </para> 
-    <link linkend="nvidia-settings">Nvidia setting page</link>
+    <para>For nvidia graphic card follow our 
+    <link linkend="nvidia-settings">Nvidia setting page</link>.
+    </para> 
 
-    <para>For ati graphic card follow our </para> 
-     <link linkend="ati-settings">Ati setting page</link>
-
+    <para>For ati graphic card follow our 
+     <link linkend="ati-settings">Ati setting page</link>.
+    </para> 
    </sect2>
 
     <sect2 id="video-input">

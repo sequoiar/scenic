@@ -1,5 +1,5 @@
       <appendix id="nvidia-settings">
-      <title>Nvidia Settings</title>
+      <title>Appendix: Nvidia Settings</title>
         <para>How to install Nvidia drivers in Ubuntu</para>
         <para>Ubuntu doesn't include Nvidia drivers by
         default.</para>
