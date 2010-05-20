@@ -227,6 +227,25 @@ class TheoraDecoder: public VideoDecoder
         RtpPay* createDepayloader() const;
 };
 
+/// Encoder that encodes raw audio using the celt encoder.
+class CeltEncoder : public Encoder
+{
+    public: 
+        CeltEncoder(const Pipeline &pipeline, int bitrate);
+
+    private:
+        ~CeltEncoder();
+        Pay* createPayloader() const;
+};
+
+/// Decoder that decodes vorbis into raw audio using the celt decoder.
+class CeltDecoder : public Decoder
+{
+    public: 
+        CeltDecoder(const Pipeline &pipeline);
+    private: 
+        RtpPay* createDepayloader() const;
+};
 
 /// Encoder that encodes raw audio using the vorbis encoder.
 class VorbisEncoder : public Encoder

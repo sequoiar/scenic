@@ -125,6 +125,8 @@ Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, int bitrate
 
     if (codec_ == "vorbis")
         return new VorbisEncoder(pipeline, bitrate, quality);
+    else if (codec_ == "celt")
+        return new CeltEncoder(pipeline, bitrate);
     else if (codec_ == "raw")
         return new RawEncoder(pipeline);
     else if (codec_ == "mp3")
@@ -142,7 +144,6 @@ void SenderConfig::sendMessage()
 {
     capsServer_.reset(new CapsServer(capsPort(), message_));
 }
-
 
 /** 
  * The new caps message is posted on the bus by the src pad of our udpsink, 
@@ -178,7 +179,7 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
 }
 
 static const std::vector<std::string> AUDIO_CODECS = 
-boost::assign::list_of<std::string>("raw")("mp3")("vorbis");
+boost::assign::list_of<std::string>("raw")("mp3")("vorbis")("celt");
 static const std::vector<std::string> VIDEO_CODECS = 
 boost::assign::list_of<std::string>("mpeg4")("h264")("h263")("theora");
 
@@ -264,6 +265,8 @@ Decoder * ReceiverConfig::createAudioDecoder(const Pipeline &pipeline, int numCh
 
     if (codec_ == "vorbis")
         return new VorbisDecoder(pipeline);
+    else if (codec_ == "celt")
+        return new CeltDecoder(pipeline);
     else if (codec_ == "raw")
         return new RawDecoder(pipeline, numChannels);
     else if (codec_ == "mp3")
@@ -280,6 +283,7 @@ Decoder * ReceiverConfig::createAudioDecoder(const Pipeline &pipeline, int numCh
 bool RemoteConfig::capsMatchCodec(const std::string &encodingName, const std::string &codec)
 {
     return (encodingName == "VORBIS" and codec == "vorbis")
+        or (encodingName == "CELT" and codec == "celt")
         or (encodingName == "L16" and codec == "raw")
         or (encodingName == "MPA" and codec == "mp3")
         or (encodingName == "MP4V-ES" and codec == "mpeg4")
