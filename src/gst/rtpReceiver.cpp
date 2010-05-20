@@ -81,7 +81,11 @@ void RtpReceiver::setCaps(const char *capsStr)
         THROW_ERROR("Cannot set rtp receiver caps to empty string");
     else
         LOG_DEBUG("Got caps string " << capsStr);
-    tassert(caps = gst_caps_from_string(capsStr));
+    caps = gst_caps_from_string(capsStr);
+    if (caps == 0)
+        THROW_ERROR("Could not generate caps from caps string\n\"" << capsStr << 
+            "\"\nThere is potentially a Gstreamer version mismatch between "
+            "this host and the sender host");
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
 
     gst_caps_unref(caps);
