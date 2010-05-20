@@ -1,4 +1,4 @@
-      <chapter id="nvidia-settings">
+      <appendix id="nvidia-settings">
       <title>Nvidia Settings</title>
         <para>How to install Nvidia drivers in Ubuntu</para>
         <para>Ubuntu doesn't include Nvidia drivers by
@@ -170,4 +170,4 @@
       <programlisting>export DISPLAY=:0.0</programlisting>
       <para />
       </sect1>
-</chapter>
+</appendix>

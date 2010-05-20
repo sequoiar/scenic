@@ -14,6 +14,8 @@
    <!ENTITY Audio_Video SYSTEM "installation/audio-video.xml">
    <!ENTITY Network_Test SYSTEM "installation/network.xml">
    <!ENTITY About SYSTEM "installation/about.xml">
+   <!ENTITY Nvidia_Settings SYSTEM "installation/nvidia-settings.xml">
+   <!ENTITY Ati_Settings SYSTEM "installation/ati-settings.xml">
    <!ENTITY Glossary SYSTEM "glossary.xml">
    <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
@@ -34,5 +36,7 @@
    &Software_Installation;
    &Audio_Video;
    &Network_Test;
+   &Nvidia_Settings;
+   &Ati_Settings;
    &Glossary;
 </book>   
