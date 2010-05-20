@@ -1,6 +1,7 @@
 installationdir = $(datadir)/scenic/docbook/installation
 installation_DATA = \
 	about.xml \
+	ati-settings.xml \
 	audio-video.xml \
 	commandline.xml \
 	hardware-requirement.xml \
@@ -8,6 +9,7 @@ installation_DATA = \
 	introduction.xml \
 	legal.xml \
 	network.xml \
+	nvidia-settings.xml \
 	software.xml
 
 EXTRA_DIST = $(installation_DATA)
