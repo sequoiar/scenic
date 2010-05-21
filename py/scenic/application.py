@@ -769,6 +769,7 @@ class Application(object):
         self._is_negotiating = False
         self.gui.hide_calling_dialog()
         self._free_ports()
+        text = _("The remote peer refused to stream with you for an unknown reason")
         if reason == communication.REFUSE_REASON_REFUSED:
             text = _("The remote peer refused to stream with you.") 
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH:
@@ -785,6 +786,10 @@ class Application(object):
             text = _("The remote peer cannot stream with you since its video capture device could not be found.")
         elif reason == communication.REFUSE_REASON_DISPLAY_NOT_FOUND:
             text = _("The remote peer cannot stream with you since its X11 display could not be found.")
+        elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC:
+            text = _("The remote peer cannot stream with you because they do not support the requested audio codec.")
+        elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC:
+            text = _("The remote peer cannot stream with you because they do not support the requested video codec.")
         elif reason == communication.REFUSE_REASON_PROBLEMS or reason is False:
             text = _("The remote peer cannot stream with you due to technical issues.")
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
@@ -801,6 +806,10 @@ class Application(object):
         """
         Got BYE
         """
+       #elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC:
+       #    text = _("The remote peer cannot stream with you because they do not support the requested audio codec.")
+       #elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC:
+       #    text = _("The remote peer cannot stream with you because they do not support the requested video codec.")
         self._is_negotiating = False
         self.got_bye = True
         self.stop_streamers()
