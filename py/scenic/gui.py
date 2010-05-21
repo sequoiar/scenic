@@ -435,6 +435,8 @@ class Gui(object):
                 for codec in broken_audio_codecs:
                     details += " * %s\n" % (codec)
             self.show_error_dialog(msg, details)
+        # important:
+        self.app.set_supported_codecs(working_audio_codecs, working_video_codecs)
 
     # ------------------ window events and actions --------------------
     def toggle_fullscreen(self):

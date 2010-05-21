@@ -214,7 +214,6 @@ class Application(object):
         self.got_bye = False 
         # starting the GUI:
         internationalization.setup_i18n()
-        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self.devices = {
             "x11_displays": [], # list of dicts
             "cameras": {}, # dict of dicts (only V4L2 cameras for now)
@@ -226,9 +225,21 @@ class Application(object):
             "midi_input_devices": [],
             "midi_output_devices": [],
             }
+        self._supported_codecs = { # populated by the gui.py. See Gui._disable_unsupported_codecs
+            "audio": [], 
+            "video": []
+        }
+        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         self.max_channels_in_raw = None
         reactor.callLater(0, self._start_the_application)
+
+    def set_supported_codecs(self, audio_codecs, video_codecs):
+        """
+        Called once by Gui._disable_unsupported_codecs
+        """
+        self._supported_codecs["audio"] = audio_codecs
+        self._supported_codecs["video"] = video_codecs
     
     def format_midi_device_name(self, midi_device_dict):
         """
@@ -644,9 +655,22 @@ class Application(object):
                     if message["audio"]["sampling_rate"] != self.get_local_sampling_rate():
                         msg = _("A mismatch in the sampling rate of JACK with remote peer has been detected.\nLocal sampling rate is %(local)s, whereas remote sampling rate is %(remote)s.") % {"local": self.get_local_sampling_rate(), "remote": message["audio"]["sampling_rate"]}
                         log.error(msg)
-                        dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                        self.gui.show_error_dialog(msg)
                         _simply_refuse(communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH)
                         return
+                if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"]:
+                    msg = _("The remote peer is asking an audio codec that are not installed on your computer.")
+                    log.error(msg)
+                    self.gui.show_error_dialog(msg)
+                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
+                    return
+                if self.remote_config["video"]["codec"] not in self._supported_codecs["video"]:
+                    msg = _("The remote peer is asking a video codec that are not installed on your computer.")
+                    log.error(msg)
+                    self.gui.show_error_dialog(msg)
+                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
+                    return
+
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
                 if contact is not None and contact["auto_accept"]:
                     log.info("Contact %s is on auto_accept. Accepting." % (invited_by))
@@ -711,6 +735,24 @@ class Application(object):
                 "video": message["video"],
                 "midi": message["midi"]
                 }
+
+            def _abort(reason):
+                # sends BYE
+                self.send_bye(reason)
+
+            if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"]:
+                msg = _("The remote peer is asking an audio codec that are not installed on your computer.")
+                log.error(msg)
+                self.gui.show_error_dialog(msg)
+                _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
+                return
+            if self.remote_config["video"]["codec"] not in self._supported_codecs["video"]:
+                msg = _("The remote peer is asking a video codec that are not installed on your computer.")
+                log.error(msg)
+                self.gui.show_error_dialog(msg)
+                _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
+                return
+
             if self.streamer_manager.is_busy():
                 log.error("Got ACCEPT but we are busy. This is very strange")
                 dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
@@ -755,7 +797,7 @@ class Application(object):
         log.info("Got ACK. Starting streamers as answerer.")
         self.start_streamers(addr)
 
-    def handle_bye(self):
+    def handle_bye(self, reason=""):
         """
         Got BYE
         """
@@ -763,9 +805,11 @@ class Application(object):
         self.got_bye = True
         self.stop_streamers()
         if self.client.is_connected():
-            log.info('disconnecting client and sending BYE')
+            log.info('Got BYE. Disconnecting client and sending OK.')
             self.client.send({"msg":"OK", "sid":0})
             self.disconnect_client()
+            if reason != "":
+                log.debug("Received BYE. Reason is %s" % (reason))
 
     def handle_ok(self):
         """
@@ -791,7 +835,7 @@ class Application(object):
         elif msg == "ACK":
             self.handle_ack(addr)
         elif msg == "BYE":
-            self.handle_bye()
+            self.handle_bye(message["reason"])
         elif msg == "OK":
             self.handle_ok()
         else:
@@ -816,7 +860,7 @@ class Application(object):
         if self._check_if_all_disabled():
             error_msg = _("Cannot start streaming if all the streams are disabled.")
             dialogs.ErrorDialog.create(error_msg, parent=self.gui.main_window)
-            self.send_bye()
+            self.send_bye(communication.BYE_REASON_PROBLEMS)
             self.stop_streamers()
         else:
             self.streamer_manager.start(addr)
@@ -1065,12 +1109,12 @@ class Application(object):
         """
         self.client.send({"msg":"ACK", "sid":0})
 
-    def send_bye(self):
+    def send_bye(self, reason=""):
         """
         Sends BYE
         BYE stops the streaming on the remote host.
         """
-        self.client.send({"msg":"BYE", "sid":0})
+        self.client.send({"msg":"BYE", "sid":0, "reason":reason})
         self._is_negotiating = False
     
     def send_cancel_and_disconnect(self, reason=""):
