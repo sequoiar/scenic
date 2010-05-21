@@ -1115,7 +1115,8 @@ class Application(object):
             "protocol": self.protocol_version,
             "sid": 0
             }
-        self.client.send(msg)
+        if self.client.is_connected():
+            self.client.send(msg)
    
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
