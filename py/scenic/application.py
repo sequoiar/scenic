@@ -240,6 +240,7 @@ class Application(object):
         """
         self._supported_codecs["audio"] = audio_codecs
         self._supported_codecs["video"] = video_codecs
+        log.info("Supported codecs are %s %s" % (audio_codecs, video_codecs))
     
     def format_midi_device_name(self, midi_device_dict):
         """

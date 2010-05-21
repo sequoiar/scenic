@@ -420,21 +420,21 @@ class Gui(object):
         _set_combobox_choices(self.audio_codec_widget, working_audio_codecs)
         _set_combobox_choices(self.video_codec_widget, working_video_codecs)
         
-        if len(broken_audio_codecs) != 0 or len(broken_video_codecs) != 0:
-            msg = _("Some codecs are not supported on your system. They are currently disabled.") 
-            details = _("You should consider installing the Gstreamer elements to benefit from those codecs.")
-            details += "\n"
-            if len(broken_video_codecs) != 0:
-                details += _("Disabled video codecs:")
-                details += "\n"
-                for codec in broken_video_codecs:
-                    details += " * %s\n" % (codec)
-            if len(broken_audio_codecs) != 0:
-                details += _("Disabled audio codecs:")
-                details += "\n"
-                for codec in broken_audio_codecs:
-                    details += " * %s\n" % (codec)
-            self.show_error_dialog(msg, details)
+        #if len(broken_audio_codecs) != 0 or len(broken_video_codecs) != 0:
+        #    msg = _("Some codecs are not supported on your system. They are currently disabled.") 
+        #    details = _("You should consider installing the Gstreamer elements to benefit from those codecs.")
+        #    details += "\n"
+        #    if len(broken_video_codecs) != 0:
+        #        details += _("Disabled video codecs:")
+        #        details += "\n"
+        #        for codec in broken_video_codecs:
+        #            details += " * %s\n" % (codec)
+        #    if len(broken_audio_codecs) != 0:
+        #        details += _("Disabled audio codecs:")
+        #        details += "\n"
+        #        for codec in broken_audio_codecs:
+        #            details += " * %s\n" % (codec)
+        #    self.show_error_dialog(msg, details)
         # important:
         self.app.set_supported_codecs(working_audio_codecs, working_video_codecs)
 

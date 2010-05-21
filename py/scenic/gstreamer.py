@@ -7,7 +7,7 @@ pygst.require('0.10')
 import gst
 from scenic import logger
 
-log = logger.start(name="gstreamer")
+log = logger.start(name="gst")
 
 def is_gstreamer_element_found(name):
     """
@@ -16,7 +16,7 @@ def is_gstreamer_element_found(name):
     """
     ok = gst.element_factory_find(name) is not None 
     if not ok:
-        log.warning("Could not find Gstreamer element %s." % (name))
+        log.info("Could not find Gstreamer element %s." % (name))
     return ok
 
 def is_codec_supported(codec):
@@ -37,7 +37,8 @@ def is_codec_supported(codec):
         ret = True
         for element in needed:
             if not is_gstreamer_element_found(element):
-                #log.error("Gstreamer element %s is NOT installed." % (element))
                 ret = False
+        if not ret:
+            log.warning("Codec %s is NOT supported." % (codec))
         return ret
 
