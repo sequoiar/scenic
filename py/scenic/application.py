@@ -652,21 +652,21 @@ class Application(object):
                     "video": message["video"],
                     "midi": message["midi"]
                     }
-                if self.config.audio_recv_enabled or self.config.audio_send_enabled:
+                if (self.config.audio_recv_enabled or self.config.audio_send_enabled) and (self.remote_config["audio"]["recv_enabled"] or self.remote_config["audio"]["send_enabled"]):
                     if message["audio"]["sampling_rate"] != self.get_local_sampling_rate():
                         msg = _("A mismatch in the sampling rate of JACK with remote peer has been detected.\nLocal sampling rate is %(local)s, whereas remote sampling rate is %(remote)s.") % {"local": self.get_local_sampling_rate(), "remote": message["audio"]["sampling_rate"]}
                         log.error(msg)
                         self.gui.show_error_dialog(msg)
                         _simply_refuse(communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH)
                         return
-                if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["enable"]:
-                    msg = _("The remote peer is asking an audio codec that are not installed on your computer.")
+                if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["recv_enabled"] and self.config.audio_send_enabled:
+                    msg = _("The remote peer is asking an audio codec that is not installed on your computer.")
                     log.error(msg)
                     self.gui.show_error_dialog(msg, self.remote_config["audio"]["codec"])
                     _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
                     return
-                if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["enable"]:
-                    msg = _("The remote peer is asking a video codec that are not installed on your computer.")
+                if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["send_enabled"] and self.config.video_send_enabled:
+                    msg = _("The remote peer is asking a video codec that is not installed on your computer.")
                     log.error(msg)
                     self.gui.show_error_dialog(msg, self.remote_config["video"]["codec"])
                     _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)

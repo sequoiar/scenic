@@ -401,24 +401,28 @@ class Gui(object):
         broken_video_codecs = []
         working_audio_codecs = []
         broken_audio_codecs = []
+        readable_working_audio_codecs = []
+        readable_working_video_codecs = []
 
         # video codecs:
         for readable, codec in VIDEO_CODECS.iteritems():
             if gstreamer.is_codec_supported(codec):
-                working_video_codecs.append(readable)
+                working_video_codecs.append(codec)
+                readable_working_video_codecs.append(readable)
             else:
                 broken_video_codecs.append(readable)
         
         # audio codecs:
         for readable, codec in AUDIO_CODECS.iteritems():
             if gstreamer.is_codec_supported(codec):
-                working_audio_codecs.append(readable)
+                working_audio_codecs.append(codec)
+                readable_working_audio_codecs.append(readable)
             else:
                 broken_audio_codecs.append(readable)
 
         # set combo boxes choices:
-        _set_combobox_choices(self.audio_codec_widget, working_audio_codecs)
-        _set_combobox_choices(self.video_codec_widget, working_video_codecs)
+        _set_combobox_choices(self.audio_codec_widget, readable_working_audio_codecs)
+        _set_combobox_choices(self.video_codec_widget, readable_working_video_codecs)
         
         #if len(broken_audio_codecs) != 0 or len(broken_video_codecs) != 0:
         #    msg = _("Some codecs are not supported on your system. They are currently disabled.") 
