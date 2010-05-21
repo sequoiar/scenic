@@ -659,16 +659,16 @@ class Application(object):
                         self.gui.show_error_dialog(msg)
                         _simply_refuse(communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH)
                         return
-                if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"]:
+                if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["enable"]:
                     msg = _("The remote peer is asking an audio codec that are not installed on your computer.")
                     log.error(msg)
-                    self.gui.show_error_dialog(msg)
+                    self.gui.show_error_dialog(msg, self.remote_config["audio"]["codec"])
                     _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
                     return
-                if self.remote_config["video"]["codec"] not in self._supported_codecs["video"]:
+                if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["enable"]:
                     msg = _("The remote peer is asking a video codec that are not installed on your computer.")
                     log.error(msg)
-                    self.gui.show_error_dialog(msg)
+                    self.gui.show_error_dialog(msg, self.remote_config["video"]["codec"])
                     _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
                     return
 
@@ -741,13 +741,13 @@ class Application(object):
                 # sends BYE
                 self.send_bye(reason)
 
-            if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"]:
+            if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["enable"]:
                 msg = _("The remote peer is asking an audio codec that are not installed on your computer.")
                 log.error(msg)
                 self.gui.show_error_dialog(msg)
                 _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
                 return
-            if self.remote_config["video"]["codec"] not in self._supported_codecs["video"]:
+            if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["enable"]:
                 msg = _("The remote peer is asking a video codec that are not installed on your computer.")
                 log.error(msg)
                 self.gui.show_error_dialog(msg)
