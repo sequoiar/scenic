@@ -1,3 +1,9 @@
+scenic (0.5.8.3-1) unstable; urgency=low
+
+  * Using the right version number format for Debian sid.
+
+ -- Alexandre Quessy <alexandre@quessy.net>  Fri, 21 May 2010 13:34:55 -0400
+
 scenic (0.5.8.2) unstable; urgency=low
 
   * Not using dpkg-source 3.0 (quilt) format anymore
