@@ -384,6 +384,46 @@ RtpPay* TheoraDecoder::createDepayloader() const
 
 
 /// Constructor 
+CeltEncoder::CeltEncoder(const Pipeline &pipeline, int /*bitrate*/) 
+    : Encoder(pipeline, "celtenc"),
+    audioconvert_(pipeline.makeElement("audioconvert", 0))
+{
+    gstlinkable::link(audioconvert_, encoder_);
+    /// FIXME: check and set bitrate
+}
+
+/// Destructor 
+CeltEncoder::~CeltEncoder() 
+{
+    pipeline_.remove(&audioconvert_);
+}
+
+/// Creates an RtpCeltPay 
+Pay* CeltEncoder::createPayloader() const
+{
+    return new CeltPay(pipeline_);
+}
+
+CeltDecoder::CeltDecoder(const Pipeline &pipeline) :
+    Decoder(pipeline, "celtdec"),
+    audioconvert_(pipeline_.makeElement("audioconvert", 0))
+{
+    gstlinkable::link(decoder_, audioconvert_);
+}
+
+/// Destructor 
+CeltDecoder::~CeltDecoder() 
+{
+    pipeline_.remove(&audioconvert_);
+}
+
+/// Creates an RtpCeltDepay 
+RtpPay* CeltDecoder::createDepayloader() const
+{
+    return new CeltDepay(pipeline_);
+}
+
+/// Constructor 
 VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality) 
     :
         Encoder(pipeline, "vorbisenc"),
@@ -400,10 +440,11 @@ VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quali
         g_object_set(encoder_, "bitrate", bitrate * BITS_PER_KB, NULL);
 }
 
-
 /// Destructor 
 VorbisEncoder::~VorbisEncoder() 
-{}
+{
+    pipeline_.remove(&queue_);
+}
 
 /// Creates an RtpVorbisPay 
 Pay* VorbisEncoder::createPayloader() const
@@ -411,17 +452,14 @@ Pay* VorbisEncoder::createPayloader() const
     return new VorbisPay(pipeline_);
 }
 
-
 unsigned long long VorbisDecoder::minimumBufferTime()
 {
     return MIN_BUFFER_USEC;
 }
 
-
 VorbisDecoder::VorbisDecoder(const Pipeline &pipeline) :
     Decoder(pipeline, "vorbisdec")
 {}
-
 
 /// Creates an RtpVorbisDepay 
 RtpPay* VorbisDecoder::createDepayloader() const
@@ -465,7 +503,6 @@ RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     gstlinkable::link(aconv_, capsfilter_);
 }
 
-
 /// Destructor
 RawDecoder::~RawDecoder()
 {
@@ -477,7 +514,6 @@ RtpPay* RawDecoder::createDepayloader() const
 {
     return new L16Depay(pipeline_);
 }
-
 
 /// Constructor
 LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality) 
@@ -516,7 +552,6 @@ LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality)
     gstlinkable::link(encoder_, mp3parse_);
 }
 
-
 /// Destructor
 LameEncoder::~LameEncoder()
 {
@@ -537,9 +572,7 @@ MadDecoder::~MadDecoder()
     pipeline_.remove(&aconv_);
 }
 
-
-/** 
- * Creates an RtpMpaPay */
+/// Creates an RtpMpaPay
 Pay* LameEncoder::createPayloader() const
 {
     return new MpaPay(pipeline_);
@@ -550,4 +583,3 @@ RtpPay* MadDecoder::createDepayloader() const
 {
     return new MpaDepay(pipeline_);
 }
-

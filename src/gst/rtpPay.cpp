@@ -139,6 +139,16 @@ VorbisDepay::VorbisDepay(const Pipeline &pipeline) : Depay(pipeline)
     rtpPay_ = pipeline_.makeElement("rtpvorbisdepay", NULL);
 }
 
+CeltPay::CeltPay(const Pipeline &pipeline) : Pay(pipeline)
+{
+    rtpPay_ = pipeline_.makeElement("rtpceltpay", NULL);
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
+}
+
+CeltDepay::CeltDepay(const Pipeline &pipeline) : Depay(pipeline)
+{
+    rtpPay_ = pipeline_.makeElement("rtpceltdepay", NULL);
+}
 
 L16Pay::L16Pay(const Pipeline &pipeline) : Pay(pipeline)
 {
