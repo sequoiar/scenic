@@ -850,7 +850,7 @@ class Application(object):
         # TODO: use prefixedMethods from twisted.
         if msg == "IDLE":
             self.handle_idle()
-        if msg == "INVITE":
+        elif msg == "INVITE":
             self.handle_invite(message, addr)
         elif msg == "CANCEL":
             self.handle_cancel(message, addr)
