@@ -1,10 +1,8 @@
 Release notes for Scenic 0.5.9
 
 This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes preparing the 0.6 stable series. 
-
-We are working on the packaging, so version 0.5.5 and up should contain no 
-new features - only big fixes or progress in the packaging.
+contains bugfixes preparing the 0.6 stable series. A few new features are 
+being introduced as well.
 
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
@@ -38,9 +36,15 @@ new features - only big fixes or progress in the packaging.
         of the 0.5 branch.
 
 New features in milhouse:
+    *   Support for the celt audio codec
 
 New features in scenic:
+    *   Detailled system status window
+    *   Detection of the supported Gstreamer elements for codecs
+    *   Checking if the codec requested by the peer are supported
 
 Bug fixes in milhouse: 
 
 Bug fixes in scenic: 
+    *   #534 Scenic must send some IDLE messages every 5 minutes to keep the TCP connection alive
+
