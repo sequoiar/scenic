@@ -21,6 +21,3 @@ epydoc:
 
 clean-local:
 	rm -rf html pythondocs
-	@for i in $(SUBDIRS); do \
-        echo "Clearing in $$i..."; \
-        (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) clean); done
