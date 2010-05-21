@@ -538,9 +538,6 @@ class StreamerManager(object):
         Handles a new line from our receiver process' stdout
         """
         
-        if "WARNING" in line:
-            log.warning(line)
-            self.warnings["receive"].append(line)
         try:
             if "stream connected" in line:
                 if "audio" in line:
@@ -552,6 +549,9 @@ class StreamerManager(object):
                     self.rtcp_stats["receive"]["video"]["bitrate"] = int(line.split(":")[-1])
                 elif "audio" in line:
                     self.rtcp_stats["receive"]["audio"]["bitrate"] = int(line.split(":")[-1])
+            elif "WARNING" in line:
+                log.warning(line)
+                self.warnings["receive"].append(line)
             else:
                 log.debug("%s stdout: %s" % (process_manager.identifier, line))
         except ValueError, e:
@@ -573,9 +573,6 @@ class StreamerManager(object):
         Handles a new line from our receiver process' stdout
         """
         log.debug("%s stdout: %s" % (process_manager.identifier, line))
-        if "WARNING" in line:
-            log.warning(line)
-            self.warnings["receive"].append(line)
         try:
             if "PACKETS-LOST" in line:
                 if "video" in line:
@@ -609,6 +606,11 @@ class StreamerManager(object):
                     self.rtcp_stats["send"]["video"]["connected"] = True
                 elif "audio" in line:
                     self.rtcp_stats["send"]["audio"]["connected"] = True
+            elif "WARNING" in line:
+                log.warning(line)
+                self.warnings["receive"].append(line)
+            else:
+                log.debug(line)
         except ValueError, e:
             log.error("%s when parsing line '%s' from sender" % (e, line))
 
