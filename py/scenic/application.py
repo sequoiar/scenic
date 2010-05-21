@@ -102,6 +102,13 @@ _ = internationalization._
 
 log = logger.start(name="application")
 
+def is_gstreamer_element_found(name):
+    """
+    Checks if a given Gstreamer element is installed.
+    @rettype: bool
+    """
+    return gst.element_factory_find(name) is not None 
+
 def is_codec_supported(codec):
     """
     Checks if a codec is supported by the Gstreamer elements found on the system.
@@ -119,7 +126,7 @@ def is_codec_supported(codec):
         needed = _elements[codec]
         ret = True
         for element in needed:
-            if gst.element_factory_find(element) is None: 
+            if not is_gstreamer_element_found(element):
                 log.error("Gstreamer element %s is NOT installed." % (element))
                 ret = False
         return ret
