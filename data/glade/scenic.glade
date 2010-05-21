@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Mon May 10 13:50:42 2010 -->
+<!--Generated with glade3 3.4.5 on Fri May 21 17:23:28 2010 -->
 <glade-interface>
   <widget class="GtkDialog" id="confirm_dialog">
     <property name="border_width">5</property>
@@ -605,6 +605,79 @@
         <property name="column_spacing">5</property>
         <property name="row_spacing">10</property>
         <child>
+          <widget class="GtkLabel" id="contactNameLabel">
+            <property name="visible">True</property>
+            <property name="xalign">1</property>
+            <property name="label" translatable="yes">Name:</property>
+            <property name="use_markup">True</property>
+          </widget>
+        </child>
+        <child>
+          <widget class="GtkEntry" id="contact_addr">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="activates_default">True</property>
+          </widget>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkEntry" id="contact_name">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="max_length">32</property>
+            <property name="activates_default">True</property>
+          </widget>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="y_options"></property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkLabel" id="contactIPLabel">
+            <property name="visible">True</property>
+            <property name="xalign">1</property>
+            <property name="label" translatable="yes">IP Address:</property>
+          </widget>
+          <packing>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkCheckButton" id="contact_auto_accept">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="response_id">0</property>
+            <property name="draw_indicator">True</property>
+          </widget>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">2</property>
+            <property name="bottom_attach">3</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="GtkLabel" id="label10">
+            <property name="visible">True</property>
+            <property name="xalign">1</property>
+            <property name="label" translatable="yes">Auto accept:</property>
+            <property name="justify">GTK_JUSTIFY_CENTER</property>
+          </widget>
+          <packing>
+            <property name="top_attach">2</property>
+            <property name="bottom_attach">3</property>
+          </packing>
+        </child>
+        <child>
           <widget class="GtkAlignment" id="alignment40">
             <property name="visible">True</property>
             <property name="yalign">1</property>
@@ -656,79 +729,6 @@
             <property name="bottom_attach">4</property>
           </packing>
         </child>
-        <child>
-          <widget class="GtkLabel" id="label10">
-            <property name="visible">True</property>
-            <property name="xalign">1</property>
-            <property name="label" translatable="yes">Auto accept:</property>
-            <property name="justify">GTK_JUSTIFY_CENTER</property>
-          </widget>
-          <packing>
-            <property name="top_attach">2</property>
-            <property name="bottom_attach">3</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkCheckButton" id="contact_auto_accept">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="response_id">0</property>
-            <property name="draw_indicator">True</property>
-          </widget>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">2</property>
-            <property name="bottom_attach">3</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkLabel" id="contactIPLabel">
-            <property name="visible">True</property>
-            <property name="xalign">1</property>
-            <property name="label" translatable="yes">IP Address:</property>
-          </widget>
-          <packing>
-            <property name="top_attach">1</property>
-            <property name="bottom_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkEntry" id="contact_name">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="has_focus">True</property>
-            <property name="max_length">32</property>
-            <property name="activates_default">True</property>
-          </widget>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="y_options"></property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkEntry" id="contact_addr">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="activates_default">True</property>
-          </widget>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">1</property>
-            <property name="bottom_attach">2</property>
-            <property name="y_options"></property>
-          </packing>
-        </child>
-        <child>
-          <widget class="GtkLabel" id="contactNameLabel">
-            <property name="visible">True</property>
-            <property name="xalign">1</property>
-            <property name="label" translatable="yes">Name:</property>
-            <property name="use_markup">True</property>
-          </widget>
-        </child>
       </widget>
     </child>
   </widget>
@@ -751,6 +751,15 @@
                   <widget class="GtkMenu" id="menu1">
                     <property name="visible">True</property>
                     <child>
+                      <widget class="GtkMenuItem" id="status_menu_item">
+                        <property name="visible">True</property>
+                        <property name="tooltip" translatable="yes">View informations about Scenic features on your system.</property>
+                        <property name="label" translatable="yes">Detailled Status</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_status_menu_item_activated"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkImageMenuItem" id="quit_menu_item">
                         <property name="visible">True</property>
                         <property name="label">gtk-quit</property>
@@ -772,21 +781,11 @@
                   <widget class="GtkMenu" id="menu3">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkImageMenuItem" id="help_menu_item">
+                      <widget class="GtkMenuItem" id="help_menu_item">
                         <property name="visible">True</property>
-                        <property name="label">gtk-help</property>
+                        <property name="label" translatable="yes">User Manual</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="on_help_menu_item_activated"/>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="about_menu_item">
-                        <property name="visible">True</property>
-                        <property name="label">gtk-about</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_about_menu_item_activate"/>
                       </widget>
                     </child>
                     <child>
@@ -795,6 +794,15 @@
                         <property name="label" translatable="yes">Installation Manual</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_installation_manual_menu_item_activated"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="about_menu_item">
+                        <property name="visible">True</property>
+                        <property name="label">gtk-about</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_about_menu_item_activated"/>
                       </widget>
                     </child>
                   </widget>
@@ -868,9 +876,9 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="response_id">0</property>
                                             <property name="has_tooltip">True</property>
                                             <property name="tooltip_text">Open a window with the selected video source</property>
+                                            <property name="response_id">0</property>
                                             <signal name="toggled" handler="on_video_view_preview_toggled"/>
                                             <child>
                                               <widget class="GtkAlignment" id="alignment42">
@@ -1258,78 +1266,108 @@
                                   <placeholder/>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="video_input_image_size_label3">
+                                  <widget class="GtkCheckButton" id="video_send_enabled">
                                     <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="label" translatable="yes">Enable</property>
+                                    <property name="use_underline">True</property>
                                     <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Aspect Ratio:</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
                                   </widget>
                                   <packing>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
+                                    <property name="x_padding">5</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkAlignment" id="alignment16">
+                                  <widget class="GtkLabel" id="video_input_source_label">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Source:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment1">
                                     <property name="visible">True</property>
                                     <property name="top_padding">5</property>
                                     <property name="bottom_padding">5</property>
                                     <property name="left_padding">5</property>
                                     <property name="right_padding">5</property>
                                     <child>
-                                      <widget class="GtkComboBox" id="aspect_ratio">
+                                      <widget class="GtkComboBox" id="video_source">
                                         <property name="visible">True</property>
-                                        <property name="items" translatable="yes">4:3
-16:9</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Picture aspect ratio. Commonly used values are 16:9 for 704x480 and 4:3 for 640x480</property>
+                                        <property name="tooltip_text">Select your camera or capture device</property>
+                                        <property name="wrap_width">1</property>
+                                        <property name="items" translatable="yes">Color bars</property>
+                                        <signal name="changed" handler="on_video_source_changed"/>
                                       </widget>
                                     </child>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkAlignment" id="alignment2">
+                                  <widget class="GtkLabel" id="video_input_image_size_label1">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Input:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="video_input_image_size_label2">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Standard:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">3</property>
+                                    <property name="bottom_attach">4</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment8">
                                     <property name="visible">True</property>
                                     <property name="top_padding">5</property>
                                     <property name="bottom_padding">5</property>
                                     <property name="left_padding">5</property>
                                     <property name="right_padding">5</property>
                                     <child>
-                                      <widget class="GtkComboBox" id="video_capture_size">
+                                      <widget class="GtkComboBox" id="v4l2_input">
                                         <property name="visible">True</property>
-                                        <property name="items" translatable="yes">720x480
-640x480
-320x240</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Some devices have many inputs. Choose which one.</property>
+                                        <property name="items" translatable="yes">Default</property>
+                                        <signal name="changed" handler="on_v4l2_input_changed"/>
                                       </widget>
                                     </child>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="video_input_image_size_label">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Image Size:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -1356,108 +1394,78 @@ PAL</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkAlignment" id="alignment8">
+                                  <widget class="GtkLabel" id="video_input_image_size_label">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Image Size:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">5</property>
+                                    <property name="bottom_attach">6</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment2">
                                     <property name="visible">True</property>
                                     <property name="top_padding">5</property>
                                     <property name="bottom_padding">5</property>
                                     <property name="left_padding">5</property>
                                     <property name="right_padding">5</property>
                                     <child>
-                                      <widget class="GtkComboBox" id="v4l2_input">
+                                      <widget class="GtkComboBox" id="video_capture_size">
                                         <property name="visible">True</property>
-                                        <property name="items" translatable="yes">Default</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Some devices have many inputs. Choose which one.</property>
-                                        <signal name="changed" handler="on_v4l2_input_changed"/>
+                                        <property name="items" translatable="yes">720x480
+640x480
+320x240</property>
                                       </widget>
                                     </child>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
+                                    <property name="top_attach">5</property>
+                                    <property name="bottom_attach">6</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="video_input_image_size_label2">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Standard:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="video_input_image_size_label1">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Input:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkAlignment" id="alignment1">
+                                  <widget class="GtkAlignment" id="alignment16">
                                     <property name="visible">True</property>
                                     <property name="top_padding">5</property>
                                     <property name="bottom_padding">5</property>
                                     <property name="left_padding">5</property>
                                     <property name="right_padding">5</property>
                                     <child>
-                                      <widget class="GtkComboBox" id="video_source">
+                                      <widget class="GtkComboBox" id="aspect_ratio">
                                         <property name="visible">True</property>
-                                        <property name="wrap_width">1</property>
-                                        <property name="items" translatable="yes">Color bars</property>
                                         <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Select your camera or capture device</property>
-                                        <signal name="changed" handler="on_video_source_changed"/>
+                                        <property name="tooltip_text">Picture aspect ratio. Commonly used values are 16:9 for 704x480 and 4:3 for 640x480</property>
+                                        <property name="items" translatable="yes">4:3
+16:9</property>
                                       </widget>
                                     </child>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
+                                    <property name="top_attach">4</property>
+                                    <property name="bottom_attach">5</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="video_input_source_label">
+                                  <widget class="GtkLabel" id="video_input_image_size_label3">
                                     <property name="visible">True</property>
                                     <property name="xalign">1</property>
                                     <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Source:</property>
+                                    <property name="label" translatable="yes">Aspect Ratio:</property>
                                   </widget>
                                   <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkCheckButton" id="video_send_enabled">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="label" translatable="yes">Enable</property>
-                                    <property name="use_underline">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="response_id">0</property>
-                                    <property name="draw_indicator">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="x_padding">5</property>
+                                    <property name="top_attach">4</property>
+                                    <property name="bottom_attach">5</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
                                   </packing>
                                 </child>
                               </widget>
@@ -1514,6 +1522,256 @@ PAL</property>
                                   <placeholder/>
                                 </child>
                                 <child>
+                                  <widget class="GtkCheckButton" id="video_receive_enabled">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="label" translatable="yes">Enable</property>
+                                    <property name="use_underline">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
+                                    <signal name="toggled" handler="on_video_receive_enabled_toggled"/>
+                                  </widget>
+                                  <packing>
+                                    <property name="x_padding">5</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label14">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Jitter Buffer:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">6</property>
+                                    <property name="bottom_attach">7</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkHBox" id="hbox2">
+                                    <property name="visible">True</property>
+                                    <child>
+                                      <widget class="GtkAlignment" id="alignment21">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="top_padding">5</property>
+                                        <property name="bottom_padding">5</property>
+                                        <property name="left_padding">5</property>
+                                        <property name="right_padding">5</property>
+                                        <child>
+                                          <widget class="GtkSpinButton" id="video_jitterbuffer">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
+                                            <property name="width_chars">6</property>
+                                            <property name="adjustment">50 50 1000 1 10 0</property>
+                                            <property name="numeric">True</property>
+                                          </widget>
+                                        </child>
+                                      </widget>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="GtkLabel" id="label15">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">ms</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">6</property>
+                                    <property name="bottom_attach">7</property>
+                                    <property name="y_options"></property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment14">
+                                    <property name="visible">True</property>
+                                    <property name="top_padding">5</property>
+                                    <property name="bottom_padding">5</property>
+                                    <property name="left_padding">5</property>
+                                    <property name="right_padding">5</property>
+                                    <child>
+                                      <widget class="GtkCheckButton" id="video_deinterlace">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Deinterlace makes a nicer image when the source is analog, but it adds latency.</property>
+                                        <property name="use_underline">True</property>
+                                        <property name="xalign">1</property>
+                                        <property name="response_id">0</property>
+                                        <property name="draw_indicator">True</property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">5</property>
+                                    <property name="bottom_attach">6</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label68">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">Codec:</property>
+                                    <property name="width_chars">12</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="video_bitrate_label">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">Bitrate:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment4">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">0</property>
+                                    <property name="top_padding">5</property>
+                                    <property name="bottom_padding">5</property>
+                                    <property name="left_padding">5</property>
+                                    <property name="right_padding">5</property>
+                                    <child>
+                                      <widget class="GtkComboBox" id="video_codec">
+                                        <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Choose h.263 for low bandwidth or low CPU setup. Use Theora for a patent-free experience. Use MPEG4 for most situation. Use h.264 to use all the CPU power you have.</property>
+                                        <property name="items" translatable="yes">h.263
+MPEG4
+h.264
+Theora</property>
+                                        <signal name="changed" handler="on_video_codec_changed"/>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label2">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">X11 display:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">4</property>
+                                    <property name="bottom_attach">5</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment5">
+                                    <property name="visible">True</property>
+                                    <property name="top_padding">5</property>
+                                    <property name="bottom_padding">5</property>
+                                    <property name="left_padding">5</property>
+                                    <property name="right_padding">5</property>
+                                    <child>
+                                      <widget class="GtkComboBox" id="video_display">
+                                        <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Useful to display the video on another monitor</property>
+                                        <property name="items" translatable="yes">:0.0
+:0.1
+</property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">4</property>
+                                    <property name="bottom_attach">5</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label1">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Fullscreen</property>
+                                    <property name="justify">GTK_JUSTIFY_RIGHT</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">3</property>
+                                    <property name="bottom_attach">4</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment7">
+                                    <property name="visible">True</property>
+                                    <property name="top_padding">5</property>
+                                    <property name="bottom_padding">5</property>
+                                    <property name="left_padding">5</property>
+                                    <property name="right_padding">5</property>
+                                    <child>
+                                      <widget class="GtkCheckButton" id="video_fullscreen">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Fullscreen can be toggled with the 'F' key</property>
+                                        <property name="use_underline">True</property>
+                                        <property name="xalign">1</property>
+                                        <property name="response_id">0</property>
+                                        <property name="draw_indicator">True</property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">3</property>
+                                    <property name="bottom_attach">4</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label13">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Deinterlace</property>
+                                    <property name="justify">GTK_JUSTIFY_RIGHT</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">5</property>
+                                    <property name="bottom_attach">6</property>
+                                  </packing>
+                                </child>
+                                <child>
                                   <widget class="GtkHBox" id="hbox5">
                                     <property name="visible">True</property>
                                     <child>
@@ -1558,256 +1816,6 @@ PAL</property>
                                     <property name="bottom_attach">3</property>
                                     <property name="x_options">GTK_FILL</property>
                                     <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label13">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Deinterlace</property>
-                                    <property name="justify">GTK_JUSTIFY_RIGHT</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkAlignment" id="alignment7">
-                                    <property name="visible">True</property>
-                                    <property name="top_padding">5</property>
-                                    <property name="bottom_padding">5</property>
-                                    <property name="left_padding">5</property>
-                                    <property name="right_padding">5</property>
-                                    <child>
-                                      <widget class="GtkCheckButton" id="video_fullscreen">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="response_id">0</property>
-                                        <property name="draw_indicator">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Fullscreen can be toggled with the 'F' key</property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label1">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Fullscreen</property>
-                                    <property name="justify">GTK_JUSTIFY_RIGHT</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">3</property>
-                                    <property name="bottom_attach">4</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkAlignment" id="alignment5">
-                                    <property name="visible">True</property>
-                                    <property name="top_padding">5</property>
-                                    <property name="bottom_padding">5</property>
-                                    <property name="left_padding">5</property>
-                                    <property name="right_padding">5</property>
-                                    <child>
-                                      <widget class="GtkComboBox" id="video_display">
-                                        <property name="visible">True</property>
-                                        <property name="items" translatable="yes">:0.0
-:0.1
-</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Useful to display the video on another monitor</property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label2">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">X11 display:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">4</property>
-                                    <property name="bottom_attach">5</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkAlignment" id="alignment4">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="top_padding">5</property>
-                                    <property name="bottom_padding">5</property>
-                                    <property name="left_padding">5</property>
-                                    <property name="right_padding">5</property>
-                                    <child>
-                                      <widget class="GtkComboBox" id="video_codec">
-                                        <property name="visible">True</property>
-                                        <property name="items" translatable="yes">h.263
-MPEG4
-h.264
-Theora</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Choose h.263 for low bandwidth or low CPU setup. Use Theora for a patent-free experience. Use MPEG4 for most situation. Use h.264 to use all the CPU power you have.</property>
-                                        <signal name="changed" handler="on_video_codec_changed"/>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="video_bitrate_label">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Bitrate:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label68">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Codec:</property>
-                                    <property name="width_chars">12</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkAlignment" id="alignment14">
-                                    <property name="visible">True</property>
-                                    <property name="top_padding">5</property>
-                                    <property name="bottom_padding">5</property>
-                                    <property name="left_padding">5</property>
-                                    <property name="right_padding">5</property>
-                                    <child>
-                                      <widget class="GtkCheckButton" id="video_deinterlace">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="use_underline">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="response_id">0</property>
-                                        <property name="draw_indicator">True</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text">Deinterlace makes a nicer image when the source is analog, but it adds latency.</property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">5</property>
-                                    <property name="bottom_attach">6</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkHBox" id="hbox2">
-                                    <property name="visible">True</property>
-                                    <child>
-                                      <widget class="GtkAlignment" id="alignment21">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="top_padding">5</property>
-                                        <property name="bottom_padding">5</property>
-                                        <property name="left_padding">5</property>
-                                        <property name="right_padding">5</property>
-                                        <child>
-                                          <widget class="GtkSpinButton" id="video_jitterbuffer">
-                                            <property name="visible">True</property>
-                                            <property name="can_focus">True</property>
-                                            <property name="width_chars">6</property>
-                                            <property name="adjustment">50 50 1000 1 10 0</property>
-                                            <property name="numeric">True</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
-                                          </widget>
-                                        </child>
-                                      </widget>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="label15">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">ms</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="y_options"></property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label14">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Jitter Buffer:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">6</property>
-                                    <property name="bottom_attach">7</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkCheckButton" id="video_receive_enabled">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="label" translatable="yes">Enable</property>
-                                    <property name="use_underline">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="response_id">0</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="on_video_receive_enabled_toggled"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="x_padding">5</property>
                                   </packing>
                                 </child>
                               </widget>
@@ -1897,59 +1905,19 @@ Theora</property>
                                   <placeholder/>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="audio_input_source_label1">
+                                  <widget class="GtkCheckButton" id="audio_send_enabled">
                                     <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="label" translatable="yes">Enable</property>
+                                    <property name="use_underline">True</property>
                                     <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Source:</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
+                                    <signal name="toggled" handler="on_audio_send_enabled_toggled"/>
                                   </widget>
                                   <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="y_options"></property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkAlignment" id="alignment13">
-                                    <property name="visible">True</property>
-                                    <property name="top_padding">5</property>
-                                    <property name="bottom_padding">5</property>
-                                    <property name="left_padding">5</property>
-                                    <property name="right_padding">5</property>
-                                    <child>
-                                      <widget class="GtkComboBox" id="audio_source">
-                                        <property name="visible">True</property>
-                                        <property name="wrap_width">1</property>
-                                        <property name="items" translatable="yes">Test sound
-JACK</property>
-
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Use a tone for testing. Receiving audio is always on Jack.</property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options"></property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label33">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Input Buffer:</property>
-                                    <property name="width_chars">12</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="y_options"></property>
+                                    <property name="y_options">GTK_EXPAND</property>
+                                    <property name="x_padding">5</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -1998,19 +1966,58 @@ JACK</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="audio_send_enabled">
+                                  <widget class="GtkLabel" id="label33">
                                     <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="label" translatable="yes">Enable</property>
-                                    <property name="use_underline">True</property>
                                     <property name="xalign">1</property>
-                                    <property name="response_id">0</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="on_audio_send_enabled_toggled"/>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">Input Buffer:</property>
+                                    <property name="width_chars">12</property>
                                   </widget>
                                   <packing>
-                                    <property name="y_options">GTK_EXPAND</property>
-                                    <property name="x_padding">5</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="y_options"></property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment13">
+                                    <property name="visible">True</property>
+                                    <property name="top_padding">5</property>
+                                    <property name="bottom_padding">5</property>
+                                    <property name="left_padding">5</property>
+                                    <property name="right_padding">5</property>
+                                    <child>
+                                      <widget class="GtkComboBox" id="audio_source">
+                                        <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Use a tone for testing. Receiving audio is always on Jack.</property>
+                                        <property name="wrap_width">1</property>
+                                        <property name="items" translatable="yes">Test sound
+JACK</property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options"></property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="audio_input_source_label1">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Source:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="y_options"></property>
                                   </packing>
                                 </child>
                               </widget>
@@ -2062,38 +2069,62 @@ JACK</property>
                                   <placeholder/>
                                 </child>
                                 <child>
-                                  <widget class="GtkCheckButton" id="audio_jack_enable_autoconnect">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="use_underline">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="response_id">0</property>
-                                    <property name="draw_indicator">True</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="y_options"></property>
-                                    <property name="x_padding">5</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="jack_autoconnect">
+                                  <widget class="GtkLabel" id="sampling_rate">
                                     <property name="visible">True</property>
                                     <property name="xalign">1</property>
                                     <property name="xpad">5</property>
                                     <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Enable jack autoconnect</property>
-                                    <property name="width_chars">12</property>
+                                    <property name="label" translatable="yes">Sampling rate:</property>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="y_options"></property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="jack_latency_icon">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">Latency:</property>
+                                    <property name="angle">0.01</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="jack_sampling_rate">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">0</property>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">48 kHz</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="jack_latency">
+                                    <property name="visible">True</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text">JACK output latency in milliseconds, calculated based on the period, rate and buffer settings. This is the latency of the audio system only.</property>
+                                    <property name="xalign">0</property>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">0 ms</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -2115,11 +2146,11 @@ JACK</property>
                                     <child>
                                       <widget class="GtkLabel" id="audio_jack_state">
                                         <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Open qjackctl to start jack daemon.</property>
                                         <property name="xalign">0</property>
                                         <property name="label" translatable="yes">&lt;b&gt;Running&lt;/b&gt;</property>
                                         <property name="use_markup">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Open qjackctl to start jack daemon.</property>
                                       </widget>
                                       <packing>
                                         <property name="position">1</property>
@@ -2128,62 +2159,38 @@ JACK</property>
                                   </widget>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="jack_latency">
-                                    <property name="visible">True</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">JACK output latency in milliseconds, calculated based on the period, rate and buffer settings. This is the latency of the audio system only.</property>
-                                    <property name="xalign">0</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">0 ms</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="jack_sampling_rate">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">48 kHz</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">2</property>
-                                    <property name="right_attach">3</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="jack_latency_icon">
+                                  <widget class="GtkLabel" id="jack_autoconnect">
                                     <property name="visible">True</property>
                                     <property name="xalign">1</property>
                                     <property name="xpad">5</property>
                                     <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Latency:</property>
-                                    <property name="angle">0.01</property>
+                                    <property name="label" translatable="yes">Enable jack autoconnect</property>
+                                    <property name="width_chars">12</property>
                                   </widget>
                                   <packing>
                                     <property name="left_attach">1</property>
                                     <property name="right_attach">2</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="y_options"></property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <widget class="GtkLabel" id="sampling_rate">
+                                  <widget class="GtkCheckButton" id="audio_jack_enable_autoconnect">
                                     <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="use_underline">True</property>
                                     <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Sampling rate:</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
                                   </widget>
                                   <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
+                                    <property name="left_attach">2</property>
+                                    <property name="right_attach">3</property>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="y_options"></property>
+                                    <property name="x_padding">5</property>
                                   </packing>
                                 </child>
                               </widget>
@@ -2241,194 +2248,20 @@ JACK</property>
                               <placeholder/>
                             </child>
                             <child>
-                              <widget class="GtkHBox" id="audio_jitterbuffer_hbox">
-                                <property name="visible">True</property>
-                                <child>
-                                  <widget class="GtkAlignment" id="alignment26">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="top_padding">5</property>
-                                    <property name="bottom_padding">5</property>
-                                    <property name="left_padding">5</property>
-                                    <property name="right_padding">5</property>
-                                    <child>
-                                      <widget class="GtkSpinButton" id="audio_jitterbuffer">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="width_chars">6</property>
-                                        <property name="adjustment">50 50 1000 1 10 0</property>
-                                        <property name="numeric">True</property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label6">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">ms</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">5</property>
-                                <property name="bottom_attach">6</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label4">
-                                <property name="visible">True</property>
-                                <property name="xalign">1</property>
-                                <property name="xpad">5</property>
-                                <property name="label" translatable="yes">Jitter Buffer:</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">5</property>
-                                <property name="bottom_attach">6</property>
-                                <property name="x_options">GTK_FILL</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkAlignment" id="alignment15">
-                                <property name="visible">True</property>
-                                <property name="xalign">0</property>
-                                <property name="xscale">0</property>
-                                <property name="yscale">0</property>
-                                <property name="top_padding">5</property>
-                                <property name="bottom_padding">5</property>
-                                <property name="left_padding">5</property>
-                                <property name="right_padding">5</property>
-                                <child>
-                                  <widget class="GtkSpinButton" id="audio_numchannels">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="width_chars">6</property>
-                                    <property name="adjustment">1 1 24 1 0 0</property>
-                                    <property name="numeric">True</property>
-                                  </widget>
-                                </child>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                                <property name="y_options">GTK_FILL</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label9">
-                                <property name="visible">True</property>
-                                <property name="xalign">1</property>
-                                <property name="xpad">5</property>
-                                <property name="ypad">5</property>
-                                <property name="label" translatable="yes">Codec:</property>
-                                <property name="width_chars">12</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkAlignment" id="alignment12">
-                                <property name="visible">True</property>
-                                <property name="top_padding">5</property>
-                                <property name="bottom_padding">5</property>
-                                <property name="left_padding">5</property>
-                                <property name="right_padding">5</property>
-                                <child>
-                                  <widget class="GtkComboBox" id="audio_codec">
-                                    <property name="visible">True</property>
-                                    <property name="items" translatable="yes">Raw
-MP3
-Vorbis</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text">RAW will gives the most quality and less latency. MP3 works only with 2 audio channels. Vorbis is good for many channels but adds latency.</property>
-                                    <signal name="changed" handler="on_audio_codec_changed"/>
-                                  </widget>
-                                </child>
-                              </widget>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">3</property>
-                                <property name="bottom_attach">4</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label7">
-                                <property name="visible">True</property>
-                                <property name="xalign">1</property>
-                                <property name="xpad">5</property>
-                                <property name="ypad">5</property>
-                                <property name="label" translatable="yes">Number of channels:</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">2</property>
-                                <property name="bottom_attach">3</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkCheckButton" id="audio_video_synchronized">
+                              <widget class="GtkCheckButton" id="audio_receive_enabled">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
+                                <property name="label" translatable="yes">Enable</property>
                                 <property name="use_underline">True</property>
                                 <property name="xalign">1</property>
+                                <property name="yalign">0</property>
                                 <property name="response_id">0</property>
                                 <property name="draw_indicator">True</property>
-                                <signal name="toggled" handler="on_audio_video_synchronized_toggled"/>
+                                <signal name="toggled" handler="on_audio_receive_enabled_toggled"/>
                               </widget>
                               <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
                                 <property name="y_options"></property>
                                 <property name="x_padding">5</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label12">
-                                <property name="visible">True</property>
-                                <property name="xalign">1</property>
-                                <property name="xpad">5</property>
-                                <property name="ypad">5</property>
-                                <property name="label" translatable="yes">Synchronize with video:</property>
-                                <property name="width_chars">12</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
-                                <property name="y_options"></property>
-                              </packing>
-                            </child>
-                            <child>
-                              <widget class="GtkLabel" id="label31">
-                                <property name="visible">True</property>
-                                <property name="xalign">1</property>
-                                <property name="xpad">5</property>
-                                <property name="ypad">5</property>
-                                <property name="label" translatable="yes">Output Buffer:</property>
-                                <property name="width_chars">12</property>
-                              </widget>
-                              <packing>
-                                <property name="top_attach">4</property>
-                                <property name="bottom_attach">5</property>
-                                <property name="y_options"></property>
                               </packing>
                             </child>
                             <child>
@@ -2475,20 +2308,194 @@ Vorbis</property>
                               </packing>
                             </child>
                             <child>
-                              <widget class="GtkCheckButton" id="audio_receive_enabled">
+                              <widget class="GtkLabel" id="label31">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="label" translatable="yes">Enable</property>
-                                <property name="use_underline">True</property>
                                 <property name="xalign">1</property>
-                                <property name="yalign">0</property>
-                                <property name="response_id">0</property>
-                                <property name="draw_indicator">True</property>
-                                <signal name="toggled" handler="on_audio_receive_enabled_toggled"/>
+                                <property name="xpad">5</property>
+                                <property name="ypad">5</property>
+                                <property name="label" translatable="yes">Output Buffer:</property>
+                                <property name="width_chars">12</property>
                               </widget>
                               <packing>
+                                <property name="top_attach">4</property>
+                                <property name="bottom_attach">5</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label12">
+                                <property name="visible">True</property>
+                                <property name="xalign">1</property>
+                                <property name="xpad">5</property>
+                                <property name="ypad">5</property>
+                                <property name="label" translatable="yes">Synchronize with video:</property>
+                                <property name="width_chars">12</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkCheckButton" id="audio_video_synchronized">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="use_underline">True</property>
+                                <property name="xalign">1</property>
+                                <property name="response_id">0</property>
+                                <property name="draw_indicator">True</property>
+                                <signal name="toggled" handler="on_audio_video_synchronized_toggled"/>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">1</property>
+                                <property name="bottom_attach">2</property>
                                 <property name="y_options"></property>
                                 <property name="x_padding">5</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label7">
+                                <property name="visible">True</property>
+                                <property name="xalign">1</property>
+                                <property name="xpad">5</property>
+                                <property name="ypad">5</property>
+                                <property name="label" translatable="yes">Number of channels:</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkAlignment" id="alignment12">
+                                <property name="visible">True</property>
+                                <property name="top_padding">5</property>
+                                <property name="bottom_padding">5</property>
+                                <property name="left_padding">5</property>
+                                <property name="right_padding">5</property>
+                                <child>
+                                  <widget class="GtkComboBox" id="audio_codec">
+                                    <property name="visible">True</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text">RAW will gives the most quality and less latency. MP3 works only with 2 audio channels. Vorbis is good for many channels but adds latency.</property>
+                                    <property name="items" translatable="yes">Raw
+MP3
+Vorbis</property>
+                                    <signal name="changed" handler="on_audio_codec_changed"/>
+                                  </widget>
+                                </child>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label9">
+                                <property name="visible">True</property>
+                                <property name="xalign">1</property>
+                                <property name="xpad">5</property>
+                                <property name="ypad">5</property>
+                                <property name="label" translatable="yes">Codec:</property>
+                                <property name="width_chars">12</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">3</property>
+                                <property name="bottom_attach">4</property>
+                                <property name="y_options"></property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkAlignment" id="alignment15">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xscale">0</property>
+                                <property name="yscale">0</property>
+                                <property name="top_padding">5</property>
+                                <property name="bottom_padding">5</property>
+                                <property name="left_padding">5</property>
+                                <property name="right_padding">5</property>
+                                <child>
+                                  <widget class="GtkSpinButton" id="audio_numchannels">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="width_chars">6</property>
+                                    <property name="adjustment">1 1 24 1 0 0</property>
+                                    <property name="numeric">True</property>
+                                  </widget>
+                                </child>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">2</property>
+                                <property name="bottom_attach">3</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkLabel" id="label4">
+                                <property name="visible">True</property>
+                                <property name="xalign">1</property>
+                                <property name="xpad">5</property>
+                                <property name="label" translatable="yes">Jitter Buffer:</property>
+                              </widget>
+                              <packing>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="x_options">GTK_FILL</property>
+                                <property name="y_options">GTK_FILL</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <widget class="GtkHBox" id="audio_jitterbuffer_hbox">
+                                <property name="visible">True</property>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment26">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">0</property>
+                                    <property name="top_padding">5</property>
+                                    <property name="bottom_padding">5</property>
+                                    <property name="left_padding">5</property>
+                                    <property name="right_padding">5</property>
+                                    <child>
+                                      <widget class="GtkSpinButton" id="audio_jitterbuffer">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="width_chars">6</property>
+                                        <property name="adjustment">50 50 1000 1 10 0</property>
+                                        <property name="numeric">True</property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label6">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">0</property>
+                                    <property name="label" translatable="yes">ms</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </widget>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="right_attach">2</property>
+                                <property name="top_attach">5</property>
+                                <property name="bottom_attach">6</property>
+                                <property name="y_options"></property>
                               </packing>
                             </child>
                           </widget>
@@ -2741,6 +2748,36 @@ Vorbis</property>
                                   <placeholder/>
                                 </child>
                                 <child>
+                                  <widget class="GtkLabel" id="label25">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">Input device:</property>
+                                    <property name="justify">GTK_JUSTIFY_CENTER</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options"></property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckButton" id="midi_send_enabled">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="label" translatable="yes">Enable</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
+                                    <signal name="toggled" handler="on_midi_send_enabled_toggled"/>
+                                  </widget>
+                                  <packing>
+                                    <property name="y_options"></property>
+                                    <property name="x_padding">5</property>
+                                  </packing>
+                                </child>
+                                <child>
                                   <widget class="GtkAlignment" id="alignment29">
                                     <property name="visible">True</property>
                                     <property name="top_padding">5</property>
@@ -2762,36 +2799,6 @@ Vorbis</property>
                                     <property name="bottom_attach">2</property>
                                     <property name="y_options"></property>
                                     <property name="y_padding">5</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkCheckButton" id="midi_send_enabled">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="label" translatable="yes">Enable</property>
-                                    <property name="response_id">0</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="on_midi_send_enabled_toggled"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="y_options"></property>
-                                    <property name="x_padding">5</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label25">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Input device:</property>
-                                    <property name="justify">GTK_JUSTIFY_CENTER</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options"></property>
                                   </packing>
                                 </child>
                               </widget>
@@ -2842,72 +2849,6 @@ Vorbis</property>
                                   <placeholder/>
                                 </child>
                                 <child>
-                                  <widget class="GtkAlignment" id="alignment28">
-                                    <property name="visible">True</property>
-                                    <property name="top_padding">5</property>
-                                    <property name="bottom_padding">5</property>
-                                    <property name="left_padding">5</property>
-                                    <property name="right_padding">5</property>
-                                    <child>
-                                      <widget class="GtkComboBox" id="midi_output_device">
-                                        <property name="width_request">200</property>
-                                        <property name="visible">True</property>
-                                        <property name="items" translatable="yes"> </property>
-                                      </widget>
-                                    </child>
-                                  </widget>
-                                  <packing>
-                                    <property name="left_attach">1</property>
-                                    <property name="right_attach">2</property>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="y_options"></property>
-                                    <property name="y_padding">5</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkCheckButton" id="midi_recv_enabled">
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">True</property>
-                                    <property name="label" translatable="yes">Enable</property>
-                                    <property name="response_id">0</property>
-                                    <property name="draw_indicator">True</property>
-                                    <signal name="toggled" handler="on_midi_recv_enabled_toggled"/>
-                                  </widget>
-                                  <packing>
-                                    <property name="y_options"></property>
-                                    <property name="x_padding">5</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label35">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="ypad">5</property>
-                                    <property name="label" translatable="yes">Output device:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">1</property>
-                                    <property name="bottom_attach">2</property>
-                                    <property name="y_options"></property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <widget class="GtkLabel" id="label27">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">1</property>
-                                    <property name="xpad">5</property>
-                                    <property name="label" translatable="yes">Jitter Buffer:</property>
-                                  </widget>
-                                  <packing>
-                                    <property name="top_attach">2</property>
-                                    <property name="bottom_attach">3</property>
-                                    <property name="x_options">GTK_FILL</property>
-                                    <property name="y_options">GTK_FILL</property>
-                                  </packing>
-                                </child>
-                                <child>
                                   <widget class="GtkHBox" id="hbox15">
                                     <property name="visible">True</property>
                                     <child>
@@ -2919,10 +2860,10 @@ Vorbis</property>
                                         <property name="right_padding">5</property>
                                         <child>
                                           <widget class="GtkSpinButton" id="midi_jitterbuffer">
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                             <property name="adjustment">5 5 2000 1 10 0</property>
                                             <property name="numeric">True</property>
                                           </widget>
@@ -2947,6 +2888,72 @@ Vorbis</property>
                                     <property name="top_attach">2</property>
                                     <property name="bottom_attach">3</property>
                                     <property name="y_options"></property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label27">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="label" translatable="yes">Jitter Buffer:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">2</property>
+                                    <property name="bottom_attach">3</property>
+                                    <property name="x_options">GTK_FILL</property>
+                                    <property name="y_options">GTK_FILL</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkLabel" id="label35">
+                                    <property name="visible">True</property>
+                                    <property name="xalign">1</property>
+                                    <property name="xpad">5</property>
+                                    <property name="ypad">5</property>
+                                    <property name="label" translatable="yes">Output device:</property>
+                                  </widget>
+                                  <packing>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="y_options"></property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkCheckButton" id="midi_recv_enabled">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="label" translatable="yes">Enable</property>
+                                    <property name="response_id">0</property>
+                                    <property name="draw_indicator">True</property>
+                                    <signal name="toggled" handler="on_midi_recv_enabled_toggled"/>
+                                  </widget>
+                                  <packing>
+                                    <property name="y_options"></property>
+                                    <property name="x_padding">5</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <widget class="GtkAlignment" id="alignment28">
+                                    <property name="visible">True</property>
+                                    <property name="top_padding">5</property>
+                                    <property name="bottom_padding">5</property>
+                                    <property name="left_padding">5</property>
+                                    <property name="right_padding">5</property>
+                                    <child>
+                                      <widget class="GtkComboBox" id="midi_output_device">
+                                        <property name="width_request">200</property>
+                                        <property name="visible">True</property>
+                                        <property name="items" translatable="yes"> </property>
+                                      </widget>
+                                    </child>
+                                  </widget>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="right_attach">2</property>
+                                    <property name="top_attach">1</property>
+                                    <property name="bottom_attach">2</property>
+                                    <property name="y_options"></property>
+                                    <property name="y_padding">5</property>
                                   </packing>
                                 </child>
                               </widget>
@@ -3060,37 +3067,46 @@ Vorbis</property>
                                     <property name="column_spacing">5</property>
                                     <property name="row_spacing">5</property>
                                     <child>
-                                      <widget class="GtkLabel" id="info_send_video">
+                                      <widget class="GtkLabel" id="info_send_video_label">
                                         <property name="visible">True</property>
-                                        <property name="xalign">0</property>
+                                        <property name="xalign">1</property>
                                         <property name="yalign">0</property>
                                         <property name="xpad">5</property>
                                         <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">320x240 h263 642.4 kbits/s
-Jitter: 1238 ns</property>
-                                        <property name="selectable">True</property>
+                                        <property name="label" translatable="yes">Video:</property>
                                       </widget>
                                       <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
+                                        <property name="x_options">GTK_FILL</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkLabel" id="info_send_audio">
+                                      <widget class="GtkLabel" id="info_send_audio_label">
                                         <property name="visible">True</property>
-                                        <property name="xalign">0</property>
+                                        <property name="xalign">1</property>
                                         <property name="yalign">0</property>
                                         <property name="xpad">5</property>
                                         <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">2 channels MP3 59.37 kbits/s
-Audio buffer: 200ms
-Jitter: 5981 ns</property>
+                                        <property name="label" translatable="yes">Audio:</property>
                                       </widget>
                                       <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
+                                        <property name="x_options">GTK_FILL</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="GtkLabel" id="label26">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">1</property>
+                                        <property name="yalign">0</property>
+                                        <property name="xpad">5</property>
+                                        <property name="ypad">2</property>
+                                        <property name="label" translatable="yes">MIDI:</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="top_attach">2</property>
+                                        <property name="bottom_attach">3</property>
+                                        <property name="x_options">GTK_FILL</property>
                                       </packing>
                                     </child>
                                     <child>
@@ -3112,46 +3128,37 @@ Jitter: 5981 ns</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkLabel" id="label26">
+                                      <widget class="GtkLabel" id="info_send_audio">
                                         <property name="visible">True</property>
-                                        <property name="xalign">1</property>
+                                        <property name="xalign">0</property>
                                         <property name="yalign">0</property>
                                         <property name="xpad">5</property>
                                         <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">MIDI:</property>
+                                        <property name="label" translatable="yes">2 channels MP3 59.37 kbits/s
+Audio buffer: 200ms
+Jitter: 5981 ns</property>
                                       </widget>
                                       <packing>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="info_send_audio_label">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="yalign">0</property>
-                                        <property name="xpad">5</property>
-                                        <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">Audio:</property>
-                                      </widget>
-                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
-                                        <property name="x_options">GTK_FILL</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkLabel" id="info_send_video_label">
+                                      <widget class="GtkLabel" id="info_send_video">
                                         <property name="visible">True</property>
-                                        <property name="xalign">1</property>
+                                        <property name="xalign">0</property>
                                         <property name="yalign">0</property>
                                         <property name="xpad">5</property>
                                         <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">Video:</property>
+                                        <property name="label" translatable="yes">320x240 h263 642.4 kbits/s
+Jitter: 1238 ns</property>
+                                        <property name="selectable">True</property>
                                       </widget>
                                       <packing>
-                                        <property name="x_options">GTK_FILL</property>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
                                       </packing>
                                     </child>
                                   </widget>
@@ -3207,61 +3214,15 @@ Jitter: 5981 ns</property>
                                     <property name="column_spacing">5</property>
                                     <property name="row_spacing">5</property>
                                     <child>
-                                      <widget class="GtkLabel" id="info_receive_midi">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="yalign">0</property>
-                                        <property name="xpad">5</property>
-                                        <property name="ypad">2</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="info_receive_midi_label">
+                                      <widget class="GtkLabel" id="info_receive_video_label">
                                         <property name="visible">True</property>
                                         <property name="xalign">1</property>
                                         <property name="yalign">0</property>
                                         <property name="xpad">5</property>
                                         <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">MIDI:</property>
+                                        <property name="label" translatable="yes">Video:</property>
                                       </widget>
                                       <packing>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="x_options">GTK_FILL</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="info_receive_audio">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="yalign">0</property>
-                                        <property name="xpad">5</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <widget class="GtkLabel" id="info_receive_audio_label">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">1</property>
-                                        <property name="yalign">0</property>
-                                        <property name="xpad">5</property>
-                                        <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">Audio:</property>
-                                      </widget>
-                                      <packing>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
                                         <property name="x_options">GTK_FILL</property>
                                       </packing>
                                     </child>
@@ -3281,16 +3242,62 @@ Jitter: 1238 ns</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <widget class="GtkLabel" id="info_receive_video_label">
+                                      <widget class="GtkLabel" id="info_receive_audio_label">
                                         <property name="visible">True</property>
                                         <property name="xalign">1</property>
                                         <property name="yalign">0</property>
                                         <property name="xpad">5</property>
                                         <property name="ypad">2</property>
-                                        <property name="label" translatable="yes">Video:</property>
+                                        <property name="label" translatable="yes">Audio:</property>
                                       </widget>
                                       <packing>
+                                        <property name="top_attach">1</property>
+                                        <property name="bottom_attach">2</property>
                                         <property name="x_options">GTK_FILL</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="GtkLabel" id="info_receive_audio">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="yalign">0</property>
+                                        <property name="xpad">5</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">1</property>
+                                        <property name="bottom_attach">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="GtkLabel" id="info_receive_midi_label">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">1</property>
+                                        <property name="yalign">0</property>
+                                        <property name="xpad">5</property>
+                                        <property name="ypad">2</property>
+                                        <property name="label" translatable="yes">MIDI:</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="top_attach">2</property>
+                                        <property name="bottom_attach">3</property>
+                                        <property name="x_options">GTK_FILL</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <widget class="GtkLabel" id="info_receive_midi">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="yalign">0</property>
+                                        <property name="xpad">5</property>
+                                        <property name="ypad">2</property>
+                                      </widget>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">2</property>
+                                        <property name="bottom_attach">3</property>
                                       </packing>
                                     </child>
                                   </widget>
@@ -4130,151 +4137,29 @@ Jitter: 1238 ns</property>
                       <placeholder/>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="video_input_image_size_label7">
+                      <widget class="GtkCheckButton" id="video_send_enabled1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">Enable</property>
+                        <property name="use_underline">True</property>
+                        <property name="xalign">1</property>
+                        <property name="response_id">0</property>
+                        <property name="draw_indicator">True</property>
+                      </widget>
+                      <packing>
+                        <property name="x_padding">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="video_input_source_label1">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
                         <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Aspect Ratio:</property>
+                        <property name="label" translatable="yes">Source:</property>
                       </widget>
                       <packing>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment47">
-                        <property name="visible">True</property>
-                        <property name="top_padding">5</property>
-                        <property name="bottom_padding">5</property>
-                        <property name="left_padding">5</property>
-                        <property name="right_padding">5</property>
-                        <child>
-                          <widget class="GtkComboBox" id="aspect_ratio1">
-                            <property name="visible">True</property>
-                            <property name="items" translatable="yes">4:3
-16:9</property>
-                          </widget>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment45">
-                        <property name="visible">True</property>
-                        <property name="top_padding">5</property>
-                        <property name="bottom_padding">5</property>
-                        <property name="left_padding">5</property>
-                        <property name="right_padding">5</property>
-                        <child>
-                          <widget class="GtkComboBox" id="video_capture_size1">
-                            <property name="visible">True</property>
-                            <property name="items" translatable="yes">720x480
-640x480
-320x240</property>
-                          </widget>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="video_input_image_size_label6">
-                        <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Image Size:</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment44">
-                        <property name="visible">True</property>
-                        <property name="top_padding">5</property>
-                        <property name="bottom_padding">5</property>
-                        <property name="left_padding">5</property>
-                        <property name="right_padding">5</property>
-                        <child>
-                          <widget class="GtkComboBox" id="v4l2_standard2">
-                            <property name="visible">True</property>
-                            <property name="items" translatable="yes">NTSC
-PAL</property>
-                            <property name="has_tooltip">True</property>
-                            <property name="tooltip_text">Most of the Americas, Japan, South Korea, Taiwan, Burma, and some Pacific island nations and territories use NTSC. The rest of the world use PAL</property>
-                          </widget>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkAlignment" id="alignment17">
-                        <property name="visible">True</property>
-                        <property name="top_padding">5</property>
-                        <property name="bottom_padding">5</property>
-                        <property name="left_padding">5</property>
-                        <property name="right_padding">5</property>
-                        <child>
-                          <widget class="GtkComboBox" id="v4l2_input2">
-                            <property name="visible">True</property>
-                            <property name="items" translatable="yes">Default</property>
-                            <property name="has_tooltip">True</property>
-                            <property name="tooltip_text">Select your camera or capture device</property>
-                          </widget>
-                        </child>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="video_input_image_size_label5">
-                        <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Standard:</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="video_input_image_size_label4">
-                        <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Input:</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options">GTK_FILL</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
                       </packing>
                     </child>
                     <child>
@@ -4302,29 +4187,151 @@ PAL</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="video_input_source_label1">
+                      <widget class="GtkLabel" id="video_input_image_size_label4">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
                         <property name="xpad">5</property>
-                        <property name="label" translatable="yes">Source:</property>
+                        <property name="label" translatable="yes">Input:</property>
                       </widget>
                       <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkCheckButton" id="video_send_enabled1">
+                      <widget class="GtkLabel" id="video_input_image_size_label5">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">Enable</property>
-                        <property name="use_underline">True</property>
                         <property name="xalign">1</property>
-                        <property name="response_id">0</property>
-                        <property name="draw_indicator">True</property>
+                        <property name="xpad">5</property>
+                        <property name="label" translatable="yes">Standard:</property>
                       </widget>
                       <packing>
-                        <property name="x_padding">5</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkAlignment" id="alignment17">
+                        <property name="visible">True</property>
+                        <property name="top_padding">5</property>
+                        <property name="bottom_padding">5</property>
+                        <property name="left_padding">5</property>
+                        <property name="right_padding">5</property>
+                        <child>
+                          <widget class="GtkComboBox" id="v4l2_input2">
+                            <property name="visible">True</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text">Select your camera or capture device</property>
+                            <property name="items" translatable="yes">Default</property>
+                          </widget>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkAlignment" id="alignment44">
+                        <property name="visible">True</property>
+                        <property name="top_padding">5</property>
+                        <property name="bottom_padding">5</property>
+                        <property name="left_padding">5</property>
+                        <property name="right_padding">5</property>
+                        <child>
+                          <widget class="GtkComboBox" id="v4l2_standard2">
+                            <property name="visible">True</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text">Most of the Americas, Japan, South Korea, Taiwan, Burma, and some Pacific island nations and territories use NTSC. The rest of the world use PAL</property>
+                            <property name="items" translatable="yes">NTSC
+PAL</property>
+                          </widget>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="video_input_image_size_label6">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="xpad">5</property>
+                        <property name="label" translatable="yes">Image Size:</property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkAlignment" id="alignment45">
+                        <property name="visible">True</property>
+                        <property name="top_padding">5</property>
+                        <property name="bottom_padding">5</property>
+                        <property name="left_padding">5</property>
+                        <property name="right_padding">5</property>
+                        <child>
+                          <widget class="GtkComboBox" id="video_capture_size1">
+                            <property name="visible">True</property>
+                            <property name="items" translatable="yes">720x480
+640x480
+320x240</property>
+                          </widget>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkAlignment" id="alignment47">
+                        <property name="visible">True</property>
+                        <property name="top_padding">5</property>
+                        <property name="bottom_padding">5</property>
+                        <property name="left_padding">5</property>
+                        <property name="right_padding">5</property>
+                        <child>
+                          <widget class="GtkComboBox" id="aspect_ratio1">
+                            <property name="visible">True</property>
+                            <property name="items" translatable="yes">4:3
+16:9</property>
+                          </widget>
+                        </child>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="video_input_image_size_label7">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="xpad">5</property>
+                        <property name="label" translatable="yes">Aspect Ratio:</property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
                       </packing>
                     </child>
                   </widget>
@@ -4398,6 +4405,30 @@ PAL</property>
           <packing>
             <property name="position">1</property>
           </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkWindow" id="status_window">
+    <property name="width_request">320</property>
+    <property name="height_request">320</property>
+    <child>
+      <widget class="GtkScrolledWindow" id="scrolledwindow1">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+        <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+        <child>
+          <widget class="GtkViewport" id="viewport1">
+            <property name="visible">True</property>
+            <property name="resize_mode">GTK_RESIZE_QUEUE</property>
+            <child>
+              <widget class="GtkTextView" id="status_textview">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </widget>
+            </child>
+          </widget>
         </child>
       </widget>
     </child>

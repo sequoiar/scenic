@@ -1534,7 +1534,7 @@ class Gui(object):
 
     # -------------------------- menu items -----------------
     
-    def on_about_menu_item_activate(self, menu_item):
+    def on_about_menu_item_activated(self, menu_item):
         About.create() # TODO: set parent window ?
     
     def on_quit_menu_item_activated(self, menu_item):
@@ -1556,9 +1556,13 @@ class Gui(object):
         """
         Opens the docbook doc
         """
-        log.info("Menu item 'Help' chosen")
+        log.info("Menu item 'User manual' chosen")
         docbook_file = os.path.join(configure.DOCBOOK_DIR, "user-manual.xml")
         process.run_once("yelp", docbook_file)
+
+    def on_status_menu_item_activated(self, menu_item):
+        log.info("Menu item 'Status window' chosen")
+        x = StatusWindow(self.app) # XXX ???
 
     # ---------------------- invitation dialogs -------------------
 
@@ -1697,3 +1701,45 @@ class About(object):
     def destroy_about(self, *args):
         self.about_dialog.destroy()
 
+class StatusWindow(object):
+    """
+    Detailled status
+    """
+    def __init__(self, app):
+        self.app = app
+        self.icon_file = os.path.join(configure.PIXMAPS_DIR, 'scenic.png')
+        widgets_tree = glade.get_widgets_tree()
+        # Get all the widgets that we use
+        self.status_window = widgets_tree.get_widget("status_window")
+        self.status_textview_widget = widgets_tree.get_widget("status_textview")
+        # set icon
+        if not os.path.exists(self.icon_file):
+            log.error("Could not find icon file %s." % (self.icon_file))
+        else:
+            self.status_window.set_icon_from_file(self.icon_file)
+        # populate the info
+        self._populate_info()
+    
+        # show it
+        self.status_window.show_all()
+
+    def _populate_info(self):
+        def _yes_or_no(data):
+            if data:
+                return _("YES")
+            else:
+                return _("NO")
+
+        def _format_text_and_yesno(text, yesno):
+            return "%s %s\n" % (text, _yes_or_no(yesno))
+
+        txt = ""
+        txt += _format_text_and_yesno(_("MIDI is supported..."), self.app._midi_is_supported)
+        
+        for readable, codec in VIDEO_CODECS.iteritems():
+            txt += _format_text_and_yesno(_("Video codec %(codec)s is supported...") % {"codec": readable}, codec in self.app._supported_codecs["video"])
+        for readable, codec in AUDIO_CODECS.iteritems():
+            txt += _format_text_and_yesno(_("Audio codec %(codec)s is supported...") % {"codec": readable}, codec in self.app._supported_codecs["audio"])
+
+        self.status_textview_widget.get_buffer().set_text(unicode(txt))
+    
