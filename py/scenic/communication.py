@@ -146,7 +146,7 @@ class Client(object):
             return self.client_factory.connected_deferred
         else:
             msg = "The client is already connected to some host."
-            log.error(msg)
+            log.warning(msg)
             #TODO: return failure?
             return defer.succeed(True) # FIXME
  
