@@ -382,12 +382,19 @@ class Gui(object):
         reactor.callLater(0, _start_update_id)
 
         self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
-        # The main app must call init_widgets_value
+        self._disable_unsupported_codecs()
    
     #TODO: for the preview in the drawing area   
     #def on_expose_event(self, widget, event):
     #    self.preview_xid = widget.window.xid
     #    return False
+
+    def _disable_unsupported_codecs(self):
+        """
+        Checks if codecs for which not Gstreamer elements are found, and disabled them.
+        Called only once at startup.
+        """
+        pass
 
     # ------------------ window events and actions --------------------
     def toggle_fullscreen(self):

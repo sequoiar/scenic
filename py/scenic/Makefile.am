@@ -8,6 +8,7 @@ scenic_PYTHON = application.py \
 	configure.py \
 	dialogs.py \
 	glade.py \
+	gstreamer.py \
 	gui.py \
 	__init__.py \
 	internationalization.py \
