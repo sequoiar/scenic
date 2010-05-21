@@ -37,7 +37,7 @@ def is_codec_supported(codec):
         ret = True
         for element in needed:
             if not is_gstreamer_element_found(element):
-                log.error("Gstreamer element %s is NOT installed." % (element))
+                #log.error("Gstreamer element %s is NOT installed." % (element))
                 ret = False
         return ret
 

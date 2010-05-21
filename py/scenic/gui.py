@@ -39,6 +39,7 @@ from scenic import dialogs
 from scenic import glade
 from scenic import preview
 from scenic import network
+from scenic import gstreamer
 from scenic import communication
 from scenic.devices import cameras
 from scenic.devices import networkinterfaces
@@ -394,7 +395,46 @@ class Gui(object):
         Checks if codecs for which not Gstreamer elements are found, and disabled them.
         Called only once at startup.
         """
-        pass
+        # all human-readable names, not computer-readble
+        #TODO: i18nize
+        working_video_codecs = []
+        broken_video_codecs = []
+        working_audio_codecs = []
+        broken_audio_codecs = []
+
+        # video codecs:
+        for readable, codec in VIDEO_CODECS.iteritems():
+            if gstreamer.is_codec_supported(codec):
+                working_video_codecs.append(readable)
+            else:
+                broken_video_codecs.append(readable)
+        
+        # audio codecs:
+        for readable, codec in AUDIO_CODECS.iteritems():
+            if gstreamer.is_codec_supported(codec):
+                working_audio_codecs.append(readable)
+            else:
+                broken_audio_codecs.append(readable)
+
+        # set combo boxes choices:
+        _set_combobox_choices(self.audio_codec_widget, working_audio_codecs)
+        _set_combobox_choices(self.video_codec_widget, working_video_codecs)
+        
+        if len(broken_audio_codecs) != 0 or len(broken_video_codecs) != 0:
+            msg = _("Some codecs are not supported on your system. They are currently disabled.") 
+            details = _("You should consider installing the Gstreamer elements to benefit from those codecs.")
+            details += "\n"
+            if len(broken_video_codecs) != 0:
+                details += _("Disabled video codecs:")
+                details += "\n"
+                for codec in broken_video_codecs:
+                    details += " * %s\n" % (codec)
+            if len(broken_audio_codecs) != 0:
+                details += _("Disabled audio codecs:")
+                details += "\n"
+                for codec in broken_audio_codecs:
+                    details += " * %s\n" % (codec)
+            self.show_error_dialog(msg, details)
 
     # ------------------ window events and actions --------------------
     def toggle_fullscreen(self):
