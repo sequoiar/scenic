@@ -231,8 +231,17 @@ class Application(object):
         }
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
+        self._keep_tcp_alive_task = task.LoopingCall(self._keep_tcp_alive)
         self.max_channels_in_raw = None
         reactor.callLater(0, self._start_the_application)
+
+    def _keep_tcp_alive(self):
+        """
+        Every 5 minutes or so, sends some data to the connected peer over TCP.
+        That's to keep the TCP connection alive.
+        """
+        if self.has_session():
+            self.send_idle()
 
     def set_supported_codecs(self, audio_codecs, video_codecs):
         """
@@ -341,6 +350,8 @@ class Application(object):
             return
         # Devices: JACKD (every 5 seconds)
         self._jackd_watch_task.start(5, now=True)
+        # send some TCP data if connected every 5 minutes
+        self._keep_tcp_alive_task.start(5 * 60, now=False)
         # first, poll devices, next restore v4l2 settings, finally, update widgets and poll cameras again.
         # Devices: X11 and XV
         def _cb2(result):
@@ -602,6 +613,9 @@ class Application(object):
         else:
             return True
 
+    def handle_idle(self):
+        pass
+
     def handle_invite(self, message, addr):
         """
         handles the INVITE message. 
@@ -741,15 +755,15 @@ class Application(object):
                 # sends BYE
                 self.send_bye(reason)
 
-            if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["enable"]:
-                msg = _("The remote peer is asking an audio codec that are not installed on your computer.")
-                log.error(msg)
+            if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["recv_enabled"] and self.config.video_recv_enabled:
+                msg = _("The remote peer is asking an audio codec that is not installed on your computer.")
+                log.error(msg, self.remove_config["audio"]["codec"])
                 self.gui.show_error_dialog(msg)
                 _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
                 return
-            if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["enable"]:
-                msg = _("The remote peer is asking a video codec that are not installed on your computer.")
-                log.error(msg)
+            if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["recv_enabled"] and self.config.video_send_enabled:
+                msg = _("The remote peer is asking a video codec that is not installed on your computer.")
+                log.error(msg, self.remove_config["video"]["codec"])
                 self.gui.show_error_dialog(msg)
                 _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
                 return
@@ -834,6 +848,8 @@ class Application(object):
         msg = message["msg"]
         log.debug("Got %s from %s" % (msg, addr))
         # TODO: use prefixedMethods from twisted.
+        if msg == "IDLE":
+            self.handle_idle()
         if msg == "INVITE":
             self.handle_invite(message, addr)
         elif msg == "CANCEL":
@@ -1092,7 +1108,15 @@ class Application(object):
 
         check_deferred = self.check_if_ready_to_stream(role="offerer")
         check_deferred.addCallback(_check_cb)
-    
+   
+    def send_idle(self):
+        msg = {
+            "msg": "IDLE",
+            "protocol": self.protocol_version,
+            "sid": 0
+            }
+        self.client.send(msg)
+   
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
         #TODO: use the Deferred it will return
