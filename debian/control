@@ -1,5 +1,5 @@
 Source: scenic
-Section: video
+Section: net
 Priority: optional
 Maintainer: Alexandre Quessy <alexandre@quessy.net>
 Build-Depends:
