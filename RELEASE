@@ -59,4 +59,5 @@ Bug fixes in scenic:
     *   #413 Use hashlib instead of the deprecated md5 module
     *   #412 Use subprocess instead of the deprecated os.popen4
     *   #503 Sometimes ports numbers are not freed
+    *   #527 In some cases when remote doesn't run Scenic, it doesn't give an error message
 
