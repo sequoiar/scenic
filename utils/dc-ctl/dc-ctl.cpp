@@ -274,7 +274,7 @@ int run(int argc, char *argv[])
         po::options_description desc;
         // Add genenic, non-dc1394 dependent options first
         desc.add_options()
-            ("help,h", "produce help message")
+            ("help,h", "produce help message, which will contain more device-specific information if a camera is connected")
             ("version", "produce version")
             ("camera,c", po::value<string>()->default_value("0"), "guid of camera number to use (0 is first camera on bus)")
             ("config,C", po::value<string>(), "path of file with configuration presets")
