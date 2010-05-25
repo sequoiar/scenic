@@ -217,6 +217,16 @@ class Gui(object):
         self.main_window.connect('delete-event', self.on_main_window_deleted)
         self.main_window.set_icon_from_file(os.path.join(configure.PIXMAPS_DIR, 'scenic.png'))
         self.main_tabs_widget = widgets_tree.get_widget("mainTabs")
+        def _on_keypress(widget, event):
+            """
+            On ctrl-Tab, go to next tab. Wraps around. 
+            """
+            if event.keyval == gtk.keysyms.Tab and (event.state & gtk.gdk.CONTROL_MASK):
+                page_num = (self.main_tabs_widget.get_current_page() + 1) % self.main_tabs_widget.get_n_pages()
+                self.main_tabs_widget.set_current_page(page_num)
+                return True
+
+        self.main_window.connect('key-press-event', _on_keypress)
         self.system_tab_contents_widget = widgets_tree.get_widget("system_tab_contents")
         self.debug_tab_contents_widget = widgets_tree.get_widget("debug_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
