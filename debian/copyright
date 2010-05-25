@@ -53,7 +53,12 @@ There are files and directories which have a different copyright/license
 attached. Here is a list.
 
     The code in the py/rtpmidi/protocols/rtp is from the Shtoom project.
-    Shtoom is (C) Copyright 2004 Anthony Baxter, and is made available under the GNU LGPL. 
+    Shtoom is (C) Copyright 2004 Anthony Baxter, and is made available under 
+    the GNU LGPL. 
     The original source code can be found on the project's Web site, which is
     http://divmod.org/trac/wiki/ShtoomProject
+
+    The src/include/ConcurrentQueue.h is in the public domain.
+    It has been written by Anthony Williams in 2008.
+    
 
