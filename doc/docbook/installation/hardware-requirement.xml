@@ -416,16 +416,16 @@
         <tbody>
           <row>
             <entry>Edirol FA101</entry>
-            <entry>Supported</entry>
+            <entry>Supported 
+            </entry>
             <entry>Good Multipurpose Soundcard</entry>
             <entry>Firewire</entry>
             <entry>10</entry>
             <entry>2.6 ms</entry>
-            <entry>
-              <ulink url="http://www.roland.com/products/en/FA-101/">
-
-                <citetitle>Edirol FA101</citetitle>
-              </ulink>
+            <entry><para> Follow our:
+              <link linkend="fa101-settings">
+                Edirol FA-101 page
+              </link></para>
             </entry>
           </row>
           <row>
@@ -435,11 +435,11 @@
             <entry>Firewire</entry>
             <entry>6</entry>
             <entry>2.6 ms</entry>
-            <entry>
-              <ulink url="http://www.roland.com/products/en/FA-66/">
 
-                <citetitle>Edirol FA66</citetitle>
-              </ulink>
+            <entry><para> Follow our: 
+              <link linkend="fa101-settings">
+                Edirol FA-66 page
+              </link></para>
             </entry>
           </row>
           <row>
