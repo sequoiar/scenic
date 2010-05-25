@@ -365,6 +365,7 @@ class Application(object):
             self.poll_x11_devices(), 
             self.poll_xvideo_extension(),
             self.poll_camera_devices(), 
+            self.poll_jack_now(),
             self.poll_midi_devices(),
             self.poll_milhouse_maxchannels()
             ])
@@ -499,29 +500,31 @@ class Application(object):
         Checks if the jackd default audio server is running.
         Called every n seconds.
         """
-        is_running = False
-        is_zombie = False
-        
-        try:
-            jack_servers = jackd.jackd_get_infos() # returns a list of dicts
-        except jackd.JackFrozenError, e:
-            log.error(str(e)) 
-            msg = _("The JACK audio server seems frozen ! \n%s") % (e)
-            log.error(msg)
-            #dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
-            is_zombie = True
-        else:
-            #print "jackd servers:", jack_servers
-            if len(jack_servers) == 0:
-                is_running = False
+        self.poll_jack_now()
+                
+    def poll_jack_now(self):
+        """
+        Polls the JACK servers.
+        @rettype: L{Deferred}
+        """
+        # TODO: the jackd_is_zombie key is deprecated
+        self.devices["jackd_is_zombie"] = False
+        def _cb(result):
+            if len(result) == 0:
+                self.devices["jackd_is_running"] = False
             else:
-                is_running = True
-        if self.devices["jackd_is_running"] != is_running:
-            log.debug("Jackd server changed state: %s" % (jack_servers))
-        self.devices["jackd_is_running"] = is_running
-        self.devices["jackd_is_zombie"] = is_zombie
-        self.devices["jack_servers"] = jack_servers
-        self.gui.update_jackd_status()
+                self.devices["jackd_is_running"] = True
+                jack_servers = result
+            self.devices["jack_servers"] = result
+            log.debug("JACK infos: %s" % (result))
+            self.gui.update_jackd_status()
+        def _eb(reason):
+            print "Error calling jackd_get_infos2: ", reason
+                
+        deferred = jackd.jackd_get_infos2()
+        deferred.addCallback(_cb)
+        deferred.addErrback(_eb)
+        return deferred
     
     def before_shutdown(self):
         """
@@ -1042,11 +1045,11 @@ class Application(object):
             else:
                 deferred.callback(True)
         
-        self._poll_jackd() # does not return a deferred for now... called in a looping call.
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_midi_devices(), 
             self.poll_xvideo_extension(),
+            self.poll_jack_now(),
             self.poll_camera_devices()
             ])
         deferred_list.addCallback(_callback)
