@@ -501,6 +501,7 @@ class Application(object):
         """
         is_running = False
         is_zombie = False
+        
         try:
             jack_servers = jackd.jackd_get_infos() # returns a list of dicts
         except jackd.JackFrozenError, e:

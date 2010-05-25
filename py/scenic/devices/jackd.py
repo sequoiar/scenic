@@ -39,10 +39,15 @@ from twisted.internet import reactor
 from twisted.python import failure
 from scenic import logger
 
+from twisted.internet import utils
+from twisted.internet import defer
+from twisted.python import procutils
+
 log = logger.start(name="jackd")
 
 SUPPORTED_BACKENDS = ['alsa', 'freebob', 'firewire'] # supported backends so far. #TODO: add more
 
+#FIXME: this is not used. Should be moved to the prototyes.
 def double_fork(args):
     """
     Starts a process and double fork so init (PID 1) becomes
@@ -77,9 +82,11 @@ def double_fork(args):
     os.dup2(stderr.fileno(), sys.stderr.fileno())
     os.execv(args[0], args) # TODO: use execve to send os.environ
 
+#FIXME: this is not used. Should be moved to the prototyes.
 class JackFrozenError(Exception):
     pass
 
+#FIXME: this is not used. Should be moved to the prototyes.
 def jackd_get_infos():
     """
     Looks in the file system for informations on running jackd servers. 
@@ -215,6 +222,98 @@ def jackd_get_infos():
                         ret[i]["nperiods"] = 2
             i += 1 # very important...
     return ret
+
+def _parse_jack_info(text):
+    """
+    Parses the results of the jack-info command.
+    
+    Returns a list of dict : 
+    [{
+    'period': 1024,
+    'rate': 44100, 
+    'latency': 32
+    }]
+    @rettype: list
+    """
+    #FIXME: I think jack-info currently only supports reporting 
+    # infos one a single JACK server. It's rather rare to see someone
+    # using more than one. (it typically needs an audio device for each)
+    #FIXME: we don't have the nperiod
+    #FIXME: we don't have the backend
+    #FIXME: we don't know if jackd is zombie
+    
+    ret = []
+    in_system_capture = False
+    in_system_playback = False
+    max_system_capture = 0.0
+    max_system_playback = 0.0
+    
+    for line in text.splitlines():
+        line = line.strip()
+        if line.startswith("JACK server not running"):
+            break
+        else:
+            if len(ret) == 0:
+                ret.append({})
+            if line.startswith("system:capture"):
+                in_system_capture = True
+                in_system_playback = False
+            elif line.startswith("system:playback"):
+                in_system_capture = False
+                in_system_playback = True
+            elif line.startswith("port latency"):
+                pass
+            elif line.startswith("total latency"):
+                if in_system_capture:
+                    val = float(line.split()[3])
+                    if val > max_system_capture:
+                        max_system_capture = val
+                elif in_system_playback:
+                    val = float(line.split()[3])
+                    if val > max_system_playback:
+                        max_system_playback = val
+                else:
+                    pass
+            elif line.startswith("buffer-size"):
+                ret[0]["period"] = int(line.split()[1])
+            elif line.startswith("samplerate"):
+                ret[0]["rate"] = int(line.split()[1])
+    if len(ret) > 0:
+        ret[0]["latency"] = max_system_playback + max_system_capture
+    return ret
+
+def jackd_get_infos2():
+    """
+    Calls jack-info to retrieve info about jackd servers. 
+    
+    Returns a Deferred whose result is list of dict: 
+    [{ 
+    'period': 1024,
+    'rate': 44100, 
+    'latency': 32
+    }]
+    @rtype: Deferred
+    """
+    def _cb(text, deferred):
+        #print text
+        ret = _parse_jack_info(text)
+        deferred.callback(ret)
+        
+    def _eb(reason, deferred):
+        deferred.errback(reason)
+        print("Error listing jackd servers: %s" % (reason))
+    
+    command_name = "jack-info"
+    args = []
+    try:
+        executable = procutils.which(command_name)[0] # gets the executable
+    except IndexError:
+        return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+    deferred = defer.Deferred()
+    d = utils.getProcessOutput(executable, args=args, env=os.environ, errortoo=True) # errortoo puts stderr in output
+    d.addCallback(_cb, deferred)
+    d.addErrback(_eb, deferred)
+    return deferred
 
 if __name__ == "__main__":
     def _poll_jackd():
