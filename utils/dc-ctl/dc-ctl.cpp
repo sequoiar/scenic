@@ -267,7 +267,7 @@ int run(int argc, char *argv[])
         using boost::lexical_cast;
         using boost::tokenizer;
         using boost::char_separator;
-        po::options_description desc("Allowed options");
+        po::options_description desc("dc-ctl");
         // Add genenic, non-dc1394 dependent options first
         desc.add_options()
             ("help,h", "produce help message")
@@ -295,7 +295,7 @@ int run(int argc, char *argv[])
         dc1394 = dc1394_new();
         if (dc1394 == 0)
         {
-            std::cout << "No dc1394 module present\n";
+            std::cerr << "No dc1394 module present\n";
             std::cout << desc << "\n";
             return 0;
         }
