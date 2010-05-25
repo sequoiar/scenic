@@ -75,7 +75,7 @@ int main(int argc, char **argv)
             int flags = jack_port_flags (port);
             if (flags & JackPortIsPhysical)
             {
-		printf ("%s\n", ports[i]);
+                printf ("%s\n", ports[i]);
 		/* show_port_latency */
 				printf("	port latency = %f ms\n",
                         (jack_port_get_latency(port) / (double) rate) * 1000);
