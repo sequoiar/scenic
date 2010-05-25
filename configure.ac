@@ -19,6 +19,10 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
+#i18n:
+AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT([external])
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/ioctl.h unistd.h linux/videodev2.h])
@@ -258,11 +262,7 @@ py/rtpmidi/protocols/rtp/Makefile
 py/scenic/Makefile
 py/scenic/configure.py
 py/scenic/devices/Makefile
-po/Makefile
-po/en_US/Makefile
-po/en_US/LC_MESSAGES/Makefile
-po/fr_CA/Makefile
-po/fr_CA/LC_MESSAGES/Makefile
+po/Makefile.in
 py/scenic/test/Makefile
 py/scripts/Makefile
 src/include/Makefile

@@ -1,0 +1,6 @@
+# List of source files which contain translatable strings.
+py/scenic/application.py
+py/scenic/gui.py
+py/scenic/preview.py
+py/scenic/streamer.py
+py/scenic/preview.py
