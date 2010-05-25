@@ -1645,7 +1645,7 @@ class Gui(object):
         if fill_stats:
             j = self.app.devices["jack_servers"][0] 
             try:
-                latency = (j["period"] * j["nperiods"] / float(j["rate"])) * 1000 # ms
+                latency = j["latency"]
             except KeyError, e:
                 log.error('Key %s is missing for the jack server process' % (e))
             else:
