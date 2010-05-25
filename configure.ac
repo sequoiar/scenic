@@ -211,7 +211,7 @@ CXXFLAGS+=" -fPIC "
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 # FIXME
-SCENIC_LOCALE_DIR=locale
+SCENIC_LOCALE_DIR=po
 AC_SUBST(SCENIC_LOCALE_DIR)
 
 AS_AC_EXPAND(LIBDIR, $libdir)
@@ -258,11 +258,11 @@ py/rtpmidi/protocols/rtp/Makefile
 py/scenic/Makefile
 py/scenic/configure.py
 py/scenic/devices/Makefile
-locale/Makefile
-locale/en_US/Makefile
-locale/en_US/LC_MESSAGES/Makefile
-locale/fr_CA/Makefile
-locale/fr_CA/LC_MESSAGES/Makefile
+po/Makefile
+po/en_US/Makefile
+po/en_US/LC_MESSAGES/Makefile
+po/fr_CA/Makefile
+po/fr_CA/LC_MESSAGES/Makefile
 py/scenic/test/Makefile
 py/scripts/Makefile
 src/include/Makefile
