@@ -230,7 +230,6 @@ class Application(object):
             "video": []
         }
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
-        self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         self._keep_tcp_alive_task = task.LoopingCall(self._keep_tcp_alive)
         self.max_channels_in_raw = None
         reactor.callLater(0, self._start_the_application)
@@ -349,7 +348,6 @@ class Application(object):
             deferred.addCallback(_cb)
             return
         # Devices: JACKD (every 5 seconds)
-        self._jackd_watch_task.start(5, now=True)
         # send some TCP data if connected every 5 minutes
         self._keep_tcp_alive_task.start(5 * 60, now=False)
         # first, poll devices, next restore v4l2 settings, finally, update widgets and poll cameras again.
@@ -493,14 +491,6 @@ class Application(object):
             self.gui.audio_numchannels_widget.set_range(1, channels)
         deferred.addCallback(_callback)
         return deferred
-
-        
-    def _poll_jackd(self):
-        """
-        Checks if the jackd default audio server is running.
-        Called every n seconds.
-        """
-        self.poll_jack_now()
                 
     def poll_jack_now(self):
         """

@@ -578,7 +578,8 @@ class Gui(object):
                 self.app.poll_x11_devices()
                 self.app.poll_camera_devices()
         elif tab_name == "audio_tab_contents":
-            pass
+            self.app.poll_jack_now()
+            log.debug("polling JACK")
         elif tab_name == "system_tab_contents":
             self.network_admin_widget.grab_default()
         elif tab_name == "midi_tab_contents":
