@@ -1,4 +1,4 @@
-man_MANS = milhouse.1 scenic.1 midistream.1 firereset.1 jack-info.1
+man_MANS = milhouse.1 scenic.1 midistream.1 firereset.1 jack-info.1 dc-ctl.1
 EXTRA_DIST = $(man_MANS)
 MAINTAINERCLEANFILES = $(man_MANS)
 
@@ -22,4 +22,7 @@ firereset.1: $(top_srcdir)/src/firereset/firereset.c $(top_srcdir)/man/firereset
 
 jack-info.1: $(top_srcdir)/utils/jack-info/jack_info.c $(top_srcdir)/man/jack-info-man.txt
 	$(HELP2MAN) --include=jack-info-man.txt --name="Prints informations about the running JACK servers" --no-info $(top_builddir)/utils/jack-info/jack-info -o $@
+
+dc-ctl.1: $(top_srcdir)/utils/dc-ctl/dc=ctl.cpp $(top_srcdir)/man/dc-ctl-man.txt
+	$(HELP2MAN) --include=dc-ctl-man.txt --name="Controls connected dc1394 cameras" --no-info $(top_builddir)/utils/dc-ctl/dc-ctl -o $@
 
