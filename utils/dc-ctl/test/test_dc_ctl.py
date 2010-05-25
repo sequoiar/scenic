@@ -16,7 +16,4 @@ class TestDcCtl(unittest.TestCase):
 
         # either camera is not plugged in and we error out correctly, or it is and 
         # we set the brightness on it
-        assert(stdout_value == 'error: libdc1394 error: no camera found on bus\n' 
-                or stdout_value.find('Allowed options') != -1
-                or stdout_value.find('could not get a handle to your IEEE1394 card') != -1
-                or stdout_value.find('No dc1394 module present') != -1)
+        assert(stdout_value.find('print current settings'))
