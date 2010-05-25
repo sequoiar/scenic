@@ -4,6 +4,7 @@ installation_DATA = \
 	ati-settings.xml \
 	audio-video.xml \
 	commandline.xml \
+	edirol-fa101-settings.xml \
 	hardware-requirement.xml \
 	hardware-setup.xml \
 	introduction.xml \
