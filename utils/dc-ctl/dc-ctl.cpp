@@ -268,6 +268,15 @@ int run(int argc, char *argv[])
         using boost::tokenizer;
         using boost::char_separator;
         po::options_description desc("Allowed options");
+        // Add genenic, non-dc1394 dependent options first
+        desc.add_options()
+            ("help,h", "produce help message")
+            ("camera,c", po::value<string>()->default_value("0"), "guid of camera number to use (0 is first camera on bus)")
+            ("config,C", po::value<string>(), "path of file with configuration presets")
+            ("list-features,l", po::bool_switch(), "print available features for this camera")
+            ("list-settings,L", po::bool_switch(), "print current settings for this camera")
+            ("save,x", po::value<string>(), "save current camera settings to the specified filename")
+            ;
 
         // make sure raw1394 is loaded and read/writeable
         raw1394handle_t tmp_handle = raw1394_new_handle();
@@ -287,6 +296,7 @@ int run(int argc, char *argv[])
         if (dc1394 == 0)
         {
             std::cout << "No dc1394 module present\n";
+            std::cout << desc << "\n";
             return 0;
         }
         camerr = dc1394_camera_enumerate(dc1394, &cameras);
@@ -309,8 +319,6 @@ int run(int argc, char *argv[])
         // using strings so that value can be "auto", set default value so that if they're not 
         // given values we can print out their current values
         desc.add_options()
-            ("help,h", "produce help message")
-            ("camera,c", po::value<string>()->default_value("0"), "guid of camera number to use (0 is first camera on bus)")
             ("brightness,b", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_BRIGHTNESS).c_str())
             ("auto-exposure,e", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_EXPOSURE).c_str())
             ("sharpness,s", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_SHARPNESS).c_str())
@@ -319,10 +327,6 @@ int run(int argc, char *argv[])
             ("gamma,g", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_GAMMA).c_str())
             ("shutter-time,t", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_SHUTTER).c_str())
             ("gain,G", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
-            ("config,C", po::value<string>(), "path of file with configuration presets")
-            ("list-features,l", po::bool_switch(), "print available features for this camera")
-            ("list-settings,L", po::bool_switch(), "print current settings for this camera")
-            ("save,x", po::value<string>(), "save current camera settings to the specified filename")
             ;
 
         po::variables_map vm;
