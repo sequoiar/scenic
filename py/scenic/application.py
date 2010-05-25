@@ -1084,10 +1084,11 @@ class Application(object):
                         msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
                     else:
                         msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
-                    log.error(msg)
+                    log.error(msg.replace("\n", " "))
                     self.gui.hide_calling_dialog()
-                    if self._is_negotiating:
-                        dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    #if self._is_negotiating: # ???
+                    self.gui.show_error_dialog(msg)
+                    #    log.debug("Not showing an error since we were not negotiating.")
                     self._is_negotiating = False
                     return None
                    
