@@ -2,4 +2,5 @@
 # This file is not included in the distributed package, nor installed
 # It is only useful for developers to simplify launching scenic.
 cd $(dirname $0)
-PATH=../src/main:./scripts:${PATH} ./scripts/scenic $@
+PATH=../utils/jack-info/:../src/main:./scripts:${PATH} ./scripts/scenic $@
+
