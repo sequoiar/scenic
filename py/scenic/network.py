@@ -23,6 +23,24 @@ Network validation and testing.
 """
 import re
 
+def _has_alpha_xor_digits(ip):
+    """
+    Ensures that an IP address' fields (separated by .'s)
+    are either strictly alphabetic characters of strictly 
+    numeric characters.
+    @param address: str IP to check
+    @ret bool
+    """
+    has_alpha = False
+    has_digit = False
+    for c in ip:
+        if c != '.':
+            has_alpha |= str.isalpha(c)
+            has_digit |= str.isdigit(c)
+            if has_digit and has_alpha:
+                return False
+    return True
+
 def validate_address(address):
     """
     Validates a hostname or a IPv4 address.
@@ -34,6 +52,6 @@ def validate_address(address):
     if re.match(valid_hostname_regex, address) is not None:
         return True
     elif re.match(valid_ipv4_address_regex, address) is not None:
-        return True
+        return _has_alpha_xor_digits(address)   # rudimentary check
     else:
         return False

@@ -254,6 +254,27 @@ void cleanup(dc1394_t * dc1394, dc1394camera_t *camera, dc1394camera_list_t *cam
         dc1394_free(dc1394);
 }
 
+namespace po = boost::program_options;
+
+bool showHelpOrVersion(int argc, char *argv[], const po::options_description &desc, po::variables_map &vm)
+{
+    // in case no dc1394 module is present, if we asked for help 
+    // we'll just show that
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    if (vm.count("help") or argc == 1)  // no args
+    {
+        std::cout << desc << "\n";
+        return true;
+    }
+    else if (vm.count("version"))
+    {
+        std::cout << "dc-ctl " << PACKAGE_VERSION << "\n";
+        return true;
+    }
+    else
+        return false;
+}
 
 int run(int argc, char *argv[])
 {
@@ -266,7 +287,6 @@ int run(int argc, char *argv[])
 
     try 
     {
-        namespace po = boost::program_options;
         using std::string;
         using boost::lexical_cast;
         using boost::tokenizer;
@@ -282,40 +302,30 @@ int run(int argc, char *argv[])
             ("list-settings,L", po::bool_switch(), "print current settings for this camera")
             ("save,x", po::value<string>(), "save current camera settings to the specified filename")
             ;
+        po::variables_map vm;
 
         // make sure raw1394 is loaded and read/writeable
         raw1394handle_t tmp_handle = raw1394_new_handle();
         if (tmp_handle == NULL) 
         {
-            throw std::runtime_error("Warning: could not get a handle to your IEEE1394 card.\n\n"
-                    "Please check that:\n- the card is present\n- the IEEE1394 modules (ieee1394,"
-                    "ohci1394,\n     raw1394 and video1394) are loaded\n- you have read/write "
-                    "permissions on the\n     /dev/raw1394 and /dev/video1394 devices.");
+            if (showHelpOrVersion(argc, argv, desc, vm))
+                return 0;
+            else
+                throw std::runtime_error("Warning: could not get a handle to your IEEE1394 card.\n\n"
+                        "Please check that:\n- the card is present\n- the IEEE1394 modules (ieee1394,"
+                        "ohci1394,\n     raw1394 and video1394) are loaded\n- you have read/write "
+                        "permissions on the\n     /dev/raw1394 and /dev/video1394 devices.");
         }
         else
             raw1394_destroy_handle(tmp_handle);
-        
-        po::variables_map vm;
 
         // get camera information first to have valid ranges
         dc1394error_t camerr;
         dc1394 = dc1394_new();
         if (dc1394 == 0)
         {
-            // no dc1394 module present, so if we asked for help 
-            // we'll just show that
-            po::store(po::parse_command_line(argc, argv, desc), vm);
-            po::notify(vm);
-            if (vm.count("help") or argc == 1)  // no args
-            {
-                std::cout << desc << "\n";
+            if (showHelpOrVersion(argc, argv, desc, vm))
                 return 0;
-            }
-            else if (vm.count("version"))
-            {
-                std::cout << "dc-ctl " << PACKAGE_VERSION << "\n";
-                return 0;
-            }
             else
             {
                 std::cerr << "No dc1394 module present\n";
