@@ -336,7 +336,12 @@ int run(int argc, char *argv[])
         if (camerr != DC1394_SUCCESS)
             throw std::runtime_error("libdc1394 error: this should be more verbose");
         if (cameras->num == 0)
-            throw std::runtime_error("libdc1394 error: no camera found on bus");
+        {
+            if (showHelpOrVersion(argc, argv, desc, vm))
+                return 0;
+            else
+                throw std::runtime_error("libdc1394 error: no camera found on bus");
+        }
 
         camera = dc1394_camera_new_unit(dc1394, cameras->ids[0].guid,
                 cameras->ids[0].unit);
