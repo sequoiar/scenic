@@ -2,7 +2,8 @@ Release notes for Scenic 0.5.9
 
 This release is an other unstable version in the 0.5 series. This version 
 contains bugfixes preparing the 0.6 stable series. A few new features are 
-being introduced as well.
+being introduced as well in this tag, such as jackdmp support, detection of
+missing Gstreamer elements, and more documentation such as man pages.
 
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
@@ -36,15 +37,26 @@ being introduced as well.
         of the 0.5 branch.
 
 New features in milhouse:
-    *   Support for the celt audio codec
+    *   #532 Implement celt support in milhouse
 
 New features in scenic:
     *   Detailled system status window
     *   Detection of the supported Gstreamer elements for codecs
     *   Checking if the codec requested by the peer are supported
+    *   #468 Scenic should support jackdmp (using jack-info)
+    *   #367 Write jack-info, which prints informations about the current jack servers
+    *   #498 Create man page for dc-ctl
+    *   #539 Mention the licences for the borrowed code
 
 Bug fixes in milhouse: 
+    (none)
 
 Bug fixes in scenic: 
+    *   #536 The debian directory should not be in the trunk
     *   #534 Scenic must send some IDLE messages every 5 minutes to keep the TCP connection alive
+    *   #388 Control-Tab should switch to next tab
+    *   #540 dc-ctrl --help and --verision should not need any device
+    *   #413 Use hashlib instead of the deprecated md5 module
+    *   #412 Use subprocess instead of the deprecated os.popen4
+    *   #503 Sometimes ports numbers are not freed
 
