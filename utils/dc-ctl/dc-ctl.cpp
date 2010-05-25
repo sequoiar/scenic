@@ -28,6 +28,7 @@
 #include <boost/program_options.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
+#include "config.h"
 
 
 int featureMin(const dc1394featureset_t &features, dc1394feature_t feature)
@@ -253,39 +254,67 @@ void cleanup(dc1394_t * dc1394, dc1394camera_t *camera, dc1394camera_list_t *cam
         dc1394_free(dc1394);
 }
 
+namespace po = boost::program_options;
+
+bool showHelpOrVersion(int argc, char *argv[], const po::options_description &desc, po::variables_map &vm)
+{
+    // in case no dc1394 module is present, if we asked for help 
+    // we'll just show that
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    if (vm.count("help") or argc == 1)  // no args
+    {
+        std::cout << desc << "\n";
+        return true;
+    }
+    else if (vm.count("version"))
+    {
+        std::cout << "dc-ctl " << PACKAGE_VERSION << "\n";
+        return true;
+    }
+    else
+        return false;
+}
 
 int run(int argc, char *argv[])
 {
+    /// turn off error logging from library as this conflicts with our output
+    void *user_data = 0;
+    dc1394_log_register_handler(DC1394_LOG_ERROR, NULL, user_data);
     dc1394_t * dc1394 = 0; 
     dc1394camera_t *camera = 0;
     dc1394camera_list_t *cameras = 0;
 
     try 
     {
-        namespace po = boost::program_options;
         using std::string;
         using boost::lexical_cast;
         using boost::tokenizer;
         using boost::char_separator;
-        po::options_description desc("dc-ctl");
+        po::options_description desc;
         // Add genenic, non-dc1394 dependent options first
         desc.add_options()
-            ("help,h", "produce help message")
+            ("help,h", "produce help message, which will contain more device-specific information if a camera is connected")
+            ("version", "produce version")
             ("camera,c", po::value<string>()->default_value("0"), "guid of camera number to use (0 is first camera on bus)")
             ("config,C", po::value<string>(), "path of file with configuration presets")
             ("list-features,l", po::bool_switch(), "print available features for this camera")
             ("list-settings,L", po::bool_switch(), "print current settings for this camera")
             ("save,x", po::value<string>(), "save current camera settings to the specified filename")
             ;
+        po::variables_map vm;
 
         // make sure raw1394 is loaded and read/writeable
         raw1394handle_t tmp_handle = raw1394_new_handle();
         if (tmp_handle == NULL) 
         {
-            throw std::runtime_error("Warning: could not get a handle to your IEEE1394 card.\n\n"
-                    "Please check that:\n- the card is present\n- the IEEE1394 modules (ieee1394,"
-                    "ohci1394,\n     raw1394 and video1394) are loaded\n- you have read/write "
-                    "permissions on the\n     /dev/raw1394 and /dev/video1394 devices.");
+            if (showHelpOrVersion(argc, argv, desc, vm))
+                return 0;
+            else
+                throw std::runtime_error("Warning: could not get a handle to your IEEE1394 card.\n\n"
+                        "Please check that:\n- the card is present\n- the IEEE1394 modules (ieee1394,"
+                        "ohci1394,\n     raw1394 and video1394) are loaded\n- you have read/write "
+                        "permissions on the\n     /dev/raw1394 and /dev/video1394 devices.");
         }
         else
             raw1394_destroy_handle(tmp_handle);
@@ -295,9 +324,13 @@ int run(int argc, char *argv[])
         dc1394 = dc1394_new();
         if (dc1394 == 0)
         {
-            std::cerr << "No dc1394 module present\n";
-            std::cout << desc << "\n";
-            return 0;
+            if (showHelpOrVersion(argc, argv, desc, vm))
+                return 0;
+            else
+            {
+                std::cerr << "No dc1394 module present\n";
+                return 1;
+            }
         }
         camerr = dc1394_camera_enumerate(dc1394, &cameras);
         if (camerr != DC1394_SUCCESS)
@@ -329,11 +362,16 @@ int run(int argc, char *argv[])
             ("gain,G", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_GAIN).c_str())
             ;
 
-        po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
         po::notify(vm);
 
-        if (vm.count("help") or argc == 1)  // no args
+        if (vm.count("version"))
+        {
+            std::cout << PACKAGE_VERSION << "\n";
+            cleanup(dc1394, camera, cameras);
+            return 0;
+        }
+        else if (vm.count("help") or argc == 1)  // no args
         {
             std::cout << desc << "\n";
             cleanup(dc1394, camera, cameras);
