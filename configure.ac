@@ -215,8 +215,8 @@ CXXFLAGS+=" -fPIC "
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 # FIXME
-SCENIC_LOCALE_DIR=po
-AC_SUBST(SCENIC_LOCALE_DIR)
+#SCENIC_LOCALE_DIR=po
+AC_SUBST(LOCALE_DIR)
 
 AS_AC_EXPAND(LIBDIR, $libdir)
 
@@ -252,7 +252,6 @@ utils/Makefile
 utils/dc-ctl/Makefile
 utils/jack-info/Makefile
 src/Makefile
-m4/Makefile
 py/Makefile
 py/doc/Makefile
 py/rtpmidi/Makefile

@@ -23,7 +23,7 @@ APPNAME = "scenic"
 VERSION = "@PACKAGE_VERSION@"
 PACKAGE_NAME = """@PACKAGE_NAME@"""
 # paths:
-LOCALE_DIR = os.path.join("@LIBDIR@", 'scenic', "@LOCALE_DIR@")
+LOCALE_DIR = os.path.join("@LOCALE_DIR@")
 GLADE_DIR = os.path.join("@DATADIR@", 'scenic', 'glade')
 PIXMAPS_DIR = os.path.join("@DATADIR@", 'scenic', 'pixmaps')
 THEMES_DIR = os.path.join("@DATADIR@", 'scenic', "themes")
