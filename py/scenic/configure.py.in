@@ -23,7 +23,7 @@ APPNAME = "scenic"
 VERSION = "@PACKAGE_VERSION@"
 PACKAGE_NAME = """@PACKAGE_NAME@"""
 # paths:
-LOCALE_DIR = os.path.join("@LIBDIR@", 'scenic', "@LOCALE_DIR@")
+LOCALE_DIR = os.path.join("@DATADIR@", "locale")
 GLADE_DIR = os.path.join("@DATADIR@", 'scenic', 'glade')
 PIXMAPS_DIR = os.path.join("@DATADIR@", 'scenic', 'pixmaps')
 THEMES_DIR = os.path.join("@DATADIR@", 'scenic', "themes")
@@ -48,7 +48,7 @@ def replace_install_paths_with_devel_paths():
     GLADE_DIR = os.path.join(root_dir, 'data', 'glade')
     PIXMAPS_DIR = os.path.join(root_dir, 'data', 'pixmaps')
     THEMES_DIR = os.path.join(root_dir, 'data', 'themes')
-    LOCALE_DIR = os.path.join(root_dir, "locale")
+    LOCALE_DIR = os.path.join(root_dir, "po") # totally useless when not installed
     DOCBOOK_DIR = os.path.join(root_dir, "doc", "docbook")
     #print("Changed paths to %s %s %s %s" % (GLADE_DIR, PIXMAPS_DIR, THEMES_DIR, LOCALE_DIR))
 
