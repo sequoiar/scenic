@@ -216,7 +216,7 @@ AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 # FIXME
 #SCENIC_LOCALE_DIR=po
-AC_SUBST(LOCALE_DIR)
+AC_SUBST(LOCALE_DIR, $localedir)
 
 AS_AC_EXPAND(LIBDIR, $libdir)
 
