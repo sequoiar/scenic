@@ -1,5 +1,5 @@
 man_MANS = milhouse.1 scenic.1 midistream.1 firereset.1 jack-info.1 dc-ctl.1
-MAN_TEXT_FILES=firereset-man.txt jack-info-man.txt midistream-man.txt milhouse-man.txt scenic-man.txt dc-ctl-man.txt
+MAN_TEXT_FILES=firereset-man.txt jack-info-man.txt midistream-man.txt milhouse-man.txt scenic-man.txt
 EXTRA_DIST = $(man_MANS) $(MAN_TEXT_FILES)
 MAINTAINERCLEANFILES = $(man_MANS)
 
