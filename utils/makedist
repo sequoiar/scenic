@@ -6,12 +6,10 @@ then
 fi
 if [ -f configure ]
 then 
-    if [ -f config.log ]
+    if [ ! -f config.log ]
     then
-        make distclean 
-    else
         ./configure
-        make distclean
     fi
+    make distclean
 fi
 autoreconf -fiv && ./configure && make && fakeroot make distcheck 
