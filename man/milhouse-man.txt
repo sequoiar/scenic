@@ -32,7 +32,8 @@ To choose an input for a V4L2 device:
 milhouse --v4l2-input 1
 
 [AUTHOR]
-Society for Arts and Technology
+Tristan Matthews <tristan@sat.qc.ca>
+Koya Charles <koya.charles@gmail.com>
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic
@@ -55,3 +56,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
+
+[SEE ALSO]
+scenic(1), midistream(1), firereset(1), dc-ctl(1), jack-info(1), /usr/share/scenic/docbook

@@ -1,24 +1,11 @@
 [DESCRIPTION]
-Scenic is software suite for transmission and reception of your fine audio-visual content. It is an interface to the milhouse command-line Gstreamer-based software.
+Controls connected DC ieee1394 cameras 
 
 [SYNOPSIS]
-scenic [options]
-.TP
-Most options are set with the graphical user interface.
-
-[STATE SAVING]
-The configuration is saved in the user's ~/.scenic directory, where "~" is the path to your home directory. 
-
-[EXAMPLES]
-Here is how to start scenic in the kiosk mode: 
-.TP
-scenic --kiosk
+dc-ctl [options]
 
 [AUTHOR]
-Alexandre Quessy <alexandre@quessy.net>
 Tristan Matthews <tristan@sat.qc.ca>
-Simon Piette <simonp@sat.qc.ca>
-Étienne Désautels <etienne@teknozen.net>
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic
@@ -41,6 +28,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
-
-[SEE ALSO]
-milhouse(1), midistream(1), firereset(1), dc-ctl(1), jack-info(1), /usr/share/scenic/docbook
