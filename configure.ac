@@ -252,6 +252,7 @@ utils/Makefile
 utils/dc-ctl/Makefile
 utils/jack-info/Makefile
 src/Makefile
+m4/Makefile
 py/Makefile
 py/doc/Makefile
 py/rtpmidi/Makefile
