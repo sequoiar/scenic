@@ -230,7 +230,6 @@ class Application(object):
             "video": []
         }
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
-        self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
         self._keep_tcp_alive_task = task.LoopingCall(self._keep_tcp_alive)
         self.max_channels_in_raw = None
         reactor.callLater(0, self._start_the_application)
@@ -349,7 +348,6 @@ class Application(object):
             deferred.addCallback(_cb)
             return
         # Devices: JACKD (every 5 seconds)
-        self._jackd_watch_task.start(5, now=True)
         # send some TCP data if connected every 5 minutes
         self._keep_tcp_alive_task.start(5 * 60, now=False)
         # first, poll devices, next restore v4l2 settings, finally, update widgets and poll cameras again.
@@ -493,14 +491,6 @@ class Application(object):
             self.gui.audio_numchannels_widget.set_range(1, channels)
         deferred.addCallback(_callback)
         return deferred
-
-        
-    def _poll_jackd(self):
-        """
-        Checks if the jackd default audio server is running.
-        Called every n seconds.
-        """
-        self.poll_jack_now()
                 
     def poll_jack_now(self):
         """
@@ -811,7 +801,9 @@ class Application(object):
             text = _("The remote peer cannot stream with you because they do not support the requested video codec.")
         elif reason == communication.REFUSE_REASON_PROBLEMS or reason is False:
             text = _("The remote peer cannot stream with you due to technical issues.")
-        dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
+        else:
+            log.info("Got unknown refusal reason.")
+        self.show_error_dialog(text)
 
     def handle_ack(self, addr):
         """
@@ -838,6 +830,19 @@ class Application(object):
             self.disconnect_client()
             if reason != "":
                 log.debug("Received BYE. Reason is %s" % (reason))
+                text = None
+                if reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC:
+                    text = _("The remote peer cannot stream with you since it does not support the audio codec you are asking for.")
+                elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC:
+                    text = _("The remote peer cannot stream with you since it does not support the video codec you are asking for.")
+                elif reason == communication.BYE_REASON_PROBLEMS:
+                    text = _("The remote peer cannot stream with you due to technical issues.")
+                else:
+                    log.info("Got unknown goodbye reason.")
+                if text is not None:
+                    self.show_error_dialog(text)
+
+                #TODO: display an error message to the user if we should
 
     def handle_ok(self):
         """
@@ -1094,10 +1099,11 @@ class Application(object):
                         msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
                     else:
                         msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
-                    log.error(msg)
+                    log.error(msg.replace("\n", " "))
                     self.gui.hide_calling_dialog()
-                    if self._is_negotiating:
-                        dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    #if self._is_negotiating: # ???
+                    self.gui.show_error_dialog(msg)
+                    #    log.debug("Not showing an error since we were not negotiating.")
                     self._is_negotiating = False
                     return None
                    

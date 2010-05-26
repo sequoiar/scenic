@@ -5,7 +5,7 @@ Jack-info prints informations about the running JACK servers.
 jack-info [options]
 
 [AUTHOR]
-Society for Arts and Technology
+Tristan Matthews <tristan@sat.qc.ca>
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic

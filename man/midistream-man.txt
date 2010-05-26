@@ -15,7 +15,9 @@ On the second host, start the receiver:
   midistream -a 10.10.10.80 -o 0 -r 10000 -v
 
 [AUTHOR]
-Society for Arts and Technology
+Antoine Collet <antoine.collet@gmail.com>
+Alexandre Quessy <alexandre@quessy.net>
+Tristan Matthews <tristan@sat.qc.ca>
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic
@@ -38,3 +40,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
+
+[SEE ALSO]
+scenic(1), milhouse(1), firereset(1), dc-ctl(1), jack-info(1), /usr/share/scenic/docbook

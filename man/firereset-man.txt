@@ -15,7 +15,7 @@ Simply ussue the command, maybe specifying the environment variable.
 RAW1394DEV=/dev/raw1394 firereset 
 
 [AUTHOR]
-Society for Arts and Technology
+Alexandre Quessy <alexandre@quessy.net>
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic
