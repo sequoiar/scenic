@@ -4,3 +4,4 @@ py/scenic/gui.py
 py/scenic/preview.py
 py/scenic/streamer.py
 py/scenic/preview.py
+data/glade/scenic.glade
