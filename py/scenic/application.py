@@ -99,6 +99,7 @@ _ = internationalization._
 
 log = logger.start(name="application")
 
+
 class Config(saving.ConfigStateSaving):
     """
     Configuration for the application.
@@ -213,7 +214,6 @@ class Application(object):
         self.got_bye = False 
         # starting the GUI:
         internationalization.setup_i18n()
-        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self.devices = {
             "x11_displays": [], # list of dicts
             "cameras": {}, # dict of dicts (only V4L2 cameras for now)
@@ -225,9 +225,30 @@ class Application(object):
             "midi_input_devices": [],
             "midi_output_devices": [],
             }
-        self._jackd_watch_task = task.LoopingCall(self._poll_jackd)
+        self._supported_codecs = { # populated by the gui.py. See Gui._disable_unsupported_codecs
+            "audio": [], 
+            "video": []
+        }
+        self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
+        self._keep_tcp_alive_task = task.LoopingCall(self._keep_tcp_alive)
         self.max_channels_in_raw = None
         reactor.callLater(0, self._start_the_application)
+
+    def _keep_tcp_alive(self):
+        """
+        Every 5 minutes or so, sends some data to the connected peer over TCP.
+        That's to keep the TCP connection alive.
+        """
+        if self.has_session():
+            self.send_idle()
+
+    def set_supported_codecs(self, audio_codecs, video_codecs):
+        """
+        Called once by Gui._disable_unsupported_codecs
+        """
+        self._supported_codecs["audio"] = audio_codecs
+        self._supported_codecs["video"] = video_codecs
+        log.info("Supported codecs are %s %s" % (audio_codecs, video_codecs))
     
     def format_midi_device_name(self, midi_device_dict):
         """
@@ -327,7 +348,8 @@ class Application(object):
             deferred.addCallback(_cb)
             return
         # Devices: JACKD (every 5 seconds)
-        self._jackd_watch_task.start(5, now=True)
+        # send some TCP data if connected every 5 minutes
+        self._keep_tcp_alive_task.start(5 * 60, now=False)
         # first, poll devices, next restore v4l2 settings, finally, update widgets and poll cameras again.
         # Devices: X11 and XV
         def _cb2(result):
@@ -341,6 +363,7 @@ class Application(object):
             self.poll_x11_devices(), 
             self.poll_xvideo_extension(),
             self.poll_camera_devices(), 
+            self.poll_jack_now(),
             self.poll_midi_devices(),
             self.poll_milhouse_maxchannels()
             ])
@@ -468,35 +491,30 @@ class Application(object):
             self.gui.audio_numchannels_widget.set_range(1, channels)
         deferred.addCallback(_callback)
         return deferred
-
-        
-    def _poll_jackd(self):
+                
+    def poll_jack_now(self):
         """
-        Checks if the jackd default audio server is running.
-        Called every n seconds.
+        Polls the JACK servers.
+        @rettype: L{Deferred}
         """
-        is_running = False
-        is_zombie = False
-        try:
-            jack_servers = jackd.jackd_get_infos() # returns a list of dicts
-        except jackd.JackFrozenError, e:
-            log.error(str(e)) 
-            msg = _("The JACK audio server seems frozen ! \n%s") % (e)
-            log.error(msg)
-            #dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
-            is_zombie = True
-        else:
-            #print "jackd servers:", jack_servers
-            if len(jack_servers) == 0:
-                is_running = False
+        # TODO: the jackd_is_zombie key is deprecated
+        self.devices["jackd_is_zombie"] = False
+        def _cb(result):
+            if len(result) == 0:
+                self.devices["jackd_is_running"] = False
             else:
-                is_running = True
-        if self.devices["jackd_is_running"] != is_running:
-            log.debug("Jackd server changed state: %s" % (jack_servers))
-        self.devices["jackd_is_running"] = is_running
-        self.devices["jackd_is_zombie"] = is_zombie
-        self.devices["jack_servers"] = jack_servers
-        self.gui.update_jackd_status()
+                self.devices["jackd_is_running"] = True
+                jack_servers = result
+            self.devices["jack_servers"] = result
+            log.debug("JACK infos: %s" % (result))
+            self.gui.update_jackd_status()
+        def _eb(reason):
+            print "Error calling jackd_get_infos2: ", reason
+                
+        deferred = jackd.jackd_get_infos2()
+        deferred.addCallback(_cb)
+        deferred.addErrback(_eb)
+        return deferred
     
     def before_shutdown(self):
         """
@@ -589,6 +607,9 @@ class Application(object):
         else:
             return True
 
+    def handle_idle(self):
+        pass
+
     def handle_invite(self, message, addr):
         """
         handles the INVITE message. 
@@ -639,13 +660,26 @@ class Application(object):
                     "video": message["video"],
                     "midi": message["midi"]
                     }
-                if self.config.audio_recv_enabled or self.config.audio_send_enabled:
+                if (self.config.audio_recv_enabled or self.config.audio_send_enabled) and (self.remote_config["audio"]["recv_enabled"] or self.remote_config["audio"]["send_enabled"]):
                     if message["audio"]["sampling_rate"] != self.get_local_sampling_rate():
                         msg = _("A mismatch in the sampling rate of JACK with remote peer has been detected.\nLocal sampling rate is %(local)s, whereas remote sampling rate is %(remote)s.") % {"local": self.get_local_sampling_rate(), "remote": message["audio"]["sampling_rate"]}
                         log.error(msg)
-                        dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                        self.gui.show_error_dialog(msg)
                         _simply_refuse(communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH)
                         return
+                if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["recv_enabled"] and self.config.audio_send_enabled:
+                    msg = _("The remote peer is asking an audio codec that is not installed on your computer.")
+                    log.error(msg)
+                    self.gui.show_error_dialog(msg, self.remote_config["audio"]["codec"])
+                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
+                    return
+                if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["send_enabled"] and self.config.video_send_enabled:
+                    msg = _("The remote peer is asking a video codec that is not installed on your computer.")
+                    log.error(msg)
+                    self.gui.show_error_dialog(msg, self.remote_config["video"]["codec"])
+                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
+                    return
+
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
                 if contact is not None and contact["auto_accept"]:
                     log.info("Contact %s is on auto_accept. Accepting." % (invited_by))
@@ -710,6 +744,24 @@ class Application(object):
                 "video": message["video"],
                 "midi": message["midi"]
                 }
+
+            def _abort(reason):
+                # sends BYE
+                self.send_bye(reason)
+
+            if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["recv_enabled"] and self.config.video_recv_enabled:
+                msg = _("The remote peer is asking an audio codec that is not installed on your computer.")
+                log.error(msg, self.remove_config["audio"]["codec"])
+                self.gui.show_error_dialog(msg)
+                _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
+                return
+            if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["recv_enabled"] and self.config.video_send_enabled:
+                msg = _("The remote peer is asking a video codec that is not installed on your computer.")
+                log.error(msg, self.remove_config["video"]["codec"])
+                self.gui.show_error_dialog(msg)
+                _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
+                return
+
             if self.streamer_manager.is_busy():
                 log.error("Got ACCEPT but we are busy. This is very strange")
                 dialogs.ErrorDialog.create(_("Got an acceptation from a remote peer, but a streaming session is already in progress."), parent=self.gui.main_window)
@@ -726,6 +778,7 @@ class Application(object):
         self._is_negotiating = False
         self.gui.hide_calling_dialog()
         self._free_ports()
+        text = _("The remote peer refused to stream with you for an unknown reason")
         if reason == communication.REFUSE_REASON_REFUSED:
             text = _("The remote peer refused to stream with you.") 
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH:
@@ -742,6 +795,10 @@ class Application(object):
             text = _("The remote peer cannot stream with you since its video capture device could not be found.")
         elif reason == communication.REFUSE_REASON_DISPLAY_NOT_FOUND:
             text = _("The remote peer cannot stream with you since its X11 display could not be found.")
+        elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC:
+            text = _("The remote peer cannot stream with you because they do not support the requested audio codec.")
+        elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC:
+            text = _("The remote peer cannot stream with you because they do not support the requested video codec.")
         elif reason == communication.REFUSE_REASON_PROBLEMS or reason is False:
             text = _("The remote peer cannot stream with you due to technical issues.")
         dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
@@ -754,17 +811,23 @@ class Application(object):
         log.info("Got ACK. Starting streamers as answerer.")
         self.start_streamers(addr)
 
-    def handle_bye(self):
+    def handle_bye(self, reason=""):
         """
         Got BYE
         """
+       #elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC:
+       #    text = _("The remote peer cannot stream with you because they do not support the requested audio codec.")
+       #elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC:
+       #    text = _("The remote peer cannot stream with you because they do not support the requested video codec.")
         self._is_negotiating = False
         self.got_bye = True
         self.stop_streamers()
         if self.client.is_connected():
-            log.info('disconnecting client and sending BYE')
+            log.info('Got BYE. Disconnecting client and sending OK.')
             self.client.send({"msg":"OK", "sid":0})
             self.disconnect_client()
+            if reason != "":
+                log.debug("Received BYE. Reason is %s" % (reason))
 
     def handle_ok(self):
         """
@@ -779,7 +842,9 @@ class Application(object):
         msg = message["msg"]
         log.debug("Got %s from %s" % (msg, addr))
         # TODO: use prefixedMethods from twisted.
-        if msg == "INVITE":
+        if msg == "IDLE":
+            self.handle_idle()
+        elif msg == "INVITE":
             self.handle_invite(message, addr)
         elif msg == "CANCEL":
             self.handle_cancel(message, addr)
@@ -790,7 +855,7 @@ class Application(object):
         elif msg == "ACK":
             self.handle_ack(addr)
         elif msg == "BYE":
-            self.handle_bye()
+            self.handle_bye(message["reason"])
         elif msg == "OK":
             self.handle_ok()
         else:
@@ -815,7 +880,7 @@ class Application(object):
         if self._check_if_all_disabled():
             error_msg = _("Cannot start streaming if all the streams are disabled.")
             dialogs.ErrorDialog.create(error_msg, parent=self.gui.main_window)
-            self.send_bye()
+            self.send_bye(communication.BYE_REASON_PROBLEMS)
             self.stop_streamers()
         else:
             self.streamer_manager.start(addr)
@@ -931,6 +996,9 @@ class Application(object):
             midi_input_devices = [device["name"] for device in self.devices["midi_input_devices"]]
             midi_output_devices = [device["name"] for device in self.devices["midi_output_devices"]]
             cameras = self.devices["cameras"].keys()
+
+#TODO: if video receive is enabled and video codec is not supported: error
+#TODO: if audio receive is enabled and audio codec is not supported: error
                 
             if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared!") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
@@ -939,7 +1007,7 @@ class Application(object):
             elif self.config.video_source == "v4l2src" and self.parse_v4l2_device_name(self.config.video_device) is None: #TODO: do not test if not sending video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
                 return deferred.callback(communication.REFUSE_REASON_CAMERA_NOT_FOUND)
-                
+
             elif (not self.devices["jackd_is_running"]) and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
                 log.debug("audio send/recv enabled: %s %s" % (self.config.audio_send_enabled, self.config.audio_recv_enabled))
                 log.debug("self.devices[\'jackd_is_running\'] = %s" % (self.devices["jackd_is_running"]))
@@ -967,11 +1035,11 @@ class Application(object):
             else:
                 deferred.callback(True)
         
-        self._poll_jackd() # does not return a deferred for now... called in a looping call.
         deferred_list = defer.DeferredList([
             self.poll_x11_devices(), 
             self.poll_midi_devices(), 
             self.poll_xvideo_extension(),
+            self.poll_jack_now(),
             self.poll_camera_devices()
             ])
         deferred_list.addCallback(_callback)
@@ -1016,10 +1084,11 @@ class Application(object):
                         msg = _("Could not invite contact %(name)s. \n\nHost %(ip)s is unreachable.") % {"ip": ip, "name": contact["name"]}
                     else:
                         msg = _("Could not invite contact %(name)s. \n\nError trying to connect to %(ip)s:%(port)s:\n %(reason)s") % {"ip": ip, "name": contact["name"], "port": port, "reason": reason.value}
-                    log.error(msg)
+                    log.error(msg.replace("\n", " "))
                     self.gui.hide_calling_dialog()
-                    if self._is_negotiating:
-                        dialogs.ErrorDialog.create(msg, parent=self.gui.main_window)
+                    #if self._is_negotiating: # ???
+                    self.gui.show_error_dialog(msg)
+                    #    log.debug("Not showing an error since we were not negotiating.")
                     self._is_negotiating = False
                     return None
                    
@@ -1034,7 +1103,16 @@ class Application(object):
 
         check_deferred = self.check_if_ready_to_stream(role="offerer")
         check_deferred.addCallback(_check_cb)
-    
+   
+    def send_idle(self):
+        msg = {
+            "msg": "IDLE",
+            "protocol": self.protocol_version,
+            "sid": 0
+            }
+        if self.client.is_connected():
+            self.client.send(msg)
+   
     def send_accept(self, addr):
         # UPDATE config once we accept the invitie
         #TODO: use the Deferred it will return
@@ -1061,12 +1139,12 @@ class Application(object):
         """
         self.client.send({"msg":"ACK", "sid":0})
 
-    def send_bye(self):
+    def send_bye(self, reason=""):
         """
         Sends BYE
         BYE stops the streaming on the remote host.
         """
-        self.client.send({"msg":"BYE", "sid":0})
+        self.client.send({"msg":"BYE", "sid":0, "reason":reason})
         self._is_negotiating = False
     
     def send_cancel_and_disconnect(self, reason=""):

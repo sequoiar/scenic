@@ -10,11 +10,21 @@
   <sect1 id="good-scenic-experience">
    <title>For a good &app; experience</title>  
       <para>You need to take the time to choose your computer and related devices. Buying a computer for linux, and specifically for audio-video performance requires time and knowledge. Computer parts and devices are constantly changing. Please do not rush your self to quickly buy the fastest and big high end computer sold by your favorite next corner computer store. Chances are you gone have problems. Unstead, follow every steps of our installation manual. It will guide you on everything you need to know to make good choices.</para> 
+
+ <orderedlist>
+    <listitem>Think of your project objective and define your project. Is it an amateur setup? A setup for test purpose only, an artistic performance with a public, an important presentation over the network with your future partners. Each project will require different ressources (materials, financials an in human ressource). This will affect wich computer specification you will finally used.  </listitem>
+    <listitem> Define your needs depending of your objectives. Here are some examples of needs related to a &app; utilisation: Good quality and performance, stability, quick setup, get your system quickly, for testing purpose only, a really stable setup, a developpement setup, cutting edge technology. Unfortunatly, in most cases, one cannot aswer to all needs. This mean that choices have to be made. To help you make a choice, we have separate the various material ressources in 3 cathegories. High, medium and low performance.</listitem>
+
+<listitem>Choose in our 3 cathegories, wich hardware, devices and computer specification best fit your needs. Take the time to read reviews on the materials. Try to find other project similar to yours and compare the material used. Follow the various links and advices we propose in the following section. Ask us. We will be happy to help you. </listitem>
+
+<listitem> Be patient. Take the time to make the good choice because you will have to live with it ; ). Take a tea with cookies. Enjoy the life and get ready to live THE SCENIC EXPERIENCE</listitem>
+</orderedlist>
+ 
   </sect1>
   <sect1 id="computer-specifications">
     <title>Computer Specifications</title>
-      <para>We strongly recommend to verify that your computer hardware is compatible with linux.</para> 
-      <entry>
+      <para>We strongly recommend to verify that your computer hardware is compatible with linux.</para>
+     <entry>
       <ulink url="http://www.linuxhardware.org">
       <citetitle>linuxhardware.org</citetitle></ulink></entry> 
     <para>We recommend the following computer specification:</para>
@@ -406,16 +416,16 @@
         <tbody>
           <row>
             <entry>Edirol FA101</entry>
-            <entry>Supported</entry>
+            <entry>Supported 
+            </entry>
             <entry>Good Multipurpose Soundcard</entry>
             <entry>Firewire</entry>
             <entry>10</entry>
             <entry>2.6 ms</entry>
-            <entry>
-              <ulink url="http://www.roland.com/products/en/FA-101/">
-
-                <citetitle>Edirol FA101</citetitle>
-              </ulink>
+            <entry><para> Follow our:
+              <link linkend="fa101-settings">
+                Edirol FA-101 page
+              </link></para>
             </entry>
           </row>
           <row>
@@ -425,11 +435,11 @@
             <entry>Firewire</entry>
             <entry>6</entry>
             <entry>2.6 ms</entry>
-            <entry>
-              <ulink url="http://www.roland.com/products/en/FA-66/">
 
-                <citetitle>Edirol FA66</citetitle>
-              </ulink>
+            <entry><para> Follow our: 
+              <link linkend="fa101-settings">
+                Edirol FA-66 page
+              </link></para>
             </entry>
           </row>
           <row>

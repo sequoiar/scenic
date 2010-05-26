@@ -137,4 +137,5 @@ if __name__ == "__main__":
     client_factory = ClientFactory()
     clientPort = reactor.connectTCP("localhost", PORT_NUMBER, client_factory)
     client_factory.connected_deferred.addCallback(on_connected)
+    client_factory.connected_deferred.addErrback(on_error)
     reactor.run()

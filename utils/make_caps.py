@@ -74,7 +74,7 @@ class VideoProfile(Profile):
         self.height = height
         self.pixel_aspect_ratio = self.get_pixel_aspect_ratio(picture_aspect_ratio)
         # FIXME: this only works for yuv and doesn't handle other framerates
-        self.src = "videotestsrc ! video/x-raw-yuv, width=%d, height=%d, framerate=30000/1001, pixel-aspect-ratio=%s " \
+        self.src = "videotestsrc ! video/x-raw-yuv, width=%d, height=%d, framerate=30/1, pixel-aspect-ratio=%s ! " \
                     % (self.width, self.height, self.pixel_aspect_ratio) 
 
 class AudioProfile(Profile):
@@ -208,7 +208,10 @@ for rate in SAMPLERATES:
             profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
 
 for profile_name, profile in profiles.iteritems():
-    profile = generate_caps(profile_name, profile)
+    try:
+        profile = generate_caps(profile_name, profile)
+    except gobject.GError: 
+        pass
 
 # generate caps by hand for raw because its more stable than getting them from a pipeline
 codec = 'raw'

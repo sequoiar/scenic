@@ -18,4 +18,4 @@ html-local:
 	done 
 
 clean-local:
-	rm -rf html
+	rm -rf html installation-manual.xml user-manual.xml

@@ -405,9 +405,8 @@ GstElement *Pipeline::makeElement(const char *factoryName, const char *elementNa
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
     if (element == 0)
-        THROW_ERROR("Element not made. factoryName: " << 
-                factoryName << " elementName: " << elementName << 
-                "check that all necessary plugins are installed with " <<
+        THROW_ERROR("No such element or pluging " << factoryName <<
+                ".Check that all necessary plugins are installed with " <<
                 "gst-check.py");
 
     add(element);

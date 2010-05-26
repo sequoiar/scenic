@@ -1,6 +1,6 @@
 #utils import
 import re
-import os
+import subprocess
 
 #rtp import
 from rtpmidi.protocols.rtp.rtp_control import RTPControl
@@ -79,10 +79,12 @@ class RTPSession(object):
 
 #Utilities
 def get_first_cmd_answer(cmd):
-    put, get = os.popen4(cmd)
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+    (child_stdin, child_stdout_and_stderr) = (proc.stdin, proc.stdout)
     p = re.compile('\\n')
 
-    for line in get.readlines():
+    for line in child_stdout_and_stderr.readlines():
+        print(line)
         res = p.sub('', line)
         return str(res)
 

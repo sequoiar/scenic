@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            std::cerr << "exitting with error: " << e.what();
+            std::cerr << "exitting with error: " << e.what() << std::endl;
             std::cerr << "Please file a bug at " << PACKAGE_BUGREPORT << std::endl;
             ret = 1;
         }

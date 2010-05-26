@@ -38,6 +38,9 @@ REFUSE_REASON_XVIDEO_NOT_FOUND = "xvideo extension not found"
 REFUSE_REASON_MIDI_DEVICE_NOT_FOUND = "midi device not found"
 REFUSE_REASON_CAMERA_NOT_FOUND = "v4l2 device not found"
 REFUSE_REASON_DISPLAY_NOT_FOUND = "x11 display not found"
+REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC = "unsupported audio codec"
+REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC = "unsupported video codec"
+BYE_REASON_PROBLEMS = "technical problems"
 
 class Server(object):
     """
@@ -143,7 +146,7 @@ class Client(object):
             return self.client_factory.connected_deferred
         else:
             msg = "The client is already connected to some host."
-            log.error(msg)
+            log.warning(msg)
             #TODO: return failure?
             return defer.succeed(True) # FIXME
  

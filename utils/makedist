@@ -1,10 +1,17 @@
 #!/bin/bash
 
-make distclean
-./autogen.sh && make && make distcheck && 
-SCENIC=$(echo scenic-*.tar.gz)
-SCENICDIR=${SCENIC%%.tar.gz}
-SCENICVERSION=${SCENICDIR##scenic-}
-tar xzf scenic-*.tar.gz
-find $SCENICDIR -type d -exec chmod 755 {} +
-fakeroot tar czf scenic-*.tar.gz $SCENICDIR
+if [ ! -f configure.ac ];
+then
+    exit 1
+fi
+if [ -f configure ]
+then 
+    if [ -f config.log ]
+    then
+        make distclean 
+    else
+        ./configure
+        make distclean
+    fi
+fi
+autoreconf -fiv && ./configure && make && fakeroot make distcheck 

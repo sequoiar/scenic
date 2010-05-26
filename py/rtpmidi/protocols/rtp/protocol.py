@@ -5,7 +5,7 @@
 #utils
 import random
 import os
-import md5
+import hashlib 
 import socket
 from time import sleep
 from time import time
@@ -615,7 +615,7 @@ class RTPProtocol(DatagramProtocol):
 
     def genSSRC(self):
         # Python-ish hack at RFC1889, Appendix A.6
-        m = md5.new()
+        m = hashlib.new('md5')
         m.update(str(time()))
         m.update(str(id(self)))
         if hasattr(os, 'getuid'):
@@ -632,7 +632,7 @@ class RTPProtocol(DatagramProtocol):
 
     def genInitTS(self):
         # Python-ish hack at RFC1889, Appendix A.6
-        m = md5.new()
+        m = hashlib.new('md5')
         m.update(str(self.genSSRC()))
         m.update(str(time()))
         hex = m.hexdigest()
@@ -648,7 +648,7 @@ class RTPProtocol(DatagramProtocol):
         if os.path.exists("/dev/urandom"):
             hex = open('/dev/urandom').read(16).encode("hex")
         else:
-            m = md5.new()
+            m = hashlib.new('md5')
             m.update(str(time()))
             m.update(str(random.random()))
             m.update(str(id(self.dest)))

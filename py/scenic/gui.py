@@ -39,6 +39,7 @@ from scenic import dialogs
 from scenic import glade
 from scenic import preview
 from scenic import network
+from scenic import gstreamer
 from scenic import communication
 from scenic.devices import cameras
 from scenic.devices import networkinterfaces
@@ -216,6 +217,16 @@ class Gui(object):
         self.main_window.connect('delete-event', self.on_main_window_deleted)
         self.main_window.set_icon_from_file(os.path.join(configure.PIXMAPS_DIR, 'scenic.png'))
         self.main_tabs_widget = widgets_tree.get_widget("mainTabs")
+        def _on_keypress(widget, event):
+            """
+            On ctrl-Tab, go to next tab. Wraps around. 
+            """
+            if event.keyval == gtk.keysyms.Tab and (event.state & gtk.gdk.CONTROL_MASK):
+                page_num = (self.main_tabs_widget.get_current_page() + 1) % self.main_tabs_widget.get_n_pages()
+                self.main_tabs_widget.set_current_page(page_num)
+                return True
+
+        self.main_window.connect('key-press-event', _on_keypress)
         self.system_tab_contents_widget = widgets_tree.get_widget("system_tab_contents")
         self.debug_tab_contents_widget = widgets_tree.get_widget("debug_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
@@ -382,12 +393,64 @@ class Gui(object):
         reactor.callLater(0, _start_update_id)
 
         self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
-        # The main app must call init_widgets_value
+        self._disable_unsupported_codecs()
    
     #TODO: for the preview in the drawing area   
     #def on_expose_event(self, widget, event):
     #    self.preview_xid = widget.window.xid
     #    return False
+
+    def _disable_unsupported_codecs(self):
+        """
+        Checks if codecs for which not Gstreamer elements are found, and disabled them.
+        Called only once at startup.
+        """
+        # all human-readable names, not computer-readble
+        #TODO: i18nize
+        working_video_codecs = []
+        broken_video_codecs = []
+        working_audio_codecs = []
+        broken_audio_codecs = []
+        readable_working_audio_codecs = []
+        readable_working_video_codecs = []
+
+        # video codecs:
+        for readable, codec in VIDEO_CODECS.iteritems():
+            if gstreamer.is_codec_supported(codec):
+                working_video_codecs.append(codec)
+                readable_working_video_codecs.append(readable)
+            else:
+                broken_video_codecs.append(readable)
+        
+        # audio codecs:
+        for readable, codec in AUDIO_CODECS.iteritems():
+            if gstreamer.is_codec_supported(codec):
+                working_audio_codecs.append(codec)
+                readable_working_audio_codecs.append(readable)
+            else:
+                broken_audio_codecs.append(readable)
+
+        # set combo boxes choices:
+        _set_combobox_choices(self.audio_codec_widget, readable_working_audio_codecs)
+        _set_combobox_choices(self.video_codec_widget, readable_working_video_codecs)
+        
+        #if len(broken_audio_codecs) != 0 or len(broken_video_codecs) != 0:
+        #    msg = _("Some codecs are not supported on your system. They are currently disabled.") 
+        #    details = _("You should consider installing the Gstreamer elements to benefit from those codecs.")
+        #    details += "\n"
+        #    if len(broken_video_codecs) != 0:
+        #        details += _("Disabled video codecs:")
+        #        details += "\n"
+        #        for codec in broken_video_codecs:
+        #            details += " * %s\n" % (codec)
+        #    if len(broken_audio_codecs) != 0:
+        #        details += _("Disabled audio codecs:")
+        #        details += "\n"
+        #        for codec in broken_audio_codecs:
+        #            details += " * %s\n" % (codec)
+        #    self.show_error_dialog(msg, details)
+        # important:
+        self.app.set_supported_codecs(working_audio_codecs, working_video_codecs)
 
     # ------------------ window events and actions --------------------
     def toggle_fullscreen(self):
@@ -515,7 +578,8 @@ class Gui(object):
                 self.app.poll_x11_devices()
                 self.app.poll_camera_devices()
         elif tab_name == "audio_tab_contents":
-            pass
+            self.app.poll_jack_now()
+            log.debug("polling JACK")
         elif tab_name == "system_tab_contents":
             self.network_admin_widget.grab_default()
         elif tab_name == "midi_tab_contents":
@@ -1481,7 +1545,7 @@ class Gui(object):
 
     # -------------------------- menu items -----------------
     
-    def on_about_menu_item_activate(self, menu_item):
+    def on_about_menu_item_activated(self, menu_item):
         About.create() # TODO: set parent window ?
     
     def on_quit_menu_item_activated(self, menu_item):
@@ -1503,9 +1567,13 @@ class Gui(object):
         """
         Opens the docbook doc
         """
-        log.info("Menu item 'Help' chosen")
+        log.info("Menu item 'User manual' chosen")
         docbook_file = os.path.join(configure.DOCBOOK_DIR, "user-manual.xml")
         process.run_once("yelp", docbook_file)
+
+    def on_status_menu_item_activated(self, menu_item):
+        log.info("Menu item 'Status window' chosen")
+        x = StatusWindow(self.app) # XXX ???
 
     # ---------------------- invitation dialogs -------------------
 
@@ -1588,7 +1656,7 @@ class Gui(object):
         if fill_stats:
             j = self.app.devices["jack_servers"][0] 
             try:
-                latency = (j["period"] * j["nperiods"] / float(j["rate"])) * 1000 # ms
+                latency = j["latency"]
             except KeyError, e:
                 log.error('Key %s is missing for the jack server process' % (e))
             else:
@@ -1644,3 +1712,45 @@ class About(object):
     def destroy_about(self, *args):
         self.about_dialog.destroy()
 
+class StatusWindow(object):
+    """
+    Detailled status
+    """
+    def __init__(self, app):
+        self.app = app
+        self.icon_file = os.path.join(configure.PIXMAPS_DIR, 'scenic.png')
+        widgets_tree = glade.get_widgets_tree()
+        # Get all the widgets that we use
+        self.status_window = widgets_tree.get_widget("status_window")
+        self.status_textview_widget = widgets_tree.get_widget("status_textview")
+        # set icon
+        if not os.path.exists(self.icon_file):
+            log.error("Could not find icon file %s." % (self.icon_file))
+        else:
+            self.status_window.set_icon_from_file(self.icon_file)
+        # populate the info
+        self._populate_info()
+    
+        # show it
+        self.status_window.show_all()
+
+    def _populate_info(self):
+        def _yes_or_no(data):
+            if data:
+                return _("YES")
+            else:
+                return _("NO")
+
+        def _format_text_and_yesno(text, yesno):
+            return "%s %s\n" % (text, _yes_or_no(yesno))
+
+        txt = ""
+        txt += _format_text_and_yesno(_("MIDI is supported..."), self.app._midi_is_supported)
+        
+        for readable, codec in VIDEO_CODECS.iteritems():
+            txt += _format_text_and_yesno(_("Video codec %(codec)s is supported...") % {"codec": readable}, codec in self.app._supported_codecs["video"])
+        for readable, codec in AUDIO_CODECS.iteritems():
+            txt += _format_text_and_yesno(_("Audio codec %(codec)s is supported...") % {"codec": readable}, codec in self.app._supported_codecs["audio"])
+
+        self.status_textview_widget.get_buffer().set_text(unicode(txt))
+    

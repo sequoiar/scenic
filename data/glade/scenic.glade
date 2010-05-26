@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Mon May 10 13:50:42 2010 -->
+<!--Generated with glade3 3.4.5 on Fri May 21 17:27:26 2010 -->
 <glade-interface>
   <widget class="GtkDialog" id="confirm_dialog">
     <property name="border_width">5</property>
@@ -751,6 +751,15 @@
                   <widget class="GtkMenu" id="menu1">
                     <property name="visible">True</property>
                     <child>
+                      <widget class="GtkMenuItem" id="status_menu_item">
+                        <property name="visible">True</property>
+                        <property name="tooltip" translatable="yes">View informations about Scenic features on your system.</property>
+                        <property name="label" translatable="yes">Detailled Status</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_status_menu_item_activated"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkImageMenuItem" id="quit_menu_item">
                         <property name="visible">True</property>
                         <property name="label">gtk-quit</property>
@@ -772,21 +781,11 @@
                   <widget class="GtkMenu" id="menu3">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkImageMenuItem" id="help_menu_item">
+                      <widget class="GtkMenuItem" id="help_menu_item">
                         <property name="visible">True</property>
-                        <property name="label">gtk-help</property>
+                        <property name="label" translatable="yes">User Manual</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                         <signal name="activate" handler="on_help_menu_item_activated"/>
-                      </widget>
-                    </child>
-                    <child>
-                      <widget class="GtkImageMenuItem" id="about_menu_item">
-                        <property name="visible">True</property>
-                        <property name="label">gtk-about</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                        <signal name="activate" handler="on_about_menu_item_activate"/>
                       </widget>
                     </child>
                     <child>
@@ -795,6 +794,15 @@
                         <property name="label" translatable="yes">Installation Manual</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_installation_manual_menu_item_activated"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="about_menu_item">
+                        <property name="visible">True</property>
+                        <property name="label">gtk-about</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_about_menu_item_activated"/>
                       </widget>
                     </child>
                   </widget>
@@ -868,9 +876,9 @@
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="receives_default">True</property>
-                                            <property name="response_id">0</property>
                                             <property name="has_tooltip">True</property>
                                             <property name="tooltip_text">Open a window with the selected video source</property>
+                                            <property name="response_id">0</property>
                                             <signal name="toggled" handler="on_video_view_preview_toggled"/>
                                             <child>
                                               <widget class="GtkAlignment" id="alignment42">
@@ -1281,10 +1289,10 @@
                                     <child>
                                       <widget class="GtkComboBox" id="aspect_ratio">
                                         <property name="visible">True</property>
-                                        <property name="items" translatable="yes">4:3
-16:9</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text">Picture aspect ratio. Commonly used values are 16:9 for 704x480 and 4:3 for 640x480</property>
+                                        <property name="items" translatable="yes">4:3
+16:9</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1365,9 +1373,9 @@ PAL</property>
                                     <child>
                                       <widget class="GtkComboBox" id="v4l2_input">
                                         <property name="visible">True</property>
-                                        <property name="items" translatable="yes">Default</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text">Some devices have many inputs. Choose which one.</property>
+                                        <property name="items" translatable="yes">Default</property>
                                         <signal name="changed" handler="on_v4l2_input_changed"/>
                                       </widget>
                                     </child>
@@ -1417,10 +1425,10 @@ PAL</property>
                                     <child>
                                       <widget class="GtkComboBox" id="video_source">
                                         <property name="visible">True</property>
-                                        <property name="wrap_width">1</property>
-                                        <property name="items" translatable="yes">Color bars</property>
                                         <property name="has_tooltip">True</property>
                                         <property name="tooltip_text">Select your camera or capture device</property>
+                                        <property name="wrap_width">1</property>
+                                        <property name="items" translatable="yes">Color bars</property>
                                         <signal name="changed" handler="on_video_source_changed"/>
                                       </widget>
                                     </child>
@@ -1584,12 +1592,12 @@ PAL</property>
                                       <widget class="GtkCheckButton" id="video_fullscreen">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Fullscreen can be toggled with the 'F' key</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">1</property>
                                         <property name="response_id">0</property>
                                         <property name="draw_indicator">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Fullscreen can be toggled with the 'F' key</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1623,11 +1631,11 @@ PAL</property>
                                     <child>
                                       <widget class="GtkComboBox" id="video_display">
                                         <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Useful to display the video on another monitor</property>
                                         <property name="items" translatable="yes">:0.0
 :0.1
 </property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Useful to display the video on another monitor</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1663,12 +1671,12 @@ PAL</property>
                                     <child>
                                       <widget class="GtkComboBox" id="video_codec">
                                         <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Choose h.263 for low bandwidth or low CPU setup. Use Theora for a patent-free experience. Use MPEG4 for most situation. Use h.264 to use all the CPU power you have.</property>
                                         <property name="items" translatable="yes">h.263
 MPEG4
 h.264
 Theora</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Choose h.263 for low bandwidth or low CPU setup. Use Theora for a patent-free experience. Use MPEG4 for most situation. Use h.264 to use all the CPU power you have.</property>
                                         <signal name="changed" handler="on_video_codec_changed"/>
                                       </widget>
                                     </child>
@@ -1719,12 +1727,12 @@ Theora</property>
                                       <widget class="GtkCheckButton" id="video_deinterlace">
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Deinterlace makes a nicer image when the source is analog, but it adds latency.</property>
                                         <property name="use_underline">True</property>
                                         <property name="xalign">1</property>
                                         <property name="response_id">0</property>
                                         <property name="draw_indicator">True</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text">Deinterlace makes a nicer image when the source is analog, but it adds latency.</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -1750,11 +1758,11 @@ Theora</property>
                                           <widget class="GtkSpinButton" id="video_jitterbuffer">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                             <property name="width_chars">6</property>
                                             <property name="adjustment">50 50 1000 1 10 0</property>
                                             <property name="numeric">True</property>
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                           </widget>
                                         </child>
                                       </widget>
@@ -1919,12 +1927,11 @@ Theora</property>
                                     <child>
                                       <widget class="GtkComboBox" id="audio_source">
                                         <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Use a tone for testing. Receiving audio is always on Jack.</property>
                                         <property name="wrap_width">1</property>
                                         <property name="items" translatable="yes">Test sound
 JACK</property>
-
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Use a tone for testing. Receiving audio is always on Jack.</property>
                                       </widget>
                                     </child>
                                   </widget>
@@ -2115,11 +2122,11 @@ JACK</property>
                                     <child>
                                       <widget class="GtkLabel" id="audio_jack_state">
                                         <property name="visible">True</property>
+                                        <property name="has_tooltip">True</property>
+                                        <property name="tooltip_text">Open qjackctl to start jack daemon.</property>
                                         <property name="xalign">0</property>
                                         <property name="label" translatable="yes">&lt;b&gt;Running&lt;/b&gt;</property>
                                         <property name="use_markup">True</property>
-                                        <property name="has_tooltip">True</property>
-                                        <property name="tooltip_text">Open qjackctl to start jack daemon.</property>
                                       </widget>
                                       <packing>
                                         <property name="position">1</property>
@@ -2131,7 +2138,7 @@ JACK</property>
                                   <widget class="GtkLabel" id="jack_latency">
                                     <property name="visible">True</property>
                                     <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text" translatable="yes">JACK output latency in milliseconds, calculated based on the period, rate and buffer settings. This is the latency of the audio system only.</property>
+                                    <property name="tooltip_text">JACK output latency in milliseconds, calculated based on the period, rate and buffer settings. This is the latency of the audio system only.</property>
                                     <property name="xalign">0</property>
                                     <property name="xpad">5</property>
                                     <property name="ypad">5</property>
@@ -2351,11 +2358,11 @@ JACK</property>
                                 <child>
                                   <widget class="GtkComboBox" id="audio_codec">
                                     <property name="visible">True</property>
+                                    <property name="has_tooltip">True</property>
+                                    <property name="tooltip_text">RAW will gives the most quality and less latency. MP3 works only with 2 audio channels. Vorbis is good for many channels but adds latency.</property>
                                     <property name="items" translatable="yes">Raw
 MP3
 Vorbis</property>
-                                    <property name="has_tooltip">True</property>
-                                    <property name="tooltip_text">RAW will gives the most quality and less latency. MP3 works only with 2 audio channels. Vorbis is good for many channels but adds latency.</property>
                                     <signal name="changed" handler="on_audio_codec_changed"/>
                                   </widget>
                                 </child>
@@ -2919,10 +2926,10 @@ Vorbis</property>
                                         <property name="right_padding">5</property>
                                         <child>
                                           <widget class="GtkSpinButton" id="midi_jitterbuffer">
-                                            <property name="has_tooltip">True</property>
-                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
+                                            <property name="has_tooltip">True</property>
+                                            <property name="tooltip_text">If you have network jitter and too much video artifacts, increase this value. In a LAN, you can lower this value. More buffer means more latency.</property>
                                             <property name="adjustment">5 5 2000 1 10 0</property>
                                             <property name="numeric">True</property>
                                           </widget>
@@ -4212,10 +4219,10 @@ Jitter: 1238 ns</property>
                         <child>
                           <widget class="GtkComboBox" id="v4l2_standard2">
                             <property name="visible">True</property>
-                            <property name="items" translatable="yes">NTSC
-PAL</property>
                             <property name="has_tooltip">True</property>
                             <property name="tooltip_text">Most of the Americas, Japan, South Korea, Taiwan, Burma, and some Pacific island nations and territories use NTSC. The rest of the world use PAL</property>
+                            <property name="items" translatable="yes">NTSC
+PAL</property>
                           </widget>
                         </child>
                       </widget>
@@ -4236,9 +4243,9 @@ PAL</property>
                         <child>
                           <widget class="GtkComboBox" id="v4l2_input2">
                             <property name="visible">True</property>
-                            <property name="items" translatable="yes">Default</property>
                             <property name="has_tooltip">True</property>
                             <property name="tooltip_text">Select your camera or capture device</property>
+                            <property name="items" translatable="yes">Default</property>
                           </widget>
                         </child>
                       </widget>
@@ -4398,6 +4405,31 @@ PAL</property>
           <packing>
             <property name="position">1</property>
           </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkWindow" id="status_window">
+    <property name="width_request">320</property>
+    <property name="height_request">320</property>
+    <property name="title" translatable="yes">Detailled Status</property>
+    <child>
+      <widget class="GtkScrolledWindow" id="scrolledwindow1">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+        <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
+        <child>
+          <widget class="GtkViewport" id="viewport1">
+            <property name="visible">True</property>
+            <property name="resize_mode">GTK_RESIZE_QUEUE</property>
+            <child>
+              <widget class="GtkTextView" id="status_textview">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </widget>
+            </child>
+          </widget>
         </child>
       </widget>
     </child>

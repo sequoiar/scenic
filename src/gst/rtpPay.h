@@ -127,13 +127,23 @@ class VorbisPay : public Pay
         explicit VorbisPay(const Pipeline &pipeline);
 };
 
-
 class VorbisDepay : public Depay 
 {
     public:
         explicit VorbisDepay(const Pipeline &pipeline);
 };
 
+class CeltPay : public Pay
+{
+    public:
+        explicit CeltPay(const Pipeline &pipeline);
+};
+
+class CeltDepay : public Depay 
+{
+    public:
+        explicit CeltDepay(const Pipeline &pipeline);
+};
 
 class L16Pay : public Pay
 {

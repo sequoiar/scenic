@@ -125,7 +125,7 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
     for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
     {
         GstPad *pad;
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequencies_[0][channelIdx], "is-live", TRUE, NULL);
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequencies_[0][channelIdx], "is-live", FALSE, NULL);
         tassert(pad = gst_element_get_static_pad(*src, "src"));
         tassert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);

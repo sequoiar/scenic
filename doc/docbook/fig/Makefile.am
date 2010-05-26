@@ -5,6 +5,8 @@ fig_DATA = \
 	click_on_add_contact.png \
 	connection_information_1.png \
 	connection_information_2.png \
+	edirol_fa101_settings_front.png \
+	edirol_fa101_settings_rear.png \
 	hardware_setup_01.jpg \
 	hardware_setup_02.jpg \
 	network_testing_01.png \

@@ -1,5 +1,5 @@
 # ===========================================================================
-#              http://autoconf-archive.cryp.to/ax_check_gl.html
+#        http://www.gnu.org/software/autoconf-archive/ax_check_gl.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -17,13 +17,9 @@
 #   header "OpenGL/gl.h" is found, HAVE_OPENGL_GL_H is defined. These
 #   preprocessor definitions may not be mutually exclusive.
 #
-# LAST MODIFICATION
+# LICENSE
 #
-#   2008-10-07
-#
-# COPYLEFT
-#
-#   Copyright (c) 2008 Braden McDaniel <braden@endoframe.com>
+#   Copyright (c) 2009 Braden McDaniel <braden@endoframe.com>
 #
 #   This program is free software; you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -47,18 +43,21 @@
 #   all other use of the material that constitutes the Autoconf Macro.
 #
 #   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Macro Archive. When you make and
-#   distribute a modified version of the Autoconf Macro, you may extend this
-#   special exception to the GPL to apply to your modified version as well.
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 9
 
 AC_DEFUN([AX_CHECK_GL],
 [AC_REQUIRE([AC_CANONICAL_HOST])
 AC_REQUIRE([AC_PATH_X])dnl
-AC_REQUIRE([ACX_PTHREAD])dnl
+AC_REQUIRE([AX_PTHREAD])dnl
 
 AC_LANG_PUSH([C])
-GL_CFLAGS="${PTHREAD_CFLAGS}"
-GL_LIBS="${PTHREAD_LIBS} -lm"
+AX_LANG_COMPILER_MS
+AS_IF([test X$ax_compiler_ms = Xno],
+      [GL_CFLAGS="${PTHREAD_CFLAGS}"; GL_LIBS="${PTHREAD_LIBS} -lm"])
 
 #
 # Use x_includes and x_libraries if they have been set (presumably by
@@ -75,8 +74,13 @@ CPPFLAGS="${GL_CFLAGS} ${CPPFLAGS}"
 AC_CHECK_HEADERS([GL/gl.h OpenGL/gl.h])
 CPPFLAGS="${ax_save_CPPFLAGS}"
 
+AC_CHECK_HEADERS([windows.h])
+
 m4_define([AX_CHECK_GL_PROGRAM],
           [AC_LANG_PROGRAM([[
+# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
+#   include <windows.h>
+# endif
 # ifdef HAVE_GL_GL_H
 #   include <GL/gl.h>
 # elif defined(HAVE_OPENGL_GL_H)
@@ -128,3 +132,4 @@ AC_LANG_POP([C])
 AC_SUBST([GL_CFLAGS])
 AC_SUBST([GL_LIBS])
 ])dnl
+
