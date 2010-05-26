@@ -801,7 +801,9 @@ class Application(object):
             text = _("The remote peer cannot stream with you because they do not support the requested video codec.")
         elif reason == communication.REFUSE_REASON_PROBLEMS or reason is False:
             text = _("The remote peer cannot stream with you due to technical issues.")
-        dialogs.ErrorDialog.create(text, parent=self.gui.main_window)
+        else:
+            log.info("Got unknown refusal reason.")
+        self.show_error_dialog(text)
 
     def handle_ack(self, addr):
         """
@@ -828,6 +830,19 @@ class Application(object):
             self.disconnect_client()
             if reason != "":
                 log.debug("Received BYE. Reason is %s" % (reason))
+                text = None
+                if reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC:
+                    text = _("The remote peer cannot stream with you since it does not support the audio codec you are asking for.")
+                elif reason == communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC:
+                    text = _("The remote peer cannot stream with you since it does not support the video codec you are asking for.")
+                elif reason == communication.BYE_REASON_PROBLEMS:
+                    text = _("The remote peer cannot stream with you due to technical issues.")
+                else:
+                    log.info("Got unknown goodbye reason.")
+                if text is not None:
+                    self.show_error_dialog(text)
+
+                #TODO: display an error message to the user if we should
 
     def handle_ok(self):
         """
