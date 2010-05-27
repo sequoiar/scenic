@@ -1,6 +1,14 @@
+How to internationalize Scenic with the autotools
+-------------------------------------------------
+ * Use gettext, aliased as "_()" in the code.
+ * make update-po to parse the code and generate the .po files
+ * The translators can edit the po with poedit or vim
+ * make update-gmo to build the .gmo files
+ * make install will install them in /usr/local/share/locale/*/*.mo
 
-More about the internationalization process
--------------------------------------------
+
+More generally about the internationalization process
+-----------------------------------------------------
 
 Here we describe all the steps involved in producing translations.
 
