@@ -1,3 +1,6 @@
+[NAME]
+Prints informations about running JACK server
+
 [SYNOPSIS]
 jack-info [options]
 

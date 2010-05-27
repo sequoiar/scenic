@@ -1,3 +1,6 @@
+[NAME]
+Telepresence software for live performances and installations
+
 [DESCRIPTION]
 Scenic is a free software suite for streaming audio, video and MIDI between live events. It was created at the Society for Arts and Technology (SAT) to give to artists a powerful tool for telepresence in contexts of live arts and new media installations.
 

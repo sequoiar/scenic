@@ -10,20 +10,20 @@ common_mandeps = $(top_srcdir)/configure.ac
 # binary when any source file changes, only the main one.
 # Use -o so that the `missing' program can infer the output file.
 milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOptions.cpp $(common_mandeps) $(top_srcdir)/man/milhouse-man.txt
-	$(HELP2MAN) --include=milhouse-man.txt --name="Streams audio and video with GStreamer over RTP" --no-info $(top_builddir)/src/main/milhouse -o $@
+	$(HELP2MAN) --include=milhouse-man.txt --no-info $(top_builddir)/src/main/milhouse -o $@
 
 scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  $(top_srcdir)/py/scenic/configure.py.in $(common_mandeps) $(top_srcdir)/man/scenic-man.txt
-	$(HELP2MAN) --include=scenic-man.txt --name="Desktop application to stream audio, video and MIDI over RTP" --no-info $(top_builddir)/py/scripts/scenic -o $@
+	$(HELP2MAN) --include=scenic-man.txt --no-info $(top_builddir)/py/scripts/scenic -o $@
 
 midistream.1: $(top_srcdir)/py/scripts/midistream.in $(top_srcdir)/py/rtpmidi/runner.py $(common_mandeps) $(top_srcdir)/man/midistream-man.txt
-	$(HELP2MAN) --include=midistream-man.txt --name="Streams MIDI notes and controls over RTP" --no-info $(top_builddir)/py/scripts/midistream -o $@
+	$(HELP2MAN) --include=midistream-man.txt --no-info $(top_builddir)/py/scripts/midistream -o $@
 
 firereset.1: $(top_srcdir)/src/firereset/firereset.c $(top_srcdir)/man/firereset-man.txt
-	$(HELP2MAN) --include=firereset-man.txt --name="Resets a IEEE 1394 bus to help in case of problems" --no-info $(top_builddir)/src/firereset/firereset -o $@
+	$(HELP2MAN) --include=firereset-man.txt --no-info $(top_builddir)/src/firereset/firereset -o $@
 
 jack-info.1: $(top_srcdir)/utils/jack-info/jack_info.c $(top_srcdir)/man/jack-info-man.txt
-	$(HELP2MAN) --include=jack-info-man.txt --name="Prints informations about running JACK servers" --no-info $(top_builddir)/utils/jack-info/jack-info -o $@
+	$(HELP2MAN) --include=jack-info-man.txt --no-info $(top_builddir)/utils/jack-info/jack-info -o $@
 
 dc-ctl.1: $(top_srcdir)/utils/dc-ctl/dc-ctl.cpp  $(top_srcdir)/man/dc-ctl-man.txt
-	$(HELP2MAN) --include=dc-ctl-man.txt --name="Controls connected DC IEEE 1394 cameras" --no-info $(top_builddir)/utils/dc-ctl/dc-ctl -o $@
+	$(HELP2MAN) --include=dc-ctl-man.txt --no-info $(top_builddir)/utils/dc-ctl/dc-ctl -o $@
 

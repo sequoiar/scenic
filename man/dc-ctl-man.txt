@@ -1,5 +1,8 @@
+[NAME]
+Image control for IIDC IEEE 1394 cameras.
+
 [DESCRIPTION]
-Controls connected DC IEEE 1394 cameras.
+Image control for IIDC IEEE 1394 cameras.
 
 [SYNOPSIS]
 dc-ctl [options]

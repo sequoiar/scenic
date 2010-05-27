@@ -1,3 +1,6 @@
+[NAME]
+Streams audio and video with GStreamer over RTP
+
 [SYNOPSIS]
 milhouse [--sender|--receiver] --address address [options]
 
