@@ -65,7 +65,6 @@ msgid "Got an acceptation from a remote peer, but a streaming session is already
 msgstr "Vous avez reçu une acceptation à transmettre d'un contact distant, mais vous êtes déjà engagé dans une session de trasmission."
 
 #: py/scenic/application.py:791
-#, fuzzy
 msgid "The remote peer refused to stream with you for an unknown reason"
 msgstr "Ce contact a refusé de transmettre avec vous."
 
@@ -102,12 +101,10 @@ msgid "The remote peer cannot stream with you since its X11 display could not be
 msgstr "Le contact ne peut pas transmettre avec vous car son moniteur X11 est introuvable."
 
 #: py/scenic/application.py:809
-#, fuzzy
 msgid "The remote peer cannot stream with you because they do not support the requested audio codec."
 msgstr "Le contact ne peut pas transmettre avec vous car son appareil de capture vidéo est introuvable."
 
 #: py/scenic/application.py:811
-#, fuzzy
 msgid "The remote peer cannot stream with you because they do not support the requested video codec."
 msgstr "Le contact ne peut pas transmettre avec vous car son appareil de capture vidéo est introuvable."
 
@@ -584,7 +581,6 @@ msgstr ""
 
 #: data/glade/scenic.glade:757
 #: data/glade/scenic.glade:4415
-#, fuzzy
 msgid "Detailled Status"
 msgstr "Détails"
 
