@@ -1,11 +1,11 @@
-[DESCRIPTION]
-Jack-info prints informations about the running JACK servers. 
-
 [SYNOPSIS]
 jack-info [options]
 
-[AUTHOR]
-Tristan Matthews <tristan@sat.qc.ca>
+[DESCRIPTION]
+Lists the JACK audio ports and their respective latency. Prints the sample rate and other useful informations. Warns the user if the JACK server is not running. 
+
+[HISTORY]
+2010 - Written by Tristan Matthews <tristan@sat.qc.ca>.
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic

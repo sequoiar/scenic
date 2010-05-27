@@ -1,11 +1,11 @@
 [DESCRIPTION]
-Controls connected DC ieee1394 cameras 
+Controls connected DC IEEE 1394 cameras.
 
 [SYNOPSIS]
 dc-ctl [options]
 
-[AUTHOR]
-Tristan Matthews <tristan@sat.qc.ca>
+[HISTORY]
+2009 - Written by Tristan Matthews <tristan@sat.qc.ca>.
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic

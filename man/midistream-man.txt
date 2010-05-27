@@ -1,3 +1,6 @@
+[DESCRIPTION]
+Streams MIDI notes and controls over RTP.
+
 [EXAMPLES]
 Let say we want to stream MIDI data from host 10.10.10.80 to host 10.10.10.65. We first need to plug our input MIDI device on the first computer, and to choose an output MIDI device on the second computer. We can list the MIDI devices on each computer using the following command: 
 .TP
