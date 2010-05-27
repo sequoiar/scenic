@@ -8,6 +8,6 @@ X-GNOME-DocPath=
 Terminal=false
 Name=Scenic
 Name[en]=Scenic
-Comment=High-Quality Audio-Video Streaming for GNU/Linux
-Comment[en]=High-Quality Audio-Video Streaming for GNU/Linux
+Comment=[fr]=Logiciel de télépresence pour la scène et les installations
+Comment[en]=Telepresence software for live performances and installations 
 Categories=Network;
