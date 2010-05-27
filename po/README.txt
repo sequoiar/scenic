@@ -1,9 +1,13 @@
 How to internationalize Scenic with the autotools
 -------------------------------------------------
+In short: ./autogen.sh && make dist will generate the .gmo files.
+You need to install Scenic to experience it in French.
+LANG=fr_CA.UTF-8 scenic
+
  * Use gettext, aliased as "_()" in the code.
  * make update-po to parse the code and generate the .po files
  * The translators can edit the po with poedit or vim
- * make update-gmo to build the .gmo files
+ * make update-gmo to build the .gmo files (done by make dist)
  * make install will install them in /usr/local/share/locale/*/*.mo
 
 
