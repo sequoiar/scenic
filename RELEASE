@@ -1,7 +1,8 @@
 Release notes for Scenic 0.5.10
 
 This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes preparing the 0.6 stable series. 
+contains bugfixes and some new features for preparing the 0.6 stable series. 
+This is the first release candiate for the stable version 0.6.
 
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
