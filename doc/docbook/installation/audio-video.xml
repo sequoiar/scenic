@@ -48,7 +48,7 @@
       <emphasis role="strong">Video4Linux</emphasis>
     </para>&gt; 
     <para>Plug in the video camera, for this, refer to our 
-    <link linkend='hardware_requirements'>Hardware Setup 
+    <link linkend='hardware-requirements'>Hardware Setup 
     Page</link></para>
     <para>Now we will modify our video settings for your specific
     needs.</para>
