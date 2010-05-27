@@ -217,8 +217,6 @@ class ProcessManager(object):
         self._child_process = ProcessIO(self)
         self.set_child_state(STATE_STARTING)
         shell = "/bin/sh"
-        if os.path.exists("/bin/bash"):
-            shell = "/bin/bash"
         log.debug("Environment: %s" % (self.env))
         self._time_child_started = time.time()
         self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], self.env)
