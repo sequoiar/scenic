@@ -1,40 +1,40 @@
 [SYNOPSIS]
 milhouse [--sender|--receiver] --address address [options]
-.TP
+
 By default, milhouse uses videotestsrc as a video test source and jackaudiosrc for audio input.
 
 [DESCRIPTION]
-Streams audio and video using GStreamer over RTP. Can be run either as a sender or a receiver. Can also be used to change V4L2 video device settings, or to display a local preview of what is captured locally.
+Streams audio and video using GStreamer over . Can be run either as a sender or a receiver. Can also be used to change V4L2 video device settings, or to display a local preview of what is captured locally.
 
 Milhouse is a simple tool that can do a lot of things. For example, it can list the cameras and video capture devices found on your computer. It can also change video settings for a V4L2 (Video4Linux2) device, such as its video standard and its selected video input number.  Milhouse also supports DV cameras and DC cameras, two kinds of cameras using IEEE 1394 (Firewire) to send their digital video signal to the computer. 
 
 For the audio, Milhouse provides optional volume unit meters, so that the opertators can monitor the audio levels.
 
-There is also a shared video library that is shipped with Milhouse. This way, a developer can display a video that is received over RTP into a 3D scene in one's OpenGL application, for example.
+There is also a shared video library that is shipped with Milhouse. This way, a developer can display a video that is received over  into a 3D scene in one's OpenGL application, for example.
 
 [EXAMPLES]
 Here is how to start a receiver and a sender to stream audio and video. 
 
 On local_ip_address:
-.TP
+
 milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000
 
 On remote_ip_address:
-.TP
+
 milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030  --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw  -c 2 --audioport 10000
 
 The milhouse command can also be used to change some properties of a V4L2 video device, such as the size and the video standard. The milhouse command should exit immediately once done. 
 
 To change the video standard to either NTSC or PAL:
-.TP
+
 milhouse --v4l2-standard NTSC
 
 To list cameras: 
-.TP
+
 milhouse --list-cameras
 
 To choose an input for a V4L2 device:
-.TP 
+ 
 milhouse --v4l2-input 1
 
 [WRITTEN]

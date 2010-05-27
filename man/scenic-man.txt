@@ -1,24 +1,24 @@
 [DESCRIPTION]
 Scenic is a free software suite for streaming audio, video and MIDI between live events. It was created at the Society for Arts and Technology (SAT) to give to artists a powerful tool for telepresence in contexts of live arts and new media installations.
-.TP
+
 The streaming is done over RTP with the GStreamer multimedia framework. Users can also choose low-bandwidth or high-quality codecs, depending on what is available on their system. It offers up to as many audio channels that your audio device supports.
 
 [SYNOPSIS]
 scenic [options]
-.TP
+
 Most options are set with the graphical user interface.
 
 [STATE SAVING]
-The configuration is saved in the user's ~/.scenic directory, where "~" is the path to your home directory. 
+The configuration and address book are saved in the $HOME/.scenic directory.
 
 [EXAMPLES]
 Here is how to start scenic in the kiosk mode: 
-.TP
+
 scenic --kiosk
 
 [HISTORY]
 2007 - Originally written by Etienne Desautels <etienne@teknozen.net>.
-.TP
+
 2010 - Rewritten by Alexandre Quessy <alexandre@quessy.net>, Tristan Matthews <tristan@sat.qc.ca>, Simon Piette <simonp@sat.qc.ca>.
 
 [REPORTING BUGS]
