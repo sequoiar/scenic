@@ -48,4 +48,5 @@ Bug fixes in milhouse:
 Bug fixes in scenic: 
     *   #535 .mo files should not be in the repository
     *   #537 debuild should run autoreconf
+    *   #546 Improve one-line descriptions
 
