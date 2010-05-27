@@ -1,21 +1,28 @@
+[NAME]
+Telepresence software for live performances and installations
+
 [DESCRIPTION]
-Scenic is software suite for transmission and reception of your fine audio-visual content. It is an interface to the milhouse command-line Gstreamer-based software.
+Scenic is a free software suite for streaming audio, video and MIDI between live events. It was created at the Society for Arts and Technology (SAT) to give to artists a powerful tool for telepresence in contexts of live arts and new media installations.
+
+The streaming is done over RTP with the GStreamer multimedia framework. Users can also choose low-bandwidth or high-quality codecs, depending on what is available on their system. It offers up to as many audio channels that your audio device supports.
 
 [SYNOPSIS]
 scenic [options]
-.TP
+
 Most options are set with the graphical user interface.
 
 [STATE SAVING]
-The configuration is saved in the user's ~/.scenic directory, where "~" is the path to your home directory. 
+The configuration and address book are saved in the $HOME/.scenic directory.
 
 [EXAMPLES]
 Here is how to start scenic in the kiosk mode: 
-.TP
+
 scenic --kiosk
 
-[AUTHOR]
-Society for Arts and Technology
+[HISTORY]
+2007 - Originally written by Etienne Desautels <etienne@teknozen.net>.
+
+2010 - Rewritten by Alexandre Quessy <alexandre@quessy.net>, Tristan Matthews <tristan@sat.qc.ca>, Simon Piette <simonp@sat.qc.ca>.
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic
@@ -38,3 +45,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
+
+[SEE ALSO]
+milhouse(1), midistream(1), firereset(1), dc-ctl(1), jack-info(1), /usr/share/scenic/docbook

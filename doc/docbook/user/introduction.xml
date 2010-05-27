@@ -15,7 +15,7 @@
   digital systems between cultural and educational venues and to
   promote research and creation through new communication
   technologies.</para>
-  <sect1 is="functional-overview">
+  <sect1 id="functional-overview">
     <title>Functional Overview</title>
     <para>This section gives a quick overview of the various
     functional components of Scenic.</para>

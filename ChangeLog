@@ -1,3 +1,626 @@
+2010-05-27 21:59  alexandre
+
+	* RELEASE: Updated again the RELEASE notes.
+
+2010-05-27 21:54  simonp
+
+	* ChangeLog: Updated ChangeLog
+
+2010-05-27 21:40  simonp
+
+	* man/Makefile.am, man/dc-ctl-man.txt, man/firereset-man.txt,
+	  man/jack-info-man.txt, man/midistream-man.txt,
+	  man/milhouse-man.txt, man/scenic-man.txt: More help2man goodness
+
+2010-05-27 21:23  simonp
+
+	* man/midistream-man.txt, man/milhouse-man.txt, man/scenic-man.txt:
+	  More man page cleaning
+
+2010-05-27 21:17  alexandre
+
+	* man/firereset-man.txt, man/midistream-man.txt: removed .TP in man
+	  files
+
+2010-05-27 21:16  alexandre
+
+	* README: Copied the text from debian/control into README
+
+2010-05-27 21:11  simonp
+
+	* doc/docbook/installation/audio-video.xml: Fixed important typo
+
+2010-05-27 21:09  alexandre
+
+	* RELEASE: updated the RELEASE notes again
+
+2010-05-27 21:05  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-05-27 21:03  simonp
+
+	* py/scenic/process.py: Don't use /bin/bash when launching process,
+	  /bin/sh will always be used.
+
+2010-05-27 20:54  alexandre
+
+	* man/Makefile.am, man/dc-ctl-man.txt, man/firereset-man.txt,
+	  man/jack-info-man.txt, man/midistream-man.txt,
+	  man/milhouse-man.txt, man/scenic-man.txt: Updated the man pages
+	  with better one-line descriptions, dates and more doc.
+	  Closes #546 - together with the next few commits.
+
+2010-05-27 20:48  simonp
+
+	* doc/docbook/glossary.xml, doc/docbook/user/introduction.xml:
+	  Added the two last id's on docbook files
+
+2010-05-27 20:23  simonp
+
+	* ., m4, po: svn:ignore galore
+
+2010-05-27 19:47  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-05-27 15:10  alexandre
+
+	* po/README.txt, po/en.po, po/fr.po, po/scenic.pot: more notes
+	  about i18n
+
+2010-05-27 15:02  alexandre
+
+	* po/README.txt, po/en.po, po/fr.po, po/scenic.pot: updated the .po
+	  files.
+
+2010-05-27 14:46  alexandre
+
+	* po/fr.po: removed some fuzzy keywords from the fr.po
+
+2010-05-27 14:27  alexandre
+
+	* po/scenic.glade.h: deleted useless file
+
+2010-05-26 21:55  tristan
+
+	* ., Makefile.am, configure.ac, locale, po, po/LINGUAS,
+	  po/Makevars, po/POTFILES.in, po/README.txt,
+	  po/create_gettext_file.sh, po/en.po, po/fr.po, po/messages.pot,
+	  po/scenic.glade.h, po/scenic.pot, py/run-fr,
+	  py/scenic/configure.py.in, py/scripts/scenic.in: merged back
+	  branches/internationalization into trunk@6199
+
+2010-05-26 20:33  pchevry
+
+	* doc/docbook/fig/edirol_fa101_settings_front.png,
+	  doc/docbook/fig/nvidia_settings-1.1.png,
+	  doc/docbook/fig/nvidia_settings-1.2.png,
+	  doc/docbook/fig/nvidia_settings-2.1.png,
+	  doc/docbook/fig/nvidia_settings-2.2.png,
+	  doc/docbook/fig/qjackctl_soundcard.png: Cropped some images and
+	  used the clearlook theme for images in docbook
+
+2010-05-26 16:29  alexandre
+
+	* py/scenic/application.py: handling more reasons to say BYE
+
+2010-05-26 16:19  alexandre
+
+	* AUTHORS: added Antoine to AUTHORS
+
+2010-05-26 16:19  alexandre
+
+	* man/Makefile.am, man/dc-ctl-man.txt, man/firereset-man.txt,
+	  man/jack-info-man.txt, man/midistream-man.txt,
+	  man/milhouse-man.txt, man/scenic-man.txt: progress in the man
+	  pages. Added authors, some licence info and see also.
+
+2010-05-26 15:33  alexandre
+
+	* data/pixmaps/Makefile.am, data/pixmaps/scenic_32x32.xpm: adding a
+	  Debian menu icon.
+
+2010-05-26 00:46  alexandre
+
+	* RELEASE, configure.ac: updated version number to 0.5.10
+
+2010-05-26 00:36  alexandre
+
+	* utils/makedist: Slightly simplified the makedist utility script
+
+2010-05-25 23:16  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-05-25 23:15  alexandre
+
+	* py/scenic/application.py, py/scenic/sic.py: Seems I fixed #527
+	  (In some cases when remote doesn't run Scenic, it doesn't give an
+	  error message)
+
+2010-05-25 22:56  alexandre
+
+	* py/scenic/application.py, py/scenic/gui.py: polling jackd when
+	  clicking on the tab, not anymore in a looping task
+
+2010-05-25 22:34  tristan
+
+	* man/Makefile.am: put man txt files in own variable
+
+2010-05-25 22:26  pchevry
+
+	* doc/docbook/installation/edirol-fa101-settings.xml,
+	  doc/docbook/installation/hardware-requirement.xml: included
+	  FA-101 and FA-66 page links to the installation manual
+
+2010-05-25 22:18  alexandre
+
+	* RELEASE: updated the RELEASE file
+
+2010-05-25 22:09  simonp
+
+	* man/Makefile.am, utils/makedist: Fixed make clean in doc
+	  Updated makedist for automake 1.11.1
+
+2010-05-25 20:23  tristan
+
+	* utils/dc-ctl/dc-ctl.cpp: dc-ctl shows help if no camera is found
+
+2010-05-25 20:13  pchevry
+
+	* doc/docbook/installation-manual.xml.in,
+	  doc/docbook/installation/edirol-fa101-settings.xml: integration
+	  of the edirol appendix in installation manual
+
+2010-05-25 20:03  pchevry
+
+	* doc/docbook/fig/Makefile.am,
+	  doc/docbook/fig/edirol_fa101_settings_front.png,
+	  doc/docbook/fig/edirol_fa101_settings_rear.png,
+	  doc/docbook/installation/Makefile.am,
+	  doc/docbook/installation/edirol-fa101-settings.xml: : added
+	  images about edirol fa101 in docbook
+
+2010-05-25 19:48  tristan
+
+	* py/scenic/gui.py: control tab cycles through tabs in scenic,
+	  fixes #388
+
+2010-05-25 19:47  alexandre
+
+	* debian: Moved the debian directory to
+	  inhouse/packaging/debian-sid
+
+2010-05-25 19:33  alexandre
+
+	* ., py/scenic/application.py, py/scenic/devices/jackd.py,
+	  py/scenic/gui.py, py/scenic/test/Makefile.am,
+	  py/scenic/test/test_jack.py: Merging r6141 through r6151 of
+	  branch jackdmpsupport into 'trunk
+
+2010-05-25 19:22  tristan
+
+	* py/scenic/network.py: don't care about characters
+
+2010-05-25 19:18  tristan
+
+	* utils/dc-ctl/test/test_dc_ctl.py: fixed make check for buildbot
+
+2010-05-25 19:06  tristan
+
+	* py/scenic/network.py, utils/dc-ctl/dc-ctl.cpp: show help or
+	  version also if raw1394 isn't loaded
+
+2010-05-25 18:16  tristan
+
+	* utils/dc-ctl/dc-ctl.cpp: more elaborate help message
+
+2010-05-25 18:13  tristan
+
+	* man/Makefile.am, man/dc-ctl.1, utils/dc-ctl/dc-ctl.cpp,
+	  utils/jack-info/jack_info.c: fix man page for dc-ctl
+
+2010-05-25 17:42  tristan
+
+	* py/rtpmidi/protocols/rtp/protocol.py: use hashlib instead of md5
+
+2010-05-25 17:37  tristan
+
+	* py/rtpmidi/protocols/rtp/rtp_session.py: use subprocess instead
+	  of popen4, fixes #412
+
+2010-05-25 17:33  alexandre
+
+	* debian/copyright, py/run, py/scripts/scenic.in: more copyright
+	  holders.
+	  Towards using jack-info
+
+2010-05-25 17:18  alexandre
+
+	* debian/copyright: Done metionning the contributed code into
+	  scenix - I think.
+
+2010-05-25 17:09  tristan
+
+	* man/dc-ctl.1: added dc-ctl.1
+
+2010-05-25 16:17  tristan
+
+	* man/Makefile.am, src/include/ConcurrentQueue.h: Added author info
+	  for ConcurrentQueue.h
+
+2010-05-25 16:05  alexandre
+
+	* AUTHORS, debian/copyright: Improved the copyright and AUTHOR
+	  infos
+
+2010-05-25 15:04  tristan
+
+	* utils/dc-ctl/dc-ctl.cpp: cleanup a bit in the output
+
+2010-05-25 14:57  tristan
+
+	* utils/dc-ctl/dc-ctl.cpp: produce partial help message if dc1394
+	  is not loaded
+
+2010-05-24 18:04  alexandre
+
+	* debian/control: I finally think scenic fits more in the net
+	  section of Debian.
+
+2010-05-21 22:43  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-05-21 22:25  alexandre
+
+	* py/scenic/streamer.py: do not print streamers' warning twice
+
+2010-05-21 22:16  alexandre
+
+	* py/scenic/application.py: send IDLE only if connected
+
+2010-05-21 21:39  tristan
+
+	* py/scenic/communication.py: decrease logging level of connection
+	  message
+
+2010-05-21 21:31  alexandre
+
+	* py/scenic/application.py: handle IDLE message
+
+2010-05-21 21:28  alexandre
+
+	* data/glade/scenic.glade: added a title to the details status
+	  window.
+
+2010-05-21 21:24  alexandre
+
+	* data/glade/scenic.glade, py/scenic/gui.py: added the detailled
+	  status window
+
+2010-05-21 20:30  alexandre
+
+	* py/scenic/application.py: Send some IDLE message to keep
+	  connection alive.
+	  Fix in the check for supported codecs.
+
+2010-05-21 20:17  alexandre
+
+	* py/scenic/application.py, py/scenic/gui.py: cleanup in check for
+	  supported audio/video codecs.
+
+2010-05-21 20:15  tristan
+
+	* doc/Makefile.am: don't recurse into subdirs to clean them...make
+	  is smart enough to do that already, even for clean-local targets.
+	  Fixed distcheck
+
+2010-05-21 19:55  tristan
+
+	* utils/gst_check.py: moved celt to optional plugins
+
+2010-05-21 19:45  alexandre
+
+	* py/scenic/application.py: only checking codec if audio/video is
+	  enabled
+
+2010-05-21 19:43  alexandre
+
+	* py/scenic/application.py, py/scenic/gstreamer.py,
+	  py/scenic/gui.py: got rid of the error message at startup if some
+	  codecs are not supported.
+
+2010-05-21 19:36  tristan
+
+	* doc/docbook/Makefile.am, py/scenic/application.py,
+	  src/shared_video/Makefile.am, src/util/Makefile.am: fixed bug in
+	  refuse reason
+
+2010-05-21 19:26  alexandre
+
+	* py/scenic/application.py, py/scenic/communication.py,
+	  py/scenic/gui.py: checking for supported codecs when receiving
+	  INVITE or ACCEPT
+
+2010-05-21 18:45  alexandre
+
+	* py/scenic/gstreamer.py, py/scenic/gui.py: Updating GUI combo box
+	  for audio/video codecs if the GST elements are not installed.
+
+2010-05-21 18:16  tristan
+
+	* src/gst/pipeline.cpp: better error message if element cannot be
+	  made (i.e. not installed)
+
+2010-05-21 18:09  alexandre
+
+	* py/scenic/Makefile.am, py/scenic/application.py,
+	  py/scenic/gstreamer.py, py/scenic/gui.py,
+	  py/scenic/test/test_gstreamer.py: Moved gstreamer-related
+	  function in a single file.
+
+2010-05-21 17:45  tristan
+
+	* ., src/gst/audioConfig.cpp, src/gst/codec.cpp, src/gst/codec.h,
+	  src/gst/remoteConfig.cpp, src/gst/rtpPay.cpp, src/gst/rtpPay.h:
+	  merged back branches/celt into trunk@6112
+
+2010-05-21 17:36  alexandre
+
+	* debian/changelog: updating changelog
+
+2010-05-21 17:34  alexandre
+
+	* py/Makefile.am, py/scenic/application.py,
+	  py/scenic/test/Makefile.am, py/scenic/test/test_gstreamer.py:
+	  adding test_gstreamer
+
+2010-05-20 21:25  tristan
+
+	* src/main/main.cpp: add carriage return in exception case
+
+2010-05-20 21:13  simonp
+
+	* doc/docbook/installation/ati-settings.xml,
+	  doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/nvidia-settings.xml: Cosmetic changes
+
+2010-05-20 21:01  simonp
+
+	* doc/docbook/installation/Makefile.am: Added nvidia-settings.xml
+	  and ati-settings.xml in Makefile.am
+
+2010-05-20 20:58  simonp
+
+	* doc/docbook/installation-manual.xml.in,
+	  doc/docbook/installation/ati-settings.xml,
+	  doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/nvidia-settings.xml: Put video cards
+	  setup in appendixes
+
+2010-05-20 20:56  tristan
+
+	* src/gst/codec.cpp: set target for lamemp3enc depending on quality
+	  or bitrate setting
+
+2010-05-20 20:53  pchevry
+
+	* doc/docbook/installation/audio-video.xml: deleted the nvidia
+	  information in audio-video page of installation-manual
+
+2010-05-20 20:45  tristan
+
+	* src/util/programOptions.cpp: don't use -C shortname for
+	  disable-caps-negotiation, very confusing
+
+2010-05-20 20:27  pchevry
+
+	* doc/docbook/installation/ati-settings.xml,
+	  doc/docbook/installation/nvidia-settings.xml: Added separate
+	  pages for video cards setup
+
+2010-05-20 20:27  tristan
+
+	* utils/make_caps.py: don't import glib
+
+2010-05-20 20:10  tristan
+
+	* src/gst/audioSource.cpp, src/gst/rtpReceiver.cpp: better error
+	  message if caps cannot be generated from caps string that is sent
+
+2010-05-19 22:31  simonp
+
+	* doc/docbook/fig/add_contact_edit_dialog.png,
+	  doc/docbook/fig/click_on_add_contact.png,
+	  doc/docbook/fig/connection_information_2.png,
+	  doc/docbook/fig/qjackctl.png: Updated some screenshots to
+	  Clearlooks
+
+2010-05-19 22:14  simonp
+
+	* configure.ac, doc/docbook/installation-manual.xml.in,
+	  doc/docbook/user-manual.xml.in: Added build time and package
+	  version in manuals
+
+2010-05-19 22:13  pchevry
+
+	* doc/docbook/installation/hardware-requirement.xml: added
+	  informations on "how to buy a computer" in hardware-requirement
+
+2010-05-19 21:49  alexandre
+
+	* m4/ax_boost_date_time.m4, m4/ax_boost_filesystem.m4: back to the
+	  patched version of the m4 boost macros.
+	  It must use sh, not bash.
+
+2010-05-19 21:39  alexandre
+
+	* autogen.sh: removed enable-mt
+
+2010-05-19 21:38  alexandre
+
+	* m4/ax_boost_date_time.m4, m4/ax_boost_filesystem.m4: reverting
+	  change r6075 - the fix that was valid for sh, not bash
+
+2010-05-19 21:37  tristan
+
+	* configure.ac, utils/gst_check.py: less verbosity in configure.ac,
+	  less scary verbosity in gst_check.py
+
+2010-05-19 21:34  alexandre
+
+	* py/scenic/streamer.py: printing error in case of an error
+	  guessing max num channels in raw
+
+2010-05-19 21:33  alexandre
+
+	* py/scenic/streamer.py: fix for when milhouse is not found, or so
+
+2010-05-19 21:27  alexandre
+
+	* py/scenic/application.py: added a check for gst elements in
+	  scenic. Not using it yet.
+
+2010-05-19 21:02  tristan
+
+	* utils/make_caps.py: don't print like crazy for missing elements
+
+2010-05-19 21:00  tristan
+
+	* configure.ac, utils/make_caps.py: fixed AC_SUBST, don't generate
+	  caps for non existing elements
+
+2010-05-19 20:52  alexandre
+
+	* debian/control: removed vorbis-tools and gtk-dev from deps
+
+2010-05-19 20:44  tristan
+
+	* utils/gst_check.py: make all video encoder optional because
+	  debian unstable supports only theora (of our encoders)
+
+2010-05-19 20:35  alexandre
+
+	* debian/control: removed libavcodec from deps
+
+2010-05-19 20:35  alexandre
+
+	* debian/control: we depend on libavcodec
+
+2010-05-19 20:09  alexandre
+
+	* ., INSTALL, debian/control: added deps gnome-doc-utisl
+
+2010-05-19 19:43  tristan
+
+	* INSTALL, configure.ac, m4/ax_lang_compiler_ms.m4: check gl need
+	  ax_lang_compiler_ms.m4
+
+2010-05-19 19:27  alexandre
+
+	* autogen.sh, debian/control: autogen.sh is now using bash. Fixed
+	  checking retval
+
+2010-05-19 19:12  tristan
+
+	* m4/ax_check_gl.m4, m4/ax_check_glu.m4: reverted gl and glu.m4
+
+2010-05-19 19:05  alexandre
+
+	* configure.ac: adding quotes in configure.ac
+
+2010-05-19 18:55  alexandre
+
+	* m4/ax_boost_date_time.m4, m4/ax_boost_filesystem.m4: applied fix
+	  for the m4 macros on debian sid
+
+2010-05-19 16:59  alexandre
+
+	* debian/control: removed comments
+
+2010-05-19 16:57  alexandre
+
+	* autogen.sh: ported --enable-mt to autogen.sh
+
+2010-05-19 16:41  tristan
+
+	* utils/gst_check.py: ugly plugins are optional
+
+2010-05-19 16:33  alexandre
+
+	* configure.ac, debian/control, debian/rules: got rid of some
+	  build-deps. added --enable-mt flag
+
+2010-05-19 15:21  alexandre
+
+	* debian/control: specific boost version or you have problems
+
+2010-05-19 15:20  alexandre
+
+	* INSTALL, m4/ax_boost_asio.m4, m4/ax_boost_base.m4,
+	  m4/ax_boost_date_time.m4, m4/ax_boost_filesystem.m4,
+	  m4/ax_boost_program_options.m4, m4/ax_boost_system.m4,
+	  m4/ax_boost_thread.m4, m4/ax_check_gl.m4, m4/ax_pthread.m4:
+	  updating the m4 macros to the latest version upstream.
+
+2010-05-19 12:27  alexandre
+
+	* debian/changelog: updated changelog again.
+
+2010-05-19 12:26  alexandre
+
+	* debian/source: removed debian/source/format since we're not using
+	  quilt
+
+2010-05-19 12:11  alexandre
+
+	* RELEASE, configure.ac: version is now 0.5.9...
+
+2010-05-19 11:52  alexandre
+
+	* debian/changelog, debian/control, debian/source,
+	  debian/source/format: fixed lintian complaints
+
+2010-05-19 11:44  alexandre
+
+	* debian/changelog, debian/control: no need build-essential.
+	  (unless using a specific version)
+
+2010-05-19 10:08  alexandre
+
+	* autogen.sh, debian/changelog, debian/control: Experimental Debian
+	  packaging.
+	  * changed the distro in changelog
+	  * removed packages that were not found nor needed (?) from the
+	  control file
+	  Made autoreconf arguments explicit.
+
+2010-05-18 17:20  pchevry
+
+	* doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/hardware-requirement.xml,
+	  doc/docbook/installation/network.xml: changes in various titles,
+	  added "system" on computer related settings
+
+2010-05-18 15:44  tristan
+
+	* ChangeLog: added ChangeLog generated by svn2cl, this should
+	  probably be done by the svn server
+
+2010-05-18 15:32  pchevry
+
+	* doc/docbook/user/advanced-options.xml,
+	  doc/docbook/user/audio-levels.xml,
+	  doc/docbook/user/audio-settings.xml,
+	  doc/docbook/user/before-using-scenic.xml,
+	  doc/docbook/user/contact-settings.xml,
+	  doc/docbook/user/introduction.xml,
+	  doc/docbook/user/midi-settings.xml, doc/docbook/user/preview.xml,
+	  doc/docbook/user/video-settings.xml: : added id's in every sect
+	  tags in user manual
+
 2010-05-18 13:54  alexandre
 
 	* debian/control: changed debian section to "video"

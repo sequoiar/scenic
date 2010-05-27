@@ -1,3 +1,9 @@
+[NAME]
+Resets a IEEE 1394 bus 
+
+[SYNOPSIS]
+firereset [options]
+
 [DESCRIPTION]
 Sometimes a device that is connected to a computer using a ieee1394 port, also know as Firewire, can become unresponsive. The applications would wait for input or crash. Nothing seems to help, until ones disconnects the device from the ieee1394 port. An other thing that might help is to reset the ieee1394 bus. The firereset command line utility resets the ieee1393 bus.
 
@@ -5,24 +11,20 @@ The default device node is /dev/raw1394, but one can override the default by set
 
 Firereset uses the libraw1394 library on GNU/Linux.
 
-[SYNOPSIS]
-firereset [options]
-.TP
-
 [EXAMPLES]
 Simply ussue the command, maybe specifying the environment variable.
-.TP
+
 RAW1394DEV=/dev/raw1394 firereset 
 
-[AUTHOR]
-Society for Arts and Technology
+[HISTORY]
+2009 - Written by Alexandre Quessy <alexandre@quessy.net>.
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
 Scenic
-Copyright (C) 2008 Society for Arts and Technology (SAT)
+Copyright (C) 2009 Society for Arts and Technology (SAT)
 http://www.sat.qc.ca
 All rights reserved. 
 

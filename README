@@ -1,2 +1,14 @@
-For an up-to-date installation guide and list of dependencies, see:
-http://svn.sat.qc.ca/trac/scenic/wiki/SoftwareInstallation
+Scenic: Telepresence software for live performances and installations
+
+Scenic is a free software suite for streaming audio, video and MIDI between live events. It was created at the Society for Arts and Technology (SAT) to give to artists a powerful tool for telepresence in contexts of live arts and new media installations. 
+
+The streaming is done over RTP with the GStreamer multimedia framework. Users can also choose low-bandwidth or high-quality codecs, depending on what is available on their system. It offers up to as many audio channels that your audio device supports. Scenic consists in a desktop application and several command-line utilities:
+
+  * scenic: Desktop application to stream audio, video and MIDI over RTP 
+  * milhouse: Streams audio and video over RTP
+  * midistream: Streams MIDI notes and controls over RTP
+  * dc-ctl: Controls connected DC IEEE 1394 cameras
+  * firereset: Resets a IEEE 1394 bus to help in case of problems
+  * jack-info: Prints informations about running JACK servers
+
+See http://svn.sat.qc.ca/trac/scenic/

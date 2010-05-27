@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.60)
 # version should always be .1 greater than last tag, unless this is a tag
-AC_INIT(SCENIC, [0.5.9], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])
+AC_INIT(SCENIC, [0.5.10], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -18,6 +18,10 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
+
+#i18n:
+AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT([external])
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -211,8 +215,8 @@ CXXFLAGS+=" -fPIC "
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 # FIXME
-SCENIC_LOCALE_DIR=locale
-AC_SUBST(SCENIC_LOCALE_DIR)
+#SCENIC_LOCALE_DIR=po
+AC_SUBST(LOCALE_DIR, $localedir)
 
 AS_AC_EXPAND(LIBDIR, $libdir)
 
@@ -258,11 +262,7 @@ py/rtpmidi/protocols/rtp/Makefile
 py/scenic/Makefile
 py/scenic/configure.py
 py/scenic/devices/Makefile
-locale/Makefile
-locale/en_US/Makefile
-locale/en_US/LC_MESSAGES/Makefile
-locale/fr_CA/Makefile
-locale/fr_CA/LC_MESSAGES/Makefile
+po/Makefile.in
 py/scenic/test/Makefile
 py/scripts/Makefile
 src/include/Makefile

@@ -20,6 +20,8 @@
 # along with Scenic. If not, see <http://www.gnu.org/licenses/>.
 """
 Executable script which calls scenic.runner.run()
+
+Note that the i18n does not work when not installed.
 """
 import os
 import sys

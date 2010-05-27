@@ -1,14 +1,14 @@
 [NAME]
-Prints informations about running JACK server
-
-[SYNOPSIS]
-jack-info [options]
+Image control for IIDC IEEE 1394 cameras.
 
 [DESCRIPTION]
-Lists the JACK audio ports and their respective latency. Prints the sample rate and other useful informations. Warns the user if the JACK server is not running. 
+Image control for IIDC IEEE 1394 cameras.
+
+[SYNOPSIS]
+dc-ctl [options]
 
 [HISTORY]
-2010 - Written by Tristan Matthews <tristan@sat.qc.ca>.
+2009 - Written by Tristan Matthews <tristan@sat.qc.ca>.
 
 [REPORTING BUGS]
 http://svn.sat.qc.ca/trac/scenic

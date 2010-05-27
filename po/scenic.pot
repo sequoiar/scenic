@@ -1,0 +1,867 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Society for Arts and Technology (SAT)
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: scenic 0.5.10\n"
+"Report-Msgid-Bugs-To: http://svn.sat.qc.ca/trac/scenic/wiki/BugReport\n"
+"POT-Creation-Date: 2010-05-27 11:07-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: py/scenic/application.py:347
+#, python-format
+msgid "Is another Scenic running? Cannot bind to port %(port)d"
+msgstr ""
+
+#: py/scenic/application.py:475
+msgid ""
+"It seems like the xvideo extension is not present. Video display is not "
+"possible."
+msgstr ""
+
+#: py/scenic/application.py:665
+#, python-format
+msgid ""
+"A mismatch in the sampling rate of JACK with remote peer has been detected.\n"
+"Local sampling rate is %(local)s, whereas remote sampling rate is %(remote)s."
+msgstr ""
+
+#: py/scenic/application.py:671 py/scenic/application.py:753
+msgid ""
+"The remote peer is asking an audio codec that is not installed on your "
+"computer."
+msgstr ""
+
+#: py/scenic/application.py:677 py/scenic/application.py:759
+msgid ""
+"The remote peer is asking a video codec that is not installed on your "
+"computer."
+msgstr ""
+
+#: py/scenic/application.py:690
+#, python-format
+msgid ""
+"<b><big>%(invited_by)s is inviting you.</big></b>\n"
+"\n"
+"Do you accept?"
+msgstr ""
+
+#: py/scenic/application.py:725
+#, python-format
+msgid "Contact %(name)s invited you but cancelled his invitation."
+msgstr ""
+
+#: py/scenic/application.py:767
+msgid ""
+"Got an acceptation from a remote peer, but a streaming session is already in "
+"progress."
+msgstr ""
+
+#: py/scenic/application.py:781
+msgid "The remote peer refused to stream with you for an unknown reason"
+msgstr ""
+
+#: py/scenic/application.py:783
+msgid "The remote peer refused to stream with you."
+msgstr ""
+
+#: py/scenic/application.py:785
+msgid ""
+"The remote peer cannot stream with you since its JACK sampling rate is not "
+"the same as yours."
+msgstr ""
+
+#: py/scenic/application.py:787
+msgid ""
+"The remote peer cannot stream with you since its JACK server is not running."
+msgstr ""
+
+#: py/scenic/application.py:789
+msgid "The remote peer is busy. Cannot start a streaming session."
+msgstr ""
+
+#: py/scenic/application.py:791
+msgid ""
+"The remote peer cannot stream with you since its xvideo extension could not "
+"be found."
+msgstr ""
+
+#: py/scenic/application.py:793
+msgid ""
+"The remote peer cannot stream with you since its MIDI device could not be "
+"found."
+msgstr ""
+
+#: py/scenic/application.py:795
+msgid ""
+"The remote peer cannot stream with you since its video capture device could "
+"not be found."
+msgstr ""
+
+#: py/scenic/application.py:797
+msgid ""
+"The remote peer cannot stream with you since its X11 display could not be "
+"found."
+msgstr ""
+
+#: py/scenic/application.py:799
+msgid ""
+"The remote peer cannot stream with you because they do not support the "
+"requested audio codec."
+msgstr ""
+
+#: py/scenic/application.py:801
+msgid ""
+"The remote peer cannot stream with you because they do not support the "
+"requested video codec."
+msgstr ""
+
+#: py/scenic/application.py:803 py/scenic/application.py:839
+msgid "The remote peer cannot stream with you due to technical issues."
+msgstr ""
+
+#: py/scenic/application.py:835
+msgid ""
+"The remote peer cannot stream with you since it does not support the audio "
+"codec you are asking for."
+msgstr ""
+
+#: py/scenic/application.py:837
+msgid ""
+"The remote peer cannot stream with you since it does not support the video "
+"codec you are asking for."
+msgstr ""
+
+#: py/scenic/application.py:896
+msgid "Cannot start streaming if all the streams are disabled."
+msgstr ""
+
+#: py/scenic/application.py:1004
+msgid "Impossible to invite a contact to start streaming."
+msgstr ""
+
+#: py/scenic/application.py:1006
+msgid "Impossible to accept an invitation to stream."
+msgstr ""
+
+#: py/scenic/application.py:1019
+#, python-format
+msgid "The X11 display %(display)s disappeared!"
+msgstr ""
+
+#: py/scenic/application.py:1023
+#, python-format
+msgid "The video source %(camera)s disappeared!"
+msgstr ""
+
+#: py/scenic/application.py:1030
+msgid "JACK is not running."
+msgstr ""
+
+#: py/scenic/application.py:1034
+msgid "A streaming session is already in progress."
+msgstr ""
+
+#: py/scenic/application.py:1038
+#, python-format
+msgid "The MIDI output device %(device)s disappeared!"
+msgstr ""
+
+#: py/scenic/application.py:1042
+#, python-format
+msgid "The MIDI input device %(device)s disappeared!"
+msgstr ""
+
+#: py/scenic/application.py:1047
+msgid "The X video extension is not present."
+msgstr ""
+
+#: py/scenic/application.py:1070
+msgid "You must select a contact to invite."
+msgstr ""
+
+#: py/scenic/application.py:1095
+#, python-format
+msgid ""
+"Could not invite contact %(name)s. \n"
+"\n"
+"Scenic is not listening on port %(port)d of host %(ip)s."
+msgstr ""
+
+#: py/scenic/application.py:1097 py/scenic/application.py:1099
+#, python-format
+msgid ""
+"Could not invite contact %(name)s. \n"
+"\n"
+"Host %(ip)s is unreachable."
+msgstr ""
+
+#: py/scenic/application.py:1101
+#, python-format
+msgid ""
+"Could not invite contact %(name)s. \n"
+"\n"
+"Error trying to connect to %(ip)s:%(port)s:\n"
+" %(reason)s"
+msgstr ""
+
+#: py/scenic/gui.py:65
+msgid ""
+"Scenic\n"
+"Copyright (C) 2009 Society for Arts and Technology (SAT)\n"
+"http://www.sat.qc.ca\n"
+"All rights reserved.\n"
+"\n"
+"This file is free software: you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation, either version 2 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+"Scenic is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with Scenic.  If not, see <http://www.gnu.org/licenses/>."
+msgstr ""
+
+#: py/scenic/gui.py:92
+msgid "Copyright 2009-2010 Society for Arts and Technology"
+msgstr ""
+
+#: py/scenic/gui.py:193
+msgid "Automatically accept invitations"
+msgstr ""
+
+#: py/scenic/gui.py:378 data/glade/scenic.glade:1213
+msgid "Contacts"
+msgstr ""
+
+#: py/scenic/gui.py:493
+msgid ""
+"Really quit ?\n"
+"All streaming processes will quit as well."
+msgstr ""
+
+#: py/scenic/gui.py:655
+msgid ""
+"<b><big>Delete this contact from the list?</big></b>\n"
+"\n"
+"Are you sure you want to delete this contact from the list?"
+msgstr ""
+
+#: py/scenic/gui.py:710
+msgid ""
+"The address is not valid\n"
+"\n"
+"Enter a valid address\n"
+"Example: 192.0.32.10 or example.org"
+msgstr ""
+
+#: py/scenic/gui.py:731
+msgid ""
+"<b><big>Shutdown the computer?</big></b>\n"
+"\n"
+"Are you sure you want to shutdown the computer now?"
+msgstr ""
+
+#: py/scenic/gui.py:742
+msgid ""
+"<b><big>Reboot the computer?</big></b>\n"
+"\n"
+"Are you sure you want to reboot the computer now?"
+msgstr ""
+
+#: py/scenic/gui.py:795
+msgid ""
+"Could not send info.\n"
+"Check your internet connection."
+msgstr ""
+
+#: py/scenic/gui.py:798
+msgid ""
+"<b><big>Send the settings?</big></b>\n"
+"\n"
+"Are you sure you want to send your computer settings to the administrator of "
+"scenic?"
+msgstr ""
+
+#: py/scenic/gui.py:1024
+msgid "Stop streaming"
+msgstr ""
+
+#: py/scenic/gui.py:1051 data/glade/scenic.glade:3410
+msgid "Not connected"
+msgstr ""
+
+#: py/scenic/gui.py:1078 py/scenic/gui.py:1080 data/glade/scenic.glade:1165
+msgid "Invite"
+msgstr ""
+
+#: py/scenic/gui.py:1131
+#, python-format
+msgid "%(bitrate)2.2f %(prefix)sbits/s"
+msgstr ""
+
+#: py/scenic/gui.py:1139
+#, python-format
+msgid "Audio buffer: %(buffer)d ms"
+msgstr ""
+
+#: py/scenic/gui.py:1147 py/scenic/gui.py:1191
+#, python-format
+msgid "%(width)dx%(height)d %(codec)s"
+msgstr ""
+
+#: py/scenic/gui.py:1154 py/scenic/gui.py:1182
+#, python-format
+msgid "Jitter: %(jitter)d ns"
+msgstr ""
+
+#: py/scenic/gui.py:1158
+#, python-format
+msgid "Packet loss: %(packetloss)2.2f%%"
+msgstr ""
+
+#: py/scenic/gui.py:1161
+#, python-format
+msgid "Packets lost: %(packetslost)d"
+msgstr ""
+
+#: py/scenic/gui.py:1166 py/scenic/gui.py:1228 py/scenic/gui.py:1233
+msgid "Disabled"
+msgstr ""
+
+#: py/scenic/gui.py:1173 py/scenic/gui.py:1208
+#, python-format
+msgid "%(numchannels)d-channel %(codec)s"
+msgstr ""
+
+#: py/scenic/gui.py:1186 py/scenic/gui.py:1201 py/scenic/gui.py:1217
+msgid "Disabled."
+msgstr ""
+
+#: py/scenic/gui.py:1197
+#, python-format
+msgid "Display: %(display)s"
+msgstr ""
+
+#: py/scenic/gui.py:1199
+msgid "Fullscreen is enabled."
+msgstr ""
+
+#: py/scenic/gui.py:1224
+msgid "Receiving MIDI"
+msgstr ""
+
+#: py/scenic/gui.py:1226
+#, python-format
+msgid "Jitter buffer: %(jitterbuffer)d ms"
+msgstr ""
+
+#: py/scenic/gui.py:1230
+msgid "Sending MIDI"
+msgstr ""
+
+#: py/scenic/gui.py:1264
+#, python-format
+msgid "$ %(command)s"
+msgstr ""
+
+#: py/scenic/gui.py:1267
+msgid "Command lines:"
+msgstr ""
+
+#: py/scenic/gui.py:1480
+#, python-format
+msgid ""
+"Could not change V4L2 standard from %(current_standard)s to %"
+"(desired_standard)s for device %(device_name)s."
+msgstr ""
+
+#: py/scenic/gui.py:1522
+#, python-format
+msgid ""
+"Could not change V4L2 input from %(current_input)s to %(desired_input)s for "
+"device %(device_name)s."
+msgstr ""
+
+#: py/scenic/gui.py:1646
+msgid "<b>Zombie</b>"
+msgstr ""
+
+#: py/scenic/gui.py:1650 data/glade/scenic.glade:2128
+msgid "<b>Running</b>"
+msgstr ""
+
+#: py/scenic/gui.py:1654
+msgid "<b>Not running</b>"
+msgstr ""
+
+#: py/scenic/gui.py:1740
+msgid "YES"
+msgstr ""
+
+#: py/scenic/gui.py:1742
+msgid "NO"
+msgstr ""
+
+#: py/scenic/gui.py:1748
+msgid "MIDI is supported..."
+msgstr ""
+
+#: py/scenic/gui.py:1751
+#, python-format
+msgid "Video codec %(codec)s is supported..."
+msgstr ""
+
+#: py/scenic/gui.py:1753
+#, python-format
+msgid "Audio codec %(codec)s is supported..."
+msgstr ""
+
+#: py/scenic/preview.py:62
+msgid "Local preview"
+msgstr ""
+
+#: py/scenic/preview.py:152
+msgid "Errors from local preview:"
+msgstr ""
+
+#: py/scenic/preview.py:156
+msgid "Warnings from local preview:"
+msgstr ""
+
+#: py/scenic/preview.py:160
+msgid "Some errors occured while looking at the local preview."
+msgstr ""
+
+#: py/scenic/streamer.py:220
+#, python-format
+msgid ""
+"Limiting the number of audio channels to receive to %(number)d since remote "
+"peer only support up to that much.\n"
+"Decrease it to get rid of this message."
+msgstr ""
+
+#: py/scenic/streamer.py:228
+#, python-format
+msgid ""
+"Limiting the number of audio channels to send to %(number)d since we only "
+"support up to that much.\n"
+"Decrease it to get rid of this message."
+msgstr ""
+
+#: py/scenic/streamer.py:229
+msgid "Update your jackaudiosrc Gstreamer element."
+msgstr ""
+
+#: py/scenic/streamer.py:688
+msgid "Errors from local sender:"
+msgstr ""
+
+#: py/scenic/streamer.py:692
+msgid "Warnings from local sender:"
+msgstr ""
+
+#: py/scenic/streamer.py:698
+msgid "Errors from local receiver:"
+msgstr ""
+
+#: py/scenic/streamer.py:702
+msgid "Warnings from local receiver:"
+msgstr ""
+
+#: py/scenic/streamer.py:706
+msgid "Some errors occured during the audio/video streaming session."
+msgstr ""
+
+#: data/glade/scenic.glade:7
+msgid "Confirmation"
+msgstr ""
+
+#: data/glade/scenic.glade:106
+msgid "Client Preview"
+msgstr ""
+
+#: data/glade/scenic.glade:221 data/glade/scenic.glade:1616
+msgid "Fullscreen"
+msgstr ""
+
+#: data/glade/scenic.glade:270
+msgid "Contacting..."
+msgstr ""
+
+#: data/glade/scenic.glade:309
+msgid "<b><big>Inviting...</big></b>"
+msgstr ""
+
+#: data/glade/scenic.glade:356 data/glade/scenic.glade:4011
+msgid "Contact Problem"
+msgstr ""
+
+#: data/glade/scenic.glade:434
+msgid "Contact Request"
+msgstr ""
+
+#: data/glade/scenic.glade:516
+msgid "Refuse"
+msgstr ""
+
+#: data/glade/scenic.glade:564
+msgid "Accept"
+msgstr ""
+
+#: data/glade/scenic.glade:595
+msgid "Edit Contact"
+msgstr ""
+
+#: data/glade/scenic.glade:663
+msgid "Auto accept:"
+msgstr ""
+
+#: data/glade/scenic.glade:689
+msgid "IP Address:"
+msgstr ""
+
+#: data/glade/scenic.glade:728
+msgid "Name:"
+msgstr ""
+
+#: data/glade/scenic.glade:736
+msgid "Scenic"
+msgstr ""
+
+#: data/glade/scenic.glade:748
+msgid "_File"
+msgstr ""
+
+#: data/glade/scenic.glade:756
+msgid "View informations about Scenic features on your system."
+msgstr ""
+
+#: data/glade/scenic.glade:757 data/glade/scenic.glade:4415
+msgid "Detailled Status"
+msgstr ""
+
+#: data/glade/scenic.glade:778
+msgid "_Help"
+msgstr ""
+
+#: data/glade/scenic.glade:786
+msgid "User Manual"
+msgstr ""
+
+#: data/glade/scenic.glade:794
+msgid "Installation Manual"
+msgstr ""
+
+#: data/glade/scenic.glade:902
+msgid "Preview"
+msgstr ""
+
+#: data/glade/scenic.glade:938
+msgid "In a window"
+msgstr ""
+
+#: data/glade/scenic.glade:977
+msgid "<b>Local Video Preview</b>"
+msgstr ""
+
+#: data/glade/scenic.glade:1273 data/glade/scenic.glade:4144
+msgid "Aspect Ratio:"
+msgstr ""
+
+#: data/glade/scenic.glade:1294 data/glade/scenic.glade:4163
+msgid ""
+"4:3\n"
+"16:9"
+msgstr ""
+
+#: data/glade/scenic.glade:1316 data/glade/scenic.glade:4185
+msgid ""
+"720x480\n"
+"640x480\n"
+"320x240"
+msgstr ""
+
+#: data/glade/scenic.glade:1334 data/glade/scenic.glade:4203
+msgid "Image Size:"
+msgstr ""
+
+#: data/glade/scenic.glade:1353 data/glade/scenic.glade:4224
+msgid ""
+"NTSC\n"
+"PAL"
+msgstr ""
+
+#: data/glade/scenic.glade:1378 data/glade/scenic.glade:4248
+msgid "Default"
+msgstr ""
+
+#: data/glade/scenic.glade:1395 data/glade/scenic.glade:4264
+msgid "Standard:"
+msgstr ""
+
+#: data/glade/scenic.glade:1409 data/glade/scenic.glade:4278
+msgid "Input:"
+msgstr ""
+
+#: data/glade/scenic.glade:1431 data/glade/scenic.glade:4298
+msgid "Color bars"
+msgstr ""
+
+#: data/glade/scenic.glade:1450 data/glade/scenic.glade:1912
+#: data/glade/scenic.glade:4316
+msgid "Source:"
+msgstr ""
+
+#: data/glade/scenic.glade:1461 data/glade/scenic.glade:1810
+#: data/glade/scenic.glade:2011 data/glade/scenic.glade:2488
+#: data/glade/scenic.glade:2778 data/glade/scenic.glade:2879
+#: data/glade/scenic.glade:4327
+msgid "Enable"
+msgstr ""
+
+#: data/glade/scenic.glade:1488 data/glade/scenic.glade:2038
+#: data/glade/scenic.glade:2617 data/glade/scenic.glade:2819
+#: data/glade/scenic.glade:3181 data/glade/scenic.glade:4354
+msgid "<b>Sending</b>"
+msgstr ""
+
+#: data/glade/scenic.glade:1555
+msgid "Mbps"
+msgstr ""
+
+#: data/glade/scenic.glade:1576
+msgid "Deinterlace"
+msgstr ""
+
+#: data/glade/scenic.glade:1636
+msgid ""
+":0.0\n"
+":0.1\n"
+msgstr ""
+
+#: data/glade/scenic.glade:1654
+msgid "X11 display:"
+msgstr ""
+
+#: data/glade/scenic.glade:1676
+msgid ""
+"h.263\n"
+"MPEG4\n"
+"h.264\n"
+"Theora"
+msgstr ""
+
+#: data/glade/scenic.glade:1698
+msgid "Bitrate:"
+msgstr ""
+
+#: data/glade/scenic.glade:1711 data/glade/scenic.glade:2342
+msgid "Codec:"
+msgstr ""
+
+#: data/glade/scenic.glade:1777 data/glade/scenic.glade:1990
+#: data/glade/scenic.glade:2279 data/glade/scenic.glade:2468
+#: data/glade/scenic.glade:2944
+msgid "ms"
+msgstr ""
+
+#: data/glade/scenic.glade:1797 data/glade/scenic.glade:2299
+#: data/glade/scenic.glade:2908
+msgid "Jitter Buffer:"
+msgstr ""
+
+#: data/glade/scenic.glade:1838 data/glade/scenic.glade:2516
+#: data/glade/scenic.glade:2670 data/glade/scenic.glade:2974
+#: data/glade/scenic.glade:3320 data/glade/scenic.glade:4392
+msgid "<b>Receiving</b>"
+msgstr ""
+
+#: data/glade/scenic.glade:1873
+msgid "Video"
+msgstr ""
+
+#: data/glade/scenic.glade:1933
+msgid ""
+"Test sound\n"
+"JACK"
+msgstr ""
+
+#: data/glade/scenic.glade:1953
+msgid "Input Buffer:"
+msgstr ""
+
+#: data/glade/scenic.glade:2095
+msgid "Enable jack autoconnect"
+msgstr ""
+
+#: data/glade/scenic.glade:2145
+msgid "0 ms"
+msgstr ""
+
+#: data/glade/scenic.glade:2158
+msgid "48 kHz"
+msgstr ""
+
+#: data/glade/scenic.glade:2173
+msgid "Latency:"
+msgstr ""
+
+#: data/glade/scenic.glade:2187
+msgid "Sampling rate:"
+msgstr ""
+
+#: data/glade/scenic.glade:2212
+msgid "<b>JACK</b>"
+msgstr ""
+
+#: data/glade/scenic.glade:2363
+msgid ""
+"Raw\n"
+"MP3\n"
+"Vorbis"
+msgstr ""
+
+#: data/glade/scenic.glade:2384
+msgid "Number of channels:"
+msgstr ""
+
+#: data/glade/scenic.glade:2417
+msgid "Synchronize with video:"
+msgstr ""
+
+#: data/glade/scenic.glade:2432
+msgid "Output Buffer:"
+msgstr ""
+
+#: data/glade/scenic.glade:2561
+msgid "Audio"
+msgstr ""
+
+#: data/glade/scenic.glade:2715
+msgid "Audio Levels"
+msgstr ""
+
+#: data/glade/scenic.glade:2761 data/glade/scenic.glade:2862
+msgid " "
+msgstr ""
+
+#: data/glade/scenic.glade:2794
+msgid "Input device:"
+msgstr ""
+
+#: data/glade/scenic.glade:2895
+msgid "Output device:"
+msgstr ""
+
+#: data/glade/scenic.glade:3029
+msgid "MIDI"
+msgstr ""
+
+#: data/glade/scenic.glade:3076 data/glade/scenic.glade:3282
+msgid ""
+"320x240 h263 642.4 kbits/s\n"
+"Jitter: 1238 ns"
+msgstr ""
+
+#: data/glade/scenic.glade:3092
+msgid ""
+"2 channels MP3 59.37 kbits/s\n"
+"Audio buffer: 200ms\n"
+"Jitter: 5981 ns"
+msgstr ""
+
+#: data/glade/scenic.glade:3110
+msgid ""
+"2 channels MP3 59.37 kbits/s\n"
+"Buffer: 200ms\n"
+"Jitter: 5981 ns"
+msgstr ""
+
+#: data/glade/scenic.glade:3128 data/glade/scenic.glade:3238
+msgid "MIDI:"
+msgstr ""
+
+#: data/glade/scenic.glade:3143 data/glade/scenic.glade:3267
+msgid "Audio:"
+msgstr ""
+
+#: data/glade/scenic.glade:3158 data/glade/scenic.glade:3297
+msgid "Video:"
+msgstr ""
+
+#: data/glade/scenic.glade:3362
+msgid "Local IP:"
+msgstr ""
+
+#: data/glade/scenic.glade:3376
+msgid "10.0.0.1"
+msgstr ""
+
+#: data/glade/scenic.glade:3397
+msgid "Peer:"
+msgstr ""
+
+#: data/glade/scenic.glade:3449
+msgid "Statistics"
+msgstr ""
+
+#: data/glade/scenic.glade:3561
+msgid "<b>Network Configuration</b>"
+msgstr ""
+
+#: data/glade/scenic.glade:3603
+msgid "Update Scenic and related librairies"
+msgstr ""
+
+#: data/glade/scenic.glade:3628
+msgid "Update"
+msgstr ""
+
+#: data/glade/scenic.glade:3655
+msgid "Send the configuration information for troubleshooting"
+msgstr ""
+
+#: data/glade/scenic.glade:3717
+msgid "<b>Maintenance</b>"
+msgstr ""
+
+#: data/glade/scenic.glade:3759
+msgid "Shutdown the computer"
+msgstr ""
+
+#: data/glade/scenic.glade:3784
+msgid "Shutdown"
+msgstr ""
+
+#: data/glade/scenic.glade:3811
+msgid "Reboot the computer"
+msgstr ""
+
+#: data/glade/scenic.glade:3873
+msgid "<b>System</b>"
+msgstr ""
+
+#: data/glade/scenic.glade:3925
+msgid "System"
+msgstr ""
+
+#: data/glade/scenic.glade:3984
+msgid "Debug"
+msgstr ""
+
+#: data/glade/scenic.glade:4066
+msgid "Details"
+msgstr ""

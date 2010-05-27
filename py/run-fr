@@ -1,0 +1,8 @@
+#!/bin/bash
+# This file is not included in the distributed package, nor installed
+# It is only useful for developers to simplify launching scenic.
+# This one specifically launches scenic in french
+# You need to have the language-pack-gnome-fr installed
+cd $(dirname $0)
+LANG=fr_CA.UTF-8 ./run $@
+
