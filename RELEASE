@@ -38,11 +38,14 @@ New features in milhouse:
     (none)
 
 New features in scenic:
-    (none)
+    *   #538 Add the reason parameter to BYE in SIC
+    *   #545 Add a Debian menu icon.
+    *   #543 Create a Debian menu entry
 
 Bug fixes in milhouse: 
     (none)
 
 Bug fixes in scenic: 
-    (none)
+    *   #535 .mo files should not be in the repository
+    *   #537 debuild should run autoreconf
 
