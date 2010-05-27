@@ -8,6 +8,8 @@ X-GNOME-DocPath=
 Terminal=false
 Name=Scenic
 Name[en]=Scenic
-Comment=[fr]=Logiciel de télépresence pour la scène et les installations
+Name[fr]=Scenic
+Comment=Telepresence software for live performances and installations 
 Comment[en]=Telepresence software for live performances and installations 
+Comment[fr]=Logiciel de télépresence pour la scène et les installations
 Categories=Network;
