@@ -302,6 +302,7 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned lon
                 G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
         gtk_widget_set_size_request(drawingArea_, width, height);
+        showWindow();
     }
 }
 
