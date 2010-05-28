@@ -49,7 +49,8 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     videoflip_(sinkConfig_->flipMethod() != "none" ? sinkConfig_->createVideoFlip(pipeline_) : 0),
     sink_(sinkConfig_->createSink(pipeline_))
 {
-    // dc1394src needs an extra colourspace if not being encoded or flipped
+    // dc1394src needs an extra colourspace converter if not being encoded or flipped
+    // FIXME: maybe it just needs a capsfilter?
     if (sourceConfig_->sourceString() == "dc1394src" and videoflip_ == 0)
     {
         colourspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
