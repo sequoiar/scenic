@@ -299,8 +299,10 @@ class Gui(object):
 
         # video preview:
         self.preview_area_widget = widgets_tree.get_widget("preview_area")
+
         self.preview_in_window_widget = widgets_tree.get_widget("preview_in_window")
         preview_socket = gtk.Socket()
+        preview_socket.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
         preview_socket.connect("plug-removed", _plug_removed_cb)
         preview_socket.show()
         self.preview_area_widget.add(preview_socket)
