@@ -115,7 +115,6 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
 
     GstIter src;
 
-    const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
     int channelIdx = 0;
 
     GstCaps *caps = gst_caps_new_simple("audio/x-raw-int", "endianness", G_TYPE_INT, 1234, "signed", 
@@ -125,7 +124,7 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
     for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
     {
         GstPad *pad;
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequencies_[0][channelIdx], "is-live", FALSE, NULL);
+        g_object_set(G_OBJECT(*src), "freq", frequencies_[0][channelIdx], "is-live", FALSE, NULL);
         tassert(pad = gst_element_get_static_pad(*src, "src"));
         tassert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);
@@ -284,8 +283,6 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     GstCaps *caps = 0;
     caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
     tassert(caps);
-    //std::vector<GstAudioChannelPosition> pos(config_.numChannels(), GST_AUDIO_CHANNEL_POSITION_NONE);
-    //gst_audio_set_channel_positions(gst_caps_get_structure(caps, 0), pos.data());
     capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", caps, NULL);
 
