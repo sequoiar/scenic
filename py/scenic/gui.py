@@ -290,11 +290,23 @@ class Gui(object):
         self.v4l2_input_widget = widgets_tree.get_widget("v4l2_input")
         self.v4l2_standard_widget = widgets_tree.get_widget("v4l2_standard")
         self.video_jitterbuffer_widget = widgets_tree.get_widget("video_jitterbuffer")
+        def _plug_removed_cb(widget):
+            """ Called when a plug is removed from socket, returns
+                True so that it can be reused
+                """
+            log.debug("I (%s) have just had a plug removed!" % (widget))
+            return True
+
         # video preview:
         self.preview_area_widget = widgets_tree.get_widget("preview_area")
-        self.preview_area_x_window_id = None
         self.preview_in_window_widget = widgets_tree.get_widget("preview_in_window")
-        
+        preview_socket = gtk.Socket()
+        preview_socket.connect("plug-removed", _plug_removed_cb)
+        preview_socket.show()
+        self.preview_area_widget.add(preview_socket)
+        self.preview_area_x_window_id = preview_socket.get_id()
+        preview_socket.show()
+
         # audio
         self.audio_source_widget = widgets_tree.get_widget("audio_source")
         self.audio_codec_widget = widgets_tree.get_widget("audio_codec")
@@ -307,14 +319,6 @@ class Gui(object):
         self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
         self.audio_jack_enable_autoconnect_widget = widgets_tree.get_widget("audio_jack_enable_autoconnect")
 
-        # audio levels:
-        def _plug_removed_cb(widget):
-            """ Called when a plug is removed from socket, returns
-                True so that it can be reused
-                """
-            log.debug("I (%s) have just had a plug removed!" % (widget))
-            return True
-        
         self.audio_levels_input_widget = widgets_tree.get_widget("audio_levels_input")
         in_socket = gtk.Socket()
         in_socket.connect("plug-removed", _plug_removed_cb)
@@ -395,11 +399,6 @@ class Gui(object):
         self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
         self._disable_unsupported_codecs()
    
-    #TODO: for the preview in the drawing area   
-    #def on_expose_event(self, widget, event):
-    #    self.preview_xid = widget.window.xid
-    #    return False
-
     def _disable_unsupported_codecs(self):
         """
         Checks if codecs for which not Gstreamer elements are found, and disabled them.
@@ -504,14 +503,6 @@ class Gui(object):
             reactor.stop()
 
     # --------------- slots for some widget events ------------
-
-    def on_preview_area_realize(self, *args):
-        # avoid bad xid errors
-        gtk.gdk.display_get_default().sync()
-        xid = self.preview_area_widget.window.xid
-        log.debug("Preview area X Window ID: %s" % (xid))
-        self.preview_area_x_window_id = xid
-        self.preview_area_widget.window.set_background(gtk.gdk.Color(0, 0, 0)) # black
 
     def on_preview_manager_state_changed(self, manager, new_state):
         if new_state == process.STATE_STOPPED:
@@ -1067,9 +1058,6 @@ class Gui(object):
                         self.make_audio_jitterbuffer_enabled_or_not()
                     else:
                         widget.set_sensitive(True)
-            if self.preview_area_x_window_id is not None:
-                if self.preview_area_widget.window is not None:
-                    self.preview_area_widget.window.clear()
 
     def update_invite_button_with_contact_name(self):
         contact = self.app.address_book.selected_contact

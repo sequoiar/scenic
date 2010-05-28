@@ -35,7 +35,7 @@ class Preview(object):
     """
     def __init__(self, app):
         self.app = app
-        self.process_manager = None #process.ProcessManager(identifier="preview")
+        self.process_manager = None
         self.state = process.STATE_STOPPED
         self.state_changed_signal = sig.Signal()
         self.error_messages = None # either None or a list
