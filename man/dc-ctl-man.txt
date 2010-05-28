@@ -1,6 +1,3 @@
-[NAME]
-Image control for IIDC IEEE 1394 cameras.
-
 [DESCRIPTION]
 Image control for IIDC IEEE 1394 cameras.
 

@@ -1,6 +1,3 @@
-[NAME]
-Resets a IEEE 1394 bus 
-
 [SYNOPSIS]
 firereset [options]
 
