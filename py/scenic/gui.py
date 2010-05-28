@@ -557,7 +557,7 @@ class Gui(object):
                 try:
                     self.preview_manager.start()
                 except RuntimeError, e:
-                    log.warning("The user starts/stops very quickly the preview. " + str(e))
+                    log.warning("The user started or stopped the preview very quickly. " + str(e))
             else:
                 self.preview_manager.stop()
 
