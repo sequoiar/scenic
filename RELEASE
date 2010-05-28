@@ -45,7 +45,7 @@ Bug fixes in milhouse:
     (none)
 
 Bug fixes in scenic: 
-    (none)
+     #547 Help2man dones't accept the name field but accepts the command argument
 
 HISTORY
 
