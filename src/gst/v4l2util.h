@@ -25,7 +25,7 @@
 
 #include <string>
  	
-/// FIXME: this should be a real object that only opens the device ONCE
+/// FIXME: this should be a real object that only opens a given device ONCE
 class v4l2util
 {
     private:
