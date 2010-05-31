@@ -232,6 +232,11 @@ class Application(object):
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self._keep_tcp_alive_task = task.LoopingCall(self._keep_tcp_alive)
         self.max_channels_in_raw = None
+
+    def start(self):
+        """
+        This must be called to start the application
+        """
         reactor.callLater(0, self._start_the_application)
 
     def _keep_tcp_alive(self):
