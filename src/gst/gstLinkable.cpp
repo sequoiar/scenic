@@ -63,7 +63,7 @@ void gstlinkable::link(GstLinkableSource &src, GstElement *sink)
     if (srcElement != 0)
         tryLink(srcElement, sink);
     else
-        LOG_DEBUG("Source element is 0");
+        LOG_WARNING("Source element is 0");
 }
 
 
