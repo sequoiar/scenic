@@ -754,7 +754,7 @@
                       <widget class="GtkMenuItem" id="status_menu_item">
                         <property name="visible">True</property>
                         <property name="tooltip" translatable="yes">View informations about Scenic features on your system.</property>
-                        <property name="label" translatable="yes">Detailled Status</property>
+                        <property name="label" translatable="yes">Detailed Status</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_status_menu_item_activated"/>
                       </widget>
