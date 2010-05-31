@@ -177,7 +177,7 @@ class Client(object):
             self.sic_sender = None
             return defer.succeed(True)
         else:
-            msg = "Not connected."
+            log.warning("Already disconnected.")
             return defer.succeed(True) # FIXME
             
 def connect_send_and_disconnect(host, port, mess):
