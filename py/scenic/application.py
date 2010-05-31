@@ -513,9 +513,9 @@ class Application(object):
             log.debug("JACK infos: %s" % (result))
             self.gui.update_jackd_status()
         def _eb(reason):
-            print "Error calling jackd_get_infos2: ", reason
+            print "Error calling jackd_get_infos: ", reason
                 
-        deferred = jackd.jackd_get_infos2()
+        deferred = jackd.jackd_get_infos()
         deferred.addCallback(_cb)
         deferred.addErrback(_eb)
         return deferred

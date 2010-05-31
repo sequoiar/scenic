@@ -94,7 +94,7 @@ def _parse_jack_info(text):
         ret[0]["latency"] = max_system_playback + max_system_capture
     return ret
 
-def jackd_get_infos2():
+def jackd_get_infos():
     """
     Calls jack-info to retrieve info about jackd servers. 
     
