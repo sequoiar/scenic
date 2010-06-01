@@ -66,7 +66,6 @@ class Note(object):
             pack_algo += 'B'
 
         #writting offbits
-        offbits = 0
         offbits_l = []
 
         for i in range(len(notes)):
@@ -80,7 +79,7 @@ class Note(object):
 
             try:
                 #Try the emplacement
-                res = offbits_l[emplacement]
+                _res = offbits_l[emplacement]
             except IndexError:
                 while len(offbits_l) < emplacement:
                     offbits_l.append(0)
@@ -284,7 +283,6 @@ class ChapterC(Chapter):
     def header(self, length, marker_s=0):
         marker_s = marker_s << 7
         #L max 127
-        length = length
         
         return pack('!B', marker_s | length)
             
@@ -528,7 +526,6 @@ class ChapterN(Chapter):
         #LOW et high sont la pour indique le nombre d'OFFBITS
         #if LOW <= HIGH there are HIGH - LOW + 1 OFFBITS
         #HIGH = biggest_notenum_of_noteoff_present
-        high = high
         #LOW = lowest_notenum_of_noteoff_present
         low = low << 4
 
@@ -604,7 +601,7 @@ class ChapterN(Chapter):
             #tmp
             note_num = note_on[0][1]
             velocity = note_on[0][2]
-            cmd = note_on[0][0]&240
+            #cmd = note_on[0][0]&240
             seq = note_on[1]
 
             if note_num in note_on_l:
@@ -676,7 +673,7 @@ class ChapterN(Chapter):
 
         #complete chapterN
         chapter_n = chapter_note_on + chapter_note_off
-        real_len = len(self.note_on) * 2 + ( self.high - self.low + 1 )
+        #real_len = len(self.note_on) * 2 + ( self.high - self.low + 1 )
 
         #building chapter
         header = self.header()
@@ -769,11 +766,10 @@ class ChapterT(Chapter):
         size = 1
         midi_cmd = []
         chap_t_parsed = unpack('!B', chap_t[0])
-        marker_s = chap_t_parsed[0] >> 7
+        #marker_s = chap_t_parsed[0] >> 7
         pressure = chap_t_parsed[0]&127
         midi_cmd.append([208, pressure, 0])
         return  size, midi_cmd
-
 
 class ChapterA(Chapter):
     """Chapter A (Poly After Touch)
@@ -842,16 +838,16 @@ class ChapterA(Chapter):
         """
         #timestamp = 1 if marker X
         #timestamp = 1 << 1 marker S
-        chapter_p = ""
+        #chapter_p = ""
         known_pitch = [data[0][0] for data in self.data_list]
 
         for i in range(len(midi_cmd)):
             marker_x = 0
             marker_s = 0
-            if (midi_cmd[i][1]>>1) and 1 or 0:
+            if (midi_cmd[i][1]>>1): 
                 marker_s = 1
                 
-            if (midi_cmd[i][1]&1) and 1 or 0:
+            if (midi_cmd[i][1]&1):
                 marker_x = 1
 
             #Encoding

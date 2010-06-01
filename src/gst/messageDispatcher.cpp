@@ -66,7 +66,7 @@ void MessageDispatcher::unsubscribe(MessageHandler *obj)
             getInstance()->handlers_.end(), obj);
 
     // assert that we were able to find the handler 
-    assert(iter != getInstance()->handlers_.end() );
+    assert(iter != getInstance()->handlers_.end());
 
     // remove it
     getInstance()->handlers_.erase(iter);

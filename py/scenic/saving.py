@@ -177,7 +177,7 @@ class AddressBook(object):
                 self.selected = None
             self.contact_list = data["contact_list"]
         else:
-            log.error("No addressbook found.")
+            log.warning("No addressbook found.")
 
     def save(self):
         data = {

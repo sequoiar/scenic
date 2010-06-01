@@ -143,7 +143,7 @@ void VideoDecoder::addDeinterlace()
     // FIXME: should maybe be settable
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
 
-    assert(decoder_ != 0);
+    assert(decoder_);
     if (doDeinterlace_)
     {
         colorspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
@@ -358,7 +358,7 @@ void TheoraEncoder::setQuality(int quality)
 // theora specific
 void TheoraEncoder::setSpeedLevel(int speedLevel)
 {
-    assert(encoder_ != 0);
+    assert(encoder_);
     if (speedLevel < MIN_SPEED_LEVEL or speedLevel > MAX_SPEED_LEVEL)
         THROW_ERROR("Speed-level must be in range [" << MIN_SPEED_LEVEL << "-" << MAX_SPEED_LEVEL << "]");
     g_object_set(encoder_, "speed-level", speedLevel, NULL);

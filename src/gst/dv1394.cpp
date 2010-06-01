@@ -33,7 +33,7 @@ Dv1394 *Dv1394::instance_ = 0;
 /// used by localvideo
 void Dv1394::doTimestamp()
 {
-    assert(dv1394src_ != 0);
+    assert(dv1394src_);
     g_object_set(dv1394src_, "do-timestamp", TRUE, NULL);
 }
 
@@ -150,7 +150,8 @@ void Dv1394::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gpoin
         return;
     }
     LOG_DEBUG("Dv1394: linking new srcpad to sinkpad.");
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
+    bool linked = gstlinkable::link_pads(srcPad, sinkPad);
+    assert(linked);
     gst_object_unref(sinkPad);
 }
 

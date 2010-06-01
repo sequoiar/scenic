@@ -182,7 +182,8 @@ void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, g
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
     LOG_DEBUG("linking new srcpad and sinkpad.");
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
+    bool linked = gstlinkable::link_pads(srcPad, sinkPad);
+    assert(linked);
     gst_object_unref(sinkPad);
 }
 

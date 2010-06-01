@@ -78,7 +78,7 @@ class Server(object):
         Closes the server and starts it on an other port.
        """
         self.port = new_port
-        def _on_closed(result):
+        def _on_closed(unused_result):
             return self.start_listening()
         
         deferred = self.close()
@@ -172,7 +172,7 @@ class Client(object):
         @rtype: Deferred
         """
         if self.is_connected():
-            d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
+            unused_d = self.clientPort.transport.loseConnection() # TODO: trigger a deffered when connection lost
             self.port = None
             self.sic_sender = None
             return defer.succeed(True)

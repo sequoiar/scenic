@@ -70,13 +70,15 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::createCodec(Pipeline &pipeline)
 {
-    assert(decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace()));
+    decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace());
+    assert(decoder_);
 }
 
 
 void VideoReceiver::createDepayloader()
 {
-    assert(depayloader_ = decoder_->createDepayloader());
+    depayloader_ = decoder_->createDepayloader();
+    assert(depayloader_);
 
     gstlinkable::link(*depayloader_, *decoder_);
 
@@ -87,14 +89,18 @@ void VideoReceiver::createDepayloader()
 void VideoReceiver::createSink(Pipeline &pipeline)
 {
     // avoid creating the videoflip as it has a colorspace converter
-    assert(videoscale_ = videoConfig_->createVideoScale(pipeline));
+    videoscale_ = videoConfig_->createVideoScale(pipeline);
+    assert(videoscale_);
     if (videoConfig_->flipMethod() != "none")
-        assert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
-    assert(sink_ = videoConfig_->createSink(pipeline));
+    {
+        videoflip_ = videoConfig_->createVideoFlip(pipeline);
+        assert(videoflip_);
+    }
+    sink_ = videoConfig_->createSink(pipeline);
+    assert(sink_);
 
     if (remoteConfig_->jitterbufferControlEnabled())
         MessageDispatcher::sendMessage("create-control");
-
 
     gstlinkable::link(*decoder_, *videoscale_);
     if (videoflip_ != 0)

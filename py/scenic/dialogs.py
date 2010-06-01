@@ -97,11 +97,11 @@ class GladeDialogFactory(object):
         else:
             pass #print("Dialog %s is already destroyed."  % (self.name))
         
-    def _on_delete_event(self, *args):
+    def _on_delete_event(self, *unused_args):
         if not self._terminating:
             self._terminate(False)
 
-    def _on_destroy_event(self, widget, event):
+    def _on_destroy_event(self, unused_widget, unused_event):
         self._destroyed = True
         if not self._terminating:
             self._terminate(answer=False)
@@ -125,7 +125,7 @@ class ConfirmDialog(GladeDialogFactory):
         self._dialog.connect('response', self._on_response_event, None)
         return deferred
 
-    def _on_response_event(self, widget, response_id, *args):
+    def _on_response_event(self, unused_widget, response_id, *unused_args):
         """
         Calls the deferred with True of False as a result.
         """
@@ -148,7 +148,7 @@ class InvitedDialog(GladeDialogFactory):
         self._dialog.connect('response', self._on_response_event)
         return deferred
 
-    def _on_response_event(self, widget, response_id, *args):
+    def _on_response_event(self, unused_widget, response_id, *unused_args):
         """
         Calls the deferred with True of False as a result.
         """
@@ -207,13 +207,13 @@ class ErrorDialog(object):
         @rtype: L{Deferred}
         """
         d = defer.Deferred()
-        dialog = ErrorDialog(d, message, parent, details)
+        unused_dialog = ErrorDialog(d, message, parent, details)
         return d
 
-    def on_close(self, dialog, *params):
+    def on_close(self, dialog, *unused_params):
         pass #print("on_close %s %s" % (dialog, params))
 
-    def on_response(self, dialog, response_id, *params):
+    def on_response(self, dialog, response_id, *unused_params):
         #print("on_response %s %s %s" % (dialog, response_id, params))
         if response_id == gtk.RESPONSE_DELETE_EVENT:
             pass #print("Deleted")
@@ -256,13 +256,13 @@ class YesNoDialog(object):
         @rtype: L{Deferred}
         """
         d = defer.Deferred()
-        dialog = YesNoDialog(d, message, parent)
+        unused_dialog = YesNoDialog(d, message, parent)
         return d
 
     def on_close(self, dialog, *params):
         pass #print("on_close %s %s" % (dialog, params))
 
-    def on_response(self, dialog, response_id, *params):
+    def on_response(self, dialog, response_id, *unused_params):
         pass #print("on_response %s %s %s" % (dialog, response_id, params))
         if response_id == gtk.RESPONSE_DELETE_EVENT:
             pass #print("Deleted")
@@ -281,5 +281,5 @@ class YesNoDialog(object):
 
 if __name__ == '__main__': 
     d = ErrorDialog.create('BOBBBBBBBBBB')
-    d.addCallback(lambda result: reactor.stop())
+    d.addCallback(lambda unused_result: reactor.stop())
     reactor.run()

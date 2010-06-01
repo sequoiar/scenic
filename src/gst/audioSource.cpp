@@ -125,8 +125,10 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
     {
         GstPad *pad;
         g_object_set(G_OBJECT(*src), "freq", frequencies_[0][channelIdx], "is-live", FALSE, NULL);
-        assert(pad = gst_element_get_static_pad(*src, "src"));
-        assert(gst_pad_set_caps(pad, caps));
+        pad = gst_element_get_static_pad(*src, "src");
+        assert(pad);
+        bool capsSet = gst_pad_set_caps(pad, caps);
+        assert(capsSet);
         g_object_unref(pad);
 
     }

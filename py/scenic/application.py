@@ -267,7 +267,7 @@ class Application(object):
     def midi_is_supported(self):
         return self._midi_is_supported
     
-    def on_connection_error(self, err, mess):
+    def on_connection_error(self, unused_err, unused_mess):
         """
         Called by the communication.Client in case of an error.
         """
@@ -346,7 +346,7 @@ class Application(object):
         try:
             self.server.start_listening()
         except error.CannotListenError, e:
-            def _cb(result):
+            def _cb(unused_result):
                 reactor.stop()
             log.error("Cannot start SIC server. %s" % (e))
             deferred = dialogs.ErrorDialog.create(_("Is another Scenic running? Cannot bind to port %(port)d") % {"port": self.config.negotiation_port}, parent=self.gui.main_window)
@@ -357,11 +357,11 @@ class Application(object):
         self._keep_tcp_alive_task.start(5 * 60, now=False)
         # first, poll devices, next restore v4l2 settings, finally, update widgets and poll cameras again.
         # Devices: X11 and XV
-        def _cb2(result):
+        def _cb2(unused_result):
             self.gui.update_widgets_with_saved_config()
             d = self.poll_camera_devices() # we need to do it once more, to update the list of possible image size according to the selected video device
         #first_action = defer.DeferredList([
-        def _cb1(result):
+        def _cb1(unused_result):
             d = self._restore_v4l2_settings()
             d.addCallback(_cb2)
         deferred_list = defer.DeferredList([
@@ -533,7 +533,7 @@ class Application(object):
             if not self.got_bye:
                 self.send_bye() # returns None
                 self.stop_streamers() # returns None
-        def _cb(result):
+        def _cb(unused_result):
             log.debug("done quitting.")
             deferred.callback(True)
         def _later():
@@ -926,7 +926,7 @@ class Application(object):
         Disconnects the SIC sender.
         @rtype: L{Deferred}
         """
-        def _cb(result, d1):
+        def _cb(unused_result, d1):
             d1.callback(True)
         def _cl(d1):
             if self.client.is_connected():
@@ -1002,7 +1002,7 @@ class Application(object):
         self.save_configuration()
         self.prepare_before_rtp_stream()
         deferred = defer.Deferred()
-        def _callback(result):
+        def _callback(unused_result):
             # callback for the deferred list created below.
             # calls the deferred's callback
             if role == "offerer":
@@ -1133,7 +1133,7 @@ class Application(object):
         if self.client.is_connected():
             self.client.send(msg)
    
-    def send_accept(self, addr):
+    def send_accept(self, unused_addr):
         # UPDATE config once we accept the invitie
         #TODO: use the Deferred it will return
         #self.prepare_before_rtp_stream()
@@ -1191,7 +1191,7 @@ class Application(object):
 
     # ------------------- streaming events handlers ----------------
     
-    def on_streamer_state_changed(self, streamer, new_state):
+    def on_streamer_state_changed(self, unused_streamer, new_state):
         """
         Slot for scenic.streamer.StreamerManager.state_changed_signal
         """

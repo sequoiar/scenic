@@ -45,7 +45,7 @@ def get_widgets_tree():
     else:
         text = _("Error : Could not find the Glade file %(filename)s. Exitting.") % {"filename": glade_file}
         print(text)
-        def _exit_cb(result):
+        def _exit_cb(unused_result):
             print("Exiting")
             if reactor.running:
                 reactor.stop()

@@ -68,7 +68,8 @@ AudioReceiver::~AudioReceiver()
 
 void AudioReceiver::createCodec(Pipeline &pipeline)
 {
-    assert(decoder_ = remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels()));
+    decoder_ = remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels());
+    assert(decoder_);
     level_ = audioConfig_->createLevel(pipeline);
     if (level_ != 0)
             gstlinkable::link(*decoder_, *level_);
@@ -77,7 +78,8 @@ void AudioReceiver::createCodec(Pipeline &pipeline)
 
 void AudioReceiver::createDepayloader()
 {
-    assert(depayloader_ = decoder_->createDepayloader());
+    depayloader_ = decoder_->createDepayloader();
+    assert(depayloader_);
     gstlinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, *remoteConfig_);
 }
@@ -85,7 +87,8 @@ void AudioReceiver::createDepayloader()
 
 void AudioReceiver::createSink(Pipeline &pipeline)
 {
-    assert(sink_ = audioConfig_->createSink(pipeline));
+    sink_ = audioConfig_->createSink(pipeline);
+    assert(sink_);
     if (level_ != 0)
         gstlinkable::link(*level_, *sink_);   
     else

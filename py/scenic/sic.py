@@ -102,7 +102,7 @@ class ClientFactory(protocol.ClientFactory):
     def __init__(self):
         self.connected_deferred = defer.Deferred()
 
-    def clientConnectionFailed(self, connector, reason):
+    def clientConnectionFailed(self, unused_connector, reason):
         log.error('Connection failed. Reason: %s' % (reason))
         self.connected_deferred.errback(reason)
         return True

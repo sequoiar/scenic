@@ -207,21 +207,30 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
             config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);
 
     /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
-    assert(rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src"));
-    assert(recv_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
-    assert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink_));
+    rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src");
+    assert(rtpReceiverSrc);
+    recv_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_"));
+    assert(recv_rtp_sink_);
+    bool linked = gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink_);
+    assert(linked);
     gst_object_unref(rtpReceiverSrc);
 
     /* get an RTCP sinkpad in session n */
-    assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
-    assert(recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
-    assert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_));
+    rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src");
+    assert(rtcpReceiverSrc);
+    recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
+    assert(recv_rtcp_sink_);
+    linked = gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_);
+    assert(linked);
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
 
     /* get an RTCP srcpad for sending RTCP back to the sender */
-    assert(send_rtcp_src_ = gst_element_get_request_pad (rtpbin_, padStr("send_rtcp_src_")));
-    assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
-    assert(gstlinkable::link_pads(send_rtcp_src_, rtcpSenderSink));
+    send_rtcp_src_ = gst_element_get_request_pad (rtpbin_, padStr("send_rtcp_src_"));
+    assert(send_rtcp_src_);
+    rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink");
+    assert(rtcpSenderSink);
+    linked = gstlinkable::link_pads(send_rtcp_src_, rtcpSenderSink);
+    assert(linked);
     gst_object_unref(rtcpSenderSink);
 
     // when pad is created, it must be linked to new sink

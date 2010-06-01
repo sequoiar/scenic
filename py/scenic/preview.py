@@ -101,13 +101,13 @@ class Preview(object):
         self._set_state(process.STATE_STARTING)
         self.process_manager.start()
 
-    def on_stdout_line(self, process_manager, line):
+    def on_stdout_line(self, unused_process_manager, line):
         log.debug(line)
         if "WARNING" in line:
             log.warning(line)
             self.warnings.append(line)
 
-    def on_stderr_line(self, process_manager, line):
+    def on_stderr_line(self, unused_process_manager, line):
         log.debug(line)
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages.append(line)
