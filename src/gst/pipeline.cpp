@@ -144,24 +144,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
             break;
         case GST_MESSAGE_APPLICATION:
             /// handle interrupt
-            const GstStructure *s;
-
-            s = gst_message_get_structure(msg);
-
-            if (gst_structure_has_name (s, "MilhouseInterrupt")) 
-            {
-                /* this application message is posted when we caught an interrupt and
-                 * we need to stop the pipeline. */
-                LOG_INFO("Interrupt: Stopping pipeline ...\n");
-                if (msg)
-                {
-                    // gst_message_unref(msg);
-                    //  gst_object_unref(bus);
-                }
-                return FALSE;
-            }
-            else
-                context->updateListeners(msg);
+            context->updateListeners(msg);
             break;
 
         case GST_MESSAGE_LATENCY:
