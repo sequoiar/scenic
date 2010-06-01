@@ -217,7 +217,7 @@ class StreamerManager(object):
                 num =  remote_config["audio"]["max_channels_in_raw"]
                 self.session_details["receive"]["audio"]["numchannels"] = num
                 msg = _("Limiting the number of audio channels to receive to %(number)d since remote peer only support up to that much.\nDecrease it to get rid of this message.") % {"number": num}
-                log.error(msg)
+                log.warning(msg)
                 self.app.gui.show_error_dialog(msg)
         # ...according to local's max
         if self.session_details["send"]["audio"]["codec"] == "raw":
@@ -226,8 +226,8 @@ class StreamerManager(object):
                 self.session_details["send"]["audio"]["numchannels"] = num
                 msg = _("Limiting the number of audio channels to send to %(number)d since we only support up to that much.\nDecrease it to get rid of this message.") % {"number": num}
                 details = _("Update your jackaudiosrc Gstreamer element.")
-                log.error(msg)
-                log.error(details)
+                log.warning(msg)
+                log.warning(details)
                 self.app.gui.show_error_dialog(msg, details=details)
         
         log.debug(str(self.session_details))
