@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#include <cassert>
 #include <cstring>
 #include <cmath>
 #include <gst/gst.h>
@@ -165,7 +166,7 @@ void AudioLevel::print(const std::vector<double> &rmsValues) const
 /// Sets the reporting interval in nanoseconds. 
 void AudioLevel::interval(unsigned long long newInterval)
 {
-    tassert(newInterval > 0);
+    assert(newInterval > 0);
     g_object_set (G_OBJECT(level_), "interval", newInterval, "message", emitMessages_, NULL);
 }
 

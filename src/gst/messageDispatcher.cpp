@@ -23,6 +23,7 @@
 #include "util.h"
 #include "messageDispatcher.h"
 #include "messageHandler.h"
+#include <cassert>
 #include <algorithm>
 
 MessageDispatcher * MessageDispatcher::getInstance()
@@ -65,7 +66,7 @@ void MessageDispatcher::unsubscribe(MessageHandler *obj)
             getInstance()->handlers_.end(), obj);
 
     // assert that we were able to find the handler 
-    tassert(iter != getInstance()->handlers_.end() );
+    assert(iter != getInstance()->handlers_.end() );
 
     // remove it
     getInstance()->handlers_.erase(iter);

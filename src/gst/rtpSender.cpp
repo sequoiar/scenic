@@ -104,33 +104,33 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 
     // padStr adds a session id to the pad name, so we get the pad for this session
     /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
-    tassert(send_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));
+    assert(send_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));
 
     g_signal_connect(send_rtp_sink_, "notify::caps", G_CALLBACK(sendCapsChanged), this);
     g_signal_connect(rtpbin_, "on-new-ssrc", G_CALLBACK(onNewSSRC), this);
 
-    tassert(payloadSrc = gst_element_get_static_pad(newSrc->srcElement(), "src"));
-    tassert(gstlinkable::link_pads(payloadSrc, send_rtp_sink_));
+    assert(payloadSrc = gst_element_get_static_pad(newSrc->srcElement(), "src"));
+    assert(gstlinkable::link_pads(payloadSrc, send_rtp_sink_));
     gst_object_unref(GST_OBJECT(payloadSrc));
 
     send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_"));
-    tassert(send_rtp_src);
-    tassert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));
-    tassert(gstlinkable::link_pads(send_rtp_src, rtpSenderSink));
+    assert(send_rtp_src);
+    assert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));
+    assert(gstlinkable::link_pads(send_rtp_src, rtpSenderSink));
     gst_object_unref(send_rtp_src); // static pad
 
 
     /* get an RTCP srcpad for sending RTCP to the receiver */
-    tassert(send_rtcp_src_ = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));
-    tassert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
-    tassert(gstlinkable::link_pads(send_rtcp_src_, rtcpSenderSink));
+    assert(send_rtcp_src_ = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));
+    assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
+    assert(gstlinkable::link_pads(send_rtcp_src_, rtcpSenderSink));
     gst_object_unref(rtcpSenderSink);
 
     /* we also want to receive RTCP, request an RTCP sinkpad for session n and
      * link it to the srcpad of the udpsrc for RTCP */
-    tassert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
-    tassert(recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
-    tassert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_));
+    assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
+    assert(recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
+    assert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_));
     gst_object_unref(rtcpReceiverSrc);
 }
 

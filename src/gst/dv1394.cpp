@@ -21,6 +21,7 @@
  */
 
 #include <gst/gst.h>
+#include <cassert>
 #include "dv1394.h"
 #include "raw1394Util.h"
 #include "gstLinkable.h"
@@ -32,7 +33,7 @@ Dv1394 *Dv1394::instance_ = 0;
 /// used by localvideo
 void Dv1394::doTimestamp()
 {
-    tassert(dv1394src_ != 0);
+    assert(dv1394src_ != 0);
     g_object_set(dv1394src_, "do-timestamp", TRUE, NULL);
 }
 
@@ -90,14 +91,14 @@ void Dv1394::reset()
 
 void Dv1394::setAudioSink(GstElement *audioSink)
 {
-    tassert(audioSink);
+    assert(audioSink);
     audioSink_ = audioSink;
 }
 
 
 void Dv1394::setVideoSink(GstElement *videoSink)
 {
-    tassert(videoSink);
+    assert(videoSink);
     videoSink_ = videoSink;
 }
 
@@ -149,7 +150,7 @@ void Dv1394::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gpoin
         return;
     }
     LOG_DEBUG("Dv1394: linking new srcpad to sinkpad.");
-    tassert(gstlinkable::link_pads(srcPad, sinkPad));
+    assert(gstlinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 

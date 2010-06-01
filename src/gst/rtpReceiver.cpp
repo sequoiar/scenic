@@ -50,7 +50,7 @@ RtpReceiver::~RtpReceiver()
         iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
 
         // make sure we found it and remove it
-        tassert(iter != depayloaders_.end());
+        assert(iter != depayloaders_.end());
         depayloaders_.erase(iter);
     }
     
@@ -66,7 +66,7 @@ RtpReceiver::~RtpReceiver()
 
 void RtpReceiver::setLatency(int latency)
 {
-    tassert(rtpbin_);
+    assert(rtpbin_);
     if (latency < MIN_LATENCY or latency > MAX_LATENCY)
         THROW_ERROR("Cannot set rtpbin latency to " << latency << ", must be in range "
                 << MIN_LATENCY << " to " << MAX_LATENCY);
@@ -207,21 +207,21 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
             config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);
 
     /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
-    tassert(rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src"));
-    tassert(recv_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
-    tassert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink_));
+    assert(rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src"));
+    assert(recv_rtp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
+    assert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink_));
     gst_object_unref(rtpReceiverSrc);
 
     /* get an RTCP sinkpad in session n */
-    tassert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
-    tassert(recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
-    tassert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_));
+    assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
+    assert(recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
+    assert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_));
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
 
     /* get an RTCP srcpad for sending RTCP back to the sender */
-    tassert(send_rtcp_src_ = gst_element_get_request_pad (rtpbin_, padStr("send_rtcp_src_")));
-    tassert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
-    tassert(gstlinkable::link_pads(send_rtcp_src_, rtcpSenderSink));
+    assert(send_rtcp_src_ = gst_element_get_request_pad (rtpbin_, padStr("send_rtcp_src_")));
+    assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
+    assert(gstlinkable::link_pads(send_rtcp_src_, rtcpSenderSink));
     gst_object_unref(rtcpSenderSink);
 
     // when pad is created, it must be linked to new sink

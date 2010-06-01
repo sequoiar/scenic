@@ -95,7 +95,7 @@ AudioSender::~AudioSender()
 
 void AudioSender::createSource(Pipeline &pipeline)
 {
-    tassert(source_ = audioConfig_->createSource(pipeline));
+    assert(source_ = audioConfig_->createSource(pipeline));
     level_ = audioConfig_->createLevel(pipeline);
     if (level_ != 0)
             gstlinkable::link(*source_, *level_);
@@ -103,7 +103,7 @@ void AudioSender::createSource(Pipeline &pipeline)
 
 void AudioSender::createCodec(Pipeline &pipeline)
 {
-    tassert(encoder_ = remoteConfig_->createAudioEncoder(pipeline, audioConfig_->bitrate(), audioConfig_->quality()));
+    assert(encoder_ = remoteConfig_->createAudioEncoder(pipeline, audioConfig_->bitrate(), audioConfig_->quality()));
     if (level_ != 0)
         gstlinkable::link(*level_, *encoder_);
     else
@@ -113,7 +113,7 @@ void AudioSender::createCodec(Pipeline &pipeline)
 
 void AudioSender::createPayloader()   
 {
-    tassert(payloader_ = encoder_->createPayloader());
+    assert(payloader_ = encoder_->createPayloader());
 
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, *remoteConfig_);   

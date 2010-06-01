@@ -59,7 +59,7 @@ Encoder::~Encoder()
 /// Returns bitrate property for this encoder
 int Encoder::getBitrate() const
 {
-    tassert(encoder_);
+    assert(encoder_);
     int bitrate; 
     g_object_get(G_OBJECT(encoder_), "bitrate", &bitrate, NULL);
     return bitrate;
@@ -68,7 +68,7 @@ int Encoder::getBitrate() const
 /// Sets bitrate property for this encoder
 void Encoder::setBitrate(int bitrate)
 {
-    tassert(encoder_);
+    assert(encoder_);
     // if pipeline is playing, we need to set it to ready to make 
     // the bitrate change actually take effect
     if (pipeline_.isPlaying())
@@ -108,7 +108,7 @@ VideoEncoder::VideoEncoder(const Pipeline &pipeline, const char *encoder, bool s
     colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)), 
     supportsInterlaced_(supportsInterlaced)  // most codecs don't have this property
 {
-    tassert(encoder_);
+    assert(encoder_);
     if (supportsInterlaced_)  // not all encoders have this property
         g_object_set(encoder_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
@@ -143,7 +143,7 @@ void VideoDecoder::addDeinterlace()
     // FIXME: should maybe be settable
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
 
-    tassert(decoder_ != 0);
+    assert(decoder_ != 0);
     if (doDeinterlace_)
     {
         colorspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
@@ -358,7 +358,7 @@ void TheoraEncoder::setQuality(int quality)
 // theora specific
 void TheoraEncoder::setSpeedLevel(int speedLevel)
 {
-    tassert(encoder_ != 0);
+    assert(encoder_ != 0);
     if (speedLevel < MIN_SPEED_LEVEL or speedLevel > MAX_SPEED_LEVEL)
         THROW_ERROR("Speed-level must be in range [" << MIN_SPEED_LEVEL << "-" << MAX_SPEED_LEVEL << "]");
     g_object_set(encoder_, "speed-level", speedLevel, NULL);
@@ -497,7 +497,7 @@ RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     capsStr << "audio/x-raw-float, channels=" << numChannels;
     LOG_DEBUG("Raw decoder caps = " << capsStr.str());
     GstCaps *caps = gst_caps_from_string(capsStr.str().c_str());
-    tassert(caps);
+    assert(caps);
     g_object_set(G_OBJECT(capsfilter_), "caps", caps, NULL);
     gst_caps_unref(caps);
     gstlinkable::link(aconv_, capsfilter_);

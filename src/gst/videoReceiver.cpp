@@ -52,7 +52,7 @@ VideoReceiver::VideoReceiver(Pipeline &pipeline,
     sink_(0), 
     gotCaps_(false) 
 {
-    tassert(remoteConfig_->hasCodec()); 
+    assert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
     createPipeline(pipeline);
 }
@@ -70,13 +70,13 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::createCodec(Pipeline &pipeline)
 {
-    tassert(decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace()));
+    assert(decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace()));
 }
 
 
 void VideoReceiver::createDepayloader()
 {
-    tassert(depayloader_ = decoder_->createDepayloader());
+    assert(depayloader_ = decoder_->createDepayloader());
 
     gstlinkable::link(*depayloader_, *decoder_);
 
@@ -87,10 +87,10 @@ void VideoReceiver::createDepayloader()
 void VideoReceiver::createSink(Pipeline &pipeline)
 {
     // avoid creating the videoflip as it has a colorspace converter
-    tassert(videoscale_ = videoConfig_->createVideoScale(pipeline));
+    assert(videoscale_ = videoConfig_->createVideoScale(pipeline));
     if (videoConfig_->flipMethod() != "none")
-        tassert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
-    tassert(sink_ = videoConfig_->createSink(pipeline));
+        assert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
+    assert(sink_ = videoConfig_->createSink(pipeline));
 
     if (remoteConfig_->jitterbufferControlEnabled())
         MessageDispatcher::sendMessage("create-control");
@@ -106,7 +106,7 @@ void VideoReceiver::createSink(Pipeline &pipeline)
         gstlinkable::link(*videoscale_, *sink_);
 
     setCaps();
-    tassert(gotCaps_);
+    assert(gotCaps_);
     if (not remoteConfig_->capsMatchCodec()) 
         THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
     decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed

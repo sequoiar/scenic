@@ -63,7 +63,7 @@ void AudioSource::initCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
     // setup capsfilter
     GstCaps *caps = 0;
     caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
-    tassert(caps);
+    assert(caps);
     capsFilter = pipeline_.makeElement("capsfilter", NULL);
     aconv = pipeline_.makeElement("audioconvert", NULL);
     g_object_set(G_OBJECT(capsFilter), "caps", caps, NULL);
@@ -125,8 +125,8 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
     {
         GstPad *pad;
         g_object_set(G_OBJECT(*src), "freq", frequencies_[0][channelIdx], "is-live", FALSE, NULL);
-        tassert(pad = gst_element_get_static_pad(*src, "src"));
-        tassert(gst_pad_set_caps(pad, caps));
+        assert(pad = gst_element_get_static_pad(*src, "src"));
+        assert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);
 
     }
@@ -282,7 +282,7 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     // setup capsfilter
     GstCaps *caps = 0;
     caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
-    tassert(caps);
+    assert(caps);
     capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", caps, NULL);
 
@@ -322,7 +322,7 @@ std::string AudioJackSource::getCapsFilterCapsString()
 
 bool AudioJackSource::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
-    tassert(source_);
+    assert(source_);
     if (path == "disable-jack-autoconnect")
     {
         g_object_set(G_OBJECT(source_), "connect", 0, NULL);

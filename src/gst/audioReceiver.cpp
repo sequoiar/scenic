@@ -50,7 +50,7 @@ AudioReceiver::AudioReceiver(Pipeline &pipeline,
     level_(0),
     sink_(0)
 { 
-    tassert(remoteConfig_->hasCodec()); 
+    assert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
     createPipeline(pipeline);
 }
@@ -68,7 +68,7 @@ AudioReceiver::~AudioReceiver()
 
 void AudioReceiver::createCodec(Pipeline &pipeline)
 {
-    tassert(decoder_ = remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels()));
+    assert(decoder_ = remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels()));
     level_ = audioConfig_->createLevel(pipeline);
     if (level_ != 0)
             gstlinkable::link(*decoder_, *level_);
@@ -77,7 +77,7 @@ void AudioReceiver::createCodec(Pipeline &pipeline)
 
 void AudioReceiver::createDepayloader()
 {
-    tassert(depayloader_ = decoder_->createDepayloader());
+    assert(depayloader_ = decoder_->createDepayloader());
     gstlinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, *remoteConfig_);
 }
@@ -85,13 +85,13 @@ void AudioReceiver::createDepayloader()
 
 void AudioReceiver::createSink(Pipeline &pipeline)
 {
-    tassert(sink_ = audioConfig_->createSink(pipeline));
+    assert(sink_ = audioConfig_->createSink(pipeline));
     if (level_ != 0)
         gstlinkable::link(*level_, *sink_);   
     else
         gstlinkable::link(*decoder_, *sink_);   
     setCaps();
-    tassert(gotCaps_);
+    assert(gotCaps_);
     if (not remoteConfig_->capsMatchCodec()) 
         THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
 

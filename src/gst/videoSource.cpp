@@ -74,7 +74,7 @@ std::string VideoSource::srcCaps(unsigned int /*framerateIndex*/) const
 /// Sets caps on capsfilter
 void VideoSource::setCapsFilter(const std::string &capsStr)
 {
-    tassert(capsFilter_ != 0);
+    assert(capsFilter_ != 0);
     GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
     LOG_DEBUG("Setting caps to " << gst_caps_to_string(videoCaps));
     g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);

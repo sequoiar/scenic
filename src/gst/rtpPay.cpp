@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#include <cassert>
 #include <gst/gst.h>
 #include "rtpPay.h"
 #include "pipeline.h"
@@ -112,7 +113,7 @@ bool Mpeg4Pay::handleMessage(const std::string &path, const std::string &/*argum
 {
     if (path == "disable-send-config")
     {
-        tassert(rtpPay_);
+        assert(rtpPay_);
         LOG_DEBUG("setting send-config to false in rtpmp4vpay");
         g_object_set(rtpPay_, "send-config", FALSE, NULL);
         return true;

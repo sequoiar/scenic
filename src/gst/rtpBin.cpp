@@ -185,7 +185,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
 
 const char *RtpBin::padStr(const char *padName) const
 {
-    tassert(sessionCount_ > 0);  // we have a session going
+    assert(sessionCount_ > 0);  // we have a session going
     std::string result(padName);
     result = result + boost::lexical_cast<std::string>(sessionId_);
     return result.c_str();

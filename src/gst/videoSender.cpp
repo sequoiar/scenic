@@ -68,13 +68,13 @@ VideoSender::~VideoSender()
 
 void VideoSender::createSource(Pipeline &pipeline)
 {
-    tassert(source_ = videoConfig_->createSource(pipeline));
+    assert(source_ = videoConfig_->createSource(pipeline));
 }
 
 
 void VideoSender::createCodec(Pipeline &pipeline)
 {
-    tassert(encoder_ = remoteConfig_->createVideoEncoder(pipeline, videoConfig_->bitrate(), videoConfig_->quality()));
+    assert(encoder_ = remoteConfig_->createVideoEncoder(pipeline, videoConfig_->bitrate(), videoConfig_->quality()));
     bool linked = false;
     int framerateIndex = 0;
     while (not linked)
@@ -96,7 +96,7 @@ void VideoSender::createCodec(Pipeline &pipeline)
 
 void VideoSender::createPayloader()       
 {
-    tassert(payloader_ = encoder_->createPayloader());
+    assert(payloader_ = encoder_->createPayloader());
     // tell rtpmp4vpay not to send config string in header since we're sending caps
     if (remoteConfig_->capsOutOfBand() and remoteConfig_->codec() == "mpeg4") 
         MessageDispatcher::sendMessage("disable-send-config");

@@ -155,7 +155,7 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
     {   
         // this is our msg
         const gchar *newCapsStr = gst_structure_get_string(s, "caps");
-        tassert(newCapsStr);
+        assert(newCapsStr);
         std::string str(newCapsStr);
 
         GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(str.c_str()), 0);
