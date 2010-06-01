@@ -549,13 +549,17 @@ class Gui(object):
         #TODO: stop it when button is toggled to false.
         # It can be the user that pushed the button, or it can be toggled by the software.
         log.debug('video_view_preview toggled %s' % (widget.get_active()))
+        def _cb(result):
+            self.app.save_configuration() #gathers and saves
+            try:
+                self.preview_manager.start()
+            except RuntimeError, e:
+                log.warning("The user started or stopped the preview very quickly. " + str(e))
+            
         if self._widgets_changed_by_user:
             if widget.get_active():
-                self.app.save_configuration() #gathers and saves
-                try:
-                    self.preview_manager.start()
-                except RuntimeError, e:
-                    log.warning("The user started or stopped the preview very quickly. " + str(e))
+                deferred = self.app.poll_jack_now()
+                deferred.addCallback(_cb)
             else:
                 self.preview_manager.stop()
 
