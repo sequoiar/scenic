@@ -46,10 +46,11 @@
     latency requirements.</para>
     <para>
       <emphasis role="strong">Video4Linux</emphasis>
-    </para>&gt; 
+    </para> 
     <para>Plug in the video camera, for this, refer to our 
-    <link linkend='hardware-requirements'>Hardware Setup 
-    Page</link></para>
+       <link linkend='hardware-requirements'>Hardware Setup 
+       Page</link>
+    </para>
     <para>Now we will modify our video settings for your specific
     needs.</para>
     <para>
@@ -74,9 +75,11 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
     <programlisting>echo "raw1394" | sudo tee -a /etc/modules</programlisting>
     <para>See 
     <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
-    this bug report </ulink>for further information.</para>
+    this bug report </ulink>for further information
+    </para>
     <para>You can test the DV camera with:</para>
-    <para>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</para></sect2>
+    <para>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</para>
+    </sect2>
     <sect2 id="video-test">
       <title>Video Test</title>
       <para>In &app;, you can easily preview video4linux2 video
@@ -521,7 +524,6 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
       </informaltable>
       <para>NOTE: If you get an error message, reboot the computer
       and try again.</para>
-      <para />
       <itemizedlist>
         <listitem>
           <para>Now start the sound server by clicking on
@@ -538,6 +540,5 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
     <para>This will produce a sine wave. You should also see the
     audio connections appear in qjackctl. The outputs are now
     routable to your speakers or other applications.</para>
-    <para />
   </sect1>
 </chapter>
