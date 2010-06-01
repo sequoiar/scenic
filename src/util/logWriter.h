@@ -28,7 +28,6 @@
 #include <sstream>
 #include "config.h"
 
-
 #define ENABLE_LOG 1
 
 
