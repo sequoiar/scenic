@@ -38,15 +38,12 @@
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
 
-Pipeline::Pipeline() : pipeline_(0), handlers_(), 
+Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(), 
     sampleRate_(SAMPLE_RATE)
 {
-    tassert(pipeline_ = gst_pipeline_new("pipeline"));
-
     /* watch for messages on the pipeline's bus (note that this will only
      *      work like this when a GLib main loop is running) */
-    GstBus *bus;
-    bus = getBus();
+    GstBus *bus = getBus();
     gst_bus_add_watch(bus, static_cast<GstBusFunc>(bus_call), static_cast<gpointer>(this));
     gst_object_unref(bus);
 }
@@ -295,7 +292,9 @@ void Pipeline::start() const
     if (isPlaying())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    tassert(checkStateChange(getBus(), ret)); // set it to playing
+    if (checkStateChange(getBus(), ret) == 0) // set it to playing
+        THROW_ERROR("Could not set pipeline state to PLAYING");
+
     LOG_DEBUG("Now playing");
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(pipeline_), GST_DEBUG_GRAPH_SHOW_ALL, "milhouse");
 }
@@ -307,7 +306,8 @@ void Pipeline::makeReady() const
     if (isReady())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    tassert(checkStateChange(getBus(), ret)); // set it to playing
+    if (checkStateChange(getBus(), ret)) 
+        THROW_ERROR("Could not set pipeline state to READY");
     LOG_DEBUG("Now ready");
 }
 
@@ -319,7 +319,8 @@ void Pipeline::pause() const
         return;
     makeReady();
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-    tassert(checkStateChange(getBus(), ret)); // set it to paused
+    if (checkStateChange(getBus(), ret) == 0) // set it to paused
+        THROW_ERROR("Could not set pipeline state to PAUSED");
     LOG_DEBUG("Now paused");
 }
 
@@ -338,7 +339,8 @@ void Pipeline::stop() const
     if (pipeline_)
     {
         GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-        tassert(checkStateChange(getBus(), ret)); // set it to paused
+        if (checkStateChange(getBus(), ret) == 0) // set it to NULL
+            THROW_ERROR("Could not set pipeline state to NULL");
         LOG_DEBUG("Now stopped/null");
     }
     else
