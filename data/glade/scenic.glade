@@ -848,11 +848,10 @@
                                     <property name="left_padding">5</property>
                                     <property name="right_padding">5</property>
                                     <child>
-                                      <widget class="GtkDrawingArea" id="preview_area">
+                                      <widget class="GtkAlignment" id="preview_area">
                                         <property name="width_request">352</property>
                                         <property name="height_request">240</property>
                                         <property name="visible">True</property>
-                                        <signal name="realize" handler="on_preview_area_realize"/>
                                       </widget>
                                     </child>
                                   </widget>

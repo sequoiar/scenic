@@ -62,7 +62,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
                 GTK_SHRINK, 0, 0);
     }
 
-    /* make window */
+    /* make plug */
     GtkWidget *plug = gtk_plug_new(socketID);
     /* end main loop when plug is destroyed */
     g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);

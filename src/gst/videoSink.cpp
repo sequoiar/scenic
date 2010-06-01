@@ -64,7 +64,7 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
     xid_(xid),
     isFullscreen_(false),
     window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0), 
-    drawingArea_(hasWindow() ? gtk_drawing_area_new() : 0),
+    drawingArea_(gtk_drawing_area_new()),
 	vbox_(hasWindow() ? gtk_vbox_new(FALSE, 0) : 0),
 	hbox_(hasWindow() ? gtk_hbox_new(FALSE, 0) : 0),
 	horizontalSlider_(0),
@@ -84,6 +84,17 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
         // add listener for window-state-event to detect fullscreenness
         g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);
     }
+    else
+    {
+        /* make plug */
+        GtkWidget *plug = gtk_plug_new(xid_);
+        gtk_container_add(GTK_CONTAINER(plug), drawingArea_);
+        /* end main loop when plug is destroyed */
+        g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
+        /* show window and log its id */
+        gtk_widget_show_all(plug);
+        LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
+    }
 }
 
 
@@ -102,10 +113,7 @@ gboolean GtkVideoSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindow
 Window GtkVideoSink::getXWindow()
 { 
     // FIXME: see https://bugzilla.gnome.org/show_bug.cgi?id=599885
-    if (hasWindow())
-        return GDK_WINDOW_XWINDOW(drawingArea_->window);
-    else
-        return xid_;
+    return GDK_WINDOW_XWINDOW(drawingArea_->window);
 }
 
 
