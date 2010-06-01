@@ -273,7 +273,9 @@ AudioPulseSource::~AudioPulseSource()
 
 /// Constructor 
 AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
-    AudioSource(pipeline, config), capsFilter_(0)
+    AudioSource(pipeline, config), 
+    capsFilter_(pipeline_.makeElement("capsfilter", 0)), 
+    queue_(pipeline_.makeElement("queue", 0)) 
 {
     source_ = pipeline_.makeElement(config_.source(), config_.source());
 
@@ -285,7 +287,6 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     GstCaps *caps = 0;
     caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
     assert(caps);
-    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", caps, NULL);
 
     gst_caps_unref(caps);
@@ -302,6 +303,8 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     unsigned long long val;
     g_object_get(source_, "buffer-time", &val, NULL);
     LOG_DEBUG("Buffer time is " << val);
+
+    gstlinkable::link(capsFilter_, queue_);
 }
 
 
