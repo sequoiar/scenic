@@ -39,16 +39,23 @@ New features in milhouse:
     (none)
 
 New features in scenic:
-    (none)
+    *  #327 improve jack monitoring in scenic
+    *  #552 create debian/watch file
 
 Bug fixes in milhouse: 
-    (none)
+    *  #483 Image preview freeze when changing norm
+    *  #504 Some v4l2 sizes that are listed by milhouse crash
 
 Bug fixes in scenic: 
-     #547 Help2man dones't accept the name field but accepts the command argument
+    *  #547 Help2man dones't accept the name field but accepts the command argument
+    *  #556 Offerer doesn't answer BUSY when inviting
+    *  #548 Missing deps or instructions for dc-ctl
+    *  Added pychecker target
 
 HISTORY
 
+    * 2010-06-01: 0.5.11
+          * Second release candidate for the 0.6 stable branch.
     * 2010-05-27: 0.5.10
           * First release candidate for the 0.6 stable branch.
     * 2010-05-25: 0.5.9
