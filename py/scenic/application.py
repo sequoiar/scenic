@@ -622,9 +622,10 @@ class Application(object):
          * We already just got an INVITE and didn't answer yet.
         """
         send_to_port = message["please_send_to_port"]
-        def _simply_refuse(reason):
+        def _simply_refuse(reason, become_available=False):
             communication.connect_send_and_disconnect(addr, send_to_port, {'msg':'REFUSE', 'reason':reason, 'sid':0})
-            self._is_negotiating = False
+            if become_available:
+                self._is_negotiating = False
 
         if self.has_session():
             _simply_refuse(communication.REFUSE_REASON_BUSY)
@@ -654,9 +655,9 @@ class Application(object):
             return
         self._is_negotiating = True
         
-        def _check_cb(result):
+        def _preflight_check_cb(result):
             if result is False:
-                _simply_refuse(communication.REFUSE_REASON_PROBLEMS)
+                _simply_refuse(communication.REFUSE_REASON_PROBLEMS, True)
             elif result is True:
                 # FIXME: the copy of dict should be more straightforward.
                 self.remote_config = {
@@ -669,19 +670,19 @@ class Application(object):
                         msg = _("A mismatch in the sampling rate of JACK with remote peer has been detected.\nLocal sampling rate is %(local)s, whereas remote sampling rate is %(remote)s.") % {"local": self.get_local_sampling_rate(), "remote": message["audio"]["sampling_rate"]}
                         log.error(msg)
                         self.gui.show_error_dialog(msg)
-                        _simply_refuse(communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH)
+                        _simply_refuse(communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH, True)
                         return
                 if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["recv_enabled"] and self.config.audio_send_enabled:
                     msg = _("The remote peer is asking an audio codec that is not installed on your computer.")
                     log.error(msg)
                     self.gui.show_error_dialog(msg, self.remote_config["audio"]["codec"])
-                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
+                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC, True)
                     return
                 if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["send_enabled"] and self.config.video_send_enabled:
                     msg = _("The remote peer is asking a video codec that is not installed on your computer.")
                     log.error(msg)
                     self.gui.show_error_dialog(msg, self.remote_config["video"]["codec"])
-                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
+                    _simply_refuse(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC, True)
                     return
 
                 connected_deferred = self.client.connect(addr, message["please_send_to_port"])
@@ -695,10 +696,10 @@ class Application(object):
                     dialog_deferred = self.gui.show_invited_dialog(text)
                     dialog_deferred.addCallback(_on_contact_request_dialog_response)
             else:
-                _simply_refuse(result) # passing it the reason
+                _simply_refuse(result, True) # passing it the reason
         
         flight_check_deferred = self.check_if_ready_to_stream(role="answerer")
-        flight_check_deferred.addCallback(_check_cb)
+        flight_check_deferred.addCallback(_preflight_check_cb)
     
     def _get_contact_by_addr(self, addr):
         """
@@ -1091,6 +1092,7 @@ class Application(object):
                 def _on_connected(proto):
                     self.client.send(msg)
                     return proto
+
                 def _on_error(reason):
                     #FIXME: do we need this error dialog?
                     exc_type = type(reason.value)
