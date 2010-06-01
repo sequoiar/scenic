@@ -1,32 +1,38 @@
 <chapter id="hardware-requirements">
   <title>Hardware Requirements</title>
   <para>The use of &app; require specific hardware.
-  Telepresence system oriented for realtime performance have to met
-  certain standard, this for good reliability and performance. Our
-  team is continuously testing various devices and computer parts.
-  We frequently update this page with material that is adequate to
-  use in a telepresence system. For any material that is not
-  proposed in our list, please contact us.</para>
+     Telepresence system oriented for realtime performance have to met
+     certain standard, this for good reliability and performance. Our
+     team is continuously testing various devices and computer parts.
+     We frequently update this page with material that is adequate to
+     use in a telepresence system. For any material that is not
+     proposed in our list, please contact us.
+  </para>
   <sect1 id="good-scenic-experience">
    <title>For a good &app; experience</title>  
-      <para>You need to take the time to choose your computer and related devices. Buying a computer for linux, and specifically for audio-video performance requires time and knowledge. Computer parts and devices are constantly changing. Please do not rush your self to quickly buy the fastest and big high end computer sold by your favorite next corner computer store. Chances are you gone have problems. Unstead, follow every steps of our installation manual. It will guide you on everything you need to know to make good choices.</para> 
+      <para>You need to take the time to choose your computer and related devices. Buying a computer for linux, and specifically for audio-video performance requires time and knowledge. Computer parts and devices are constantly changing. Please do not rush your self to quickly buy the fastest and big high end computer sold by your favorite next corner computer store. Chances are you gone have problems. Unstead, follow every steps of our installation manual. It will guide you on everything you need to know to make good choices.
+      </para> 
 
- <orderedlist>
-    <listitem>Think of your project objective and define your project. Is it an amateur setup? A setup for test purpose only, an artistic performance with a public, an important presentation over the network with your future partners. Each project will require different ressources (materials, financials an in human ressource). This will affect wich computer specification you will finally used.  </listitem>
-    <listitem> Define your needs depending of your objectives. Here are some examples of needs related to a &app; utilisation: Good quality and performance, stability, quick setup, get your system quickly, for testing purpose only, a really stable setup, a developpement setup, cutting edge technology. Unfortunatly, in most cases, one cannot aswer to all needs. This mean that choices have to be made. To help you make a choice, we have separate the various material ressources in 3 cathegories. High, medium and low performance.</listitem>
-
-<listitem>Choose in our 3 cathegories, wich hardware, devices and computer specification best fit your needs. Take the time to read reviews on the materials. Try to find other project similar to yours and compare the material used. Follow the various links and advices we propose in the following section. Ask us. We will be happy to help you. </listitem>
-
-<listitem> Be patient. Take the time to make the good choice because you will have to live with it ; ). Take a tea with cookies. Enjoy the life and get ready to live THE SCENIC EXPERIENCE</listitem>
-</orderedlist>
+      <orderedlist>
+         <listitem>Think of your project objective and define your project. Is it an amateur setup? A setup for test purpose only, an artistic performance with a public, an important presentation over the network with your future partners. Each project will require different ressources (materials, financials an in human ressource). This will affect wich computer specification you will finally used.
+         </listitem>
+         <listitem>Define your needs depending of your objectives. Here are some examples of needs related to a &app; utilisation: Good quality and performance, stability, quick setup, get your system quickly, for testing purpose only, a really stable setup, a developpement setup, cutting edge technology. Unfortunatly, in most cases, one cannot aswer to all needs. This mean that choices have to be made. To help you make a choice, we have separate the various material ressources in 3 cathegories. High, medium and low performance.
+         </listitem>
+         <listitem>Choose in our 3 categories, which hardware, devices and computer specification best fit your needs. Take the time to read reviews on the materials. Try to find other project similar to yours and compare the material used. Follow the various links and advices we propose in the following section. Ask us. We will be happy to help you.
+         </listitem>
+         <listitem>Be patient. Take the time to make the good choice because you will have to live with it ; ). Take a tea with cookies. Enjoy the life and get ready to live THE SCENIC EXPERIENCE.
+         </listitem>
+      </orderedlist>
  
   </sect1>
   <sect1 id="computer-specifications">
     <title>Computer Specifications</title>
       <para>We strongly recommend to verify that your computer hardware is compatible with linux.</para>
-     <entry>
-      <ulink url="http://www.linuxhardware.org">
-      <citetitle>linuxhardware.org</citetitle></ulink></entry> 
+      <entry>
+         <ulink url="http://www.linuxhardware.org">
+         <citetitle>linuxhardware.org</citetitle>
+         </ulink>
+      </entry> 
     <para>We recommend the following computer specification:</para>
     <table>
       <title>High Performance Computer Specification</title>
@@ -104,11 +110,13 @@
       only on certain releases. Before buying a graphic card,
       verify on the nvidia unix page that the hardware you are
       planning to use is supported not only by your linux
-      distribution but also on the release you are using.</para>
+      distribution but also on the release you are using.
+      </para>
       <para>We need to define the type of video output you will
       need. Usually this output is sent to a video mixer, a video
       projector, a monitor or any video display. On the table below
-      we list the various possible ouput on a graphic card.</para>
+      we list the various possible ouput on a graphic card.
+      </para>
       <table>
         <title>Graphic Card Output Types</title>
         <tgroup cols="2">

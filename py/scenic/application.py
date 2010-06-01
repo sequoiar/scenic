@@ -232,6 +232,11 @@ class Application(object):
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
         self._keep_tcp_alive_task = task.LoopingCall(self._keep_tcp_alive)
         self.max_channels_in_raw = None
+
+    def start(self):
+        """
+        This must be called to start the application
+        """
         reactor.callLater(0, self._start_the_application)
 
     def _keep_tcp_alive(self):
@@ -504,14 +509,13 @@ class Application(object):
                 self.devices["jackd_is_running"] = False
             else:
                 self.devices["jackd_is_running"] = True
-                jack_servers = result
             self.devices["jack_servers"] = result
             log.debug("JACK infos: %s" % (result))
             self.gui.update_jackd_status()
         def _eb(reason):
-            print "Error calling jackd_get_infos2: ", reason
+            print "Error calling jackd_get_infos: ", reason
                 
-        deferred = jackd.jackd_get_infos2()
+        deferred = jackd.jackd_get_infos()
         deferred.addCallback(_cb)
         deferred.addErrback(_eb)
         return deferred
@@ -751,13 +755,13 @@ class Application(object):
 
             if self.remote_config["audio"]["codec"] not in self._supported_codecs["audio"] and self.remote_config["audio"]["recv_enabled"] and self.config.video_recv_enabled:
                 msg = _("The remote peer is asking an audio codec that is not installed on your computer.")
-                log.error(msg, self.remove_config["audio"]["codec"])
+                log.error(msg, self.remote_config["audio"]["codec"])
                 self.gui.show_error_dialog(msg)
                 _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_AUDIO_CODEC)
                 return
             if self.remote_config["video"]["codec"] not in self._supported_codecs["video"] and self.remote_config["video"]["recv_enabled"] and self.config.video_send_enabled:
                 msg = _("The remote peer is asking a video codec that is not installed on your computer.")
-                log.error(msg, self.remove_config["video"]["codec"])
+                log.error(msg, self.remote_config["video"]["codec"])
                 self.gui.show_error_dialog(msg)
                 _abort(communication.REFUSE_REASON_PROBLEM_UNSUPPORTED_VIDEO_CODEC)
                 return
@@ -803,7 +807,7 @@ class Application(object):
             text = _("The remote peer cannot stream with you due to technical issues.")
         else:
             log.info("Got unknown refusal reason.")
-        self.show_error_dialog(text)
+        self.gui.show_error_dialog(text)
 
     def handle_ack(self, addr):
         """
@@ -840,7 +844,7 @@ class Application(object):
                 else:
                     log.info("Got unknown goodbye reason.")
                 if text is not None:
-                    self.show_error_dialog(text)
+                    self.gui.show_error_dialog(text)
 
                 #TODO: display an error message to the user if we should
 
@@ -1008,12 +1012,11 @@ class Application(object):
                 raise RuntimeError("Invalid role value : %s" % (role))
             
             x11_displays = [display["name"] for display in self.devices["x11_displays"]]
-            midi_input_devices = [device["name"] for device in self.devices["midi_input_devices"]]
-            midi_output_devices = [device["name"] for device in self.devices["midi_output_devices"]]
-            cameras = self.devices["cameras"].keys()
+            #midi_input_devices = [device["name"] for device in self.devices["midi_input_devices"]]
+            #midi_output_devices = [device["name"] for device in self.devices["midi_output_devices"]]
+            #cameras = self.devices["cameras"].keys()
 
-#TODO: if video receive is enabled and video codec is not supported: error
-#TODO: if audio receive is enabled and audio codec is not supported: error
+            #TODO: if video receive is enabled and video codec is not supported: error
                 
             if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared!") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !

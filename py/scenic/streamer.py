@@ -24,7 +24,6 @@ Manages local streamer processes.
 """
 
 from scenic import process
-import subprocess
 from scenic import sig
 from scenic import dialogs
 from scenic.internationalization import _

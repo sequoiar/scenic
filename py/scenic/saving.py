@@ -47,7 +47,7 @@ def _create_directory_if_it_does_not_exist(dir_path):
             os.makedirs(dir_path)
             log.info('mkdir %s' % (dir_path))
     except OSError, e:
-        msg = 'Error creating directories' % (dir_path, e.message)
+        msg = 'Error creating directories %s: %s' % (dir_path, e.message)
         log.error(msg)
         raise RuntimeError(msg)
 

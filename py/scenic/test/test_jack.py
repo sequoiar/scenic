@@ -26,7 +26,7 @@ class Test_Jack(unittest.TestCase):
             if VERBOSE:
                 print result
             return result
-        deferred = jackd.jackd_get_infos2()
+        deferred = jackd.jackd_get_infos()
         deferred.addCallback(_cb)
         return deferred
 

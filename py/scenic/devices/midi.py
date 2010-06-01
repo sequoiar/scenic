@@ -82,7 +82,7 @@ def _parse_miditream_list_devices(text):
             midi_devices.append(device)
     return midi_devices
 
-def list_midi_devices(verbose=True):
+def list_midi_devices():
     """
     Twisted wrapper for _list_x11_displays.
     Result is a dict with keys "input" and "output". The value are dict with ID and name for each device.

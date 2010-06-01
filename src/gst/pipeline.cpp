@@ -59,6 +59,7 @@ Pipeline::~Pipeline()
 }
 
 
+namespace {
 /// Translate error messages into more helpful/detailed info
 std::string translateMessage(GstObject *src, const std::string &errStr)
 {
@@ -89,6 +90,7 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
     }
 
     return srcName + ":" + errStr;
+}
 }
 
 
@@ -274,7 +276,7 @@ bool Pipeline::isStopped() const
         return false;
 }
 
-
+namespace {
 bool checkStateChange(GstBus *bus, GstStateChangeReturn ret)
 {
     if (ret == GST_STATE_CHANGE_NO_PREROLL)
@@ -300,6 +302,7 @@ bool checkStateChange(GstBus *bus, GstStateChangeReturn ret)
     }
     else
         return true;
+}
 }
 
 

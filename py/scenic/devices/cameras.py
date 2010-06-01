@@ -118,28 +118,28 @@ def _parse_milhouse_list_cameras(text):
                 #print "  card:", card
             elif line.startswith("Video input"):
                 try:
-                    input = value.split(" ")[0]
+                    _input = value.split(" ")[0]
                 except IndexError:
-                    input = None
+                    _input = None
                 else:
                     # now, let's try to get an int out of it:
                     try:
-                        log.debug(input)
-                        input = int(input)
+                        log.debug(_input)
+                        _input = int(_input)
                     except ValueError, e:
                         log.error(e)
-                        input = None
+                        _input = None
                     except TypeError, e:
                         log.error(e)
-                        input = None
+                        _input = None
                     else:
                         #print "  input", input
-                        v4l2_devices[current_v4l2_device]["input"] = input
+                        v4l2_devices[current_v4l2_device]["input"] = _input
             elif line.startswith("All inputs"):
                 for each in value.split(","):
                     tokens = each.strip().split(" ")
                     try:
-                        num = tokens[0]
+                        #num = tokens[0]
                         name = tokens[1].replace("(", "").replace(")", "")
                     except IndexError:
                         pass

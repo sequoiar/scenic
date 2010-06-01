@@ -107,10 +107,8 @@ def _get_combobox_value(widget):
     tree_model = widget.get_model()
     try:
         tree_model_row = tree_model[index]
-    except IndexError, e:
+    except IndexError:
         raise RuntimeError("Cannot get ComboBox's value. Its tree model %s doesn't have row number %s." % (widget, index))
-    #except TypeError, e:
-    #    raise RuntimeError("%s is not a ComboBox widget" % (widget))
     return tree_model_row[0] 
 
 def _set_combobox_choices(widget, choices=[]):
@@ -544,13 +542,17 @@ class Gui(object):
         #TODO: stop it when button is toggled to false.
         # It can be the user that pushed the button, or it can be toggled by the software.
         log.debug('video_view_preview toggled %s' % (widget.get_active()))
+        def _cb(result):
+            self.app.save_configuration() #gathers and saves
+            try:
+                self.preview_manager.start()
+            except RuntimeError, e:
+                log.warning("The user started or stopped the preview very quickly. " + str(e))
+            
         if self._widgets_changed_by_user:
             if widget.get_active():
-                self.app.save_configuration() #gathers and saves
-                try:
-                    self.preview_manager.start()
-                except RuntimeError, e:
-                    log.warning("The user started or stopped the preview very quickly. " + str(e))
+                deferred = self.app.poll_jack_now()
+                deferred.addCallback(_cb)
             else:
                 self.preview_manager.stop()
 
@@ -1006,7 +1008,7 @@ class Gui(object):
         self.update_bitrate_and_codec()
         
         is_streaming = self.app.has_session()
-        is_previewing =  self.preview_manager.is_busy()
+        self.preview_manager.is_busy()
         if is_streaming:
             details = self.app.streamer_manager.session_details
         _contact_list_currently_sensitive = self.contact_list_widget.get_property("sensitive")
@@ -1438,8 +1440,7 @@ class Gui(object):
         if self._widgets_changed_by_user: 
             full_name = _get_combobox_value(self.video_source_widget)
             if full_name != VIDEO_TEST_INPUT:
-                dev = self.app.parse_v4l2_device_name(full_name)
-                current_camera_name = dev["name"]
+                #dev = self.app.parse_v4l2_device_name(full_name)
                 self.app.poll_camera_devices()
             self.update_v4l2_inputs_size_and_norm()
 
@@ -1462,14 +1463,14 @@ class Gui(object):
                     cameras = self.app.devices["cameras"]
                     try:
                         cam = cameras[current_camera_name]
-                    except KeyError, e:
+                    except KeyError:
                         log.error("Camera %s disappeared once changed standard!" % (current_camera_name))
                     else:
                         actual_standard = cam["standard"]
                         if actual_standard != standard_name:
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             log.error(msg)
-                            self.show_error_dialog(msg, parent=self.main_window)
+                            self.show_error_dialog(msg)
                             
                             self._widgets_changed_by_user = False
                             _set_combobox_value(self.v4l2_standard_widget, actual_standard)
@@ -1499,7 +1500,7 @@ class Gui(object):
             self.app.devices["cameras"] = cameras # important! needed by parse_v4l2_device_name
             try:
                 cam = self.app.parse_v4l2_device_name(current_camera_name)
-            except KeyError, e:
+            except KeyError:
                 log.error("Camera %s disappeared once changed input!" % (current_camera_name))
                 log.error("List of cameras: %s" % (cameras))
             else:
@@ -1563,7 +1564,7 @@ class Gui(object):
 
     def on_status_menu_item_activated(self, menu_item):
         log.info("Menu item 'Status window' chosen")
-        x = StatusWindow(self.app) # XXX ???
+        StatusWindow(self.app)
 
     # ---------------------- invitation dialogs -------------------
 
