@@ -61,7 +61,7 @@ Pipeline::~Pipeline()
 
 namespace {
 /// Translate error messages into more helpful/detailed info
-std::string translateMessage(GstObject *src, const std::string &errStr)
+void translateMessage(GstObject *src, const std::string &errStr)
 {
     // FIXME: somehow this info could be improved by getting details from elsewhere,
     // or at least querying the element responsible for more info
@@ -73,8 +73,8 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
             int port;
             g_object_get(src, "port", &port, NULL);
 
-            return srcName + ":" + errStr + " Port " + 
-                boost::lexical_cast<std::string>(port) + " may be in use by another process.";
+            THROW_CRITICAL(srcName << ":" << errStr << " Port " <<
+                boost::lexical_cast<std::string>(port) << " may be in use by another process.");
         }
     }
     else if (srcName.find("v4l2src") != std::string::npos) // this comes from a v4l2src
@@ -84,12 +84,15 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
         if (pos != std::string::npos)
         {
             std::string deviceName(errStr.substr(pos + v4l2busy.length(), errStr.length() - v4l2busy.length() - 1));
-            return srcName + ":" + errStr + 
-                 deviceName + " is probably already in use.";
+            THROW_CRITICAL(srcName << ":" << errStr <<
+                 deviceName << " is probably already in use.");
         }
+        else 
+            LOG_WARNING(srcName << ":" << errStr);
+        return;
     }
 
-    return srcName + ":" + errStr;
+    THROW_CRITICAL(srcName << ":" << errStr);
 }
 }
 
@@ -119,7 +122,8 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
                     LOG_DEBUG("Debug details: " << debug);
                     g_free(debug);
                 }
-                THROW_CRITICAL(translateMessage(msg->src, errStr));
+                // this will either throw or log a warning
+                translateMessage(msg->src, errStr); 
                 break;
             }
         case GST_MESSAGE_WARNING:
@@ -138,15 +142,12 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
                 }
                 break;
             }
-            // using fallthrough
         case GST_MESSAGE_ELEMENT:
             context->updateListeners(msg);
             break;
         case GST_MESSAGE_APPLICATION:
-            /// handle interrupt
             context->updateListeners(msg);
             break;
-
         case GST_MESSAGE_LATENCY:
             {
                 LOG_DEBUG("Latency change, recalculating latency for pipeline");

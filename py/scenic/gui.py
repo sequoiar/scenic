@@ -975,6 +975,8 @@ class Gui(object):
             self.aspect_ratio_widget,
             self.video_view_preview_widget,
             self.preview_in_window_widget, 
+            self.v4l2_input_widget,
+            self.v4l2_standard_widget,
             ]
         
         _other_widgets_to_toggle_sensitivity = [
@@ -1008,7 +1010,6 @@ class Gui(object):
         self.update_bitrate_and_codec()
         
         is_streaming = self.app.has_session()
-        self.preview_manager.is_busy()
         if is_streaming:
             details = self.app.streamer_manager.session_details
         _contact_list_currently_sensitive = self.contact_list_widget.get_property("sensitive")
