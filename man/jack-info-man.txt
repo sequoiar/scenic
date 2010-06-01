@@ -2,7 +2,7 @@
 jack-info [options]
 
 [DESCRIPTION]
-Lists the JACK audio ports and their respective latency. Prints the sample rate and other useful informations. Warns the user if the JACK server is not running. 
+Lists the JACK audio ports and their respective latency. Prints the sample rate and other useful information. Warns the user if the JACK server is not running. 
 
 [HISTORY]
 2010 - Written by Tristan Matthews <tristan@sat.qc.ca>.
