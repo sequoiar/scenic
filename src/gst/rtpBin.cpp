@@ -284,7 +284,7 @@ int RtpBin::createSourceSocket(int port)
     using std::string;
     using boost::lexical_cast;
 
-    int sockfd;
+    int sockfd = -1;
     struct addrinfo hints, *servinfo, *p;
     int rv;
     //int reuse = 1;

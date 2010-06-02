@@ -94,7 +94,7 @@ int maxRawChannels()
 
 int AudioSourceConfig::maxChannels(const std::string &codec)
 {
-    int result;
+    int result = 0;
     if (codec == "mp3" or codec == "celt")
         result = 2;
     else if (codec == "raw")
