@@ -185,7 +185,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
 
 const char *RtpBin::padStr(const char *padName) const
 {
-    tassert(sessionCount_ > 0);  // we have a session going
+    assert(sessionCount_ > 0);  // we have a session going
     std::string result(padName);
     result = result + boost::lexical_cast<std::string>(sessionId_);
     return result.c_str();
@@ -284,7 +284,7 @@ int RtpBin::createSourceSocket(int port)
     using std::string;
     using boost::lexical_cast;
 
-    int sockfd;
+    int sockfd = -1;
     struct addrinfo hints, *servinfo, *p;
     int rv;
     //int reuse = 1;

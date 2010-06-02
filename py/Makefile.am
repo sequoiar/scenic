@@ -17,4 +17,8 @@ desktop_DATA = scenic.desktop
 EXTRA_DIST = $(desktop_DATA) scenic.svg
 
 clean-local:
-	rm -rf _trial_temp
+	rm -rf _trial_temp pychecker.log
+
+pychecker:
+	rm -f pychecker.log
+	for f in `find ./ -type f -name \*.py`; do pychecker --limit 100 $$f >> pychecker.log; done; echo "Wrote pychecker output to pychecker.log"

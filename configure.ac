@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.60)
 # version should always be .1 greater than last tag, unless this is a tag
-AC_INIT(SCENIC, [0.5.10], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])
+AC_INIT(SCENIC, [0.5.11], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -202,10 +202,12 @@ AS_IF([! $PYTHON $GST_CHECK], [AC_MSG_ERROR([Not all gstreamer plugins installed
 
 # see /usr/share/aclocal/gst-element-check-0.10.m4
 #AM_GST_ELEMENT_CHECK(["xvimagesink"], [AC_MSG_NOTICE([OK])],  [AC_MSG_ERROR([Requires xvimagesink])])
+CFLAGS="-O2"
+CXXFLAGS=$CFLAGS
 
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
-    CFLAGS="-Wextra -pedantic -Wfatal-errors -Werror -Wall -Wno-long-long -Wno-variadic-macros -Wshadow"
+    CFLAGS="-O2 -Wextra -pedantic -Wfatal-errors -Werror -Wall -Wno-long-long -Wno-variadic-macros -Wshadow"
     CXXFLAGS="-Weffc++ "
     CXXFLAGS+=$CFLAGS
 fi

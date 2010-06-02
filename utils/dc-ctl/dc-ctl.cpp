@@ -328,7 +328,7 @@ int run(int argc, char *argv[])
                 return 0;
             else
             {
-                std::cerr << "No dc1394 module present\n";
+                std::cerr << "No dc1394 module present, please run sudo modprobe video1394 and if needed sudo modprobe raw1394\n";
                 return 1;
             }
         }

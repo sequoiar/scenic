@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#include <cassert>
 #include <cstring>
 #include <cmath>
 #include <gst/gst.h>
@@ -62,7 +63,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
                 GTK_SHRINK, 0, 0);
     }
 
-    /* make window */
+    /* make plug */
     GtkWidget *plug = gtk_plug_new(socketID);
     /* end main loop when plug is destroyed */
     g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
@@ -165,7 +166,7 @@ void AudioLevel::print(const std::vector<double> &rmsValues) const
 /// Sets the reporting interval in nanoseconds. 
 void AudioLevel::interval(unsigned long long newInterval)
 {
-    tassert(newInterval > 0);
+    assert(newInterval > 0);
     g_object_set (G_OBJECT(level_), "interval", newInterval, "message", emitMessages_, NULL);
 }
 

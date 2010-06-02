@@ -25,6 +25,7 @@ if a location already exists, try to plug into that one.
 else create new filesrc and plug into it */
 
 #include <gst/gst.h>
+#include <cassert>
 #include "util.h"
 #include "pipeline.h"
 #include "gstLinkable.h"
@@ -181,7 +182,8 @@ void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, g
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
     LOG_DEBUG("linking new srcpad and sinkpad.");
-    tassert(gstlinkable::link_pads(srcPad, sinkPad));
+    bool linked = gstlinkable::link_pads(srcPad, sinkPad);
+    assert(linked);
     gst_object_unref(sinkPad);
 }
 

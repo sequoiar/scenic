@@ -107,10 +107,8 @@ def _get_combobox_value(widget):
     tree_model = widget.get_model()
     try:
         tree_model_row = tree_model[index]
-    except IndexError, e:
+    except IndexError:
         raise RuntimeError("Cannot get ComboBox's value. Its tree model %s doesn't have row number %s." % (widget, index))
-    #except TypeError, e:
-    #    raise RuntimeError("%s is not a ComboBox widget" % (widget))
     return tree_model_row[0] 
 
 def _set_combobox_choices(widget, choices=[]):
@@ -217,7 +215,7 @@ class Gui(object):
         self.main_window.connect('delete-event', self.on_main_window_deleted)
         self.main_window.set_icon_from_file(os.path.join(configure.PIXMAPS_DIR, 'scenic.png'))
         self.main_tabs_widget = widgets_tree.get_widget("mainTabs")
-        def _on_keypress(widget, event):
+        def _on_keypress(unused_widget, event):
             """
             On ctrl-Tab, go to next tab. Wraps around. 
             """
@@ -290,11 +288,25 @@ class Gui(object):
         self.v4l2_input_widget = widgets_tree.get_widget("v4l2_input")
         self.v4l2_standard_widget = widgets_tree.get_widget("v4l2_standard")
         self.video_jitterbuffer_widget = widgets_tree.get_widget("video_jitterbuffer")
+        def _plug_removed_cb(widget):
+            """ Called when a plug is removed from socket, returns
+                True so that it can be reused
+                """
+            log.debug("I (%s) have just had a plug removed!" % (widget))
+            return True
+
         # video preview:
         self.preview_area_widget = widgets_tree.get_widget("preview_area")
-        self.preview_area_x_window_id = None
+
         self.preview_in_window_widget = widgets_tree.get_widget("preview_in_window")
-        
+        preview_socket = gtk.Socket()
+        preview_socket.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
+        preview_socket.connect("plug-removed", _plug_removed_cb)
+        preview_socket.show()
+        self.preview_area_widget.add(preview_socket)
+        self.preview_area_x_window_id = preview_socket.get_id()
+        preview_socket.show()
+
         # audio
         self.audio_source_widget = widgets_tree.get_widget("audio_source")
         self.audio_codec_widget = widgets_tree.get_widget("audio_codec")
@@ -307,14 +319,6 @@ class Gui(object):
         self.jack_sampling_rate_widget = widgets_tree.get_widget("jack_sampling_rate")
         self.audio_jack_enable_autoconnect_widget = widgets_tree.get_widget("audio_jack_enable_autoconnect")
 
-        # audio levels:
-        def _plug_removed_cb(widget):
-            """ Called when a plug is removed from socket, returns
-                True so that it can be reused
-                """
-            log.debug("I (%s) have just had a plug removed!" % (widget))
-            return True
-        
         self.audio_levels_input_widget = widgets_tree.get_widget("audio_levels_input")
         in_socket = gtk.Socket()
         in_socket.connect("plug-removed", _plug_removed_cb)
@@ -339,7 +343,6 @@ class Gui(object):
         self.midi_input_device_widget = widgets_tree.get_widget("midi_input_device")
         self.midi_output_device_widget = widgets_tree.get_widget("midi_output_device")
         self.midi_jitterbuffer_widget = widgets_tree.get_widget("midi_jitterbuffer")
-
         # synchronize and disable a/v stuff
         self.audio_input_buffer_widget = widgets_tree.get_widget("audio_input_buffer")
         self.audio_output_buffer_widget = widgets_tree.get_widget("audio_output_buffer")
@@ -395,11 +398,6 @@ class Gui(object):
         self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
         self._disable_unsupported_codecs()
    
-    #TODO: for the preview in the drawing area   
-    #def on_expose_event(self, widget, event):
-    #    self.preview_xid = widget.window.xid
-    #    return False
-
     def _disable_unsupported_codecs(self):
         """
         Checks if codecs for which not Gstreamer elements are found, and disabled them.
@@ -462,7 +460,7 @@ class Gui(object):
         else:
             self.main_window.fullscreen()
 
-    def on_window_state_event(self, widget, event):
+    def on_window_state_event(self, unused_widget, event):
         """
         Called when toggled fullscreen.
         """
@@ -470,7 +468,7 @@ class Gui(object):
         #print('fullscreen %s' % (self.is_fullscreen))
         return True
     
-    def on_main_window_deleted(self, *args):
+    def on_main_window_deleted(self, *unused_args):
         """
         Destroy method causes application to exit
         when main window closed
@@ -497,7 +495,7 @@ class Gui(object):
             _cb(True)
             return False
     
-    def on_main_window_destroyed(self, *args):
+    def on_main_window_destroyed(self, *unused_args):
         # TODO: confirm dialog!
         if reactor.running:
             log.debug("reactor.stop()")
@@ -505,15 +503,7 @@ class Gui(object):
 
     # --------------- slots for some widget events ------------
 
-    def on_preview_area_realize(self, *args):
-        # avoid bad xid errors
-        gtk.gdk.display_get_default().sync()
-        xid = self.preview_area_widget.window.xid
-        log.debug("Preview area X Window ID: %s" % (xid))
-        self.preview_area_x_window_id = xid
-        self.preview_area_widget.window.set_background(gtk.gdk.Color(0, 0, 0)) # black
-
-    def on_preview_manager_state_changed(self, manager, new_state):
+    def on_preview_manager_state_changed(self, unused_manager, new_state):
         if new_state == process.STATE_STOPPED:
             log.debug("Making the preview button to False since the preview process died.")
             if self.preview_manager.is_busy(): # very unlikely
@@ -551,17 +541,21 @@ class Gui(object):
         #TODO: stop it when button is toggled to false.
         # It can be the user that pushed the button, or it can be toggled by the software.
         log.debug('video_view_preview toggled %s' % (widget.get_active()))
+        def _cb(unused_result):
+            self.app.save_configuration() #gathers and saves
+            try:
+                self.preview_manager.start()
+            except RuntimeError, e:
+                log.warning("The user started or stopped the preview very quickly. " + str(e))
+            
         if self._widgets_changed_by_user:
             if widget.get_active():
-                self.app.save_configuration() #gathers and saves
-                try:
-                    self.preview_manager.start()
-                except RuntimeError, e:
-                    log.warning("The user starts/stops very quickly the preview. " + str(e))
+                deferred = self.app.poll_jack_now()
+                deferred.addCallback(_cb)
             else:
                 self.preview_manager.stop()
 
-    def on_main_tabs_switch_page(self, widget, notebook_page, page_number):
+    def on_main_tabs_switch_page(self, widget, unused_notebook_page, page_number):
         """
         Called when the user switches to a different page.
         Pages names are : 
@@ -627,7 +621,7 @@ class Gui(object):
         """
         self.on_edit_contact_clicked(args)
 
-    def on_add_contact_clicked(self, *args):
+    def on_add_contact_clicked(self, *unused_args):
         """
         Pops up a dialog to be filled with new contact infos.
         
@@ -640,7 +634,7 @@ class Gui(object):
         self.contact_auto_accept_widget.set_active(False)
         self.edit_contact_window.show()
 
-    def on_remove_contact_clicked(self, *args):
+    def on_remove_contact_clicked(self, *unused_args):
         """
         Upon confirmation, the selected contact is removed.
         """
@@ -656,7 +650,7 @@ class Gui(object):
             "to delete this contact from the list?")
         self.show_confirm_dialog(text, _on_confirm_result)
 
-    def on_edit_contact_clicked(self, *args):
+    def on_edit_contact_clicked(self, *unused_args):
         """
         Shows the edit contact dialog.
         """
@@ -670,14 +664,14 @@ class Gui(object):
         self.contact_auto_accept_widget.set_active(auto_accept)
         self.edit_contact_window.show() # addr
 
-    def on_edit_contact_cancel_clicked(self, *args):
+    def on_edit_contact_cancel_clicked(self, *unused_args):
         """
         The cancel button in the "edit_contact" window has been clicked.
         Hides the edit_contact window.
         """
         self.edit_contact_window.hide()
 
-    def on_edit_contact_save_clicked(self, *args):
+    def on_edit_contact_save_clicked(self, *unused_args):
         """
         The save button in the "edit_contact" window has been clicked.
         Hides the edit_contact window and saves the changes. (new or modified contact)
@@ -714,13 +708,13 @@ class Gui(object):
 
     # ---------------------------- Custom system tab buttons ---------------
 
-    def on_network_admin_clicked(self, *args):
+    def on_network_admin_clicked(self, *unused_args):
         """
         Opens the network-admin Gnome applet.
         """
         process.run_once("gksudo", "network-admin")
 
-    def on_system_shutdown_clicked(self, *args):
+    def on_system_shutdown_clicked(self, *unused_args):
         """
         Shuts down the computer.
         """
@@ -731,7 +725,7 @@ class Gui(object):
         text = _("<b><big>Shutdown the computer?</big></b>\n\nAre you sure you want to shutdown the computer now?")
         self.show_confirm_dialog(text, _on_confirm_result)
 
-    def on_system_reboot_clicked(self, *args):
+    def on_system_reboot_clicked(self, *unused_args):
         """
         Reboots the computer.
         """
@@ -742,13 +736,13 @@ class Gui(object):
         text = _("<b><big>Reboot the computer?</big></b>\n\nAre you sure you want to reboot the computer now?")
         self.show_confirm_dialog(text, _on_confirm_result)
 
-    def on_maintenance_apt_update_clicked(self, *args):
+    def on_maintenance_apt_update_clicked(self, *unused_args):
         """
         Opens APT update manager.
         """
         process.run_once("gksudo", "update-manager")
 
-    def on_maintenance_send_info_clicked(self, *args):
+    def on_maintenance_send_info_clicked(self, *unused_args):
         """
         Sends an email to SAT with this information : 
          * milhouse version
@@ -980,6 +974,8 @@ class Gui(object):
             self.aspect_ratio_widget,
             self.video_view_preview_widget,
             self.preview_in_window_widget, 
+            self.v4l2_input_widget,
+            self.v4l2_standard_widget,
             ]
         
         _other_widgets_to_toggle_sensitivity = [
@@ -1013,7 +1009,6 @@ class Gui(object):
         self.update_bitrate_and_codec()
         
         is_streaming = self.app.has_session()
-        is_previewing =  self.preview_manager.is_busy()
         if is_streaming:
             details = self.app.streamer_manager.session_details
         _contact_list_currently_sensitive = self.contact_list_widget.get_property("sensitive")
@@ -1067,9 +1062,6 @@ class Gui(object):
                         self.make_audio_jitterbuffer_enabled_or_not()
                     else:
                         widget.set_sensitive(True)
-            if self.preview_area_x_window_id is not None:
-                if self.preview_area_widget.window is not None:
-                    self.preview_area_widget.window.clear()
 
     def update_invite_button_with_contact_name(self):
         contact = self.app.address_book.selected_contact
@@ -1104,12 +1096,12 @@ class Gui(object):
             self.midi_output_device_widget.set_sensitive(False)
             self.midi_jitterbuffer_widget.set_sensitive(False)
 
-    def on_midi_send_enabled_toggled(self, *args):
+    def on_midi_send_enabled_toggled(self, *unused_args):
         if self._widgets_changed_by_user:
             self._gather_configuration()
             self.make_midi_widget_sensitive_or_not()
     
-    def on_midi_recv_enabled_toggled(self, *args):
+    def on_midi_recv_enabled_toggled(self, *unused_args):
         if self._widgets_changed_by_user:
             self._gather_configuration()
             self.make_midi_widget_sensitive_or_not()
@@ -1293,14 +1285,14 @@ class Gui(object):
         deferred = networkinterfaces.list_network_interfaces_addresses()
         deferred.addCallback(_cb)
 
-    def on_audio_video_synchronized_toggled(self, *args):
+    def on_audio_video_synchronized_toggled(self, *unused_args):
         """
         Called when the user toggles on/off the synchronization of audio and video. 
         """
         #if self._widgets_changed_by_user:
         self.make_audio_jitterbuffer_enabled_or_not()
 
-    def on_video_receive_enabled_toggled(self, *args):
+    def on_video_receive_enabled_toggled(self, *unused_args):
         self.make_audio_jitterbuffer_enabled_or_not()
 
     def make_audio_jitterbuffer_enabled_or_not(self):
@@ -1314,7 +1306,7 @@ class Gui(object):
         else:
             self.audio_jitterbuffer_widget.set_sensitive(True)
         
-    def on_audio_codec_changed(self, widget):
+    def on_audio_codec_changed(self, unused_widget):
         """
         Called when the user selects a different audio codec, updates
         the range of the numchannels box.
@@ -1347,7 +1339,7 @@ class Gui(object):
         else:
             self.video_bitrate_widget.set_sensitive(False)
     
-    def on_video_codec_changed(self, widget):
+    def on_video_codec_changed(self, _widget):
         self.update_bitrate_and_codec()
         
     def update_x11_devices(self):
@@ -1440,7 +1432,7 @@ class Gui(object):
         # once done:
         self._widgets_changed_by_user = True
             
-    def on_video_source_changed(self, widget):
+    def on_video_source_changed(self, unused_widget):
         """
         Called when the user changes the video source.
          * updates the input
@@ -1448,8 +1440,7 @@ class Gui(object):
         if self._widgets_changed_by_user: 
             full_name = _get_combobox_value(self.video_source_widget)
             if full_name != VIDEO_TEST_INPUT:
-                dev = self.app.parse_v4l2_device_name(full_name)
-                current_camera_name = dev["name"]
+                #dev = self.app.parse_v4l2_device_name(full_name)
                 self.app.poll_camera_devices()
             self.update_v4l2_inputs_size_and_norm()
 
@@ -1465,21 +1456,21 @@ class Gui(object):
             if full_name != VIDEO_TEST_INPUT:
                 dev = self.app.parse_v4l2_device_name(full_name)
                 current_camera_name = dev["name"]
-                def _cb2(result):
+                def _cb2(unused_result):
                     # callback for the poll_cameras_devices deferred.
                     # check if successfully changed norm
                     # see below
                     cameras = self.app.devices["cameras"]
                     try:
                         cam = cameras[current_camera_name]
-                    except KeyError, e:
+                    except KeyError:
                         log.error("Camera %s disappeared once changed standard!" % (current_camera_name))
                     else:
                         actual_standard = cam["standard"]
                         if actual_standard != standard_name:
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             log.error(msg)
-                            self.show_error_dialog(msg, parent=self.main_window)
+                            self.show_error_dialog(msg)
                             
                             self._widgets_changed_by_user = False
                             _set_combobox_value(self.v4l2_standard_widget, actual_standard)
@@ -1509,7 +1500,7 @@ class Gui(object):
             self.app.devices["cameras"] = cameras # important! needed by parse_v4l2_device_name
             try:
                 cam = self.app.parse_v4l2_device_name(current_camera_name)
-            except KeyError, e:
+            except KeyError:
                 log.error("Camera %s disappeared once changed input!" % (current_camera_name))
                 log.error("List of cameras: %s" % (cameras))
             else:
@@ -1545,17 +1536,17 @@ class Gui(object):
 
     # -------------------------- menu items -----------------
     
-    def on_about_menu_item_activated(self, menu_item):
+    def on_about_menu_item_activated(self, unused_menu_item):
         About.create() # TODO: set parent window ?
     
-    def on_quit_menu_item_activated(self, menu_item):
+    def on_quit_menu_item_activated(self, unused_menu_item):
         """
         Quits the application.
         """
         log.info("Menu item 'Quit' chosen")
         self._confirm_and_quit()
     
-    def on_installation_manual_menu_item_activated(self, menu_item):
+    def on_installation_manual_menu_item_activated(self, unused_menu_item):
         """
         Opens the docbook doc
         """
@@ -1563,7 +1554,7 @@ class Gui(object):
         docbook_file = os.path.join(configure.DOCBOOK_DIR, "installation-manual.xml")
         process.run_once("yelp", docbook_file)
     
-    def on_help_menu_item_activated(self, menu_item):
+    def on_help_menu_item_activated(self, unused_menu_item):
         """
         Opens the docbook doc
         """
@@ -1571,13 +1562,13 @@ class Gui(object):
         docbook_file = os.path.join(configure.DOCBOOK_DIR, "user-manual.xml")
         process.run_once("yelp", docbook_file)
 
-    def on_status_menu_item_activated(self, menu_item):
+    def on_status_menu_item_activated(self, unused_menu_item):
         log.info("Menu item 'Status window' chosen")
-        x = StatusWindow(self.app) # XXX ???
+        StatusWindow(self.app)
 
     # ---------------------- invitation dialogs -------------------
 
-    def on_invite_contact_clicked(self, *args):
+    def on_invite_contact_clicked(self, *unused_args):
         """
         Sends an INVITE to the remote peer.
         """
@@ -1622,7 +1613,7 @@ class Gui(object):
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         self.calling_dialog.show()
     
-    def on_invite_contact_cancelled(self, *args):
+    def on_invite_contact_cancelled(self, *unused_args):
         """
         Sends a CANCEL to the remote peer when invite contact window is closed.
         """
@@ -1706,10 +1697,10 @@ class About(object):
         dialog = About()
         return dialog.show_about_dialog()
      
-    def show_website(self, widget, data):
+    def show_website(self, unused_widget, data):
         webbrowser.open(data)
 
-    def destroy_about(self, *args):
+    def destroy_about(self, *unused_args):
         self.about_dialog.destroy()
 
 class StatusWindow(object):

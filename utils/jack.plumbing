@@ -1,4 +1,5 @@
-; for postures02
+; to use, move to ~/.jack.plumbing
+; to use for postures02, you'll have the following connections
 ;
 ; milhouse_postures01   -> pd_input0
 ; capture1            -> pd_input1

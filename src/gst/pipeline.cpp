@@ -38,15 +38,12 @@
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
 
-Pipeline::Pipeline() : pipeline_(0), handlers_(), 
+Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(), 
     sampleRate_(SAMPLE_RATE)
 {
-    tassert(pipeline_ = gst_pipeline_new("pipeline"));
-
     /* watch for messages on the pipeline's bus (note that this will only
      *      work like this when a GLib main loop is running) */
-    GstBus *bus;
-    bus = getBus();
+    GstBus *bus = getBus();
     gst_bus_add_watch(bus, static_cast<GstBusFunc>(bus_call), static_cast<gpointer>(this));
     gst_object_unref(bus);
 }
@@ -59,8 +56,9 @@ Pipeline::~Pipeline()
 }
 
 
+namespace {
 /// Translate error messages into more helpful/detailed info
-std::string translateMessage(GstObject *src, const std::string &errStr)
+void translateMessage(GstObject *src, const std::string &errStr)
 {
     // FIXME: somehow this info could be improved by getting details from elsewhere,
     // or at least querying the element responsible for more info
@@ -72,8 +70,8 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
             int port;
             g_object_get(src, "port", &port, NULL);
 
-            return srcName + ":" + errStr + " Port " + 
-                boost::lexical_cast<std::string>(port) + " may be in use by another process.";
+            THROW_CRITICAL(srcName << ":" << errStr << " Port " <<
+                boost::lexical_cast<std::string>(port) << " may be in use by another process.");
         }
     }
     else if (srcName.find("v4l2src") != std::string::npos) // this comes from a v4l2src
@@ -83,12 +81,16 @@ std::string translateMessage(GstObject *src, const std::string &errStr)
         if (pos != std::string::npos)
         {
             std::string deviceName(errStr.substr(pos + v4l2busy.length(), errStr.length() - v4l2busy.length() - 1));
-            return srcName + ":" + errStr + 
-                 deviceName + " is probably already in use.";
+            THROW_CRITICAL(srcName << ":" << errStr <<
+                 deviceName << " is probably already in use.");
         }
+        else 
+            LOG_WARNING(srcName << ":" << errStr);
+        return;
     }
 
-    return srcName + ":" + errStr;
+    THROW_CRITICAL(srcName << ":" << errStr);
+}
 }
 
 
@@ -117,7 +119,8 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
                     LOG_DEBUG("Debug details: " << debug);
                     g_free(debug);
                 }
-                THROW_CRITICAL(translateMessage(msg->src, errStr));
+                // this will either throw or log a warning
+                translateMessage(msg->src, errStr); 
                 break;
             }
         case GST_MESSAGE_WARNING:
@@ -136,32 +139,12 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
                 }
                 break;
             }
-            // using fallthrough
         case GST_MESSAGE_ELEMENT:
             context->updateListeners(msg);
             break;
         case GST_MESSAGE_APPLICATION:
-            /// handle interrupt
-            const GstStructure *s;
-
-            s = gst_message_get_structure(msg);
-
-            if (gst_structure_has_name (s, "MilhouseInterrupt")) 
-            {
-                /* this application message is posted when we caught an interrupt and
-                 * we need to stop the pipeline. */
-                LOG_INFO("Interrupt: Stopping pipeline ...\n");
-                if (msg)
-                {
-                    // gst_message_unref(msg);
-                    //  gst_object_unref(bus);
-                }
-                return FALSE;
-            }
-            else
-                context->updateListeners(msg);
+            context->updateListeners(msg);
             break;
-
         case GST_MESSAGE_LATENCY:
             {
                 LOG_DEBUG("Latency change, recalculating latency for pipeline");
@@ -274,7 +257,7 @@ bool Pipeline::isStopped() const
         return false;
 }
 
-
+namespace {
 bool checkStateChange(GstBus *bus, GstStateChangeReturn ret)
 {
     if (ret == GST_STATE_CHANGE_NO_PREROLL)
@@ -301,6 +284,7 @@ bool checkStateChange(GstBus *bus, GstStateChangeReturn ret)
     else
         return true;
 }
+}
 
 
 void Pipeline::start() const
@@ -308,7 +292,9 @@ void Pipeline::start() const
     if (isPlaying())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    tassert(checkStateChange(getBus(), ret)); // set it to playing
+    if (checkStateChange(getBus(), ret) == 0) // set it to playing
+        THROW_ERROR("Could not set pipeline state to PLAYING");
+
     LOG_DEBUG("Now playing");
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(pipeline_), GST_DEBUG_GRAPH_SHOW_ALL, "milhouse");
 }
@@ -320,7 +306,8 @@ void Pipeline::makeReady() const
     if (isReady())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    tassert(checkStateChange(getBus(), ret)); // set it to playing
+    if (checkStateChange(getBus(), ret)) 
+        THROW_ERROR("Could not set pipeline state to READY");
     LOG_DEBUG("Now ready");
 }
 
@@ -332,7 +319,8 @@ void Pipeline::pause() const
         return;
     makeReady();
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-    tassert(checkStateChange(getBus(), ret)); // set it to paused
+    if (checkStateChange(getBus(), ret) == 0) // set it to paused
+        THROW_ERROR("Could not set pipeline state to PAUSED");
     LOG_DEBUG("Now paused");
 }
 
@@ -351,7 +339,8 @@ void Pipeline::stop() const
     if (pipeline_)
     {
         GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-        tassert(checkStateChange(getBus(), ret)); // set it to paused
+        if (checkStateChange(getBus(), ret) == 0) // set it to NULL
+            THROW_ERROR("Could not set pipeline state to NULL");
         LOG_DEBUG("Now stopped/null");
     }
     else

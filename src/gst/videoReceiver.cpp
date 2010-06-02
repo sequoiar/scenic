@@ -52,7 +52,7 @@ VideoReceiver::VideoReceiver(Pipeline &pipeline,
     sink_(0), 
     gotCaps_(false) 
 {
-    tassert(remoteConfig_->hasCodec()); 
+    assert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
     createPipeline(pipeline);
 }
@@ -70,13 +70,15 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::createCodec(Pipeline &pipeline)
 {
-    tassert(decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace()));
+    decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace());
+    assert(decoder_);
 }
 
 
 void VideoReceiver::createDepayloader()
 {
-    tassert(depayloader_ = decoder_->createDepayloader());
+    depayloader_ = decoder_->createDepayloader();
+    assert(depayloader_);
 
     gstlinkable::link(*depayloader_, *decoder_);
 
@@ -87,14 +89,18 @@ void VideoReceiver::createDepayloader()
 void VideoReceiver::createSink(Pipeline &pipeline)
 {
     // avoid creating the videoflip as it has a colorspace converter
-    tassert(videoscale_ = videoConfig_->createVideoScale(pipeline));
+    videoscale_ = videoConfig_->createVideoScale(pipeline);
+    assert(videoscale_);
     if (videoConfig_->flipMethod() != "none")
-        tassert(videoflip_ = videoConfig_->createVideoFlip(pipeline));
-    tassert(sink_ = videoConfig_->createSink(pipeline));
+    {
+        videoflip_ = videoConfig_->createVideoFlip(pipeline);
+        assert(videoflip_);
+    }
+    sink_ = videoConfig_->createSink(pipeline);
+    assert(sink_);
 
     if (remoteConfig_->jitterbufferControlEnabled())
         MessageDispatcher::sendMessage("create-control");
-
 
     gstlinkable::link(*decoder_, *videoscale_);
     if (videoflip_ != 0)
@@ -106,7 +112,7 @@ void VideoReceiver::createSink(Pipeline &pipeline)
         gstlinkable::link(*videoscale_, *sink_);
 
     setCaps();
-    tassert(gotCaps_);
+    assert(gotCaps_);
     if (not remoteConfig_->capsMatchCodec()) 
         THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
     decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed

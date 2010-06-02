@@ -120,7 +120,7 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
     parser.add_option("-i", "--input-device", type="int", help="Select a midi input device. (source) Must be used with the --sending-port option.")
     parser.add_option("-L", "--latency", type="int", help="Specify the latency (in ms) of the midi out device (default is 20)")
     parser.add_option("-b", "--jitter-buffer", type="int", help="Specify the jitter buffer size in ms (default is 10)")
-    parser.add_option("-k", "--safe-keyboard", action="store_true", help="Take care of note ON/OFF alternating, usefull if several notes in a ms (experimental)"),
+    parser.add_option("-k", "--safe-keyboard", action="store_true", help="Take care of note ON/OFF alternating, useful if several notes in a ms (experimental)"),
     parser.add_option("-j", "--disable-recovery-journal", action="store_true", help="DISABLE recovery journal (journal provide note recovery when a packet is lost, so at your own risks!)"),
     parser.add_option("-f", "--follow-standard", action="store_true", help="Take care of MIDI standard (ex: omni on) in recovery journal (experimental)"),
     parser.add_option("-v", "--verbose", action="store_true", help="Enables a verbose output"),

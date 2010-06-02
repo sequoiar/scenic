@@ -1,6 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
-Version=1.0
 Type=Application
 Exec=scenic
 Icon=scenic
@@ -8,6 +6,8 @@ X-GNOME-DocPath=
 Terminal=false
 Name=Scenic
 Name[en]=Scenic
-Comment=High-Quality Audio-Video Streaming for GNU/Linux
-Comment[en]=High-Quality Audio-Video Streaming for GNU/Linux
+Name[fr]=Scenic
+Comment=Telepresence software for live performances and installations 
+Comment[en]=Telepresence software for live performances and installations 
+Comment[fr]=Logiciel de télépresence pour la scène et les installations
 Categories=Network;

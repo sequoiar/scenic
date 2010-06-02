@@ -26,15 +26,6 @@
 #include <sstream>
 #include<iomanip>
 
-#define BACKTRACE
-#ifdef BACKTRACE
-#include <signal.h>
-#include <execinfo.h>
-#include <cxxabi.h>
-#include <dlfcn.h>
-#include <stdlib.h>
-#endif
-
 #ifdef CONFIG_DEBUG_LOCAL
 #define LOG_LEVEL DEBUG
 #else
@@ -128,43 +119,5 @@ void cerr_log_throw(const std::string &msg, LogLevel level,
         throw (CriticalExcept(strerr.c_str()));
     else
         throw (AssertExcept(strerr.c_str()));
-
 }
 
-#ifdef BACKTRACE
-void backtrace()
-{
-    void *trace[16];
-    char **messages = (char **)NULL;
-    int status, i, trace_size = 0;
-    Dl_info dlinfo;
-    const char *symname;
-    char *demangled;
-
-    trace_size = backtrace(trace, 16);
-    messages = backtrace_symbols(trace, trace_size);
-    for (i=0; i < trace_size; ++i)
-    {
-        if(!dladdr(trace[i], &dlinfo))
-            continue;
-
-        symname = dlinfo.dli_sname;
-        demangled = abi::__cxa_demangle(symname, NULL, 0, &status);
-        if(status == 0 && demangled)
-            symname = demangled;
-
-        std::cerr << "object:" << dlinfo.dli_fname << " function:" <<  symname << std::endl;
-
-        if (demangled)
-            free(demangled);
-    }
-}
-#else
-void backtrace(){}
-#endif
-void assert_throw(__const char *__assertion, __const char *__file,
-        unsigned int __line)
-{
-    backtrace();
-    cerr_log_throw(__assertion, ASSERT_FAIL, __file, __line);
-}

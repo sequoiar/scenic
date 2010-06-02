@@ -23,7 +23,6 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
-#include "lassert.h"
 #include "util/logWriter.h"
 #include "util/sigint.h"
 

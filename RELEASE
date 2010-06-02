@@ -1,8 +1,8 @@
-Release notes for Scenic 0.5.10
+Release notes for Scenic 0.5.11
 
 This release is an other unstable version in the 0.5 series. This version 
 contains bugfixes and some new features for preparing the 0.6 stable series. 
-This is the first release candiate for the stable version 0.6.
+This is the second release candiate for the stable version 0.6.
 
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
@@ -39,20 +39,24 @@ New features in milhouse:
     (none)
 
 New features in scenic:
-    *   #538 Add the reason parameter to BYE in SIC
-    *   #545 Add a Debian menu icon.
-    *   #543 Create a Debian menu entry
+    *  #327 improve jack monitoring in scenic
+    *  #552 create debian/watch file
 
 Bug fixes in milhouse: 
-    (none)
+    *  #483 Image preview freeze when changing norm
+    *  #560 jackaudiosrc doesn't respect client name
+    *  #558 Assertions should not have side effects
 
 Bug fixes in scenic: 
-    *   #535 .mo files should not be in the repository
-    *   #537 debuild should run autoreconf
-    *   #546 Improve one-line descriptions
+    *  #547 Help2man dones't accept the name field but accepts the command argument
+    *  #556 Offerer doesn't answer BUSY when inviting
+    *  #548 Missing deps or instructions for dc-ctl
+    *  Added pychecker target
 
 HISTORY
 
+    * 2010-06-02: 0.5.11
+          * Second release candidate for the 0.6 stable branch.
     * 2010-05-27: 0.5.10
           * First release candidate for the 0.6 stable branch.
     * 2010-05-25: 0.5.9

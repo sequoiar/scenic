@@ -60,6 +60,7 @@ class AudioSourceConfig
         AudioLevel* createLevel(Pipeline &pipeline) const;
         unsigned long long bufferTime() const;
         std::string sourceString() const { return source_; }
+        const char* sourceName() const; 
 
     private:
         const std::string source_;

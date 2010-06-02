@@ -3,6 +3,8 @@
         <para>How to install Nvidia drivers in Ubuntu</para>
         <para>Ubuntu doesn't include Nvidia drivers by
         default.</para>
+        <sect1 id="installing-nvidia-drivers">
+        <title>Installing NVidia drivers</title>
         <itemizedlist>
           <listitem>
             <para>First, go to System &gt; Administration &gt;
@@ -42,6 +44,7 @@
         To make this setup we have to configure your xorg.conf with
         the nvidia-settings application situated in
         System/Administration/Nvidia X Server Settings </para> 
+        </sect1>
 
         <sect1 id="connecting-video-out">
         <title>Physically connecting your video output</title>
@@ -63,6 +66,7 @@
         <title>Starting your computer</title>
         <para>When your both output are connected, you can start
         your computer.</para>
+      </sect1>
         <sect1 id="starting-nvidia-settings">
         <title>Starting nvidia-settings</title>
         <para>Install your graphic card driver. Go to
@@ -116,7 +120,6 @@
             format="PNG" />
           </imageobject>
         </mediaobject>
-        </sect1>
         </sect1>
         <sect1 id="configuring-second-out">
         <title>Configuring your second video output</title>

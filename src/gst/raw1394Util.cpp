@@ -39,6 +39,7 @@
  */
 #ifdef CONFIG_IEEE1394
 
+namespace {
 int raw1394_get_num_ports()
 {
     int n_ports;
@@ -161,6 +162,7 @@ std::vector<std::string> discoverAVC(int* port, octlet_t* guid)
     }
 
     return results;
+}
 }
 
 std::vector<std::string> Raw1394::getDeviceList()

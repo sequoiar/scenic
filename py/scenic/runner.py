@@ -25,7 +25,6 @@ Some imports are in run().
 """
 import sys
 import os
-import copy
 from twisted.python import logfile
 from optparse import OptionParser
 from scenic import logger
@@ -42,7 +41,6 @@ def start_file_logging(level="warning", full_path="/var/tmp/scenic/scenic.log"):
     @rtype: str path to the log file
     """
     global log
-    file_name = os.path.basename(full_path)
     directory = os.path.dirname(full_path)
     if directory == '':
         directory = os.getcwd()
@@ -150,10 +148,11 @@ def run():
         sys.exit(0)
     
     if options.disable_v4l2_settings_restoration:
-        v4l2_state_saving_restoration = False
+        enable_v4l2_state_saving_restoration = False
     
     try:
         app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restoration, log_file_name=log_file_name)
+        app.start()
     except error.CannotListenError, e:
         msg = "There must be an other Scenic running."
         log.error(msg)
