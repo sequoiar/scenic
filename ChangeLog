@@ -1,3 +1,264 @@
+2010-06-02 20:43  alexandre
+
+	* RELEASE: updated date for this release in RELEASE notes.
+
+2010-06-02 20:43  alexandre
+
+	* po/en.po, po/fr.po, po/scenic.pot: updating languages files.
+
+2010-06-02 20:35  tristan
+
+	* RELEASE, utils/.jack.plumbing, utils/jack.plumbing: updated
+	  RELEASE, moved jack.plumbing
+
+2010-06-02 16:59  tristan
+
+	* RELEASE: updated release notes
+
+2010-06-02 16:56  tristan
+
+	* py: added pychecker.log to svn:ignore in py
+
+2010-06-02 16:51  tristan
+
+	* py/Makefile.am: added pychecker.log to clean-local
+
+2010-06-02 16:47  tristan
+
+	* src/gst/audioConfig.cpp, src/gst/audioConfig.h,
+	  src/gst/audioSource.cpp: audiosource respects jack client name
+
+2010-06-02 16:45  simonp
+
+	* doc/docbook/installation/hardware-requirement.xml,
+	  doc/docbook/installation/introduction.xml: More XML fixes
+
+2010-06-02 16:34  tristan
+
+	* configure.ac, src/gst/audioConfig.cpp, src/gst/rtpBin.cpp:
+	  initialize vars, set default optimization level to 2
+
+2010-06-02 16:30  pchevry
+
+	* doc/docbook/user/before-using-scenic.xml: :edited the
+	  installation manual link in user manual
+
+2010-06-02 15:58  pchevry
+
+	* doc/docbook/user/before-using-scenic.xml: Deleted the ifconfig
+	  and ping information since it is detected in the application
+
+2010-06-01 22:31  tristan
+
+	* src/gst/audioSource.cpp, src/gst/audioSource.h: added queue to
+	  jackaudiosrc to avoid discontinuities (aka Can't record audio
+	  fast enough) messages
+
+2010-06-01 22:01  alexandre
+
+	* RELEASE: added tickets closed in RELEASE
+
+2010-06-01 22:00  tristan
+
+	* configure.ac,
+	  py/rtpmidi/engines/midi/recovery_journal_chapters.py,
+	  py/scenic/application.py, py/scenic/communication.py,
+	  py/scenic/dialogs.py, py/scenic/glade.py, py/scenic/gui.py,
+	  py/scenic/preview.py, py/scenic/saving.py, py/scenic/sic.py,
+	  src/gst/audioReceiver.cpp, src/gst/audioSender.cpp,
+	  src/gst/audioSource.cpp, src/gst/codec.cpp, src/gst/dv1394.cpp,
+	  src/gst/fileSource.cpp, src/gst/messageDispatcher.cpp,
+	  src/gst/rtpReceiver.cpp, src/gst/rtpSender.cpp,
+	  src/gst/videoReceiver.cpp, src/gst/videoSender.cpp,
+	  src/gst/videoSource.cpp: assertions should not have side effects.
+	  Renamed unused variables in python. Added optimization flags for
+	  non-debug configure
+
+2010-06-01 20:26  tristan
+
+	* py/scenic/streamer.py: grammar fixes
+
+2010-06-01 20:09  tristan
+
+	* src/util/Makefile.am, src/util/logWriter.cpp,
+	  src/util/logWriter.h: removed lassert for good
+
+2010-06-01 20:02  tristan
+
+	* src/gst/audioLevel.cpp, src/gst/audioReceiver.cpp,
+	  src/gst/audioSender.cpp, src/gst/audioSink.cpp,
+	  src/gst/audioSource.cpp, src/gst/codec.cpp, src/gst/dv1394.cpp,
+	  src/gst/fileSource.cpp, src/gst/messageDispatcher.cpp,
+	  src/gst/remoteConfig.cpp, src/gst/rtpBin.cpp, src/gst/rtpPay.cpp,
+	  src/gst/rtpReceiver.cpp, src/gst/rtpSender.cpp,
+	  src/gst/videoReceiver.cpp, src/gst/videoSender.cpp,
+	  src/gst/videoSource.cpp, src/include/lassert.h,
+	  src/include/util.h: use assert instead of lassert
+
+2010-06-01 19:53  tristan
+
+	* src/gst/pipeline.cpp: don't use assertions for runtime-level
+	  errors, better error messages in pipeline
+
+2010-06-01 19:31  alexandre
+
+	* py/scenic/application.py: Added become_available arg to
+	  _simply_refuse in handle_invite
+
+2010-06-01 19:10  tristan
+
+	* py/scenic/gui.py, src/gst/pipeline.cpp: scenic should not be able
+	  to change standards or inputs while streaming or previewing
+
+2010-06-01 18:57  alexandre
+
+	* py/scenic/streamer.py: decreased log level for a few messages.
+
+2010-06-01 18:36  tristan
+
+	* src/gst/pipeline.cpp: no such thing as MilhouseInterrupt message
+
+2010-06-01 18:31  tristan
+
+	* ., data/glade/scenic.glade, py/scenic/gui.py,
+	  py/scenic/preview.py, src/gst/audioLevel.cpp,
+	  src/gst/videoSink.cpp: merged back branches/preview_socket into
+	  trunk@6264
+
+2010-06-01 18:03  alexandre
+
+	* py/scenic/gui.py: Checking if jack runs right before starting
+	  preview.
+	  That avoids a nice crash.
+
+2010-06-01 14:56  alexandre
+
+	* man/jack-info-man.txt, po/en.po, po/fr.po, po/scenic.pot,
+	  py/rtpmidi/runner.py: fixed more spelling errors in man pages
+
+2010-06-01 14:54  alexandre
+
+	* man/firereset-man.txt: fixed spelling error: Another
+
+2010-06-01 13:50  alexandre
+
+	* py/scenic.desktop: removed encoding field from .desktop file
+	  since it in deprecated
+
+2010-06-01 00:49  simonp
+
+	* doc/docbook/installation-manual.xml.in,
+	  doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/hardware-requirement.xml,
+	  doc/docbook/installation/nvidia-settings.xml,
+	  doc/docbook/installation/software.xml: Some XML fixes.
+
+2010-05-31 22:30  tristan
+
+	* src/gst/gstLinkable.cpp, src/gst/raw1394Util.cpp: more helpers in
+	  unused namespace
+
+2010-05-31 22:29  tristan
+
+	* py/Makefile.am: added pychecker target to py/Makefile.am
+
+2010-05-31 21:50  tristan
+
+	* src/gst/pipeline.cpp, src/gst/v4l2util.h: put helpers in unnamed
+	  namespaces
+
+2010-05-31 19:18  tristan
+
+	* py/scenic/saving.py, py/scenic/streamer.py: finished pychecking
+	  scenic
+
+2010-05-31 18:43  tristan
+
+	* data/glade/scenic.glade, py/scenic/gui.py: fixed typo in glade,
+	  pychecked gui.py
+
+2010-05-31 18:27  tristan
+
+	* py/scenic/application.py, py/scenic/devices/cameras.py,
+	  py/scenic/devices/jackd.py, py/scenic/devices/midi.py,
+	  py/scenic/test/test_jack.py: pychecked devices, renamed
+	  jackd_get_infos2
+
+2010-05-31 18:21  simonp
+
+	* doc/docbook/installation/about.xml,
+	  doc/docbook/installation/hardware-requirement.xml: Fixed some
+	  bookinfo and typos
+
+2010-05-31 18:20  tristan
+
+	* py/scenic/communication.py: pychecked communication.py
+
+2010-05-31 18:17  tristan
+
+	* py/scenic/application.py: fixed show_error_dialog calls and got
+	  rid of unused variables
+
+2010-05-31 17:59  tristan
+
+	* utils/dc-ctl/dc-ctl.cpp: better error msg
+
+2010-05-31 17:32  tristan
+
+	* py/scenic/application.py, py/scenic/runner.py: pychecked
+	  runner.py, separated app creation from app reactor start
+
+2010-05-28 21:31  tristan
+
+	* src/gst/audioSource.cpp: gain shouldn't change with number of
+	  channels, earplugs recommended
+
+2010-05-28 20:22  tristan
+
+	* utils/milhouse.completion: added celt to completion
+
+2010-05-28 20:13  tristan
+
+	* py/scenic/gui.py: fixed warning msg
+
+2010-05-28 18:20  tristan
+
+	* src/gst/videoSink.cpp: definitely do need to showwindow in
+	  constructor
+
+2010-05-28 18:20  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-05-28 18:18  tristan
+
+	* src/gst/localVideo.cpp, src/gst/videoSink.cpp: don't need to call
+	  showWindow in videosink constructor
+
+2010-05-28 17:53  alexandre
+
+	* man/Makefile.am, man/dc-ctl-man.txt, man/firereset-man.txt,
+	  man/jack-info-man.txt, man/midistream-man.txt,
+	  man/milhouse-man.txt, man/scenic-man.txt: Moved back descriptions
+	  for each man page as an argument to help2man.
+	  The name filed in the included .txt file dones't work on Debian.
+
+2010-05-27 23:56  alexandre
+
+	* RELEASE, configure.ac: updated version to 0.5.11
+
+2010-05-27 22:34  alexandre
+
+	* py/scenic.desktop: fixed error in .desktop
+
+2010-05-27 22:17  simonp
+
+	* py/scenic.desktop: Update description of desktop file
+
+2010-05-27 22:00  simonp
+
+	* ChangeLog: svn2cl
+
 2010-05-27 21:59  alexandre
 
 	* RELEASE: Updated again the RELEASE notes.
