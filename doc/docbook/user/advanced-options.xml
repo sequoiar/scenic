@@ -34,7 +34,9 @@
       </listitem>
       <listitem><para>Type "scenic --debug" and press enter.</para></listitem>
     </orderedlist>
-    <programlisting>scenic --debug</programlisting>
+    <para>
+    <userinput>scenic --debug</userinput>
+    </para>
     <para>You can now see more detailed information about what
     happens under the hood of &app;. You can copy some of this text
     to the clipboard in order to paste it into an email to the
@@ -97,7 +99,9 @@
     <keycombo>
       <keycap>Q</keycap>
     </keycombo>to quit the manual page reader.</para>
-    <programlisting>man milhouse</programlisting>
+    <para>
+    <userinput>man milhouse</userinput>
+    </para>
     <para>The next section is dedicated to the 
     <application>Milhouse</application>command-line
     streamer.</para>
@@ -174,19 +178,27 @@
       <para>Here is a short explanation on how to start the
       milhouse receivers to receive audio and video streams.</para>
       <para>Set the local_machine display</para>
-      <programlisting>export DISPLAY=:0.0</programlisting>
+      <para>
+      <userinput>export DISPLAY=:0.0</userinput>
+      </para>
       <para>Run the program on the local machine with the following
       parameters:</para>
-      <programlisting width="80">
+      <para>
+      <userinput>
 milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
-      </programlisting>
+      </userinput>
+      </para>
       <para>Set the remote_machine display</para>
-      <programlisting>export DISPLAY=:0.0</programlisting>
+      <para>
+      <userinput>export DISPLAY=:0.0</userinput>
+      </para>
       <para>Execute program on the remote machine with the
       following parameters:</para>
-      <programlisting>
+      <para>
+      <userinput>
 milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
-      </programlisting>
+      </userinput>
+      </para>
     </sect1>
     <sect1 id="milhouse-senders">
       <title>launch the senders</title>
@@ -195,14 +207,18 @@ milhouse --receiver --address local_ip_address --videosink xvimagesink --videoco
       computer.</para>
       <para>execute program on local machine with the following
       parameters:</para>
-      <programlisting>
+      <para>
+      <userinput>
 milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
-</programlisting>
+</userinput>
+</para>
       <para>execute program on remote machine with the following
       parameters:</para>
-      <programlisting>
+      <para>
+      <userinput>
 milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
-      </programlisting>
+      </userinput>
+      </para>
       <para>a video window displaying the live video stream should
       appear on one of your designated screens. it is movable by
       holding down the -alt- key and dragging the window. pressing
@@ -219,7 +235,9 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
     <title>Milhouse Help</title>
     <para>Type milhouse --help to have informations on the
     different options available.</para>
-    <programlisting>milhouse --help</programlisting>
+    <para>
+    <userinput>milhouse --help</userinput>
+    </para>
     <informaltable frame="all">
       <tgroup cols="2">
         <tbody>
@@ -613,10 +631,16 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
     the video standard. The milhouse command should exit
     immediately once done.</para>
     <para>To change the video standard to NTSC:</para>
-    <programlisting>milhouse --v4l2-standard NTSC</programlisting>
+    <para>
+    <userinput>milhouse --v4l2-standard NTSC</userinput>
+    </para>
     <para>To list cameras:</para>
-    <programlisting>milhouse --list-cameras</programlisting>
+    <para>
+    <userinput>milhouse --list-cameras</userinput>
+    </para>
     <para>To choose an input for a V4L2 device:</para>
-    <programlisting>milhouse --v4l2-input 1</programlisting>
+    <para>
+    <userinput>milhouse --v4l2-input 1</userinput>
+    </para>
   </sect1>
 </chapter>
