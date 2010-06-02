@@ -277,7 +277,7 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     capsFilter_(pipeline_.makeElement("capsfilter", 0)), 
     queue_(pipeline_.makeElement("queue", 0)) 
 {
-    source_ = pipeline_.makeElement(config_.source(), config_.source());
+    source_ = pipeline_.makeElement(config_.source(), config_.sourceName());
 
     // use auto-forced connect mode if available
     if (Jack::autoForcedSupported(source_))

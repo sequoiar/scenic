@@ -193,6 +193,15 @@ const char* AudioSourceConfig::deviceName() const
     return deviceName_.c_str();
 }
 
+/// Returns c-style string specifying the source name
+const char* AudioSourceConfig::sourceName() const
+{
+    if (sourceName_ != "")
+        return sourceName_.c_str();
+    else
+        return 0;
+}
+
 
 /// Returns true if location indicates an existing, readable file/device. 
 bool AudioSourceConfig::locationExists() const
@@ -232,7 +241,6 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
         return 0;
     }
 }
-
 
 /// Returns c-style string specifying the source name
 const char* AudioSinkConfig::sinkName() const
