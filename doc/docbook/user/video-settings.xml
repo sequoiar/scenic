@@ -226,6 +226,9 @@
     </sect2>
     <sect2 id="video-jitter-buffer">
       <title>Video Jitter Buffer</title>
+    <para>
+   The video jitter buffer is a buffer that protects you from the variation in latency. It cumulates video frames, so video can play smoothly even if a frame is a bit late. Increase this number (in milliseconds) in case of high network jitter.
+    </para>
     </sect2>
   </sect1>
 </chapter>

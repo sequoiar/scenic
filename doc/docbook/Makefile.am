@@ -19,3 +19,7 @@ html-local:
 
 clean-local:
 	rm -rf html installation-manual.xml user-manual.xml
+
+xmlcheck: installation-manual.xml user-manual.xml
+	xmllint --noout --noent --xinclude --postvalid $^
+

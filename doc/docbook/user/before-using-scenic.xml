@@ -85,12 +85,16 @@
     <title>Connecting the devices</title>
     <sect2 id="supported-devices">
       <title> Supported Devices </title>
+      <para>
       &app; is usually used with many audio, video and MIDI devices.
-      <para>It is really important to verify that you have
-      devices that are supported by &app; and more generally by <application> GNU/Linux</application>. Please refer to
-      our 
-      <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
-      Hardware Requirements</ulink> page to know more about supported devices.</para>
+      </para>
+      <para>
+         It is really important to verify that you have
+         devices that are supported by &app; and more generally by <application> GNU/Linux</application>. Please refer to
+         our 
+         <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
+         Hardware Requirements</ulink> page to know more about supported devices.
+      </para>
       <para>It is also necessary to make sure that all devices
       are properly configured and connected.</para>
       <para>Here is an overview of the various peripheral used in a
@@ -101,7 +105,7 @@
       is then connected to the input of an audio mixer and then to
       a sound card. This Sound card is then connected to the
       computer.</para>
-    </sect3>"
+    </sect3>
     <sect3 id="audio-output">
       <title>Audio output</title>
       <para>The usual direct audio output is a speaker or
@@ -220,6 +224,11 @@
   </sect1>
   <sect1 id="launching-scenic">
     <title>Lauching &app;</title>
-    <para>To launch &app;, choose the <menuchoice><guimenu>Application</guimenu><guimenuitem>Internet</guimenuitem><guimenuitem>&app;</guimenuitem></menuchoice> menu item. You should be ready to go!</para>
+    <para>To launch &app;, choose the
+    <menuchoice>
+       <guimenu>Application</guimenu>
+          <guimenuitem>Internet</guimenuitem>
+          <guimenuitem>Scenic</guimenuitem>
+    </menuchoice> menu item. You should be ready to go!</para>
   </sect1>
 </chapter>
