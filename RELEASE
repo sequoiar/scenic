@@ -45,6 +45,7 @@ New features in scenic:
 Bug fixes in milhouse: 
     *  #483 Image preview freeze when changing norm
     *  #560 jackaudiosrc doesn't respect client name
+    *  #558 Assertions should not have side effects
 
 Bug fixes in scenic: 
     *  #547 Help2man dones't accept the name field but accepts the command argument
