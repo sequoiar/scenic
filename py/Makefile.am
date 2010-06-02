@@ -17,7 +17,7 @@ desktop_DATA = scenic.desktop
 EXTRA_DIST = $(desktop_DATA) scenic.svg
 
 clean-local:
-	rm -rf _trial_temp
+	rm -rf _trial_temp pychecker.log
 
 pychecker:
 	rm -f pychecker.log
