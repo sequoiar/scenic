@@ -10,7 +10,7 @@
     <para>This is a quick list of the equipement used for a basic setup. Note that you need equipement on both side (local and distant.)</para>
     <itemizedlist>
       <listitem>
-        <para>One computer, for indications on what  kind of computer may be used, please refer to our <link link="installation-manual.xml"> Installation Manual </link></para>
+        <para>One computer, for indications on what  kind of computer may be used, please refer to our <ulink url="http://svn.sat.qc.ca/trac/scenic/installation-manual/"> Installation Manual </ulink></para>
       </listitem>
       <listitem>
         <para>1 x video capture card supported under Linux.</para>
