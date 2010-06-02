@@ -31,7 +31,7 @@
          </listitem>
          <listitem>
             <para>
-         Be patient. Take the time to make the good choice because you will have to live with it ; ). Take a tea with cookies. Enjoy the life and get ready to live THE SCENIC EXPERIENCE.
+         Be patient. Take the time to make the good choice because you will have to live with it ; ).
             </para>
          </listitem>
       </orderedlist>
@@ -102,7 +102,7 @@
           </row>
           <row>
             <entry>Motherboard</entry>
-            <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
+            <entry>USB for webcam or USB capture card</entry>
           </row>
         </tbody>
       </tgroup>
@@ -146,15 +146,15 @@
             </row>
             <row>
               <entry>DVI</entry>
-              <entry></entry>
+              <entry>video interface for digital display devices such as flat panel LCD computer displays and digital projectors</entry>
             </row>
             <row>
               <entry>S-Video</entry>
-              <entry></entry>
+              <entry>An analog video signal connection usually used to connect TV, DVD-Player or video mixer</entry>
             </row>
             <row>
               <entry>HDMI</entry>
-              <entry>Not supported and not tested</entry>
+              <entry>Not supported and not tested yet</entry>
             </row>
           </tbody>
         </tgroup>
