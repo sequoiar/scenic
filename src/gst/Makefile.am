@@ -1,6 +1,6 @@
 pkglib_LTLIBRARIES = libgst.la
 
-libgst_la_SOURCES = caps.cpp mediaBase.cpp \
+libgst_la_SOURCES = mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp \
 				   videoConfig.cpp rtpBin.cpp pipeline.cpp \
 				   rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
@@ -22,12 +22,11 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   noncopyable.h videoFlip.h videoFactory.h audioFactory.h
 
 BUILT_SOURCES = caps.cpp
-nodist_SOURCES = $(BUILT_SOURCES)
+nodist_libgst_la_SOURCES = $(BUILT_SOURCES)
 
 caps.cpp: $(top_srcdir)/utils/make_caps.py
 	$< $@
 
-clean-local:
-	rm -f caps.cpp
+CLEANFILES = $(BUILT_SOURCES)
 		
 libgst_la_CPPFLAGS=$(GLIB_CFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) $(DC1394_CFLAGS) -DPIXMAPS_DIR=\"$(PIXMAPS_DIR)\" -I$(top_srcdir)/src/include -I$(top_srcdir)/src
