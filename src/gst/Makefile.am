@@ -22,6 +22,7 @@ libgst_la_SOURCES = caps.cpp mediaBase.cpp \
 				   noncopyable.h videoFlip.h videoFactory.h audioFactory.h
 
 BUILT_SOURCES = caps.cpp
+nodist_SOURCES = $(BUILT_SOURCES)
 
 caps.cpp: $(top_srcdir)/utils/make_caps.py
 	$< $@
