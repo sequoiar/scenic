@@ -5,7 +5,6 @@ scenicdir = $(libdir)/scenic/py/scenic
 # in alphabetical order:
 scenic_PYTHON = application.py \
 	communication.py \
-	configure.py \
 	dialogs.py \
 	glade.py \
 	gstreamer.py \
@@ -23,6 +22,8 @@ scenic_PYTHON = application.py \
 	streamer.py \
 	logger.py \
 	twistedbackports.py
+
+nodist_scenic_PYTHON = configure.py
 
 clean-local:
 	rm -rf *.pyc

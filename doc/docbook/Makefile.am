@@ -5,7 +5,7 @@ docbook_DATA = \
 	installation-manual.xml \
 	user-manual.xml
 
-EXTRA_DIST = $(docbook_DATA)
+EXTRA_DIST = glossary.xml
 
 html-local:
 	mkdir -p html/fig ; cp -r fig/*.png fig/*.jpg html/fig/ ; \
