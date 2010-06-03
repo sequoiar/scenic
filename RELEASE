@@ -45,7 +45,7 @@ Bug fixes in milhouse:
     (none)
 
 Bug fixes in scenic: 
-    (none)
+    #563 Tarball should not contain generated Python and docbook files
 
 HISTORY
 
