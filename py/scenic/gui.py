@@ -299,13 +299,20 @@ class Gui(object):
         self.preview_area_widget = widgets_tree.get_widget("preview_area")
 
         self.preview_in_window_widget = widgets_tree.get_widget("preview_in_window")
-        preview_socket = gtk.Socket()
-        preview_socket.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
-        preview_socket.connect("plug-removed", _plug_removed_cb)
-        preview_socket.show()
-        self.preview_area_widget.add(preview_socket)
-        self.preview_area_x_window_id = preview_socket.get_id()
-        preview_socket.show()
+        self.preview_socket = gtk.Socket()
+        self.preview_socket.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("black"))
+        self.preview_socket.connect("plug-removed", _plug_removed_cb)
+        self.preview_socket.show()
+        self.preview_area_widget.add(self.preview_socket)
+        self.preview_socket.show()
+        def _redraw_socket():
+            """
+            Calls clear on the socket window to avoid lingering artifacts.
+            """
+            if self.preview_socket.window is not None:
+                self.preview_socket.window.clear()
+        self._redraw_socket_task = task.LoopingCall(_redraw_socket)
+        self._redraw_socket_task.start(0.1, now=False)
 
         # audio
         self.audio_source_widget = widgets_tree.get_widget("audio_source")

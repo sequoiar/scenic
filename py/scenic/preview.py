@@ -62,10 +62,10 @@ class Preview(object):
         window_title = _("Local preview")
         x_window_id = None
         if not self.app.config.preview_in_window:
-            if self.app.gui.preview_area_x_window_id is None:
-                log.error("XID of the preview drawing area is None !")
+            if self.app.gui.preview_socket.get_id() == 0L:
+                log.error("XID of the preview drawing area is 0L!")
             else:
-                x_window_id = self.app.gui.preview_area_x_window_id
+                x_window_id = self.app.gui.preview_socket.get_id()
         command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio, )
         if self.app.devices["jackd_is_running"] and numchannels > 0: 
             command += " --localaudio --audiosource %s --numchannels %s --vumeter-id %s --audio-buffer %s" % (self.app.config.audio_source, numchannels, vumeter_id, audio_buffer)
