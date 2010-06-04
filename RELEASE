@@ -1,8 +1,8 @@
 Release notes for Scenic 0.5.12
 
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes and some new features for preparing the 0.6 stable series. 
-This is the third release candiate for the stable version 0.6.
+This release contains bugfixes and some new features for preparing the 
+0.6 stable series. This is the third release candiate for the stable 
+version 0.6. It contains only minor packaging bug fixes.
 
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
@@ -45,10 +45,14 @@ Bug fixes in milhouse:
     (none)
 
 Bug fixes in scenic: 
+    #562 The drawing area should always be black
     #563 Tarball should not contain generated Python and docbook files
+    #564 Tarball should not contain src/gst/caps.cpp
 
 HISTORY
 
+    * 2010-06-04: 0.5.12
+          * Third release candidate for the 0.6 stable branch.
     * 2010-06-02: 0.5.11
           * Second release candidate for the 0.6 stable branch.
     * 2010-05-27: 0.5.10
