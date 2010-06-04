@@ -309,7 +309,7 @@ class Gui(object):
             """
             Calls clear on the socket window to avoid lingering artifacts.
             """
-            if self.preview_socket.window is not None:
+            if self.preview_socket.window is not None and not self.preview_manager.is_busy():
                 self.preview_socket.window.clear()
         self._redraw_socket_task = task.LoopingCall(_redraw_socket)
         self._redraw_socket_task.start(0.1, now=False)
