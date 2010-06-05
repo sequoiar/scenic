@@ -37,7 +37,7 @@ To choose an input for a V4L2 device:
  
 milhouse --v4l2-input 1
 
-[WRITTEN]
+[HISTORY]
 2008 - Written by Tristan Matthews <tristan@sat.qc.ca> and Koya Charles <koya.charles@gmail.com>.
 
 [REPORTING BUGS]
