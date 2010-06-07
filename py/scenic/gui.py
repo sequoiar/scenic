@@ -292,7 +292,7 @@ class Gui(object):
             """ Called when a plug is removed from socket, returns
                 True so that it can be reused
                 """
-            log.debug("I (%s) have just had a plug removed!" % (widget))
+            log.debug("The socket just had a plug removed.")
             return True
 
         # video preview:
