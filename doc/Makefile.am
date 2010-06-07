@@ -1,5 +1,5 @@
 SUBDIRS = docbook 
-dist_pkgdata_DATA=footer.html header.html doxygen.css epydoc.css Doxyfile
+EXTRA_DIST=footer.html header.html doxygen.css epydoc.css Doxyfile
 
 html-local: doxygen epydoc
     
