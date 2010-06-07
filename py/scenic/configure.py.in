@@ -22,6 +22,7 @@ import os
 APPNAME = "scenic"
 VERSION = "@PACKAGE_VERSION@"
 PACKAGE_NAME = """@PACKAGE_NAME@"""
+DESCRIPTION = "Telepresence application for live performances and installations"
 # paths:
 LOCALE_DIR = os.path.join("@DATADIR@", "locale")
 GLADE_DIR = os.path.join("@DATADIR@", 'scenic', 'glade')

@@ -49,7 +49,7 @@ from scenic.internationalization import _
 log = logger.start(name="gui")
 
 ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
-ONE_LINE_DESCRIPTION = """Scenic is a telepresence software oriented for live performances."""
+ONE_LINE_DESCRIPTION = _("Telepresence application for live performances and installations") # Copy-pasted from configure.DESCRIPTION, but i18nized.
 ALL_SUPPORTED_SIZE = [ # by milhouse video
     "924x576",
     "768x480",

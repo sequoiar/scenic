@@ -13,7 +13,7 @@ milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/util/programOp
 	$(HELP2MAN) --include=milhouse-man.txt --name="Streams audio and video with GStreamer over RTP" --no-info $(top_builddir)/src/main/milhouse -o $@
 
 scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  $(top_srcdir)/py/scenic/configure.py.in $(common_mandeps) $(top_srcdir)/man/scenic-man.txt
-	$(HELP2MAN) --include=scenic-man.txt --name="Desktop application to stream audio, video and MIDI over RTP" --no-info $(top_builddir)/py/scripts/scenic -o $@
+	$(HELP2MAN) --include=scenic-man.txt --name="Telepresence application for live performance and installations" --no-info $(top_builddir)/py/scripts/scenic -o $@
 
 midistream.1: $(top_srcdir)/py/scripts/midistream.in $(top_srcdir)/py/rtpmidi/runner.py $(common_mandeps) $(top_srcdir)/man/midistream-man.txt
 	$(HELP2MAN) --include=midistream-man.txt --name="Streams MIDI notes and controls over RTP" --no-info $(top_builddir)/py/scripts/midistream -o $@

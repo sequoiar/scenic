@@ -91,7 +91,7 @@ def run():
     from scenic import configure
     
     # command line parsing
-    parser = OptionParser(usage="%prog", version=str(configure.VERSION))
+    parser = OptionParser(usage="%prog", version=str(configure.VERSION), description=configure.DESCRIPTION)
     parser.add_option("-k", "--kiosk", action="store_true", help="Run in kiosk mode")
     parser.add_option("-l", "--enable-logging", action="store_true", help="Enables logging to file.")
     parser.add_option("-L", "--log-file-name", type="string", help="Specifies the path to the log file. Default is %s. Logging must be enabled for this option value to be useful." % (LOG_FILE_NAME), default=LOG_FILE_NAME)
@@ -168,5 +168,4 @@ def run():
             pass
         log.info("Goodbye.")
         sys.exit(0)
-
 
