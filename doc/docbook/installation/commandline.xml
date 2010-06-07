@@ -24,20 +24,23 @@
     <para>Here is a short explanation on how to start the milhouse
     receivers to receive audio and video streams.</para>
     <para>Set the local_machine display</para>
-    <programlisting>export DISPLAY=:0.0</programlisting>
+    <para>
+    <userinput>export DISPLAY=:0.0</userinput>
+    </para>
     <para>Run the program on the local machine with the following
     parameters:</para>
-    <programlisting>milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 
-    <para>--videoport 10030 --audiosink jackaudiosink --audiocodec
-    raw --audioport 10000</para>--numchannels 2</programlisting>
+    <para>
+    <userinput>milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2</userinput>
+    </para>
     <para>Set the remote_machine display</para>
-    <programlisting>export DISPLAY=:0.0</programlisting>
+    <para>
+    <userinput>export DISPLAY=:0.0</userinput>
+    </para>
     <para>Execute program on the remote machine with the following
     parameters:</para>
-    <programlisting>milhouse --receiver --address local_ip_address
-    --videosink xvimagesink --videocodec mpeg4 
-    <para>--videoport 10030 --audiosink jackaudiosink --audiocodec
-    raw --audioport 10000</para>--numchannels 2</programlisting>
+    <para>
+    <userinput>milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2</userinput>
+    </para>
   </sect1>
   <sect1 id="milhouse-senders">
     <title>Launch the senders</title>
@@ -45,18 +48,14 @@
     Of course, that should be on a different computer.</para>
     <para>Execute program on local machine with the following
     parameters:</para>
-    <programlisting>milhouse --sender --address remote_ip_address
-    --videocodec mpeg4 --videoport 10030 
-    <para>--videosource v4l2src --audiosource jackaudiosrc
-    --audiocodec raw &#160;-c 2</para>--audioport
-    10000</programlisting>
+    <para>
+    <userinput>milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000</userinput>
+    </para>
     <para>Execute program on remote machine with the following
     parameters:</para>
-    <programlisting>milhouse --sender --address local_ip_address
-    --videocodec mpeg4 --videoport 10030 
-    <para>--videosource v4l2src --audiosource jackaudiosrc
-    --audiocodec raw &#160;-c 2</para>--audioport
-    10000</programlisting>
+    <para>
+    <userinput>milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000</userinput>
+    </para>
     <para>A video window displaying the live video stream should
     appear on one of your designated screens. It is movable by
     holding down the -alt- key and dragging the window. Pressing
@@ -73,7 +72,9 @@
     <title>Milhouse Help</title>
     <para>Type milhouse --help to have informations on the
     different options available.</para>
-    <programlisting>milhouse --help</programlisting>
+    <para>
+    <userinput>milhouse --help</userinput>
+    </para>
     <informaltable frame="all">
       <tgroup cols="2">
         <tbody>

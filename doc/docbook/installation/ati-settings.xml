@@ -3,7 +3,7 @@
       <para>If you're using the fglrx driver, you may have to
       enable the XVideo extension with the aticonfig command (part
       of the xorg-driver-fglrx package).</para>
-        <para><programlisting>sudo aticonfig --overlay-type=Xv</programlisting></para>
+        <para><userinput>sudo aticonfig --overlay-type=Xv</userinput></para>
         <para>Alternatively, you can manually add those lines in
         the Device section of the fglrx driver in the
         /etc/X11/xorg.conf file. After Driver "fglrx" , add:</para>

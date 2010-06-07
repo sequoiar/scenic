@@ -8,12 +8,18 @@
     <title>System A/V Device Acces</title>
     <para>Then add your username to the different groups:</para>
     <para>Add your user to the video group</para>
-    <programlisting>sudo gpasswd -a "username" video</programlisting>
+    <para>
+    <userinput>sudo gpasswd -a "username" video</userinput>
+    </para>
     <para>Add your user to the audio group</para>
-    <programlisting>sudo gpasswd -a "username" audio</programlisting>
+    <para>
+    <userinput>sudo gpasswd -a "username" audio</userinput>
+    </para>
     <para>For firewire-based hardware (DV, IIDC,
     freebob/ffado)</para>
-    <programlisting>sudo gpasswd -a "username" disk</programlisting>
+    <para>
+    <userinput>sudo gpasswd -a "username" disk</userinput>
+    </para>
     <para>To be in effect, you have to log out, then log in.</para>
   </sect1>
 
@@ -63,22 +69,29 @@
     <para>On Karmic Koala, you have to fix devices attribution for
     raw1394. Create a udev rule to change group of /dev/raw1394
     device:</para>
-    <programlisting>echo 'KERNEL=="raw1394", NAME="raw1394", GROUP="disk"' | 
-sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
-    <programlisting>sudo /etc/init.d/udev restart</programlisting>
+    <para>
+    <userinput>echo 'KERNEL=="raw1394", NAME="raw1394", GROUP="disk"' | sudo tee -a /etc/udev/rules.d/99-raw1394.rules</userinput>
+    </para>
+    <para>
+    <userinput>sudo /etc/init.d/udev restart</userinput>
+    </para>
     <para>Furthermore, on all distributions, it is advisable to
     load the raw1394 module even if no dc1394 cameras are present
     so that calls to libdc (i.e. milhouse --list-cameras) won't
     error out. To do this, add raw1394 to the /etc/modules
     file:</para>
-    <programlisting>sudo modprobe raw1394</programlisting>
-    <programlisting>echo "raw1394" | sudo tee -a /etc/modules</programlisting>
+    <para>
+    <userinput>sudo modprobe raw1394</userinput>
+    </para>
+    <para>
+    <userinput>echo "raw1394" | sudo tee -a /etc/modules</userinput>
+    </para>
     <para>See 
     <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
     this bug report </ulink>for further information
     </para>
     <para>You can test the DV camera with:</para>
-    <para>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</para>
+    <para><userinput>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</userinput></para>
     </sect2>
     <sect2 id="video-test">
       <title>Video Test</title>
@@ -128,7 +141,9 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
           </tbody>
         </tgroup>
       </informaltable>
-      <programlisting>milhouse --localhost --videosource v4l2src</programlisting>
+      <para>
+      <userinput>milhouse --localvideo --videosource v4l2src</userinput>
+      </para>
       <para>You can add several options such as:</para>
       <itemizedlist>
         <listitem>
@@ -160,9 +175,13 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
       <title>Firewire sound card</title>
       <para>Verify that your soundcard is detected For firewire
       soundcard:</para>
-      <programlisting>ls -l /dev/*1394*</programlisting>
+      <para>
+      <userinput>ls -l /dev/*1394*</userinput>
+      </para>
       <para>If the device does not appear try this:</para>
-      <programlisting>sudo modprobe raw1394</programlisting>
+      <para>
+      <userinput>sudo modprobe raw1394</userinput>
+      </para>
       <para>The current user must be part of the disk group. If
       that is not the case, then the system administrator must add
       the "user" to the "disk" group (as shown above)</para>
@@ -171,7 +190,9 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
       <title>For PCI soundcard</title>
       <para>For pci soundcard with alsa driver, verify that your
       soundcard is detected:</para>
-      <programlisting>aplay -l</programlisting>
+      <para>
+      <userinput>aplay -l</userinput>
+    </para>
     </sect2>
   </sect1>
   <sect1 id="sound-server">
@@ -407,19 +428,32 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
       order of module loading. To solve, use ALSA names instead of
       index (hw:0) to specify the card. Here's how to:</para>
       <para>To select the appropriate soundcard, first verify the
-      name of the sound card to use with asoundconf</para>
-      <para>Here is an examples of asoundconf output:</para>
-      <programlisting>asoundconf list Names of available sound
-      cards: Intel Bt878 M2496</programlisting>
-      <para>Copy the name of the sound card and paste it in your
-      .asoundrc file situated in your /home/$USER directory. Ex:
+      name of the sound card to use with aplay</para>
+      <para>Here is an examples of <userinput>aplay -l</userinput> output:</para>
+      <programlisting>
+card 0: Intel [HDA Intel], device 0: ALC889A Analog [ALC889A Analog]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+</programlisting>
+      <para>Copy the name of the sound card (eg. "HDA Intel") and paste it in your
+      .asoundrc file situated in your $HOME directory. Ex:
       Here i want to use the M2496 soundcard.</para>
       <para>ex:</para>
-      <programlisting>gedit .asoundrc</programlisting>
+      <para>
+      <userinput>gedit .asoundrc</userinput>
+      </para>
       <para>.asoundrc file with m2496 name added</para>
-      <programlisting>pcm.m2496 { &#160; &#160; type hw &#160;
-      &#160; card M2496 } ctl.m2496 { &#160; &#160; type hw &#160;
-      &#160; card M2496 }</programlisting>
+      <programlisting>pcm.m2496 {
+   type hw;
+   card M2496;
+}
+ctl.m2496 { 
+   type hw;
+   card M2496;
+}</programlisting>
       <para>Now you just have to add the name of the soundcard in
       the qjackctl interface field . For example, the m2496:</para>
       <para>
@@ -535,8 +569,9 @@ sudo tee -a /etc/udev/rules.d/99-raw1394.rules</programlisting>
   <sect1 id="sound-check">
     <title>System Sound check</title>
     <para>Then you can start an audio test with:</para>
-    <programlisting>gst-launch audiotestsrc !
-    jackaudiosink</programlisting>
+    <para>
+    <userinput>gst-launch audiotestsrc ! jackaudiosink</userinput>
+    </para>
     <para>This will produce a sine wave. You should also see the
     audio connections appear in qjackctl. The outputs are now
     routable to your speakers or other applications.</para>

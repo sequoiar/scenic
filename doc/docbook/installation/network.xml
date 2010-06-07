@@ -104,11 +104,22 @@
     <para>On one of the computers, open a terminal session
     (Applications/Accessories/Terminal), start an iperf server with
     the UDP option.</para>
-    <programlisting>iperf -s &#160;-u -i 10</programlisting>
+    <para>
+    <userinput>iperf -s -u -i 10</userinput>
+    </para>
     <para>On the other computer, open a terminal session and start
     an iperf client with the UDP option.</para>
-    <programlisting>iperf -c ''server ip address'' -u -b
-    1M</programlisting>
+    <para>
+    <userinput>iperf -c ''server ip address'' -u -b 1M</userinput>
+    <cmdsynopsis>
+   <command>iperf</command>
+       <group>
+      <arg>-s</arg>
+      <arg>-c</arg>
+      </group>
+
+    </cmdsynopsis>
+    </para>
     <para>The iperf report should be similar to this:</para>
     <programlisting>
     ------------------------------------------------------------
@@ -122,10 +133,14 @@
     datagrams [ &#160;3] Server Report: [ &#160;3] &#160;0.0-10.0
     sec &#160;1.19 MBytes &#160;1000 Kbits/sec &#160;0.004 ms
     &#160; &#160;0/ &#160;852 (0%)
-    ------------------------------------------------------ If the
+    ------------------------------------------------------
+    </programlisting>
+    <para>
+    If the
     server reports 0% packet loss, then test your network with
     respectively 15M, 30M, 60M, 80M. If you detect packet loss,
-    please refer to our troubleshooting section.</programlisting>
+    please refer to our troubleshooting section.
+    </para>
   </sect1>
   <sect1 id="bidirectional-network-test">
     <title>Bidirectional Local Network Testing</title>
@@ -135,17 +150,21 @@
     <para>NOTE: For now we do not recommend the -d option in iperf
     as it generates unwanted warnings and errors.</para>
     <para>Single-sided bidirectional test:</para>
-    <programlisting>iperf -c ''server ip address'' -b 30M -r
-    -u</programlisting>
+    <para>
+    <userinput>iperf -c ''server ip address'' -b 30M -r -u</userinput>
+    </para>
     <para>The -r option does a bidirectional test individually, you
     should get 0% packet loss on both sides.</para>
     <para>Simultaneous client/server test (on computers A and
     B):</para>
-    <programlisting>iperf &#160;-s &#160;-u</programlisting>
+    <para>
+    <userinput>iperf &#160;-s &#160;-u</userinput>
+    </para>
     <para>On computers A and B, started at the same time, you
     should get 0% packet loss on both sides.</para>
-    <programlisting>iperf &#160;-c ''server ip address'' -b 30M
-    -u</programlisting>
+    <para>
+    <userinput>iperf &#160;-c ''server ip address'' -b 30M -u</userinput>
+  </para>
   </sect1>
   <sect1 id="remote-network-test">
     <title>Remote Network Testing</title>
@@ -153,7 +172,10 @@
     remote computer. This will show you the route taken by the
     packets across the network. You can use this to determine if
     the packets are traveling on the proper ISP.</para>
-    <programlisting>traceroute "Remote IP Address"</programlisting>
+    <cmdsynopsis>
+    <command>traceroute</command>
+      <arg rep='repeat' choice='plain'><replaceable>host</replaceable></arg>
+    </cmdsynopsis>
     <para>Now, repeat the same steps as the Local Network Test but
     this time between your local network and the remote
     network.</para>
@@ -173,23 +195,23 @@
       <para>Ping will be used here to test the latency over the
       network.</para>
       <para>Open a terminal, by choosing the "Terminal" item from
-      the Application:Accessories menu. Next, type "ping
-      www.google.com" and press enter. The text content of the
+      the Application:Accessories menu. Next, <userinput>ping -c 4 www.google.com</userinput>
+      and press enter. The text content of the
       terminal should look like this:</para>
-      <programlisting>ping www.google.com PING www.l.google.com
-      (74.125.93.104) 56(84) bytes of data. 64 bytes from
-      qw-in-f104.google.com (74.125.93.104): icmp_seq=1 ttl=23
-      time=36.2 ms 64 bytes from qw-in-f104.google.com
-      (74.125.93.104): icmp_seq=2 ttl=239 time=37.3 ms 64 bytes
-      from qw-in-f104.google.com (74.125.93.104): icmp_seq=3
-      ttl=239 time=36.4 ms 64 bytes from qw-in-f104.google.com
-      (74.125.93.104): icmp_seq=4 ttl=239 time=36.1 ms ---
-      www.l.google.com ping statistics --- 4 packets transmitted, 4
-      received, 0% packet loss, time 3003ms rtt min/avg/max/mdev =
-      36.174/36.557/37.322/0.494 ms</programlisting>
+      <para>
+      <programlisting>
+PING www.l.google.com (74.125.93.104) 56(84) bytes of data.
+64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=1 ttl=23 time=36.2 ms
+64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=2 ttl=239 time=37.3 ms
+64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=3 ttl=239 time=36.4 ms
+64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=4 ttl=239 time=36.1 ms
+--- www.l.google.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3003ms
+rtt min/avg/max/mdev = 36.174/36.557/37.322/0.494 ms
+</programlisting>
+      </para>
       <para>Here we can observe that the average round trip time is
       36.557 millisecond with 0% of packet loss.</para>
-      <para>Use ctrl-c to quit.</para>
     </sect2>
   </sect1>
 </chapter>
