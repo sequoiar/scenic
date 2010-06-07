@@ -48,6 +48,7 @@ Bug fixes in scenic:
     #562 The drawing area should always be black
     #563 Tarball should not contain generated Python and docbook files
     #564 Tarball should not contain src/gst/caps.cpp
+    #572 Scenic thinks that jackd is running but it's not
 
 HISTORY
 
