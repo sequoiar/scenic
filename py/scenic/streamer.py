@@ -22,7 +22,7 @@
 """
 Manages local streamer processes.
 """
-
+from textwrap import wrap
 from scenic import process
 from scenic import sig
 from scenic import dialogs
@@ -563,9 +563,16 @@ class StreamerManager(object):
         log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["receive"].append(line)
-        if "WARNING" in line:
+        elif "WARNING" in line:
             log.warning(line)
             self.warnings["receive"].append(line)
+        else:
+            # TODO: maybe this is too much verbose
+            lines = wrap(line, 100)
+            if len(lines) > 2:
+                lines = lines[0:2]
+                lines.append("...")
+            self.warnings["receive"].extend(lines)
     
     def on_sender_stdout_line(self, process_manager, line):
         """
@@ -620,9 +627,16 @@ class StreamerManager(object):
         log.error("%9s stderr: %s" % (process_manager.identifier, line))
         if "CRITICAL" in line or "ERROR" in line:
             self.error_messages["send"].append(line)
-        if "WARNING" in line:
+        elif "WARNING" in line:
             log.warning(line)
-            self.warnings["receive"].append(line)
+            self.warnings["send"].append(line)
+        else:
+            #TODO: maybe this is too much verbose
+            lines = wrap(line, 100)
+            if len(lines) > 2:
+                lines = lines[0:2]
+                lines.append("...")
+            self.warnings["send"].extend(lines)
 
     def is_busy(self):
         """
