@@ -63,7 +63,11 @@ def _parse_jack_info(text):
     for line in text.splitlines():
         line = line.strip()
         if line.startswith("JACK server not running"):
+            ret = [] # clear the list in case some extra lines 
+            # of text are found at the beginning of jack-info's output
             break
+        elif line.startswith("Cannot lock down memory area"):
+            log.warning("jack-info cannot allocation memory")
         else:
             if len(ret) == 0:
                 ret.append({})
