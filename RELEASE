@@ -49,6 +49,7 @@ Bug fixes in scenic:
     #563 Tarball should not contain generated Python and docbook files
     #564 Tarball should not contain src/gst/caps.cpp
     #572 Scenic thinks that jackd is running but it's not
+    #571 Preview always uses audio on sid
 
 HISTORY
 
