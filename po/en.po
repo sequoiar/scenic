@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
 "Report-Msgid-Bugs-To: http://svn.sat.qc.ca/trac/scenic/wiki/BugReport\n"
-"POT-Creation-Date: 2010-06-07 11:26-0400\n"
+"POT-Creation-Date: 2010-06-07 17:31-0400\n"
 "PO-Revision-Date: 2010-05-13 18:09-0400\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: English\n"
@@ -560,23 +560,23 @@ msgstr ""
 msgid "Update your jackaudiosrc Gstreamer element."
 msgstr "Update your jackaudiosrc Gstreamer element."
 
-#: py/scenic/streamer.py:687
+#: py/scenic/streamer.py:701
 msgid "Errors from local sender:"
 msgstr "Errors from local sender:"
 
-#: py/scenic/streamer.py:691
+#: py/scenic/streamer.py:705
 msgid "Warnings from local sender:"
 msgstr "Warnings from local sender:"
 
-#: py/scenic/streamer.py:697
+#: py/scenic/streamer.py:711
 msgid "Errors from local receiver:"
 msgstr "Errors from local receiver:"
 
-#: py/scenic/streamer.py:701
+#: py/scenic/streamer.py:715
 msgid "Warnings from local receiver:"
 msgstr "Warnings from local receiver:"
 
-#: py/scenic/streamer.py:705
+#: py/scenic/streamer.py:719
 msgid "Some errors occured during the audio/video streaming session."
 msgstr "Some errors occured during the audio/video streaming session."
 
