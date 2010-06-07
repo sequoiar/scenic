@@ -39,7 +39,7 @@ New features in milhouse:
     (none)
 
 New features in scenic:
-    (none)
+    * Increased verbosity (stderr) in case of error
 
 Bug fixes in milhouse: 
     (none)
@@ -50,6 +50,7 @@ Bug fixes in scenic:
     #564 Tarball should not contain src/gst/caps.cpp
     #572 Scenic thinks that jackd is running but it's not
     #571 Preview always uses audio on sid
+    #512 Disable jackd latency estimation if the backend is not supported
 
 HISTORY
 
