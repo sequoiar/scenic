@@ -2,24 +2,26 @@
   <title>Appendix: Edirol FA-101 and FA-66 settings</title>
 <para>Here is the settings we recommend to use for the Edirol FA-101</para>
 <para> For the front side of the sound card:</para>
+<para>
 <mediaobject>
     <imageobject>
         <imagedata fileref="fig/edirol_fa101_settings_front.png" format="PNG" />
     </imageobject>
 </mediaobject>
+</para>
 
 
 <para> For the rear side of the sound card:</para>
 
+<para>
 <mediaobject>
     <imageobject>
         <imagedata fileref="fig/edirol_fa101_settings_rear.png" format="PNG" />
     </imageobject>
 </mediaobject>
+</para>
 
 <para>Here is the link of the Roland Edirol Pages:
-</para>
-<para>
 <ulink url="http://www.roland.com/products/en/FA-101/">
     <citetitle>Roland Edirol FA-101 page</citetitle>
 </ulink> 

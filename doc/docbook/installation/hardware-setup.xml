@@ -8,6 +8,7 @@
     <title>Generic connection sheme</title>
     <para>The diagram below illustrate a generic &app;
     connection sheme:</para>
+<para>
     <mediaobject>
       <imageobject>
         <imagedata fileref="fig/hardware_setup_01.jpg"
@@ -17,6 +18,7 @@
         <phrase>Generic Scheme</phrase>
       </textobject>
     </mediaobject>
+</para>
     <para>Audio Input:</para>
     <itemizedlist>
       <listitem>
@@ -67,6 +69,7 @@
     location setup is configured to send its audio signal over the
     Internet to be output in the other location. For this you need
     identical audio setup in both locations.</para>
+<para>
     <mediaobject>
       <imageobject>
         <imagedata fileref="fig/hardware_setup_02.jpg"
@@ -76,6 +79,7 @@
         <phrase>Bidirectional Setup</phrase>
       </textobject>
     </mediaobject>
+</para>
     <para />
     <informaltable frame="all">
       <tgroup cols="2">

@@ -99,8 +99,12 @@
     <para>Before performing the scenic installation, please perform
     an update of your linux distribution:
     </para>
-    <programlisting>sudo aptitude update</programlisting>
-    <programlisting>sudo aptitude upgrade</programlisting>
+    <para>
+    <userinput>sudo aptitude update</userinput>
+    </para>
+    <para>
+    <userinput>sudo aptitude upgrade</userinput>
+    </para>
     <para>&app; need various package to be installed. You can have
     a detailed view of the required library and dependency on our 
     <ulink url="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
@@ -111,16 +115,9 @@
       <emphasis role="strong">For Ubuntu 8.04 LTS (Hardy) install
       the following package:</emphasis>
     </para>
-    <table>
-      <title>aptitude install command for Ubuntu Hardy</title>
-      <tgroup cols="1">
-        <tbody>
-          <row>
-            <entry>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev liblame-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect gnome-themes-extra </entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
+    <para>
+<userinput>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev liblame-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect gnome-themes-extra</userinput>
+    </para>
     <para>You must download the debian sid iperf 
     <ulink url="http://packages.debian.org/sid/iperf">
     version </ulink> 2.0.4-3 or 2.0.4-4 on your desktop and install
@@ -132,22 +129,14 @@
       <emphasis role="strong">For Ubuntu 9.10 (Karmic) install the
       following package:</emphasis>
     </para>
-    <table>
-      <title>aptitude install command for Ubuntu Karmic</title>
-      <tgroup cols="1">
-        <tbody>
-          <row>
-            <entry>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect iperf libmp3lame-dev gnome-themes-extras libboost-dev libboost-thread-dev libboost-system-dev libboost-program-options-dev libasio-dev libboost-iostreams-dev libboost-filesystem-dev</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
+    <para>
+            <userinput>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect iperf libmp3lame-dev gnome-themes-extras libboost-dev libboost-thread-dev libboost-system-dev libboost-program-options-dev libasio-dev libboost-iostreams-dev libboost-filesystem-dev</userinput>
+    </para>
     <para>
       <emphasis role="strong">For Ubuntu 10.04 (Lucid) install our scenic packages</emphasis>
     </para>
     <para>note that to use more than 8 audio channel in raw, you need to install our scenic-dependency package, wich will compile gstreamer</para>
-    <table>
-      <title>Scenic installation through package manager</title>
+    <informaltable>
       <tgroup cols="1">
         <tbody>
           <row>
@@ -155,10 +144,9 @@
           </row>
         </tbody>
       </tgroup>
-    </table>
+    </informaltable>
     
-    <table>
-      <title>Scenic installation through package manager</title>
+    <informaltable>
       <tgroup cols="1">
         <tbody>
           <row>
@@ -166,21 +154,14 @@
           </row>
         </tbody>
       </tgroup>
-    </table>
+    </informaltable>
     <para>
       <emphasis role="strong">For Debian 5.0.4 (lenny) install the
       following package:</emphasis>
     </para>
-    <table>
-      <title>aptitude install command for Debian lenny</title>
-      <tgroup cols="1">
-        <tbody>
-          <row>
-            <entry>sudo aptitude -R install qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev bison flex vorbis-tools ffmpeg libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev libxml2-dev python-twisted doxygen python-setuptools help2man python-simplejson iperf gnome-themes-extras libboost1.35-dev jackd libboost-program-options1.35-dev libboost-thread1.35-dev libboost-system1.35-dev libboost-iostreams1.35-dev libboost-filesystem1.35-dev</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
+    <para>
+            <userinput>sudo aptitude -R install qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev bison flex vorbis-tools ffmpeg libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev libxml2-dev python-twisted doxygen python-setuptools help2man python-simplejson iperf gnome-themes-extras libboost1.35-dev jackd libboost-program-options1.35-dev libboost-thread1.35-dev libboost-system1.35-dev libboost-iostreams1.35-dev libboost-filesystem1.35-dev</userinput>
+    </para>
     <para>
       <emphasis role="strong">Now configure your realtime
       kernel</emphasis>
@@ -188,8 +169,10 @@
     <para>When your rt kernel is installed, execute the following
     commands (to get audio server to run in real time):
     </para>
-    <programlisting>sudo su -c 'echo @audio - rtprio 20 &gt;&gt; /etc/security/limits.conf'</programlisting>
-    <programlisting>sudo su -c 'echo @audio - memlock 250000 &gt;&gt; /etc/security/limits.conf'</programlisting>
+    <para>
+        <userinput>sudo su -c 'echo @audio - rtprio 20 &gt;&gt; /etc/security/limits.conf'</userinput>
+        <userinput>sudo su -c 'echo @audio - memlock 250000 &gt;&gt; /etc/security/limits.conf'</userinput>
+    </para>
     <para>
       <emphasis role="strong">Then finally, logout and login
       again.</emphasis>
@@ -216,29 +199,39 @@
        http://scenic.sat.qc.ca/download </ulink>
     </para>
     <para>Extract the tarball and cd into it:</para>
-    <programlisting>tar xzj scenic-0.4.x.tar.gz</programlisting>
-    <programlisting>cd scenic-0.4.x</programlisting>
+    <para>
+    <userinput>tar xzj scenic-0.4.x.tar.gz</userinput>
+    <userinput>cd scenic-0.4.x</userinput>
+    </para>
     <para>For Debian 5.0.4 (lenny), you need to install liblame.
     Please skip this step for other distributions.
     </para>
-    <programlisting>./utils/install_lame.sh</programlisting>
+    <para>
+    <userinput>./utils/install_lame.sh</userinput>
+    </para>
     <para>To get all gstreamer tarballs and build all the gstreamer
     modules, from the current directory, run:
     </para>
-    <programlisting>./utils/install_gstreamer.sh</programlisting>
+    <para>
+    <userinput>./utils/install_gstreamer.sh</userinput>
+    </para>
     <para>This script runs each module's autogen.sh script,
-    followed by make and sudo make install.
+    followed by <userinput>make and sudo make install</userinput>.
     </para>
     <para>Now type ldconfig command:</para>
     <para>For Ubuntu 8.04 LTS (Hardy) you need to install boost
     version 1.35. Please skip this step for other
     distributions.
     </para>
-    <programlisting>./utils/boost1_35_for_hardy.sh</programlisting>
+    <para>
+    <userinput>./utils/boost1_35_for_hardy.sh</userinput>
+    </para>
     <para>
       <emphasis role="strong">Next, compile scenic:</emphasis>
     </para>
-    <programlisting>cd scenic</programlisting>
-    <programlisting>./configure &amp;&amp; make &amp;&amp; sudo make install</programlisting>
+    <para>
+    <userinput>cd scenic</userinput>
+    <userinput>./configure &amp;&amp; make &amp;&amp; sudo make install</userinput>
+    </para>
   </sect1>
 </chapter>

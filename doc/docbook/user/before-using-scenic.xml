@@ -47,11 +47,13 @@
   <sect2 id="standalone-setup">
     <title>Standalone Setup</title>
     <para>Here is an overview of a standalone setup.</para>
+<para>
     <mediaobject>
       <imageobject>
         <imagedata fileref="fig/hardware_setup_01.jpg" format="JPG" />
       </imageobject>
     </mediaobject>
+</para>
   </sect2>
   <sect2 id="point-to-point">
     <title>Point to point setup</title>
@@ -61,11 +63,13 @@
   </sect2>
   <sect2 id="unidirectional-setup">
     <title>Unidirectional setup</title>
+<para>
     <mediaobject>
       <imageobject>
         <imagedata fileref="fig/unidirectional_setup.png" />
       </imageobject>
     </mediaobject>
+</para>
   </sect2>
   <sect2 id="bidirectional-setup">
     <title>Bidirectional setup</title>
@@ -74,11 +78,13 @@
     video transmission. The performance in Room 1 is captured
     through cameras and microphones and sent to be broadcast in
     Room 2 and vice versa.</para>
+<para>
     <mediaobject>
       <imageobject>
       <imagedata fileref="fig/bidirectional_setup.png" />
       </imageobject>
     </mediaobject>
+</para>
   </sect2>
   </sect1>
   <sect1 id="connecting-devices">

@@ -111,6 +111,7 @@
     an iperf client with the UDP option.</para>
     <para>
     <userinput>iperf -c ''server ip address'' -u -b 1M</userinput>
+<!--
     <cmdsynopsis>
    <command>iperf</command>
        <group>
@@ -119,22 +120,22 @@
       </group>
 
     </cmdsynopsis>
+-->
     </para>
     <para>The iperf report should be similar to this:</para>
-    <programlisting>
-    ------------------------------------------------------------
-    Client connecting to 10.10.10.183, UDP port 5001 Sending 1470
-    byte datagrams UDP buffer size: &#160; 108 KByte (default)
-    ------------------------------------------------------------ [
-    &#160;3] local 10.10.10.162 port 42451 connected with
-    10.10.10.183 port 5000 [ ID] Interval &#160; &#160; &#160;
-    Transfer &#160; &#160; Bandwidth [ &#160;3] &#160;0.0-10.0 sec
-    &#160;1.19 MBytes &#160;1000 Kbits/sec [ &#160;3] Sent 852
-    datagrams [ &#160;3] Server Report: [ &#160;3] &#160;0.0-10.0
-    sec &#160;1.19 MBytes &#160;1000 Kbits/sec &#160;0.004 ms
-    &#160; &#160;0/ &#160;852 (0%)
-    ------------------------------------------------------
-    </programlisting>
+    <screen>
+------------------------------------------------------------
+Client connecting to 10.10.10.183, UDP port 5001 Sending 1470
+byte datagrams UDP buffer size:   108 KByte (default)
+------------------------------------------------------------
+[ 3] local 10.10.10.162 port 42451 connected with 10.10.10.183 port 5000
+[ID] Interval       Transfer     Bandwidth
+[ 3]  0.0-10.0 sec  1.19 MBytes  1000 Kbits/sec
+[ 3] Sent 852 datagrams
+[ 3] Server Report:
+[ 3]  0.0-10.0 sec  1.19 MBytes  1000 Kbits/sec  0.004 ms    0/  852 (0%)
+------------------------------------------------------
+</screen>
     <para>
     If the
     server reports 0% packet loss, then test your network with
@@ -199,7 +200,7 @@
       and press enter. The text content of the
       terminal should look like this:</para>
       <para>
-      <programlisting>
+      <screen>
 PING www.l.google.com (74.125.93.104) 56(84) bytes of data.
 64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=1 ttl=23 time=36.2 ms
 64 bytes from qw-in-f104.google.com (74.125.93.104): icmp_seq=2 ttl=239 time=37.3 ms
@@ -208,7 +209,7 @@ PING www.l.google.com (74.125.93.104) 56(84) bytes of data.
 --- www.l.google.com ping statistics ---
 4 packets transmitted, 4 received, 0% packet loss, time 3003ms
 rtt min/avg/max/mdev = 36.174/36.557/37.322/0.494 ms
-</programlisting>
+</screen>
       </para>
       <para>Here we can observe that the average round trip time is
       36.557 millisecond with 0% of packet loss.</para>

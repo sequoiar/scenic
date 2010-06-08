@@ -201,7 +201,7 @@ milhouse --receiver --address local_ip_address --videosink xvimagesink --videoco
       </para>
     </sect1>
     <sect1 id="milhouse-senders">
-      <title>launch the senders</title>
+      <title>Launch the senders</title>
       <para>the next step is to launch the milhouse sender
       processes. of course, that should be on a different
       computer.</para>

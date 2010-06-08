@@ -77,7 +77,7 @@
             <para>Now install nvidia-setting</para>
           </listitem>
         </itemizedlist>
-        <para><programlisting>sudo aptitude install nvidia-settings</programlisting></para>
+        <para><userinput>sudo aptitude install nvidia-settings</userinput></para>
         <itemizedlist>
           <listitem>
             <para>Now open nvidia-settings situated in
@@ -102,24 +102,28 @@
             ex: 1024x768</para>
           </listitem>
         </itemizedlist>
+        <para>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-1.1.png"
             format="PNG" />
           </imageobject>
         </mediaobject>
+        </para>
         <itemizedlist>
           <listitem>
             <para>Then on the X-Screen Tab, set the position to
             absolute +0+0</para>
           </listitem>
         </itemizedlist>
+        <para>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-1.2.png"
             format="PNG" />
           </imageobject>
         </mediaobject>
+        </para>
         </sect1>
         <sect1 id="configuring-second-out">
         <title>Configuring your second video output</title>
@@ -131,24 +135,28 @@
             ex: 800x600</para>
           </listitem>
         </itemizedlist>
+        <para>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-2.1.png"
             format="PNG" />
           </imageobject>
         </mediaobject>
+        </para>
         <itemizedlist>
           <listitem>
             <para>Then on the X-Screen Tab for the second output
             (TV, S-video or VGA)</para>
           </listitem>
         </itemizedlist>
+        <para>
         <mediaobject>
           <imageobject>
             <imagedata fileref="fig/nvidia_settings-2.2.png"
             format="PNG" />
           </imageobject>
         </mediaobject>
+        </para>
         <itemizedlist>
           <listitem>
             <para>Now you can click apply, a pop up window will ask
@@ -167,10 +175,11 @@
       the remote machine on the wanted monitor or TV.</para>
       <para>The environment variable DISPLAY tells all X clients
       where to display their windows.</para>
-      <para>Ex: export DISPLAY=:0.0 will display the video on your
+      <para>Ex: <userinput>export DISPLAY=:0.0</userinput> will display the video on your
       local default screen. export DISPLAY=:0.1 will display the
       video on your second screen.</para>
-      <programlisting>export DISPLAY=:0.0</programlisting>
-      <para />
+      <para>
+      <userinput>export DISPLAY=:0.0</userinput>
+      </para>
       </sect1>
 </appendix>

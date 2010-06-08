@@ -202,11 +202,13 @@
       <para>Now start the jackd sound server using qjackctl
       situated in Applications/Sound &amp; Video/Jack
       Control</para>
+<para>
       <mediaobject>
         <imageobject>
           <imagedata fileref="fig/qjackctl.png" format="PNG" />
         </imageobject>
       </mediaobject>
+</para>
       <para>Then, click on setup button.</para>
       <para>Here is an examples of qjackctl realtime setup
       configuration:</para>
@@ -430,14 +432,14 @@
       <para>To select the appropriate soundcard, first verify the
       name of the sound card to use with aplay</para>
       <para>Here is an examples of <userinput>aplay -l</userinput> output:</para>
-      <programlisting>
+      <screen>
 card 0: Intel [HDA Intel], device 0: ALC889A Analog [ALC889A Analog]
   Subdevices: 1/1
   Subdevice #0: subdevice #0
 card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
   Subdevices: 1/1
   Subdevice #0: subdevice #0
-</programlisting>
+</screen>
       <para>Copy the name of the sound card (eg. "HDA Intel") and paste it in your
       .asoundrc file situated in your $HOME directory. Ex:
       Here i want to use the M2496 soundcard.</para>
@@ -446,14 +448,14 @@ card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
       <userinput>gedit .asoundrc</userinput>
       </para>
       <para>.asoundrc file with m2496 name added</para>
-      <programlisting>pcm.m2496 {
+      <screen>pcm.m2496 {
    type hw;
    card M2496;
 }
 ctl.m2496 { 
    type hw;
    card M2496;
-}</programlisting>
+}</screen>
       <para>Now you just have to add the name of the soundcard in
       the qjackctl interface field . For example, the m2496:</para>
       <para>
