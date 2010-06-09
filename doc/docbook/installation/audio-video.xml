@@ -1,10 +1,10 @@
-<chapter id="av-configuration">
+<chapter id="installation.av-configuration">
   <title>System Audio and Video Configuration</title>
   <para>First verify that you have all required dependencies at our
   
   <link linkend='software-installation'>Software
   Installation </link>page</para>
-  <sect1 id="av-transmission">
+  <sect1 id="installation.av-transmission">
     <title>System A/V Device Acces</title>
     <para>Then add your username to the different groups:</para>
     <para>Add your user to the video group</para>
@@ -23,12 +23,12 @@
     <para>To be in effect, you have to log out, then log in.</para>
   </sect1>
 
-  <sect1 id="video-settings">
+  <sect1 id="installation.video-settings">
     <title>System Video Settings</title>
     <para>Here we will configure all the settings related to the
     video input and output</para>
 
-    <sect2 id="video-output">
+    <sect2 id="installation.video-output">
 
       <title>System Video Output</title>
      <para> Video output usally mean using a graphic card</para> 
@@ -43,7 +43,7 @@
     </para> 
    </sect2>
 
-    <sect2 id="video-input">
+    <sect2 id="installation.video-input">
     <title>System Video Input</title>
     <para>&app; can capture video from a video capture card through
     v4l2, from IIDC camera or DV camera (also called iLink). DV
@@ -93,7 +93,7 @@
     <para>You can test the DV camera with:</para>
     <para><userinput>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</userinput></para>
     </sect2>
-    <sect2 id="video-test">
+    <sect2 id="installation.video-test">
       <title>Video Test</title>
       <para>In &app;, you can easily preview video4linux2 video
       devices in the "Video" tab. Other input drivers cannot be
@@ -165,13 +165,13 @@
       <para />
     </sect2>
   </sect1>
-  <sect1 id="audio-settings">
+  <sect1 id="installation.audio-settings">
     <title>System Audio Settings</title>
     <para>First verify that you have an appropriate sound card on
     our 
     <link linkend='hardware-requirements'>Hardware
     Requirements </link>.</para>
-    <sect2 id="firewire-sound-card">
+    <sect2 id="installation.firewire-sound-card">
       <title>Firewire sound card</title>
       <para>Verify that your soundcard is detected For firewire
       soundcard:</para>
@@ -186,7 +186,7 @@
       that is not the case, then the system administrator must add
       the "user" to the "disk" group (as shown above)</para>
     </sect2>
-    <sect2 id="pci-sound-card">
+    <sect2 id="installation.pci-sound-card">
       <title>For PCI soundcard</title>
       <para>For pci soundcard with alsa driver, verify that your
       soundcard is detected:</para>
@@ -195,9 +195,9 @@
     </para>
     </sect2>
   </sect1>
-  <sect1 id="sound-server">
+  <sect1 id="installation.sound-server">
     <title>System Sound Server Configuration</title>
-    <sect2 id="jackd-configuration">
+    <sect2 id="installation.jackd-configuration">
       <title>Configuration of jackd</title>
       <para>Now start the jackd sound server using qjackctl
       situated in Applications/Sound &amp; Video/Jack
@@ -568,7 +568,7 @@ ctl.m2496 {
       </itemizedlist>
     </sect2>
   </sect1>
-  <sect1 id="sound-check">
+  <sect1 id="installation.sound-check">
     <title>System Sound check</title>
     <para>Then you can start an audio test with:</para>
     <para>

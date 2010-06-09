@@ -2,7 +2,7 @@
 <!-- ============= Introduction ============================== -->
 <!-- Use the Introduction section to give a brief overview of what
      the application is and what it does. -->
-<chapter id="introduction">
+<chapter id="installation.introduction">
   <title>Introduction</title>
   <para>
   &app; is an on stage telepresence system that allows for

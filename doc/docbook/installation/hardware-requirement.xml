@@ -1,4 +1,4 @@
-<chapter id="hardware-requirements">
+<chapter id="installation.hardware-requirements">
   <title>Hardware Requirements</title>
   <para>The use of &app; require specific hardware.
      Telepresence system oriented for realtime performance have to met
@@ -8,7 +8,7 @@
      use in a telepresence system. For any material that is not
      proposed in our list, please contact us.
   </para>
-  <sect1 id="good-scenic-experience">
+  <sect1 id="installation.good-scenic-experience">
    <title>For a good &app; experience</title>  
       <para>You need to take the time to choose your computer and related devices. Buying a computer for linux, and specifically for audio-video performance requires time and knowledge. Computer parts and devices are constantly changing. Please do not rush your self to quickly buy the fastest and big high end computer sold by your favorite next corner computer store. Chances are you gone have problems. Unstead, follow every steps of our installation manual. It will guide you on everything you need to know to make good choices.
       </para> 
@@ -37,7 +37,7 @@
       </orderedlist>
  
   </sect1>
-  <sect1 id="computer-specifications">
+  <sect1 id="installation.computer-specifications">
     <title>Computer Specifications</title>
       <para>We strongly recommend to verify that your computer hardware is compatible with linux.
          <ulink url="http://www.linuxhardware.org">
@@ -108,9 +108,9 @@
       </tgroup>
     </table>
   </sect1>
-  <sect1 id="video-hardware-specifications">
+  <sect1 id="installation.video-hardware-specifications">
     <title>Video Hardware Specifications</title>
-    <sect2 id="graphic-card">
+    <sect2 id="installation.graphic-card">
       <title>Graphic Card</title>
       <para>The graphic card will manage your video output. The
       choice of your graphic card will depend on how you want to
@@ -226,7 +226,7 @@
         </tgroup>
       </table>
     </sect2>
-    <sect2 id="video-capture">
+    <sect2 id="installation.video-capture">
       <title>Video Capture</title>
       <para>The video capture is usally a card or a device
       connected on one end to your camera and on the other end, to
@@ -344,7 +344,7 @@
         </tgroup>
       </table>
     </sect2>
-    <sect2 id="camera">
+    <sect2 id="installation.camera">
       <title>Camera and Camcorder</title>
       <table>
         <title>List of tested camera</title>
@@ -383,7 +383,7 @@
       </table>
     </sect2>
   </sect1>
-  <sect1 id="audio-hardware-specification">
+  <sect1 id="installation.audio-hardware-specification">
     <title>Audio Hardware Specifications</title>
     <table>
       <title>High quality audio card</title>
@@ -492,7 +492,7 @@
       </listitem>
     </itemizedlist>
   </sect1>
-  <sect1 id="network-specifications">
+  <sect1 id="installation.network-specifications">
     <title>Network Specifications</title>
     <itemizedlist>
       <listitem>

@@ -1,4 +1,4 @@
-<chapter id="introduction">
+<chapter id="user.introduction">
   <title>Introduction</title>
   <para>&app; is an on stage telepresence system that allows for
   real time transmission of audio, video and control data over any
@@ -15,7 +15,7 @@
   digital systems between cultural and educational venues and to
   promote research and creation through new communication
   technologies.</para>
-  <sect1 id="functional-overview">
+  <sect1 id="user.functional-overview">
     <title>Functional Overview</title>
     <para>This section gives a quick overview of the various
     functional components of Scenic.</para>
@@ -28,7 +28,7 @@
     and to choose the video input and the settings for the
     streaming sessions.</para>
   </sect1>
-  <sect1 id="art-direction">
+  <sect1 id="user.art-direction">
     <title>Thinking About the Art Direction</title>
     <para>When preparing a show that includes live telepresence,
     there are thinkgs to consider that can help a lot to improve
@@ -42,9 +42,9 @@
     are steamed live from an other city. This is similar to the
     cabaret entertainment form.</para>
   </sect1>
-  <sect1 id="using-scenic">
+  <sect1 id="user.using-scenic">
     <title>Telepresence and Real Wold's Issues</title>
-    <sect2 id="performance-issues">
+    <sect2 id="user.performance-issues">
       <title>Performance Issues</title>
       <para>When planning a show, it is important to consider the
       limitations that are inherent to the computers and hardware.
@@ -54,7 +54,7 @@
       close to no latency to the system. This is valid for both
       digital and analog video signals.</para>
     </sect2>
-    <sect2 id="audio-feedback">
+    <sect2 id="user.audio-feedback">
       <title>Fighting Against Audio Feedback</title>
       <para>When sending and receiving audio signals in a context
       of telepresence, serious audio feedback can occur. The
@@ -75,7 +75,7 @@
       processing chain. Of course, this does not replace the
       hardware precautions listed above.</para>
     </sect2>
-    <sect2 id="projections-and-lighting">
+    <sect2 id="user.projections-and-lighting">
       <title>Video Projections and Lighting</title>
       <para>A few common issues are commonly encountered in shows
       involving both video projections and lighting. Of course,
@@ -107,7 +107,7 @@
       neat.</para>
     </sect2>
   </sect1>
-  <sect1 id="quick-overview">
+  <sect1 id="user.quick-overview">
     <title>Quick How-To</title>
     <para>In a nut shell, once Scenic is installed and the computer
     is properly connected to the Internet and accessible from

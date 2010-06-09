@@ -1,4 +1,4 @@
-<chapter id="software-installation">
+<chapter id="installation.software-installation">
   <title>Software Installation</title>
   <para>A standard &app; installation always requires at least two
   computers with identical linux operating systems, the required
@@ -12,7 +12,7 @@
   <link linkend='network-test'>required network
   specification </link>
   </para>
-  <sect1 id="os-installation">
+  <sect1 id="installation.os-installation">
     <title>Operating System Installation</title>
     <para>&app; operates on the Linux based desktop operating
     system and is tested on the following Linux
@@ -94,7 +94,7 @@
     Debian </ulink>page.
     </para>
   </sect1>
-  <sect1 id="lib-packages-installation">
+  <sect1 id="installation.lib-packages-installation">
     <title>Libraries and Development Packages Installation</title>
     <para>Before performing the scenic installation, please perform
     an update of your linux distribution:
@@ -178,7 +178,7 @@
       again.</emphasis>
     </para>
   </sect1>
-  <sect1 id="midi-component-installationi">
+  <sect1 id="installation.midi-component-installationi">
     <title>Installing the midi component </title>
     <para>The midi component in &app; is available on the unstable
     branch (0.5). You can skip this if you install &app; 0.4.x and
@@ -192,7 +192,7 @@
     bindings that comes with portmidi.
     </para>
   </sect1>
-  <sect1 id="building-scenic">
+  <sect1 id="installation.building-scenic">
     <title>Building &app; </title>
     <para>To get the latest &app; version, go to 
        <ulink url="http://scenic.sat.qc.ca/download">

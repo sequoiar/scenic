@@ -1,9 +1,9 @@
-      <appendix id="nvidia-settings">
+      <appendix id="installation.nvidia-settings">
       <title>Appendix: Nvidia Settings</title>
         <para>How to install Nvidia drivers in Ubuntu</para>
         <para>Ubuntu doesn't include Nvidia drivers by
         default.</para>
-        <sect1 id="installing-nvidia-drivers">
+        <sect1 id="installation.installing-nvidia-drivers">
         <title>Installing NVidia drivers</title>
         <itemizedlist>
           <listitem>
@@ -46,7 +46,7 @@
         System/Administration/Nvidia X Server Settings </para> 
         </sect1>
 
-        <sect1 id="connecting-video-out">
+        <sect1 id="installation.connecting-video-out">
         <title>Physically connecting your video output</title>
         <para>First be sure to connect both output: The Monitor
         Output and the TV (VGA Or S-Video output) before starting
@@ -62,12 +62,12 @@
         s-video output from the graphic card to the s-video input
         of your capture card.</para>
         </sect1>
-        <sect1 id="starting-computer">
+        <sect1 id="installation.starting-computer">
         <title>Starting your computer</title>
         <para>When your both output are connected, you can start
         your computer.</para>
       </sect1>
-        <sect1 id="starting-nvidia-settings">
+        <sect1 id="installation.starting-nvidia-settings">
         <title>Starting nvidia-settings</title>
         <para>Install your graphic card driver. Go to
         System/Administration/Hardware Driver and enable the Nvidia
@@ -92,7 +92,7 @@
           </listitem>
         </itemizedlist>
         </sect1>
-        <sect1 id="configuring-monitor">
+        <sect1 id="installation.configuring-monitor">
         <title>Configuring your computer monitor</title>
         <itemizedlist>
           <listitem>
@@ -125,7 +125,7 @@
         </mediaobject>
         </para>
         </sect1>
-        <sect1 id="configuring-second-out">
+        <sect1 id="installation.configuring-second-out">
         <title>Configuring your second video output</title>
         <itemizedlist>
           <listitem>

@@ -1,8 +1,8 @@
-<chapter id="advanced-options">
+<chapter id="user.advanced-options">
   <title>Advanced options</title>
   <para>In this chapter, we will explain miscellaneous options and
   features that power users might want to use.</para>
-  <sect1 id="kiosk-mode">
+  <sect1 id="user.kiosk-mode">
     <title>Using &app; in kiosk mode</title>
     <para>Kiosk mode is useful when &app; is the only software that
     runs at startup. It contains a system tab with buttons for
@@ -12,7 +12,7 @@
     from a terminal. It is best used with the "--fullscreen"
     flag.</para>
   </sect1>
-  <sect1 id="debug-mode">
+  <sect1 id="user.debug-mode">
     <title>Activating the debug mode</title>
     <para>&app; supports a wide variety of devices and libraries.
     The tradeoff for this greater flexibility is a greater number
@@ -50,7 +50,7 @@
       <keycap>C</keycap>
     </keycombo>.</para>
   </sect1>
-  <sect1 id="command-line-tootls">
+  <sect1 id="user.command-line-tootls">
     <title>Command line tools</title>
     <para>Here are a few command-line tools that come with
     &app;.</para>
@@ -106,7 +106,7 @@
     <application>Milhouse</application>command-line
     streamer.</para>
   </sect1>
-  <sect1 id="using-milhouse">
+  <sect1 id="user.using-milhouse">
     <title>Using 
     <application>Milhouse</application></title>
     <para>Milhouse command line is a powerful tool with many
@@ -143,7 +143,7 @@
     give it the command-line option "--receiver" or
     "--sender".</para>
     </sect1>
-    <sect1 id="milhouse-send-receive">
+    <sect1 id="user.milhouse-send-receive">
       <title>using 
       <application>milhouse</application>as a sender or a
       receiver</title>
@@ -173,7 +173,7 @@
       <application>Milhouse</application>sender and receiver on two separate computer.</para> 
 
     </sect1>
-    <sect1 id="milhouse-receivers">
+    <sect1 id="user.milhouse-receivers">
       <title>Launch the receivers</title>
       <para>Here is a short explanation on how to start the
       milhouse receivers to receive audio and video streams.</para>
@@ -200,7 +200,7 @@ milhouse --receiver --address local_ip_address --videosink xvimagesink --videoco
       </userinput>
       </para>
     </sect1>
-    <sect1 id="milhouse-senders">
+    <sect1 id="user.milhouse-senders">
       <title>Launch the senders</title>
       <para>the next step is to launch the milhouse sender
       processes. of course, that should be on a different
@@ -231,7 +231,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
       <para>to stop milhouse type control-c in the used terminal or
       type control-q in the video window.</para>
     </sect1>
-  <sect1 id="milhouse-help">
+  <sect1 id="user.milhouse-help">
     <title>Milhouse Help</title>
     <para>Type milhouse --help to have informations on the
     different options available.</para>
@@ -624,7 +624,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
       </tgroup>
     </informaltable>
   </sect1>
-  <sect1 id="other-uses">
+  <sect1 id="user.other-uses">
     <title>Other uses</title>
     <para>The milhouse command can also be used to change some
     properties of a V4L2 video device, such as the resolution and

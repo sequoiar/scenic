@@ -1,7 +1,7 @@
-<chapter id="contact-settings">
+<chapter id="user.contact-settings">
 <title>The Address Book</title>
 <para>In this chapter, we will explain how to use the address book that is in Scenic. To invite a remote peer to stream with you, you must add its IP address in your address book. You can give it a name so that it is easy to know with who you are streaming. When this is in your address book, you can invite it.</para>
-<sect1 id="add-delete-contact">
+<sect1 id="user.add-delete-contact">
 <title>Adding and Deleting Contacts</title>
 <para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
    <orderedlist>
@@ -37,7 +37,7 @@
    </orderedlist>
    <para>On the contact window, you can see a summary of the current settings for this particular contact. </para>
 </sect1>
-<sect1 id="inviting-peer">
+<sect1 id="user.inviting-peer">
     <title>Inviting a remote peer to stream</title>
     <para>To invite a contact, simply click on its name in the address book and click on the "Invite" button.</para>
     <para>When one receives an invitation, a dialog appears, asking the user if he agrees to start a streaming session. If the user accepts, the streaming starts. This step can be skipped by enabling the "Auto accept" option for a contact, as described above.</para>
