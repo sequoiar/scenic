@@ -503,6 +503,6 @@
         etc...)</para>
       </listitem>
     </itemizedlist>
-    <para> Please refer to our <link linkend="network-requirements">Network Requirement Page</link></para>
+    <para> Please refer to our <link linkend="installation.network-requirements">Network Requirement Page</link></para>
   </sect1>
 </chapter>
