@@ -133,28 +133,14 @@
             <userinput>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect iperf libmp3lame-dev gnome-themes-extras libboost-dev libboost-thread-dev libboost-system-dev libboost-program-options-dev libasio-dev libboost-iostreams-dev libboost-filesystem-dev</userinput>
     </para>
     <para>
-      <emphasis role="strong">For Ubuntu 10.04 (Lucid) install our scenic packages</emphasis>
+      <emphasis role="strong">For Ubuntu 10.04 (Lucid) install our Scenic packages</emphasis>
     </para>
-    <para>note that to use more than 8 audio channel in raw, you need to install our scenic-dependency package, wich will compile gstreamer</para>
-    <informaltable>
-      <tgroup cols="1">
-        <tbody>
-          <row>
-            <entry>To install the scenic package:</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </informaltable>
-    
-    <informaltable>
-      <tgroup cols="1">
-        <tbody>
-          <row>
-            <entry>To install the scenic-dependency package</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </informaltable>
+    <para>Now install Scenic on Ubuntu 10.04, for this, download the package associated to your computer architecture at: <ulink url="http://ppa.launchpad.net/sat-metalab/metalab/ubuntu/pool/main/s/scenic/">Download Scenic Package</ulink>
+    </para>
+
+    <para>note that to use more than 8 audio channel in raw, you need to install our scenic-dependency package, wich will compile gstreamer
+    </para>
+
     <para>
       <emphasis role="strong">For Debian 5.0.4 (lenny) install the
       following package:</emphasis>
