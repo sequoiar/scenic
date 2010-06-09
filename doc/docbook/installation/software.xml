@@ -5,11 +5,11 @@
   libraries and development packages, and a build of the most
   recent release of the &app; software.</para>
   <para>The computers must meet these 
-     <link linkend='hardware-requirements'>minimum
+     <link linkend='installation.hardware-requirements'>minimum
      requirements </link>.
   </para>
   <para>Note that prior to using &app; you also need to meet the 
-  <link linkend='network-test'>required network
+  <link linkend='installation.network-test'>required network
   specification </link>
   </para>
   <sect1 id="installation.os-installation">

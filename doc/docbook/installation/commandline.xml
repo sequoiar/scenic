@@ -16,7 +16,7 @@
     and output and defining the audio quality. It usually runs as a
     background process.</para>
     <para>Follow our 
-    <link linkend='av-configuration'>Audio settings page </link>to
+    <link linkend='installation.av-configuration'>Audio settings page </link>to
     start the sound server.</para>
   </sect1>
   <sect1 id="installation.milhouse-receivers">
