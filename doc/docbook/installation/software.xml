@@ -169,10 +169,12 @@
     <para>When your rt kernel is installed, execute the following
     commands (to get audio server to run in real time):
     </para>
-    <para>
+        <para>
         <userinput>sudo su -c 'echo @audio - rtprio 20 &gt;&gt; /etc/security/limits.conf'</userinput>
+        </para>
+        <para>
         <userinput>sudo su -c 'echo @audio - memlock 250000 &gt;&gt; /etc/security/limits.conf'</userinput>
-    </para>
+        </para>
     <para>
       <emphasis role="strong">Then finally, logout and login
       again.</emphasis>
