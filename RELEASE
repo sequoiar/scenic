@@ -1,8 +1,15 @@
-Release notes for Scenic 0.5.12
+Release notes for Scenic 0.6
 
-This release contains bugfixes and some new features for preparing the 
-0.6 stable series. This is the third release candiate for the stable 
-version 0.6. It contains only minor packaging bug fixes.
+This release is the first of the stable 0.6 branch. This branch introduces
+many new features developed during 0.5 series. Those features include MIDI 
+streaming support and the hability to customize what each peer receives as 
+audio and video. 
+
+This release contains minor bugfixes and some minor new features since the 
+last 0.5.11 release candidate. Those are mostly related to using Scenic on 
+Debian GNU/Linux. The doc has also been improved a lot.
+
+This version should work with every version in the stable 0.6 series. 
 
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
@@ -51,11 +58,14 @@ Bug fixes in scenic:
     #572 Scenic thinks that jackd is running but it's not
     #571 Preview always uses audio on sid
     #512 Disable jackd latency estimation if the backend is not supported
+    #569 Do not install doxygen.css and footer.html
 
 HISTORY
 
-    * 2010-06-04: 0.5.12
-          * Third release candidate for the 0.6 stable branch.
+    * 2010-06-10: 0.6
+          * First stable release of the 0.6 stable branch.
+          * MIDI support officially supported
+          * Allows to fine tune what audio/video/MIDI each peer receives.
     * 2010-06-02: 0.5.11
           * Second release candidate for the 0.6 stable branch.
     * 2010-05-27: 0.5.10

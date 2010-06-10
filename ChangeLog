@@ -1,3 +1,208 @@
+2010-06-09 20:11  pchevry
+
+	* doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/commandline.xml,
+	  doc/docbook/installation/hardware-requirement.xml,
+	  doc/docbook/installation/nvidia-settings.xml,
+	  doc/docbook/installation/software.xml: Fixed various broken link
+	  in linkend tag
+
+2010-06-09 19:59  pchevry
+
+	* doc/docbook/installation/hardware-requirement.xml: Fixed a broken
+	  link to network specification
+
+2010-06-09 19:44  pchevry
+
+	* doc/docbook/installation/software.xml: Added basic package
+	  installation information of Scenic for 10.04
+
+2010-06-09 18:07  simonp
+
+	* doc/docbook/installation/software.xml: Fixed paragraphs for audio
+	  setup commands
+
+2010-06-09 13:07  simonp
+
+	* doc/docbook/installation/about.xml,
+	  doc/docbook/installation/ati-settings.xml,
+	  doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/commandline.xml,
+	  doc/docbook/installation/edirol-fa101-settings.xml,
+	  doc/docbook/installation/hardware-requirement.xml,
+	  doc/docbook/installation/hardware-setup.xml,
+	  doc/docbook/installation/introduction.xml,
+	  doc/docbook/installation/legal.xml,
+	  doc/docbook/installation/network.xml,
+	  doc/docbook/installation/nvidia-settings.xml,
+	  doc/docbook/installation/software.xml,
+	  doc/docbook/user/about.xml,
+	  doc/docbook/user/advanced-options.xml,
+	  doc/docbook/user/audio-levels.xml,
+	  doc/docbook/user/audio-settings.xml,
+	  doc/docbook/user/before-using-scenic.xml,
+	  doc/docbook/user/contact-settings.xml,
+	  doc/docbook/user/introduction.xml, doc/docbook/user/legal.xml,
+	  doc/docbook/user/midi-settings.xml, doc/docbook/user/preview.xml,
+	  doc/docbook/user/video-settings.xml: Changed docbook ids to
+	  installation.something and user.something
+
+2010-06-08 14:09  simonp
+
+	* doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/edirol-fa101-settings.xml,
+	  doc/docbook/installation/hardware-setup.xml,
+	  doc/docbook/installation/network.xml,
+	  doc/docbook/installation/nvidia-settings.xml,
+	  doc/docbook/installation/software.xml,
+	  doc/docbook/user/advanced-options.xml,
+	  doc/docbook/user/before-using-scenic.xml: Finished userinput
+	  conversion
+	  Added para around mediaobject
+
+2010-06-07 21:42  tristan
+
+	* po/en.po, po/fr.po, po/scenic.pot: undo po mods, keep modified
+	  autoge.sh
+
+2010-06-07 21:39  tristan
+
+	* autogen.sh, po/en.po, po/fr.po, po/scenic.pot: don't use --force
+	  for autoreconf, this stops needless mods to .po files
+
+2010-06-07 18:49  tristan
+
+	* doc/Makefile.am: put doxygen stuff in EXTRA_DIST so that it
+	  doesn't get installed, fixes #569
+
+2010-06-07 15:28  alexandre
+
+	* man/Makefile.am, po/en.po, po/fr.po, po/scenic.pot,
+	  py/scenic/configure.py.in, py/scenic/gui.py, py/scenic/runner.py:
+	  updated one-line description for the app
+
+2010-06-07 15:20  simonp
+
+	* doc/docbook/installation/ati-settings.xml,
+	  doc/docbook/installation/audio-video.xml,
+	  doc/docbook/installation/commandline.xml,
+	  doc/docbook/installation/network.xml: More computerlisting to
+	  userinput conversions
+
+2010-06-07 03:09  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-06-07 03:08  alexandre
+
+	* py/scenic/streamer.py: Showing stderr to the user when there are
+	  errors.
+
+2010-06-07 02:19  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-06-07 02:05  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-06-07 02:03  alexandre
+
+	* py/scenic/gui.py: Simplified a debug message
+
+2010-06-07 01:58  alexandre
+
+	* py/scenic/devices/jackd.py: Fix jack-info's output parsing
+	  Closes #572 (Scenic thinks that jackd is running but it's not)
+
+2010-06-05 07:16  alexandre
+
+	* man/milhouse-man.txt: The man section for who has written it must
+	  be called HISTORY, not something like "WRITTEN".
+
+2010-06-04 19:31  alexandre
+
+	* RELEASE: updated RELEASE file.
+
+2010-06-04 19:25  tristan
+
+	* py/scenic/gui.py: only redraw if not previewing
+
+2010-06-04 15:26  tristan
+
+	* py/scenic/gui.py, py/scenic/preview.py: added redraw looping task
+	  as a workaround lingering menus
+
+2010-06-03 17:43  tristan
+
+	* po/en.po, po/fr.po, po/scenic.pot: undo changes to po
+
+2010-06-03 17:37  tristan
+
+	* po/en.po, po/fr.po, po/scenic.pot, src/gst/Makefile.am: don't
+	  distribute caps.cpp for real
+
+2010-06-03 16:46  tristan
+
+	* py/.coverage: removed sinister hidden file
+
+2010-06-03 16:39  tristan
+
+	* src/gst/Makefile.am: added built sources to nodist_SOURCES
+
+2010-06-03 15:49  alexandre
+
+	* py/rtpmidi/Makefile.am, py/rtpmidi/engines/Makefile.am,
+	  py/rtpmidi/engines/midi/Makefile.am,
+	  py/rtpmidi/protocols/Makefile.am,
+	  py/rtpmidi/protocols/rtp/Makefile.am,
+	  py/scenic/devices/Makefile.am: Make clean must delete all .pyc
+	  files.
+
+2010-06-03 15:48  tristan
+
+	* src/vumeter/test, utils/jack-info: added some ignores
+
+2010-06-03 14:24  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-06-03 14:20  alexandre
+
+	* configure.ac, doc/docbook/Makefile.am, py/scenic/Makefile.am,
+	  py/scripts/Makefile.am: Removed files generated by configure from
+	  tarball.
+	  Python scripts must be nodist.
+
+2010-06-02 23:24  simonp
+
+	* doc/docbook/user-manual.xml.in,
+	  doc/docbook/user/advanced-options.xml: Trying userinput in
+	  documentation
+
+2010-06-02 22:52  pchevry
+
+	* doc/docbook/installation/hardware-requirement.xml: filling
+	  missing data in the video output table of installation manual
+
+2010-06-02 22:29  simonp
+
+	* doc/docbook/Makefile.am, doc/docbook/installation/software.xml,
+	  doc/docbook/user/about.xml,
+	  doc/docbook/user/advanced-options.xml,
+	  doc/docbook/user/before-using-scenic.xml,
+	  doc/docbook/user/video-settings.xml: Integrated xmlcheck make
+	  target
+	  User Manual now passes xmllint checks
+
+2010-06-02 20:59  alexandre
+
+	* RELEASE, configure.ac: updated version in trunk
+
+2010-06-02 20:45  alexandre
+
+	* ChangeLog: updated ChangeLog with more recent changes
+
 2010-06-02 20:43  alexandre
 
 	* RELEASE: updated date for this release in RELEASE notes.
