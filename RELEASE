@@ -11,6 +11,8 @@ Debian GNU/Linux. The doc has also been improved a lot.
 
 This version should work with every version in the stable 0.6 series. 
 
+See the NEWS and ChangeLog files for a complete history of changes.
+
     Upgrading:
     *   Be sure to uninstall your previous miville or scenic before installing
         scenic.
