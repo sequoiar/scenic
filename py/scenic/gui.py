@@ -940,7 +940,10 @@ class Gui(object):
         self.audio_jitterbuffer_widget.set_value(_get_config("audio_jitterbuffer"))
         self.audio_jack_enable_autoconnect_widget.set_active(_get_config("audio_jack_enable_autoconnect"))
         # source, codec
-        audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
+        try:
+            audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
+        except KeyError:
+            audio_source_readable = _get_key_for_value(AUDIO_SOURCES, "jackaudiosrc")
         log.debug(" * audio_source: %s" % (audio_source_readable))
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
