@@ -3,6 +3,32 @@ This files lists RELEASE notes since Scenic version 0.4.
 
 ----------------------------------------------------------------------
 
+Release notes for Scenic 0.6.1
+
+This release is the second of the stable 0.6 branch. This branch introduces
+many new features developed during 0.5 series. Those features include MIDI 
+streaming support and the hability to customize what each peer receives as 
+audio and video. 
+
+This release contains minor bugfixes.
+
+This version should work with every version in the stable 0.6 series. 
+
+New features in milhouse:
+    (none)
+
+New features in scenic:
+    (none)
+
+Bug fixes in milhouse: 
+    (none)
+
+Bug fixes in scenic: 
+    * #582 Disable audio test source in Scenic since it might use 100% of the CPU
+    * #583 Maximum audio channels should be set to 64 (for now)
+
+----------------------------------------------------------------------
+
 Release notes for Scenic 0.6
 
 This release is the first of the stable 0.6 branch. This branch introduces
