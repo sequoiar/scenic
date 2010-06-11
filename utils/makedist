@@ -12,4 +12,4 @@ then
     fi
     make distclean
 fi
-autoreconf -fiv && ./configure && make && fakeroot make distcheck 
+autoreconf -iv && ./configure && make && fakeroot make distcheck 
