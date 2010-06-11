@@ -168,7 +168,7 @@ AUDIO_CODECS = {
     }
 AUDIO_SOURCES = {
     "JACK": "jackaudiosrc",
-    "Test sound": "audiotestsrc"
+#    "Test sound": "audiotestsrc"
     }
 # min/max:
 VIDEO_BITRATE_MIN_MAX = {
@@ -404,6 +404,10 @@ class Gui(object):
 
         self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
         self._disable_unsupported_codecs()
+        self._disable_audio_test_source()
+
+    def _disable_audio_test_source(self):
+        _set_combobox_choices(self.audio_source_widget, AUDIO_SOURCES.keys())
    
     def _disable_unsupported_codecs(self):
         """
