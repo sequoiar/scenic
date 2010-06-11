@@ -62,5 +62,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
 
+[KNOWN BUGS]
+On some operating systems, one must use 127.0.0.1 instead of localhost for local connections.
+
+Using the audiotestsrc might use 100% of your CPU power.
+
 [SEE ALSO]
 scenic(1), midistream(1), firereset(1), dc-ctl(1), jack-info(1), /usr/share/scenic/docbook
