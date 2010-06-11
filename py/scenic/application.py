@@ -493,6 +493,9 @@ class Application(object):
         def _callback(channels):
             log.info("Max number of channels for raw audio: %s" % (channels))
             self.max_channels_in_raw = channels
+            if self.max_channels_in_raw > 64: #for now that makes more sense
+                self.max_channels_in_raw = 64
+            # TODO: if current codec is raw
             self.gui.audio_numchannels_widget.set_range(1, channels)
         deferred.addCallback(_callback)
         return deferred
