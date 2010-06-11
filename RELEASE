@@ -52,7 +52,8 @@ Bug fixes in milhouse:
     (none)
 
 Bug fixes in scenic: 
-    * Disable audio test source in Scenic since it might use 100% of the CPU
+    * #582 Disable audio test source in Scenic since it might use 100% of the CPU
+    * #583 Maximum audio channels should be set to 64 (for now)
 
 HISTORY
 
