@@ -168,7 +168,7 @@ AUDIO_CODECS = {
     }
 AUDIO_SOURCES = {
     "JACK": "jackaudiosrc",
-    "Test sound": "audiotestsrc"
+#    "Test sound": "audiotestsrc"
     }
 # min/max:
 VIDEO_BITRATE_MIN_MAX = {
@@ -404,6 +404,10 @@ class Gui(object):
 
         self.debug_textview_widget = widgets_tree.get_widget("debug_textview")
         self._disable_unsupported_codecs()
+        self._disable_audio_test_source()
+
+    def _disable_audio_test_source(self):
+        _set_combobox_choices(self.audio_source_widget, AUDIO_SOURCES.keys())
    
     def _disable_unsupported_codecs(self):
         """
@@ -936,7 +940,11 @@ class Gui(object):
         self.audio_jitterbuffer_widget.set_value(_get_config("audio_jitterbuffer"))
         self.audio_jack_enable_autoconnect_widget.set_active(_get_config("audio_jack_enable_autoconnect"))
         # source, codec
-        audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
+        try:
+            audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
+        except ValueError:
+            audio_source_readable = _get_key_for_value(AUDIO_SOURCES, "jackaudiosrc")
+            log.warning("changed audiosource to jackaudiosrc, since it was set to an invalid value")
         log.debug(" * audio_source: %s" % (audio_source_readable))
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
@@ -1325,7 +1333,7 @@ class Gui(object):
         elif _get_combobox_value(self.audio_codec_widget) == "Raw":
             max_channels = self.app.max_channels_in_raw
         elif _get_combobox_value(self.audio_codec_widget) == "Vorbis":
-            max_channels = 256
+            max_channels = 64 #256
         # update range and clamp numchannels to new range 
         self.audio_numchannels_widget.set_range(1, max_channels)
         self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 

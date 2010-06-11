@@ -1,13 +1,11 @@
-Release notes for Scenic 0.6
+Release notes for Scenic 0.6.1
 
-This release is the first of the stable 0.6 branch. This branch introduces
+This release is the second of the stable 0.6 branch. This branch introduces
 many new features developed during 0.5 series. Those features include MIDI 
 streaming support and the hability to customize what each peer receives as 
 audio and video. 
 
-This release contains minor bugfixes and some minor new features since the 
-last 0.5.11 release candidate. Those are mostly related to using Scenic on 
-Debian GNU/Linux. The doc has also been improved a lot.
+This release contains minor bugfixes.
 
 This version should work with every version in the stable 0.6 series. 
 
@@ -48,22 +46,20 @@ New features in milhouse:
     (none)
 
 New features in scenic:
-    * Increased verbosity (stderr) in case of error
+    (none)
 
 Bug fixes in milhouse: 
     (none)
 
 Bug fixes in scenic: 
-    #562 The drawing area should always be black
-    #563 Tarball should not contain generated Python and docbook files
-    #564 Tarball should not contain src/gst/caps.cpp
-    #572 Scenic thinks that jackd is running but it's not
-    #571 Preview always uses audio on sid
-    #512 Disable jackd latency estimation if the backend is not supported
-    #569 Do not install doxygen.css and footer.html
+    * #582 Disable audio test source in Scenic since it might use 100% of the CPU
+    * #583 Maximum audio channels should be set to 64 (for now)
 
 HISTORY
 
+    * 2010-06-11: 0.6.1
+         * Second stable release of the 0.6 stable branch.
+         * Disabled audio test source, since it might use 100% of the CPU
     * 2010-06-10: 0.6
           * First stable release of the 0.6 stable branch.
           * MIDI support officially supported

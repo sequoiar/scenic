@@ -1,342 +1,303 @@
+
 This files lists RELEASE notes since Scenic version 0.4.
 
 ----------------------------------------------------------------------
 
-Release notes for Scenic 0.4
+Release notes for Scenic 0.6
 
-Milhouse:
-This release fixes a big regression in caps transmission which broke Vorbis and Theora support in 0.3.6.
-New features include better v4l2 controls, the ability to restart a sender without restarting a receiver, rtpjitterbuffer
-control embedded in our output window, as well as a lot of cleanup and output fixes.
+This release is the first of the stable 0.6 branch. This branch introduces
+many new features developed during 0.5 series. Those features include MIDI 
+streaming support and the hability to customize what each peer receives as 
+audio and video. 
 
-Scenic:
-Moved the graphical user interface to GTK+ for faster development.
-The Scenic software now polls devices using the Milhouse streamer. 
-We implemented SIC, the SIP Spelled Incorrectly protocol, which mimics SIP 
-to negotiate the streaming session using JSON over TCP/IP.
-Moved Miville code out of trunk. 
-Superseded Miville features within a three week code sprint in GTK+!
+This release contains minor bugfixes and some minor new features since the 
+last 0.5.11 release candidate. Those are mostly related to using Scenic on 
+Debian GNU/Linux. The doc has also been improved a lot.
 
-* Fixed #181 Man page of midistream has each command twice
-* Fixed #182 midistream port range needs to be documented
-* Fixed #92 Separate Integrator Manual from User Manual
-* Fixed #261 Capture size not in state saving
-* Fixed #260 Preview does not use capture setting size
-* Fixed #255 Increase timeout for invited
-* Fixed #218 auto accept
-* Fixed #231 Selected contact should be saved
-* Fixed #259 editing a contact removes its auto_accept flag
-* Fixed #242 invited dialog should display contact name if present in addressbook
-* Fixed #233 Send BYE at shutdown time
-* Fixed #140 make distcheck still fails
-* Fixed #198 make check fails on buildbot because PATH variable is broken
-* Fixed #249 use python_PYTHON instead of dist_bin_SCRIPTS for most python files
-* Fixed #257 Package data is not installed
-* Fixed #248 Show all supported capture sizes to the user
-* Fixed #245 Modernize state saving
-* Fixed #212 Detect v4l2 devices
-* Fixed #211 User source/sink configuration
-* Fixed #217 Implement video deinterlace option
-* Fixed #215 video device configuration
-* Fixed #214 user source configuration
-* Fixed #241 Cleanup in trac components
-* Fixed #243 exit on start up if we can't bind to the negotiation port
-* Fixed #210 Session media description in JSON
-* Fixed #227 don't allow join contact if jack is not running
-* Fixed #239 implement --set-standard and --set-input in milhouse
-* Fixed #216 media format configuration
-* Fixed #226 send_bye doesn't happen when session is stopped
-* Fixed #237 Add more infos in milhouse --list-cameras
-* Fixed #234 dc-ctl should be able to show values, not only save in a file
-* Fixed #199 put rtpjitterbuffer control in xvimagesink window
-* Fixed #235 dc-ctl should be able to get a specific value
-* Fixed #223 Generate about text on the fly
-* Fixed #206 trac needs a category for scenic (gtk-interface)
-* Fixed #213 Support cancel invitation
-* Fixed #225 if no dc camera is plugged in, using videosource=dc1394src will segfault
-* Fixed #224 request pads should be unreffed in rtpreceiver/sender's destructor
-* Fixed #222 receiver should handle new senders
-* Fixed #221 Use ports allocator
-* Fixed #205 closing dialogs has permanent side effects in maugis
-* Fixed #208 rename gtk widgets (dialogs)
-* Fixed #209 Pango markup setlabel bug in scenic
-* Fixed #207 closing video window is broken
+This version should work with every version in the stable 0.6 series. 
+
+See the NEWS and ChangeLog files for a complete history of changes.
+
+New features in milhouse:
+    (none)
+
+New features in scenic:
+    * Increased verbosity (stderr) in case of error
+
+Bug fixes in milhouse: 
+    (none)
+
+Bug fixes in scenic: 
+    #562 The drawing area should always be black
+    #563 Tarball should not contain generated Python and docbook files
+    #564 Tarball should not contain src/gst/caps.cpp
+    #572 Scenic thinks that jackd is running but it's not
+    #571 Preview always uses audio on sid
+    #512 Disable jackd latency estimation if the backend is not supported
+    #569 Do not install doxygen.css and footer.html
 
 ----------------------------------------------------------------------
 
-Release notes for Scenic 0.4.1
+Release notes for Scenic 0.5.11
 
-    Milhouse:
-    This minor release fixes a bug with the deinterlace option. It has
-    also been enabled again in the Scenic graphical user interface. We
-    also fixed a bug that was preventing users to see a preview of a local
-    video Web camera. An other bug has also been fixed which made the
-    listing of cameras impossible on Ubuntu Karmic when the libdc1394
-    library was not found. Removed globals.mak
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes and some new features for preparing the 0.6 stable series. 
+This is the second release candiate for the stable version 0.6.
 
-    Scenic GUI:
-    This minor release fixes a bug with the Scenic icon which was not
-    showing up in the Gnome menu. It is now under
-    Applications/Internet/Scenic.
+    Upgrading:
+    *   Be sure to uninstall your previous miville or scenic before installing
+        scenic.
+    *   In the older source directory, use "make uninstall" as root to
+        uninstall previous installations.
+    *   Don't forget to run ldconfig after installation.
+    *   As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
+        again or simply apply the utils/rtpsource.diff patch to
+        gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
+        https://bugzilla.gnome.org/show_bug.cgi?id=611213
+        This fix adds receiver side bitrate estimation. Note that milhouse
+        will function fine without it, as will scenic.
+    *   Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
+        Install them with aptitude. 
 
-    * Fixed #263 Fixed potential crash in case of wrong JSON library version.
-    * Fixed #264 videoflip is frail with input material
-    * Moved colorspace converter into videoflip
-    * Moved application data out of the Python package.
-    * Flattened gst file hierarchy
-    * Videoflip (and consequently deinterlace) fixed, added extra colorspace element
-    * Installation: shared librairies (except for shared_video) are installed in
-    $(prefix)/lib/scenic instead of just $(prefix)/scenic
-    * Fixed formatting of some i18n strings.
+    Backward compatibility:
+        Each release in the 0.4 series should be interoperable with each other.
 
-----------------------------------------------------------------------
+    Milhouse dependency for Scenic
+        Scenic always needs the same version of milhouse, eg. scenic 0.4.5
+        needs milhouse 0.4.5
 
-Release notes for Scenic 0.4
+    Limitations:
+    *   While milhouse supports many video and audio input types, Scenic only 
+        supports a subset of them. 
+    *   Each release version in the 0.5 branch is considered unstable and will 
+        not be supported in the future. Each version is not interoperable with 
+        any other version of the unstable 0.5 branch. Wait for the next release 
+        in the 0.6 branch to benefit from long term support of the new features 
+        of the 0.5 branch.
 
-Milhouse:
-This release fixes a big regression in caps transmission which broke Vorbis and
-Theora support in 0.3.6.
-New features include better v4l2 controls, the ability to restart a sender
-without restarting a receiver, rtpjitterbuffer control embedded in our output
-window, as well as a lot of cleanup and output fixes.
+New features in milhouse:
+    (none)
 
-Scenic:
-Moved the graphical user interface to GTK+ for faster development.
-The Scenic software now polls devices using the Milhouse streamer. 
-We implemented SIC, the SIP Spelled Incorrectly protocol, which mimics SIP 
-to negotiate the streaming session using JSON over TCP/IP.
-Moved Miville code out of trunk. 
-Superseded Miville features within a three week code sprint in GTK+!
+New features in scenic:
+    *  #327 improve jack monitoring in scenic
+    *  #552 create debian/watch file
 
-* Fixed #181 Man page of midistream has each command twice
-* Fixed #182 midistream port range needs to be documented
-* Fixed #92 Separate Integrator Manual from User Manual
-* Fixed #261 Capture size not in state saving
-* Fixed #260 Preview does not use capture setting size
-* Fixed #255 Increase timeout for invited
-* Fixed #218 auto accept
-* Fixed #231 Selected contact should be saved
-* Fixed #259 editing a contact removes its auto_accept flag
-* Fixed #242 invited dialog should display contact name if present in addressbook
-* Fixed #233 Send BYE at shutdown time
-* Fixed #140 make distcheck still fails
-* Fixed #198 make check fails on buildbot because PATH variable is broken
-* Fixed #249 use python_PYTHON instead of dist_bin_SCRIPTS for most python files
-* Fixed #257 Package data is not installed
-* Fixed #248 Show all supported capture sizes to the user
-* Fixed #245 Modernize state saving
-* Fixed #212 Detect v4l2 devices
-* Fixed #211 User source/sink configuration
-* Fixed #217 Implement video deinterlace option
-* Fixed #215 video device configuration
-* Fixed #214 user source configuration
-* Fixed #241 Cleanup in trac components
-* Fixed #243 exit on start up if we can't bind to the negotiation port
-* Fixed #210 Session media description in JSON
-* Fixed #227 don't allow join contact if jack is not running
-* Fixed #239 implement --set-standard and --set-input in milhouse
-* Fixed #216 media format configuration
-* Fixed #226 send_bye doesn't happen when session is stopped
-* Fixed #237 Add more infos in milhouse --list-cameras
-* Fixed #234 dc-ctl should be able to show values, not only save in a file
-* Fixed #199 put rtpjitterbuffer control in xvimagesink window
-* Fixed #235 dc-ctl should be able to get a specific value
-* Fixed #223 Generate about text on the fly
-* Fixed #206 trac needs a category for scenic (gtk-interface)
-* Fixed #213 Support cancel invitation
-* Fixed #225 if no dc camera is plugged in, using videosource=dc1394src will segfault
-* Fixed #224 request pads should be unreffed in rtpreceiver/sender's destructor
-* Fixed #222 receiver should handle new senders
-* Fixed #221 Use ports allocator
-* Fixed #205 closing dialogs has permanent side effects in maugis
-* Fixed #208 rename gtk widgets (dialogs)
-* Fixed #209 Pango markup setlabel bug in scenic
-* Fixed #207 closing video window is broken
+Bug fixes in milhouse: 
+    *  #483 Image preview freeze when changing norm
+    *  #560 jackaudiosrc doesn't respect client name
+    *  #558 Assertions should not have side effects
+
+Bug fixes in scenic: 
+    *  #547 Help2man dones't accept the name field but accepts the command argument
+    *  #556 Offerer doesn't answer BUSY when inviting
+    *  #548 Missing deps or instructions for dc-ctl
+    *  Added pychecker target
 
 ----------------------------------------------------------------------
 
-Release notes for Scenic 0.4.2
+Release notes for Scenic 0.5.10
 
-    Milhouse:
-    This minor release fixes some system-level bugs. Improvements to
-    RTCP stats allow for more detailed info on rtp session quality.
-    Cleaner output so that Scenic can report on errors/etc. Improvements
-    to --list-cameras.
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes and some new features for preparing the 0.6 stable series. 
+This is the first release candiate for the stable version 0.6.
 
-    Scenic GUI:
-    Lots of improvements to the UI, include more advanced state management for both
-    sessions and processes. More forwarding of info output by Milhouse (errors, rtcp, etc.)
+New features in milhouse:
+    (none)
 
-    Documentation:
-    Documentaion for installation is still accurate, but some operations (video
-    and audio testing) needs to use more Scenic new features. Documentation has
-    been updated to include Debian-specific instructions.  Testing on Debian
-    still have to be made, especially that it doesn't come with a realtime kernel.
-    Hardware support is probably different too. We'll update
+New features in scenic:
+    *   #538 Add the reason parameter to BYE in SIC
+    *   #545 Add a Debian menu icon.
+    *   #543 Create a Debian menu entry
 
-Fixes:
+Bug fixes in milhouse: 
+    (none)
 
-#283: X11 display option is not working in the GUI
-#284: X11 device setting is not saved in state saving
-#298: Sender doesn't give the audio codec that the receiver wants.
-#315: Add a window icon to milhouse
-#162: when using dc1394src, if you use the same device in another process, interrupt won't work on milhouse
-#204: test_dc_ctl segfaults on Karmic
-#240: check if the videodevice is v4l2, not v4l
-#244: Change status icons for each contact
-#253: Improve preview window behaviour
-#264: videoflip is frail with input material
-#268: Show infos when streaming
-#270: deactivate certain widgets while streaming
-#275: use rtcp stats to determine streaming status in scenic
-#276: when done streaming, video bitrate widget becomes sensitive for theora
-#278: Crash with info formatting when using theora
-#279: Add RTCP stats to GUI
-#280: Consider only the last 2 seconds for packet loss
-#281: Parse milhouse output for errors and warnings
-#296: configure detect presence or absence of libboost*dev libraries and header, but don't act accordingly
-#297: gtk theme is not loaded on karmic
-#299: Display bitrate stats in sender
-#300: Display a summary of session errors in a single error dialog
-#301: Report bitrate on receiver side.
-#307: Make sure all messages are internationalized
-#313: The IP address field for a new contact only accepts 15 characters
-#256: Some dialogs lose their contents
-#266: gtkrc theme not loaded on Karmic
-#267: GtkSpinButton setting an adjustment with non-zero page size is deprecated
-#273: Contact name in the milhouse window
-#277: Show local IP in summary
-#289: Validate domain name addresses and IP addresses
-#269: Use gtk.TextIter to create tags in the summary text view
-#271: bad folder permission for scenic-0.4.1 extracted with fileroller
-#247: --snapshot-file argument to display a snaphost in the GUI
+Bug fixes in scenic: 
+    *   #535 .mo files should not be in the repository
+    *   #537 debuild should run autoreconf
+    *   #546 Improve one-line descriptions
 
 ----------------------------------------------------------------------
 
-Release notes for Scenic 0.4.3
+Release notes for Scenic 0.5.9
 
-    Milhouse:
-    This release fixes a bug with dc1394src in localvideo. This release
-    introduces audiobitrate and quality settings for vorbis and mp3.
-    Another new feature is the xid option that allows a user to specify
-    an xid for the video window that could belong to a separate process. 
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes preparing the 0.6 stable series. A few new features are 
+being introduced as well in this tag, such as jackdmp support, detection of
+missing Gstreamer elements, and more documentation such as man pages.
 
-    Scenic GUI:
-    This release improves error dialogs and error handling in general.
-    It also allows a milhouse video preview to be embedded in scenic.
+New features in milhouse:
+    *   #532 Implement celt support in milhouse
 
-Milhouse Fixes:
+New features in scenic:
+    *   Detailled system status window
+    *   Detection of the supported Gstreamer elements for codecs
+    *   Checking if the codec requested by the peer are supported
+    *   #468 Scenic should support jackdmp (using jack-info)
+    *   #367 Write jack-info, which prints informations about the current jack servers
+    *   #498 Create man page for dc-ctl
+    *   #539 Mention the licences for the borrowed code
 
-#236: add audio bitrate/quality settings for mp3 and vorbis
-#321: use variable map everywhere
-#326: dc1394src has too many colourspace conversions for localvideo
-#238: --x-window-id option added
-#334: install_gstreamer.sh, boost1_35_for_hardy.sh, gst_check.py and install_lame.sh are not in the tarball
+Bug fixes in milhouse: 
+    (none)
 
-Scenic Fixes:
-#274: accepting invite at last minutes leads to one way stream
-#308: Add a timeout to some dialogs
-#309: Receiving an invitation should make the peer unavailable for others
-#325: When the answerer cancels, he sees a timeout error dialog
-#312: An invite to an unreachable address gives a bad error message
-#316: Add display and fullscreen in summary
-#319: start jackd in short form leads to KeyError when looking for jack info
-#228: gross output in error dialog on trying to join
-#322: Add current DISPLAY variable to list of screens
-#310: os.environ['GTK2_RC-FILES'] should be cleared when launching external applications
-#306: Do a flight check before starting a stream
-#329: Sometimes some unsupported image sizes are listed
-#331: Preview not in a window should use the parent's display
-#333: make distcheck fails
+Bug fixes in scenic: 
+    *   #536 The debian directory should not be in the trunk
+    *   #534 Scenic must send some IDLE messages every 5 minutes to keep the TCP connection alive
+    *   #388 Control-Tab should switch to next tab
+    *   #540 dc-ctrl --help and --verision should not need any device
+    *   #413 Use hashlib instead of the deprecated md5 module
+    *   #412 Use subprocess instead of the deprecated os.popen4
+    *   #503 Sometimes ports numbers are not freed
+    *   #527 In some cases when remote doesn't run Scenic, it doesn't give an error message
 
 ----------------------------------------------------------------------
 
-Release notes for Scenic 0.4.4
+Release notes for Scenic 0.5.8
 
-This release backports various major bugfixes (mainly packaging), and 
-introduces no new features since 0.4.3, as new development takes place 
-in the 0.5 branch.
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes preparing the 0.6 stable series. 
 
-Misc. Fixes:
-#370: RELEASE not include in tarball by make dist
-#373: add README
+New features in milhouse:
 
-Milhouse Fixes:
-#328: improve gst element checking at configure stage
-#364: make distcheck broken by gst_check.py
-#372: make shared_video compatible with AC_CHECK_LIB
+New features in scenic:
 
-Scenic Fixes:
-#356: when inviting, gtkwarning gets posted
-#361: check for python modules at configure stage
-#349: ./configure should check for python-portmidi
-#347: fix ProcessIO to avoid truncating output
+Bug fixes in milhouse: 
+
+Bug fixes in scenic: 
 
 ----------------------------------------------------------------------
 
-Release notes for Scenic 0.4.5
+Release notes for Scenic 0.5.7
 
-This release backports a few bugfixes, (mostly in the GUI) and introduces 
-no new features since 0.4.3, as new development takes place in the 0.5 branch.
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes preparing the 0.6 stable series. 
 
-Misc. Fixes:
- * Using HTTP, not FTP for downloading the x264 Gstreamer plugins
- * Added bash completion for the milhouse command line tool
+New features in milhouse:
 
-Scenic Fixes:
-#379 : Cannot close the delete contact dialog
+New features in scenic:
+
+Bug fixes in milhouse: 
+
+Bug fixes in scenic: 
+    *   The user manual was not working at all.
 
 ----------------------------------------------------------------------
 
-Release notes for Scenic 0.5
+Release notes for Scenic 0.5.5
 
-This release adds many new experimental features. These features include MIDI transmission and VU meters. 
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes preparing the 0.6 stable series. 
 
-Fixes in 0.5:
+New features in milhouse:
+    *   Dump pipeline into a graphviz file
 
-#383: make VUMeter
-#398: make localaudio that pipes to a fakesink 
-#394: call gst_init and gtk_init as early as possible 
-#386: Cannot delete contacts 
-#381: audio channels widget max should be 24 
-#354: Merge all gui-interactive state variables 
-#384: Put name of selected contact in the invite button 
-#380: Preview button is not set to false when we stop the preview 
-#382: State saving for number of channels does not work for more than 8 channels 
-#352: Should be possible to select some devices with the same name 
-#293: Move the summary section out of the tabs in the GUI 
-#379: Cannot close the delete contact dialog 
-#378: Can't record audio fast enough audio messages sometimes 
-#376: milhouse --localvideo broken for dv 
-#161: ximagesink doesn't work with dv1394src 
-#375: error on cleanup of dv1394 
-#335: default audio-buffer is too big for on board sound 
-#374: convert "localhost" to 127.0.0.1 as temporary workaround for #143 
-#371: get vendor label for dv1394 
-#351: Build python doc with autotools 
-#360: Milhouse --list-cameras expects the dc1394 library? 
-#373: add README 
-#372: make shared_video compatible with AC_CHECK_LIB 
-#370: RELEASE not included in tarball by make dist 
-#356: when invite, gtkwarning gets posted 
-#355: at startup, midi widgets are sensitive even if midi is disabled 
-#328: improve gst element checking at configure-stage 
-#361: Check for all Python modules in the autotools 
-#355: at startup, midi widgets are sensitive even if midi is disabled 
-#365: Testing ticket workflow 
-#364: make distcheck broken by gst_check.py 
-#357: Add new png to makefile 
-#349: ./configure should check for python-portmidi 
-#342: Disable MIDI device widgets when MIDI is disabled 
-#341: Remove MIDI device number 
-#346: Add jitterbuffer controls for MIDI 
-#343: change MIDI tab icon 
-#345: midistream should handle SIGINT well 
-#292: Implement MIDI streaming in the GUI 
-#336: milhouse --list-cameras don't list dv1394 cameras 
-#340: midistream should accept domain names, not only IP addresses 
-#338: Cleanup in options parsing in midistream 
-#164: have receiver request caps from sender 
+New features in scenic:
+    *   #520 Translate to french
+    *   #314 i18n procedure with gettext and glade should be documented
+    *   #513 Add the "Installation Manual" item in the Help menu
+
+Bug fixes in milhouse: 
+    *   #495 Not receiving vumeters because of display variable being set to non 
+        default when audio and video are synchronized
+    *   #517 Milhouse in audio-only should not require a DISPLAY to be set
+    *   #324 Milhouse lacks a tutorial
+    *   Don't toggle frequency for audiotestsrc as it is not designed to handle 
+        this and it produces artifacts, especially in MP3.
+
+Bug fixes in scenic: 
+    *   #518 Newer configuration options are erased when we run an older version
+    *   #519 Messages from the application modules are logged twice
+    *   #405 Document ports to open
+    *   #441 Widgets must have tooltips
+
+----------------------------------------------------------------------
+
+Release notes for Scenic 0.5.5
+
+This release is an other unstable version in the 0.5 series. This version 
+contains bugfixes preparing the 0.6 stable series. 
+
+New features in milhouse:
+    *   Dump pipeline into a graphviz file
+
+New features in scenic:
+    *   #520 Translate to french
+    *   #314 i18n procedure with gettext and glade should be documented
+    *   #513 Add the "Installation Manual" item in the Help menu
+
+Bug fixes in milhouse: 
+    *   #495 Not receiving vumeters because of display variable being set to non 
+        default when audio and video are synchronized
+    *   #517 Milhouse in audio-only should not require a DISPLAY to be set
+    *   #324 Milhouse lacks a tutorial
+    *   Don't toggle frequency for audiotestsrc as it is not designed to handle 
+        this and it produces artifacts, especially in MP3.
+
+Bug fixes in scenic: 
+    *   #518 Newer configuration options are erased when we run an older version
+    *   #519 Messages from the application modules are logged twice
+    *   #405 Document ports to open
+    *   #441 Widgets must have tooltips
+
+----------------------------------------------------------------------
+
+Release notes for Scenic 0.5.4
+
+This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. 
+
+New features and bug fixes in 0.5.4:
+
+New features in milhouse:
+
+New features in scenic:
+    #515 Include installation manual in the help menu and in packaging
+    #508 Install the bash completion file with the debian package
+    #500 Show errors when the preview crashes
+
+Bug fixes in milhouse: 
+
+Bug fixes in scenic : 
+    #510 Latency calculation is wrong with the firewire jackd driver
+    #467 Logging to file is broken
+    #363 Sometimes the video preview crashes
+
+----------------------------------------------------------------------
+
+Release notes for Scenic 0.5.2
+
+This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. We created an Ubuntu package and the python-portmidi module is not mandatory anymore. We fixed bug related to sampling rate mismatch and increased the maximum number of raw audio channels when using the properly patched gst-plugins-bad elements. Error messages are also a lot more verbose, to help the user debugging.
+
+New features and bug fixes in 0.5.2:
+
+New features in milhouse:
+    #197 Audio sync with sharedVideoBuffer
+    #491 milhouse should report max number of channels it can send
+    #497 show channel number under vumeter
+
+New features in scenic:
+    #474 Add the --verbose option to scenic
+    #490 Make python-portmidi not mandatory
+    #476 add an option to disable to auto connect to jack ports in scenic
+    #506 Show milhouse's warnings to the user
+
+Bug fixes in milhouse: 
+    #482 audiotestsrc sample rate is fixed at 48000
+    #487 when filesource location isn't valid, the error message is horrible
+    #196 Need to drop frames in sharedVideoBuffer
+
+Bug fixes in scenic : 
+    #488 The port allocator is not called to free ports
+    #489 scenic.desktop always crashes
+    #492 maximum number of channels sent with raw must be negotiated
+    #473 Lots of docbook documents not found
+    #472 Use 2 spaces for indentation in user manual
+    #486 If the python midi doesn't work, MIDI should be disabled
+    #443 An error should be shown if midistream does not work
+    #493 preview complains about STOPPING state
+    #494 Improve the reason messages on offerer's side
+    #469 Scenic don't detect jack sample rate mismatch in RAW
+    #496 Create man page for jack-info
 
 ----------------------------------------------------------------------
 
@@ -411,288 +372,276 @@ Bug fixes in scenic :
     #406: midi / gui bug. Blocking the video cam usage on some laptop
 
 ----------------------------------------------------------------------
-Release notes for Scenic 0.5.2
 
-This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. We created an Ubuntu package and the python-portmidi module is not mandatory anymore. We fixed bug related to sampling rate mismatch and increased the maximum number of raw audio channels when using the properly patched gst-plugins-bad elements. Error messages are also a lot more verbose, to help the user debugging.
+Release notes for Scenic 0.5
 
-New features and bug fixes in 0.5.2:
+This release adds many new experimental features. These features include MIDI transmission and VU meters. 
 
-New features in milhouse:
-    #197 Audio sync with sharedVideoBuffer
-    #491 milhouse should report max number of channels it can send
-    #497 show channel number under vumeter
+Fixes in 0.5:
 
-New features in scenic:
-    #474 Add the --verbose option to scenic
-    #490 Make python-portmidi not mandatory
-    #476 add an option to disable to auto connect to jack ports in scenic
-    #506 Show milhouse's warnings to the user
-
-Bug fixes in milhouse: 
-    #482 audiotestsrc sample rate is fixed at 48000
-    #487 when filesource location isn't valid, the error message is horrible
-    #196 Need to drop frames in sharedVideoBuffer
-
-Bug fixes in scenic : 
-    #488 The port allocator is not called to free ports
-    #489 scenic.desktop always crashes
-    #492 maximum number of channels sent with raw must be negotiated
-    #473 Lots of docbook documents not found
-    #472 Use 2 spaces for indentation in user manual
-    #486 If the python midi doesn't work, MIDI should be disabled
-    #443 An error should be shown if midistream does not work
-    #493 preview complains about STOPPING state
-    #494 Improve the reason messages on offerer's side
-    #469 Scenic don't detect jack sample rate mismatch in RAW
-    #496 Create man page for jack-info
-
-----------------------------------------------------------------------
-Release notes for Scenic 0.5.2
-
-This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. We created an Ubuntu package and the python-portmidi module is not mandatory anymore. We fixed bug related to sampling rate mismatch and increased the maximum number of raw audio channels when using the properly patched gst-plugins-bad elements. Error messages are also a lot more verbose, to help the user debugging.
-
-New features and bug fixes in 0.5.2:
-
-New features in milhouse:
-    #197 Audio sync with sharedVideoBuffer
-    #491 milhouse should report max number of channels it can send
-    #497 show channel number under vumeter
-
-New features in scenic:
-    #474 Add the --verbose option to scenic
-    #490 Make python-portmidi not mandatory
-    #476 add an option to disable to auto connect to jack ports in scenic
-    #506 Show milhouse's warnings to the user
-
-Bug fixes in milhouse: 
-    #482 audiotestsrc sample rate is fixed at 48000
-    #487 when filesource location isn't valid, the error message is horrible
-    #196 Need to drop frames in sharedVideoBuffer
-
-Bug fixes in scenic : 
-    #488 The port allocator is not called to free ports
-    #489 scenic.desktop always crashes
-    #492 maximum number of channels sent with raw must be negotiated
-    #473 Lots of docbook documents not found
-    #472 Use 2 spaces for indentation in user manual
-    #486 If the python midi doesn't work, MIDI should be disabled
-    #443 An error should be shown if midistream does not work
-    #493 preview complains about STOPPING state
-    #494 Improve the reason messages on offerer's side
-    #469 Scenic don't detect jack sample rate mismatch in RAW
-    #496 Create man page for jack-info
+#383: make VUMeter
+#398: make localaudio that pipes to a fakesink 
+#394: call gst_init and gtk_init as early as possible 
+#386: Cannot delete contacts 
+#381: audio channels widget max should be 24 
+#354: Merge all gui-interactive state variables 
+#384: Put name of selected contact in the invite button 
+#380: Preview button is not set to false when we stop the preview 
+#382: State saving for number of channels does not work for more than 8 channels 
+#352: Should be possible to select some devices with the same name 
+#293: Move the summary section out of the tabs in the GUI 
+#379: Cannot close the delete contact dialog 
+#378: Can't record audio fast enough audio messages sometimes 
+#376: milhouse --localvideo broken for dv 
+#161: ximagesink doesn't work with dv1394src 
+#375: error on cleanup of dv1394 
+#335: default audio-buffer is too big for on board sound 
+#374: convert "localhost" to 127.0.0.1 as temporary workaround for #143 
+#371: get vendor label for dv1394 
+#351: Build python doc with autotools 
+#360: Milhouse --list-cameras expects the dc1394 library? 
+#373: add README 
+#372: make shared_video compatible with AC_CHECK_LIB 
+#370: RELEASE not included in tarball by make dist 
+#356: when invite, gtkwarning gets posted 
+#355: at startup, midi widgets are sensitive even if midi is disabled 
+#328: improve gst element checking at configure-stage 
+#361: Check for all Python modules in the autotools 
+#355: at startup, midi widgets are sensitive even if midi is disabled 
+#365: Testing ticket workflow 
+#364: make distcheck broken by gst_check.py 
+#357: Add new png to makefile 
+#349: ./configure should check for python-portmidi 
+#342: Disable MIDI device widgets when MIDI is disabled 
+#341: Remove MIDI device number 
+#346: Add jitterbuffer controls for MIDI 
+#343: change MIDI tab icon 
+#345: midistream should handle SIGINT well 
+#292: Implement MIDI streaming in the GUI 
+#336: milhouse --list-cameras don't list dv1394 cameras 
+#340: midistream should accept domain names, not only IP addresses 
+#338: Cleanup in options parsing in midistream 
+#164: have receiver request caps from sender 
 
 ----------------------------------------------------------------------
-Release notes for Scenic 0.5.4
 
-This release is an other unstable version in the 0.5 series. This version contains bugfixes preparing the 0.6 stable series. 
+Release notes for Scenic 0.4.5
 
-New features and bug fixes in 0.5.4:
+This release backports a few bugfixes, (mostly in the GUI) and introduces 
+no new features since 0.4.3, as new development takes place in the 0.5 branch.
 
-New features in milhouse:
+Misc. Fixes:
+ * Using HTTP, not FTP for downloading the x264 Gstreamer plugins
+ * Added bash completion for the milhouse command line tool
 
-New features in scenic:
-    #515 Include installation manual in the help menu and in packaging
-    #508 Install the bash completion file with the debian package
-    #500 Show errors when the preview crashes
-
-Bug fixes in milhouse: 
-
-Bug fixes in scenic : 
-    #510 Latency calculation is wrong with the firewire jackd driver
-    #467 Logging to file is broken
-    #363 Sometimes the video preview crashes
-----------------------------------------------------------------------
-Release notes for Scenic 0.5.5
-
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes preparing the 0.6 stable series. 
-
-New features in milhouse:
-    *   Dump pipeline into a graphviz file
-
-New features in scenic:
-    *   #520 Translate to french
-    *   #314 i18n procedure with gettext and glade should be documented
-    *   #513 Add the "Installation Manual" item in the Help menu
-
-Bug fixes in milhouse: 
-    *   #495 Not receiving vumeters because of display variable being set to non 
-        default when audio and video are synchronized
-    *   #517 Milhouse in audio-only should not require a DISPLAY to be set
-    *   #324 Milhouse lacks a tutorial
-    *   Don't toggle frequency for audiotestsrc as it is not designed to handle 
-        this and it produces artifacts, especially in MP3.
-
-Bug fixes in scenic: 
-    *   #518 Newer configuration options are erased when we run an older version
-    *   #519 Messages from the application modules are logged twice
-    *   #405 Document ports to open
-    *   #441 Widgets must have tooltips
+Scenic Fixes:
+#379 : Cannot close the delete contact dialog
 
 ----------------------------------------------------------------------
-Release notes for Scenic 0.5.5
 
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes preparing the 0.6 stable series. 
+Release notes for Scenic 0.4.4
 
-New features in milhouse:
-    *   Dump pipeline into a graphviz file
+This release backports various major bugfixes (mainly packaging), and 
+introduces no new features since 0.4.3, as new development takes place 
+in the 0.5 branch.
 
-New features in scenic:
-    *   #520 Translate to french
-    *   #314 i18n procedure with gettext and glade should be documented
-    *   #513 Add the "Installation Manual" item in the Help menu
+Misc. Fixes:
+#370: RELEASE not include in tarball by make dist
+#373: add README
 
-Bug fixes in milhouse: 
-    *   #495 Not receiving vumeters because of display variable being set to non 
-        default when audio and video are synchronized
-    *   #517 Milhouse in audio-only should not require a DISPLAY to be set
-    *   #324 Milhouse lacks a tutorial
-    *   Don't toggle frequency for audiotestsrc as it is not designed to handle 
-        this and it produces artifacts, especially in MP3.
+Milhouse Fixes:
+#328: improve gst element checking at configure stage
+#364: make distcheck broken by gst_check.py
+#372: make shared_video compatible with AC_CHECK_LIB
 
-Bug fixes in scenic: 
-    *   #518 Newer configuration options are erased when we run an older version
-    *   #519 Messages from the application modules are logged twice
-    *   #405 Document ports to open
-    *   #441 Widgets must have tooltips
+Scenic Fixes:
+#356: when inviting, gtkwarning gets posted
+#361: check for python modules at configure stage
+#349: ./configure should check for python-portmidi
+#347: fix ProcessIO to avoid truncating output
 
 ----------------------------------------------------------------------
-Release notes for Scenic 0.5.7
 
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes preparing the 0.6 stable series. 
+Release notes for Scenic 0.4.3
 
-New features in milhouse:
+    Milhouse:
+    This release fixes a bug with dc1394src in localvideo. This release
+    introduces audiobitrate and quality settings for vorbis and mp3.
+    Another new feature is the xid option that allows a user to specify
+    an xid for the video window that could belong to a separate process. 
 
-New features in scenic:
+    Scenic GUI:
+    This release improves error dialogs and error handling in general.
+    It also allows a milhouse video preview to be embedded in scenic.
 
-Bug fixes in milhouse: 
+Milhouse Fixes:
 
-Bug fixes in scenic: 
-    *   The user manual was not working at all.
-----------------------------------------------------------------------
-Release notes for Scenic 0.5.8
+#236: add audio bitrate/quality settings for mp3 and vorbis
+#321: use variable map everywhere
+#326: dc1394src has too many colourspace conversions for localvideo
+#238: --x-window-id option added
+#334: install_gstreamer.sh, boost1_35_for_hardy.sh, gst_check.py and install_lame.sh are not in the tarball
 
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes preparing the 0.6 stable series. 
-
-New features in milhouse:
-
-New features in scenic:
-
-Bug fixes in milhouse: 
-
-Bug fixes in scenic: 
-----------------------------------------------------------------------
-Release notes for Scenic 0.5.9
-
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes preparing the 0.6 stable series. A few new features are 
-being introduced as well in this tag, such as jackdmp support, detection of
-missing Gstreamer elements, and more documentation such as man pages.
-
-New features in milhouse:
-    *   #532 Implement celt support in milhouse
-
-New features in scenic:
-    *   Detailled system status window
-    *   Detection of the supported Gstreamer elements for codecs
-    *   Checking if the codec requested by the peer are supported
-    *   #468 Scenic should support jackdmp (using jack-info)
-    *   #367 Write jack-info, which prints informations about the current jack servers
-    *   #498 Create man page for dc-ctl
-    *   #539 Mention the licences for the borrowed code
-
-Bug fixes in milhouse: 
-    (none)
-
-Bug fixes in scenic: 
-    *   #536 The debian directory should not be in the trunk
-    *   #534 Scenic must send some IDLE messages every 5 minutes to keep the TCP connection alive
-    *   #388 Control-Tab should switch to next tab
-    *   #540 dc-ctrl --help and --verision should not need any device
-    *   #413 Use hashlib instead of the deprecated md5 module
-    *   #412 Use subprocess instead of the deprecated os.popen4
-    *   #503 Sometimes ports numbers are not freed
-    *   #527 In some cases when remote doesn't run Scenic, it doesn't give an error message
+Scenic Fixes:
+#274: accepting invite at last minutes leads to one way stream
+#308: Add a timeout to some dialogs
+#309: Receiving an invitation should make the peer unavailable for others
+#325: When the answerer cancels, he sees a timeout error dialog
+#312: An invite to an unreachable address gives a bad error message
+#316: Add display and fullscreen in summary
+#319: start jackd in short form leads to KeyError when looking for jack info
+#228: gross output in error dialog on trying to join
+#322: Add current DISPLAY variable to list of screens
+#310: os.environ['GTK2_RC-FILES'] should be cleared when launching external applications
+#306: Do a flight check before starting a stream
+#329: Sometimes some unsupported image sizes are listed
+#331: Preview not in a window should use the parent's display
+#333: make distcheck fails
 
 ----------------------------------------------------------------------
-Release notes for Scenic 0.5.10
 
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes and some new features for preparing the 0.6 stable series. 
-This is the first release candiate for the stable version 0.6.
+Release notes for Scenic 0.4.2
 
-New features in milhouse:
-    (none)
+    Milhouse:
+    This minor release fixes some system-level bugs. Improvements to
+    RTCP stats allow for more detailed info on rtp session quality.
+    Cleaner output so that Scenic can report on errors/etc. Improvements
+    to --list-cameras.
 
-New features in scenic:
-    *   #538 Add the reason parameter to BYE in SIC
-    *   #545 Add a Debian menu icon.
-    *   #543 Create a Debian menu entry
+    Scenic GUI:
+    Lots of improvements to the UI, include more advanced state management for both
+    sessions and processes. More forwarding of info output by Milhouse (errors, rtcp, etc.)
 
-Bug fixes in milhouse: 
-    (none)
+    Documentation:
+    Documentaion for installation is still accurate, but some operations (video
+    and audio testing) needs to use more Scenic new features. Documentation has
+    been updated to include Debian-specific instructions.  Testing on Debian
+    still have to be made, especially that it doesn't come with a realtime kernel.
+    Hardware support is probably different too. We'll update
 
-Bug fixes in scenic: 
-    *   #535 .mo files should not be in the repository
-    *   #537 debuild should run autoreconf
-    *   #546 Improve one-line descriptions
+Fixes:
+
+#283: X11 display option is not working in the GUI
+#284: X11 device setting is not saved in state saving
+#298: Sender doesn't give the audio codec that the receiver wants.
+#315: Add a window icon to milhouse
+#162: when using dc1394src, if you use the same device in another process, interrupt won't work on milhouse
+#204: test_dc_ctl segfaults on Karmic
+#240: check if the videodevice is v4l2, not v4l
+#244: Change status icons for each contact
+#253: Improve preview window behaviour
+#264: videoflip is frail with input material
+#268: Show infos when streaming
+#270: deactivate certain widgets while streaming
+#275: use rtcp stats to determine streaming status in scenic
+#276: when done streaming, video bitrate widget becomes sensitive for theora
+#278: Crash with info formatting when using theora
+#279: Add RTCP stats to GUI
+#280: Consider only the last 2 seconds for packet loss
+#281: Parse milhouse output for errors and warnings
+#296: configure detect presence or absence of libboost*dev libraries and header, but don't act accordingly
+#297: gtk theme is not loaded on karmic
+#299: Display bitrate stats in sender
+#300: Display a summary of session errors in a single error dialog
+#301: Report bitrate on receiver side.
+#307: Make sure all messages are internationalized
+#313: The IP address field for a new contact only accepts 15 characters
+#256: Some dialogs lose their contents
+#266: gtkrc theme not loaded on Karmic
+#267: GtkSpinButton setting an adjustment with non-zero page size is deprecated
+#273: Contact name in the milhouse window
+#277: Show local IP in summary
+#289: Validate domain name addresses and IP addresses
+#269: Use gtk.TextIter to create tags in the summary text view
+#271: bad folder permission for scenic-0.4.1 extracted with fileroller
+#247: --snapshot-file argument to display a snaphost in the GUI
 
 ----------------------------------------------------------------------
-Release notes for Scenic 0.5.11
 
-This release is an other unstable version in the 0.5 series. This version 
-contains bugfixes and some new features for preparing the 0.6 stable series. 
-This is the second release candiate for the stable version 0.6.
+Release notes for Scenic 0.4.1
 
-    Upgrading:
-    *   Be sure to uninstall your previous miville or scenic before installing
-        scenic.
-    *   In the older source directory, use "make uninstall" as root to
-        uninstall previous installations.
-    *   Don't forget to run ldconfig after installation.
-    *   As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
-        again or simply apply the utils/rtpsource.diff patch to
-        gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
-        https://bugzilla.gnome.org/show_bug.cgi?id=611213
-        This fix adds receiver side bitrate estimation. Note that milhouse
-        will function fine without it, as will scenic.
-    *   Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
-        Install them with aptitude. 
+    Milhouse:
+    This minor release fixes a bug with the deinterlace option. It has
+    also been enabled again in the Scenic graphical user interface. We
+    also fixed a bug that was preventing users to see a preview of a local
+    video Web camera. An other bug has also been fixed which made the
+    listing of cameras impossible on Ubuntu Karmic when the libdc1394
+    library was not found. Removed globals.mak
 
-    Backward compatibility:
-        Each release in the 0.4 series should be interoperable with each other.
+    Scenic GUI:
+    This minor release fixes a bug with the Scenic icon which was not
+    showing up in the Gnome menu. It is now under
+    Applications/Internet/Scenic.
 
-    Milhouse dependency for Scenic
-        Scenic always needs the same version of milhouse, eg. scenic 0.4.5
-        needs milhouse 0.4.5
+    * Fixed #263 Fixed potential crash in case of wrong JSON library version.
+    * Fixed #264 videoflip is frail with input material
+    * Moved colorspace converter into videoflip
+    * Moved application data out of the Python package.
+    * Flattened gst file hierarchy
+    * Videoflip (and consequently deinterlace) fixed, added extra colorspace element
+    * Installation: shared librairies (except for shared_video) are installed in
+    $(prefix)/lib/scenic instead of just $(prefix)/scenic
+    * Fixed formatting of some i18n strings.
 
-    Limitations:
-    *   While milhouse supports many video and audio input types, Scenic only 
-        supports a subset of them. 
-    *   Each release version in the 0.5 branch is considered unstable and will 
-        not be supported in the future. Each version is not interoperable with 
-        any other version of the unstable 0.5 branch. Wait for the next release 
-        in the 0.6 branch to benefit from long term support of the new features 
-        of the 0.5 branch.
+----------------------------------------------------------------------
 
-New features in milhouse:
-    (none)
+Release notes for Scenic 0.4
 
-New features in scenic:
-    *  #327 improve jack monitoring in scenic
-    *  #552 create debian/watch file
+Milhouse:
+This release fixes a big regression in caps transmission which broke Vorbis and Theora support in 0.3.6.
+New features include better v4l2 controls, the ability to restart a sender without restarting a receiver, rtpjitterbuffer
+control embedded in our output window, as well as a lot of cleanup and output fixes.
 
-Bug fixes in milhouse: 
-    *  #483 Image preview freeze when changing norm
-    *  #560 jackaudiosrc doesn't respect client name
-    *  #558 Assertions should not have side effects
+Scenic:
+Moved the graphical user interface to GTK+ for faster development.
+The Scenic software now polls devices using the Milhouse streamer. 
+We implemented SIC, the SIP Spelled Incorrectly protocol, which mimics SIP 
+to negotiate the streaming session using JSON over TCP/IP.
+Moved Miville code out of trunk. 
+Superseded Miville features within a three week code sprint in GTK+!
 
-Bug fixes in scenic: 
-    *  #547 Help2man dones't accept the name field but accepts the command argument
-    *  #556 Offerer doesn't answer BUSY when inviting
-    *  #548 Missing deps or instructions for dc-ctl
-    *  Added pychecker target
+* Fixed #181 Man page of midistream has each command twice
+* Fixed #182 midistream port range needs to be documented
+* Fixed #92 Separate Integrator Manual from User Manual
+* Fixed #261 Capture size not in state saving
+* Fixed #260 Preview does not use capture setting size
+* Fixed #255 Increase timeout for invited
+* Fixed #218 auto accept
+* Fixed #231 Selected contact should be saved
+* Fixed #259 editing a contact removes its auto_accept flag
+* Fixed #242 invited dialog should display contact name if present in addressbook
+* Fixed #233 Send BYE at shutdown time
+* Fixed #140 make distcheck still fails
+* Fixed #198 make check fails on buildbot because PATH variable is broken
+* Fixed #249 use python_PYTHON instead of dist_bin_SCRIPTS for most python files
+* Fixed #257 Package data is not installed
+* Fixed #248 Show all supported capture sizes to the user
+* Fixed #245 Modernize state saving
+* Fixed #212 Detect v4l2 devices
+* Fixed #211 User source/sink configuration
+* Fixed #217 Implement video deinterlace option
+* Fixed #215 video device configuration
+* Fixed #214 user source configuration
+* Fixed #241 Cleanup in trac components
+* Fixed #243 exit on start up if we can't bind to the negotiation port
+* Fixed #210 Session media description in JSON
+* Fixed #227 don't allow join contact if jack is not running
+* Fixed #239 implement --set-standard and --set-input in milhouse
+* Fixed #216 media format configuration
+* Fixed #226 send_bye doesn't happen when session is stopped
+* Fixed #237 Add more infos in milhouse --list-cameras
+* Fixed #234 dc-ctl should be able to show values, not only save in a file
+* Fixed #199 put rtpjitterbuffer control in xvimagesink window
+* Fixed #235 dc-ctl should be able to get a specific value
+* Fixed #223 Generate about text on the fly
+* Fixed #206 trac needs a category for scenic (gtk-interface)
+* Fixed #213 Support cancel invitation
+* Fixed #225 if no dc camera is plugged in, using videosource=dc1394src will segfault
+* Fixed #224 request pads should be unreffed in rtpreceiver/sender's destructor
+* Fixed #222 receiver should handle new senders
+* Fixed #221 Use ports allocator
+* Fixed #205 closing dialogs has permanent side effects in maugis
+* Fixed #208 rename gtk widgets (dialogs)
+* Fixed #209 Pango markup setlabel bug in scenic
+* Fixed #207 closing video window is broken
+
