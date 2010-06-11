@@ -942,8 +942,9 @@ class Gui(object):
         # source, codec
         try:
             audio_source_readable = _get_key_for_value(AUDIO_SOURCES, self.app.config.audio_source)
-        except KeyError:
+        except ValueError:
             audio_source_readable = _get_key_for_value(AUDIO_SOURCES, "jackaudiosrc")
+            log.warning("changed audiosource to jackaudiosrc, since it was set to an invalid value")
         log.debug(" * audio_source: %s" % (audio_source_readable))
         _set_combobox_value(self.audio_source_widget, audio_source_readable)
         audio_codec = _get_key_for_value(AUDIO_CODECS, self.app.config.audio_codec)
