@@ -21,9 +21,9 @@ std::string CapsClient::getCaps()
     tcp::resolver::query query(host_.c_str(), port_.c_str());
 
     tcp::socket socket(io_service_);
-    bool gotCaps = false;
+    bool connected = false;
     boost::system::error_code error;
-    while (not gotCaps)
+    while (not connected)
     {
         tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
         tcp::resolver::iterator end;
@@ -42,7 +42,7 @@ std::string CapsClient::getCaps()
         else if (error)
             throw boost::system::system_error(error);
         else
-            gotCaps = true;
+            connected = true;
 
         // client must check for this in case we've been interrupted
         // FIXME: this isn't very elegant but at least it gets us to the top level
