@@ -50,7 +50,7 @@ Bug fixes in milhouse:
     (none)
 
 Bug fixes in scenic: 
-    (none)
+    * #586  Use $(pythondir) for Python files
 
 HISTORY
 
