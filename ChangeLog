@@ -1,3 +1,73 @@
+2010-06-16 21:39  tristan
+
+	* src/tcp/CapsClient.cpp: renamed variable
+
+2010-06-11 21:36  alexandre
+
+	* NEWS, RELEASE, configure.ac: updated version in trunk to 0.6.2
+
+2010-06-11 21:12  alexandre
+
+	* RELEASE: updated RELEASE notes
+
+2010-06-11 18:33  alexandre
+
+	* py/scenic/application.py, py/scenic/gui.py: Set max number of
+	  audio channels to 64
+	  Fixes #583
+
+2010-06-11 16:27  tristan
+
+	* py/scenic/gui.py: catch right error for invalid source
+
+2010-06-11 16:15  alexandre
+
+	* py/scenic/gui.py: Avoid crash in case of invalid audiotestsrc
+
+2010-06-11 15:02  simonp
+
+	* utils/makedist: Removed --force from autoreconf in makedist
+
+2010-06-11 12:14  alexandre
+
+	* NEWS: Inverse order in the NEWS file.
+
+2010-06-11 11:49  alexandre
+
+	* BUGS, man/milhouse-man.txt: Added KNOWN BUGS to the milhouse man
+	  page.
+	  Updated BUGS
+
+2010-06-11 02:00  alexandre
+
+	* py/scenic/gui.py: disabled audio test source
+
+2010-06-11 01:55  alexandre
+
+	* NEWS, RELEASE, configure.ac: updated version number, RELEASE and
+	  NEWS to prepare release 0.6.1
+
+2010-06-10 20:51  alexandre
+
+	* Makefile.am: added NEWS to distributed files
+
+2010-06-10 20:51  alexandre
+
+	* RELEASE: added a minor comment in the RELEASE file
+
+2010-06-10 20:50  alexandre
+
+	* po/en.po, po/fr.po, po/scenic.pot: updated po files
+
+2010-06-10 20:37  alexandre
+
+	* NEWS: Filled the NEWS file
+
+2010-06-10 20:28  alexandre
+
+	* ChangeLog, RELEASE, configure.ac: Updated version number to 0.6
+	  preparing the stable release
+
 2010-06-09 20:11  pchevry
 
 	* doc/docbook/installation/audio-video.xml,
