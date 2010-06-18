@@ -1,6 +1,6 @@
 SUBDIRS = midi
 
-enginesdir = $(libdir)/scenic/py/rtpmidi/engines
+enginesdir = $(pythondir)/rtpmidi/engines
 
 engines_PYTHON = __init__.py
 

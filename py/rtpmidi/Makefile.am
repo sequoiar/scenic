@@ -1,6 +1,6 @@
 SUBDIRS = engines protocols
 
-rtpmididir = $(libdir)/scenic/py/rtpmidi
+rtpmididir = $(pythondir)/rtpmidi
 
 rtpmidi_PYTHON = __init__.py runner.py utils.py
 

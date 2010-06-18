@@ -37,8 +37,6 @@ if __name__ == "__main__":
         d = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
         sys.path.insert(0, d)
         os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
-    else:
-        sys.path.append(PYTHON_LIB_PATH)
     from rtpmidi import runner
     
     runner.run(VERSION)

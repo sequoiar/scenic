@@ -1,3 +1,3 @@
-scriptsdir = $(libdir)/scenic/py/scripts
+scriptsdir = $(pythondir)/scenic/py/scripts
 
 bin_SCRIPTS = scenic midistream

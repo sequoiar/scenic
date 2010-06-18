@@ -50,7 +50,6 @@ if __name__ == "__main__":
         from scenic import configure
         configure.replace_install_paths_with_devel_paths()
     else:
-        sys.path.append(PYTHON_LIB_PATH)
         from scenic import configure
 
     from scenic import runner
