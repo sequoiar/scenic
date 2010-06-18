@@ -1,6 +1,6 @@
 SUBDIRS = devices test
 
-scenicdir = $(libdir)/scenic/py/scenic
+scenicdir = $(pythondir)/scenic
 
 # in alphabetical order:
 scenic_PYTHON = application.py \

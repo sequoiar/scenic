@@ -1,6 +1,6 @@
 SUBDIRS = rtp
 
-protocolsdir = $(libdir)/scenic/py/rtpmidi/protocols
+protocolsdir = $(pythondir)/rtpmidi/protocols
 
 protocols_PYTHON = __init__.py
 
