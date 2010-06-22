@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
 "Report-Msgid-Bugs-To: http://svn.sat.qc.ca/trac/scenic/wiki/BugReport\n"
-"POT-Creation-Date: 2010-06-10 16:50-0400\n"
+"POT-Creation-Date: 2010-06-22 11:25-0400\n"
 "PO-Revision-Date: 2010-06-07 11:27-0500\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: French\n"
@@ -31,7 +31,7 @@ msgstr ""
 "Il semblerait que l'entension xvideo ne soit pas présente. Afficher de la "
 "vidéo sera impossible."
 
-#: py/scenic/application.py:670
+#: py/scenic/application.py:673
 #, python-format
 msgid ""
 "A mismatch in the sampling rate of JACK with remote peer has been detected.\n"
@@ -42,7 +42,7 @@ msgstr ""
 "Le taux local est de %(local)s, alors que celui du contact distant est de %"
 "(remote)s."
 
-#: py/scenic/application.py:676 py/scenic/application.py:758
+#: py/scenic/application.py:679 py/scenic/application.py:761
 msgid ""
 "The remote peer is asking an audio codec that is not installed on your "
 "computer."
@@ -50,7 +50,7 @@ msgstr ""
 "L'hôte distant demande un codec audio qui n'est pas installé sur votre "
 "ordinateur."
 
-#: py/scenic/application.py:682 py/scenic/application.py:764
+#: py/scenic/application.py:685 py/scenic/application.py:767
 msgid ""
 "The remote peer is asking a video codec that is not installed on your "
 "computer."
@@ -58,7 +58,7 @@ msgstr ""
 "L'hôte distant demande un codec vidéo qui n'est pas installé sur votre "
 "ordinateur."
 
-#: py/scenic/application.py:695
+#: py/scenic/application.py:698
 #, python-format
 msgid ""
 "<b><big>%(invited_by)s is inviting you.</big></b>\n"
@@ -69,12 +69,12 @@ msgstr ""
 "\n"
 "Acceptez-vous ?"
 
-#: py/scenic/application.py:730
+#: py/scenic/application.py:733
 #, python-format
 msgid "Contact %(name)s invited you but cancelled his invitation."
 msgstr "Le contact %(name)s vous a invité, puis a annulé son invitation."
 
-#: py/scenic/application.py:772
+#: py/scenic/application.py:775
 msgid ""
 "Got an acceptation from a remote peer, but a streaming session is already in "
 "progress."
@@ -82,15 +82,15 @@ msgstr ""
 "Vous avez reçu une acceptation à transmettre d'un contact distant, mais vous "
 "êtes déjà engagé dans une session de trasmission."
 
-#: py/scenic/application.py:786
+#: py/scenic/application.py:789
 msgid "The remote peer refused to stream with you for an unknown reason"
 msgstr "Ce contact a refusé de transmettre avec vous."
 
-#: py/scenic/application.py:788
+#: py/scenic/application.py:791
 msgid "The remote peer refused to stream with you."
 msgstr "Ce contact a refusé de transmettre avec vous."
 
-#: py/scenic/application.py:790
+#: py/scenic/application.py:793
 msgid ""
 "The remote peer cannot stream with you since its JACK sampling rate is not "
 "the same as yours."
@@ -98,18 +98,18 @@ msgstr ""
 "Le taux d'échantillonnage du JACK du contact distant n'est pas compatible "
 "avec le vôtre. Impossible de transmettre avec lui."
 
-#: py/scenic/application.py:792
+#: py/scenic/application.py:795
 msgid ""
 "The remote peer cannot stream with you since its JACK server is not running."
 msgstr ""
 "Le contact distant n'a pas son JACK en fonction. Impossible de transmettre "
 "avec lui."
 
-#: py/scenic/application.py:794
+#: py/scenic/application.py:797
 msgid "The remote peer is busy. Cannot start a streaming session."
 msgstr "Le contact distant est occupé. Impossible de transmettre avec lui."
 
-#: py/scenic/application.py:796
+#: py/scenic/application.py:799
 msgid ""
 "The remote peer cannot stream with you since its xvideo extension could not "
 "be found."
@@ -117,7 +117,7 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car il n'a pas l'extenxion "
 "xvideo."
 
-#: py/scenic/application.py:798
+#: py/scenic/application.py:801
 msgid ""
 "The remote peer cannot stream with you since its MIDI device could not be "
 "found."
@@ -125,7 +125,7 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car son appareil MIDI est "
 "introuvable."
 
-#: py/scenic/application.py:800
+#: py/scenic/application.py:803
 msgid ""
 "The remote peer cannot stream with you since its video capture device could "
 "not be found."
@@ -133,7 +133,7 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car son appareil de capture "
 "vidéo est introuvable."
 
-#: py/scenic/application.py:802
+#: py/scenic/application.py:805
 msgid ""
 "The remote peer cannot stream with you since its X11 display could not be "
 "found."
@@ -141,7 +141,7 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car son moniteur X11 est "
 "introuvable."
 
-#: py/scenic/application.py:804
+#: py/scenic/application.py:807
 msgid ""
 "The remote peer cannot stream with you because they do not support the "
 "requested audio codec."
@@ -149,7 +149,7 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car son appareil de capture "
 "vidéo est introuvable."
 
-#: py/scenic/application.py:806
+#: py/scenic/application.py:809
 msgid ""
 "The remote peer cannot stream with you because they do not support the "
 "requested video codec."
@@ -157,13 +157,13 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car son appareil de capture "
 "vidéo est introuvable."
 
-#: py/scenic/application.py:808 py/scenic/application.py:844
+#: py/scenic/application.py:811 py/scenic/application.py:847
 msgid "The remote peer cannot stream with you due to technical issues."
 msgstr ""
 "Le contact ne peut pas transmettre avec vous car des problèmes techniques "
 "sont survenus."
 
-#: py/scenic/application.py:840
+#: py/scenic/application.py:843
 msgid ""
 "The remote peer cannot stream with you since it does not support the audio "
 "codec you are asking for."
@@ -171,7 +171,7 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car son appareil de capture "
 "vidéo est introuvable."
 
-#: py/scenic/application.py:842
+#: py/scenic/application.py:845
 msgid ""
 "The remote peer cannot stream with you since it does not support the video "
 "codec you are asking for."
@@ -179,56 +179,56 @@ msgstr ""
 "Le contact ne peut pas transmettre avec vous car son appareil de capture "
 "vidéo est introuvable."
 
-#: py/scenic/application.py:901
+#: py/scenic/application.py:904
 msgid "Cannot start streaming if all the streams are disabled."
 msgstr ""
 "Il est impossible d'entamer une session si tous les flux sont désactivés."
 
-#: py/scenic/application.py:1009
+#: py/scenic/application.py:1012
 msgid "Impossible to invite a contact to start streaming."
 msgstr "Impossible d'inviter un contact."
 
-#: py/scenic/application.py:1011
+#: py/scenic/application.py:1014
 msgid "Impossible to accept an invitation to stream."
 msgstr "Impossible d'accepter une invitation."
 
-#: py/scenic/application.py:1023
+#: py/scenic/application.py:1026
 #, python-format
 msgid "The X11 display %(display)s disappeared!"
 msgstr "Le moniteur X11 %(display)s a disparu !"
 
-#: py/scenic/application.py:1027
+#: py/scenic/application.py:1030
 #, python-format
 msgid "The video source %(camera)s disappeared!"
 msgstr "La source vidéo %(camera)s a disparu !"
 
-#: py/scenic/application.py:1034
+#: py/scenic/application.py:1037
 msgid "JACK is not running."
 msgstr "JACK est inactif."
 
-#: py/scenic/application.py:1038
+#: py/scenic/application.py:1041
 msgid "A streaming session is already in progress."
 msgstr "Une session est déjà en cours."
 
-#: py/scenic/application.py:1042
+#: py/scenic/application.py:1045
 #, python-format
 msgid "The MIDI output device %(device)s disappeared!"
 msgstr "L'appareil d'entrée MIDI %(device)s a disparu !"
 
-#: py/scenic/application.py:1046
+#: py/scenic/application.py:1049
 #, python-format
 msgid "The MIDI input device %(device)s disappeared!"
 msgstr "L'appareil de sortie MIDI %(device)s a disparu !"
 
-#: py/scenic/application.py:1051
+#: py/scenic/application.py:1054
 msgid "The X video extension is not present."
 msgstr "L'extension X video est introuvable."
 
-#: py/scenic/application.py:1074
+#: py/scenic/application.py:1077
 msgid "You must select a contact to invite."
 msgstr "Vous devez choisir un contact à inviter."
 
-#: py/scenic/application.py:1100
+#: py/scenic/application.py:1103
 #, python-format
 msgid ""
 "Could not invite contact %(name)s. \n"
@@ -239,7 +239,7 @@ msgstr ""
 "\n"
 "Scenic ne semble pas écouter sur le %(port)d de son hôte %(ip)s."
 
-#: py/scenic/application.py:1102 py/scenic/application.py:1104
+#: py/scenic/application.py:1105 py/scenic/application.py:1107
 #, python-format
 msgid ""
 "Could not invite contact %(name)s. \n"
@@ -250,7 +250,7 @@ msgstr ""
 "\n"
 "L'hôte %(ip)s est innateignable."
 
-#: py/scenic/application.py:1106
+#: py/scenic/application.py:1109
 #, python-format
 msgid ""
 "Could not invite contact %(name)s. \n"
@@ -319,7 +319,7 @@ msgstr "Accepter automatiquement les invitations"
 msgid "Contacts"
 msgstr "Carnet d'adresses"
 
-#: py/scenic/gui.py:498
+#: py/scenic/gui.py:502
 msgid ""
 "Really quit ?\n"
 "All streaming processes will quit as well."
@@ -327,7 +327,7 @@ msgstr ""
 "Souhaitez réellement quitter ?\n"
 "Tous les processus de transmission seront interrompus."
 
-#: py/scenic/gui.py:656
+#: py/scenic/gui.py:660
 msgid ""
 "<b><big>Delete this contact from the list?</big></b>\n"
 "\n"
@@ -337,7 +337,7 @@ msgstr ""
 "\n"
 "Voulez-vous vraiment effacer ce contact de votre carner d'adresses ?"
 
-#: py/scenic/gui.py:711
+#: py/scenic/gui.py:715
 msgid ""
 "The address is not valid\n"
 "\n"
@@ -349,7 +349,7 @@ msgstr ""
 "Veuillez en entrer une valide.\n"
 "Exemple: 192.0.32.10 ou example.org"
 
-#: py/scenic/gui.py:732
+#: py/scenic/gui.py:736
 msgid ""
 "<b><big>Shutdown the computer?</big></b>\n"
 "\n"
@@ -359,7 +359,7 @@ msgstr ""
 "\n"
 "Souhaitez-vous vraiment éteindre l'ordinateur maintenant ?"
 
-#: py/scenic/gui.py:743
+#: py/scenic/gui.py:747
 msgid ""
 "<b><big>Reboot the computer?</big></b>\n"
 "\n"
@@ -369,7 +369,7 @@ msgstr ""
 "\n"
 "Souhaitez-vous vraiment redémarrer l'ordinateur maintenant ?"
 
-#: py/scenic/gui.py:796
+#: py/scenic/gui.py:800
 msgid ""
 "Could not send info.\n"
 "Check your internet connection."
@@ -377,7 +377,7 @@ msgstr ""
 "Impossible d'envoyer les informations.\n"
 "Veuillez vérifier votre connexion à Internet."
 
-#: py/scenic/gui.py:799
+#: py/scenic/gui.py:803
 msgid ""
 "<b><big>Send the settings?</big></b>\n"
 "\n"
@@ -389,93 +389,93 @@ msgstr ""
 "Souhaitez-vous vraiment envoyer votre configuration aux développeurs de "
 "Scenic ?"
 
-#: py/scenic/gui.py:1026
+#: py/scenic/gui.py:1034
 msgid "Stop streaming"
 msgstr "Terminer la session"
 
-#: py/scenic/gui.py:1053 data/glade/scenic.glade:3409
+#: py/scenic/gui.py:1061 data/glade/scenic.glade:3409
 msgid "Not connected"
 msgstr "Non connecté"
 
-#: py/scenic/gui.py:1077 py/scenic/gui.py:1079 data/glade/scenic.glade:1164
+#: py/scenic/gui.py:1085 py/scenic/gui.py:1087 data/glade/scenic.glade:1164
 msgid "Invite"
 msgstr "Inviter"
 
-#: py/scenic/gui.py:1130
+#: py/scenic/gui.py:1138
 #, python-format
 msgid "%(bitrate)2.2f %(prefix)sbits/s"
 msgstr "%(bitrate)2.2f %(prefix)sbits/s"
 
-#: py/scenic/gui.py:1138
+#: py/scenic/gui.py:1146
 #, python-format
 msgid "Audio buffer: %(buffer)d ms"
 msgstr "Tampon audio: %(buffer)d ms"
 
-#: py/scenic/gui.py:1146 py/scenic/gui.py:1190
+#: py/scenic/gui.py:1154 py/scenic/gui.py:1198
 #, python-format
 msgid "%(width)dx%(height)d %(codec)s"
 msgstr "%(width)dx%(height)d %(codec)s"
 
-#: py/scenic/gui.py:1153 py/scenic/gui.py:1181
+#: py/scenic/gui.py:1161 py/scenic/gui.py:1189
 #, python-format
 msgid "Jitter: %(jitter)d ns"
 msgstr "Variation de latence: %(jitter)d ns"
 
-#: py/scenic/gui.py:1157
+#: py/scenic/gui.py:1165
 #, python-format
 msgid "Packet loss: %(packetloss)2.2f%%"
 msgstr "Perte de paquets: %(packetloss)2.2f%%"
 
-#: py/scenic/gui.py:1160
+#: py/scenic/gui.py:1168
 #, python-format
 msgid "Packets lost: %(packetslost)d"
 msgstr "Paquets perdus: %(packetslost)d"
 
-#: py/scenic/gui.py:1165 py/scenic/gui.py:1227 py/scenic/gui.py:1232
+#: py/scenic/gui.py:1173 py/scenic/gui.py:1235 py/scenic/gui.py:1240
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: py/scenic/gui.py:1172 py/scenic/gui.py:1207
+#: py/scenic/gui.py:1180 py/scenic/gui.py:1215
 #, python-format
 msgid "%(numchannels)d-channel %(codec)s"
 msgstr "%(numchannels)d-channel %(codec)s"
 
-#: py/scenic/gui.py:1185 py/scenic/gui.py:1200 py/scenic/gui.py:1216
+#: py/scenic/gui.py:1193 py/scenic/gui.py:1208 py/scenic/gui.py:1224
 msgid "Disabled."
 msgstr "Désactivé."
 
-#: py/scenic/gui.py:1196
+#: py/scenic/gui.py:1204
 #, python-format
 msgid "Display: %(display)s"
 msgstr "Moniteur: %(display)s"
 
-#: py/scenic/gui.py:1198
+#: py/scenic/gui.py:1206
 msgid "Fullscreen is enabled."
 msgstr "Le mode plein écran est activé."
 
-#: py/scenic/gui.py:1223
+#: py/scenic/gui.py:1231
 msgid "Receiving MIDI"
 msgstr "Réception MIDI en cours"
 
-#: py/scenic/gui.py:1225
+#: py/scenic/gui.py:1233
 #, python-format
 msgid "Jitter buffer: %(jitterbuffer)d ms"
 msgstr "Tampon de variation de latence : %(jitterbuffer)d ms"
 
-#: py/scenic/gui.py:1229
+#: py/scenic/gui.py:1237
 msgid "Sending MIDI"
 msgstr "Envoi MIDI en cours"
 
-#: py/scenic/gui.py:1263
+#: py/scenic/gui.py:1271
 #, python-format
 msgid "$ %(command)s"
 msgstr "$ %(command)s"
 
-#: py/scenic/gui.py:1266
+#: py/scenic/gui.py:1274
 msgid "Command lines:"
 msgstr "Lignes de commanes:"
 
-#: py/scenic/gui.py:1478
+#: py/scenic/gui.py:1486
 #, python-format
 msgid ""
 "Could not change V4L2 standard from %(current_standard)s to %"
@@ -484,7 +484,7 @@ msgstr ""
 "La tentative de changer le standard vidéo de %(current_standard)s à %"
 "(desired_standard)s pour l'appareil %(device_name)s a échoué."
 
-#: py/scenic/gui.py:1520
+#: py/scenic/gui.py:1528
 #, python-format
 msgid ""
 "Could not change V4L2 input from %(current_input)s to %(desired_input)s for "
@@ -493,36 +493,36 @@ msgstr ""
 "La tentative de changer l'entrée vidéo de %(current_input)s à %"
 "(desired_input)s pour l'appareil %(device_name)s a échoué."
 
-#: py/scenic/gui.py:1644
+#: py/scenic/gui.py:1652
 msgid "<b>Zombie</b>"
 msgstr "<b>Zombie</b>"
 
-#: py/scenic/gui.py:1648 data/glade/scenic.glade:2127
+#: py/scenic/gui.py:1656 data/glade/scenic.glade:2127
 msgid "<b>Running</b>"
 msgstr "Actif"
 
-#: py/scenic/gui.py:1652
+#: py/scenic/gui.py:1660
 msgid "<b>Not running</b>"
 msgstr "Inactif"
 
-#: py/scenic/gui.py:1738
+#: py/scenic/gui.py:1746
 msgid "YES"
 msgstr "OUI"
 
-#: py/scenic/gui.py:1740
+#: py/scenic/gui.py:1748
 msgid "NO"
 msgstr "NON"
 
-#: py/scenic/gui.py:1746
+#: py/scenic/gui.py:1754
 msgid "MIDI is supported..."
 msgstr "MIDI est supporté..."
 
-#: py/scenic/gui.py:1749
+#: py/scenic/gui.py:1757
 #, python-format
 msgid "Video codec %(codec)s is supported..."
 msgstr ""
 
-#: py/scenic/gui.py:1751
+#: py/scenic/gui.py:1759
 #, python-format
 msgid "Audio codec %(codec)s is supported..."
 msgstr ""
