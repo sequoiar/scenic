@@ -232,9 +232,6 @@ AC_SUBST(PIXMAPS_DIR)
 
 AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
 
-PYTHON_LIB_PATH=$LIBDIR/scenic/py
-AC_SUBST(PYTHON_LIB_PATH)
-
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 

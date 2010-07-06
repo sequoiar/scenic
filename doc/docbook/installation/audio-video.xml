@@ -88,10 +88,14 @@
     </para>
     <para>See 
     <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
-    this bug report </ulink>for further information
+    this bug report </ulink> and 
+    <ulink url="https://help.ubuntu.com/community/Firewire">
+    this community documentation </ulink> for further information.
     </para>
     <para>You can test the DV camera with:</para>
     <para><userinput>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</userinput></para>
+    <para>You can test the IIDC camera with:</para>
+    <para><userinput>gst-launch dc1394src ! ffmpegcolorspace ! xvimagesink</userinput></para>
     </sect2>
     <sect2 id="installation.video-test">
       <title>Video Test</title>
