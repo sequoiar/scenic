@@ -27,9 +27,9 @@
 #include <set>
 #include <boost/scoped_ptr.hpp>
 #include "portOffsets.h"
-#include "tcp/CapsServer.h"
 
 #include "busMsgHandler.h"
+#include "caps/CapsServer.h"
 
 class Encoder;
 class Pipeline;

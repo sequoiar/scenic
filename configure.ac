@@ -273,7 +273,7 @@ src/gutil/Makefile
 src/shared_video/Makefile
 src/vumeter/Makefile
 src/vumeter/test/Makefile
-src/tcp/Makefile
+src/caps/Makefile
 src/gst/Makefile
 src/firereset/Makefile
 src/main/Makefile

@@ -27,9 +27,9 @@
 #include <boost/lexical_cast.hpp>
 #include <gst/gst.h>
 #include "pipeline.h"
+#include "caps/CapsServer.h"
+#include "caps/CapsClient.h"
 #include "remoteConfig.h"
-#include "tcp/CapsServer.h"
-#include "tcp/CapsClient.h"
 #include "codec.h"
 
 const int RemoteConfig::PORT_MIN = 1024;

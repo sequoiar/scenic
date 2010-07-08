@@ -29,7 +29,7 @@
 #include "localAudio.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
-#include "capsParser.h"
+#include "caps/capsParser.h"
 #include "pipeline.h"
 
 using boost::shared_ptr;

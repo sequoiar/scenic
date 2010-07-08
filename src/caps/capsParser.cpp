@@ -1,7 +1,7 @@
 #include "./capsParser.h"
 
 #include "util.h"
-#include "audioConfig.h"
+#include "gst/audioConfig.h"
 #include <iostream>
 #include <string>
 #include <climits>

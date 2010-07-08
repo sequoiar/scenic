@@ -29,7 +29,7 @@
 
 #include "videoConfig.h"
 #include "remoteConfig.h"
-#include "capsParser.h"
+#include "caps/capsParser.h"
 
 using boost::shared_ptr;
 namespace po = boost::program_options;
