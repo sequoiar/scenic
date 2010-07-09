@@ -57,7 +57,8 @@ void MulticastCapsServer::handle_send_to(const boost::system::error_code& error)
 {
     if (!error && !done_)
     {
-        timer_.expires_from_now(boost::posix_time::seconds(1));
+        static const int PERIOD = 1; // seconds
+        timer_.expires_from_now(boost::posix_time::seconds(PERIOD));
         timer_.async_wait(
                 boost::bind(&MulticastCapsServer::handle_timeout, this,
                     boost::asio::placeholders::error));
