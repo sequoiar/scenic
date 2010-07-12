@@ -27,14 +27,14 @@
 #include "util/logWriter.h"
 #include "MulticastCapsClient.h"
 
-const short multicast_port = 30001;
-
 MulticastCapsClient::MulticastCapsClient(boost::asio::io_service& io_service,
-        const boost::asio::ip::address& listen_address,
-                const boost::asio::ip::address& multicast_address) : 
+        const std::string& listenAddress,
+        const std::string& multicastAddress, 
+        short multicastPort) : 
     socket_(io_service),
-    listen_address_(listen_address),
-    multicast_address_(multicast_address)
+    listenAddress_(boost::asio::ip::address::from_string(listenAddress)),
+    multicastAddress_(boost::asio::ip::address::from_string(multicastAddress)),
+    multicastPort_(multicastPort)
 {}
 
 std::string MulticastCapsClient::getCaps()
@@ -42,13 +42,21 @@ std::string MulticastCapsClient::getCaps()
     boost::asio::ip::udp::endpoint sender_endpoint;
     // Create the socket so that multiple clients may be bound to the same address.
     boost::asio::ip::udp::endpoint listen_endpoint(
-        listen_address_, multicast_port);
+        listenAddress_, multicastPort_);
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(boost::asio::ip::udp::socket::reuse_address(true));
     socket_.bind(listen_endpoint);
 
     // Join the multicast group.
-    socket_.set_option(boost::asio::ip::multicast::join_group(multicast_address_));
+    try {
+    socket_.set_option(boost::asio::ip::multicast::join_group(multicastAddress_));
+    }
+    catch (const boost::system::system_error& error)
+    {
+        LOG_ERROR("Got socket error \"" << error.what() << 
+                "\" for multicast address " << multicastAddress_);
+        throw;
+    }
 
     const int BUF_SIZE = 4096;
     char data[BUF_SIZE];

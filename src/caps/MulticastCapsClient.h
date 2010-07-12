@@ -35,14 +35,16 @@ class MulticastCapsClient
 {
     public:
         MulticastCapsClient(boost::asio::io_service& io_service,
-                const boost::asio::ip::address& listen_address,
-                const boost::asio::ip::address& multicast_address);
+                const std::string& listen_address,
+                const std::string& multicast_address,
+                short multicastPort);
         std::string getCaps();
     
     private:
         boost::asio::ip::udp::socket socket_;
-        boost::asio::ip::address listen_address_;
-        boost::asio::ip::address multicast_address_;
+        boost::asio::ip::address listenAddress_;
+        boost::asio::ip::address multicastAddress_;
+        const short multicastPort_;
 };
 
 #endif // _MULTICAST_CAPS_CLIENT_H_

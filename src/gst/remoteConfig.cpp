@@ -28,7 +28,9 @@
 #include <gst/gst.h>
 #include "pipeline.h"
 #include "caps/CapsServer.h"
+#include "caps/MulticastCapsServer.h"
 #include "caps/CapsClient.h"
+#include "caps/MulticastCapsClient.h"
 #include "remoteConfig.h"
 #include "codec.h"
 
@@ -87,12 +89,14 @@ void RemoteConfig::checkPorts() const
 SenderConfig::SenderConfig(Pipeline &pipeline,
         const std::string &codec__,
         const std::string &remoteHost__,
-        int port__) :
+        int port__,
+        const std::string &multicastInterface__) :
     RemoteConfig(codec__, remoteHost__, port__),
     BusMsgHandler(&pipeline),
     message_(""), 
     capsOutOfBand_(false),    // this will be determined later
-    capsServer_()
+    capsServer_(),
+    multicastInterface_(multicastInterface__)
 {}
 
 
@@ -140,9 +144,16 @@ Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, int bitrate
 }
 
 
-void SenderConfig::sendMessage() 
+void SenderConfig::sendCaps() 
 {
-    capsServer_.reset(new CapsServer(capsPort(), message_));
+    /// FIXME: maybe these should have a common base class, so only one pointer is needed?
+    if (multicastInterface_.empty())
+        capsServer_.reset(new TcpCapsServer(capsPort(), message_));
+    else
+    {
+        LOG_DEBUG("USING MULTICAST!");
+        capsServer_.reset(new MulticastCapsServer(remoteHost_, capsPort(), message_));
+    }
 }
 
 /** 
@@ -168,7 +179,7 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
         { 
             LOG_DEBUG("Creating caps server for codec " << codec());
             message_ = std::string(newCapsStr);
-            sendMessage();
+            sendCaps();
             return true;
         }
         else
@@ -311,8 +322,19 @@ void ReceiverConfig::receiveCaps()
 {
     // this blocks
     LOG_DEBUG("Creating new caps client to get caps from " << remoteHost_);
-    CapsClient capsClient(remoteHost_, boost::lexical_cast<std::string>(capsPort()));
-    caps_ = capsClient.getCaps();
+    if (multicastInterface_.empty())
+    {
+        CapsClient capsClient(remoteHost_, boost::lexical_cast<std::string>(capsPort()));
+        caps_ = capsClient.getCaps();
+    }
+    else
+    {
+        // multicast version, FIXME io_service should be created in MulticastCapsClient
+        // 0.0.0.0 is ipv4, 0::0 is ipv6, TODO fix for ipv6
+        boost::asio::io_service io_service;
+        MulticastCapsClient capsClient(io_service, "0.0.0.0", remoteHost_, capsPort());
+        caps_ = capsClient.getCaps();
+    }
     LOG_DEBUG("Received caps " << caps_);
 }
 

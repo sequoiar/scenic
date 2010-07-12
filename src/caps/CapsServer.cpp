@@ -21,7 +21,6 @@
  *
  */
 
-
 #include "util/logWriter.h"
 #include "CapsServer.h"
 #include <boost/bind.hpp>
@@ -53,27 +52,27 @@ void TcpConnection::handle_write(const boost::system::error_code& /*error*/,
 }
 
 // an async tcp server that serves caps
-CapsServer::CapsServer(unsigned int port, const std::string &caps) : 
+TcpCapsServer::TcpCapsServer(unsigned int port, const std::string &caps) : 
     caps_(caps),
     io_service_(),
     acceptor_(io_service_, tcp::endpoint(tcp::v4(), port)),
     dummy_(start_accept()),
     serverThread_(boost::bind(&boost::asio::io_service::run, &io_service_)) {}
 
-CapsServer::~CapsServer() 
+TcpCapsServer::~TcpCapsServer() 
 {
     io_service_.stop();
     serverThread_.join();
 }
 
 // gets called by constructor and also when we have new connections
-int CapsServer::start_accept()
+int TcpCapsServer::start_accept()
 {
     TcpConnection::connection_ptr new_connection =
         TcpConnection::create(acceptor_.io_service(), caps_);
 
     acceptor_.async_accept(new_connection->socket(),
-            boost::bind(&CapsServer::handle_accept, 
+            boost::bind(&TcpCapsServer::handle_accept, 
                 this, 
                 new_connection,
                 boost::asio::placeholders::error));
@@ -81,7 +80,7 @@ int CapsServer::start_accept()
     return 0;
 }
 
-void CapsServer::handle_accept(TcpConnection::connection_ptr new_connection, 
+void TcpCapsServer::handle_accept(TcpConnection::connection_ptr new_connection, 
         const boost::system::error_code& error)
 {
     if (not error)

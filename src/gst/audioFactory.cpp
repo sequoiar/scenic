@@ -52,8 +52,9 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
     if (remoteHost == "localhost")
         remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();
+    std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
-    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port));
+    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface));
 
     shared_ptr<AudioSender> tx(new AudioSender(pipeline, aConfig, rConfig));
 

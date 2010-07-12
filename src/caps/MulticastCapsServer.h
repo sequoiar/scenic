@@ -31,11 +31,13 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include "CapsServer.h"
 
-class MulticastCapsServer
+class MulticastCapsServer : public CapsServer
 {
     public:
-        MulticastCapsServer(const boost::asio::ip::address& multicast_address);
+        MulticastCapsServer(const std::string& multicast_address, 
+                short multicast_port, const std::string &message);
         ~MulticastCapsServer();
         void handle_send_to(const boost::system::error_code& error);
         void handle_timeout(const boost::system::error_code& error);

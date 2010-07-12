@@ -32,13 +32,13 @@
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-const short multicast_port = 30001;
-
-MulticastCapsServer::MulticastCapsServer(const boost::asio::ip::address& multicast_address) : 
+MulticastCapsServer::MulticastCapsServer(const std::string &multicast_address, 
+        short multicast_port,
+        const std::string &message) : 
     io_service_(),
-    endpoint_(multicast_address, multicast_port),
+    endpoint_(boost::asio::ip::address::from_string(multicast_address), multicast_port),
     socket_(io_service_, endpoint_.protocol()),
-    timer_(io_service_), message_("These are multicast caps"),
+    timer_(io_service_), message_(message),
     serverThread_(boost::bind(&boost::asio::io_service::run, &io_service_)),
     done_(false)
 {
