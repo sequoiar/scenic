@@ -31,6 +31,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/lexical_cast.hpp>
 #include "util/sigint.h"
 
 MulticastCapsServer::MulticastCapsServer(const std::string &multicast_address, 
@@ -39,7 +40,8 @@ MulticastCapsServer::MulticastCapsServer(const std::string &multicast_address,
     io_service_(),
     endpoint_(boost::asio::ip::address::from_string(multicast_address), multicast_port),
     socket_(io_service_, endpoint_.protocol()),
-    timer_(io_service_), message_(message + "END_CAPS"),
+    timer_(io_service_), 
+    message_(message + std::string(" BYTES SENT: ") + boost::lexical_cast<std::string>(message.length())),
     serverThread_(boost::bind(&boost::asio::io_service::run, &io_service_)),
     done_(false)
 {

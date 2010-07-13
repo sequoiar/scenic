@@ -26,6 +26,7 @@
 
 #include "util/logWriter.h"
 #include "MulticastCapsClient.h"
+#include <boost/lexical_cast.hpp>
 
 MulticastCapsClient::MulticastCapsClient(boost::asio::io_service& io_service,
         const std::string& listenAddress,
@@ -64,13 +65,22 @@ std::string MulticastCapsClient::getCaps()
     bool done = false;
     std::string result;
     std::string::size_type capsEnd;
+    const static std::string SENTINEL = "BYTES SENT: ";
+    unsigned int bytesDeclared = 0;
+
     while (not done)
     {
         size_t len = socket_.receive_from(boost::asio::buffer(data, BUF_SIZE), sender_endpoint);
         LOG_DEBUG("Received " << len << "bytes");
-        // TODO: message is terminated by a null character, so once we have that we're done
+        // message is terminated by a BYTES SENT: n, where n is the length of the caps,
+        // so once we have that we're done
         result = std::string(data, len);
-        capsEnd = result.find("END_CAPS");
+        capsEnd = result.find(SENTINEL);
+        bytesDeclared = boost::lexical_cast<int>(result.substr(capsEnd + SENTINEL.length(), result.length()));
+        if (bytesDeclared != capsEnd - 1)
+            LOG_WARNING("MISMATCH BETWEEN DECLARED CAPS LENGTH " << 
+                    bytesDeclared <<  " AND RECEIVED CAPS LENGTH" <<
+                    capsEnd - 1);
         if (capsEnd != std::string::npos)
             done = true;
     }
