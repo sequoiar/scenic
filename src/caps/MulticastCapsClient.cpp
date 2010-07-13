@@ -58,20 +58,24 @@ std::string MulticastCapsClient::getCaps()
         throw;
     }
 
-    const int BUF_SIZE = 4096;
+    const int BUF_SIZE = 8192;
     char data[BUF_SIZE];
 
     bool done = false;
+    std::string result;
+    std::string::size_type capsEnd;
     while (not done)
     {
         size_t len = socket_.receive_from(boost::asio::buffer(data, BUF_SIZE), sender_endpoint);
         LOG_DEBUG("Received " << len << "bytes");
         // TODO: message is terminated by a null character, so once we have that we're done
-        done = true;
+        result = std::string(data, len);
+        capsEnd = result.find("END_CAPS");
+        if (capsEnd != std::string::npos)
+            done = true;
     }
     //std::string retVal((std::istreambuf_iterator<char>(&buf)),
      //       std::istreambuf_iterator<char>());
-    std::string retVal(data);
-    return retVal;
+    return result.substr(0, capsEnd);
 }
 

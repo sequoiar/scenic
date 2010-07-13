@@ -31,6 +31,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include "util/sigint.h"
 
 MulticastCapsServer::MulticastCapsServer(const std::string &multicast_address, 
         short multicast_port,
@@ -38,7 +39,7 @@ MulticastCapsServer::MulticastCapsServer(const std::string &multicast_address,
     io_service_(),
     endpoint_(boost::asio::ip::address::from_string(multicast_address), multicast_port),
     socket_(io_service_, endpoint_.protocol()),
-    timer_(io_service_), message_(message),
+    timer_(io_service_), message_(message + "END_CAPS"),
     serverThread_(boost::bind(&boost::asio::io_service::run, &io_service_)),
     done_(false)
 {
@@ -55,9 +56,9 @@ MulticastCapsServer::~MulticastCapsServer()
 
 void MulticastCapsServer::handle_send_to(const boost::system::error_code& error)
 {
-    if (!error && !done_)
+    if (!error and not done_)
     {
-        static const int PERIOD = 1; // seconds
+        static const int PERIOD = 2; // seconds
         timer_.expires_from_now(boost::posix_time::seconds(PERIOD));
         timer_.async_wait(
                 boost::bind(&MulticastCapsServer::handle_timeout, this,
@@ -67,38 +68,13 @@ void MulticastCapsServer::handle_send_to(const boost::system::error_code& error)
 
 void MulticastCapsServer::handle_timeout(const boost::system::error_code& error)
 {
-    if (!error)
+    if (!error and not done_)
     {
+        done_ = signal_handlers::signalFlag();
         socket_.async_send_to(
-                boost::asio::buffer(message_), endpoint_,
+                boost::asio::buffer(message_, message_.length()), endpoint_,
                 boost::bind(&MulticastCapsServer::handle_send_to, this,
                     boost::asio::placeholders::error));
     }
 }
-
-#if 0
-// example usage
-int main(int argc, char* argv[])
-{
-    try
-    {
-        if (argc != 2)
-        {
-            std::cerr << "Usage: sender <multicast_address>\n";
-            std::cerr << "  For IPv4, try:\n";
-            std::cerr << "    sender 239.255.0.1\n";
-            std::cerr << "  For IPv6, try:\n";
-            std::cerr << "    sender ff31::8000:1234\n";
-            return 1;
-        }
-        sender s(boost::asio::ip::address::from_string(argv[1]));
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << "Exception: " << e.what() << "\n";
-    }
-
-    return 0;
-}
-#endif
 
