@@ -165,7 +165,7 @@ fi
 
 AX_PYTHON_MODULE([pypm], [])
 AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
-    [AC_MSG_WARN(["The Scenic graphical user interface requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home or is python-pygame 1.9 and above."])])
+    [AC_MSG_WARN(["The Scenic graphical user interface requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home or in python-pygame 1.9 and above."])])
     # We install midistream anyways, but the MIDI support is checked by Scenic and will be disabled if pypm if not found at runtime.
 
 AX_PYTHON_MODULE([twisted], [Fatal])
