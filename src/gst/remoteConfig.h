@@ -27,9 +27,9 @@
 #include <set>
 #include <boost/scoped_ptr.hpp>
 #include "portOffsets.h"
-#include "tcp/CapsServer.h"
 
 #include "busMsgHandler.h"
+#include "caps/CapsServer.h"
 
 class Encoder;
 class Pipeline;
@@ -81,7 +81,8 @@ class SenderConfig : public RemoteConfig, private BusMsgHandler
         SenderConfig(Pipeline &pipeline,
                 const std::string &codec, 
                 const std::string &remoteHost, 
-                int port);
+                int port,
+                const std::string &multicastInterface);
 
         VideoEncoder* createVideoEncoder(const Pipeline &pipeline, int bitrate, int quality) const;
         Encoder* createAudioEncoder(const Pipeline &pipeline, int bitrate, double quality) const;
@@ -89,12 +90,13 @@ class SenderConfig : public RemoteConfig, private BusMsgHandler
         void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
 
     private:
-        void sendMessage();
+        void sendCaps();
 
         std::string message_;
         bool capsOutOfBand_;
         bool handleBusMsg(_GstMessage *msg);
         boost::scoped_ptr<CapsServer> capsServer_;
+        const std::string multicastInterface_;
 };
 
 

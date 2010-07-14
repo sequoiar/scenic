@@ -33,11 +33,15 @@ class TcpConnection : public boost::enable_shared_from_this<TcpConnection>
         std::string message_;
 };
 
-// an async tcp server that serves caps
+// empty base class so we can switch implementations
 class CapsServer {
+};
+
+// an async tcp server that serves caps
+class TcpCapsServer : public CapsServer {
     public:
-        CapsServer(unsigned int port, const std::string &caps);
-        ~CapsServer();
+        TcpCapsServer(unsigned int port, const std::string &caps);
+        ~TcpCapsServer();
 
     private:
         int start_accept();

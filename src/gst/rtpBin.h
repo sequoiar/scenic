@@ -40,7 +40,7 @@ class RtpBin : boost::noncopyable
 
     protected:
         /// FIXME: this sessionId is all kinds of gross
-        explicit RtpBin(const Pipeline& pipeline);
+        explicit RtpBin(const Pipeline& pipeline, bool printStats = true);
         const char *padStr(const char *padName) const;
 
         void registerSession(const std::string &codec);

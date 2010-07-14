@@ -1,7 +1,7 @@
 #include "./capsParser.h"
 
 #include "util.h"
-#include "audioConfig.h"
+#include "gst/codec.h"
 #include <iostream>
 #include <string>
 #include <climits>
@@ -26,7 +26,7 @@ std::string CapsParser::getVideoCaps(const std::string &codec, int width, int he
 std::string CapsParser::getAudioCaps(const std::string &codec, int numChannels, int sampleRate)
 {
     using boost::lexical_cast;
-    if (AudioSourceConfig::maxChannels(codec) < numChannels or numChannels < 1)
+    if (Encoder::maxChannels(codec) < numChannels or numChannels < 1)
         THROW_CRITICAL("Invalid channel number " << numChannels << " for codec " << codec); 
 
     const std::string profile = codec + "_" + 

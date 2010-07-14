@@ -45,6 +45,7 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
         virtual Pay* createPayloader() const = 0;
         int getBitrate() const;
         virtual void setBitrate(int bitrate);
+        static int maxChannels(const std::string &codec);
 
     protected:
         const Pipeline &pipeline_;

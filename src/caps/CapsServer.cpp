@@ -1,4 +1,26 @@
 
+/* CapsServer.cpp
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "util/logWriter.h"
 #include "CapsServer.h"
 #include <boost/bind.hpp>
@@ -30,27 +52,27 @@ void TcpConnection::handle_write(const boost::system::error_code& /*error*/,
 }
 
 // an async tcp server that serves caps
-CapsServer::CapsServer(unsigned int port, const std::string &caps) : 
+TcpCapsServer::TcpCapsServer(unsigned int port, const std::string &caps) : 
     caps_(caps),
     io_service_(),
     acceptor_(io_service_, tcp::endpoint(tcp::v4(), port)),
     dummy_(start_accept()),
     serverThread_(boost::bind(&boost::asio::io_service::run, &io_service_)) {}
 
-CapsServer::~CapsServer() 
+TcpCapsServer::~TcpCapsServer() 
 {
     io_service_.stop();
     serverThread_.join();
 }
 
 // gets called by constructor and also when we have new connections
-int CapsServer::start_accept()
+int TcpCapsServer::start_accept()
 {
     TcpConnection::connection_ptr new_connection =
         TcpConnection::create(acceptor_.io_service(), caps_);
 
     acceptor_.async_accept(new_connection->socket(),
-            boost::bind(&CapsServer::handle_accept, 
+            boost::bind(&TcpCapsServer::handle_accept, 
                 this, 
                 new_connection,
                 boost::asio::placeholders::error));
@@ -58,7 +80,7 @@ int CapsServer::start_accept()
     return 0;
 }
 
-void CapsServer::handle_accept(TcpConnection::connection_ptr new_connection, 
+void TcpCapsServer::handle_accept(TcpConnection::connection_ptr new_connection, 
         const boost::system::error_code& error)
 {
     if (not error)

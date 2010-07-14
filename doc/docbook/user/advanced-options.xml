@@ -109,43 +109,43 @@
   <sect1 id="user.using-milhouse">
     <title>Using 
     <application>Milhouse</application></title>
-    <para>Milhouse command line is a powerful tool with many
+    <para>The <application>milhouse</application> command line application is a powerful tool with many
     options not implemented yet in the Scenic GUI. For more complex
-    setup than what Scenic can currently support, we suggest you to
+    setups than what Scenic can currently support, we suggest you 
     use 
-    <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink>as a
+    <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> as a
     launching script. Look at some examples in 
     <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
     trunk/utils/</ulink>. You should look at the manual page of
     both these tools to know more about them.</para>
     <para>Here is a quick introduction to using 
-    <application>Milhouse</application>, an application for
+    <application>milhouse</application>, an application for
     audio-video streaming over RTP.</para>
     <para>
-    <application>Milhouse</application>is a simple tool that can do
-    a lot of things. For example, it can list the cameras and video
+    The <application>milhouse</application> application is a simple tool 
+    that can do a lot of things. For example, it can list the cameras and video
     capture devices found on your computer. It can also change
     video settings for a V4L2 (Video4Linux2) device, such as its
     video standard and its selected video input number. 
-    <application>Milhouse</application>also supports DV cameras and
+    <application>Milhouse</application> also supports DV cameras and
     DC cameras, two kinds of cameras using ieee1394 (Firewire) to
-    send their digital video signal to the computer. Those two
-    types of cameras are not yet supported by the &app; graphical
+    send their digital video signal to the computer. These two
+    camera types are not yet supported by the &app; graphical
     user interface. This is one of the reasons why an advanced user
-    might prefer to use the 
-    <application>Milhouse</application>command line tool instead of
+    might prefer to use 
+    <application>milhouse</application> instead of
     the &app; graphical user interface.</para>
     <para>Above all, 
-    <application>Milhouse</application>is an audio-video streamer.
+    <application>Milhouse</application> is an audio-video streamer.
     Its main purpose is to transmit digital video and audio signals
-    over the Internet. As a streamer, it can be used in either of
-    it modes: as a sender or a receiver. To choose its mode, simply
+    over the Internet. As a streamer, it can be used in one of two 
+    it modes: as a sender or a receiver. To choose, simply
     give it the command-line option "--receiver" or
     "--sender".</para>
     </sect1>
     <sect1 id="user.milhouse-send-receive">
-      <title>using 
-      <application>milhouse</application>as a sender or a
+      <title>Using 
+      <application>milhouse</application> as a sender or a
       receiver</title>
       <para>To create a streaming session with 
       <application>Milhouse</application>, you must launch a sender
@@ -154,23 +154,23 @@
       option is for.</para>
       <para>If you want to stream audio, the sender is the one that
       captures the audio signal from its audio source. You must
-      choose a value for its "--audiosource" option. A common value
-      would be "jackaudiosrc", for the JACK audio server. An other
+      choose a value for its "--audiosource" option. If omitted,
+      the default is "jackaudiosrc", for the JACK audio server. Another
       common value is "audiotestsrc", a test source that generates
-      simple tones.</para>
+      simple test tones.</para>
       <para>If you want to stream video, you must specify a video
       source for the sender, using its "--videosource" option. A
       common value is "v4l2src", for a V4L2 source. In this case,
       you might want to specify a video device, such as
-      "/dev/video0", using the "--videodevice" option. An other
-      useful value for the "--videosource" is "videotestsrc", for
+      "/dev/video0", using the "--videodevice" option. The
+      default value for the "--videosource" is "videotestsrc", for
       test color bars.</para>
       <para>On the receiver's side, you must choose an output for
       the audio - the "--audiosink" argument - and specify the
       audio and video codecs, like for the sender (or use the
       defaults listed in milhouse --help).</para>
       <para>We will create a 
-      <application>Milhouse</application>sender and receiver on two separate computer.</para> 
+      <application>milhouse</application> sender and receiver on two separate computers.</para> 
 
     </sect1>
     <sect1 id="user.milhouse-receivers">
@@ -192,7 +192,7 @@ milhouse --receiver --address remote_ip_address --videosink xvimagesink --videoc
       <para>
       <userinput>export DISPLAY=:0.0</userinput>
       </para>
-      <para>Execute program on the remote machine with the
+      <para>Execute this command on the remote machine with the
       following parameters:</para>
       <para>
       <userinput>
@@ -202,38 +202,38 @@ milhouse --receiver --address local_ip_address --videosink xvimagesink --videoco
     </sect1>
     <sect1 id="user.milhouse-senders">
       <title>Launch the senders</title>
-      <para>the next step is to launch the milhouse sender
+      <para>The next step is to launch the milhouse sender
       processes. of course, that should be on a different
       computer.</para>
-      <para>execute program on local machine with the following
+      <para>Execute this command on the local machine with the following
       parameters:</para>
       <para>
       <userinput>
 milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
 </userinput>
 </para>
-      <para>execute program on remote machine with the following
+      <para>Execute this command on the remote machine with the following
       parameters:</para>
       <para>
       <userinput>
 milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
       </userinput>
       </para>
-      <para>a video window displaying the live video stream should
-      appear on one of your designated screens. it is movable by
-      holding down the -alt- key and dragging the window. pressing
-      'f' or escape will toggle full screen mode.</para>
-      <para>you should also see the audio connections appear in
-      qjackctl. the outputs are now routable to your speakers or
+      <para>A video window displaying the live video stream should
+      appear on one of your designated screens. It is movable by
+      holding down the -alt- key and dragging the window. Pressing
+      'f' or escape will toggle fullscreen mode.</para>
+      <para>You should also see the audio connections appear in
+      qjackctl. The outputs are now routable to your speakers or
       other applications.</para>
-      <para>you should now have video and audio input fully working
+      <para>You should now have video and audio input fully working
       on both sides.</para>
-      <para>to stop milhouse type control-c in the used terminal or
-      type control-q in the video window.</para>
+      <para>To stop milhouse type control-c in the terminal from which it
+      was started or type control-q in the video window.</para>
     </sect1>
   <sect1 id="user.milhouse-help">
     <title>Milhouse Help</title>
-    <para>Type milhouse --help to have informations on the
+    <para>Type milhouse --help to have information on the
     different options available.</para>
     <para>
     <userinput>milhouse --help</userinput>
@@ -623,6 +623,25 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
         </tbody>
       </tgroup>
     </informaltable>
+  </sect1>
+  <sect1 id="user.Multicast">
+    <title>Multicast</title>
+    <para>The milhouse command can also be used in multicast scenarios.
+    All the same options apply as before, only two things need changing:
+    <orderedlist>
+    <listitem>Both the sender (who will stream audio and/or video to multiple 
+        receivers) and each of the receivers need to specify the 
+        --multicast-interface argument, which specifies which network 
+        interface to use.</listitem>
+    <listitem>A multicast address must be used for the --address argument, preferably
+    in the range 239.0.0.0/8, which is intended for private or locally administered multicast domains (see <ulink url="http://tools.ietf.org/html/rfc2365">RFC 2365</ulink>).</listitem>
+    </orderedlist>
+    </para>
+    <para>A simple example of a multicast setup:</para>
+    <para>Sender:</para>
+    <para>milhouse -s --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</para>
+    <para>Receivers:</para>
+    <para>milhouse -r --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</para>
   </sect1>
   <sect1 id="user.other-uses">
     <title>Other uses</title>

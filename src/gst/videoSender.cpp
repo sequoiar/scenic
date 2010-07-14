@@ -30,7 +30,7 @@
 #include "videoConfig.h"
 #include "remoteConfig.h"
 #include "codec.h"
-#include "capsParser.h"
+#include "caps/capsParser.h"
 #include "messageDispatcher.h"
 
 #include <boost/shared_ptr.hpp>

@@ -27,9 +27,10 @@
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "localAudio.h"
+#include "codec.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
-#include "capsParser.h"
+#include "caps/capsParser.h"
 #include "pipeline.h"
 
 using boost::shared_ptr;
@@ -38,7 +39,7 @@ namespace po = boost::program_options;
 void audiofactory::printMaxChannels(const std::string &codec)
 {
     LOG_PRINT(codec << " supports up to " << 
-            AudioSourceConfig::maxChannels(codec) << " channels\n");
+            Encoder::maxChannels(codec) << " channels\n");
 }
 
 shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const po::variables_map &options)
@@ -51,8 +52,9 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
     if (remoteHost == "localhost")
         remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();
+    std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
-    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port));
+    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface));
 
     shared_ptr<AudioSender> tx(new AudioSender(pipeline, aConfig, rConfig));
 
