@@ -29,6 +29,7 @@ class Pipeline;
 class VideoSource;
 class VideoScale;
 class VideoFlip;
+class TextOverlay;
 class VideoSink;
 
 class VideoSourceConfig
@@ -90,8 +91,10 @@ class VideoSinkConfig
         VideoSink* createSink(Pipeline &pipeline) const;
         VideoScale* createVideoScale(const Pipeline &pipeline) const;
         VideoFlip* createVideoFlip(const Pipeline &pipeline) const;
+        TextOverlay* createTextOverlay(const Pipeline &pipeline) const;
         bool doDeinterlace() const { return doDeinterlace_; }
         std::string flipMethod() const { return flipMethod_; }
+        bool hasText() const { return not text_.empty(); }
 
     private:
         bool resolutionIsInverted() const;
@@ -105,6 +108,7 @@ class VideoSinkConfig
         const std::string flipMethod_;
         const unsigned long xid_;
         const std::string display_;
+        const std::string text_;
 };
 
 #endif // _VIDEO_CONFIG_H_

@@ -30,6 +30,7 @@
 #include "videoConfig.h"
 #include "remoteConfig.h"
 #include "videoFlip.h"
+#include "textOverlay.h"
 #include "videoSink.h"
 #include "codec.h"
 #include "rtpPay.h"
@@ -47,6 +48,7 @@ VideoReceiver::VideoReceiver(Pipeline &pipeline,
     session_(pipeline), 
     depayloader_(0), 
     decoder_(0), 
+    textoverlay_(0),
     videoscale_(0), 
     videoflip_(0), 
     sink_(0), 
@@ -63,6 +65,7 @@ VideoReceiver::~VideoReceiver()
     delete sink_;
     delete videoflip_;
     delete videoscale_;
+    delete textoverlay_;
     delete depayloader_;
     delete decoder_;
 }
@@ -91,6 +94,16 @@ void VideoReceiver::createSink(Pipeline &pipeline)
     // avoid creating the videoflip as it has a colorspace converter
     videoscale_ = videoConfig_->createVideoScale(pipeline);
     assert(videoscale_);
+
+    if (videoConfig_->hasText())
+    {
+        textoverlay_ = videoConfig_->createTextOverlay(pipeline);
+        gstlinkable::link(*decoder_, *textoverlay_);
+        gstlinkable::link(*textoverlay_, *videoscale_);
+    }
+    else
+        gstlinkable::link(*decoder_, *videoscale_);
+
     if (videoConfig_->flipMethod() != "none")
     {
         videoflip_ = videoConfig_->createVideoFlip(pipeline);
@@ -102,7 +115,6 @@ void VideoReceiver::createSink(Pipeline &pipeline)
     if (remoteConfig_->jitterbufferControlEnabled())
         MessageDispatcher::sendMessage("create-control");
 
-    gstlinkable::link(*decoder_, *videoscale_);
     if (videoflip_ != 0)
     {
         gstlinkable::link(*videoscale_, *videoflip_);

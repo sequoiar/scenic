@@ -30,6 +30,7 @@
 
 class RtpPay;
 class VideoDecoder;
+class TextOverlay;
 class VideoScale;
 class VideoFlip;
 class VideoSink;
@@ -59,6 +60,7 @@ class VideoReceiver
 
         RtpPay *depayloader_; 
         VideoDecoder *decoder_;
+        TextOverlay *textoverlay_;
         VideoScale *videoscale_;
         VideoFlip *videoflip_;
         VideoSink *sink_;

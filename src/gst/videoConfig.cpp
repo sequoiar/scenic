@@ -31,6 +31,7 @@
 #include "videoSink.h"
 #include "videoFlip.h"
 #include "videoScale.h"
+#include "textOverlay.h"
 #include "sharedVideoSink.h"
 
 #ifdef CONFIG_GL
@@ -243,7 +244,8 @@ VideoSinkConfig::VideoSinkConfig(const boost::program_options::variables_map &op
                     options["display-height"].as<int>() : options["height"].as<int>()), VideoScale::MAX_SCALE)),
     flipMethod_(options["flip-video"].as<std::string>()),
     xid_(options["x-window-id"].as<unsigned long>()), 
-    display_(options.count("videodisplay") ? options["videodisplay"].as<std::string>() : "")
+    display_(options.count("videodisplay") ? options["videodisplay"].as<std::string>() : ""),
+    text_(options.count("text-overlay") ? options["text-overlay"].as<std::string>() : "")
 {}
 
 
@@ -300,5 +302,10 @@ VideoScale* VideoSinkConfig::createVideoScale(const Pipeline &pipeline) const
 VideoFlip* VideoSinkConfig::createVideoFlip(const Pipeline &pipeline) const
 {
     return new VideoFlip(pipeline, flipMethod_);
+}
+
+TextOverlay* VideoSinkConfig::createTextOverlay(const Pipeline &pipeline) const
+{
+    return new TextOverlay(pipeline, text_);
 }
 
