@@ -30,6 +30,8 @@ import smtplib
 import gtk.gdk
 import webbrowser
 from twisted.internet import reactor
+from twisted.internet import utils 
+from twisted.python import procutils
 from twisted.internet import defer
 from twisted.internet import task
 from twisted.python.reflect import prefixedMethods
@@ -1720,7 +1722,7 @@ class About(object):
 
 class StatusWindow(object):
     """
-    Detailled status
+    Detailed status
     """
     def __init__(self, app):
         self.app = app
@@ -1757,6 +1759,28 @@ class StatusWindow(object):
             txt += _format_text_and_yesno(_("Video codec %(codec)s is supported...") % {"codec": readable}, codec in self.app._supported_codecs["video"])
         for readable, codec in AUDIO_CODECS.iteritems():
             txt += _format_text_and_yesno(_("Audio codec %(codec)s is supported...") % {"codec": readable}, codec in self.app._supported_codecs["audio"])
+        self._append_milhouse_version(txt)
 
-        self.status_textview_widget.get_buffer().set_text(unicode(txt))
+    def _append_milhouse_version(self, txt):
+        """
+        Appends the version number for milhouse to txt and sets the status window text to txt
+        @param txt: text for the status window
+        """
+        def _cb(output, txt):
+            """ Callback that completes the status window """
+            txt += _("Milhouse version: %s\n") % (output.splitlines()[0].split(':')[1].split()[0])
+            txt += _("Gstreamer Core Library version: %s\n") % (output.splitlines()[-1].split()[-1])
+            self.status_textview_widget.get_buffer().set_text(unicode(txt))
+        def _eb(reason, deferred):
+            deferred.errback(reason)
+            print("Error getting milhouse version: %s" % (reason))
+
+        command_name = "milhouse"
+        try:
+            executable = procutils.which(command_name)[0] # gets the executable in our current path
+        except IndexError:
+            return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
+        d = utils.getProcessOutput(executable, args=['--gst-version'], env=os.environ, errortoo=True)
+        d.addCallback(_cb, txt)
+        d.addErrback(_eb, d)
     

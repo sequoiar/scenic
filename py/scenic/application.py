@@ -272,7 +272,7 @@ class Application(object):
         Called by the communication.Client in case of an error.
         """
         self._is_negotiating = False #important
-
+    
     def format_v4l2_device_name(self, device_dict):
         log.debug("formatting v4l2 device name %s" % (device_dict))
         return _format_device_name_and_identifier(device_dict["card"], device_dict["name"])

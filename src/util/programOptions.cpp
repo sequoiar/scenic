@@ -103,6 +103,7 @@ po::options_description ProgramOptions::createDefaultOptions()
              "channels milhouse can send for the selected audiocodec")
             ("dump-pipeline", po::bool_switch(), "outputs a dotfile representation of this process' pipeline")
             ("text-overlay", po::value<string>(), "overlays given text on video sink (receiver side only)")
+            ("gst-version", po::bool_switch(), "prints the version number of the GStreamer (core) library currently installed")
             ;
 
         descriptionInitialized = true;

@@ -220,6 +220,11 @@ short Milhouse::run(int argc, char **argv)
 
     // wrapper so main doesn't need to know about gst and gtk
     gutil::init_gst_gtk(argc, argv);
+    if (options["gst-version"].as<bool>())
+    {
+        // this was handled internally by gst_init's argv parsing
+        return 0;
+    }
 
     if (options["max-channels"].as<bool>())
     { 
