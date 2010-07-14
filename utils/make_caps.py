@@ -74,7 +74,7 @@ class VideoProfile(Profile):
         self.height = height
         self.pixel_aspect_ratio = self.get_pixel_aspect_ratio(picture_aspect_ratio)
         # FIXME: this only works for yuv and doesn't handle other framerates
-        self.src = "videotestsrc ! video/x-raw-yuv, width=%d, height=%d, framerate=30/1, pixel-aspect-ratio=%s ! " \
+        self.src = "videotestsrc ! video/x-raw-yuv, width=%d, height=%d, framerate=30/1, pixel-aspect-ratio=%s ! ffmpegcolorspace " \
                     % (self.width, self.height, self.pixel_aspect_ratio) 
 
 class AudioProfile(Profile):
@@ -90,7 +90,7 @@ def generate_caps(profile_name, profile):
     """ Generate caps for a set of profiles """
     #print ('/*----------------------------------------------*/' )
     #print ('CAPS FOR CODEC ' + codecName + ':')
-    launch_line = profile.src + " ! %s ! %s name=payloader ! fakesink sync=false" \
+    launch_line = profile.src + " ! %s ! %s name=payloader ! fakesink sync=false silent=true" \
     % (profile.encoder, profile.payloader)
     pipeline = gst.parse_launch(launch_line)
     pipeline.set_state(gst.STATE_PLAYING)
