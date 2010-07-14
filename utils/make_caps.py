@@ -174,6 +174,7 @@ payloaders = {
 
 
 if __name__ == '__main__': 
+    print "Generating caps, this may take a while..."
     if len(sys.argv) == 2:
         filename = sys.argv[1]
     else:
