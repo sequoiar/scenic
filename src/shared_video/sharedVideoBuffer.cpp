@@ -43,6 +43,11 @@ SharedVideoBuffer::SharedVideoBuffer(int width, int height) : width_(width), hei
     ASPECT_RATIO = width_ / height_;
 }
 
+SharedVideoBuffer::~SharedVideoBuffer()
+{
+    doPush_ = false;
+}
+
 interprocess_mutex & SharedVideoBuffer::getMutex()
 {
     return mutex_;
@@ -117,9 +122,12 @@ void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 // wait for buffer to be pushed if it's currently empty
 void SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 {
+    boost::system_time const timeout = boost::get_system_time() +
+        boost::posix_time::milliseconds(1);
+
     if (!bufferIn_)  // XXX: this must be an if, not a while, otherwise process hangs
     {
-        conditionEmpty_.wait(lock);
+        conditionEmpty_.timed_wait(lock, timeout);
     }
 }
 

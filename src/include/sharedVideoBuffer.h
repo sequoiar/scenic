@@ -34,6 +34,7 @@ class SharedVideoBuffer
         static double ASPECT_RATIO;
 
         SharedVideoBuffer(int width, int height);
+        ~SharedVideoBuffer();
 
         boost::interprocess::interprocess_mutex & getMutex();
 
