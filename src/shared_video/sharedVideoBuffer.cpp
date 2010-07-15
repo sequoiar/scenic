@@ -109,7 +109,7 @@ void SharedVideoBuffer::notifyProducer()
 
 bool SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 {
-    boost::system_time const timeout = boost::get_system_time() +
+    const boost::system_time timeout = boost::get_system_time() +
         boost::posix_time::milliseconds(1);
 
     if (bufferIn_)   // XXX: this must be an if, not a while, otherwise process hangs 
@@ -123,7 +123,7 @@ bool SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 // wait for buffer to be pushed if it's currently empty
 bool SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 {
-    boost::system_time const timeout = boost::get_system_time() +
+    const boost::system_time timeout = boost::get_system_time() +
         boost::posix_time::seconds(1);
 
     if (!bufferIn_)  // XXX: this must be an if, not a while, otherwise process hangs
