@@ -29,7 +29,7 @@ TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) :
     pipeline_(pipeline),
     textoverlay_(pipeline_.makeElement("textoverlay", NULL))
 {
-    g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "normal 50",
+    g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "sans 50",
             NULL);
 }
 
