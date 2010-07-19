@@ -1,6 +1,6 @@
-Release notes for Scenic 0.6.2
+Release notes for Scenic 0.6.3
 
-This release is the second of the stable 0.6 branch. This branch introduces
+This release is the fourth of the stable 0.6 branch. This branch introduces
 many new features developed during 0.5 series. Those features include MIDI 
 streaming support and the hability to customize what each peer receives as 
 audio and video. 
@@ -41,19 +41,31 @@ See the NEWS and ChangeLog files for a complete history of changes.
         of the 0.5 branch.
 
 New features in milhouse:
-    (none)
+    -Added text overlay
+    -Added gst-version command to print out the current version of the gstreamer
+    library being used.
+    -Added multicast caps negotiation.
+    -avoid flickering on video resize
+    -improvements to SharedVideoBuffer API
 
 New features in scenic:
-    (none)
+    -fixed python packaging
 
 Bug fixes in milhouse: 
-    (none)
+    * #589 Add AM_MAINTAINER_MODE to configure.ac
+    * Fixed /man Makefile.am
+    * #594 Be able to write text overlay in milhouse's texture
+    * #576 We get a "Could not generate caps from caps string" error
+    * #592 test and probably fix multicast in milhouse
+    * #577 Add GStreamer version in the detailed status
 
 Bug fixes in scenic: 
-    * #586  Use $(pythondir) for Python files
+    * (none)
 
 HISTORY
 
+    * 2010-06-18: 0.6.2
+         * Third stable release of the 0.6 stable branch.
     * 2010-06-11: 0.6.1
          * Second stable release of the 0.6 stable branch.
          * Disabled audio test source, since it might use 100% of the CPU
