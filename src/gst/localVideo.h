@@ -30,6 +30,7 @@ class Pipeline;
 class VideoSource;
 class VideoSourceConfig;
 class VideoScale;
+class TextOverlay;
 class VideoFlip;
 class VideoSink;
 class VideoSinkConfig;
@@ -49,6 +50,7 @@ class LocalVideo : boost::noncopyable
         VideoSource *source_;
         _GstElement *colourspace_;
         VideoScale *videoscale_;
+        TextOverlay *textoverlay_;
         VideoFlip *videoflip_;
         VideoSink *sink_;
 };

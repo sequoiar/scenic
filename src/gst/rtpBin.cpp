@@ -39,13 +39,13 @@ bool RtpBin::destroyed_ = false;
 
 std::map<int, RtpBin*> RtpBin::sessions_;
 
-RtpBin::RtpBin(const Pipeline &pipeline) : 
+RtpBin::RtpBin(const Pipeline &pipeline, bool printStats) : 
     pipeline_(pipeline),
     rtcp_sender_(0), 
     rtcp_receiver_(0), 
     sessionId_((++sessionCount_) - 1), 
     sessionName_(), 
-    printStats_(true)  // 0 based
+    printStats_(printStats)  // 0 based
 {
     // only initialize rtpbin element once per process
     if (rtpbin_ == 0) 
@@ -59,10 +59,13 @@ RtpBin::RtpBin(const Pipeline &pipeline) :
 
 void RtpBin::startPrintStatsCallback()
 {
+    if (printStats_)
+    {
     // comment this to not print stats
     g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
             static_cast<GSourceFunc>(printStatsCallback),
             this);
+    }
 }
 
 

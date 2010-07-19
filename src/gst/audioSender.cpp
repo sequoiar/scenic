@@ -32,7 +32,7 @@
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
-#include "capsParser.h"
+#include "caps/capsParser.h"
 
 using boost::shared_ptr;
 

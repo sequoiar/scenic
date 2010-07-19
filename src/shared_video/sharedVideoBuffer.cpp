@@ -11,7 +11,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * [propulse]ART is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * [propulse]ART is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -40,6 +41,11 @@ SharedVideoBuffer::SharedVideoBuffer(int width, int height) : width_(width), hei
     mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), doPush_(true)
 {
     ASPECT_RATIO = width_ / height_;
+}
+
+SharedVideoBuffer::~SharedVideoBuffer()
+{
+    doPush_ = false;
 }
 
 interprocess_mutex & SharedVideoBuffer::getMutex()
@@ -101,25 +107,30 @@ void SharedVideoBuffer::notifyProducer()
 }
 
 
-void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
+bool SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 {
-    boost::system_time const timeout = boost::get_system_time() +
+    const boost::system_time timeout = boost::get_system_time() +
         boost::posix_time::milliseconds(1);
 
     if (bufferIn_)   // XXX: this must be an if, not a while, otherwise process hangs 
     {
-        conditionFull_.timed_wait(lock, timeout);
+        return conditionFull_.timed_wait(lock, timeout);
     }
+    return true;
 }
 
 
 // wait for buffer to be pushed if it's currently empty
-void SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
+bool SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 {
+    const boost::system_time timeout = boost::get_system_time() +
+        boost::posix_time::seconds(1);
+
     if (!bufferIn_)  // XXX: this must be an if, not a while, otherwise process hangs
     {
-        conditionEmpty_.wait(lock);
+        return conditionEmpty_.timed_wait(lock, timeout);
     }
+    return true;
 }
 
 

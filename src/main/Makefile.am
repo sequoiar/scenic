@@ -18,7 +18,7 @@ milhouse_LDADD = $(ALL_GST_LIBS) $(JACK_LIBS) \
 		$(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(LIBDC1394_LIBS) \
         $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_FILESYSTEM_LIB) \
         $(top_builddir)/src/gst/libgst.la  \
-        $(top_builddir)/src/tcp/libcaps.la \
+        $(top_builddir)/src/caps/libcaps.la \
         $(top_builddir)/src/util/libutil.la \
         $(top_builddir)/src/gutil/libgutil.la \
         $(top_builddir)/src/shared_video/libshared_video.la \

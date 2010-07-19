@@ -29,7 +29,7 @@
 
 #include "videoConfig.h"
 #include "remoteConfig.h"
-#include "capsParser.h"
+#include "caps/capsParser.h"
 
 using boost::shared_ptr;
 namespace po = boost::program_options;
@@ -72,8 +72,9 @@ shared_ptr<VideoSender> videofactory::buildVideoSender(Pipeline &pipeline, const
     if (remoteHost == "localhost")
         remoteHost = "127.0.0.1";
     int port = options["videoport"].as<int>();
+    std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
-    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port)); 
+    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface)); 
     shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, rConfig));
 
     rConfig->capsOutOfBand(not options["disable-caps-negotiation"].as<bool>() 

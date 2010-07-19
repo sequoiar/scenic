@@ -30,6 +30,7 @@
 #include "videoConfig.h"
 #include "videoScale.h"
 #include "videoFlip.h"
+#include "textOverlay.h"
 #include "videoSink.h"
 
 #include "dv1394.h"
@@ -46,6 +47,7 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     source_(sourceConfig_->createSource(pipeline_)), 
     colourspace_(0),
     videoscale_(sinkConfig_->createVideoScale(pipeline_)),
+    textoverlay_(0),
     videoflip_(sinkConfig_->flipMethod() != "none" ? sinkConfig_->createVideoFlip(pipeline_) : 0),
     sink_(sinkConfig_->createSink(pipeline_))
 {
@@ -77,13 +79,30 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
         }
     }
 
+    if (sinkConfig_->hasText())
+        textoverlay_ = sinkConfig_->createTextOverlay(pipeline);
+    
     if (videoflip_ != 0)
     {
-        gstlinkable::link(*videoscale_, *videoflip_);
+        if (textoverlay_ == 0)
+            gstlinkable::link(*videoscale_, *videoflip_);
+        else
+        {
+            gstlinkable::link(*videoscale_, *textoverlay_);
+            gstlinkable::link(*textoverlay_, *videoflip_);
+        }
         gstlinkable::link(*videoflip_, *sink_);
     }
     else
-        gstlinkable::link(*videoscale_, *sink_);
+    {
+        if (textoverlay_ == 0)
+            gstlinkable::link(*videoscale_, *sink_);
+        else
+        {
+            gstlinkable::link(*videoscale_, *textoverlay_);
+            gstlinkable::link(*textoverlay_, *sink_);
+        }
+    }
 
     /// FIXME: hack for dv1394src
     if (sourceConfig_->sourceString() == "dv1394src")

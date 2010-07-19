@@ -34,6 +34,7 @@ class SharedVideoBuffer
         static double ASPECT_RATIO;
 
         SharedVideoBuffer(int width, int height);
+        ~SharedVideoBuffer();
 
         boost::interprocess::interprocess_mutex & getMutex();
 
@@ -51,10 +52,10 @@ class SharedVideoBuffer
 
         void notifyProducer();
 
-        void waitOnConsumer(boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> &lock);
+        bool waitOnConsumer(boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> &lock);
 
         // wait for buffer to be pushed if it's currently empty
-        void waitOnProducer(boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> &lock);
+        bool waitOnProducer(boost::interprocess::scoped_lock<boost::interprocess::interprocess_mutex> &lock);
 
         int getWidth();
         int getHeight();

@@ -70,6 +70,7 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
 	horizontalSlider_(0),
 	sliderFrame_(0)
 {
+    gtk_widget_set_double_buffered(drawingArea_, FALSE);
     if (hasWindow())
     {
         namespace fs = boost::filesystem;

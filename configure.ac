@@ -11,6 +11,11 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wno-portability])
 
+dnl we use this to avoid causing normal builds to regenerate autotools if
+dnl "too old" which might happen accidentally, especially when using a VCS
+dnl such as when building debian packages
+AM_MAINTAINER_MODE([enable])
+
 AC_SUBST([BUILD_TIME], ["`date +%F\ %T\ %Z`"])
 
 # Check for C and C++ compilers
@@ -160,7 +165,7 @@ fi
 
 AX_PYTHON_MODULE([pypm], [])
 AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
-    [AC_MSG_WARN(["The Scenic graphical user interface requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home or is python-pygame 1.9 and above."])])
+    [AC_MSG_WARN(["The Scenic graphical user interface requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home or in python-pygame 1.9 and above."])])
     # We install midistream anyways, but the MIDI support is checked by Scenic and will be disabled if pypm if not found at runtime.
 
 AX_PYTHON_MODULE([twisted], [Fatal])
@@ -227,9 +232,6 @@ AC_SUBST(PIXMAPS_DIR)
 
 AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
 
-PYTHON_LIB_PATH=$LIBDIR/scenic/py
-AC_SUBST(PYTHON_LIB_PATH)
-
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
@@ -271,7 +273,7 @@ src/gutil/Makefile
 src/shared_video/Makefile
 src/vumeter/Makefile
 src/vumeter/test/Makefile
-src/tcp/Makefile
+src/caps/Makefile
 src/gst/Makefile
 src/firereset/Makefile
 src/main/Makefile
