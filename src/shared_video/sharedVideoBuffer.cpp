@@ -136,22 +136,12 @@ bool SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 
 int SharedVideoBuffer::getWidth()
 {
-    const boost::system_time timeout = boost::get_system_time() +
-        boost::posix_time::seconds(5);
-    scoped_lock<interprocess_mutex> lock(mutex_, timeout);
-    if (not lock.owns())
-        throw std::runtime_error("Could not acquire interprocess mutex in __PRETTY_FUNCTION__");
     return width_;
 }
 
 
 int SharedVideoBuffer::getHeight()
 {
-    const boost::system_time timeout = boost::get_system_time() +
-        boost::posix_time::seconds(5);
-    scoped_lock<interprocess_mutex> lock(mutex_, timeout);
-    if (not lock.owns())
-        throw std::runtime_error("Could not acquire interprocess mutex in __PRETTY_FUNCTION__");
     return height_;
 }
  
