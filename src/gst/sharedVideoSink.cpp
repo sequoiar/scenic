@@ -32,6 +32,7 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/thread/thread_time.hpp>
 
 
 using boost::interprocess::shared_memory_object;
@@ -108,25 +109,30 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         buffer = gst_app_sink_pull_buffer(GST_APP_SINK(elt));
 
         // lock the mutex
-        scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex());
+        LOG_DEBUG("locking ip mutex");
+        const boost::system_time timeout = boost::get_system_time() +
+            boost::posix_time::seconds(5);
+        scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex(), timeout);
+        if (not lock.owns())
+            LOG_ERROR("Could not acquire shared memory mutex");
 
         // if a buffer has been pushed, wait until the consumer tells us
         // it's consumed it. note that upon waiting the mutex is released and will be
         // reacquired when this process is notified by the consumer.
+        LOG_DEBUG("wait on consumer");
         context->sharedBuffer_->waitOnConsumer(lock);
 
-        if (context->sharedBuffer_->isPushing())
-        {
-            // push the buffer
-            size = GST_BUFFER_SIZE (buffer);
-            context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
-        }
+        // push the buffer
+        size = GST_BUFFER_SIZE (buffer);
+        context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
 
+        LOG_DEBUG("notify consumer");
         context->sharedBuffer_->notifyConsumer();
         // mutex is released here (goes out of scope)
     }
     catch (const interprocess_exception &ex)
     {
+        LOG_WARNING("Got interprocess exception " << ex.what());
         removeSharedMemory(context->id_);
         /* we don't need the appsink buffer anymore */
         gst_buffer_unref(buffer);

@@ -30,7 +30,7 @@
 
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/thread_time.hpp>
 
 /// FIXME: doesn't get updated
 double SharedVideoBuffer::ASPECT_RATIO = videosize::WIDTH / videosize::HEIGHT;
@@ -38,14 +38,13 @@ double SharedVideoBuffer::ASPECT_RATIO = videosize::WIDTH / videosize::HEIGHT;
 using namespace boost::interprocess;
 
 SharedVideoBuffer::SharedVideoBuffer(int width, int height) : width_(width), height_(height),
-    mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), doPush_(true)
+    mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false)
 {
     ASPECT_RATIO = width_ / height_;
 }
 
 SharedVideoBuffer::~SharedVideoBuffer()
 {
-    doPush_ = false;
 }
 
 interprocess_mutex & SharedVideoBuffer::getMutex()
@@ -56,11 +55,6 @@ interprocess_mutex & SharedVideoBuffer::getMutex()
 unsigned char* SharedVideoBuffer::pixelsAddress()
 {
     return pixels;
-}
-
-bool SharedVideoBuffer::isPushing() const
-{
-    return doPush_;
 }
 
 void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
@@ -79,17 +73,6 @@ void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
     memcpy(pixels, newBuffer, size);
 }
 
-void SharedVideoBuffer::stopPushing()
-{
-    doPush_ = false;
-}
-
-
-void SharedVideoBuffer::startPushing()
-{
-    doPush_ = true;
-}
-
 // notify the consumer process that there is a new buffer
 void SharedVideoBuffer::notifyConsumer()
 {
@@ -97,7 +80,6 @@ void SharedVideoBuffer::notifyConsumer()
     // mark message buffer as full
     bufferIn_ = true;
 }
-
 
 void SharedVideoBuffer::notifyProducer()
 {
@@ -110,7 +92,7 @@ void SharedVideoBuffer::notifyProducer()
 bool SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 {
     const boost::system_time timeout = boost::get_system_time() +
-        boost::posix_time::milliseconds(1);
+        boost::posix_time::milliseconds(10);
 
     if (bufferIn_)   // XXX: this must be an if, not a while, otherwise process hangs 
     {
@@ -124,7 +106,7 @@ bool SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 bool SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 {
     const boost::system_time timeout = boost::get_system_time() +
-        boost::posix_time::seconds(1);
+        boost::posix_time::seconds(5);
 
     if (!bufferIn_)  // XXX: this must be an if, not a while, otherwise process hangs
     {
