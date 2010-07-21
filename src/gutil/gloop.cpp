@@ -75,5 +75,7 @@ void gutil::init_gst_gtk(int argc, char **argv)
     gst_init(&argc, &argv);
     if (getenv("DISPLAY") != NULL)
         gtk_init(&argc, &argv);
+    else
+        LOG_DEBUG("DISPLAY variable has not been set");
 }
 
