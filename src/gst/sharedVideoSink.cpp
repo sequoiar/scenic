@@ -109,24 +109,21 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         buffer = gst_app_sink_pull_buffer(GST_APP_SINK(elt));
 
         // lock the mutex
-        LOG_DEBUG("locking ip mutex");
         const boost::system_time timeout = boost::get_system_time() +
             boost::posix_time::seconds(5);
         scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex(), timeout);
         if (not lock.owns())
-            LOG_ERROR("Could not acquire shared memory mutex");
+            LOG_ERROR("Could not acquire shared memory mutex in 5 seconds or less.");
 
         // if a buffer has been pushed, wait until the consumer tells us
         // it's consumed it. note that upon waiting the mutex is released and will be
         // reacquired when this process is notified by the consumer.
-        LOG_DEBUG("wait on consumer");
         context->sharedBuffer_->waitOnConsumer(lock);
 
         // push the buffer
         size = GST_BUFFER_SIZE (buffer);
         context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
 
-        LOG_DEBUG("notify consumer");
         context->sharedBuffer_->notifyConsumer();
         // mutex is released here (goes out of scope)
     }
