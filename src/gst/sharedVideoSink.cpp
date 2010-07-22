@@ -113,7 +113,12 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
             boost::posix_time::seconds(5);
         scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex(), timeout);
         if (not lock.owns())
-            LOG_ERROR("Could not acquire shared memory mutex in 5 seconds or less.");
+        {
+            /* we don't need the appsink buffer anymore */
+            gst_buffer_unref(buffer);
+            removeSharedMemory(context->id_);
+            LOG_ERROR("Could not acquire shared memory mutex in 5 seconds or less, exitting.");
+        }
 
         // if a buffer has been pushed, wait until the consumer tells us
         // it's consumed it. note that upon waiting the mutex is released and will be

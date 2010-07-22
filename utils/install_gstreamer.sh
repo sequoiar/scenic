@@ -37,48 +37,46 @@ GST_UGLY=gst-plugins-ugly-0.10.13
 GST_FFMPEG=gst-ffmpeg-0.10.9
 GST_PYTHON=gst-python-0.10.17
 GST_GL=gst-plugins-gl-0.10.1
-YASM=yasm-0.8.0
-X264=x264-snapshot-20090711-2245
+#YASM=yasm-0.8.0
+#X264=x264-snapshot-20090711-2245
 DC1394=libdc1394-2.1.2
 MODULES="$GST_CORE $GST_BASE $GST_GOOD $GST_BAD $GST_UGLY $GST_FFMPEG $GST_PYTHON $GST_GL"
 
 # Downloads
 cd $DOWNLOAD_DIR
 
-#get YASM, as x264 depends on a post-hardy version of it
-wget -c http://www.tortall.net/projects/yasm/releases/$YASM.tar.gz
-tar xzf $YASM.tar.gz
-pushd $YASM
-./configure 
-make 
-sudo $MAKEINSTALL
-popd
+##get YASM, as x264 depends on a post-hardy version of it
+#wget -c http://www.tortall.net/projects/yasm/releases/$YASM.tar.gz
+#tar xzf $YASM.tar.gz
+#pushd $YASM
+#./configure 
+#make 
+#sudo $MAKEINSTALL
+#popd
 
 
-# get x264, note that as of 09/23/2009 upstream x264 is incompatible with gstreamer
-# and that there are unfortunately no real releases of x264, only daily tarballs
-wget -c http://download.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
-tar xjf $X264.tar.bz2
-pushd $X264
-## added enable-shared flag to make sure that we can build the gstreamer x264enc
-## plugin on 64 bit platforms
-./configure --enable-shared
-make 
-sudo $MAKEINSTALL
-sudo ldconfig
-popd
+## get x264, note that as of 09/23/2009 upstream x264 is incompatible with gstreamer
+## and that there are unfortunately no real releases of x264, only daily tarballs
+#wget -c http://download.videolan.org/pub/videolan/x264/snapshots/$X264.tar.bz2
+#tar xjf $X264.tar.bz2
+#pushd $X264
+### added enable-shared flag to make sure that we can build the gstreamer x264enc
+### plugin on 64 bit platforms
+#./configure --enable-shared
+#make 
+#sudo $MAKEINSTALL
+#sudo ldconfig
+#popd
 
-
-# get libdc1394
-wget -c http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/2.1.2/$DC1394.tar.gz
-tar xzf $DC1394.tar.gz
-pushd $DC1394
-./configure
-make
-sudo $MAKEINSTALL
-sudo ldconfig
-popd
-
+## get libdc1394
+#wget -c http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/2.1.2/$DC1394.tar.gz
+#tar xzf $DC1394.tar.gz
+#pushd $DC1394
+#./configure
+#make
+#sudo $MAKEINSTALL
+#sudo ldconfig
+#popd
 
 for uri_path in gstreamer/$GST_CORE.tar.bz2 \
                 gst-plugins-base/$GST_BASE.tar.bz2 \
