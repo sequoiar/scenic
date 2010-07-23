@@ -45,7 +45,7 @@ TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) :
 {
     g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "sans 50",
             NULL);
-    g_timeout_add(30 /* ms */, 
+    g_timeout_add(50 /* ms */, 
             static_cast<GSourceFunc>(textPositionCallback),
             textoverlay_);
 }
