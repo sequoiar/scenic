@@ -15,6 +15,9 @@ class TestJackInfo(unittest.TestCase):
                 stdout=subprocess.PIPE)
 
         stdout_value = proc.communicate()[0]
+        if "not found" in stdout_value:
+            self.fail("jack-info is not in PATH")
+
         info = {}
         # parse output of jack-info into dict (stripping the ":" from the key name
         expected = ['buffer-size', 'samplerate']
@@ -30,7 +33,8 @@ class TestJackInfo(unittest.TestCase):
                     print "%s: %s" % (key, str(value))
 
         for key in expected:
-            assert(key in info.iterkeys())
+            if key not in info.iterkeys():
+                self.fail("key %s was not found in jack-info output" % (key))
         
         # check for correct number of lines
         #assert(len(info) == len(expected))
