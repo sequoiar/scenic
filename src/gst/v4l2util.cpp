@@ -338,14 +338,15 @@ DeviceList getDevices()
 }
 #endif
 
-
-
-void v4l2util::listCameras()
+/// Returns true if cameras were found
+bool v4l2util::listCameras()
 {
     DeviceList names(getDevices());
 
     for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
         printCaptureFormat(*deviceName);
+
+    return not names.empty();
 }
 
 bool v4l2util::isInterlaced(const std::string &device)

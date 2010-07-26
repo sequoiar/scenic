@@ -363,7 +363,8 @@ bool isModuleWriteable(const std::string &module)
 }
 
 
-void Dc1394::listCameras()
+/// Returns true if cameras were found
+bool Dc1394::listCameras()
 {
     LOG_DEBUG("listing cameras");
 
@@ -392,7 +393,7 @@ void Dc1394::listCameras()
         else
             LOG_DEBUG("Neither raw1394 nor video1394 modules are loaded");
         // do nothing, neither module is loaded, we can assume no firewire utilization
-        return;
+        return false;
     }
     else
         raw1394_destroy_handle(tmpHandle);
@@ -404,6 +405,7 @@ void Dc1394::listCameras()
         Dc1394Handle dc(i);
         dc.printInfo();
     }
+    return nCameras > 0;
 }
 
 void Dc1394Handle::printInfo() const

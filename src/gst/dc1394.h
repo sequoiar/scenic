@@ -27,7 +27,7 @@
 
 namespace Dc1394 
 {
-    void listCameras();
+    bool listCameras();
     int capsToMode(int cameraNumber, int width, 
             int height, 
             const std::string &colourspace,
