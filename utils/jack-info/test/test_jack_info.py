@@ -9,7 +9,7 @@ class TestJackInfo(unittest.TestCase):
             Check that jack-info prints backend, device, name, nperiods, period, pid, rate
         """
         # redirect stderr to stdout
-        proc = subprocess.Popen(['jack-info', '"to stdout"'], 
+        proc = subprocess.Popen(['../jack-info', '"to stdout"'], 
                 shell=True, 
                 stderr=subprocess.STDOUT,
                 stdout=subprocess.PIPE)
@@ -35,6 +35,5 @@ class TestJackInfo(unittest.TestCase):
         for key in expected_keys:
             if key not in info_retrieved.iterkeys():
                 self.fail("Key %s was not found in jack-info output. Its output is: \n%s" % (key, stdout_value))
-        
         # check for correct number of lines
         #assert(len(info) == len(expected))

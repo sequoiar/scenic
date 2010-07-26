@@ -53,6 +53,5 @@ int main(int argc, char **argv)
         std::cerr << "Please file a bug at " << PACKAGE_BUGREPORT << std::endl;
         ret = 1;
     }
-    std::cout << "Exitting Milhouse" << std::endl;
     return ret;
 }

@@ -175,25 +175,19 @@ short Milhouse::run(int argc, char **argv)
     po::store(po::parse_command_line(argc, argv, desc), options);
     po::notify(options);
 
-#ifdef SVNVERSION
-    std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
-#else
-    std::cout << "Ver:" << PACKAGE_VERSION << std::endl;
-#endif
-
     if (options.count("help") or argc == 1) 
         return usage(desc);
 
     MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
 
-    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
+    LOG_DEBUG("Built on " << __DATE__ << " at " << __TIME__);
 
     if (options["version"].as<bool>())
     {
 #ifdef SVNVERSION
-        LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
+        LOG_PRINT("milhouse version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
 #else
-        LOG_INFO("version " << PACKAGE_VERSION << std::endl);
+        LOG_PRINT("milhouse version " << PACKAGE_VERSION << std::endl);
 #endif
         return 0;
     }
