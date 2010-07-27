@@ -5,7 +5,26 @@ import sys
 import subprocess
 import pygtk
 pygtk.require('2.0')
-import gtk
+import warnings
+
+# HACK to raise an exception when we get a GtkWarning
+def customwarn(message, category, filename, lineno, file=None, line=None):
+        """ 
+        Override warnings.showwarning to avoid importing gtk when it fails to
+        open the display.
+        """
+        sys.stdout.write(warnings.formatwarning(message, category, filename, lineno))
+        if "could not open display" in message:
+            raise ImportError("Could not open display")
+
+warnings.showwarning = customwarn
+
+no_gtk = False
+try:
+    import gtk
+except ImportError, e:
+    print ('Got ImportError "%s"' % str(e))
+    no_gtk = True   # we'll skip the test in this case
 
 class TestVumeter(unittest.TestCase):
     def test_vumeter(self):
@@ -52,4 +71,6 @@ class TestVumeter(unittest.TestCase):
 
     if "DISPLAY" not in os.environ:
         test_vumeter.skip = "No DISPLAY set, cannot run test"
+    elif no_gtk:
+        test_vumeter.skip = "Gtk could not open display, cannot run test"
 
