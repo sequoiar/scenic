@@ -67,8 +67,6 @@ void print_help()
 int main(int argc, char **argv)
 {
     raw1394handle_t handle;
-    struct raw1394_portinfo pinf;
-    int  nports;
     int result;
     int type = RAW1394_LONG_RESET;
     int adapter_number = 0; /* see firecontrol/commander.c */
@@ -105,8 +103,11 @@ int main(int argc, char **argv)
     raw1394_set_bus_reset_handler(handle, bus_reset_handler);
     fprintf(stdout, "INFO: using adapter %d.\n", adapter_number);
 
+#if 0
+    this was causing stack smashing, i think because of the max ports value
     nports = raw1394_get_port_info(handle, &pinf, 1000 /* maxports */);
     printf("Got %d ports\n", nports);
+#endif
 
     if (raw1394_set_port(handle, adapter_number) < 0) 
     {
