@@ -473,7 +473,7 @@ int Dc1394::GUIDToCameraNumber(unsigned long long GUID)
     }
 
     if (result == -1)
-        LOG_WARNING("Could not find camera with guid " << GUID);
+        THROW_ERROR("Could not find camera with guid " << GUID);
 
     return result;
 }
