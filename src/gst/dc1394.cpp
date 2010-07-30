@@ -473,7 +473,7 @@ int Dc1394::GUIDToCameraNumber(unsigned long long GUID)
     }
 
     if (result == -1)
-        THROW_ERROR("Could not find camera with guid " << GUID);
+        THROW_ERROR("Could not find camera with guid " << std::hex << GUID);
 
     return result;
 }
