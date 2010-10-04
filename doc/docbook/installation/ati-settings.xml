@@ -1,18 +1,12 @@
 <appendix id="installation.ati-settings">
-  <title>Appendix: Ati Settings</title>
-      <para>If you're using the fglrx driver, you may have to
-      enable the XVideo extension with the aticonfig command (part
-      of the xorg-driver-fglrx package).</para>
+  <title>Appendice : Réglages ATI </title>
+      <para>Si vous utilisez le pilote fglrx, il vous fera peut-être activer l’extension XVideo à l’aide de la commande aticonfig (dans le paquet xorg-driver-fglrx).</para>
         <para><userinput>sudo aticonfig --overlay-type=Xv</userinput></para>
-        <para>Alternatively, you can manually add those lines in
-        the Device section of the fglrx driver in the
-        /etc/X11/xorg.conf file. After Driver "fglrx" , add:</para>
+        <para>Vous pouvez plutôt choisir d’ajouter ces lignes dans la partie « Device » du pilote fglrx du fichier /etc/X11/xorg.conf. Après « Driver fglrx », ajoutez :</para>
         <para>&#160; &#160; &#160; &#160; Option &#160; &#160;
         &#160;"VideoOverlay" "on"</para>
         <para>&#160; &#160; &#160; &#160; Option &#160; &#160;
         &#160;"OpenGLOverlay" "off"</para>
-        <para>Note: As now, it's unclear which ATI cards properly
-        supports Xvideo. Feel free to share your
-        experiences.</para>
+        <para>Note : À ce jour nous ne sommes pas certains des modèles de cartes ATI qui supportent Xvideo adéquatement. Merci de nous faire part de vos expériences. </para>
       <para />
 </appendix>

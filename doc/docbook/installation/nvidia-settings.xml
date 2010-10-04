@@ -1,105 +1,70 @@
       <appendix id="installation.nvidia-settings">
-      <title>Appendix: Nvidia Settings</title>
-        <para>How to install Nvidia drivers in Ubuntu</para>
-        <para>Ubuntu doesn't include Nvidia drivers by
-        default.</para>
+      <title>Appendice : Réglages Nvidia</title>
+        <para>Comment installer les pilotes Nvidia sous Ubuntu</para>
+        <para>Ubuntu n’inclut pas de pilotes Nvidia par défaut.</para>
         <sect1 id="installation.installing-nvidia-drivers">
-        <title>Installing NVidia drivers</title>
+        <title>Installer les pilotes Nvidia </title>
         <itemizedlist>
           <listitem>
-            <para>First, go to System &gt; Administration &gt;
-            Hardware Drivers</para>
+            <para>Allez d'abbord dans "System &gt; Administration &gt;
+            Hardware Drivers"</para>
           </listitem>
           <listitem>
-            <para>You'll then see that Nvidia drivers are not in
-            use. Check (or tick) the box underneath Enabled to
-            enable the drivers.</para>
+            <para>Vous constaterez que les pilotes Nvidia ne sont pas utilisés. Cochez la case sous « Enabled » pour activer les pilotes. </para>
           </listitem>
           <listitem>
-            <para>You'll then be asked (after a brief explanation
-            about desktop effects) if you want to enable the
-            driver. Click Enable Driver.</para>
+            <para>Il vous sera alors demandé (après une brève explication des effets sur le bureau) si vous souhaitez activer le pilote. Cliquez « Enable Driver ».</para>
           </listitem>
           <listitem>
-            <para>Wait for the installer file to download.</para>
+            <para>Attendez pendant le téléchargement du fichier d’installation. </para>
           </listitem>
           <listitem>
-            <para>Wait for the drivers to be installed.</para>
+            <para>Attendez que les pilotes soient installés. </para>
           </listitem>
           <listitem>
-            <para>Then, click Close once the changes have been
-            applied.</para>
+            <para>Cliquez ensuite « Close » une fois que les changements auront été appliqués. </para>
           </listitem>
           <listitem>
-            <para>You'll then see that the drivers are enabled and
-            will be available for use upon a reboot.</para>
+            <para>Vous constaterez alors que  les pilotes sont activés et disponibles après un redémarrage. </para>
           </listitem>
         </itemizedlist>
-        <para>The typical video setup used is to have two video
-        output. Both of these output are from your graphic card.
-        One output is going to your monitor and the second is going
-        to a projector or a video mixer. As shown in the General
-        Setup part of the 
-        <link linkend='installation.hardware-setup'>Hardware Setup </link>page.
-        To make this setup we have to configure your xorg.conf with
-        the nvidia-settings application situated in
-        System/Administration/Nvidia X Server Settings </para> 
+        <para>Le standard est d’avoir deux sorties vidéo issues de votre carte graphique. Une sortie se dirige vers votre moniteur et la seconde vers un projecteur ou un mixeur vidéo (tel qu’illustré dans la partie installation générale de la page installation matérielle). Pour une installation similaire, il faut configurer votre xorg.conf avec l’application des réglages Nvidia située dans « System/Administration/Nvidia X Server Settings » <link linkend='installation.hardware-setup'>Réglage de l'équipement</link></para> 
         </sect1>
-
         <sect1 id="installation.connecting-video-out">
-        <title>Physically connecting your video output</title>
-        <para>First be sure to connect both output: The Monitor
-        Output and the TV (VGA Or S-Video output) before starting
-        your computer. If your both output are not connected when
-        starting the computer,the nvidia-settings will not be able
-        to detect the second output.</para>
-        <para>Note that for the s-video output (The graphic card
-        s-video connector), the nvidia-settings application will
-        only detect a regular s-video cable. If you have any
-        composite cable or adaptor, don't use it for this
-        configuration part.</para>
-        <para>You can use a regular S-Video Cable and connect the
-        s-video output from the graphic card to the s-video input
-        of your capture card.</para>
+        <title>Connexion physique de la sortie vidéo</title>
+        <para>Assurez vous de connecter les deux extrémités (sortie moniteur et sortie TV – VGA ou S-Vidéo) avant de démarrer votre ordinateur. Si les deux sorties ne sont pas connectées au démarrage du système, les réglages Nvidia-settings ne détecteront pas la seconde sortie. </para>
+        <para>Veuillez noter que pour la sortie S-Vidéo, (connecteur S-Vidéo de la carte graphique), l’application des réglages Nvidia ne détectera qu’un câble S-Vidéo standard. NE pas utiliser de câble composite ou d’adaptateur pour ce réglage. </para>
+        <para>Vous pouvez utiliser un câble S-Vidéo standard et connecter la sortie S-Vidéo de votre carte graphique à l’entrée S-Vidéo de votre carte de capture. </para>
         </sect1>
         <sect1 id="installation.starting-computer">
-        <title>Starting your computer</title>
-        <para>When your both output are connected, you can start
-        your computer.</para>
+        <title>Démarrer votre ordinateur.</title>
+        <para>Une fois les deux sorties connectées, vous pouvez démarrer l’ordinateur.</para>
       </sect1>
         <sect1 id="installation.starting-nvidia-settings">
-        <title>Starting nvidia-settings</title>
-        <para>Install your graphic card driver. Go to
-        System/Administration/Hardware Driver and enable the Nvidia
-        driver.</para>
+        <title>Démarrer les réglages Nvidia</title>
+        <para>Installez le pilote de votre carte graphique. Allez à « System/Administration/Hardware Driver » et activez le pilote Nvidia.</para>
         <itemizedlist>
           <listitem>
-            <para>Now install nvidia-setting</para>
+            <para>Installez les réglages Nvidia</para>
           </listitem>
         </itemizedlist>
         <para><userinput>sudo aptitude install nvidia-settings</userinput></para>
         <itemizedlist>
           <listitem>
-            <para>Now open nvidia-settings situated in
-            System/Administration/Nvidia X Server Settings and
-            click on "X Sever Display configuration"</para>
+            <para>Ouvrez les réglages Nvidia situés à « System/Administration/Nvidia X Server Settings » et cliquez sur « X Sever Display configuration ».</para>
           </listitem>
         </itemizedlist>
         <itemizedlist>
           <listitem>
-            <para>Verify that Enable Xinerama si NOT
-            selected</para>
+            <para>Vérifiez que « Enable Xinerama » n’est PAS sélectionné. </para>
           </listitem>
         </itemizedlist>
         </sect1>
         <sect1 id="installation.configuring-monitor">
-        <title>Configuring your computer monitor</title>
+        <title>Configurez votre moniteur d’ordinateur </title>
         <itemizedlist>
           <listitem>
-            <para>Click on the first monitor layout and verify that
-            your "Configuration" option is set to "separate X
-            screen" then set the display settings for this monitor
-            ex: 1024x768</para>
+            <para>Cliquez sur les options d’affichage du premier moniteur, vérifiez que l’option « Configuration » est réglée à « separate X screen » et entrez ensuite les réglages d’affichage pour ce moniteur. Exemple : 1024x768</para>
           </listitem>
         </itemizedlist>
         <para>
@@ -112,8 +77,7 @@
         </para>
         <itemizedlist>
           <listitem>
-            <para>Then on the X-Screen Tab, set the position to
-            absolute +0+0</para>
+            <para>Sur l’onglet « X-Screen », réglez la position à « absolute +0+0 »</para>
           </listitem>
         </itemizedlist>
         <para>
@@ -126,13 +90,10 @@
         </para>
         </sect1>
         <sect1 id="installation.configuring-second-out">
-        <title>Configuring your second video output</title>
+        <title>Configurer votre sortie vidéo secondaire</title>
         <itemizedlist>
           <listitem>
-            <para>Now click on the second output layout and verify
-            that your "Configuration" option is set to "separate X
-            screen" then set the display settings for this monitor
-            ex: 800x600</para>
+            <para>Cliquez sur les options d’affichage de la sortie vidéo secondaire, vérifiez que l’option « Configuration » est réglée à « separate X screen » et entrez ensuite les réglages d’affichage pour cette sortie vidéo. Exemple : 800x600</para>
           </listitem>
         </itemizedlist>
         <para>
@@ -145,8 +106,7 @@
         </para>
         <itemizedlist>
           <listitem>
-            <para>Then on the X-Screen Tab for the second output
-            (TV, S-video or VGA)</para>
+            <para>Cliquez ensuite sur l’onglet « X-Screen » de la sortie secondaire (TV, S-Vidéo ou VGA)</para>
           </listitem>
         </itemizedlist>
         <para>
@@ -159,25 +119,14 @@
         </para>
         <itemizedlist>
           <listitem>
-            <para>Now you can click apply, a pop up window will ask
-            if you want to apply what is possible. Click yes</para>
+            <para>Cliquez « apply », une fenêtre s’affiche et vous demande de confirmer l’application. Cliquez « yes ».</para>
           </listitem>
         </itemizedlist>
-      <para>Next, what we want now is two video outputs. One for
-      your monitor screen and one for your projector or video
-      mixer.</para>
-      <para>For the nvidia graphic card, we have to detect both
-      output. The first output (your monitor) is usually set to a
-      1024x768 resolution and the second output (VGA, or S-video
-      Output) is usually set to a resolution of 800x600. Note that
-      those resolution can vary from one setup to an other.</para>
-      <para>Set the local machine display to output the video from
-      the remote machine on the wanted monitor or TV.</para>
-      <para>The environment variable DISPLAY tells all X clients
-      where to display their windows.</para>
-      <para>Ex: <userinput>export DISPLAY=:0.0</userinput> will display the video on your
-      local default screen. export DISPLAY=:0.1 will display the
-      video on your second screen.</para>
+      <para>Il faut désormais régler les deux sorties vidéo, une pour le moniteur et une pour le projecteur ou mixeur vidéo.</para>
+      <para>Pour la carte graphique Nvidia, les deux sorties doivent être détectées. La résolution de votre moniteur est généralement réglée à 1024x768 et celle de la seconde sortie (VGA ou S-Vidéo) à 800x600. Veuillez noter que ces réglages peuvent varier d’une machine à l’autre.</para>
+      <para>Réglez l’affichage de l’ordinateur local de manière à ce que la vidéo de l’ordinateur distant soit affichée sur le moniteur ou écran TV désiré.</para>
+      <para>La variable DISPLAY informe tous les clients X où afficher leurs fenêtres. </para>
+      <para>Exemple: <userinput>export DISPLAY=:0.0</userinput> affichera la vidéo sur votre écran par défault. export DISPLAY=:0.1 affichera la vidéo sur votre écran secondaire.</para>
       <para>
       <userinput>export DISPLAY=:0.0</userinput>
       </para>
