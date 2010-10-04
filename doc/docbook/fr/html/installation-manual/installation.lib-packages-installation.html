@@ -1,0 +1,502 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Installation des librairies et des paquets de développement.</title>
+<link rel="previous" href="installation.os-installation.html" title="Installation du système d’opération">
+<link rel="next" href="installation.midi-component-installationi.html" title="Installer les composantes MIDI">
+<link rel="top" href="installation-manual.html" title="Scenic Manuel d'installation @PACKAGE_VERSION@">
+<style type="text/css">
+
+html { height: 100%; }
+body {
+  margin: 0px; padding: 12px;
+  background-color: #f9f9f6;
+  min-height: 100%;
+  direction: ltr;
+}
+div, p, pre, blockquote { margin: 0; padding: 0; }
+p img { vertical-align: middle; }
+sub { font-size: 0.83em; }
+sub sub { font-size: 1em; }
+sup { font-size: 0.83em; }
+sup sup { font-size: 1em; }
+table { border-collapse: collapse; }
+table.table-pgwide { width: 100%; }
+td { vertical-align: top; }
+td { padding: 0.2em 0.83em 0.2em 0.83em; }
+th { padding: 0 0.83em 0 0.83em; }
+tr.tr-shade {
+  background-color: #f9f9f6;
+}
+td.td-colsep { border-right: solid 1px; }
+td.td-rowsep { border-bottom: solid 1px; }
+thead { border-top: solid 2px; border-bottom: solid 2px; }
+tfoot { border-top: solid 2px; border-bottom: solid 2px; }
+div.body {
+  padding: 1em;
+  max-width: 60em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.body-sidebar {
+  margin-right: 13em;
+}
+div.division div.division { margin-top: 1.72em; }
+div.division div.division div.division { margin-top: 1.44em; }
+div.header {
+  margin: 0;
+  color: #3f3f3f;
+  border-bottom: solid 1px #e0e0df;
+}
+h1, h2, h3, h4, h5, h6, h7 {
+  margin: 0; padding: 0;
+  color: #3f3f3f;
+}
+h1.title { font-size: 1.72em; }
+h2.title { font-size: 1.44em; }
+h3.title { font-size: 1.2em; }
+h4.title, h5.title, h6.title, h7.title { font-size: 1em; }
+.block { margin-top: 1em; }
+.block .block-first { margin-top: 0; }
+.block-indent {
+  margin-left left: 1.72em;
+  margin-: 1em;
+}
+.block-indent .block-indent { margin-left: 0em; margin-right: 0em; }
+td .block-indent  { margin-left: 0em; margin-right: 0em; }
+dd .block-indent  { margin-left: 0em; margin-right: 0em; }
+.block-verbatim { white-space: pre; }
+div.title {
+  margin-bottom: 0.2em;
+  font-weight: bold;
+  color: #3f3f3f;
+}
+div.title-formal { padding-left: 0.2em; padding-right: 0.2em; }
+div.title-formal .label { font-weight: normal; }
+a {
+  color: #1f609f;
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+a:visited { color: #9f1f6f; }
+ul, ol, dl { margin: 0; padding: 0; }
+li {
+  margin-top: 1em;
+  margin-left: 2.4em;
+  padding: 0;
+}
+li.li-first { margin-top: 0; }
+dt { margin: 1em 0 0 0; }
+dt.dt-first { margin: 0; }
+dd {
+  margin-left: 1.72em;
+  margin-top: 0.5em;
+}
+dl.dl-compact dt { margin-top: 0; }
+dl.dl-compact dd { margin-top: 0; margin-bottom: 0; }
+
+
+ul.linktrail {
+  display: block;
+  margin: 0.2em 0 0 0;
+  text-align: right;
+}
+li.linktrail { display: inline; margin: 0; padding: 0; }
+
+li.linktrail::before {
+  content: '  /  ';
+  color: #3f3f3f;
+}
+
+li.linktrail-first::before, li.linktrail-only::before { content: ''; }
+
+
+div.navbar {
+  padding: 0.5em 1em 0.5em 1em;
+  max-width: 60em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.navbar-top { margin-bottom: 1em; }
+div.navbar-bottom { margin-top: 1em; clear: both; }
+div.navbar img { border: 0; vertical-align: -0.4em; }
+table.navbar { width: 100%; margin: 0; border: none; }
+table.navbar td { padding: 0; border: none; }
+td.navbar-next {
+  text-align: right;
+}
+a.navbar-prev::before {
+  
+  content: '◀  ';
+  color: #3f3f3f;
+}
+a.navbar-next::after {
+  
+  content: '  ▶';
+  color: #3f3f3f;
+}
+
+
+div.sidebar {
+  float: right;
+  padding: 0; margin: 0; width: 12em;
+}
+div.sidenav {
+  padding: 0.5em 1em 0 1em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.sidenav div.autotoc {
+  background-color: #ffffff;
+  border: none; padding: 0; margin: 0;
+}
+div.sidenav div.autotoc div.autotoc { margin-top: 0.5em; }
+div.sidenav div.autotoc li { margin-bottom: 0.5em; }
+div.sidenav div.autotoc div.autotoc div.autotoc {
+  margin-left: 1em;
+  margin-top: 0;
+}
+div.sidenav div.autotoc div.autotoc div.autotoc li { margin-bottom: 0; }
+
+
+div.autotoc {
+  
+  display: table;
+  margin-top: 1em;
+  margin-left: 1.72em;
+  padding: 0.5em 1em 0.5em 1em;
+  background-color: #f0f9ff;
+  border: solid 1px #c0c9ff;
+}
+div.autotoc ul { margin: 0; padding: 0; }
+div.autotoc li { list-style-type: none; margin: 0; }
+div.autotoc div.autotoc-title { margin-bottom: 0.5em; }
+div.autotoc div.autotoc { border: none; padding: 0; margin-top: 0; margin-bottom: 0.5em; }
+div.autotoc div.autotoc div.autotoc { margin-bottom: 0; }
+
+
+span.bibliolabel {
+  color: #3f3f3f;
+}
+
+
+div.admonition {
+  padding: 0.5em 6px 0.5em 6px;
+  border: solid 1px #e0e0df;
+  background-color: #fffff0;
+}
+div.caution-inner, div.important-inner, div.note-inner, div.tip-inner, div.warning-inner {
+  padding-left: 60px;
+  background-position: left top;
+  background-repeat: no-repeat;
+  min-height: 48px;
+}
+div.caution-inner { background-image: url("admon-caution.png"); }
+div.important-inner { background-image: url("admon-important.png"); }
+div.note-inner { background-image: url("admon-note.png"); }
+div.note-bug div.note-inner { background-image: url("admon-bug.png"); }
+div.tip-inner { background-image: url("admon-tip.png"); }
+div.warning-inner { background-image: url("admon-warning.png"); }
+div.blockquote {
+  
+  background-image: url('watermark-blockquote-201C.png');
+  background-repeat: no-repeat;
+  background-position: top left;
+  padding: 0.5em;
+  padding-left: 4em;
+}
+div.attribution {
+  margin-top: 0.5em;
+  color: #3f3f3f;
+}
+div.attribution::before {
+  
+  content: '― ';
+}
+div.epigraph {
+  text-align: right;
+  margin-left: 20%;
+  margin-right: 0;
+  color: #3f3f3f;
+}
+div.figure, div.informalfigure {
+  
+  display: table;
+  padding: 0.5em;
+  background-color: #f9f9f6;
+  border: solid 1px #e0e0df;
+}
+div.figure-inner, div.informalfigure-inner {
+  padding: 0.5em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.caption { margin-top: 0.5em; }
+div.programlisting {
+  padding: 0.5em;
+  
+  background-color: #f9f9f6;
+  border: solid 1px #e0e0df;
+}
+div.screen {
+  padding: 0.5em;
+  
+  background-color: #f9f9f6;
+  border: solid 1px #e0e0df;
+}
+div.screen .prompt {
+  color: #3f3f3f;
+}
+div.screen .userinput {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+div.programlisting .userinput {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+pre.linenumbering {
+  color: #3f3f3f;
+  margin: 0;
+  padding-right: 1em;
+  float: left;
+  text-align: right;
+}
+
+
+
+dl.index dt { margin-top: 0; }
+dl.index dd { margin-top: 0; margin-bottom: 0; }
+dl.indexdiv dt { margin-top: 0; }
+dl.indexdiv dd { margin-top: 0; margin-bottom: 0; }
+dl.setindex dt { margin-top: 0; }
+dl.setindex dd { margin-top: 0; margin-bottom: 0; }
+div.list div.title-formal span.title {
+  border-bottom: solid 1px #e0e0df;
+}
+div.simplelist {
+  margin-left: 1.72em;
+}
+div.simplelist table { margin-left: 0; border: none; }
+div.simplelist td {
+  padding: 0.5em;
+  border-left: solid 1px #e0e0df;
+}
+div.simplelist td.td-first {
+  padding-left: 0;
+  border-left: 0;
+}
+div.synopsis {
+  padding: 0.5em;
+  
+  background-color: #f9f9f6;
+  border-top: solid 2px #c0c9ff;
+  border-bottom: solid 2px #c0c9ff;
+}
+div.synopsis div.synopsis {
+  padding: 0;
+  border: none;
+}
+div.synopsis div.block { margin-top: 0.2em; }
+div.synopsis div.block-first { margin-top: 0; }
+div.cmdsynopsis { font-family: monospace; }
+
+span.accel { text-decoration: underline; }
+span.acronym { font-family: sans-serif; }
+span.application { font-style: italic; }
+span.classname, span.exceptionname, span.interfacename { font-family: monospace; }
+span.code {
+  font-family: monospace;
+  border: solid 1px #e0e0df;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+pre span.code { border: none; padding: 0; }
+span.command {
+  font-family: monospace;
+  border: solid 1px #e0e0df;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+pre span.command { border: none; padding: 0; }
+span.computeroutput { font-family: monospace; }
+
+span.constant { font-family: monospace; }
+span.database { font-family: monospace; }
+span.email { font-family: monospace; }
+span.emphasis { font-style: italic; }
+span.emphasis-bold { font-style: normal; font-weight: bold; }
+span.envar { font-family: monospace; }
+
+span.filename { font-family: monospace; }
+span.firstterm { font-style: italic; }
+span.foreignphrase { font-style: italic; }
+span.function { font-family: monospace; }
+
+dt.glossterm span.glossterm { font-style: normal; }
+
+
+span.glossterm { font-style: italic; }
+
+span.guibutton, span.guilabel, span.guimenu, span.guimenuitem, span.guisubmenu, span.interface {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+span.keycap {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+span.lineannotation { font-style: italic; }
+span.literal { font-family: monospace; }
+span.markup  { font-family: monospace; }
+span.medialabel { font-style: italic; }
+span.methodname { font-family: monospace; }
+span.ooclass, span.ooexception, span.oointerface { font-family: monospace; }
+span.option { font-family: monospace; }
+span.parameter { font-family: monospace; }
+span.paramdef span.parameter { font-style: italic; }
+span.prompt { font-family: monospace; }
+span.property { font-family: monospace; }
+span.replaceable  { font-style: italic; }
+span.returnvalue { font-family: monospace; }
+span.sgmltag { font-family: monospace; }
+span.structfield, span.structname { font-family: monospace; }
+span.symbol { font-family: monospace; }
+span.systemitem { font-family: monospace; }
+span.token { font-family: monospace; }
+span.type { font-family: monospace; }
+span.uri { font-family: monospace; }
+span.userinput { font-family: monospace; }
+span.varname { font-family: monospace; }
+span.wordasword { font-style: italic; }
+
+
+
+div.footnotes { font-style: italic; font-size: 0.8em; }
+div.footnote { margin-top: 1.44em; }
+span.footnote-number { display: inline; padding-right: 0.83em; }
+span.footnote-number + p { display: inline; }
+a.footnote { text-decoration: none; font-size: 0.8em; }
+a.footnote-ref { text-decoration: none; }
+
+span.co {
+  margin-left: 0.2em; margin-right: 0.2em;
+  padding-left: 0.4em; padding-right: 0.4em;
+  border: solid 1px #000000;
+  -moz-border-radius: 8px;
+  background-color: #000000;
+  color: #FFFFFF;
+  font-size: 8px;
+}
+span.co:hover {
+  border-color: #333333;
+  background-color: #333333;
+  color: #FFFFFF;
+}
+span.co a { text-decoration: none; }
+span.co a:hover { text-decoration: none; }
+
+dt.question { margin-left: 0em; }
+dt.question div.label { float: left; }
+dd + dt.question { margin-top: 1em; }
+dd.answer {
+  margin-top: 1em;
+  margin-left: 2em;
+  margin-right: 1em;
+}
+dd.answer div.label { float: left; }
+</style>
+</head>
+<body>
+<div class="navbar navbar-top"><table class="navbar"><tr>
+<td class="navbar-prev"><a class="navbar-prev" href="installation.os-installation.html" title="Installation du système d’opération">Installation du système d’opération</a></td>
+<td class="navbar-next"><a class="navbar-next" href="installation.midi-component-installationi.html" title="Installer les composantes MIDI">Installer les composantes MIDI</a></td>
+</tr></table></div>
+<div class="sidebar"><div class="sidenav"><div class="autotoc"><ul>
+<li><a href="installation-manual-info.html" title="À propos de ce document">À propos de ce document</a></li>
+<li>
+<a class="xref" href="installation-manual.html" title="Scenic Manuel d'installation @PACKAGE_VERSION@"><span class="application">Scenic</span> Manuel d'installation @PACKAGE_VERSION@</a><div class="autotoc"><ul>
+<li><a class="xref" href="installation.introduction.html" title="Introduction">Introduction</a></li>
+<li><a class="xref" href="installation.hardware-requirements.html" title="Pré-requis matériel">Pré-requis matériel</a></li>
+<li><a class="xref" href="installation.hardware-setup.html" title="Réglages des équipements">Réglages des équipements</a></li>
+<li>
+<a class="xref" href="installation.software-installation.html" title="Installation logicielle">Installation logicielle</a><div class="autotoc"><ul>
+<li><a class="xref" href="installation.os-installation.html" title="Installation du système d’opération">Installation du système d’opération</a></li>
+<li>Installation des librairies et des paquets de développement.</li>
+<li><a class="xref" href="installation.midi-component-installationi.html" title="Installer les composantes MIDI">Installer les composantes MIDI</a></li>
+<li><a class="xref" href="installation.building-scenic.html" title="Construire Scenic ">Construire <span class="application">Scenic</span> </a></li>
+</ul></div>
+</li>
+<li><a class="xref" href="installation.av-configuration.html" title="Configuration audio et vidéo du système">Configuration audio et vidéo du système</a></li>
+<li><a class="xref" href="installation.network-test.html" title="Test du réseau">Test du réseau</a></li>
+<li><a class="xref" href="installation.nvidia-settings.html" title="Appendix: Nvidia Settings">Appendix: Nvidia Settings</a></li>
+<li><a class="xref" href="installation.ati-settings.html" title="Appendix: Ati Settings">Appendix: Ati Settings</a></li>
+<li><a class="xref" href="installation.fa101-settings.html" title="Appendix: Edirol FA-101 and FA-66 settings">Appendix: Edirol FA-101 and FA-66 settings</a></li>
+<li><a class="xref" href="glossary.html" title="Scenic Glossary">Scenic Glossary</a></li>
+</ul></div>
+</li>
+</ul></div></div></div>
+<div class="body body-sidebar"><div class="division sect1">
+<a name="installation.lib-packages-installation"></a><div class="header"><h1 class="sect1 title"><span class="title">Installation des librairies et des paquets de développement.</span></h1></div>
+<ul class="linktrail">
+<li class="linktrail linktrail-first"><a class="linktrail" href="installation-manual.html" title="Scenic Manuel d'installation @PACKAGE_VERSION@"><span class="application">Scenic</span> Manuel d'installation @PACKAGE_VERSION@</a></li>
+<li class="linktrail linktrail-last"><a class="linktrail" href="installation.software-installation.html" title="Installation logicielle">Installation logicielle</a></li>
+</ul>
+<p class="para block block-first">Avant de démarrer l’installation de Scenic, veuillez effectuer une mise à jour de la distribution de Linux.</p>
+<p class="para block">
+    <span class="userinput" dir="ltr">sudo aptitude update</span>
+    </p>
+<p class="para block">
+    <span class="userinput" dir="ltr">sudo aptitude upgrade</span>
+    </p>
+<p class="para block">Scenic nécessite l’installation de plusieurs paquets. Une revue détaillée des librairies et dépendances requises sur notre page <a class="ulink" href="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage" title="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage"> "Library and Package" </a> Pour installer ces dernières, tapez les commandes suivantes dans un terminal : </p>
+<p class="para block">
+      <span class="emphasis emphasis-bold">For Ubuntu 8.04 LTS (Hardy) install
+ur Ubuntu 8.04 LTS (Hardy), installez les paquets suivants :</span>
+    </p>
+<p class="para block">
+<span class="userinput" dir="ltr">sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev liblame-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect gnome-themes-extra</span>
+    </p>
+<p class="para block">Il vous faut télécharger debian sid iperf
+    <a class="ulink" href="http://packages.debian.org/sid/iperf" title="http://packages.debian.org/sid/iperf">
+    version </a> 2.0.4-3 or 2.0.4-4 sur votre bureau et l’installer sur les deux ordinateurs. Double-cliquez sur le paquet pour démarrer le gestionnaire de paquets ou installer le avec dpkgdpkg -i ./iperf_2.0.4-3_i386.deb .
+    </p>
+<p class="para block">
+      <span class="emphasis emphasis-bold">Pour Ubuntu 9.10 (Karmic), installez les paquets suivants :</span>
+    </p>
+<p class="para block">
+            <span class="userinput" dir="ltr">sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect iperf libmp3lame-dev gnome-themes-extras libboost-dev libboost-thread-dev libboost-system-dev libboost-program-options-dev libasio-dev libboost-iostreams-dev libboost-filesystem-dev</span>
+    </p>
+<p class="para block">
+      <span class="emphasis emphasis-bold">Pour Ubuntu 10.04 (Lucid), installez nos paquets Scenic</span>
+    </p>
+<p class="para block">Vous pouvez désormais installer Scenic sous Ubuntu 10.04. Téléchargez pour cela le paquet correspondant à l’architecture de votre ordinateur à <a class="ulink" href="http://ppa.launchpad.net/sat-metalab/metalab/ubuntu/pool/main/s/scenic/" title="http://ppa.launchpad.net/sat-metalab/metalab/ubuntu/pool/main/s/scenic/">"Download Scenic Package"</a>
+    </p>
+<p class="para block">Veuillez noter que pour utiliser plus de 8 canaux audio au format RAW, il vous faudra installer notre paquet « Scenic-dependency » qui compilera gstreamer.</p>
+<p class="para block">
+      <span class="emphasis emphasis-bold">Pour Debian 5.0.4 (lenny), installez le paquet suivant : </span>
+    </p>
+<p class="para block">
+            <span class="userinput" dir="ltr">sudo aptitude -R install qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev bison flex vorbis-tools ffmpeg libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev libxml2-dev python-twisted doxygen python-setuptools help2man python-simplejson iperf gnome-themes-extras libboost1.35-dev jackd libboost-program-options1.35-dev libboost-thread1.35-dev libboost-system1.35-dev libboost-iostreams1.35-dev libboost-filesystem1.35-dev</span>
+    </p>
+<p class="para block">
+      <span class="emphasis emphasis-bold">Veuillez configurer votre noyau Linux temps réel. </span>
+    </p>
+<p class="para block">Une fois celui-ci est installé, exécutez la ligne de commandes suivante (pour faire en sorte que le serveur audio fonctionne en temps réel) :</p>
+<p class="para block">
+        <span class="userinput" dir="ltr">sudo su -c 'echo @audio - rtprio 20 &gt;&gt; /etc/security/limits.conf'</span>
+        </p>
+<p class="para block">
+        <span class="userinput" dir="ltr">sudo su -c 'echo @audio - memlock 250000 &gt;&gt; /etc/security/limits.conf'</span>
+        </p>
+<p class="para block">
+      <span class="emphasis emphasis-bold">Veuillez ensuite quitter la session et en ouvrir une nouvelle.</span>
+    </p>
+</div></div>
+<div class="navbar navbar-bottom"><table class="navbar"><tr>
+<td class="navbar-prev"><a class="navbar-prev" href="installation.os-installation.html" title="Installation du système d’opération">Installation du système d’opération</a></td>
+<td class="navbar-next"><a class="navbar-next" href="installation.midi-component-installationi.html" title="Installer les composantes MIDI">Installer les composantes MIDI</a></td>
+</tr></table></div>
+</body>
+</html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Configuration du serveur audio du système</title>
+<link rel="previous" href="installation.audio-settings.html" title="Réglages audio du système">
+<link rel="next" href="installation.sound-check.html" title="Vérification de l’audio du système ">
+<link rel="top" href="installation-manual.html" title="Scenic Manuel d'installation @PACKAGE_VERSION@">
+<style type="text/css">
+
+html { height: 100%; }
+body {
+  margin: 0px; padding: 12px;
+  background-color: #f9f9f6;
+  min-height: 100%;
+  direction: ltr;
+}
+div, p, pre, blockquote { margin: 0; padding: 0; }
+p img { vertical-align: middle; }
+sub { font-size: 0.83em; }
+sub sub { font-size: 1em; }
+sup { font-size: 0.83em; }
+sup sup { font-size: 1em; }
+table { border-collapse: collapse; }
+table.table-pgwide { width: 100%; }
+td { vertical-align: top; }
+td { padding: 0.2em 0.83em 0.2em 0.83em; }
+th { padding: 0 0.83em 0 0.83em; }
+tr.tr-shade {
+  background-color: #f9f9f6;
+}
+td.td-colsep { border-right: solid 1px; }
+td.td-rowsep { border-bottom: solid 1px; }
+thead { border-top: solid 2px; border-bottom: solid 2px; }
+tfoot { border-top: solid 2px; border-bottom: solid 2px; }
+div.body {
+  padding: 1em;
+  max-width: 60em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.body-sidebar {
+  margin-right: 13em;
+}
+div.division div.division { margin-top: 1.72em; }
+div.division div.division div.division { margin-top: 1.44em; }
+div.header {
+  margin: 0;
+  color: #3f3f3f;
+  border-bottom: solid 1px #e0e0df;
+}
+h1, h2, h3, h4, h5, h6, h7 {
+  margin: 0; padding: 0;
+  color: #3f3f3f;
+}
+h1.title { font-size: 1.72em; }
+h2.title { font-size: 1.44em; }
+h3.title { font-size: 1.2em; }
+h4.title, h5.title, h6.title, h7.title { font-size: 1em; }
+.block { margin-top: 1em; }
+.block .block-first { margin-top: 0; }
+.block-indent {
+  margin-left left: 1.72em;
+  margin-: 1em;
+}
+.block-indent .block-indent { margin-left: 0em; margin-right: 0em; }
+td .block-indent  { margin-left: 0em; margin-right: 0em; }
+dd .block-indent  { margin-left: 0em; margin-right: 0em; }
+.block-verbatim { white-space: pre; }
+div.title {
+  margin-bottom: 0.2em;
+  font-weight: bold;
+  color: #3f3f3f;
+}
+div.title-formal { padding-left: 0.2em; padding-right: 0.2em; }
+div.title-formal .label { font-weight: normal; }
+a {
+  color: #1f609f;
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+a:visited { color: #9f1f6f; }
+ul, ol, dl { margin: 0; padding: 0; }
+li {
+  margin-top: 1em;
+  margin-left: 2.4em;
+  padding: 0;
+}
+li.li-first { margin-top: 0; }
+dt { margin: 1em 0 0 0; }
+dt.dt-first { margin: 0; }
+dd {
+  margin-left: 1.72em;
+  margin-top: 0.5em;
+}
+dl.dl-compact dt { margin-top: 0; }
+dl.dl-compact dd { margin-top: 0; margin-bottom: 0; }
+
+
+ul.linktrail {
+  display: block;
+  margin: 0.2em 0 0 0;
+  text-align: right;
+}
+li.linktrail { display: inline; margin: 0; padding: 0; }
+
+li.linktrail::before {
+  content: '  /  ';
+  color: #3f3f3f;
+}
+
+li.linktrail-first::before, li.linktrail-only::before { content: ''; }
+
+
+div.navbar {
+  padding: 0.5em 1em 0.5em 1em;
+  max-width: 60em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.navbar-top { margin-bottom: 1em; }
+div.navbar-bottom { margin-top: 1em; clear: both; }
+div.navbar img { border: 0; vertical-align: -0.4em; }
+table.navbar { width: 100%; margin: 0; border: none; }
+table.navbar td { padding: 0; border: none; }
+td.navbar-next {
+  text-align: right;
+}
+a.navbar-prev::before {
+  
+  content: '◀  ';
+  color: #3f3f3f;
+}
+a.navbar-next::after {
+  
+  content: '  ▶';
+  color: #3f3f3f;
+}
+
+
+div.sidebar {
+  float: right;
+  padding: 0; margin: 0; width: 12em;
+}
+div.sidenav {
+  padding: 0.5em 1em 0 1em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.sidenav div.autotoc {
+  background-color: #ffffff;
+  border: none; padding: 0; margin: 0;
+}
+div.sidenav div.autotoc div.autotoc { margin-top: 0.5em; }
+div.sidenav div.autotoc li { margin-bottom: 0.5em; }
+div.sidenav div.autotoc div.autotoc div.autotoc {
+  margin-left: 1em;
+  margin-top: 0;
+}
+div.sidenav div.autotoc div.autotoc div.autotoc li { margin-bottom: 0; }
+
+
+div.autotoc {
+  
+  display: table;
+  margin-top: 1em;
+  margin-left: 1.72em;
+  padding: 0.5em 1em 0.5em 1em;
+  background-color: #f0f9ff;
+  border: solid 1px #c0c9ff;
+}
+div.autotoc ul { margin: 0; padding: 0; }
+div.autotoc li { list-style-type: none; margin: 0; }
+div.autotoc div.autotoc-title { margin-bottom: 0.5em; }
+div.autotoc div.autotoc { border: none; padding: 0; margin-top: 0; margin-bottom: 0.5em; }
+div.autotoc div.autotoc div.autotoc { margin-bottom: 0; }
+
+
+span.bibliolabel {
+  color: #3f3f3f;
+}
+
+
+div.admonition {
+  padding: 0.5em 6px 0.5em 6px;
+  border: solid 1px #e0e0df;
+  background-color: #fffff0;
+}
+div.caution-inner, div.important-inner, div.note-inner, div.tip-inner, div.warning-inner {
+  padding-left: 60px;
+  background-position: left top;
+  background-repeat: no-repeat;
+  min-height: 48px;
+}
+div.caution-inner { background-image: url("admon-caution.png"); }
+div.important-inner { background-image: url("admon-important.png"); }
+div.note-inner { background-image: url("admon-note.png"); }
+div.note-bug div.note-inner { background-image: url("admon-bug.png"); }
+div.tip-inner { background-image: url("admon-tip.png"); }
+div.warning-inner { background-image: url("admon-warning.png"); }
+div.blockquote {
+  
+  background-image: url('watermark-blockquote-201C.png');
+  background-repeat: no-repeat;
+  background-position: top left;
+  padding: 0.5em;
+  padding-left: 4em;
+}
+div.attribution {
+  margin-top: 0.5em;
+  color: #3f3f3f;
+}
+div.attribution::before {
+  
+  content: '― ';
+}
+div.epigraph {
+  text-align: right;
+  margin-left: 20%;
+  margin-right: 0;
+  color: #3f3f3f;
+}
+div.figure, div.informalfigure {
+  
+  display: table;
+  padding: 0.5em;
+  background-color: #f9f9f6;
+  border: solid 1px #e0e0df;
+}
+div.figure-inner, div.informalfigure-inner {
+  padding: 0.5em;
+  background-color: #ffffff;
+  border: solid 1px #e0e0df;
+}
+div.caption { margin-top: 0.5em; }
+div.programlisting {
+  padding: 0.5em;
+  
+  background-color: #f9f9f6;
+  border: solid 1px #e0e0df;
+}
+div.screen {
+  padding: 0.5em;
+  
+  background-color: #f9f9f6;
+  border: solid 1px #e0e0df;
+}
+div.screen .prompt {
+  color: #3f3f3f;
+}
+div.screen .userinput {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+div.programlisting .userinput {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+pre.linenumbering {
+  color: #3f3f3f;
+  margin: 0;
+  padding-right: 1em;
+  float: left;
+  text-align: right;
+}
+
+
+
+dl.index dt { margin-top: 0; }
+dl.index dd { margin-top: 0; margin-bottom: 0; }
+dl.indexdiv dt { margin-top: 0; }
+dl.indexdiv dd { margin-top: 0; margin-bottom: 0; }
+dl.setindex dt { margin-top: 0; }
+dl.setindex dd { margin-top: 0; margin-bottom: 0; }
+div.list div.title-formal span.title {
+  border-bottom: solid 1px #e0e0df;
+}
+div.simplelist {
+  margin-left: 1.72em;
+}
+div.simplelist table { margin-left: 0; border: none; }
+div.simplelist td {
+  padding: 0.5em;
+  border-left: solid 1px #e0e0df;
+}
+div.simplelist td.td-first {
+  padding-left: 0;
+  border-left: 0;
+}
+div.synopsis {
+  padding: 0.5em;
+  
+  background-color: #f9f9f6;
+  border-top: solid 2px #c0c9ff;
+  border-bottom: solid 2px #c0c9ff;
+}
+div.synopsis div.synopsis {
+  padding: 0;
+  border: none;
+}
+div.synopsis div.block { margin-top: 0.2em; }
+div.synopsis div.block-first { margin-top: 0; }
+div.cmdsynopsis { font-family: monospace; }
+
+span.accel { text-decoration: underline; }
+span.acronym { font-family: sans-serif; }
+span.application { font-style: italic; }
+span.classname, span.exceptionname, span.interfacename { font-family: monospace; }
+span.code {
+  font-family: monospace;
+  border: solid 1px #e0e0df;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+pre span.code { border: none; padding: 0; }
+span.command {
+  font-family: monospace;
+  border: solid 1px #e0e0df;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+pre span.command { border: none; padding: 0; }
+span.computeroutput { font-family: monospace; }
+
+span.constant { font-family: monospace; }
+span.database { font-family: monospace; }
+span.email { font-family: monospace; }
+span.emphasis { font-style: italic; }
+span.emphasis-bold { font-style: normal; font-weight: bold; }
+span.envar { font-family: monospace; }
+
+span.filename { font-family: monospace; }
+span.firstterm { font-style: italic; }
+span.foreignphrase { font-style: italic; }
+span.function { font-family: monospace; }
+
+dt.glossterm span.glossterm { font-style: normal; }
+
+
+span.glossterm { font-style: italic; }
+
+span.guibutton, span.guilabel, span.guimenu, span.guimenuitem, span.guisubmenu, span.interface {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+span.keycap {
+  font-weight: bold;
+  color: #3f3f3f;
+}
+span.lineannotation { font-style: italic; }
+span.literal { font-family: monospace; }
+span.markup  { font-family: monospace; }
+span.medialabel { font-style: italic; }
+span.methodname { font-family: monospace; }
+span.ooclass, span.ooexception, span.oointerface { font-family: monospace; }
+span.option { font-family: monospace; }
+span.parameter { font-family: monospace; }
+span.paramdef span.parameter { font-style: italic; }
+span.prompt { font-family: monospace; }
+span.property { font-family: monospace; }
+span.replaceable  { font-style: italic; }
+span.returnvalue { font-family: monospace; }
+span.sgmltag { font-family: monospace; }
+span.structfield, span.structname { font-family: monospace; }
+span.symbol { font-family: monospace; }
+span.systemitem { font-family: monospace; }
+span.token { font-family: monospace; }
+span.type { font-family: monospace; }
+span.uri { font-family: monospace; }
+span.userinput { font-family: monospace; }
+span.varname { font-family: monospace; }
+span.wordasword { font-style: italic; }
+
+
+
+div.footnotes { font-style: italic; font-size: 0.8em; }
+div.footnote { margin-top: 1.44em; }
+span.footnote-number { display: inline; padding-right: 0.83em; }
+span.footnote-number + p { display: inline; }
+a.footnote { text-decoration: none; font-size: 0.8em; }
+a.footnote-ref { text-decoration: none; }
+
+span.co {
+  margin-left: 0.2em; margin-right: 0.2em;
+  padding-left: 0.4em; padding-right: 0.4em;
+  border: solid 1px #000000;
+  -moz-border-radius: 8px;
+  background-color: #000000;
+  color: #FFFFFF;
+  font-size: 8px;
+}
+span.co:hover {
+  border-color: #333333;
+  background-color: #333333;
+  color: #FFFFFF;
+}
+span.co a { text-decoration: none; }
+span.co a:hover { text-decoration: none; }
+
+dt.question { margin-left: 0em; }
+dt.question div.label { float: left; }
+dd + dt.question { margin-top: 1em; }
+dd.answer {
+  margin-top: 1em;
+  margin-left: 2em;
+  margin-right: 1em;
+}
+dd.answer div.label { float: left; }
+</style>
+</head>
+<body>
+<div class="navbar navbar-top"><table class="navbar"><tr>
+<td class="navbar-prev"><a class="navbar-prev" href="installation.audio-settings.html" title="Réglages audio du système">Réglages audio du système</a></td>
+<td class="navbar-next"><a class="navbar-next" href="installation.sound-check.html" title="Vérification de l’audio du système ">Vérification de l’audio du système </a></td>
+</tr></table></div>
+<div class="sidebar"><div class="sidenav"><div class="autotoc"><ul>
+<li><a href="installation-manual-info.html" title="À propos de ce document">À propos de ce document</a></li>
+<li>
+<a class="xref" href="installation-manual.html" title="Scenic Manuel d'installation @PACKAGE_VERSION@"><span class="application">Scenic</span> Manuel d'installation @PACKAGE_VERSION@</a><div class="autotoc"><ul>
+<li><a class="xref" href="installation.introduction.html" title="Introduction">Introduction</a></li>
+<li><a class="xref" href="installation.hardware-requirements.html" title="Pré-requis matériel">Pré-requis matériel</a></li>
+<li><a class="xref" href="installation.hardware-setup.html" title="Réglages des équipements">Réglages des équipements</a></li>
+<li><a class="xref" href="installation.software-installation.html" title="Installation logicielle">Installation logicielle</a></li>
+<li>
+<a class="xref" href="installation.av-configuration.html" title="Configuration audio et vidéo du système">Configuration audio et vidéo du système</a><div class="autotoc"><ul>
+<li><a class="xref" href="installation.av-transmission.html" title="Accès aux équipements A/V du système">Accès aux équipements A/V du système</a></li>
+<li><a class="xref" href="installation.video-settings.html" title="Réglages vidéo du système">Réglages vidéo du système</a></li>
+<li><a class="xref" href="installation.audio-settings.html" title="Réglages audio du système">Réglages audio du système</a></li>
+<li>Configuration du serveur audio du système</li>
+<li><a class="xref" href="installation.sound-check.html" title="Vérification de l’audio du système ">Vérification de l’audio du système </a></li>
+</ul></div>
+</li>
+<li><a class="xref" href="installation.network-test.html" title="Test du réseau">Test du réseau</a></li>
+<li><a class="xref" href="installation.nvidia-settings.html" title="Appendix: Nvidia Settings">Appendix: Nvidia Settings</a></li>
+<li><a class="xref" href="installation.ati-settings.html" title="Appendix: Ati Settings">Appendix: Ati Settings</a></li>
+<li><a class="xref" href="installation.fa101-settings.html" title="Appendix: Edirol FA-101 and FA-66 settings">Appendix: Edirol FA-101 and FA-66 settings</a></li>
+<li><a class="xref" href="glossary.html" title="Scenic Glossary">Scenic Glossary</a></li>
+</ul></div>
+</li>
+</ul></div></div></div>
+<div class="body body-sidebar"><div class="division sect1">
+<a name="installation.sound-server"></a><div class="header"><h1 class="sect1 title"><span class="title">Configuration du serveur audio du système</span></h1></div>
+<ul class="linktrail">
+<li class="linktrail linktrail-first"><a class="linktrail" href="installation-manual.html" title="Scenic Manuel d'installation @PACKAGE_VERSION@"><span class="application">Scenic</span> Manuel d'installation @PACKAGE_VERSION@</a></li>
+<li class="linktrail linktrail-last"><a class="linktrail" href="installation.av-configuration.html" title="Configuration audio et vidéo du système">Configuration audio et vidéo du système</a></li>
+</ul>
+<div class="autotoc"><ul><li>
+<span class="label">V.IV.I. </span><a class="xref" href="installation.sound-server.html#installation.jackd-configuration" title="Configuration de jackd">Configuration de jackd</a>
+</li></ul></div>
+<div class="division sect2">
+<a name="installation.jackd-configuration"></a><div class="header"><h2 class="sect2 title"><span class="title"><span class="label">V.IV.I. </span>Configuration de jackd</span></h2></div>
+<p class="para block block-first">Démarrez le serveur audio jackd avec qjackctl situé dans « Applications/Sound &amp; Video/Jack Control »</p>
+<p class="para block">
+      <div class="mediaobject"><img src="../fig/qjackctl.png"></div>
+</p>
+<p class="para block">Cliquez sur le bouton « setup ».</p>
+<p class="para block">Voici quelques exemples de configuration en temps réel pour qjackctl :</p>
+<div class="table block block-indent"><table style="border: solid 1px;"><tbody>
+<tr>
+<td class="td-colsep">
+                <span class="para">Parameter</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">Value</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Realtime</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">Yes</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Priority</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">Default</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Frames/Period</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">64</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Sample Rate</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">48000</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Periods/Buffer</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">2</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Port Maximum</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">256</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Timeout (msec)</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">500</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Interface</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">Default</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Audio</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">Duplex</span>
+              </td>
+<td>
+                <span class="para">freebob/ffa</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Input Latency</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">Default</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Output Latency</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">Default</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Latency</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">2.67 msec</span>
+              </td>
+</tr>
+</tbody></table></div>
+<p class="para block">Notre page dédiée aux réglages de qjackctl vous indique comment d’abord ajuster les paramètres en fonction de votre carte son spécifique. Ces paramètres sont précisés dans le tableau de réglages de JACK ci-dessous.</p>
+<p class="para block">Veuillez noter que ces réglages dépendent également des spécifications de votre ordinateur et peuvent varier d’un type d’installation à l’autre. </p>
+<p class="para block">Voici un tableau de l’ensemble des cartes son testées avec les réglages de JACK appropriés : </p>
+<div class="table block block-indent"><table style="border: solid 1px;"><tbody>
+<tr>
+<td class="td-colsep">
+                <span class="para">Carte de son</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-d backen</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-r taux d'échantillonage</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">- p images/période</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-n pérides/tampon</span>
+              </td>
+<td>
+                <span class="para">Latence</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">
+                MaudioDelta 1010 (regular or LT)</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-d alsa</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-r 48000</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-p 64</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-n 2</span>
+              </td>
+<td>
+                <span class="para">2.67 msec</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">
+                EdirolFirewire Fa101</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-d freebob</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-r 48000</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-p 64</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-n 2</span>
+              </td>
+<td>
+                <span class="para">2.67 msec</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Intel HDAudio</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-d alsa</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-r 48000</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-p 512</span>
+              </td>
+<td class="td-colsep">
+                <span class="para">-n 4</span>
+              </td>
+<td>
+                <span class="para">16 msec</span>
+              </td>
+</tr>
+</tbody></table></div>
+<p class="para block">-v = verbose, -R = mode temps réel, -d alsa règle le backend à ALSA (utiliser plutôt -dfreebob pourles cartes firewire), -r 48000 règle le taux d’échantillonnage à 48000 échantillons/sec, -p64 règle le nombre d’images/période à 64, and -n2 règle le nombre de périodes/tampon à 2.</p>
+<p class="para block">Si vous utilisez ALSA, vous rencontrerez potentiellement un problème dans la séquence de chargement du module. Pour y remédier, utilisez plutôt les noms ALSA plutôt que l’index (hw:0) pour spécifier le type de carte. Voici comment :</p>
+<p class="para block">Pour sélectionner la carte son appropriée, vérifiez tout d’abord le nom de la carte son à utiliser avec aplay.</p>
+<p class="para block">Voici un exemple de sortie avec aplay<span class="userinput" dir="ltr">aplay -l</span> output:</p>
+<div dir="ltr" class=" block screen block-indent"><pre class="screen">card 0: Intel [HDA Intel], device 0: ALC889A Analog [ALC889A Analog]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+</pre></div>
+<p class="para block">Copiez le nom de la carte son (ex. : « HDA Intel ») et collez le dans le fichier .asoundrc  localisé dan svotre répertoire $HOME. Ex. : Pour utiliser la carte son M2496 : </p>
+<p class="para block">ex:</p>
+<p class="para block">
+      <span class="userinput" dir="ltr">gedit .asoundrc</span>
+      </p>
+<p class="para block">Fichier .asoundrc avec le nom m2496 ajouté. </p>
+<div dir="ltr" class=" block screen block-indent"><pre class="screen">pcm.m2496 {
+   type hw;
+   card M2496;
+}
+ctl.m2496 { 
+   type hw;
+   card M2496;
+}</pre></div>
+<p class="para block">Il ne vous reste qu’à ajouter le nom de la carte son dans le champ de l’interface de qjackctl. Par exemple, la m2496:</p>
+<p class="para block">
+        <div class="mediaobject"><img src="../fig/qjackctl_soundcard.png"></div>
+      </p>
+<div class="block list itemizedlist"><ul class="itemizedlist"><li class="li-first">
+          <span class="para">Cliquez sur l’onglet « Options ».</span>
+        </li></ul></div>
+<p class="para block">Vérifiez que seules les options suivantes sont sélectionnées : </p>
+<div class="table block block-indent"><table style="border: solid 1px;"><tbody>
+<tr>
+<td class="td-colsep">
+                <span class="para">Paramètre</span>
+              </td>
+<td>
+                <span class="para">Valeur</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Capture Standard Output</span>
+              </td>
+<td>
+                <span class="para">Yes</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">XRUN detection regex</span>
+              </td>
+<td>
+                <span class="para">xrun d'un minimum de ([0-9|\.]+) msecs</span>
+              </td>
+</tr>
+</tbody></table></div>
+<div class="block list itemizedlist"><ul class="itemizedlist"><li class="li-first">
+          <span class="para">Cliquez sur l’onglet « Misc ».</span>
+        </li></ul></div>
+<p class="para block">Vérifiez que seules les options suivantes sont sélectionnées : </p>
+<div class="table block block-indent"><table style="border: solid 1px;"><tbody>
+<tr>
+<td class="td-colsep">
+                <span class="para">Paramètre</span>
+              </td>
+<td>
+                <span class="para">Valeur</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Start JACK audio server on application
+                startup</span>
+              </td>
+<td>
+                <span class="para">Yes</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Save JACK audio server configuration
+                to:</span>
+              </td>
+<td>
+                <span class="para">.jackdrc</span>
+              </td>
+</tr>
+<tr class="tr-shade">
+<td class="td-colsep">
+                <span class="para">Confirm server shutdown</span>
+              </td>
+<td>
+                <span class="para">Yes</span>
+              </td>
+</tr>
+<tr>
+<td class="td-colsep">
+                <span class="para">Enable ALSA Sequencer support</span>
+              </td>
+<td>
+                <span class="para">Yes</span>
+              </td>
+</tr>
+</tbody></table></div>
+<p class="para block">NOTE : En cas de message d’erreur, redémarrer l’ordinateur et essayez à nouveau.</p>
+<div class="block list itemizedlist"><ul class="itemizedlist"><li class="li-first">
+          <span class="para"></span>
+        </li></ul></div>
+</div>
+</div></div>
+<div class="navbar navbar-bottom"><table class="navbar"><tr>
+<td class="navbar-prev"><a class="navbar-prev" href="installation.audio-settings.html" title="Réglages audio du système">Réglages audio du système</a></td>
+<td class="navbar-next"><a class="navbar-next" href="installation.sound-check.html" title="Vérification de l’audio du système ">Vérification de l’audio du système </a></td>
+</tr></table></div>
+</body>
+</html>
