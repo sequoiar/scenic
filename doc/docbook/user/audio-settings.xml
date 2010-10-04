@@ -1,44 +1,44 @@
 <chapter id="user.audio-settings">
-<title>Audio Settings</title>
-<para>This chapter will cover the audio settings in &app;.</para>
+<title>Réglages audio </title>
+<para>Ce chapitre concerne les réglages audio de &app;.</para>
 
 <sect1 id="user.sending-audio">
-    <title>Sending Audio</title>
-    <para>Right now, &app; only supports either capturing the sound from the <application>JACK</application> audio server, or from a test source. In the "Sending" section of the "Audio" tab, choose the desired source in in "Audio Source" combo box.</para>
+    <title>Envoyer des données audio</title>
+    <para>&app; ne supporte pour l’instant que le son capté par le serveur audio JACK ou par une source test. Dans la section « Sending » de l’onglet « Audio », choisissez la source désirée dans la boîte « Audio Source ».</para>
 </sect1>
 
 <sect1 id="user.receiving-audio">
-    <title>Receiving Audio</title>
+    <title>Recevoir des données audio</title>
     <sect2 id="user.synchronize">
-        <title>Synchronization with the video stream</title>
-        <para>The audio stream can be synchronized with the video stream, or its timing can be independant. Turning off this option usually results in hearing the sound before seeing the video. It can be suitable for musicians who want a latency that is as low as possible for the audio.</para>
+        <title>Synchronisation avec le flux vidéo </title>
+        <para>Le flux audio peut être synchronisé au flux vidéo tout comme il peut être réglé de façon indépendante. Désactiver cette option implique habituellement que le son sera entendu avant que l’on puisse voir la vidéo. Cette option est adaptée aux musiciens qui souhaitent un temps de latence minimal pour l’audio. </para>
     </sect2>
     <sect2 id="user.num-of-chan">
-        <title>Number of channels</title>
-        <para>The maximum of audio channels depends on the chosen audio codec. It is 2 for MP3, 24 vor Vorbis and as much as your hardware supports for Raw audio, if you have the proper version of some Gstreamer plugins installed.</para>
+        <title>Nombre de canaux </title>
+        <para>Le nombre maximum de canaux audio dépend du codec audio choisi. Il sera de 2 pour les MP3, de 24 pour Vorbis et d’autant de canaux que votre équipement le permet pour le format Raw audio pour peu que vous ayez installé la bonne version de plugiciels Gstreamer.</para>
     </sect2>
     <sect2 id="user.audio-codec">
-        <title>Audio codec</title>
-        <para>The audio signals can be compressed or not. If it is not, it is said to be "raw" audio, and it is the best quality possible, since it is the same digital information as when it is captured from your audio input device.</para>
-        <para>If you want to decrease the bandwidth that it used by the audio, choose to compress it. Note that this will increase the latency. There are two supported codec: Vorbis and MP3. Vorbis is a free high-quality audio codec. Mp3 has more limitations, since the number of channels is limited to 2, and is protected by a patent. The Vorbis codec involves more latency than the MP3 codec, though.</para>
+        <title>Codec audio</title>
+        <para>Les signaux audio peuvent être compressés ou gardés tels quels. Dans le cas où ils ne sont pas compressés, on parle alors d’audio de type « RAW», de la meilleure qualité possible puisque identique aux données numériques telles que captées par votre équipement d’entrée de signal audio.</para>
+        <para>Pour diminuer la bande passante mise à profit pour le flux audio, il vous faut alors compresser ces données. Veuillez noter que la latence sera alors augmentée. Deux types de codec sont supportés : Vorbis et MP3. Vorbis est un codec audio de haute qualité de type libre. Les MP3 sont plus limités puisque le nombre de canaux possibles est limité à 2 et est protégé par une licence. Le codec Vorbis implique une latence supérieure à celle du codec MP3. </para>
     </sect2>
 </sect1>
 
 <sect1 id="user.jack-audio">
-    <title>Informations about the <application>JACK</application> audio server</title>
+    <title>Informations à propos du serveur audio <application>JACK</application> </title>
     <sect2 id="user.jack-latency">
-        <title>The Estimated <application>JACK</application> Latency</title>
-        <para>This information is given to you as a tool to estimate latency. To decrease this, you must configure the <application>JACK</application> audio server with better settings. That means to decrease the number of frames per period and the number of periods per buffer. Note that you need a good audio card to benefit from a low latency with <application>JACK</application>.</para>
+        <title>Latence estimée pour<application>JACK</application></title>
+        <para>Cette information vous est donnée pour vous aider à estimer le temps de latence. Pour diminuer ce dernier, il vous faut configurer le serveur audio JACK au mieux. Cela implique de diminuer le nombre d’image par période et le nombre de périodes par tampon. Veuillez noter qu’une carte audio de qualité permet des latences plus acceptables dans le cadre de l’utilisation de JACK.</para>
     </sect2>
     <sect2 id="user.jack-auto-connect">
-        <title>Auto connecting <application>JACK</application> ports</title>
-        <para>Leave it enabled if you want to hear some audio signals when starting to stream. Otherwise, it is left to the user to connect the <application>JACK</application> ports of <application>Milhouse</application> to and from the audio device's ports. If you want to do some custom routing of the audio channels, we recommend to use <application>jack.plumbing</application> to do so.</para>
+        <title>Connexion automatique des ports de<application>JACK</application></title>
+        <para>Laissez cette option activée si vous souhaitez entendre le signal audio dès le démarrage du flux. Dans le cas contraire, l’usager peut décider de connecter les ports de Milhouse dédiés à JACK aux ports d’entrée et de sortie de l’équipement audio concerné. Pour des options de routage plus personnalisées, il est conseillé d’utiliser jack.plumbing.</para>
     </sect2>
 </sect1>
 
 <sect1 id="user.audio-options">
-    <title>Advanced audio options</title>
-    <para>The input and output audio buffer size is the size of the buffer between the Gstreamer element and the <application>JACK</application> audio server.</para>
+    <title>Options audio avancées </title>
+    <para>La taille du tampon d’entrée et de sortie audio est celle du tampon entre l’élément Gstreamer et le serveur audio JACK.</para>
 </sect1>
 
 </chapter>
