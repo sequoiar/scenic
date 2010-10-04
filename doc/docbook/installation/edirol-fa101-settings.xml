@@ -1,7 +1,7 @@
 <appendix id="installation.fa101-settings">
-  <title>Appendice : Réglages pour Edirol FA-101 et FA</title>
-<para>Voici les réglages recommandés pour l’Edirol FA-101</para>
-<para>Pour la partie avant de la carte son </para>
+  <title>Appendix: Edirol FA-101 and FA-66 settings</title>
+<para>Here is the settings we recommend to use for the Edirol FA-101</para>
+<para> For the front side of the sound card:</para>
 <para>
 <mediaobject>
     <imageobject>
@@ -11,7 +11,7 @@
 </para>
 
 
-<para>Pour la partie arrière de la carte son </para>
+<para> For the rear side of the sound card:</para>
 
 <para>
 <mediaobject>
@@ -21,7 +21,8 @@
 </mediaobject>
 </para>
 
-<para>Voici le lien pour les pages dédiées à Roland Edirol:<ulink url="http://www.roland.com/products/en/FA-101/">
+<para>Here is the link of the Roland Edirol Pages:
+<ulink url="http://www.roland.com/products/en/FA-101/">
     <citetitle>Roland Edirol FA-101 page</citetitle>
 </ulink> 
 </para>

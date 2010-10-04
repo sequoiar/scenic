@@ -1,100 +1,199 @@
 <chapter id="user.advanced-options">
-  <title>Options avancées </title>
-  <para>Dans ce chapitre, vous trouverez des informations sur diverses options et fonctionnalités à la disposition des administrateurs principaux. </para>
+  <title>Advanced options</title>
+  <para>In this chapter, we will explain miscellaneous options and
+  features that power users might want to use.</para>
   <sect1 id="user.kiosk-mode">
-    <title>Utiliser &app; en mode kiosque </title>
-    <para>Le mode kiosque est utile lorsque &app; est le seul logiciel utiliser au démarrage. Il contient un système d’onglets avec des boutons de commande de taches telles que la mise à jour des paquets Debian ou Ubuntu et le redémarrage de l’ordinateur. </para>
-    <para>Pour démarrer &app; en mode kiosque, utiliser le flag "--kiosk" depuis un terminal. Le résultat est meilleur avec le flag "--fullscreen".</para>
+    <title>Using &app; in kiosk mode</title>
+    <para>Kiosk mode is useful when &app; is the only software that
+    runs at startup. It contains a system tab with buttons for
+    tasks such as upgrading the Debian or Ubuntu packages, and
+    rebooting the computer.</para>
+    <para>To launch &app; in kiosk mode, use the "--kiosk" flag
+    from a terminal. It is best used with the "--fullscreen"
+    flag.</para>
   </sect1>
   <sect1 id="user.debug-mode">
-    <title>Activer le mode débogage </title>
-    <para>&app; supporte un large éventail d’équipements et de librairies. L’inconvénient à cette grande flexibilité est un nombre accru d’accrocs potentiels, potentiellement difficiles à régler. Pour plus d’information, vous pouvez démarrer &app; en mode débogage. Pour ce faire, démarrer le par le biais d’un terminal avec le flag "—debug". Voici comment procéder avec Ubuntu GNU/Linux:</para>
+    <title>Activating the debug mode</title>
+    <para>&app; supports a wide variety of devices and libraries.
+    The tradeoff for this greater flexibility is a greater number
+    of potential pitfalls, which may be difficult to troubleshoot.
+    To get more information about what is happening behind the
+    scenes, you can launch &app; in debug mode. To do so, launch it
+    from a terminal with the "--debug" flag. Here is how to do it
+    in Ubuntu GNU/Linux:</para>
     <orderedlist>
       <listitem>
          <para>
-            Choisir 
+            Choose the 
             <menuchoice>
               <guimenu>Application</guimenu>
               <guimenuitem>Accessories</guimenuitem>
               <guimenuitem>Terminal</guimenuitem>
-            </menuchoice>dans le menu.
+            </menuchoice>menu item.
          </para>
       </listitem>
-      <listitem><para></para></listitem>
+      <listitem><para>Type "scenic --debug" and press enter.</para></listitem>
     </orderedlist>
     <para>
     <userinput>scenic --debug</userinput>
     </para>
-    <para>Vous avez désormais accès à des informations détaillées sur ce qui se passe sous le capot de &app;. Vous avez toujours l’option de copier tout ou partie du texte affiché et de l’envoyer par courriel aux développeurs du projet &app;. Dans le <application>Terminal</application>
-    <application>Ubuntu GNU/Linux</application>Vous avez désormais accès à des informations détaillées sur ce qui se passe sous le capot de &app;. Vous avez toujours l’option de copier tout ou partie du texte affiché et de l’envoyer par courriel aux développeurs du projet &app;. Dans le terminal Ubuntu GNU/Linux, les touches.
+    <para>You can now see more detailed information about what
+    happens under the hood of &app;. You can copy some of this text
+    to the clipboard in order to paste it into an email to the
+    &app; developers. In the 
+    <application>Terminal</application>that comes with 
+    <application>Ubuntu GNU/Linux</application>, you can copy the
+    selected text by pressing 
     <keycombo>
       <keycap>Ctrl</keycap>
       <keycap>Shift</keycap>
       <keycap>C</keycap>
-    </keycombo>permettent de copier le texte sélectionné.</para>
+    </keycombo>.</para>
   </sect1>
   <sect1 id="user.command-line-tootls">
-    <title>Outils de lignes de commande </title>
-    <para>Voici quelques outils de lignes de commande intégrés à &app;.</para>
+    <title>Command line tools</title>
+    <para>Here are a few command-line tools that come with
+    &app;.</para>
     <orderedlist>
       <listitem>
-         <para>dc-ctl : contrôle des caméras DC ieee1394 (Firewire). </para>
+         <para>
+         dc-ctl: Controls DC ieee1394 (Firewire) cameras.
+         </para>
       </listitem>
       <listitem>
-         <para>Midistream : flux de notes et contrôles MIDI sur RTP. </para>
+         <para>
+            midistream: Streams MIDI notes and controls over RTP.
+         </para>
       </listitem>
       <listitem>
-         <para>&app; : interface graphique usagers pour les flux audio, vidéo et MIDI sur RTP. </para>
+         <para>
+            scenic: Graphical user interface to stream audio, video and MIDI over RTP.
+         </para>
       </listitem>
       <listitem>
-         <para>milhouse : flux audio et vidéo over RTP. </para>
+         <para>
+            milhouse: Streams audio and video over RTP.
+         </para>
       </listitem>
       <listitem>
-         <para>Firereset : redémarre un bus ieee1394 (Firewire). </para>
+         <para>
+            firereset: Resets a ieee1394 (Firewire) bus.
+         </para>
       </listitem>
       <listitem>
-         <para>jack-info : imprime les informations relatives aux serveurs JACK en fonction. </para>
+         <para>
+         jack-info: Prints informations about currently running JACK servers.
+         </para>
       </listitem>
     </orderedlist>
-    <para>Veuillez vous référer à leurs pages respectives dans le  manuel pour de plus amples informations. Par exemple, pour accéder à la page de milhouse, tapez « man milhouse » dans un terminal. Enfoncez ensuite les flèches correspondantes pour faire défiler l’information verticalement. Enfoncez la touche « Q » pour quitter le manuel.</para>
-    <para>La prochaine section est dédiée aux lignes de commande de <application>milhouse.</application></para>
+    <para>See their manual page for more informations. For example,
+    to read the manual page of 
+    <application>Milhouse</application>, type "man milhouse" in a
+    terminal. Press the 
+    <keycombo>
+      <keycap>Up</keycap>
+    </keycombo>and 
+    <keycombo>
+      <keycap>Down</keycap>
+    </keycombo>arrows to scroll up and down. Press 
+    <keycombo>
+      <keycap>Q</keycap>
+    </keycombo>to quit the manual page reader.</para>
+    <para>
+    <userinput>man milhouse</userinput>
+    </para>
+    <para>The next section is dedicated to the 
+    <application>Milhouse</application>command-line
+    streamer.</para>
   </sect1>
   <sect1 id="user.using-milhouse">
-    <title>Utiliser milhouse</title>
-    <para>La ligne de commande milhouse est un puisant outil doté de nombreuses options qui n’ont pas encore été intégrées à &app; GUI. Pour des installations plus complexes que ce que &app; peut supporter à ce jour, il est suggéré d’utiliser <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> comme script de lancement. Vous en trouverez plusieurs exemples dans « trunk/utils/ ». Un coup d’œil à leur page respective dans le manuel vous en apprendra plus sur chacun de ces outils. 
+    <title>Using 
+    <application>Milhouse</application></title>
+    <para>The <application>milhouse</application> command line application is a powerful tool with many
+    options not implemented yet in the Scenic GUI. For more complex
+    setups than what Scenic can currently support, we suggest you 
+    use 
+    <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> as a
+    launching script. Look at some examples in 
     <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
-    trunk/utils/</ulink></para>
-    <para>Voici une brève introduction à milhouse, une application pour les flux audio et vidéo sur RTP.</para>
-    <para>milhouse est un outil simple capable de beaucoup de choses. Par exemple, il peut dresser la liste des caméras et autres équipements de capture vidéo connectés à votre ordinateur. Il peut également changer les réglages vidéo pour une pièce d’équipement V4L2 (Video4Linux2), tels que les informations sur le standard vidéo et sa position dans la chaine des entrées vidéo. milhouse supporte également les caméras DV et DC cameras, toutes deux faisant appel à ieee1394 (Firewire) pour envoyer leur signal vidéo à l’ordinateur. Ces deux types de caméras ce sont pas supportés à ce jour par l’interface graphique usager &app;. C’est entre autres pour cette raison qu’in utilisateur avancé préférera peut-être utiliser l’outil de lignes de commande milhouse plutôt que l’interface graphique usager &app;.</para>
-    <para>Par dessus tout, milhouse est un diffuseur de flux audio et vidéo. Sa raison d’être est de transmettre des signaux numériques audio et vidéo sur Internet. En tant que diffuseur, il peut aussi bien être utilisé comme récepteur que comme transmetteur. Pour choisir son mode d’utilisation, il suffit de lui donner l’option par la ligne de commande « --receiver » ou « --sender ».</para>
+    trunk/utils/</ulink>. You should look at the manual page of
+    both these tools to know more about them.</para>
+    <para>Here is a quick introduction to using 
+    <application>milhouse</application>, an application for
+    audio-video streaming over RTP.</para>
+    <para>
+    The <application>milhouse</application> application is a simple tool 
+    that can do a lot of things. For example, it can list the cameras and video
+    capture devices found on your computer. It can also change
+    video settings for a V4L2 (Video4Linux2) device, such as its
+    video standard and its selected video input number. 
+    <application>Milhouse</application> also supports DV cameras and
+    DC cameras, two kinds of cameras using ieee1394 (Firewire) to
+    send their digital video signal to the computer. These two
+    camera types are not yet supported by the &app; graphical
+    user interface. This is one of the reasons why an advanced user
+    might prefer to use 
+    <application>milhouse</application> instead of
+    the &app; graphical user interface.</para>
+    <para>Above all, 
+    <application>Milhouse</application> is an audio-video streamer.
+    Its main purpose is to transmit digital video and audio signals
+    over the Internet. As a streamer, it can be used in one of two 
+    it modes: as a sender or a receiver. To choose, simply
+    give it the command-line option "--receiver" or
+    "--sender".</para>
     </sect1>
     <sect1 id="user.milhouse-send-receive">
-      <title>Utiliser milhouse comme émetteur ou comme récepteur.</title>
-      <para>Pour créer une session de diffusion de flux avec milhouse, il vous faut démarrer un transmetteur et un récepteur. Il vous faut donner à chacun l’adresse IP de l’autre par le biais de la commande « --address ». </para>
-      <para>Pour envoyer un flux audio, le transmetteur est celui qui capte le signal audio à sa source. Il faut choisir une valeur pour l’option « --audiosource ». « jackaudiosrc » est celle du serveur audio JACK. Une autre valeur commune est « audiotestsrc », une source test qui génère de simples notes. </para>
-      <para>Pour envoyer un flux vidéo, il vous faut spécifier une source vidéo à l’attention du récepteur en utilisant son option « --videosource ». « v4l2src » est une valeur commune pour toute source en V4L2. Dans ce cas, vous voudrez peut-être spécifier un équipement vidéo tel que « /dev/video0 » en utilisant l’option « --videodevice ». « videotestsrc » est une autre valeur commune, utile pour des tests avec des barres de couleur.</para>
-      <para>Du côté du récepteur, il faut spécifier une sortie pour l’audio – « --audiosink » - et les codec audio et vidéo, tout comme pour l’émetteur (ou utiliser les valeurs par défaut proposées dans « milhouse –help »).</para>
-      <para>Nous créerons un émetteur et un récepteur milhouse sur deux ordinateurs distincts. </para> 
+      <title>Using 
+      <application>milhouse</application> as a sender or a
+      receiver</title>
+      <para>To create a streaming session with 
+      <application>Milhouse</application>, you must launch a sender
+      and a receiver. You must give each of them the IP address of
+      the other one. That is what the "--address" command line
+      option is for.</para>
+      <para>If you want to stream audio, the sender is the one that
+      captures the audio signal from its audio source. You must
+      choose a value for its "--audiosource" option. If omitted,
+      the default is "jackaudiosrc", for the JACK audio server. Another
+      common value is "audiotestsrc", a test source that generates
+      simple test tones.</para>
+      <para>If you want to stream video, you must specify a video
+      source for the sender, using its "--videosource" option. A
+      common value is "v4l2src", for a V4L2 source. In this case,
+      you might want to specify a video device, such as
+      "/dev/video0", using the "--videodevice" option. The
+      default value for the "--videosource" is "videotestsrc", for
+      test color bars.</para>
+      <para>On the receiver's side, you must choose an output for
+      the audio - the "--audiosink" argument - and specify the
+      audio and video codecs, like for the sender (or use the
+      defaults listed in milhouse --help).</para>
+      <para>We will create a 
+      <application>milhouse</application> sender and receiver on two separate computers.</para> 
 
     </sect1>
     <sect1 id="user.milhouse-receivers">
-      <title>Démarrer les récepteurs </title>
-      <para>Voici une courte description de la façon de démarrer les récepteurs milhouse pour recevoir des flux audio et vidéo. </para>
-      <para>Réglez l’affichage de la machine locale </para>
+      <title>Launch the receivers</title>
+      <para>Here is a short explanation on how to start the
+      milhouse receivers to receive audio and video streams.</para>
+      <para>Set the local_machine display</para>
       <para>
       <userinput>export DISPLAY=:0.0</userinput>
       </para>
-      <para>Démarrez le programme sur la machine locale avec les paramètres suivants : </para>
+      <para>Run the program on the local machine with the following
+      parameters:</para>
       <para>
       <userinput>
 milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
       </userinput>
       </para>
-      <para>Réglez l’affichage de la machine distante </para>
+      <para>Set the remote_machine display</para>
       <para>
       <userinput>export DISPLAY=:0.0</userinput>
       </para>
-      <para>Démarrez le programme sur la machine distante avec les paramètres suivants : </para>
+      <para>Execute this command on the remote machine with the
+      following parameters:</para>
       <para>
       <userinput>
 milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
@@ -102,28 +201,40 @@ milhouse --receiver --address local_ip_address --videosink xvimagesink --videoco
       </para>
     </sect1>
     <sect1 id="user.milhouse-senders">
-      <title>Démarrer les émetteurs </title>
-      <para>L’étape suivante concerne le démarrage des émetteurs milhouse sur un ordinateur différent évidemment.</para>
-      <para>Démarrez le programme sur la machine locale avec les paramètres suivants : </para>
+      <title>Launch the senders</title>
+      <para>The next step is to launch the milhouse sender
+      processes. of course, that should be on a different
+      computer.</para>
+      <para>Execute this command on the local machine with the following
+      parameters:</para>
       <para>
       <userinput>
 milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
 </userinput>
 </para>
-      <para>Démarrez le programme sur la machine distante avec les paramètres suivants : </para>
+      <para>Execute this command on the remote machine with the following
+      parameters:</para>
       <para>
       <userinput>
 milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
       </userinput>
       </para>
-      <para>Une fenêtre affichant le flux vidéo en direct devrait apparaître sur l’un de vos écrans.  Vous pouvez la déplacer en gardant la touche « alt » enfoncée. Le mode plein écran s’affiche en pressant la touche « f » ou « esc ». </para>
-      <para>Les informations de connexion audio devraient également s’afficher dans qjackctl. Les sorties peuvent alors être assignées à vis haut-parleurs ou à d’autres applications. </para>
-      <para>Les flux audio et vidéo devraient désormais être complètement fonctionnels des deux côtés. </para>
-      <para>Pour arrêter milhouse, tapez « control-c » dans le terminal en fonction ou « control-q » dans la fenêtre de la vidéo. </para>
+      <para>A video window displaying the live video stream should
+      appear on one of your designated screens. It is movable by
+      holding down the -alt- key and dragging the window. Pressing
+      'f' or escape will toggle fullscreen mode.</para>
+      <para>You should also see the audio connections appear in
+      qjackctl. The outputs are now routable to your speakers or
+      other applications.</para>
+      <para>You should now have video and audio input fully working
+      on both sides.</para>
+      <para>To stop milhouse type control-c in the terminal from which it
+      was started or type control-q in the video window.</para>
     </sect1>
   <sect1 id="user.milhouse-help">
-    <title>Aide de milhouse </title>
-    <para>Tapez « milhouse –help » pour des informations sur les différentes options disponibles.</para>
+    <title>Milhouse Help</title>
+    <para>Type milhouse --help to have information on the
+    different options available.</para>
     <para>
     <userinput>milhouse --help</userinput>
     </para>
@@ -132,7 +243,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
         <tbody>
           <row>
             <entry>
-              <para>Options de l’aide :	_</para>
+              <para>Help Options:</para>
             </entry>
           </row>
           <row>
@@ -140,7 +251,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-?, --help</para>
             </entry>
             <entry>
-              <para>Lance l’aide </para>
+              <para>produce help</para>
             </entry>
           </row>
           <row>
@@ -148,7 +259,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-r, --receiver</para>
             </entry>
             <entry>
-              <para>Ce procédé en est un de réception  </para>
+              <para>this process is a receiver</para>
             </entry>
           </row>
           <row>
@@ -156,7 +267,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-s, --sender</para>
             </entry>
             <entry>
-              <para>Ce procédé en est un d’émission</para>
+              <para>this process is a sender</para>
             </entry>
           </row>
           <row>
@@ -164,7 +275,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-i, --address</para>
             </entry>
             <entry>
-              <para>Donne l’adresse IP de l’hôte distant </para>
+              <para>provide ip address of remote host
+              address</para>
             </entry>
           </row>
           <row>
@@ -172,7 +284,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-v, --videocodec</para>
             </entry>
             <entry>
-              <para>Codec vidéo (mpeg4, h264, h263, theora)</para>
+              <para>videocodec (mpeg4, h264, h263, theora)</para>
             </entry>
           </row>
           <row>
@@ -180,7 +292,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-a, --audiocodec</para>
             </entry>
             <entry>
-              <para>Codec audio (raw, vorbis, mp3)</para>
+              <para>audiocodec (raw, vorbis, mp3)</para>
             </entry>
           </row>
           <row>
@@ -188,7 +300,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-k, --videosink</para>
             </entry>
             <entry>
-              <para>Sortie vidéo (xvimagesink, glimagesink, sharedvideosink, ximagesink)</para>
+              <para>video output (xvimagesink, glimagesink,
+              sharedvideosink, ximagesink)</para>
             </entry>
           </row>
           <row>
@@ -196,7 +309,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-l, --audiosink</para>
             </entry>
             <entry>
-              <para>Sortie audio (jackaudiosink, alsasink, pulsesink)</para>
+              <para>audio output (jackaudiosink, alsasink,
+              pulsesink)</para>
             </entry>
           </row>
           <row>
@@ -204,7 +318,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-t, --audioport</para>
             </entry>
             <entry>
-              <para>Numéro du port audio (1024-65535)</para>
+              <para>audioport number (1024-65535)</para>
             </entry>
           </row>
           <row>
@@ -212,7 +326,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-p, --videoport</para>
             </entry>
             <entry>
-              <para>Numéro du port vidéo (1024-65535)</para>
+              <para>videoport number (1024-65535)</para>
             </entry>
           </row>
           <row>
@@ -220,7 +334,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-f, --fullscreen</para>
             </entry>
             <entry>
-              <para>Affiche la vidéo en mode plein écran  </para>
+              <para>display video in fullscreen</para>
             </entry>
           </row>
           <row>
@@ -228,7 +342,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-B, --shared-video-id</para>
             </entry>
             <entry>
-              <para>Nom de la sortie du tampon vidéo partagé (ne s’applique qu’à sharedvideosink)</para>
+              <para>name for shared video buffer output (only
+              applies to sharedvideosink)</para>
             </entry>
           </row>
           <row>
@@ -236,7 +351,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-o, --deinterlace</para>
             </entry>
             <entry>
-              <para>Désentralecement vidéo (côté récepteur seulement)  </para>
+              <para>deinterlace video (receiver side only)</para>
             </entry>
           </row>
           <row>
@@ -244,7 +359,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-d, --videodevice</para>
             </entry>
             <entry>
-              <para>Nom de l’équipement vidéo (/dev/video0, /dev/video1)</para>
+              <para>name of videodevice (/dev/video0,
+              /dev/video1)</para>
             </entry>
           </row>
           <row>
@@ -252,7 +368,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-q, --audiodevice</para>
             </entry>
             <entry>
-              <para>Nom de l’équipement audio (hw:0, hw:2, plughw:0, plughw:2)</para>
+              <para>name of audiodevice (hw:0, hw:2, plughw:0,
+              plughw:2)</para>
             </entry>
           </row>
           <row>
@@ -260,7 +377,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>--videolocation</para>
             </entry>
             <entry>
-              <para>Emplacement du fichier vidéo &lt;filename&lt; (s’applique uniquement quand source vidéo =filesrc)</para>
+              <para>video file location &lt;filename&gt; (only
+              applies when videosource=filesrc)</para>
             </entry>
           </row>
           <row>
@@ -268,7 +386,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>--audiolocation</para>
             </entry>
             <entry>
-              <para>Emplacement du fichier audio &lt;filename&lt;(s’applique uniquement quand source audio =filesrc)</para>
+              <para>audio file location &lt;filename&gt; (only
+              applies when audiosource=filesrc)</para>
             </entry>
           </row>
           <row>
@@ -276,7 +395,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-n, --screen</para>
             </entry>
             <entry>
-              <para>-n, --screen	Numéro de l’écran xinerama (0, 1)</para>
+              <para>xinerama screen num (0, 1)</para>
             </entry>
           </row>
           <row>
@@ -284,7 +403,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-w, --version</para>
             </entry>
             <entry>
-              <para>Numéro de version des sorties </para>
+              <para>outputs version number</para>
             </entry>
           </row>
           <row>
@@ -292,7 +411,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-c, --numchannels</para>
             </entry>
             <entry>
-              <para>Nombre de canaux audio disponibles.</para>
+              <para>The numbers of audio channels to use.</para>
             </entry>
           </row>
           <row>
@@ -300,7 +419,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-x, --videobitrate</para>
             </entry>
             <entry>
-              <para>Débit vidéo : quantité de donnée vidéo en encodage. Exprimé en octets par secondes. </para>
+              <para>videobitrate: The amount of video data being
+              encoded; expressed in bits per second</para>
             </entry>
           </row>
           <row>
@@ -308,7 +428,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-e, --audiosource</para>
             </entry>
             <entry>
-              <para>Entrée audio (jackaudiosrc, alsasrc, pulsesrc)</para>
+              <para>audio input (jackaudiosrc, alsasrc,
+              pulsesrc)</para>
             </entry>
           </row>
           <row>
@@ -316,7 +437,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-u, --videosource</para>
             </entry>
             <entry>
-              <para>Entrée vidéo (v4l2src, v4lsrc, dv1394src)</para>
+              <para>video input (v4l2src, v4lsrc, dv1394src)</para>
             </entry>
           </row>
           <row>
@@ -324,7 +445,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-z, --timeout</para>
             </entry>
             <entry>
-              <para>Temps d’attente en ms avant de pouvoir quitter, 0 impliquant un fonctionnement indéfini.  </para>
+              <para>time in ms to wait before quitting, 0 means run
+              indefinitely</para>
             </entry>
           </row>
           <row>
@@ -332,7 +454,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-b, --audio-buffer-usec</para>
             </entry>
             <entry>
-              <para>Durée du tampon audio du récepteur en microsecondes, doit être > 11333</para>
+              <para>length of receiver's audio buffer in
+              microseconds, must be &gt; 11333</para>
             </entry>
           </row>
           <row>
@@ -340,7 +463,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-g, --jitterbuffer</para>
             </entry>
             <entry>
-              <para>-g, --jitterbuffer	Durée des tampons jitter RTP du récepteur en millisecondes, doit être &gt;= 1</para>
+              <para>length of receiver's rtp jitterbuffers in
+              milliseconds, must be &gt;= 1</para>
             </entry>
           </row>
           <row>
@@ -348,7 +472,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-G, --camera-number</para>
             </entry>
             <entry>
-              <para>Identification de la caméra pour dc1394src (0,1)</para>
+              <para>camera id for dc1394src (0,1)</para>
             </entry>
           </row>
           <row>
@@ -356,7 +480,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-U, --camera-guid</para>
             </entry>
             <entry>
-              <para>Guide de caméra pour dc1394src</para>
+              <para>camera guid for dc1394src</para>
             </entry>
           </row>
           <row>
@@ -364,7 +488,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-I, --mulitcast-interface</para>
             </entry>
             <entry>
-              <para>Interface à utiliser pour le multicasting (eth0, eth1)</para>
+              <para>interface to use for mutlicast (eth0,
+              eth1)</para>
             </entry>
           </row>
           <row>
@@ -372,7 +497,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-j, --enable-controls</para>
             </entry>
             <entry>
-              <para>Active les contrôles GUI pour tampon jitter</para>
+              <para>enable gui controls for jitterbuffer</para>
             </entry>
           </row>
           <row>
@@ -380,7 +505,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-J, --disable-jack-autoconnect</para>
             </entry>
             <entry>
-              <para>Évite que les ports audio JACK de milhouse ne se connecte pas au démarrage. </para>
+              <para>prevent milhouse's jack audio ports don't
+              connect on startup</para>
             </entry>
           </row>
           <row>
@@ -388,7 +514,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-O, --jack-client-name</para>
             </entry>
             <entry>
-              <para>Nom du client JACK </para>
+              <para>name of jack-client</para>
             </entry>
           </row>
           <row>
@@ -396,7 +522,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-C, --negotiate-caps</para>
             </entry>
             <entry>
-              <para>Force la communication des capacités média RTP via TCP</para>
+              <para>force rtp media capabilities (caps) to be
+              communicated over tcp</para>
             </entry>
           </row>
           <row>
@@ -404,7 +531,9 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-D, --debug</para>
             </entry>
             <entry>
-              <para>Niveau de la qualité de la connexion (critique=1, erreur=2, alerte=3, info=4, débogage=5, débogage-gst =6)</para>
+              <para>level of logging verbosity (critical=1,
+              error=2, warning=3, info=4, debug=5,
+              gst-debug=6)</para>
             </entry>
           </row>
           <row>
@@ -412,7 +541,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-W, --window-title</para>
             </entry>
             <entry>
-              <para>Titre de la fenêtre de sortie vidéo </para>
+              <para>title for video output window</para>
             </entry>
           </row>
           <row>
@@ -420,7 +549,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-F, --framerate</para>
             </entry>
             <entry>
-              <para>Nombre d’images/seconde de la capture vidéo (15,30)</para>
+              <para>framerate for video capture (15,30)</para>
             </entry>
           </row>
           <row>
@@ -428,7 +557,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-H, --list-cameras</para>
             </entry>
             <entry>
-              <para>Dresse la liste des caméras connectées </para>
+              <para>list connected cameras</para>
             </entry>
           </row>
           <row>
@@ -436,7 +565,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-N, --width</para>
             </entry>
             <entry>
-              <para>Largeur de la capture vidéo, doit être spécifiée par l’émission et la réception  </para>
+              <para>width for video capture, must be specified for
+              sender and receiver</para>
             </entry>
           </row>
           <row>
@@ -444,7 +574,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-Y, --height</para>
             </entry>
             <entry>
-              <para>Hauteur de la capture vidéo, doit être spécifiée par l’émission et la réception </para>
+              <para>height for video capture, must be specified for
+              sender and receiver</para>
             </entry>
           </row>
           <row>
@@ -452,7 +583,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-P, --display-width</para>
             </entry>
             <entry>
-              <para>Largeur de la vidéo affichée display (peut potentiellement modifier la taille en entrée)</para>
+              <para>width for video on display (may scale
+              input)</para>
             </entry>
           </row>
           <row>
@@ -460,7 +592,8 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-Q, --display-height</para>
             </entry>
             <entry>
-              <para>Hauteur de la vidéo affichée (peut potentiellement modifier la taille en sortie)</para>
+              <para>height for video on display (may scale
+              output)</para>
             </entry>
           </row>
           <row>
@@ -468,7 +601,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-M, --grayscale</para>
             </entry>
             <entry>
-              <para>Force la capture  dc1394 en niveaux de gris </para>
+              <para>force dc1394 capture to grayscale</para>
             </entry>
           </row>
           <row>
@@ -476,7 +609,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-A, --aspect-ratio</para>
             </entry>
             <entry>
-              <para>Format d’affichage de l’image (4:3, 16:9)</para>
+              <para>picture aspect ratio (4:3, 16:9)</para>
             </entry>
           </row>
           <row>
@@ -484,7 +617,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>--localvideo</para>
             </entry>
             <entry>
-              <para>Affiche uniquement la vidéo locale  </para>
+              <para>display local video only</para>
             </entry>
           </row>
         </tbody>
@@ -492,32 +625,39 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
     </informaltable>
   </sect1>
   <sect1 id="user.Multicast">
-    <title>Multidiffusion</title>
-    <para>Les commandes milhouse peuvent aussi être utilisé pour des scénarios en multidiffusion.
+    <title>Multicast</title>
+    <para>The milhouse command can also be used in multicast scenarios.
+    All the same options apply as before, only two things need changing:
     <orderedlist>
-    <listitem>Les deux émetteurs doivent ajouter l'argument
-        --multicast-interface qui permet de spécifier quel interface réseau sera utilisé</listitem>
-    <listitem>Une addresse dédié à la multidiffusion doit être spécifié avec la'argument --address, de préférence dans la gamme 239.0.0.0/8, réservée pour les domaines multidiffusion administrés localement. (voir <ulink url="http://tools.ietf.org/html/rfc2365">RFC 2365</ulink>).</listitem>
+    <listitem>Both the sender (who will stream audio and/or video to multiple 
+        receivers) and each of the receivers need to specify the 
+        --multicast-interface argument, which specifies which network 
+        interface to use.</listitem>
+    <listitem>A multicast address must be used for the --address argument, preferably
+    in the range 239.0.0.0/8, which is intended for private or locally administered multicast domains (see <ulink url="http://tools.ietf.org/html/rfc2365">RFC 2365</ulink>).</listitem>
     </orderedlist>
     </para>
-    <para>Un exemple simple de scénario multidiffusion:</para>
-    <para>émetteur</para>
+    <para>A simple example of a multicast setup:</para>
+    <para>Sender:</para>
     <para>milhouse -s --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</para>
-    <para>Récepteur</para>
+    <para>Receivers:</para>
     <para>milhouse -r --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</para>
   </sect1>
   <sect1 id="user.other-uses">
-    <title>Autres utilisations</title>
-    <para>Les commandes milhouse peuvent également être utilisées pour changer certaines propriétés d’un équipement vidéo V4L2, telles que la résolution et le standard vidéo. La commande milhouse devrait quitter immédiatement après avoir été effectuée.</para>
-    <para>Pour changer le standard vidéo à NTSC :</para>
+    <title>Other uses</title>
+    <para>The milhouse command can also be used to change some
+    properties of a V4L2 video device, such as the resolution and
+    the video standard. The milhouse command should exit
+    immediately once done.</para>
+    <para>To change the video standard to NTSC:</para>
     <para>
     <userinput>milhouse --v4l2-standard NTSC</userinput>
     </para>
-    <para>Pour lister les caméras :</para>
+    <para>To list cameras:</para>
     <para>
     <userinput>milhouse --list-cameras</userinput>
     </para>
-    <para>Pour déterminer une entrée à un équipement V4L2 :</para>
+    <para>To choose an input for a V4L2 device:</para>
     <para>
     <userinput>milhouse --v4l2-input 1</userinput>
     </para>

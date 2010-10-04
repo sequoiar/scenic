@@ -1,241 +1,274 @@
 <chapter id="installation.hardware-requirements">
-  <title>Pré-requis matériel</title>
-  <para>L’utilisation de &app; requiert des équipements spécifiques. Pour des performances et une fiabilité acceptables, un système de téléprésence utilisé dans un contexte de performance en temps réel doit satisfaire à plusieurs standards. Notre équipe teste continuellement équipements, périphériques et pièces d’ordinateur. Cette page est fréquemment mise à jour par l’ajout d’équipements qui satisfont aux besoins de la téléprésence. Pour tout matériel et équipement ne figurant pas dans cette liste, veuillez nous contacter. 
+  <title>Hardware Requirements</title>
+  <para>The use of &app; require specific hardware.
+     Telepresence system oriented for realtime performance have to met
+     certain standard, this for good reliability and performance. Our
+     team is continuously testing various devices and computer parts.
+     We frequently update this page with material that is adequate to
+     use in a telepresence system. For any material that is not
+     proposed in our list, please contact us.
   </para>
   <sect1 id="installation.good-scenic-experience">
-   <title>Pour une expérience &app; satisfaisante</title>  
-      <para>Il est recommandé de prendre le temps de choisir l’ordinateur et les équipements et périphériques que vous utiliserez. L’achet d’un ordinateur pour linux et des performances audiovisuelles prend du temps et nécessite un minimum de connaissances. Des pièces d’ordinateur et autres équipements connexes apparaissent constamment sur le marché. Pour éviter les problèmes, il est recommandé de ne pas vous précipiter sur n’importe quel ordinateur puissant et rapide disponible près de chez vous. Suivez plutôt chaque étape des instructions  de notre manuel d’installation qui vous guidera quant à l’ensemble des points essentiels pour vous permettre de faire les meilleurs choix possibles. 
+   <title>For a good &app; experience</title>  
+      <para>You need to take the time to choose your computer and related devices. Buying a computer for linux, and specifically for audio-video performance requires time and knowledge. Computer parts and devices are constantly changing. Please do not rush your self to quickly buy the fastest and big high end computer sold by your favorite next corner computer store. Chances are you gone have problems. Unstead, follow every steps of our installation manual. It will guide you on everything you need to know to make good choices.
       </para> 
 
       <orderedlist>
          <listitem>
-            <para>Pensez aux objectifs de votre projet et définissez le précisément. S’agit-il d’une installation amateur? Une installation à des fins de test uniquement, une performance artistique devant public, une importante présentation en réseau avec vos futurs partenaires? Chaque projet a ses propres besoins (matériels, financiers et en termes de ressources humaines). Ces besoins définiront les spécifications de l’ordinateur qu’il vous faudra utiliser. 
+            <para>
+            Think of your project objective and define your project. Is it an amateur setup? A setup for test purpose only, an artistic performance with a public, an important presentation over the network with your future partners. Each project will require different ressources (materials, financials an in human ressource). This will affect wich computer specification you will finally used.
             </para>
          </listitem>
          <listitem>
-            <para>Définissez vos besoins en relation avec vos objectifs. Voici quelques exemples de besoins relatifs à l’utilisation de &app; : qualité et performances, stabilité, installation rapide, démarrage rapide du système, installation à des fins de test uniquement, installation vraiment stable, installation à des fins de développement, technologie à la pointe. Malheureusement, dans la plupart des cas, aucun ordinateur ne peut répondre à tous ces besoins. Il faut donc faire un choix. Pour vous aidera ces fins, nous avons regroupés les ressources et équipements nécessaires en trois catégories. Haute, moyenne et basse.
+            <para>
+         Define your needs depending of your objectives. Here are some examples of needs related to a &app; utilisation: Good quality and performance, stability, quick setup, get your system quickly, for testing purpose only, a really stable setup, a developpement setup, cutting edge technology. Unfortunatly, in most cases, one cannot aswer to all needs. This mean that choices have to be made. To help you make a choice, we have separate the various material ressources in 3 cathegories. High, medium and low performance.
             </para>
          </listitem>
          <listitem>
-            <para>Choisissez au sein de ces 3 catégories quels équipements, périphériques et ordinateur rejoint vos besoins au mieux. Prenez le temps de lire les critiques des équipements en question. Essayer d’identifier des projets similaires au votre et comparez les équipements utilisés. N’hésitez pas à visiter les liens proposés et les conseils prodigués dans la section suivante. N’hésitez pas à nous solliciter, il nous fera plaisir de vous répondre. 
+            <para>
+         Choose in our 3 categories, which hardware, devices and computer specification best fit your needs. Take the time to read reviews on the materials. Try to find other project similar to yours and compare the material used. Follow the various links and advices we propose in the following section. Ask us. We will be happy to help you.
             </para>
          </listitem>
          <listitem>
-            <para>Soyez patient. Prenez le temps d’établir vos choix puisque vous serez dépendants des équipements que vous aurez achetés. ;-)
+            <para>
+         Be patient. Take the time to make the good choice because you will have to live with it ; ).
             </para>
          </listitem>
       </orderedlist>
  
   </sect1>
   <sect1 id="installation.computer-specifications">
-    <title>Spécifications de l’ordinateur</title>
-      <para>Nous vous suggérons fortement de vérifier que votre ordinateur et vos équipements sont compatibles avec linux.
+    <title>Computer Specifications</title>
+      <para>We strongly recommend to verify that your computer hardware is compatible with linux.
          <ulink url="http://www.linuxhardware.org">
             <citetitle>linuxhardware.org</citetitle>
-         </ulink>Nous recommandons les spécifications suivantes : 
+         </ulink>
+          We recommend the following computer specification:
        </para>
     <table>
-      <title>Spécifications pour ordinateur de haute performance</title>
+      <title>High Performance Computer Specification</title>
       <tgroup cols="2">
         <tbody>
           <row>
-            <entry>Mémoire</entry>
+            <entry>Computer Memory</entry>
             <entry>4GB</entry>
           </row>
           <row>
-            <entry>Processeur</entry>
+            <entry>Processor</entry>
             <entry>Intel Core 2 Quad</entry>
           </row>
           <row>
-            <entry>Carte mère</entry>
-            <entry>Minimum de 2 emplacements PCI et 2 PCIe </entry>
+            <entry>Motherboard</entry>
+            <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
           </row>
         </tbody>
       </tgroup>
     </table>
     <table>
-      <title>Spécifications pour ordinateur de performance moyenne</title>
+      <title>Medium Performance Computer Specification</title>
       <tgroup cols="2">
         <tbody>
           <row>
-            <entry>Mémoire</entry>
+            <entry>Computer Memory</entry>
             <entry>2GB</entry>
           </row>
           <row>
-            <entry>Processeur</entry>
+            <entry>Processor</entry>
             <entry>Intel Core 2 Quad</entry>
           </row>
           <row>
-            <entry>Carte mère</entry>
-            <entry>Minimum de 2 emplacements PCI et 2 PCIe </entry>
+            <entry>Motherboard</entry>
+            <entry>Minimum of 2 PCI and 2 PCIe slot</entry>
           </row>
         </tbody>
       </tgroup>
     </table>
     <table>
-      <title>Spécifications pour ordinateur de basse performance</title>
+      <title>Low Performance Computer Specification</title>
       <tgroup cols="2">
         <tbody>
           <row>
-            <entry>Ordinateur portable ou tour d’entrée de gamme</entry>
-            <entry>Uniquement recommandé à des fins de tests</entry>
+            <entry>Laptop or basic desktop</entry>
+            <entry>Recommended for testing purpose only</entry>
           </row>
           <row>
-            <entry>Mémoire</entry>
+            <entry>Computer Memory</entry>
             <entry>2GB</entry>
           </row>
 
           <row>
-            <entry>Processeur</entry>
+            <entry>Processor</entry>
             <entry>Intel Dual Core</entry>
           </row>
           <row>
-            <entry>Carte mère</entry>
-            <entry>USB pour webcam ou carte de capture USB </entry>
+            <entry>Motherboard</entry>
+            <entry>USB for webcam or USB capture card</entry>
           </row>
         </tbody>
       </tgroup>
     </table>
   </sect1>
   <sect1 id="installation.video-hardware-specifications">
-    <title>Spécifications des équipements vidéo</title>
+    <title>Video Hardware Specifications</title>
     <sect2 id="installation.graphic-card">
-      <title>Carte graphique</title>
-      <para>La carte graphique gère vos sorties vidéo. Le choix de cette dernière dépend donc de l’utilisation que vous voulez faire de &app;. Nous ne supportons à ce jour que la carte vidéo Nvidia. Certaines cartes ATI éprouvent des problèmes avec l’extension Xvideo. Avant de choisir votre carte vidéo, déterminez la distribution et la version de votre système linux. Certaines cartes graphiques peuvent ne fonctionner qu’avec certaines versions du système d’exploitation. Avant d’acheter votre carte graphique, vérifiez sur la page Nvidia unix que l’équipement que vous convoitez est supporté non seulement par la distribution de linux que vous utilisez mais également par sa version spécifique. 
+      <title>Graphic Card</title>
+      <para>The graphic card will manage your video output. The
+      choice of your graphic card will depend on how you want to
+      use &app;. For now, we only support nvidia video card.
+      Some ATI cards have problems with Xvideo extension. Before
+      choosing your graphic card, determine on wich linux
+      distribution and releases you are. Some graphic card may work
+      only on certain releases. Before buying a graphic card,
+      verify on the nvidia unix page that the hardware you are
+      planning to use is supported not only by your linux
+      distribution but also on the release you are using.
       </para>
-      <para>Il vous faut définir le type de sortie vidéo dont vous aurez besoin. Celle-ci est généralement envoyée vers un mixeur vidéo, un projecteur vidéo, un moniteur ou tout autre périphérique d’affichage. Le tableau ci-dessous dresse la liste des différents types de sortie possibles selon la carte graphique.  
+      <para>We need to define the type of video output you will
+      need. Usually this output is sent to a video mixer, a video
+      projector, a monitor or any video display. On the table below
+      we list the various possible ouput on a graphic card.
       </para>
       <table>
-        <title>Types de sorties de carte graphique</title>
+        <title>Graphic Card Output Types</title>
         <tgroup cols="2">
           <thead>
             <row>
-              <entry>Sortie vidéo</entry>
-              <entry>Détermine le nombre et le type de sorties vidéo nécessaires</entry>
+              <entry>Video Output</entry>
+              <entry>Determine the number and type of video output
+              required</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry>VGA</entry>
-              <entry>Plus petit dénominateur commun partagé par l’ensemble des cartes graphiques pour PC.</entry>
+              <entry>The lowest common denominator that all PC
+              graphics hardware supports</entry>
             </row>
             <row>
               <entry>DVI</entry>
-              <entry>Interface vidéo pour les équipements d’affichage numérique tels que les moniteurs d’ordinateur à écrans plats LCD et projecteurs numériques. </entry>
+              <entry>video interface for digital display devices such as flat panel LCD computer displays and digital projectors</entry>
             </row>
             <row>
               <entry>S-Video</entry>
-              <entry>Connexion de signal vidéo analogue généralement utilisé pour connecter une TV, un lecteur de DVD ou un mixeur vidéo. </entry>
+              <entry>An analog video signal connection usually used to connect TV, DVD-Player or video mixer</entry>
             </row>
             <row>
               <entry>HDMI</entry>
-              <entry>Ni supporté ni testé à ce jour</entry>
+              <entry>Not supported and not tested yet</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
-      <para>Une fois le type de sortie déterminé, il vous reste à choisir votre carte graphique. Ce choix dépend grandement de la qualité finale de l’image vidéo à laquelle vous vous attendez.</para>
+      <para>Once you have selected the type of output you need, you
+      will have to choose the graphic card. This choice depends
+      mainly of the final video quality you are expecting.</para>
       <table>
-        <title>Carte graphique de haute qualité</title>
+        <title>High Quality Graphic Card</title>
         <tgroup cols="3">
           <thead>
             <row>
-              <entry>Équipement</entry>
-              <entry>Statut</entry>
-              <entry>Utilisation</entry>
+              <entry>Device</entry>
+              <entry>Status</entry>
+              <entry>Usage</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry>Nvidia Quadro FX Serie</entry>
-              <entry>En phase de test</entry>
-              <entry>Uniquement pour les projets 3D</entry>
+              <entry>Actually in testing</entry>
+              <entry>Used only for 3D project</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
       <table>
-        <title>Carte graphique de qualité moyenne</title>
+        <title>Medium Quality Graphic Card</title>
         <tgroup cols="3">
           <thead>
             <row>
-              <entry>Équipement</entry>
-              <entry>Statut</entry>
-              <entry>Utilisation</entry>
+              <entry>Device</entry>
+              <entry>Status</entry>
+              <entry>Usage</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry>nvidia 9800 GT</entry>
-              <entry>Entièrement supportée</entry>
-              <entry>Projections de bonne qualité globale</entry>
+              <entry>Fully Supported</entry>
+              <entry>Genral good quality projection</entry>
             </row>
             <row>
               <entry>nvida 5200 GT</entry>
-              <entry>Entièrement supportée</entry>
-              <entry>Projets de téléprésence standard</entry>
+              <entry>Fully Supported</entry>
+              <entry>Regaular telepresence project</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
       <table>
-        <title>Carte graphique de basse qualité</title>
+        <title>Low Quality Graphic Card</title>
         <tgroup cols="3">
           <thead>
             <row>
-              <entry>Équipement</entry>
-              <entry>Statut</entry>
-              <entry>Utilisation</entry>
+              <entry>Device</entry>
+              <entry>Status</entry>
+              <entry>Usage</entry>
             </row>
           </thead>
           <tbody>
             <row>
-              <entry></entry>
-              <entry>Entièrement supportée</entry>
-              <entry>Uniquement pour effectuer des tests</entry>
+              <entry>Built-in laptop graphic card, ie Intel,
+              Asus</entry>
+              <entry>Fully Supported</entry>
+              <entry>For Testing purpose only</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
     </sect2>
     <sect2 id="installation.video-capture">
-      <title>Capture vidéo</title>
-      <para>La capture vidéo est généralement une carte ou un équipement connecté à votre caméra à une extrémité et à votre ordinateur à l’autre. Le choix de l’équipement de capture vidéo dépend de nombreux facteurs, dont :</para>
+      <title>Video Capture</title>
+      <para>The video capture is usally a card or a device
+      connected on one end to your camera and on the other end, to
+      your computer. Choosing your video capture device depends on
+      the many factors:</para>
       <itemizedlist>
         <listitem>
-          <para>Le câble de sortie de votre caméra</para>
+          <para>The ouput cable on your camera</para>
         </listitem>
         <listitem>
-          <para>La résolution de votre caméra</para>
+          <para>The output resolution of your camera</para>
         </listitem>
         <listitem>
-          <para>La qualité de la capture vidéo nécessaire</para>
+          <para>The video capture quality you need</para>
         </listitem>
         <listitem>
-          <para>Les spécifications de l’ordinateur telles que décrites dans la section précédente.</para>
+          <para>The computer specification descriped in the
+          previous section</para>
         </listitem>
         <listitem>
-          <para>La sortie finale nécessaire</para>
+          <para>The final output you need</para>
         </listitem>
       </itemizedlist>
-      <para>À la lumière de ces facteurs, nous suggérons les équipements suivants, dans l’ordre de leur qualité et performances.</para>
+      <para>Giving these factors, we suggest some devices ordered
+      by the quality and performance that they provide.</para>
       <table>
-        <title>Capture de haute qualité</title>
+        <title>High Quality Capture</title>
         <tgroup cols="6">
           <thead>
             <row>
-              <entry>Équipement</entry>
-              <entry>Statut</entry>
-              <entry>Résolution maximale</entry>
-              <entry>Image par seconde Max pour résolution maximale</entry>
-              <entry>Entrée</entry>
-              <entry>Type de connexion</entry>
+              <entry>Device</entry>
+              <entry>Status</entry>
+              <entry>Max Resolutions</entry>
+              <entry>Max fps for Max Res</entry>
+              <entry>Input</entry>
+              <entry>Connection Type</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry>DVI2USB Capture</entry>
-              <entry>En phase de test</entry>
+              <entry>Actually in testing</entry>
               <entry>1920x1200</entry>
               <entry>32fps</entry>
               <entry>DVI/VGA</entry>
@@ -245,22 +278,22 @@
         </tgroup>
       </table>
       <table>
-        <title>Capture de qualité moyenne</title>
+        <title>Medium Quality Capture</title>
         <tgroup cols="6">
           <thead>
             <row>
-              <entry>Équipement</entry>
-              <entry>Statut</entry>
-              <entry>Résolution maximale</entry>
-              <entry>Image par seconde Max pour résolution maximale</entry>
-              <entry>Entrée</entry>
-              <entry>Type de connexion</entry>
+              <entry>Device</entry>
+              <entry>Status</entry>
+              <entry>Max Resolutions</entry>
+              <entry>Max fps for Max Res</entry>
+              <entry>Input</entry>
+              <entry>Connection Type</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry>Viewcast Osprey 100/210</entry>
-              <entry>Entièrement supporté</entry>
+              <entry>Fully Supported</entry>
               <entry>720x480</entry>
               <entry>30fps</entry>
               <entry>3xComposite 1xS-Video</entry>
@@ -268,7 +301,7 @@
             </row>
             <row>
               <entry>Pinnacle Dazzle</entry>
-              <entry>Entièrement supporté</entry>
+              <entry>Fully Supported</entry>
               <entry>720x480</entry>
               <entry>30fps</entry>
               <entry>1xComposite 1xS-Video</entry>
@@ -276,7 +309,7 @@
             </row>
             <row>
               <entry>DV Capture</entry>
-              <entry>Entièrement supporté</entry>
+              <entry>Fully Supported</entry>
               <entry>800x600</entry>
               <entry>30fps</entry>
               <entry>i1394</entry>
@@ -286,22 +319,22 @@
         </tgroup>
       </table>
       <table>
-        <title>Capture de basse qualité</title>
+        <title>Low Quality Capture</title>
         <tgroup cols="6">
           <thead>
             <row>
-              <entry>Équipement</entry>
-              <entry>Statut</entry>
-              <entry>Résolution maximale</entry>
-              <entry>Image par seconde Max pour résolution maximale</entry>
-              <entry>Entrée</entry>
-              <entry>Type de connexion</entry>
+              <entry>Device</entry>
+              <entry>Status</entry>
+              <entry>Max Resolutions</entry>
+              <entry>Max fps for Max Res</entry>
+              <entry>Input</entry>
+              <entry>Connection Type</entry>
             </row>
           </thead>
           <tbody>
             <row>
               <entry>WintvHauppauge 350/1800</entry>
-              <entry>Entièrement supporté</entry>
+              <entry>Fully Supported</entry>
               <entry>740x480</entry>
               <entry>30fps</entry>
               <entry>S-Video</entry>
@@ -312,38 +345,38 @@
       </table>
     </sect2>
     <sect2 id="installation.camera">
-      <title>Caméras et caméscopes</title>
+      <title>Camera and Camcorder</title>
       <table>
-        <title>Liste des caméras testées</title>
+        <title>List of tested camera</title>
         <tgroup cols="2">
           <tbody>
             <row>
               <entry>Camera</entry>
-              <entry>Statut</entry>
+              <entry>Status</entry>
             </row>
             <row>
-              <entry>USB V4L2 Supporté</entry>
-              <entry> <ulink url="http://www.ideasonboard.org/uvc/#devices">Liste des équipements V4L2 supportés</ulink></entry>
+              <entry>USB V4L2 Supported</entry>
+              <entry> <ulink url="http://www.ideasonboard.org/uvc/#devices"> List of V4L2 supported devices</ulink></entry>
             </row>
             <row>
               <entry>DV Pointgrey FL2G</entry>
-              <entry>Testé</entry>
+              <entry>Tested</entry>
             </row>
             <row>
               <entry>Unibrain (most cams)</entry>
-              <entry>Testé</entry>
+              <entry>Tested</entry>
             </row>
             <row>
               <entry>Sony XD-Cam EX1</entry>
-              <entry>Testé</entry>
+              <entry>Tested</entry>
             </row>
             <row>
               <entry>Sony PD-170</entry>
-              <entry>Testé</entry>
+              <entry>Tested</entry>
             </row>
             <row>
               <entry>Sony PD-X10</entry>
-              <entry>Testé</entry>
+              <entry>Tested</entry>
             </row>
           </tbody>
         </tgroup>
@@ -351,26 +384,27 @@
     </sect2>
   </sect1>
   <sect1 id="installation.audio-hardware-specification">
-    <title>Spécifications des équipements audio</title>
+    <title>Audio Hardware Specifications</title>
     <table>
-      <title>Carte son de haute qualité</title>
+      <title>High quality audio card</title>
       <tgroup cols="7">
         <thead>
           <row>
-            <entry>Équipement</entry>
-            <entry>Statut</entry>
-            <entry>Utilisation</entry>
-            <entry>Type de connexion</entry>
-            <entry>Nombre de canaux</entry>
-            <entry>Latence mini. testée</entry>
-            <entry>Lien</entry>
+            <entry>Device</entry>
+            <entry>Status</entry>
+            <entry>Usage</entry>
+            <entry>Connection Type</entry>
+            <entry>Num. Channel</entry>
+            <entry>Min. Latency Tested</entry>
+            <entry>Link</entry>
           </row>
         </thead>
         <tbody>
           <row>
             <entry>RME Hammerfall Digiface</entry>
-            <entry>En phase de test</entry>
-            <entry>Bon pour les enregistrements audio professionnels et spectacles de type orchestre</entry>
+            <entry>Actually in testing</entry>
+            <entry>Good for professional audio recording,
+            Orchestral show</entry>
             <entry>PCI</entry>
             <entry>24</entry>
             <entry>2.6 ms</entry>
@@ -385,29 +419,29 @@
       </tgroup>
     </table>
     <table>
-      <title>Carte son de haute qualité moyenne</title>
+      <title>Medium quality audio card</title>
       <tgroup cols="7">
         <thead>
           <row>
-            <entry>Équipement</entry>
-            <entry>Statut</entry>
-            <entry>Utilisation</entry>
-            <entry>Type de connexion</entry>
-            <entry>Nombre de canaux</entry>
-            <entry>Latence mini. testée</entry>
-            <entry>Lien</entry>
+            <entry>Device</entry>
+            <entry>Status</entry>
+            <entry>Usage</entry>
+            <entry>Connection Type</entry>
+            <entry>Num. Channel</entry>
+            <entry>Min. Latency Tested</entry>
+            <entry>Link</entry>
           </row>
         </thead>
         <tbody>
           <row>
             <entry>Edirol FA101</entry>
-            <entry>Supporté
+            <entry>Supported 
             </entry>
-            <entry>Bonne carte multi-utilisation</entry>
+            <entry>Good Multipurpose Soundcard</entry>
             <entry>Firewire</entry>
             <entry>10</entry>
             <entry>2.6 ms</entry>
-            <entry><para> Voir page :
+            <entry><para> Follow our:
               <link linkend="installation.fa101-settings">
                 Edirol FA-101 page
               </link></para>
@@ -415,13 +449,13 @@
           </row>
           <row>
             <entry>Edirol FA66</entry>
-            <entry>Supporté</entry>
-            <entry>Bonne carte multi-utilisation</entry>
+            <entry>Supported</entry>
+            <entry>Good Multipurpose Soundcard</entry>
             <entry>Firewire</entry>
             <entry>6</entry>
             <entry>2.6 ms</entry>
 
-            <entry><para> Voir page : 
+            <entry><para> Follow our: 
               <link linkend="installation.fa101-settings">
                 Edirol FA-66 page
               </link></para>
@@ -429,8 +463,8 @@
           </row>
           <row>
             <entry>M-Audio Delta 1010</entry>
-            <entry>Supporté</entry>
-            <entry>Bonne carte multi-utilisation</entry>
+            <entry>Supported</entry>
+            <entry>Good Multipurpose Soundcard</entry>
             <entry>PCI</entry>
             <entry>10</entry>
             <entry>2.6 ms</entry>
@@ -446,26 +480,29 @@
     </table>
     <itemizedlist>
       <listitem>
-        <para>1 casque d’écoute</para>
+        <para>1 set of headphone</para>
       </listitem>
       <listitem>
-        <para>1 microphone</para>
+        <para>1 microphones</para>
       </listitem>
       <listitem>
-        <para>1 mixeur audio avec un minimum de deux sous-groupes audio, pour pouvoir mixer la sortie locale et mixer le fichier destiné au pair distant.  </para>
+        <para>1 audio mixerwith at least two audio subgroups, so
+        you can have one mix for local output ans one mix to send
+        on the remote side</para>
       </listitem>
     </itemizedlist>
   </sect1>
   <sect1 id="installation.network-specifications">
-    <title>Spécifications réseau</title>
+    <title>Network Specifications</title>
     <itemizedlist>
       <listitem>
-        <para>Connecteur Ethernet (10/100/1000)</para>
+        <para>Ethernet connector (10/100/1000)</para>
       </listitem>
       <listitem>
-        <para>Équipements de connexion au réseau (routeur, pare-feu, etc.)</para>
+        <para>Network connection devices (hub, firewall,
+        etc...)</para>
       </listitem>
     </itemizedlist>
-    <para> Veuillez vous référer à notre page sur les<link linkend="installation.network-requirements"> pré-requis réseau.</link></para>
+    <para> Please refer to our <link linkend="installation.network-requirements">Network Requirement Page</link></para>
   </sect1>
 </chapter>

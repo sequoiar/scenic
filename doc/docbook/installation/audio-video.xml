@@ -1,86 +1,109 @@
 <chapter id="installation.av-configuration">
-  <title>Configuration audio et vidéo du système</title>
-  <para>Vérifiez tout d’abord que vous répondez à l’ensemble des pré-requis sur notre page relative à l’installation logicielle.<link linkend='installation.software-installation'>Pré-requis logiciel</link></para>
+  <title>System Audio and Video Configuration</title>
+  <para>First verify that you have all required dependencies at our
+  
+  <link linkend='installation.software-installation'>Software
+  Installation </link>page</para>
   <sect1 id="installation.av-transmission">
-    <title>Accès aux équipements A/V du système</title>
-    <para>Ajoutez ensuite votre nom d’usager aux différents groupes :</para>
-    <para>Pour ajouter votre nom d’usager au groupe vidéo</para>
+    <title>System A/V Device Acces</title>
+    <para>Then add your username to the different groups:</para>
+    <para>Add your user to the video group</para>
     <para>
     <userinput>sudo gpasswd -a "username" video</userinput>
     </para>
-    <para>Pour ajouter votre nom d’usager au groupe audio</para>
+    <para>Add your user to the audio group</para>
     <para>
     <userinput>sudo gpasswd -a "username" audio</userinput>
     </para>
-    <para>Pour les équipements Firewire (DV, IIDC, freebob/ffado)</para>
+    <para>For firewire-based hardware (DV, IIDC,
+    freebob/ffado)</para>
     <para>
     <userinput>sudo gpasswd -a "username" disk</userinput>
     </para>
-    <para>Pour rendre le tout effectif, il vous faut quitter la session puis en démarre une nouvelle.</para>
+    <para>To be in effect, you have to log out, then log in.</para>
   </sect1>
 
   <sect1 id="installation.video-settings">
-    <title>Réglages vidéo du système</title>
-    <para>Nous verrons ici comment configurer les réglages relatifs aux entrées et sorties vidéo.</para>
+    <title>System Video Settings</title>
+    <para>Here we will configure all the settings related to the
+    video input and output</para>
 
     <sect2 id="installation.video-output">
 
-      <title>Sortie vidéo du système</title>
-     <para>La sortie vidéo concerne généralement l’utilisation d’une carte graphique.</para> 
-      <para>Il est essentiel de configurer la sortie vidéo correctement faute de quoi l’écran demeurera noir.</para>
+      <title>System Video Output</title>
+     <para> Video output usally mean using a graphic card</para> 
+      <para> It is really important to configure the video ouput the right way if not, you will find yourself in front of a black screen</para>
 
-    <para>Pour les cartes graphiques Nvidia, veuillez suivre les instructions figurant à la page des réglages Nvidia. 
-    <link linkend="installation.nvidia-settings">Réglages Nvidia</link>.
+    <para>For nvidia graphic card follow our 
+    <link linkend="installation.nvidia-settings">Nvidia setting page</link>.
     </para> 
 
-    <para>Pour les cartes graphiques ATI, veuillez suivre les instructions figurant à la page des réglages ATI.<link linkend="installation.ati-settings">Réglages ATI</link>
+    <para>For ati graphic card follow our 
+     <link linkend="installation.ati-settings">Ati setting page</link>.
     </para> 
    </sect2>
 
     <sect2 id="installation.video-input">
-    <title>Entrée vidéo du système Entrée vidéo du système</title>
-    <para>&app; peut effectuer la capture vidéo via une carte de capture vidéo v4l2, une caméra IIDC ou DV (également appelée iLink). Ces dernières ont une latence importante (souvent entre 150 et 250ms) et ne devraient pas servir comme entrée vidéo si une faible latence est désirée. </para>
+    <title>System Video Input</title>
+    <para>&app; can capture video from a video capture card through
+    v4l2, from IIDC camera or DV camera (also called iLink). DV
+    cameras and decks have a high latency (often between 150 and
+    250ms) and should not be the video input of choise for low
+    latency requirements.</para>
     <para>
       <emphasis role="strong">Video4Linux</emphasis>
     </para> 
-    <para>Connectez la caméra. Pour ce faire. Veuillez vous référer à notre page relative à l’installation matérielle. 
-       <link linkend='installation.hardware-requirements'>Installastion matérielle</link>
+    <para>Plug in the video camera, for this, refer to our 
+       <link linkend='installation.hardware-requirements'>Hardware Setup 
+       Page</link>
     </para>
-    <para>Il s’agit maintenant de modifier vos réglages vidéo en fonction de vos besoins spécifiques.</para>
+    <para>Now we will modify our video settings for your specific
+    needs.</para>
     <para>
-      <emphasis role="strong">Entrée vidéo Firewire (DV ou IIDC)</emphasis>
+      <emphasis role="strong">Firewire (DV or IIDC) Video
+      Input</emphasis>
     </para>
-    <para>* L’usager doit être membre des groupes « disk » et « vidéo ». Dans le cas contraire, l’administrateur système doit inclure l’usager au groupe « disk » (tel qu’indiqué plus haut).</para>
-    <para>Sous Karmic Koala, il vous faut préciser l’attribution des équipements pour raw1394. Créez une règle udev pour changer le groupe de l’équipement /dev/raw1394:</para>
+    <para>* The current user must be part of the disk and video
+    groups. If that is not the case, then the system administrator
+    must add the "user" to the "disk" group (as shown above)</para>
+    <para>On Karmic Koala, you have to fix devices attribution for
+    raw1394. Create a udev rule to change group of /dev/raw1394
+    device:</para>
     <para>
     <userinput>echo 'KERNEL=="raw1394", NAME="raw1394", GROUP="disk"' | sudo tee -a /etc/udev/rules.d/99-raw1394.rules</userinput>
     </para>
     <para>
     <userinput>sudo /etc/init.d/udev restart</userinput>
     </para>
-    <para>De plus, sous toutes les distributions, il est conseillé de charger le module raw1394 même si aucune caméra dc1394 n’est utilisée pour que les sollicitations de libdc (ex. : milhouse --list-cameras) ne génèrent pas de message d’erreur. Pour ce faire, ajoutez raw1394 aux fichiers des modules /etc/:</para>
+    <para>Furthermore, on all distributions, it is advisable to
+    load the raw1394 module even if no dc1394 cameras are present
+    so that calls to libdc (i.e. milhouse --list-cameras) won't
+    error out. To do this, add raw1394 to the /etc/modules
+    file:</para>
     <para>
     <userinput>sudo modprobe raw1394</userinput>
     </para>
     <para>
     <userinput>echo "raw1394" | sudo tee -a /etc/modules</userinput>
     </para>
-    <para>Se référer à
+    <para>See 
     <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
-    ce rapport de bogue</ulink>
+    this bug report </ulink> and 
     <ulink url="https://help.ubuntu.com/community/Firewire">
-    et cette documentation </ulink> pour de plus amples renseignements. 
+    this community documentation </ulink> for further information.
     </para>
-    <para>Vous pouvez tester la caméra DV avec :</para>
+    <para>You can test the DV camera with:</para>
     <para><userinput>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</userinput></para>
-    
-    <para>Vous pouvez tester la caméra IIDC avec :</para>
+    <para>You can test the IIDC camera with:</para>
     <para><userinput>gst-launch dc1394src ! ffmpegcolorspace ! xvimagesink</userinput></para>
     </sect2>
     <sect2 id="installation.video-test">
-      <title>Test vidéo</title>
-      <para>Dans &app;, il est facile de prévisionner les entrées vidéo des équipements video4Linux2 dans l’onglet « Video ». Les autres pilotes d’entrée ne sont pas encore supportés par &app; mais le sont par milhouse :</para>
-      <para>Choisissez la source vidéo en fonction du tableau suivant : </para>
+      <title>Video Test</title>
+      <para>In &app;, you can easily preview video4linux2 video
+      devices in the "Video" tab. Other input drivers cannot be
+      used at the moment in &app;, but milhouse supports
+      them:</para>
+      <para>Choose the video source according to this table:</para>
       <informaltable frame="all">
         <tgroup cols="2">
           <tbody>
@@ -89,7 +112,7 @@
                 <para>v4l2src</para>
               </entry>
               <entry>
-                <para>Équipements video4linux2 </para>
+                <para>video4linux2 devices</para>
               </entry>
             </row>
             <row>
@@ -97,7 +120,8 @@
                 <para>v4lsrc</para>
               </entry>
               <entry>
-                <para>Équipements video4Linux (v1) – uniquement supportés par ligne de commande</para>
+                <para>video4linux (v1) devices - Only supported on
+                the command line</para>
               </entry>
             </row>
             <row>
@@ -105,7 +129,8 @@
                 <para>dv139src</para>
               </entry>
               <entry>
-                <para>Caméras et lecteurs DV – uniquement supportés par ligne de commande</para>
+                <para>DV cameras and decks - Only supported on the
+                command line</para>
               </entry>
             </row>
             <row>
@@ -113,7 +138,8 @@
                 <para>dc1394src</para>
               </entry>
               <entry>
-                <para>Caméras IIDC 1.31– uniquement supportés par ligne de commande</para>
+                <para>IIDC 1.31 cameras - Only supported on the
+                command line</para>
               </entry>
             </row>
           </tbody>
@@ -122,54 +148,64 @@
       <para>
       <userinput>milhouse --localvideo --videosource v4l2src</userinput>
       </para>
-      <para>Vous pouvez ajouter de nombreuses options telles que :</para>
+      <para>You can add several options such as:</para>
       <itemizedlist>
         <listitem>
-          <para>--aspect-ratio (format)</para>
+          <para>--aspect-ratio</para>
         </listitem>
         <listitem>
-          <para>--width (largeur)</para>
+          <para>--width</para>
         </listitem>
         <listitem>
-          <para>--height (hauteur)</para>
+          <para>--height</para>
         </listitem>
         <listitem>
-          <para>--fullscreen (plein écran)</para>
+          <para>--fullscreen</para>
         </listitem>
         <listitem>
           <para>--flip-video</para>
         </listitem>
       </itemizedlist>
+      <para />
     </sect2>
   </sect1>
   <sect1 id="installation.audio-settings">
-    <title>Réglages audio du système</title>
-    <para>Vérifiez route d’abord que vous disposez d’une carte son appropriée sur la page des pré-requis matériel.<link linkend='installation.hardware-requirements'>Pré-requis matériel</link>.</para>
+    <title>System Audio Settings</title>
+    <para>First verify that you have an appropriate sound card on
+    our 
+    <link linkend='installation.hardware-requirements'>Hardware
+    Requirements </link>.</para>
     <sect2 id="installation.firewire-sound-card">
-      <title>Carte son Firewire</title>
-      <para>Vérifiez que votre carte son est détectée en tant que carte son firewire :</para>
+      <title>Firewire sound card</title>
+      <para>Verify that your soundcard is detected For firewire
+      soundcard:</para>
       <para>
       <userinput>ls -l /dev/*1394*</userinput>
       </para>
-      <para>Si votre équipement n’apparaît pas, essayez ceci : </para>
+      <para>If the device does not appear try this:</para>
       <para>
       <userinput>sudo modprobe raw1394</userinput>
       </para>
-      <para>L’usager doit être membre du groupe « disk ». Dans le cas contraire, l’administrateur système doit inclure l’usager au groupe « disk » (tel qu’indiqué plus haut).</para>
+      <para>The current user must be part of the disk group. If
+      that is not the case, then the system administrator must add
+      the "user" to the "disk" group (as shown above)</para>
     </sect2>
     <sect2 id="installation.pci-sound-card">
-      <title>Pour une carte son PCI </title>
-      <para>Pour les cartes son PCI avec pilote ALSA, vérifiez qu’elle est détectée : </para>
+      <title>For PCI soundcard</title>
+      <para>For pci soundcard with alsa driver, verify that your
+      soundcard is detected:</para>
       <para>
       <userinput>aplay -l</userinput>
     </para>
     </sect2>
   </sect1>
   <sect1 id="installation.sound-server">
-    <title>Configuration du serveur audio du système</title>
+    <title>System Sound Server Configuration</title>
     <sect2 id="installation.jackd-configuration">
-      <title>Configuration de <application>jackd</application></title>
-      <para>Démarrez le serveur audio <application>jackd</application> avec qjackctl situé dans « Applications/Sound &amp; Video/Jack Control »</para>
+      <title>Configuration of jackd</title>
+      <para>Now start the jackd sound server using qjackctl
+      situated in Applications/Sound &amp; Video/Jack
+      Control</para>
 <para>
       <mediaobject>
         <imageobject>
@@ -177,8 +213,9 @@
         </imageobject>
       </mediaobject>
 </para>
-      <para>Cliquez sur le bouton « setup ».</para>
-      <para>Voici quelques exemples de configuration en temps réel pour qjackctl :</para>
+      <para>Then, click on setup button.</para>
+      <para>Here is an examples of qjackctl realtime setup
+      configuration:</para>
       <informaltable frame="all">
         <tgroup cols="3">
           <tbody>
@@ -292,30 +329,35 @@
           </tbody>
         </tgroup>
       </informaltable>
-      <para>Notre page dédiée aux réglages de qjackctl vous indique comment d’abord ajuster les paramètres en fonction de votre carte son spécifique. Ces paramètres sont précisés dans le tableau de réglages de JACK ci-dessous.</para>
-      <para>Veuillez noter que ces réglages dépendent également des spécifications de votre ordinateur et peuvent varier d’un type d’installation à l’autre. </para>
-      <para>Voici un tableau de l’ensemble des cartes son testées avec les réglages de JACK appropriés : </para>
+      <para>On your qjackctl setup page you will have first to
+      adjust all parameter for your specific sound card. Those
+      parameter are shown on the jack settings table below.</para>
+      <para>Note that these settings also depends of your computer
+      specification and can varies from one setup to an
+      other.</para>
+      <para>Here is a table of all tested soundcard with there
+      appropriate jack settings.</para>
       <informaltable frame="all">
         <tgroup cols="6">
           <tbody>
             <row>
               <entry>
-                <para>Carte de son</para>
+                <para>Soundcard</para>
               </entry>
               <entry>
                 <para>-d backen</para>
               </entry>
               <entry>
-                <para>-r taux d'échantillonage</para>
+                <para>-r sample rate</para>
               </entry>
               <entry>
-                <para>- p images/période</para>
+                <para>- p frames/period</para>
               </entry>
               <entry>
-                <para>-n pérides/tampon</para>
+                <para>-n periods/buffer</para>
               </entry>
               <entry>
-                <para>Latence</para>
+                <para>Latency</para>
               </entry>
             </row>
             <row>
@@ -383,10 +425,17 @@
           </tbody>
         </tgroup>
       </informaltable>
-      <para>-v = verbose, -R = mode temps réel, -d alsa règle le backend à ALSA (utiliser plutôt -dfreebob pourles cartes firewire), -r 48000 règle le taux d’échantillonnage à 48000 échantillons/sec, -p64 règle le nombre d’images/période à 64, and -n2 règle le nombre de périodes/tampon à 2.</para>
-      <para>Si vous utilisez ALSA, vous rencontrerez potentiellement un problème dans la séquence de chargement du module. Pour y remédier, utilisez plutôt les noms ALSA plutôt que l’index (hw:0) pour spécifier le type de carte. Voici comment :</para>
-      <para>Pour sélectionner la carte son appropriée, vérifiez tout d’abord le nom de la carte son à utiliser avec aplay.</para>
-      <para>Voici un exemple de sortie avec aplay<userinput>aplay -l</userinput> output:</para>
+      <para>where -v is verbose, -R is realtime mode, -dalsa sets
+      the backend to ALSA (should use -dfreebob instead for any
+      firewire cards), -r 48000 sets the sample rate to 48000
+      samples/sec, -p64 sets the frames/period to 64, and -n2 sets
+      the periods/buffer to 2.</para>
+      <para>If you use ALSA, you may run in the problem of the
+      order of module loading. To solve, use ALSA names instead of
+      index (hw:0) to specify the card. Here's how to:</para>
+      <para>To select the appropriate soundcard, first verify the
+      name of the sound card to use with aplay</para>
+      <para>Here is an examples of <userinput>aplay -l</userinput> output:</para>
       <screen>
 card 0: Intel [HDA Intel], device 0: ALC889A Analog [ALC889A Analog]
   Subdevices: 1/1
@@ -395,12 +444,14 @@ card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
   Subdevices: 1/1
   Subdevice #0: subdevice #0
 </screen>
-      <para>Copiez le nom de la carte son (ex. : « HDA Intel ») et collez le dans le fichier .asoundrc  localisé dan svotre répertoire $HOME. Ex. : Pour utiliser la carte son M2496 : </para>
+      <para>Copy the name of the sound card (eg. "HDA Intel") and paste it in your
+      .asoundrc file situated in your $HOME directory. Ex:
+      Here i want to use the M2496 soundcard.</para>
       <para>ex:</para>
       <para>
       <userinput>gedit .asoundrc</userinput>
       </para>
-      <para>Fichier .asoundrc avec le nom m2496 ajouté. </para>
+      <para>.asoundrc file with m2496 name added</para>
       <screen>pcm.m2496 {
    type hw;
    card M2496;
@@ -409,7 +460,8 @@ ctl.m2496 {
    type hw;
    card M2496;
 }</screen>
-      <para>Il ne vous reste qu’à ajouter le nom de la carte son dans le champ de l’interface de qjackctl. Par exemple, la m2496:</para>
+      <para>Now you just have to add the name of the soundcard in
+      the qjackctl interface field . For example, the m2496:</para>
       <para>
         <mediaobject>
           <imageobject>
@@ -420,19 +472,20 @@ ctl.m2496 {
       </para>
       <itemizedlist>
         <listitem>
-          <para>Cliquez sur l’onglet « Options ».</para>
+          <para>Click on the Options tab.</para>
         </listitem>
       </itemizedlist>
-      <para>Vérifiez que seules les options suivantes sont sélectionnées : </para>
+      <para>Verify that only the following options are
+      selected:</para>
       <informaltable frame="all">
         <tgroup cols="2">
           <tbody>
             <row>
               <entry>
-                <para>Paramètre</para>
+                <para>Parameter</para>
               </entry>
               <entry>
-                <para>Valeur</para>
+                <para>Value</para>
               </entry>
             </row>
             <row>
@@ -448,7 +501,7 @@ ctl.m2496 {
                 <para>XRUN detection regex</para>
               </entry>
               <entry>
-                <para>xrun d'un minimum de ([0-9|\.]+) msecs</para>
+                <para>xrun of at least ([0-9|\.]+) msecs</para>
               </entry>
             </row>
           </tbody>
@@ -456,19 +509,20 @@ ctl.m2496 {
       </informaltable>
       <itemizedlist>
         <listitem>
-          <para>Cliquez sur l’onglet « Misc ».</para>
+          <para>Click on the Misc tab.</para>
         </listitem>
       </itemizedlist>
-      <para>Vérifiez que seules les options suivantes sont sélectionnées : </para>
+      <para>Verify that only the following "Misc" options are
+      selected:</para>
       <informaltable frame="all">
         <tgroup cols="2">
           <tbody>
             <row>
               <entry>
-                <para>Paramètre</para>
+                <para>Parameter</para>
               </entry>
               <entry>
-                <para>Valeur</para>
+                <para>Value</para>
               </entry>
             </row>
             <row>
@@ -508,20 +562,24 @@ ctl.m2496 {
           </tbody>
         </tgroup>
       </informaltable>
-      <para>NOTE : En cas de message d’erreur, redémarrer l’ordinateur et essayez à nouveau.</para>
+      <para>NOTE: If you get an error message, reboot the computer
+      and try again.</para>
       <itemizedlist>
         <listitem>
-          <para></para>
+          <para>Now start the sound server by clicking on
+          "Start".</para>
         </listitem>
       </itemizedlist>
     </sect2>
   </sect1>
   <sect1 id="installation.sound-check">
-    <title>Vérification de l’audio du système </title>
-    <para>Vous pouvez alors démarrer le test audio avec : </para>
+    <title>System Sound check</title>
+    <para>Then you can start an audio test with:</para>
     <para>
     <userinput>gst-launch audiotestsrc ! jackaudiosink</userinput>
     </para>
-    <para>Cela générera une onde sinusoïdale. Les connexions audio devraient également s’afficher dans qjackctl. Les sorties sont maintenant adressables vers vos haut-parleurs ou autres applications. </para>
+    <para>This will produce a sine wave. You should also see the
+    audio connections appear in qjackctl. The outputs are now
+    routable to your speakers or other applications.</para>
   </sect1>
 </chapter>

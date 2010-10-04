@@ -1,65 +1,123 @@
 <chapter id="user.video-settings">
-  <title>Réglages vidéo</title>
-  <para>Ce chapitre décrit comment effectuer les réglages liés à la vidéo dans &app;. &app; peut évidemment transmettre un signal vidéo à un pair distant.</para>
-  <para>Chaque pair configure sa propre taille de capture vidéo et choisit son propre équipement. Pour un équipement de capture analogique, le standard vidéo peut être PAL ou NTSC.</para>
-  <para>&app; a été conçu pour que la configuration du codec vidéo soit effectuée par le pair récepteur. Il peut ainsi effectuer les réglages appropriés quant à l’image reçue. L’opérateur de la partie réceptrice peut également choisir l’affichage plein écran sur l’équipement de son choix. C’est également à cette étape que l’utilisateur choisit le tampon jitter approprié au flux vidéo. Augmentez-le pour éviter une mauvaise qualité de l’image en cas de perte de paquets. Son augmentation cause une latence plus importante, il est donc préférable de s’assurer de la qualité de son réseau en terme de perte de paquets plutôt que d’augmenter la valeur du tampon. </para>
+  <title>Video Settings</title>
+  <para>This chapter describes how to setup your video settings in
+  Scenic. How course, Scenic can transmit video to a remote
+  peer.</para>
+  <para>Each peer configures its video capture size and chooses the
+  right device. Next, when using analog capture device, the video
+  standard can be PAL or NTSC.</para>
+  <para>Scenic is designed so that configuring the video codec must
+  be done by the receiver. This way, the receiver can fine tune the
+  quality of the image it receives. On the receiver's side, the
+  operator can also choose to display the window in full screen on
+  a specific display. This is also where the user chooses the
+  jitter buffer for the video stream. Increase it to prevent poor
+  image quality in case of packets loss. Increasing the jitter
+  buffer add mores latency, so it is better to have a sane network
+  with close to no packets loss, instead of increasing this
+  value.</para>
   <sect1 id="user.sending-video">
-    <title>Envoyer un flux vidéo</title>
-    <para>Les informations de configuration de l’image vidéo à envoyer au pair distant sont données dans cette section.</para>
+    <title>Sending Video</title>
+    <para>In this section, it is possible to configure the video
+    image that will be sent to your remote peer.</para>
     <sect2 id="user.video-preview">
-      <title>Prévisionnement vidéo </title>
-      <para>L’option de prévisionnement vous affiche la vidéo telle que vous la captez (qui est donc l’image que vous enverrez au pair récepteur). Ceci vous permet de valider la nature et la qualité du signal vidéo tel que vous le captez. </para>
+      <title>Video Preview</title>
+      <para>The preview option will show you the video you are
+      actually capturing, (The one you will send to the receiver)
+      This enable you to validate that you are actually capturing a
+      video feed.</para>
     </sect2>
     <sect2 id="user.video-source">
-      <title>Source vidéo</title>
-      <para>C’est ici que vous pouvez choisir la source vidéo que vous souhaitez envoyer. Pour effectuer un test de couleur, vous pouvez utiliser les barres de couleur. &app; détecte et affiche les équipements de capture vidéo connectés à votre ordinateur. Une détection est opérée chaque fois que l’utilisateur clique l’onglet « video » ou qu’une nouvelle session d’émission est entamée avec un pair distant. Si un équipement vidéo que vous venez de connecter n’apparaît pas dans la liste, vous pouvez alors activer un autre onglet avant de réactiver l’onglet « video » pour vérifier s’il est alors détecté.  </para>
+      <title>Video Source</title>
+      <para>Here you can choose witch video source you want to use
+      to send. To make a color test, you can use the Color bars.
+      Scenic detects which supported video devices are connected to
+      your computer, and lists them there. It tries to detect them
+      every tiem the user switches to the video tab, and when
+      trying to initiate a streaming session with a peer. That
+      means that if you don't see a video device you have just
+      plugged, you could try switching to an other tab, and
+      switching back to the video tab, to see if it is
+      detected.</para>
     </sect2>
     <sect2 id="user.video-in">
-      <title>Entrée vidéo </title>
-      <para>Certains équipements disposent de plusieurs entrées, telles que S-Video, composite, etc. Le cas échéant, il vous faut choisir l’entrée correspondante au type de connecteur de votre caméra. </para>
-      <para>Si vous utilisez une carte d’acquisition vidéo analogique, S-Video est généralement préférable à toute autre entrée composite puisque la qualité de l’image, surtout en ce qui concerne les couleurs, est supérieure. Une entrée composante est encore préférable. S-Video utilise un signal vidéo analogue qui transporte les données vidéo en deux signaux séparés : luma (luminance) et chroma (couleur). Ceci diffère de la vidéo composite qui transporte les données vidéo en un seul signal de moindre qualité et de la vidéo composante, qui transporte les données vidéo en trois signaux de qualité supérieure. </para>
+      <title>Video Input</title>
+      <para>Some devices have many input, such as S-Video,
+      composite, etc. In this case, you must choose the input to
+      which the camera is connected to.</para>
+      <para>If using an analog video capture card, S-Video is
+      generally preferable over a composite input, since it offers
+      a better image quality, especially for colors. A component
+      input is even better. S-Video is an analog video signal that
+      carries video data as two separate signals: luma (luminance)
+      and chroma (color). This differs from composite video, which
+      carries picture information as a single lower-quality signal,
+      and component video, which carries picture information as
+      three separate higher-quality signals.</para>
     </sect2>
     <sect2 id="user.video-standard">
-      <title>Standard vidéo </title>
-      <para>Si vous utilisez une carte d’acquisition vidéo analogique, ce réglage doit être conforme au standard vidéo de la caméra. La plupart des pays américains ainsi que le Japon, la Corée du Sud, Taiwan, la Birmanie et plusieurs iles du Pacifique utilisent le standard NTSC. Le reste du monde utilise le standard PAL. </para>
-      <para>PAL (Phase Alternate Line) : système d’encodage analogue de diffusion du signal télévisuel utilisé dans la plupart des pays du monde. NTSC (National Television System Committee) est le système d’encodage analogue de signal télévisuel utilisé par la plupart des pays américains ainsi que le Japon, la Corée du Sud, Taiwan, la Birmanie et plusieurs iles du Pacifique. </para>
+      <title>Video Standard</title>
+      <para>When using an analog video capture card, this
+      configuration entry must be set accordingly to the video
+      standard of the camera. Most of the Americas, Japan, South
+      Korea, Taiwan, Burma, and some Pacific island nations and
+      territories use NTSC. The rest of the world use PAL</para>
+      <para>PAL: Phase Alternate Line, is an analogue television
+      encoding system used in broadcast television systems in large
+      parts of the world. Many European country uses this standard.
+      NTSC: National Television System Committee, is the analog
+      television system used in most of North America, South
+      America, Japan, South Korea, Taiwan, Burma, and some Pacific
+      island nations and territories.</para>
     </sect2>
     <sect2 id="user.aspect-ratio">
-      <title>Format de l’image</title>
-      <para>Le format d’une image est défini par le ratio entre sa largeur et sa hauteur. &app; supporte à ce jour les formats 4:3 et 16:9. Le format peut être 4:3 ou 16:9 selon que l’image source est constituée de pixels carrés ou de pixel rectangulaires. Les valeurs les plus communément utilisées sont 16:9 pour 704x480 pixels et 4:3 pour 640x480 pixels.</para>
+      <title>Aspect Ratio</title>
+      <para>The aspect ratio of an image is the ratio of the width
+      of the image to its height. Scenic currently supports 4:3 and
+      16:9. Finally, the aspect ratio can be 4:3 or 16:9, depending
+      on if the image source provides square pixels or rectangle
+      pixels. Commonly used values are 16:9 for 704x480 and 4:3 for
+      640x480</para>
     </sect2>
     <sect2 id="user.image-size">
-      <title>Taille de l’image </title>
-      <para>Ce menu déroulant donne la liste des tailles d’image à choisir pour l’image vidéo en capture. Plus l’image est grosse et plus elle nécessitera une bande passante plus importante si vous souhaitez la compresser de manière importante. </para>
-      <para>Puisque la bande passante dédiée est décidée du côté du pair récepteur, les deux pairs devraient s’entendre sur la taille et la qualité de l’image pour une qualité optimale et l’utilisation inutile de la bande passante. </para>
+      <title>Image Size</title>
+      <para>This drop-down menu offers you a list of image size to choose for the video image to capture. A bigger image needs more bandwidth if you want it to be too much compressed. </para>
+      <para>Since the bandwidth is decided on the receiver's side, both peers should agree on an image size and quality to avoid getting an ugly image or using too much bandwidth for no reason.</para>
     </sect2>
   </sect1>
   <sect1 id="user.receiving-video">
-    <title>Recevoir un flux vidéo</title>
-    <para>Avec &app;, chaque pair décide de la qualité de la vidéo reçue. Cela implique de choisir le codec vidéo, la vitesse du débit et le tampon jitter. Il est également possible de choisir de recevoir le flux en mode plein écran et de le diffuser sur un écran secondaire. </para>
+    <title>Receiving Video</title>
+    <para>In Scenic, each peer decides the quality of the video that he receives. This means choosing the video codec, the bitrate and the jitter buffer. It is also possible to choose to start the receiver in full screen, and to show it on a secondary display.</para>
     <sect2 id="user.video-codec">
-      <title>Codec vidéo </title>
-      <para>Il est recommandé de choisir h.263 en cas de bande passante limitée ou de système à faible CPU. Utilisez Theora pour tester une solution libre de droit. Utilisez MPEG4 dans la plupart des cas et h.264 si vous souhaitez tirer partie de l’intégralité de votre CPU. </para>
+      <title>Video Codec</title>
+      <para>Choose h.263 for low bandwidth or low CPU setup. Use
+      Theora for a patent-free experience. Use MPEG4 for most
+      situation. Use h.264 to use all the CPU power you
+      have.</para>
     </sect2>
     <sect2 id="user.video-bitrate">
-      <title>Débit vidéo</title>
-      <para>Le débit vidéo est le nombre d’octets de données vidéo envoyé ou traité par unité de temps. Il se calcule en Mégabits par seconde Le débit vidéo varie en fonction du codec vidéo utilisé :</para>
-      <para>Vidéo : large bande passante (H.264), bande passante moyenne (MPEG-4), faible bande passante (H.263)</para>
+      <title>Video Bitrate</title>
+      <para>Video bitrate is the number of bits of video data that
+      are conveyed or processed per unit of time. It is expressed
+      in Mega bits per second. Video bitrate capabilities varies
+      depending of the video codec used:</para>
+      <para>video: high-bandwidth (H.264), medium-bw (MPEG-4),
+      low-bw (H.263)</para>
       <informaltable frame="all">
         <tgroup cols="5">
           <tbody>
             <row>
               <entry>
-                <para>Nom</para>
+                <para>Name</para>
               </entry>
               <entry>
                 <para>Codec</para>
               </entry>
               <entry>
-                <para>Débit minimum</para>
+                <para>Minimum Bitrate</para>
               </entry>
               <entry>
-                <para>Débit maximum</para>
+                <para>Maximum Bitrate</para>
               </entry>
               <entry>
                 <para>Notes</para>
@@ -67,7 +125,7 @@
             </row>
             <row>
               <entry>
-                <para>Large bande passante (H.264)</para>
+                <para>High-Bandwidth H.264 Video</para>
               </entry>
               <entry>
                 <para>h264</para>
@@ -76,32 +134,37 @@
                 <para>2 Mbps</para>
               </entry>
               <entry>
-                <para>16 Mbps, semble limité uniquement limité par les capacitéd du CPU.</para>
+                <para>16 Mbps, seems to be limited only by
+                CPU</para>
               </entry>
               <entry>
-                <para>La plus gourmande en utilisation CPU - (s’adapte si présence de processeurs multiples) et présente la latence la plus élevée. </para>
+                <para>Most CPU-intensive (though scales to multiple
+                cores) and most latency.</para>
               </entry>
             </row>
             <row>
               <entry>
-                <para>Bande passante moyenne (MPEG-4)</para>
+                <para>Medium-Bandwidth MPEG-4 Video</para>
               </entry>
               <entry>
                 <para>mpeg4</para>
               </entry>
               <entry>
-                <para>100 kbps (jusqu'à 500 kbp)</para>
+                <para>100 kbps (will go to 500 kbps with
+                motion)</para>
               </entry>
               <entry>
-                <para>4Mbps (restera habituellement à 3Mbps avec un peu de mouvement à l'écran)</para>
+                <para>4Mbps (generally will be stay at 3Mbps
+                without a lot of motion)</para>
               </entry>
               <entry>
-                <para>À privilégier pour une utilisation CPU moindre et un bon rapport latence/qualité.</para>
+                <para>Preferable tradeoff for CPU-cost + Latency
+                vs. Quality.</para>
               </entry>
             </row>
             <row>
               <entry>
-                <para>Faible bande passante (H.263)</para>
+                <para>Low-Bandwidth H.263 Video</para>
               </entry>
               <entry>
                 <para>h263</para>
@@ -113,24 +176,31 @@
                 <para>4Mbps</para>
               </entry>
               <entry>
-                <para>Débit variable, largement tributaire de l’image source. Souffre des changements brutaux et intenses de lumière (clignotement possible). Solution la moins gourmande en utilisation CPU, plus petite latence observée, qualité acceptable à des débits plus élevés. </para>
+                <para>Bitrate variable, depends largely on image
+                source material. Doesn't like sudden, extreme
+                changes in light (results in stuttering). Least
+                CPU-intensive, lowest latency, reasonable quality
+                at higher bitrate.</para>
               </entry>
             </row>
             <row>
               <entry>
-                <para>faible bande passante (Theora)</para>
+                <para>Low-Bandwidth Theora Video</para>
               </entry>
               <entry>
                 <para>theora</para>
               </entry>
               <entry>
-                <para>Qualité vidé = 5 </para>
+                <para>videoquality=5</para>
               </entry>
               <entry>
-                <para>Qualité vidéo = 45</para>
+                <para>videoquality=45</para>
               </entry>
               <entry>
-                <para>L’ajustement de la qualité est plus fiable que les réglages de valeur de débit. Tendance à clignoter en cas d’image source homogène et statique (caméra pointée sur un mur par exemple) avec réglages de basse qualité. </para>
+                <para>Quality engine is much more reliable than
+                using the bitrate setting. Tends to stutter with
+                static, homogenous source material (i.e. camera
+                pointed at wall) for low quality setting.</para>
               </entry>
             </row>
           </tbody>
@@ -138,20 +208,27 @@
       </informaltable>
     </sect2>
     <sect2 id="user.fullscreen">
-      <title>Plein écran</title>
-      <para>Vous pouvez décider d’afficher automatiquement l’image en plein écran au démarrage, Une fois l’image en réception, vous pouvez désactiver et réactiver le mode plein écran en pressant la touche Escape (ou F). </para>
+      <title>Fullscreen</title>
+      <para>You have an option to automatically launch the
+      receiver's window in fullscreen. Once the receiver's window
+      is running, you can press the Escape (or F) key to toggle on
+      and off the fullscreen mode.</para>
     </sect2>
     <sect2 id="user.x11-display">
-      <title>Affichage X11 </title>
-      <para>Option utile pour afficher la vidéo sur un moniteur annexe. </para>
+      <title>X11 Display</title>
+      <para>Useful to display the video on another monitor.</para>
     </sect2>
     <sect2 id="user.deinterlace">
-      <title>Désentrelacement </title>
-      <para>Le désentrelacement rend l’image plus nette en cas de source analogue mais induit une latence plus grande. À ne jamais utiliser si la source de l’image distante provient d’une Webcam. </para>
+      <title>Deinterlace</title>
+      <para>Deinterlacing makes a nicer image when the source is
+      analog, but it adds latency. You should never use it if the
+      remote video source is a Web cam.</para>
     </sect2>
     <sect2 id="user.video-jitter-buffer">
-      <title>Tampon vidéo Jitter </title>
-    <para>Le tampon vidéo jitter est un tampon qui vous protège des variations de la latence. Il accumule les images vidéo pour afficher cette dernière de façon plus fluide même si une image est un peu en retard. Il est recommandé d’en accroître la valeur (en millisecondes) dans le cas d’un réseau à forte latence. </para>
+      <title>Video Jitter Buffer</title>
+    <para>
+   The video jitter buffer is a buffer that protects you from the variation in latency. It cumulates video frames, so video can play smoothly even if a frame is a bit late. Increase this number (in milliseconds) in case of high network jitter.
+    </para>
     </sect2>
   </sect1>
 </chapter>

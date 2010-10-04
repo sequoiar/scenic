@@ -1,9 +1,9 @@
 <chapter id="installation.milhouse">
-  <title>&app; in command line</title>
-  <para>The use of &app; in command line is a powerful tool with
-  many options not implemented yet in the &app; GUI. The actual
-  name of &app; commandline is "milhouse". For more complex setup
-  than what &app; can currently support, we suggest you to use 
+  <title>Scenic in command line</title>
+  <para>The use of Scenic in command line is a powerful tool with
+  many options not implemented yet in the Scenic GUI. The actual
+  name of Scenic commandline is "milhouse". For more complex setup
+  than what Scenic can currently support, we suggest you to use 
   <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch </ulink>as a
   launching script. Look at some examples in 
   <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">

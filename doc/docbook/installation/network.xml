@@ -1,45 +1,91 @@
 <chapter id="installation.network-test">
-  <title>Test du réseau</title>
-  <para>L’utilisation de &app; requiert des capacités réseau particulières que nous déterminerons dans ce chapitre en plus de vous donner quelques outils pour évaluer et améliorer la qualité de votre réseau.</para>
+  <title>Network Testing</title>
+  <para>The use of &app; require specific network capabilities. In
+  this chapter we will determine what this capabilites are. We will
+  also give you tools how tho evaluate and improve the quality of
+  your network.</para>
   <sect1 id="installation.network-requirements">
-    <title>Pré-requis réseau</title>
+    <title>Network Requirements</title>
     <sect2 id="installation.network-speed">
-      <title>Vitesse du réseau </title>
-      <para>Les performances et la vitesse du réseau sont de la plus haute importance. Pour confirmer que le réseau est apte à supporter &app;, les administrateurs système/usagers doivent effectuer les tests décrits ci-dessous sur le réseau local et entre les deux points distants. </para>
-      <para>Les valeurs suivantes doivent être atteintes : </para>
-      <para>Bande passante : 3.5Mbps pour la vidéo + 1.6Mbps pour l’audio = &gt; 5Mbps + 20%</para>
+      <title>Network speed</title>
+      <para>Network speed and performance are of the utmost
+      importance. To ensure that the network can handle the &app;
+      setup, system administrators / users must perform the tests,
+      described below, on the local network and between two
+      endpoints.</para>
+      <para>The following performance rates must be met:</para>
+      <para>Bandwidth: 3.5Mbps video + 1.6Mbps audio = &gt; 5Mbps +
+      20%</para>
     </sect2>
     <sect2 id="installation.network-bandwith">
-      <title>Bande passante </title>
-      <para>La bande passante d’un réseau est la mesure des ressources réseau disponibles ou utilisées exprimée en octets ou ses multiples (kbps, Mbps, etc.). Pour déterminer le niveau de bande passante requis, il faut calculer le taux de Mbps des flux audio et vidéo (prendre en compte les taux de compression). Exemple : Une vidéo MPEG4 à 3,5 Mbps et deux canaux audio à 800 kbps requiert 5,1 Mbps. Pour de meilleurs résultats, il est recommandé d’ajouter une marge de 20% et prendre en compte les sollicitations supplémentaires du réseau pour des applications telles que le clavardage, Skype et autres visites de sites web.  </para>
+      <title>Network bandwidth</title>
+      <para>Network bandwidth is a measure of available or consumed
+      data communication resources expressed in bits or multiples
+      of it (kbps, Mbps etc). To determine the required level of
+      needed bandwidth, you have to calculate the Mbps rate of the
+      audio and video tracks (including compression rates).
+      Example: a 3.5 Mbps MPEG4 video with 2 x 800kbps audio
+      channels requires 5.1 Mbps. For best results, users should
+      add to this a 20% leeway and also consider additional network
+      usage such as chat, skype, web browsing and so on.</para>
     </sect2>
     <sect2 id="installation.network-latency">
-      <title>Latence du réseau </title>
-      <para>La latence est le temps de propagation d’un signal de son point de départ à son point d’arrivée sur le réseau. Elle inclut le temps d’encodage du paquet à émettre, sa transmission proprement dite à travers le réseau et le temps de réception et de décodage du paquet. Le degré d’acceptabilité de la latence dépend de nombreux facteurs. Il faut donc prendre en compte les pré-requis à l’utilisation de &app;. Si, par exemple, vous avez besoin de transmettre un signal audio unidirectionnel sans aucune forme interaction, le taux de latence est alors sans grande importance. La règle est de mettre la latence à l’échelle de la distance qui sépare les deux sites distants. </para>
-      <para>Latence:30-200ms</para>
-      <para>Taux approximatifs selon les distances moyennes : </para>
-      <para>Niveau régional : 30ms</para>
+      <title>Network Latency</title>
+      <para>Latency is the time taken for a sent packet of data to
+      be received at the other end. It includes the time to encode
+      the packet for transmission and transmit it, the time for
+      that data to traverse the network equipment between the
+      nodes, and the time to receive and decode the data. The
+      degree of permissible latency depends on many factors. Users
+      must first consider the scenic requirements; if for example,
+      you only need to transmit sound one way without any form of
+      interaction, then latency rates are somewhat irrelevant. As a
+      rule, the latency rate should be scaled according to the
+      distance between sites.</para>
+      <para>Latency:30-200ms</para>
+      <para>Approximate rates per average distance:</para>
+      <para>Regional level: 30ms</para>
       <para />
-      <para>À travers le pays : 75ms</para>
+      <para>Across the country: 75ms</para>
       <para />
-      <para>Intercontinental : 200ms</para>
+      <para>Across continents: 200ms</para>
     </sect2>
     <sect2 id="installation.minimum-jitter">
       <title>Jitter</title>
-      <para>Le jitter, dans le jargon de la réseautique, est la mesure des variations de la latence à travers le réseau sur une échelle de temps. Le jitter d’un paquet est la moyenne de la variation par rapport à la latence moyenne d’un réseau donné (voir plus haut). Il est à prendre en compte puisqu’il peut accroître le taux moyen de latence et doit donc être pris en considération dans le calcul de la latence totale. La moyenne de la variation par rapport à la latence moyenne devrait être inférieure à 1%. </para>
+      <para>Jitter, in the context of computer networks, is a
+      measure of the variability over time of the packet latency
+      across a network. Packet jitter is expressed as an average of
+      the deviation from the network mean latency (see above).
+      Packet jitter is quite important as it can increase the
+      overall rate of latency, it must therefore be taken into
+      account in order to calculate the total latency. The average
+      deviation from the network mean latency should be less than
+      1%.</para>
       <para>Jitter: &lt;1%</para>
     </sect2>
     <sect2 id="installation.minimum-packet-loss">
-      <title>Perte de paquets </title>
-      <para>La perte de paquets survient lorsque un ou plusieurs paquets de données en transit sur un réseau informatique ne parvient pas à destination. La perte de paquets peut provoquer de sérieuses distorsions du signal, systématiquement décelables, quelle que soit le pourcentage de perte de paquets.  Dans le pire des cas, la perte de paquets ne devrait pas excéder 1 %. À des niveaux supérieurs, l’impact sera clairement ressenti au niveau de la qualité de l’image et particulièrement dérangeant pour la qualité de la transmission audio. </para>
+      <title>Packet Loss</title>
+      <para>Packet loss occurs when one or more packets of data
+      traveling across a computer network fail to reach their
+      destination. Packet loss causes important signal distortions
+      that are always noticeable, regardless of the packet loss
+      percentage. In a worst case scenario, packet loss should
+      never be higher than 1%. At levels higher than this, there
+      will be a significantly noticeable impact on the quality of
+      the image, and an highly disruptive impact on the quality of
+      the audio transmission.</para>
       <para>&lt;1%</para>
-      <para>&gt;1% = significant impact significatif</para>
+      <para>&gt;1% = significant impact</para>
     </sect2>
   </sect1>
   <sect1 id="installation.local-network-test">
-    <title>Test du réseau local </title>
-    <para>Il vous faut télécharger debian sid iperf version 2.0.4-3 or 2.0.4-4 sur votre bureau et l’installer sur les deux ordinateurs. Double-cliquez sur le paquet pour démarrer le gestionnaire de paquets Ubuntu. </para>
-    <para>Testez les deux sessions iperf sur un LAN stable. Voici un diagramme illustrant ce premier test :</para>
+    <title>Local Network Testing</title>
+    <para>You must download the debian sid iperf version 2.0.4-3 or
+    2.0.4-4 on your desktop and install it on both computer. Double
+    click on the package to start the Ubuntu package manager
+    installation process.</para>
+    <para>Test the two iperf sessions on a stable LAN. Here is a
+    diagram of this first test:</para>
     <para>
       <mediaobject>
         <imageobject>
@@ -48,13 +94,21 @@
         </imageobject>
       </mediaobject>
     </para>
-    <para>Connectez les deux ordinateurs à la même prise. </para>
-    <para>Assignez une adresse IP statique à chacun des deux ordinateurs. Suivez le tutoriel « Ubuntu Networking for Basic and Advanced Users » et, au stade du menu de configuration du réseau, sélectionnez « Static IP Address » et assignez lui une adresse IP (par exemple 192.168.2.168). Assurez-vous d’assigner une adresse IP statique qui n’entre pas en conflit avec la gamme de vos réglages DHCP. En cas de doute, veuillez contacter l’administrateur du système.</para>
-    <para>Démarrez une session de terminal sur l’un des ordinateurs (Applications/Accessories/Terminal), démarrez un serveur iperf avec l’option UDP. </para>
+    <para>Connect the two computers to the same switch.</para>
+    <para>Assign a static ip address to both computers. Follow the
+    Ubuntu Networking for Basic and Advanced Users Tutorial and at
+    the Network configuration menu, select Static IP Address and
+    assign an IP address, ex: 192.168.2.168. Be sure to give a
+    static IP address that does not conflict with your DHCP range.
+    If in doubt, contact a system administrator.</para>
+    <para>On one of the computers, open a terminal session
+    (Applications/Accessories/Terminal), start an iperf server with
+    the UDP option.</para>
     <para>
     <userinput>iperf -s -u -i 10</userinput>
     </para>
-    <para>Démarrez une session de terminal sur l’autre ordinateur et démarrez un client iperf avec l’option UDP. </para>
+    <para>On the other computer, open a terminal session and start
+    an iperf client with the UDP option.</para>
     <para>
     <userinput>iperf -c ''server ip address'' -u -b 1M</userinput>
 <!--
@@ -68,7 +122,7 @@
     </cmdsynopsis>
 -->
     </para>
-    <para>Le rapport iperf devrait être identique à ceci : </para>
+    <para>The iperf report should be similar to this:</para>
     <screen>
 ------------------------------------------------------------
 Client connecting to 10.10.10.183, UDP port 5001 Sending 1470
@@ -82,34 +136,50 @@ byte datagrams UDP buffer size:   108 KByte (default)
 [ 3]  0.0-10.0 sec  1.19 MBytes  1000 Kbits/sec  0.004 ms    0/  852 (0%)
 ------------------------------------------------------
 </screen>
-    <para>Si le serveur rapporte un taux de perte de paquets de 0%, testez alors votre réseau à 15M puis 30M, 60M et 80M. En cas de détection de perte de paquets, veuillez vous référer à notre section de résolution de problèmes. </para>
+    <para>
+    If the
+    server reports 0% packet loss, then test your network with
+    respectively 15M, 30M, 60M, 80M. If you detect packet loss,
+    please refer to our troubleshooting section.
+    </para>
   </sect1>
   <sect1 id="installation.bidirectional-network-test">
-    <title>Test bidirectionnel du réseau local</title>
-    <para>Le test iperf bidirectionnel évalue les performances du réseau dans le contexte de transmission audio et vidéo bidirectionnelle. </para>
-    <para>NOTE : À ce jour, nous ne recommandons pas l’option -d dans iperf puisqu’elle génère alertes et erreurs. </para>
-    <para>Test unilatéral de transmission bidirectionnelle :</para>
+    <title>Bidirectional Local Network Testing</title>
+    <para>This iperf bidirectional test evaluates network
+    performances in the the context of bidirectional video and
+    audio transmission.</para>
+    <para>NOTE: For now we do not recommend the -d option in iperf
+    as it generates unwanted warnings and errors.</para>
+    <para>Single-sided bidirectional test:</para>
     <para>
     <userinput>iperf -c ''server ip address'' -b 30M -r -u</userinput>
     </para>
-    <para>L’option -r opère un test bidirectionnel individuel et devrait générer une perte de paquets de 0 % packet des deux côtés. </para>
-    <para>Test simultané client/serveur (sur les ordinateurs A et B) :</para>
+    <para>The -r option does a bidirectional test individually, you
+    should get 0% packet loss on both sides.</para>
+    <para>Simultaneous client/server test (on computers A and
+    B):</para>
     <para>
     <userinput>iperf &#160;-s &#160;-u</userinput>
     </para>
-    <para>Vous devriez obtenir un taux de perte de paquets de 0 % sur les ordinateurs A et B démarrés en même temps. </para>
+    <para>On computers A and B, started at the same time, you
+    should get 0% packet loss on both sides.</para>
     <para>
     <userinput>iperf &#160;-c ''server ip address'' -b 30M -u</userinput>
   </para>
   </sect1>
   <sect1 id="installation.remote-network-test">
-    <title>Test du réseau distant. </title>
-    <para>Faites un test de routage (traceroute) de votre ordinateur à l’ordinateur distant. Celui-ci vous montrera le chemin parcouru par les paquets à travers le réseau. Ceci vous permettra de déterminer si les paquets transitent par le bon ISP.</para>
+    <title>Remote Network Testing</title>
+    <para>Perform a traceroute starting from your computer to the
+    remote computer. This will show you the route taken by the
+    packets across the network. You can use this to determine if
+    the packets are traveling on the proper ISP.</para>
     <cmdsynopsis>
     <command>traceroute</command>
       <arg rep='repeat' choice='plain'><replaceable>host</replaceable></arg>
     </cmdsynopsis>
-    <para>Répétez maintenant les différentes étapes du test précédent entre votre réseau local et le réseau distant.</para>
+    <para>Now, repeat the same steps as the Local Network Test but
+    this time between your local network and the remote
+    network.</para>
     <para>
       <mediaobject>
         <imageobject>
@@ -120,11 +190,15 @@ byte datagrams UDP buffer size:   108 KByte (default)
     </para>
   </sect1>
   <sect1 id="installation.network-testing-tools">
-    <title>Outils de test du réseau utiles. </title>
+    <title>Useful network testing tools</title>
     <sect2 id="installation.ping">
       <title>Ping</title>
-      <para>Ping sera mis à profit pour tester la latence sur le réseau. </para>
-      <para>Démarrez un terminal en choisissant « Terminal » dans le menu « Application:Accessories ». Ensuite, entrez ping -c 4 www.google.com et presser la touche « Enter ».  Le texte affiché sur le terminal devrait ressembler à celui-ci : <userinput>ping -c 4 www.google.com</userinput></para>
+      <para>Ping will be used here to test the latency over the
+      network.</para>
+      <para>Open a terminal, by choosing the "Terminal" item from
+      the Application:Accessories menu. Next, <userinput>ping -c 4 www.google.com</userinput>
+      and press enter. The text content of the
+      terminal should look like this:</para>
       <para>
       <screen>
 PING www.l.google.com (74.125.93.104) 56(84) bytes of data.
@@ -137,7 +211,8 @@ PING www.l.google.com (74.125.93.104) 56(84) bytes of data.
 rtt min/avg/max/mdev = 36.174/36.557/37.322/0.494 ms
 </screen>
       </para>
-      <para>On constate ici que le temps de transit aller-retour est de 36.557 millisecond avec un taux de perte de paquets de 0%.</para>
+      <para>Here we can observe that the average round trip time is
+      36.557 millisecond with 0% of packet loss.</para>
     </sect2>
   </sect1>
 </chapter>

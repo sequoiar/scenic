@@ -1,12 +1,12 @@
 <chapter id="user.contact-settings">
-<title>Le carnet d’adresses</title>
-<para>Dans ce chapitre, vous verrez comment utiliser le carnet d’adresses de &app;. Pour inviter un pair à partager un flux, il vous faut ajouter son adresse IP à votre carnet d’adresses. Vous pouvez lui assigner un nom afin de faciliter les échanges. Une fois ces informations dans votre carnet d’adresses, vous pouvez l’inviter à partager un flux. </para>
+<title>The Address Book</title>
+<para>In this chapter, we will explain how to use the address book that is in Scenic. To invite a remote peer to stream with you, you must add its IP address in your address book. You can give it a name so that it is easy to know with who you are streaming. When this is in your address book, you can invite it.</para>
 <sect1 id="user.add-delete-contact">
-<title>Ajouter et retirer des contacts </title>
-<para>Cette section de l’interface permet aux usagers d’ajouter et de retirer des contacts ou de modifier les informations les concernant. Il est nécessaire d’ajouter un contact sur l’ordinateur distant et l’ordinateur local.</para>
+<title>Adding and Deleting Contacts</title>
+<para>This section of the interface allows users to add, remove and configure contacts. You need to create a contact on both machine, remote and local. </para>
    <orderedlist>
       <listitem>
-         <para>Ajouter un nouveau contact : pour ajouter une connexion, cliquez sur le bouton « + ». Pour effacer un contact existant, cliquez sur le bouton « - ». </para>
+         <para>Add a new contact: to add a connection, click the button with the plus "+" sign. To remove a connection, click the button with the minus "-" sign. </para>
       </listitem>
    </orderedlist>
    <para>
@@ -16,7 +16,7 @@
       </imageobject>
     </mediaobject>
    </para>
-   <para>Une fenêtre de dialogue avec les informations de contact pertinentes apparaît alors : </para>
+   <para>Next, a dialog will appear with the appropriate contact field: </para>
    <para>
     <mediaobject>
       <imageobject>
@@ -26,20 +26,20 @@
    </para>
    <orderedlist>
       <listitem>
-         <para>Nom : insérer le nom de contact dans le champ « contact » :</para>
+         <para>Name: insert the name of your contact in the field Name:. </para>
       </listitem>
       <listitem>
-         <para>Adresse : insérez l’adresse IP du contact dans le champ « IP Address » : </para>
+         <para>Address: insert the contact's IP address in the field IP Address:. </para>
       </listitem>
       <listitem>
-         <para>« Auto Accept » : activez cette option pour accepter automatiquement toute nouvelle invitation d’un pair connecté. Aucune confirmation ne sera nécessaire. Cette option est pratique dans le cas où une seule et même personne contrôle les deux sites distants. Prenez note que la confidentialité est en jeu puisque lorsque &app; est en route, le pair peut démarre une session et voir et entendre ce qui se passe sur le site distant. </para>
+         <para>Auto Accept: check this option if you want to accept every invitations from the remote user. This will not ask you any confirmation each time. This can make things a lot easier when there is only one person that controls both sides. Beware that your privacy may be a concern, since when the Scenic application is running, this peer can start a streaming session, and look and listen at what is happening on your side.</para>
       </listitem>
    </orderedlist>
-   <para>La fenêtre du contact affiche les informations relatives aux réglages mis en place par ce dernier. </para>
+   <para>On the contact window, you can see a summary of the current settings for this particular contact. </para>
 </sect1>
 <sect1 id="user.inviting-peer">
-    <title>Inviter un pair distant à diffuser</title>
-    <para>Pour inviter un contact, il suffit de cliquer sur son nom dans le carnet d’adresses puis de cliquer sur le bouton « Invite ».</para>
-    <para>À l’invitation, une fenêtre de dialogue apparaît et demande à l’utilisateur son accord pour démarrer une session. En cas d’acceptation de l’utilisateur, le flux démarre. Cette étape peut être éliminée en activant l’option « Auto Accept » telle que décrit plus haut. </para>
+    <title>Inviting a remote peer to stream</title>
+    <para>To invite a contact, simply click on its name in the address book and click on the "Invite" button.</para>
+    <para>When one receives an invitation, a dialog appears, asking the user if he agrees to start a streaming session. If the user accepts, the streaming starts. This step can be skipped by enabling the "Auto accept" option for a contact, as described above.</para>
     </sect1>
 </chapter>

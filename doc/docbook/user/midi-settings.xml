@@ -1,19 +1,19 @@
 <chapter id="user.midi-settings">
-<title>Réglages MIDI</title>
-<para>Dans ce chapitre, il vous sera expliqué comment configurer vos équipements d’entrée et de sortie pour pouvoir diffuser notes et contrôles MIDI. </para>
+<title>Midi Settings</title>
+<para>In this chapter, we will explain you how to configure your MIDI input and output device so that you can stream MIDI notes and controls.</para>
 <sect1 id="user.enabling-midi">
-    <title>Activer l’envoi et la réception de signaux MIDI </title>
-    <para>Pour utiliser l’option d’envoi de données MIDI, les deux pairs doivent activer l’envoi et/ou la réception. Cochez la case pour l’activer et décochez la pour désactiver. </para>
+    <title>Enabling MIDI sending and receiving</title>
+    <para>To use the MIDI streaming feature, both peer must enable sending and/or receiving. Check the checkbox to enable it. Uncheck it to disable it.</para>
 </sect1>
 <sect1 id="user.midi-io">
-    <title>Choisir les équipements d’entrée et de sortie MIDI </title>
-    <para>Pour envoyer notes et contrôles MIDI au pair distant, vous devez choisir un équipement MIDI en activant simplement le menu déroulant dans la portion « sending » de l’onglet MIDI.</para>
-    <para>De la même manière, vous pouvez choisir l’équipement MIDI pour la sortie dans la portion « output » de l’onglet MIDI.</para>
+    <title>Choosing the MIDI input and output devices</title>
+    <para>To send some MIDI notes and controls to the remote peer, you must choose a MIDI device to poll. Simply choose it from the drop-down menu in the "sending" frame of the MIDI tab.</para>
+    <para>In the same manner, choose a MIDI output device in the "output" frame of the MIDI tab.</para>
 </sect1>
 <sect1 id="user.midi-jitter-buffer">
-    <title>Configuration du tampon jitter MIDI</title>
-    <para>Le tampon jitter MIDI est un tampon qui vous protège des variations du temps de latence. Cela assurera une diffusion régulière et harmonieuse des sons et évitera la création spontanée de rythmes qui ne seraient pas en accord avec la musique créée par le musicien distant. Il est recommandé d’en accroître la valeur (en millisecondes) dans le cas d’un réseau à forte latence. </para>
-    <para>Pour synchroniser les flux audio, vidéo et MIDI, il suffit d’accroître la valeur du tampon jitter du flux MIDI jusqu’à un résultat satisfaisant. L’option « Synchronize audio and vidéo » doit évidemment être activée.</para>
-    <para>La latence total d’un flux est le résultat de l’accumulation des latence des équipements d’entrée de données utilisés, de l’encodeur le cas échéant, du « payloader » RTP, des équipements de réseautique, du « depayloader » RTP, du décodeur et des équipements de sortie de données utilisés. La parfaite synchronisation du flux MIDI avec les flux audio et vidéo est impossible mais il est probable que vous obteniez un résultat satisfaisant. </para>
+    <title>Configuring the MIDI jitter buffer</title>
+    <para>The MIDI jitter buffer is a buffer that protects you from the variation in latency. This will prevent the notes from being heard in an irregular flow, creating beats that do not match what the remote musican had played. Increase this number (in milliseconds) in case of high network jitter.</para>
+    <para>If you want to synchronize the audio, video and MIDI streams, it is possible to get to a satisfying result by increasing the jitter buffer for the MIDI stream until the result sounds correct. Of course, the "Synchronize audio and video" option must be on to do so.</para>
+    <para>The total latency for a stream is the result of the addition of the latency of its input device, encoder if there is one, RTP payloader, the network devices, the RTP depayloader, the decoder and the output device. Making sure the MIDI stream is totally synchronized with the audio and video streams is impossible, but it is likely that you can get a satisfying result.</para>
 </sect1>
 </chapter>

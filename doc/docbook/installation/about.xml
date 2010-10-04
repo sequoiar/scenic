@@ -1,9 +1,9 @@
 <bookinfo>
-   <title>Manuel d'installation de &app;  &manrevision;</title>       
+   <title>&app; Installation Manual &manrevision;</title>       
       <copyright> 
          <year>2009</year> 
          <year>2010</year> 
-         <holder>Société des arts technologiques</holder> 
+         <holder>Society for Arts and Technology</holder> 
       </copyright> 
 <!-- translators: uncomment this
   <copyright>
@@ -17,7 +17,7 @@
      document.  
 -->
    <publisher> 
-      <publishername>Société des arts technologiques</publishername> 
+      <publishername>Society for Arts and Technology</publishername> 
    </publisher> 
 
    <authorgroup> 
@@ -25,7 +25,7 @@
          <firstname>Philippe</firstname> 
          <surname>Chevry</surname> 
          <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
 	         <address><email>scenic-users@sat.qc.ca</email> </address> 
 		   </affiliation> 
       </author> 
@@ -33,7 +33,7 @@
 		   <firstname>Simon</firstname> 
 		   <surname>Piette</surname> 
 		   <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
 	  		   <address><email>scenic-users@sat.qc.ca</email></address> 
 		   </affiliation> 
       </author>
@@ -41,7 +41,7 @@
          <firstname>Alexandre</firstname> 
          <surname>Quessy</surname> 
          <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
 	         <address><email>scenic-users@sat.qc.ca</email> </address> 
 		   </affiliation> 
       </author> 
@@ -50,7 +50,7 @@
          <firstname>Tristan</firstname> 
          <surname>Matthews</surname> 
          <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
+	  		   <orgname>Society for Arts and Technology</orgname> 
 	         <address><email>scenic-users@sat.qc.ca</email> </address> 
 		   </affiliation> 
       </author> 
@@ -58,17 +58,17 @@
 
 <!-- This is appropriate place for other contributors: translators,
      maintainers,  etc. Commented out by default.
--->
      
       <othercredit role="translator">
-		<firstname>Hugues</firstname> 
-		<surname>Monfroy</surname> 
+		<firstname>Latin</firstname> 
+		<surname>Translator 1</surname> 
 		<affiliation> 
-	  		<orgname>Société des arts technologiques</orgname> 
-	      <address><email>scenic-users@sat.qc.ca</email> </address> 
+	  		<orgname>Latin Translation Team</orgname> 
+	  		<address> <email>translator@gnome.org</email> </address> 
 		</affiliation>
-		<contrib>Traduction française</contrib>
+		<contrib>Latin translation</contrib>
       </othercredit>
+-->
    </authorgroup>
 <!-- According to GNU FDL, revision history is mandatory if you are -->
 <!-- modifying/reusing someone else's document.  If not, you can omit it. -->
@@ -88,22 +88,24 @@
 		<revnumber>&manrevision;</revnumber> 
 		<date>&date;</date> 
 		<revdescription> 
-	  	   <para role="author">Société des arts technologiques<email>scenic-users@sat.qc.ca</email>
+	  	   <para role="author">Society for Arts and Technology
+	    	<email>scenic-users@sat.qc.ca</email>
 	  		</para>
-	  		<para role="publisher">Société des arts technologiques</para>
+	  		<para role="publisher">Society for Arts and Technology</para>
 		</revdescription> 
       </revision> 
    </revhistory>
 
-   <releaseinfo>Ce manuel d’installation concerne la version &appversion; de &app;.</releaseinfo>
+   <releaseinfo>This manual describes version &appversion; of Scenic Installation.</releaseinfo>
 
 <!-- Legal notice and info
 -->
    &legal;
    <legalnotice> 
-   <title>Commentaires</title> 
-      <para>Pour signaler un bogue ou faire une suggestion à propos de l’application &app; ou du présent manuel, suivez les indications figurant à la page de gestion des listes d’envoi aux utilisateurs.  <ulink url="http://mailman.sat.qc.ca/mailman/listinfo/scenic-users"
-	  type="help">&app; Listes d'envoi aux utilisateurs</ulink>.</para>
+   <title>Feedback</title> 
+      <para>To report a bug or make a suggestion regarding the &app; application or
+      this manual, follow the directions in the <ulink url="http://mailman.sat.qc.ca/mailman/listinfo/scenic-users"
+	  type="help">&app; User Mailing ListPage</ulink>.</para>
 <!-- Translators may also add here feedback address for translations -->
    </legalnotice>
    
