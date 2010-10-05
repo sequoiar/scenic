@@ -1,0 +1,178 @@
+<chapter id="user.before-using-scenic">
+  <title>Avant d’utiliser &app;</title>
+  <para>Dans ce chapitre, vous trouverez une liste de considérations à prendre en compte lorsque vous prévoyez utiliser &app; pour une performance. Tout d’abord, une liste d’équipements recommandés puis les réglages les plus communs. Pour terminer, un résumé de la façon de démarrer l’ordinateur et de tester la connexion au réseau. </para>
+  <sect1 id="user.equipment-list">
+    <title>Liste d’équipements </title>
+    <para>Voici une courte liste des équipements utilisés pour un réglage courant de &app;. Notez que ces équipements sont indispensables de chaque côté de la performance distante (en local et en distant). </para>
+    <itemizedlist>
+      <listitem>
+        <para>Un ordinateur (pour des indications quant au type d’ordinateur à utiliser, veuillez consulter notre manuel d’installation). <ulink url="http://svn.sat.qc.ca/trac/scenic/installation-manual/">Manuel d'installation</ulink></para>
+      </listitem>
+      <listitem>
+        <para>1 x carte de capture vidéo supportée par Linux. </para>
+      </listitem>
+      <listitem>
+        <para>1 x carte son. </para>
+      </listitem>
+      <listitem>
+        <para>1(+) caméra(s) vidéo avec sortie A/V.</para>
+      </listitem>
+      <listitem>
+        <para>1(+) casque(s) d’écoute.</para>
+      </listitem>
+      <listitem>
+        <para>1(+) microphone(s).</para>
+      </listitem>
+      <listitem>
+        <para>1 x mixer audio avec un minimum de deux sous-groupes audio pour pouvoir mixer à la fois la sortie locale et le fichier audio envoyé via le réseau. </para>
+      </listitem>
+      <listitem>
+        <para>Connecteur Ethernet (10/100).</para>
+      </listitem>
+      <listitem>
+        <para>Équipements de connexion réseau (routeur, pare-feu, etc.).</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+  <sect1 id="user.common-setups">
+    <title>Installations de base</title>
+    <para>Les informations d’installation suivantes concernent les façons les plus fréquentes d’utiliser &app;.</para>
+  <sect2 id="user.standalone-setup">
+    <title>Installation autonome </title>
+    <para>Voici une vue d’ensemble d’une installation autonome de &app; </para>
+<para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/hardware_setup_01.jpg" format="JPG" />
+      </imageobject>
+    </mediaobject>
+</para>
+  </sect2>
+  <sect2 id="user.point-to-point">
+    <title>Installation point-à-point</title>
+    <para>Ce type d’installation fait référence à la connexion de deux systèmes &app; connectés au réseau de la recherche à haute vitesse. </para>
+  </sect2>
+  <sect2 id="user.unidirectional-setup">
+    <title>Installation unidirectionnelle </title>
+<para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/unidirectional_setup.png" />
+      </imageobject>
+    </mediaobject>
+</para>
+  </sect2>
+  <sect2 id="user.bidirectional-setup">
+    <title>Installation bidirectionnelle </title>
+    <para>Deux groupes d’artistes en performance situés dans deux endroits distincts peuvent interagir directement par le biais de transmission audio et vidéo. La performance dans la salle 1 est captée par le biais de caméras et de microphones et transmise à la salle 2 et inversement. </para>
+<para>
+    <mediaobject>
+      <imageobject>
+      <imagedata fileref="fig/bidirectional_setup.png" />
+      </imageobject>
+    </mediaobject>
+</para>
+  </sect2>
+  </sect1>
+  <sect1 id="user.connecting-devices">
+    <title>Connecter les équipements. </title>
+    <sect2 id="user.supported-devices">
+      <title>Équipements supportés. </title>
+      <para>&app; est habituellement utilisé avec de nombreux équipements audio, vidéo et MIDI. </para>
+      <para>Il est essentiel de vérifier que les équipements utilisés sont supportés par &app; et plus généralement par <application> GNU/Linux</application>. Veuillez vous référer à la page des spécifications équipements pour en savoir plus  propos des équipements supportés. 
+         <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
+         Équipements supportés</ulink>
+      </para>
+      <para>Il est également nécessaire de vous assurer que tous les équipements sont correctement configurés et connectés. </para>
+      <para>Voici une vue d’ensemble des différents périphériques mis à profit par &app; et de ce qu’il faut garder en tête. </para>
+    <sect3 id="user.audio-input">
+      <title>Entrée audio</title>
+      <para>L’entrée audio la plus commune est un microphone. Celui-ci est connecté à la prise entrée d’un mixeur audio puis à la carte de son. Celle-ci doit être connectée à l’ordinateur. </para>
+    </sect3>
+    <sect3 id="user.audio-output">
+      <title>Sortie audio </title>
+      <para>Les équipements de sortie les plus répandus sont un haut-parleur ou un casque d’écoute. Il peut arriver qu’un mixeur audio soit installé entre la carte son et le(s) périphérique(s) de sortie proprement dits. </para>
+    </sect3>
+    <sect3 id="user.video-input">
+      <title>Entrée vidéo </title>
+      <para>L’équipement d’entrée vidéo le plus répandu est une caméra vidéo. Une carte d’acquisition vidéo doit être utilisée en cas de signal analogique. Quelques webcams USB sont également supportées par &app;.</para>
+    </sect3>
+    <sect3 id="user.vide-output">
+      <title>Sortie vidéo </title>
+      <para>Les équipements de sortie vidéo les plus répandus sont un écran de projection ou un moniteur de contrôle.</para>
+    </sect3>
+    <sect3 id="user.controll-devices">
+      <title>Équipements de contrôle </title>
+      <para>Bien entendu, il est plus aisé d’utiliser un ordinateur équipé des équipements suivants : clavier, souris, écran tactile, wii-mote, etc. Avant d’utiliser un contrôleur non-standard, assurez-vous de sa compatibilité. </para>
+    </sect3>
+    </sect2>
+  </sect1>
+  <sect1 id="user.turning-on">
+    <title>Démarrer l’ordinateur et ses périphériques</title>
+    <para>L’ordre de démarrages des équipements et périphériques audiovisuels est très important.</para>
+    <orderedlist>
+      <listitem>
+        <para>Connectez la souris, le clavier et le moniteur de contrôle uniquement. </para>
+      </listitem>
+      <listitem>
+        <para>Connectez le câble réseau à l’interface réseau.</para>
+      </listitem>
+      <listitem>
+        <para>Vérifiez que vous disposez de la puissance électrique nécessaire à l’alimentation de l’ensemble de vos équipements. Il est fortement recommandé d’utiliser un onduleur (UPS) afin de réguler l’alimentation électrique. </para>
+      </listitem>
+      <listitem>
+        <para>Démarrer l’ordinateur </para>
+      </listitem>
+      <listitem>
+        <para>Vérifiez que vous lancez la session d’utilisateur adéquate. </para>
+      </listitem>
+      <listitem>
+        <para>Vérifiez que vous utilisez le noyau Linux temps réel.</para>
+      </listitem>
+      <listitem>
+        <para>Tapez dans un terminal </para>
+        <para>uname -r</para>
+      </listitem>
+      <listitem>
+        <para>Vous devriez voir l’extension –rt : 2.6.24-26-rt. Dans le cas contraire, vous devez redémarrer l’ordinateur. Au début de l’amorce de redémarrage un écran apparaît. Pressez alors ESC et sélectionnez le noyau Linux doté de l’extension -rt.</para>
+      </listitem>
+      <listitem>
+        <para>Vous pouvez maintenant éteindre l’ordinateur. </para>
+      </listitem>
+      <listitem>
+        <para>Connectez l’ensemble des équipements et périphériques audio et vidéo en suivant les instructions figurant sur la page sur les réglages des équipements et périphériques.<ulink url="http://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">Réglages des équipements</ulink></para>
+      </listitem>
+      <listitem>
+        <para>Lors de la connexion des équipements et au cas où vous auriez deux sorties vidéo, il vous faut connecter les deux sorties en question avant de redémarrer le système afin que les deux périphériques soient détectés. </para>
+      </listitem>
+      <listitem>
+        <para>Configurez et testez ensuite vous équipements audio et vidéo en suivant les instructions figurant sur la page « TestAudiovisualInputOutput »<ulink url="http://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
+        TestAudiovisualInputOutput</ulink></para>
+      </listitem>
+    </orderedlist>
+    <para />
+  </sect1>
+  <sect1 id="user.internet-connection">
+    <title>Être joint via l’Internet </title>
+    <para>Pour rendre un flux effectif avec &app;, les deux pairs doivent s’assurer que leur ordinateur peut communiquer à travers le réseau. En d’autres mots, que chaque pair est en mesure d’envoyer des données à l’autre pair. </para>
+    <para>La façon la plus simple de s’en assurer est d’avoir une adresse IP publique et l’ensemble des ports ouverts à l’Internet sans pare-feu. L’utilisation d’un VPN est également une option.</para>
+    <para>Si vous utilisez un routeur, vous pouvez configurer ce dernier en spécifiant les ports à ouvrir sur l’ordinateur équipé de &app;. La redirection de port doit être effective à la fois pour TCP/IP et UDP/IP sur le port 17446, ainsi que pour l’ensemble des ports de 10000 à au moins 11000.</para>
+    <para>Le port 17446 est le port de communication de &app;. &app; alloue les ports 10000 et au dessus aux pairs en mode réception de flux.  </para>
+  </sect1>
+  <sect1 id="user.testing-devices">
+    <title>Tester les équipements </title>
+    <para>Avant de procéder à quelque envoie de flux audio et vidéo en direct, il convient de s’assurer que les équipements sont adéquatement connectés et alimentés en électricité. Il peut arriver qu’une carte de capture audio soit en mode numérique alors que vous préférez utiliser le mode d’entrée analogique. De la manière qu’un équipement de capture MIDI en USB peut être désactivé en pressant le commutateur en position « off ». Même si cela peut paraître évident, on trouve là la source de plusieurs problèmes fréquents.</para>
+  </sect1>
+  <sect1 id="user.sound-server">
+    <title>Démarrer le serveur audio <application>JACK</application></title>
+    <para>Pour diffuser un flux audio, il faut utiliser le serveur audio <application>JACK</application>. <application>JACK Control</application> en est l’interface graphique. Elle peut être démarrée en choisissant <menuchoice><guimenu>Application</guimenu><guimenuitem>Audio/Video</guimenuitem><guimenuitem>JACK Control</guimenuitem></menuchoice> menu item.</para>
+  </sect1>
+  <sect1 id="user.launching-scenic">
+    <title>Démarrer &app;</title>
+    <para>Pour lancer l’application &app;, choisissez <menuchoice>
+       <guimenu>Application</guimenu>
+          <guimenuitem>Internet</guimenuitem>
+          <guimenuitem>&app;</guimenuitem>
+    </menuchoice>Vous êtes prêt à commencer! </para>
+  </sect1>
+</chapter>

@@ -1,0 +1,527 @@
+<chapter id="installation.av-configuration">
+  <title>Configuration audio et vidéo du système</title>
+  <para>Vérifiez tout d’abord que vous répondez à l’ensemble des pré-requis sur notre page relative à l’installation logicielle.<link linkend='installation.software-installation'>Pré-requis logiciel</link></para>
+  <sect1 id="installation.av-transmission">
+    <title>Accès aux équipements A/V du système</title>
+    <para>Ajoutez ensuite votre nom d’usager aux différents groupes :</para>
+    <para>Pour ajouter votre nom d’usager au groupe vidéo</para>
+    <para>
+    <userinput>sudo gpasswd -a "username" video</userinput>
+    </para>
+    <para>Pour ajouter votre nom d’usager au groupe audio</para>
+    <para>
+    <userinput>sudo gpasswd -a "username" audio</userinput>
+    </para>
+    <para>Pour les équipements Firewire (DV, IIDC, freebob/ffado)</para>
+    <para>
+    <userinput>sudo gpasswd -a "username" disk</userinput>
+    </para>
+    <para>Pour rendre le tout effectif, il vous faut quitter la session puis en démarre une nouvelle.</para>
+  </sect1>
+
+  <sect1 id="installation.video-settings">
+    <title>Réglages vidéo du système</title>
+    <para>Nous verrons ici comment configurer les réglages relatifs aux entrées et sorties vidéo.</para>
+
+    <sect2 id="installation.video-output">
+
+      <title>Sortie vidéo du système</title>
+     <para>La sortie vidéo concerne généralement l’utilisation d’une carte graphique.</para> 
+      <para>Il est essentiel de configurer la sortie vidéo correctement faute de quoi l’écran demeurera noir.</para>
+
+    <para>Pour les cartes graphiques Nvidia, veuillez suivre les instructions figurant à la page des réglages Nvidia. 
+    <link linkend="installation.nvidia-settings">Réglages Nvidia</link>.
+    </para> 
+
+    <para>Pour les cartes graphiques ATI, veuillez suivre les instructions figurant à la page des réglages ATI.<link linkend="installation.ati-settings">Réglages ATI</link>
+    </para> 
+   </sect2>
+
+    <sect2 id="installation.video-input">
+    <title>Entrée vidéo du système Entrée vidéo du système</title>
+    <para>&app; peut effectuer la capture vidéo via une carte de capture vidéo v4l2, une caméra IIDC ou DV (également appelée iLink). Ces dernières ont une latence importante (souvent entre 150 et 250ms) et ne devraient pas servir comme entrée vidéo si une faible latence est désirée. </para>
+    <para>
+      <emphasis role="strong">Video4Linux</emphasis>
+    </para> 
+    <para>Connectez la caméra. Pour ce faire. Veuillez vous référer à notre page relative à l’installation matérielle. 
+       <link linkend='installation.hardware-requirements'>Installastion matérielle</link>
+    </para>
+    <para>Il s’agit maintenant de modifier vos réglages vidéo en fonction de vos besoins spécifiques.</para>
+    <para>
+      <emphasis role="strong">Entrée vidéo Firewire (DV ou IIDC)</emphasis>
+    </para>
+    <para>* L’usager doit être membre des groupes « disk » et « vidéo ». Dans le cas contraire, l’administrateur système doit inclure l’usager au groupe « disk » (tel qu’indiqué plus haut).</para>
+    <para>Sous Karmic Koala, il vous faut préciser l’attribution des équipements pour raw1394. Créez une règle udev pour changer le groupe de l’équipement /dev/raw1394:</para>
+    <para>
+    <userinput>echo 'KERNEL=="raw1394", NAME="raw1394", GROUP="disk"' | sudo tee -a /etc/udev/rules.d/99-raw1394.rules</userinput>
+    </para>
+    <para>
+    <userinput>sudo /etc/init.d/udev restart</userinput>
+    </para>
+    <para>De plus, sous toutes les distributions, il est conseillé de charger le module raw1394 même si aucune caméra dc1394 n’est utilisée pour que les sollicitations de libdc (ex. : milhouse --list-cameras) ne génèrent pas de message d’erreur. Pour ce faire, ajoutez raw1394 aux fichiers des modules /etc/:</para>
+    <para>
+    <userinput>sudo modprobe raw1394</userinput>
+    </para>
+    <para>
+    <userinput>echo "raw1394" | sudo tee -a /etc/modules</userinput>
+    </para>
+    <para>Se référer à
+    <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
+    ce rapport de bogue</ulink>
+    <ulink url="https://help.ubuntu.com/community/Firewire">
+    et cette documentation </ulink> pour de plus amples renseignements. 
+    </para>
+    <para>Vous pouvez tester la caméra DV avec :</para>
+    <para><userinput>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</userinput></para>
+    
+    <para>Vous pouvez tester la caméra IIDC avec :</para>
+    <para><userinput>gst-launch dc1394src ! ffmpegcolorspace ! xvimagesink</userinput></para>
+    </sect2>
+    <sect2 id="installation.video-test">
+      <title>Test vidéo</title>
+      <para>Dans &app;, il est facile de prévisionner les entrées vidéo des équipements video4Linux2 dans l’onglet « Video ». Les autres pilotes d’entrée ne sont pas encore supportés par &app; mais le sont par milhouse :</para>
+      <para>Choisissez la source vidéo en fonction du tableau suivant : </para>
+      <informaltable frame="all">
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>
+                <para>v4l2src</para>
+              </entry>
+              <entry>
+                <para>Équipements video4linux2 </para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>v4lsrc</para>
+              </entry>
+              <entry>
+                <para>Équipements video4Linux (v1) – uniquement supportés par ligne de commande</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>dv139src</para>
+              </entry>
+              <entry>
+                <para>Caméras et lecteurs DV – uniquement supportés par ligne de commande</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>dc1394src</para>
+              </entry>
+              <entry>
+                <para>Caméras IIDC 1.31– uniquement supportés par ligne de commande</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>
+      <userinput>milhouse --localvideo --videosource v4l2src</userinput>
+      </para>
+      <para>Vous pouvez ajouter de nombreuses options telles que :</para>
+      <itemizedlist>
+        <listitem>
+          <para>--aspect-ratio (format)</para>
+        </listitem>
+        <listitem>
+          <para>--width (largeur)</para>
+        </listitem>
+        <listitem>
+          <para>--height (hauteur)</para>
+        </listitem>
+        <listitem>
+          <para>--fullscreen (plein écran)</para>
+        </listitem>
+        <listitem>
+          <para>--flip-video</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+  </sect1>
+  <sect1 id="installation.audio-settings">
+    <title>Réglages audio du système</title>
+    <para>Vérifiez route d’abord que vous disposez d’une carte son appropriée sur la page des pré-requis matériel.<link linkend='installation.hardware-requirements'>Pré-requis matériel</link>.</para>
+    <sect2 id="installation.firewire-sound-card">
+      <title>Carte son Firewire</title>
+      <para>Vérifiez que votre carte son est détectée en tant que carte son firewire :</para>
+      <para>
+      <userinput>ls -l /dev/*1394*</userinput>
+      </para>
+      <para>Si votre équipement n’apparaît pas, essayez ceci : </para>
+      <para>
+      <userinput>sudo modprobe raw1394</userinput>
+      </para>
+      <para>L’usager doit être membre du groupe « disk ». Dans le cas contraire, l’administrateur système doit inclure l’usager au groupe « disk » (tel qu’indiqué plus haut).</para>
+    </sect2>
+    <sect2 id="installation.pci-sound-card">
+      <title>Pour une carte son PCI </title>
+      <para>Pour les cartes son PCI avec pilote ALSA, vérifiez qu’elle est détectée : </para>
+      <para>
+      <userinput>aplay -l</userinput>
+    </para>
+    </sect2>
+  </sect1>
+  <sect1 id="installation.sound-server">
+    <title>Configuration du serveur audio du système</title>
+    <sect2 id="installation.jackd-configuration">
+      <title>Configuration de <application>jackd</application></title>
+      <para>Démarrez le serveur audio <application>jackd</application> avec qjackctl situé dans « Applications/Sound &amp; Video/Jack Control »</para>
+<para>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="fig/qjackctl.png" format="PNG" />
+        </imageobject>
+      </mediaobject>
+</para>
+      <para>Cliquez sur le bouton « setup ».</para>
+      <para>Voici quelques exemples de configuration en temps réel pour qjackctl :</para>
+      <informaltable frame="all">
+        <tgroup cols="3">
+          <tbody>
+            <row>
+              <entry>
+                <para>Parameter</para>
+              </entry>
+              <entry>
+                <para>Value</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Realtime</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Priority</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Frames/Period</para>
+              </entry>
+              <entry>
+                <para>64</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Sample Rate</para>
+              </entry>
+              <entry>
+                <para>48000</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Periods/Buffer</para>
+              </entry>
+              <entry>
+                <para>2</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Port Maximum</para>
+              </entry>
+              <entry>
+                <para>256</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Timeout (msec)</para>
+              </entry>
+              <entry>
+                <para>500</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Interface</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Audio</para>
+              </entry>
+              <entry>
+                <para>Duplex</para>
+              </entry>
+              <entry>
+                <para>freebob/ffa</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Input Latency</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Output Latency</para>
+              </entry>
+              <entry>
+                <para>Default</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Latency</para>
+              </entry>
+              <entry>
+                <para>2.67 msec</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>Notre page dédiée aux réglages de qjackctl vous indique comment d’abord ajuster les paramètres en fonction de votre carte son spécifique. Ces paramètres sont précisés dans le tableau de réglages de JACK ci-dessous.</para>
+      <para>Veuillez noter que ces réglages dépendent également des spécifications de votre ordinateur et peuvent varier d’un type d’installation à l’autre. </para>
+      <para>Voici un tableau de l’ensemble des cartes son testées avec les réglages de JACK appropriés : </para>
+      <informaltable frame="all">
+        <tgroup cols="6">
+          <tbody>
+            <row>
+              <entry>
+                <para>Carte de son</para>
+              </entry>
+              <entry>
+                <para>-d backen</para>
+              </entry>
+              <entry>
+                <para>-r taux d'échantillonage</para>
+              </entry>
+              <entry>
+                <para>- p images/période</para>
+              </entry>
+              <entry>
+                <para>-n pérides/tampon</para>
+              </entry>
+              <entry>
+                <para>Latence</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                MaudioDelta 1010 (regular or LT)</para>
+              </entry>
+              <entry>
+                <para>-d alsa</para>
+              </entry>
+              <entry>
+                <para>-r 48000</para>
+              </entry>
+              <entry>
+                <para>-p 64</para>
+              </entry>
+              <entry>
+                <para>-n 2</para>
+              </entry>
+              <entry>
+                <para>2.67 msec</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>
+                EdirolFirewire Fa101</para>
+              </entry>
+              <entry>
+                <para>-d freebob</para>
+              </entry>
+              <entry>
+                <para>-r 48000</para>
+              </entry>
+              <entry>
+                <para>-p 64</para>
+              </entry>
+              <entry>
+                <para>-n 2</para>
+              </entry>
+              <entry>
+                <para>2.67 msec</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Intel HDAudio</para>
+              </entry>
+              <entry>
+                <para>-d alsa</para>
+              </entry>
+              <entry>
+                <para>-r 48000</para>
+              </entry>
+              <entry>
+                <para>-p 512</para>
+              </entry>
+              <entry>
+                <para>-n 4</para>
+              </entry>
+              <entry>
+                <para>16 msec</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>-v = verbose, -R = mode temps réel, -d alsa règle le backend à ALSA (utiliser plutôt -dfreebob pourles cartes firewire), -r 48000 règle le taux d’échantillonnage à 48000 échantillons/sec, -p64 règle le nombre d’images/période à 64, and -n2 règle le nombre de périodes/tampon à 2.</para>
+      <para>Si vous utilisez ALSA, vous rencontrerez potentiellement un problème dans la séquence de chargement du module. Pour y remédier, utilisez plutôt les noms ALSA plutôt que l’index (hw:0) pour spécifier le type de carte. Voici comment :</para>
+      <para>Pour sélectionner la carte son appropriée, vérifiez tout d’abord le nom de la carte son à utiliser avec aplay.</para>
+      <para>Voici un exemple de sortie avec aplay<userinput>aplay -l</userinput> output:</para>
+      <screen>
+card 0: Intel [HDA Intel], device 0: ALC889A Analog [ALC889A Analog]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+</screen>
+      <para>Copiez le nom de la carte son (ex. : « HDA Intel ») et collez le dans le fichier .asoundrc  localisé dan svotre répertoire $HOME. Ex. : Pour utiliser la carte son M2496 : </para>
+      <para>ex:</para>
+      <para>
+      <userinput>gedit .asoundrc</userinput>
+      </para>
+      <para>Fichier .asoundrc avec le nom m2496 ajouté. </para>
+      <screen>pcm.m2496 {
+   type hw;
+   card M2496;
+}
+ctl.m2496 { 
+   type hw;
+   card M2496;
+}</screen>
+      <para>Il ne vous reste qu’à ajouter le nom de la carte son dans le champ de l’interface de qjackctl. Par exemple, la m2496:</para>
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="fig/qjackctl_soundcard.png"
+            format="PNG" />
+          </imageobject>
+        </mediaobject>
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>Cliquez sur l’onglet « Options ».</para>
+        </listitem>
+      </itemizedlist>
+      <para>Vérifiez que seules les options suivantes sont sélectionnées : </para>
+      <informaltable frame="all">
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>
+                <para>Paramètre</para>
+              </entry>
+              <entry>
+                <para>Valeur</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Capture Standard Output</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>XRUN detection regex</para>
+              </entry>
+              <entry>
+                <para>xrun d'un minimum de ([0-9|\.]+) msecs</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <itemizedlist>
+        <listitem>
+          <para>Cliquez sur l’onglet « Misc ».</para>
+        </listitem>
+      </itemizedlist>
+      <para>Vérifiez que seules les options suivantes sont sélectionnées : </para>
+      <informaltable frame="all">
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>
+                <para>Paramètre</para>
+              </entry>
+              <entry>
+                <para>Valeur</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Start JACK audio server on application
+                startup</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Save JACK audio server configuration
+                to:</para>
+              </entry>
+              <entry>
+                <para>.jackdrc</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Confirm server shutdown</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+            <row>
+              <entry>
+                <para>Enable ALSA Sequencer support</para>
+              </entry>
+              <entry>
+                <para>Yes</para>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para>NOTE : En cas de message d’erreur, redémarrer l’ordinateur et essayez à nouveau.</para>
+      <itemizedlist>
+        <listitem>
+          <para></para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+  </sect1>
+  <sect1 id="installation.sound-check">
+    <title>Vérification de l’audio du système </title>
+    <para>Vous pouvez alors démarrer le test audio avec : </para>
+    <para>
+    <userinput>gst-launch audiotestsrc ! jackaudiosink</userinput>
+    </para>
+    <para>Cela générera une onde sinusoïdale. Les connexions audio devraient également s’afficher dans qjackctl. Les sorties sont maintenant adressables vers vos haut-parleurs ou autres applications. </para>
+  </sect1>
+</chapter>

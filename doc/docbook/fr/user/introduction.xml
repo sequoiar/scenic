@@ -1,0 +1,41 @@
+<chapter id="user.introduction">
+  <title>Introduction</title>
+  <para>&app; est un système de téléprésence pour la scène qui permet la transmission de données audiovisuelles et de contrôle en temps réel sur n’importe quel réseau IP. Les systèmes de téléprésence peuvent être utilisés dans divers contextes culturels et artistiques et permettent des communications bidirectionnelles ou la présentation de performances combinées. &app; permet différentes combinaisons et assure ainsi à un nombre maximum de collaborateurs  de prendre part au vaste réseau international de formation, de recherche et de création artistique (là où la bande passante le permet). </para>
+  <para>Le projet &app; est pris en charge par l’équipe de développement du programme de recherche PropulseART de la SAT, créé pour faciliter la mise en place de solutions réseau pour l’audiovisuel, la scène et les systèmes numériques entre différentes salles et institutions dédiées à la culture et à la formation et pour faire la promotion de la recherche et de la création par le biais des nouvelles technologies de la communication. </para>
+  <sect1 id="user.functional-overview">
+    <title>Survol des fonctionnalités</title>
+    <para>Cette section donne un bref aperçu des principales fonctionnalités de &app;.</para>
+    <para>&app; est une suite logicielle composée de &app; lui-même, d’une interface utilisateur graphique et d’utilitaires avec lignes de commande. L’utilitaire milhouse est utilisé pour envoyer ou recevoir fichiers son et vidéo par internet. L’utilitaire de flux MIDI est utilisé pour l’envoi et la réception de données MIDI. &app; vous permet également de gérer une liste de contacts et de choisir la source vidéo et les réglages des sessions de diffusion en continu.       </para>
+  </sect1>
+  <sect1 id="user.art-direction">
+    <title>À propos de direction artistique </title>
+    <para>Plusieurs paramètres sont à prendre en considération pour la préparation d’un spectacle incluant la téléprésence en direct afin d’en assurer la qualité. Tout d’abord, les arts de la scène impliquant l’utilisation du corps au complet sont souvent plus intéressants à regarder que d’autres où le corps serait statique. En outre, des pièces ou numéros courts et entrecoupés d’intervention d’un maître de cérémonie permettent au public de comprendre ce qui se passe au niveau de la téléprésence. Dans le cas contraire, les spectateurs novices risquent de ne pas saisir que certains éléments sont en fait diffusés en direct depuis une autre ville ou salle. Le cabaret est la forme la plus appropriée pour ce type de performances.</para>
+  </sect1>
+  <sect1 id="user.using-scenic">
+    <title>Téléprésence et monde réel </title>
+    <sect2 id="user.performance-issues">
+      <title>À propos de performance</title>
+      <para>Dans la préparation d’un spectacle, il est essentiel de prendre en compte les limites inhérentes à l’informatique et aux équipements. Par exemple, un ordinateur ne diffusant qu’une seule source vidéo sera plus efficace qu’un autre qui en diffuserait  plusieurs. Une seule image peut être divisée en plusieurs fichiers avec un équipement adéquat qui permet une latence quasi nulle. Ceci est vrai pour les signaux vidéo numériques autant qu’analogues. </para>
+    </sect2>
+    <sect2 id="user.audio-feedback">
+      <title>Combattre le Larsen </title>
+      <para>Lors de la réception ou de l’envoi de signaux audio dans un contexte de téléprésence, de sérieux problèmes de Larsen peuvent subvenir.  La plupart du temps,  il s’agira de bruits aigus très forts. Le moyen le plus rapide de corriger le problème est d’éteindre les microphones ou les haut-parleurs. Ces désagréments peuvent être évités grâce à des moyens très simples. </para>
+      <para>La scénographie de votre spectacle peut par exemple prévoir l’utilisation d’un casque d’écoute pour le son en provenance de votre pair distant afin d’éviter tout effet Larsen. Si cela est impossible, l’utilisation d’instruments de musique sans microphones ou encore de microphones aussi directionnels que possible ou à très courte portée peut régler le problème. Dans tous les cas, il faut éviter de diriger les microphones vers les haut-parleurs. </para>
+      <para>Pour aider à éliminer le Larsen, il est également possible d’utiliser un équipement de type « limiter », « gate » ou encore un compresseur dans la chaîne de traitement de l’audio. Ceci ne dispense en rien de prendre les précautions décrites ci-dessus. </para>
+    </sect2>
+    <sect2 id="user.projections-and-lighting">
+      <title>Projections vidéo et éclairage </title>
+      <para>Plusieurs problèmes sont fréquemment observés dans le cadre de spectacles utilisant à la fois des projections vidéo et de l’éclairage. Les deux impliquent évidemment la lumière et donnent de meilleurs résultats dans la pénombre, optimisant ainsi le contraste entre ombre et lumière. L’utilisation simultanée de vidéo et d’éclairages augmente la luminosité ambiante et diminue d’autant les possibilités de contraste. Il faut donc prévoir que les équipements d’éclairage soient le plus possible éloignés des équipements d’affichage vidéo afin d’éviter la pollution lumineuse sur ces derniers. </para>
+      <para>L‘éclairage de ce qui est destiné à être capté en vidéo doit être suffisant pour éviter que la caméra n’ait à ajouter trop de gain à l’image captée pour éviter une diminution de sa qualité finale. La technique dite des trois points est idéale : une lampe « clé », une « arrière » et une «  de remplissage». Cette dernière réduit les ombres créées par la lampe « clé », plus puissante. La lampe « arrière » est utile pour l’éclairage de la tête et des épaules du sujet qui se détacheront alors du fond.  On peut utiliser deux lampes « arrières ». </para>
+      <para>Un fond sombre peut également contribuer à une image facilement reconnaissable. Le sujet peut âtre habillé de couleurs claires, contribuant également à sa reconnaissance aisée. </para>
+      <para>Une image de meilleure qualité est sans aucun doute plus facile à compresser par ordinateur qui générera alors un fichier moins gourmand en bande passante. La règle du « source pourrie, résultat pourri » n’est pas une légende et plus vos captures seront de qualité, plus le résultat sera à l’avenant. </para>
+    </sect2>
+  </sect1>
+  <sect1 id="user.quick-overview">
+    <title>Guide express</title>
+    <para>En un mot, une fois &app; installé et l’ordinateur correctement connecté à Internet et aux ordinateurs distants, il est temps de démarrer &app; et d’en faire l’essai. La première chose à faire est d’ajouter un contact dans le carnet d’adresse. Il suffit pour cela de préciser un nom et l’adresse IP de l’ordinateur distant. Chaque pair peut voir sa propre adresse IP locale dans l’onglet des statistiques qu’il peut alors communiquer à ses pairs au besoin.</para>
+    <para>Il est alors temps de configurer ce qui doit être envoyé au pair et reçu de ce dernier. Lorsque correctement installé et configuré, &app; permet la transmission d’un flux vidéo bidirectionnel, d’un flux MIDI et d’autant de canaux audio que l’équipement le permet. Pour chacun d’entre eux, vous pouvez décider d’activer ou de désactiver l’envoi et la réception en cliquant sur le bouton approprié dans la section « Sending » et « Receiving » des onglets « video », « audio » et « MIDI ».  Pour qu’un flux soit effectif, les deux pairs doivent l’activer. Si l’un des deux pairs désactive l’envoi ou la réception d’un signal vidéo, ce dernier sera bloqué dans la direction correspondante. </para>
+    <para>Dans chacun des trois onglets, des réglages vous permettent d’ajuster la qualité, la source et la destination des flux. Les informations de codec sont établies du côté du pair récepteur. Pour la source, le choix est évidemment fait du côté du pair émetteur. </para>
+    <para>L’onglet « Statistics » donne des informations et statistiques à propos du flux en cours ainsi que votre adresse IP locale et celle de votre pair. </para>
+  </sect1>
+</chapter>

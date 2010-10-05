@@ -1,0 +1,123 @@
+<chapter id="installation.hardware-setup">
+  <title>Réglages des équipements</title>
+  <para>&app; requiert l’utilisation de nombreux équipements. Ce chapitre vous guidera quant au type d’équipements généralement utilisés ainsi que sur la marche à suivre pour les connecter en plus de vous informer sur quelques problèmes fréquents et le moyen d’y remédier.</para>
+  <sect1 id="installation.generic-sheme">
+    <title>Schéma de connexion générique</title>
+    <para>Le diagramme ci-dessous illustre un type de connexion courant pour &app;.</para>
+<para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/hardware_setup_01.jpg"
+        format="JPG" />
+      </imageobject>
+      <textobject>
+        <phrase>Schéma générique</phrase>
+      </textobject>
+    </mediaobject>
+</para>
+    <para>Entrée audio :</para>
+    <itemizedlist>
+      <listitem>
+        <para>Microphone dans l’entrée mic. (ou autres entrées audio)</para>
+      </listitem>
+      <listitem>
+        <para>Sorties 1 et 2 de la carte son dans les entrées 6 et 7 du mixeur.</para>
+      </listitem>
+    </itemizedlist>
+    <para>Sortie audio :</para>
+    <itemizedlist>
+      <listitem>
+        <para>Sous-groupe 1 – envoyer vers les entrées 1 et 2 de la carte son</para>
+      </listitem>
+      <listitem>
+        <para>Sous-groupe 2 – envoyer vers les haut-parleurs</para>
+      </listitem>
+      <listitem>
+        <para>Casque d’écoute</para>
+      </listitem>
+      <listitem>
+        <para>Carte son externe connectée par USB (installation optionnelle)</para>
+      </listitem>
+    </itemizedlist>
+    <para>Entrée vidéo :</para>
+    <itemizedlist>
+      <listitem>
+        <para>Le signal vidéo de la caméra vers l’entrée S-Vidéo de la carte de capture vidéo. NOTE : en cas de câble composite, insérer le connecteur jaune. </para>
+      </listitem>
+    </itemizedlist>
+    <para>Sortie vidéo :</para>
+    <itemizedlist>
+      <listitem>
+        <para>DVI vers projecteur / VGA vers moniteur</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+  <sect1 id="installation.bidirectional-setup">
+    <title>Installation bidirectionnelle</title>
+    <para>Le diagramme ci-dessous illustre une installation pour une transmission audio distante bilatérale. Chacun des sites connectés est configuré pour envoyer un signal audio sur Internet qui sera alors diffusé dans le site distant. L’installation audio doit être identique pour chacun des deux sites.</para>
+<para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="fig/hardware_setup_02.jpg"
+        format="JPG" />
+      </imageobject>
+      <textobject>
+        <phrase>Installation bidirectionnelle</phrase>
+      </textobject>
+    </mediaobject>
+</para>
+    <para />
+    <informaltable frame="all">
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry>
+              <para>Réglages du mixeur audio sur site 1</para>
+            </entry>
+            <entry>
+              <para>Réglages du mixeur audio sur site 2</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Microphone dans entrée Mic IN (ou autre source) du canal 1 du mixeur.</para>
+              <para>Ouvrir Mic AUX (ou line AUX) pour envoyer le signal du microphone à la carte son puis au site 2.</para>
+              <para>Mettre à OFF le niveau de sortie Mic vers le mix. principal.</para>
+            </entry>
+            <entry>
+              <para>Microphone dans entrée Mic IN (ou autre source) du canal 1 du mixeur.</para>
+              <para>Ouvrir Mic AUX (ou line AUX) pour envoyer le signal du microphone à la carte son puis au site 1.</para>
+              <para>Mettre à OFF le niveau de sortie Mic vers le mix. principal.</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>L’audio du site 1 est envoyé via AUX 1&amp;2 vers les entrées 1 et 2 de la carte son puis vers le site 2.</para>
+            </entry>
+            <entry>
+              <para>L’audio du site 2 est envoyé via AUX 1&amp;2 vers les entrées 1 et 2 de la carte son puis vers le site 1.</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>L’audio du site 2 est redirigé via les sorties 1 et 2 de la carte son du site 1 vers les entrées 7 et 8 du mixeur.</para>
+              <para>Mettre à OFF le niveau de sortie des entrées 7 et 8 pour éviter d’envoyer à nouveau le signal vers la carte.</para>
+            </entry>
+            <entry>
+              <para>L’audio du site 1 est redirigé via les sorties 1 et 2 de la carte son du site 2 vers les entrées 7 et 8 du mixeur.</para>
+              <para>Mettre à OFF le niveau de sortie des entrées 7 et 8 pour éviter d’envoyer à nouveau le signal vers la carte.</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Ouvrir les niveaux principaux des entrées 7 et 8 pour entendre la sortie audio du site 2 dans le mix principal.</para>
+            </entry>
+            <entry>
+              <para>Ouvrir les niveaux principaux des entrées 7 et 8 pour entendre la sortie audio du site 1 dans le mix principal.</para>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+  </sect1>
+</chapter>

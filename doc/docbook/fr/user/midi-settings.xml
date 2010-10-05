@@ -1,0 +1,19 @@
+<chapter id="user.midi-settings">
+<title>Réglages MIDI</title>
+<para>Dans ce chapitre, il vous sera expliqué comment configurer vos équipements d’entrée et de sortie pour pouvoir diffuser notes et contrôles MIDI. </para>
+<sect1 id="user.enabling-midi">
+    <title>Activer l’envoi et la réception de signaux MIDI </title>
+    <para>Pour utiliser l’option d’envoi de données MIDI, les deux pairs doivent activer l’envoi et/ou la réception. Cochez la case pour l’activer et décochez la pour désactiver. </para>
+</sect1>
+<sect1 id="user.midi-io">
+    <title>Choisir les équipements d’entrée et de sortie MIDI </title>
+    <para>Pour envoyer notes et contrôles MIDI au pair distant, vous devez choisir un équipement MIDI en activant simplement le menu déroulant dans la portion « sending » de l’onglet MIDI.</para>
+    <para>De la même manière, vous pouvez choisir l’équipement MIDI pour la sortie dans la portion « output » de l’onglet MIDI.</para>
+</sect1>
+<sect1 id="user.midi-jitter-buffer">
+    <title>Configuration du tampon jitter MIDI</title>
+    <para>Le tampon jitter MIDI est un tampon qui vous protège des variations du temps de latence. Cela assurera une diffusion régulière et harmonieuse des sons et évitera la création spontanée de rythmes qui ne seraient pas en accord avec la musique créée par le musicien distant. Il est recommandé d’en accroître la valeur (en millisecondes) dans le cas d’un réseau à forte latence. </para>
+    <para>Pour synchroniser les flux audio, vidéo et MIDI, il suffit d’accroître la valeur du tampon jitter du flux MIDI jusqu’à un résultat satisfaisant. L’option « Synchronize audio and vidéo » doit évidemment être activée.</para>
+    <para>La latence total d’un flux est le résultat de l’accumulation des latence des équipements d’entrée de données utilisés, de l’encodeur le cas échéant, du « payloader » RTP, des équipements de réseautique, du « depayloader » RTP, du décodeur et des équipements de sortie de données utilisés. La parfaite synchronisation du flux MIDI avec les flux audio et vidéo est impossible mais il est probable que vous obteniez un résultat satisfaisant. </para>
+</sect1>
+</chapter>

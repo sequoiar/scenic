@@ -1,0 +1,44 @@
+<chapter id="user.audio-settings">
+<title>Réglages audio </title>
+<para>Ce chapitre concerne les réglages audio de &app;.</para>
+
+<sect1 id="user.sending-audio">
+    <title>Envoyer des données audio</title>
+    <para>&app; ne supporte pour l’instant que le son capté par le serveur audio JACK ou par une source test. Dans la section « Sending » de l’onglet « Audio », choisissez la source désirée dans la boîte « Audio Source ».</para>
+</sect1>
+
+<sect1 id="user.receiving-audio">
+    <title>Recevoir des données audio</title>
+    <sect2 id="user.synchronize">
+        <title>Synchronisation avec le flux vidéo </title>
+        <para>Le flux audio peut être synchronisé au flux vidéo tout comme il peut être réglé de façon indépendante. Désactiver cette option implique habituellement que le son sera entendu avant que l’on puisse voir la vidéo. Cette option est adaptée aux musiciens qui souhaitent un temps de latence minimal pour l’audio. </para>
+    </sect2>
+    <sect2 id="user.num-of-chan">
+        <title>Nombre de canaux </title>
+        <para>Le nombre maximum de canaux audio dépend du codec audio choisi. Il sera de 2 pour les MP3, de 24 pour Vorbis et d’autant de canaux que votre équipement le permet pour le format Raw audio pour peu que vous ayez installé la bonne version de plugiciels Gstreamer.</para>
+    </sect2>
+    <sect2 id="user.audio-codec">
+        <title>Codec audio</title>
+        <para>Les signaux audio peuvent être compressés ou gardés tels quels. Dans le cas où ils ne sont pas compressés, on parle alors d’audio de type « RAW», de la meilleure qualité possible puisque identique aux données numériques telles que captées par votre équipement d’entrée de signal audio.</para>
+        <para>Pour diminuer la bande passante mise à profit pour le flux audio, il vous faut alors compresser ces données. Veuillez noter que la latence sera alors augmentée. Deux types de codec sont supportés : Vorbis et MP3. Vorbis est un codec audio de haute qualité de type libre. Les MP3 sont plus limités puisque le nombre de canaux possibles est limité à 2 et est protégé par une licence. Le codec Vorbis implique une latence supérieure à celle du codec MP3. </para>
+    </sect2>
+</sect1>
+
+<sect1 id="user.jack-audio">
+    <title>Informations à propos du serveur audio <application>JACK</application> </title>
+    <sect2 id="user.jack-latency">
+        <title>Latence estimée pour<application>JACK</application></title>
+        <para>Cette information vous est donnée pour vous aider à estimer le temps de latence. Pour diminuer ce dernier, il vous faut configurer le serveur audio JACK au mieux. Cela implique de diminuer le nombre d’image par période et le nombre de périodes par tampon. Veuillez noter qu’une carte audio de qualité permet des latences plus acceptables dans le cadre de l’utilisation de JACK.</para>
+    </sect2>
+    <sect2 id="user.jack-auto-connect">
+        <title>Connexion automatique des ports de<application>JACK</application></title>
+        <para>Laissez cette option activée si vous souhaitez entendre le signal audio dès le démarrage du flux. Dans le cas contraire, l’usager peut décider de connecter les ports de Milhouse dédiés à JACK aux ports d’entrée et de sortie de l’équipement audio concerné. Pour des options de routage plus personnalisées, il est conseillé d’utiliser jack.plumbing.</para>
+    </sect2>
+</sect1>
+
+<sect1 id="user.audio-options">
+    <title>Options audio avancées </title>
+    <para>La taille du tampon d’entrée et de sortie audio est celle du tampon entre l’élément Gstreamer et le serveur audio JACK.</para>
+</sect1>
+
+</chapter>
