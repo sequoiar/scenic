@@ -43,11 +43,14 @@ TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) :
     pipeline_(pipeline),
     textoverlay_(pipeline_.makeElement("textoverlay", NULL))
 {
-    g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "sans 50",
-            NULL);
-    g_timeout_add(50 /* ms */, 
-            static_cast<GSourceFunc>(textPositionCallback),
-            textoverlay_);
+    if (not text.empty())
+    {
+        g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "sans 50",
+                NULL);
+        g_timeout_add(50 /* ms */, 
+                static_cast<GSourceFunc>(textPositionCallback),
+                textoverlay_);
+    }
 }
 
 /// Destructor 

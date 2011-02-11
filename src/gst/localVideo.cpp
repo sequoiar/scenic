@@ -48,7 +48,7 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     colourspace_(0),
     videoscale_(sinkConfig_->createVideoScale(pipeline_)),
     textoverlay_(0),
-    videoflip_(sinkConfig_->flipMethod() != "none" ? sinkConfig_->createVideoFlip(pipeline_) : 0),
+    videoflip_(sinkConfig_->createVideoFlip(pipeline_)),
     sink_(sinkConfig_->createSink(pipeline_))
 {
     // dc1394src needs an extra colourspace converter if not being encoded or flipped
@@ -74,35 +74,16 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
             {
                 LOG_WARNING("Link failed, trying another framerate");
                 ++framerateIndex;
-                source_->setCapsFilter(source_->srcCaps(framerateIndex));
+                //source_->setCapsFilter(source_->srcCaps(framerateIndex));
             }
         }
     }
 
-    if (sinkConfig_->hasText())
-        textoverlay_ = sinkConfig_->createTextOverlay(pipeline);
+    textoverlay_ = sinkConfig_->createTextOverlay(pipeline);
     
-    if (videoflip_ != 0)
-    {
-        if (textoverlay_ == 0)
-            gstlinkable::link(*videoscale_, *videoflip_);
-        else
-        {
-            gstlinkable::link(*videoscale_, *textoverlay_);
-            gstlinkable::link(*textoverlay_, *videoflip_);
-        }
-        gstlinkable::link(*videoflip_, *sink_);
-    }
-    else
-    {
-        if (textoverlay_ == 0)
-            gstlinkable::link(*videoscale_, *sink_);
-        else
-        {
-            gstlinkable::link(*videoscale_, *textoverlay_);
-            gstlinkable::link(*textoverlay_, *sink_);
-        }
-    }
+    gstlinkable::link(*videoscale_, *textoverlay_);
+    gstlinkable::link(*textoverlay_, *videoflip_);
+    gstlinkable::link(*videoflip_, *sink_);
 
     /// FIXME: hack for dv1394src
     if (sourceConfig_->sourceString() == "dv1394src")
