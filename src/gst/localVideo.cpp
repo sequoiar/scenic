@@ -74,7 +74,7 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
             {
                 LOG_WARNING("Link failed, trying another framerate");
                 ++framerateIndex;
-                //source_->setCapsFilter(source_->srcCaps(framerateIndex));
+                source_->setCapsFilter(source_->srcCaps(framerateIndex));
             }
         }
     }
