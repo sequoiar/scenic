@@ -67,13 +67,19 @@ fi
 #Trying to set GSTAUDIO using pkg-config
 PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
 if test "x${have_gstreamer_audio}" = "xfalse" ; then
-    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-audio0.10-dev  ])
 fi
 
 #Trying to set GSTAPP using pkg-config
 PKG_CHECK_MODULES(GSTAPP, gstreamer-app-0.10, have_gstreamer_app=true, have_gstreamer_app=false)
 if test "x${have_gstreamer_app}" = "xfalse" ; then
-    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-app0.10-dev  ])
+fi
+
+#Trying to set GSTVIDEO using pkg-config
+PKG_CHECK_MODULES(GSTVIDEO, gstreamer-video-0.10, have_gstreamer_video=true, have_gstreamer_video=false)
+if test "x${have_gstreamer_video}" = "xfalse" ; then
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-video0.10-dev  ])
 fi
 
 #Trying to set JACK using pkg-config
@@ -103,7 +109,7 @@ if test "x${have_libdc1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing package: libdc1394-2])
 fi
 
-AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
+AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTVIDEO_LIBS $GSTAPP_LIBS")
 
 GNOME_DOC_INIT(0.12.2, , AC_MSG_WARN(["DocBook Documentation will not be converted to HTML."]))
 
