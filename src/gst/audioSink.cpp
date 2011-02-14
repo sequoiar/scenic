@@ -23,6 +23,7 @@
 #include "util.h"
 
 #include <gst/gst.h>
+#include <gstLinkable.h>
 #include <signal.h>
 #include "audioSink.h"
 #include "audioConfig.h"

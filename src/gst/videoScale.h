@@ -24,7 +24,6 @@
 #ifndef _VIDEO_SCALE_H_
 #define _VIDEO_SCALE_H_
 
-#include "gstLinkable.h"
 #include "noncopyable.h"
 
 // forward declarations
@@ -35,18 +34,18 @@ class _GstElement;
  *  A filter that scales video to a specified resolution.
  */
 
-class VideoScale : public GstLinkableFilter, boost::noncopyable
+class VideoScale : private boost::noncopyable
 {
     public:
         VideoScale(const Pipeline &pipeline, int width, int height);
         ~VideoScale();
         /// Found by trial and error, neither width nor height may exceed this value
         static const int MAX_SCALE = 2046;
-
-    private:
         _GstElement *sinkElement() { return videoscale_; }
         _GstElement *srcElement() { return capsfilter_; }
 
+
+    private:
         const Pipeline &pipeline_;
         _GstElement *videoscale_;
         _GstElement *capsfilter_;

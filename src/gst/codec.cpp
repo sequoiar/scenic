@@ -28,6 +28,7 @@
 #include <gst/audio/multichannel.h>
 
 #include "util.h"
+#include "gstLinkable.h"
 
 #include <boost/thread/thread.hpp>
 #include <boost/lexical_cast.hpp>

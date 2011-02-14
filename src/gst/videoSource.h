@@ -32,12 +32,13 @@ class VideoSourceConfig;
 class _GstElement;
 
 class VideoSource
-    : public GstLinkableSource, boost::noncopyable
+    : private boost::noncopyable
 {
     public:
-        ~VideoSource();
+        virtual ~VideoSource();
         virtual std::string srcCaps(unsigned framerateIndex = 0) const;
         void setCapsFilter(const std::string &srcCaps);
+        virtual _GstElement *srcElement() { return source_; }
 
     protected:
         VideoSource(const Pipeline &pipeline, const VideoSourceConfig &config);
@@ -46,9 +47,6 @@ class VideoSource
         _GstElement *source_;
         _GstElement *capsFilter_;
         std::string defaultSrcCaps() const;
-
-    private:
-        _GstElement *srcElement() { return source_; }
 };
 
 class VideoTestSource

@@ -113,7 +113,7 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
         frequencies_[1].push_back(frequencies_[0].back() + 100);
     }
 
-    GstIter src;
+    gstlinkable::GstIter src;
 
     int channelIdx = 0;
 
@@ -154,7 +154,7 @@ void AudioTestSource::toggle_frequency()
     int i = 0;
     offset_ = (offset_ == 0) ? 1 : 0;
 
-    for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
+    for (gstlinkable::GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "freq", frequencies_[offset_][i++], NULL);
 }
 

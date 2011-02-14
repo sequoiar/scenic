@@ -25,7 +25,6 @@
 #pragma GCC diagnostic ignored "-pedantic"
 #include <gst/audio/multichannel.h>
 #include <vector>
-#include "gstLinkable.h"
 #include "busMsgHandler.h"
 #include "messageHandler.h"
 
@@ -42,10 +41,11 @@ class Pipeline;
  *  need to have its audio frames interleaved.
  */
 
-class AudioSource : public GstLinkableSource, boost::noncopyable
+class AudioSource : private boost::noncopyable
 {
     public:
-        ~AudioSource();
+        virtual ~AudioSource();
+        virtual GstElement *srcElement() { return source_; }
 
     protected:
         AudioSource(const Pipeline &pipeline, const AudioSourceConfig &config);
@@ -60,10 +60,6 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
         virtual std::string getCapsFilterCapsString();
 
         void initCapsFilter(GstElement* &aconv, GstElement* &capsfilter);
-
-    private:
-        
-        GstElement *srcElement() { return source_; }
 };
 
 /** 
@@ -73,7 +69,7 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
 class InterleavedAudioSource : public AudioSource
 {
     private:
-        class Interleave : public GstLinkableFilter, boost::noncopyable
+        class Interleave : private boost::noncopyable
         {
             public:
                 /** The interleave functionality used to be part of the same class

@@ -22,15 +22,13 @@
 #ifndef _PAY_H_
 #define _PAY_H_
 
-#include "gstLinkable.h"
 #include "messageHandler.h"
-
 #include "noncopyable.h"
 
 class Pipeline;
 class _GstElement;
 
-class RtpPay : public GstLinkableFilter, boost::noncopyable
+class RtpPay : private boost::noncopyable
 {
     public:
         explicit RtpPay(const Pipeline &pipeline) : pipeline_(pipeline), rtpPay_(0) {}

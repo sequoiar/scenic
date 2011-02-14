@@ -22,7 +22,6 @@
 #ifndef _CODEC_H_
 #define _CODEC_H_
 
-#include "gstLinkable.h"
 #include "noncopyable.h"
 
 // forward declarations
@@ -35,7 +34,7 @@ class Pipeline;
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc encoding of raw media streams.
  */
-class Encoder : public GstLinkableFilter, boost::noncopyable
+class Encoder : private boost::noncopyable
 {
     public:
         Encoder(const Pipeline &pipeline, const char *encoder);
@@ -46,22 +45,20 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
         int getBitrate() const;
         virtual void setBitrate(int bitrate);
         static int maxChannels(const std::string &codec);
+        virtual _GstElement *srcElement() { return encoder_; }
+        virtual _GstElement *sinkElement() { return encoder_; }
 
     protected:
         const Pipeline &pipeline_;
         virtual void setBitrateInKbs(int bitrate);
         _GstElement *encoder_;
-
-    private:
-        _GstElement *srcElement() { return encoder_; }
-        _GstElement *sinkElement() { return encoder_; }
 };
 
 /** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc decoding of encoded media streams.
  */
-class Decoder : public GstLinkableFilter, boost::noncopyable
+class Decoder : private boost::noncopyable
 {
     public:
         Decoder(const Pipeline &pipeline, const char *decoder);
@@ -72,14 +69,12 @@ class Decoder : public GstLinkableFilter, boost::noncopyable
         virtual void adjustJitterBuffer() {}; // buy default, do nothing
         virtual bool adjustsBufferTime() { return false; }
         virtual unsigned long long minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
+        virtual _GstElement *srcElement() { return decoder_; }
+        virtual _GstElement *sinkElement() { return decoder_; }
         
     protected:
         const Pipeline &pipeline_;
         _GstElement *decoder_;
-
-    private:
-        _GstElement *srcElement() { return decoder_; }
-        _GstElement *sinkElement() { return decoder_; }
 };
 
 
@@ -88,17 +83,14 @@ class VideoEncoder : public Encoder
     public: 
         VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced);
         ~VideoEncoder();
+        virtual _GstElement *sinkElement() 
+        { 
+            return colorspace_;
+        }
 
     protected:
         _GstElement *colorspace_;
         bool supportsInterlaced_;
-
-    private:
-        
-        _GstElement *sinkElement() 
-        { 
-            return colorspace_;
-        }
 };
 
 
@@ -108,6 +100,13 @@ class VideoDecoder : public Decoder
         VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace);
         ~VideoDecoder();
         virtual void adjustJitterBuffer();
+        virtual _GstElement *srcElement() 
+        { 
+            if (!doDeinterlace_)
+                return decoder_;
+            else 
+                return deinterlace_;
+        }
     
     protected:
         void addDeinterlace();
@@ -115,15 +114,6 @@ class VideoDecoder : public Decoder
         _GstElement *colorspace_;
         _GstElement *deinterlace_;
         static const unsigned long long LONGER_JITTER_BUFFER_MS = 60;
-
-    private:
-        _GstElement *srcElement() 
-        { 
-            if (!doDeinterlace_)
-                return decoder_;
-            else 
-                return deinterlace_;
-        }
 };
 
 /// Encoder that encodes raw video into H.264 using the x264 encoder
@@ -237,7 +227,7 @@ class CeltEncoder : public Encoder
     private:
         ~CeltEncoder();
         Pay* createPayloader() const;
-        _GstElement *sinkElement() { return audioconvert_; }
+        virtual _GstElement *sinkElement() { return audioconvert_; }
         _GstElement *audioconvert_;
 };
 

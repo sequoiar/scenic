@@ -24,7 +24,6 @@
 #ifndef _VIDEO_FLIP_H_
 #define _VIDEO_FLIP_H_
 
-#include "gstLinkable.h"
 #include "noncopyable.h"
 
 // forward declarations
@@ -35,16 +34,16 @@ class _GstElement;
  *  A filter that scales video to a specified resolution.
  */
 
-class VideoFlip : public GstLinkableFilter, boost::noncopyable
+class VideoFlip : private boost::noncopyable
 {
     public:
         VideoFlip(const Pipeline &pipeline, const std::string &flipMethod);
         ~VideoFlip();
-
-    private:
         _GstElement *sinkElement() { return colorspace_; }
         _GstElement *srcElement() { return videoflip_; }
 
+
+    private:
         const Pipeline &pipeline_;
         _GstElement *colorspace_;
         _GstElement *videoflip_;

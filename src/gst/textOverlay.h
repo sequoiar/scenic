@@ -24,8 +24,8 @@
 #ifndef _TEXT_OVERLAY_H_
 #define _TEXT_OVERLAY_H_
 
-#include "gstLinkable.h"
 #include "noncopyable.h"
+#include <string>
 
 // forward declarations
 class Pipeline;
@@ -35,16 +35,16 @@ class _GstElement;
  *  A filter that overlays text on a video
  */
 
-class TextOverlay: public GstLinkableFilter, boost::noncopyable
+class TextOverlay: private boost::noncopyable
 {
     public:
         TextOverlay(const Pipeline &pipeline, const std::string &text);
         ~TextOverlay();
-
-    private:
         _GstElement *sinkElement() { return textoverlay_; }
         _GstElement *srcElement() { return textoverlay_; }
 
+
+    private:
         const Pipeline &pipeline_;
         _GstElement *textoverlay_;
 };

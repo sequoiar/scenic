@@ -23,7 +23,6 @@
 #define _GL_VIDEO_SINK_H_
 
 #include <GL/gl.h>
-#include "gstLinkable.h"
 #include "videoSink.h"
 #include "busMsgHandler.h"
 

@@ -24,7 +24,6 @@
 
 #include <string>
 #include <X11/Xlib.h>
-#include "gstLinkable.h"
 #include "busMsgHandler.h"
 #include "messageHandler.h"
 
@@ -37,11 +36,12 @@ class _GdkEventScroll;
 class _GstElement;
 class _GdkEventWindowState;
 
-class VideoSink : public GstLinkableSink, boost::noncopyable
+class VideoSink : private boost::noncopyable
 {
     public:
         explicit VideoSink(const Pipeline &pipeline) : pipeline_(pipeline), sink_(0) {};
         virtual ~VideoSink() {};
+        virtual _GstElement* sinkElement() { return sink_; }
 
     protected:
         virtual void destroySink();

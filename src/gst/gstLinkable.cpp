@@ -25,19 +25,6 @@
 #include <gst/gst.h>
 #include "gstLinkable.h"
 
-
-void gstlinkable::tryLink(GstElement *src, GstElement *sink)
-{
-    if (not gst_element_link(src, sink))
-    {
-        std::string msg("Failed to link ");
-        msg += GST_ELEMENT_NAME(src);
-        msg += " to ";
-        msg += GST_ELEMENT_NAME(sink); 
-        throw LinkExcept(msg.c_str());
-    }
-}
-
 void gstlinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks)
 {
     GstIter src;
@@ -48,58 +35,10 @@ void gstlinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement
         gstlinkable::link(*src, *sink);
 }
 
-
 void gstlinkable::link(GstElement *src, GstElement *sink)
 {
-   tryLink(src, sink); 
+    tryLink(src, sink);
 }
-
-
-void gstlinkable::link(GstLinkableSource &src, GstElement *sink)
-{
-    GstElement *srcElement = src.srcElement();
-    //FIXME: this conditional is a hack to deal with leaf classes that don't implement srcElement
-    //and/or sinkElement
-    if (srcElement != 0)
-        tryLink(srcElement, sink);
-    else
-        LOG_WARNING("Source element is 0");
-}
-
-
-void gstlinkable::link(GstElement *src, GstLinkableSink &sink)
-{
-    tryLink(src, sink.sinkElement());
-}
-
-
-void gstlinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
-{
-    GstElement *srcElement = src.srcElement();
-    GstElement *sinkElement = sink.sinkElement();
-
-    //FIXME: this conditional is a hack to deal with leaf classes that don't implement srcElement
-    //and/or sinkElement
-    if (srcElement and sinkElement)
-        tryLink(srcElement, sinkElement);
-}
-
-
-void gstlinkable::link(std::vector<GstElement*> &sources, GstLinkableSink &sink)
-{
-    GstIter src;
-    for (src = sources.begin(); src != sources.end(); ++src)
-        tryLink(*src, sink.sinkElement());
-}
-
-
-void gstlinkable::link(GstLinkableSource &src, std::vector<GstElement*> &sinks)
-{
-    GstIter sink;
-    for (sink = sinks.begin(); sink != sinks.end(); ++sink)
-        tryLink(src.srcElement(), *sink);
-}
-
 
 // with this method, we can find out why pads don't link
 // if they fail
@@ -143,3 +82,4 @@ bool gstlinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
 
     return linkOk;
 }
+

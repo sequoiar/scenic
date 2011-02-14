@@ -28,6 +28,7 @@
 #include "audioConfig.h"
 #include "audioLevel.h"
 #include "dv1394.h"
+#include "gstLinkable.h"
 
 using boost::shared_ptr;
 

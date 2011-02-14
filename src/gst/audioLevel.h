@@ -26,7 +26,6 @@
 
 #include <vector>
 #include <gdk/gdktypes.h>
-#include "gstLinkable.h"
 #include "busMsgHandler.h"
 
 // forward declarations
@@ -40,11 +39,14 @@ class _GtkWidget;
  *  the rms value of each audio channel passing through it.
  */
 
-class AudioLevel : public GstLinkableFilter, private BusMsgHandler
+class AudioLevel : private BusMsgHandler
 {
     public:
         AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID);
         ~AudioLevel();
+        _GstElement *srcElement() { return level_; }
+        _GstElement *sinkElement() { return level_; }
+
         void interval(unsigned long long newInterval);
 
         bool handleBusMsg(_GstMessage *msg);
@@ -53,9 +55,6 @@ class AudioLevel : public GstLinkableFilter, private BusMsgHandler
 
     private:
         static void setValue(gdouble peak, gdouble decayPeak, _GtkWidget *vumeter);
-        _GstElement *srcElement() { return level_; }
-        _GstElement *sinkElement() { return level_; }
-
         void print(const std::vector<double> &rmsValues) const;
 
         Pipeline &pipeline_;

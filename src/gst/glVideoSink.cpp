@@ -26,7 +26,6 @@
 #ifdef CONFIG_GL
 
 #include <gst/interfaces/xoverlay.h>
-#include "gstLinkable.h"
 #include "pipeline.h"
 #include "playback.h"
 
