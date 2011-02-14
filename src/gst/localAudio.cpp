@@ -30,11 +30,11 @@
 #include "dv1394.h"
 #include "gstLinkable.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 /// Constructor
-LocalAudio::LocalAudio(Pipeline &pipeline, 
-        shared_ptr<AudioSourceConfig> sourceConfig) : 
+LocalAudio::LocalAudio(Pipeline &pipeline,
+        const shared_ptr<AudioSourceConfig> &sourceConfig) :
     pipeline_(pipeline),
     sourceConfig_(sourceConfig),
     source_(sourceConfig_->createSource(pipeline_)), 

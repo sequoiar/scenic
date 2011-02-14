@@ -24,7 +24,7 @@
 #define _LOCAL_VIDEO_H_
 
 #include "noncopyable.h"
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 
 class Pipeline;
 class VideoSource;
@@ -39,14 +39,14 @@ class _GstElement;
 class LocalVideo : boost::noncopyable
 {
     public:
-        LocalVideo(Pipeline &pipeline, boost::shared_ptr<VideoSourceConfig> sourceConfig,
-                boost::shared_ptr<VideoSinkConfig> sinkConfig);
+        LocalVideo(Pipeline &pipeline, const std::tr1::shared_ptr<VideoSourceConfig> &sourceConfig,
+                const std::tr1::shared_ptr<VideoSinkConfig> &sinkConfig);
         ~LocalVideo();
 
     private:
         Pipeline &pipeline_;
-        boost::shared_ptr<VideoSourceConfig> sourceConfig_;
-        boost::shared_ptr<VideoSinkConfig> sinkConfig_;
+        std::tr1::shared_ptr<VideoSourceConfig> sourceConfig_;
+        std::tr1::shared_ptr<VideoSinkConfig> sinkConfig_;
         VideoSource *source_;
         _GstElement *colourspace_;
         VideoScale *videoscale_;

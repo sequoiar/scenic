@@ -33,7 +33,7 @@
 #include "caps/capsParser.h"
 #include "pipeline.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 namespace po = boost::program_options;
 
 void audiofactory::printMaxChannels(const std::string &codec)

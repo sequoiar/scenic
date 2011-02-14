@@ -42,7 +42,7 @@ namespace po = boost::program_options;
 
 void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
-    using boost::shared_ptr;
+    using std::tr1::shared_ptr;
 
     LOG_DEBUG("Running as receiver");
     Pipeline pipeline; // Pipeline will go out of scope last
@@ -88,7 +88,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
 
 void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
-    using boost::shared_ptr;
+    using std::tr1::shared_ptr;
 
     LOG_DEBUG("Running as sender");
     Pipeline pipeline; // Pipeline will go out of scope last
@@ -122,7 +122,7 @@ void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, b
 
 void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
-    using boost::shared_ptr;
+    using std::tr1::shared_ptr;
 
     LOG_DEBUG("Running local");
     Pipeline pipeline; // Pipeline will go out of scope last

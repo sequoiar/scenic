@@ -23,7 +23,7 @@
 #ifndef _LOCAL_AUDIO_H_
 #define _LOCAL_AUDIO_H_
 
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 #include "noncopyable.h"
 
 class Pipeline;
@@ -35,12 +35,12 @@ class _GstElement;
 class LocalAudio : boost::noncopyable
 {
     public:
-        LocalAudio(Pipeline &pipeline, boost::shared_ptr<AudioSourceConfig> sourceConfig);
+        LocalAudio(Pipeline &pipeline, const std::tr1::shared_ptr<AudioSourceConfig> &sourceConfig);
         ~LocalAudio();
 
     private:
         Pipeline &pipeline_;
-        boost::shared_ptr<AudioSourceConfig> sourceConfig_;
+        std::tr1::shared_ptr<AudioSourceConfig> sourceConfig_;
         AudioSource *source_;
         AudioLevel *level_;
         _GstElement *fakesink_;

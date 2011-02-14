@@ -26,9 +26,9 @@
 #include "remoteConfig.h"
 #include <gst/gst.h>
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
-SenderBase::SenderBase(shared_ptr<SenderConfig> rConfig) : 
+SenderBase::SenderBase(const shared_ptr<SenderConfig> &rConfig) :
     remoteConfig_(rConfig)
 {
     remoteConfig_->checkPorts();

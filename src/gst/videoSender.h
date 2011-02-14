@@ -29,7 +29,7 @@
 
 #include "noncopyable.h"
 
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 
 class VideoSourceConfig;
 class VideoSource;
@@ -42,8 +42,8 @@ class VideoSender
 {
     public:
         VideoSender(Pipeline &pipeline,
-                boost::shared_ptr<VideoSourceConfig> vConfig, 
-                boost::shared_ptr<SenderConfig> rConfig);
+                const std::tr1::shared_ptr<VideoSourceConfig> &vConfig,
+                const std::tr1::shared_ptr<SenderConfig> &rConfig);
         ~VideoSender();
 
     private:
@@ -52,7 +52,7 @@ class VideoSender
         void createPayloader();
         virtual bool checkCaps() const;
 
-        boost::shared_ptr<VideoSourceConfig> videoConfig_;
+        std::tr1::shared_ptr<VideoSourceConfig> videoConfig_;
         RtpSender session_;
         VideoSource *source_;
         VideoEncoder *encoder_;

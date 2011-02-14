@@ -28,7 +28,7 @@
 #include "busMsgHandler.h"
 #include "noncopyable.h"
 
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 
 class AudioSource;
 class AudioSourceConfig;
@@ -45,8 +45,8 @@ class AudioSender
 {
     public:
         AudioSender(Pipeline &pipeline,
-                boost::shared_ptr<AudioSourceConfig> aConfig, 
-                boost::shared_ptr<SenderConfig> rConfig);
+                const std::tr1::shared_ptr<AudioSourceConfig> &aConfig,
+                const std::tr1::shared_ptr<SenderConfig> &rConfig);
 
         ~AudioSender();
 
@@ -57,7 +57,7 @@ class AudioSender
         virtual bool checkCaps() const;
 
 
-        boost::shared_ptr<AudioSourceConfig> audioConfig_;
+        std::tr1::shared_ptr<AudioSourceConfig> audioConfig_;
         Pipeline &pipeline_;
         RtpSender session_;
         AudioSource *source_;

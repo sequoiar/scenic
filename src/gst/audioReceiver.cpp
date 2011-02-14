@@ -32,15 +32,15 @@
 #include "audioLevel.h"
 #include "audioSink.h"
 
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 /** Constructor parameterized by an AudioSinkConfig 
  * and a ReceiverConfig */
 AudioReceiver::AudioReceiver(Pipeline &pipeline,
-        shared_ptr<AudioSinkConfig> aConfig, 
-        shared_ptr<ReceiverConfig> rConfig) : 
+        const shared_ptr<AudioSinkConfig> &aConfig,
+        const shared_ptr<ReceiverConfig> &rConfig) :
     audioConfig_(aConfig), 
     remoteConfig_(rConfig), 
     session_(pipeline), 

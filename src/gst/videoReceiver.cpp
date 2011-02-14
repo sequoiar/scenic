@@ -38,11 +38,11 @@
 
 #include <boost/shared_ptr.hpp>
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
     
 VideoReceiver::VideoReceiver(Pipeline &pipeline,
-        shared_ptr<VideoSinkConfig> vConfig, 
-        shared_ptr<ReceiverConfig> rConfig) : 
+        const shared_ptr<VideoSinkConfig> &vConfig,
+        const shared_ptr<ReceiverConfig> &rConfig) :
     videoConfig_(vConfig), 
     remoteConfig_(rConfig), 
     session_(pipeline), 

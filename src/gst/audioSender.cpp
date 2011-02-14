@@ -35,7 +35,7 @@
 #include "gstLinkable.h"
 #include "caps/capsParser.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 static void 
 validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
@@ -60,8 +60,8 @@ validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
 
 /// Constructor 
 AudioSender::AudioSender(Pipeline &pipeline,
-        shared_ptr<AudioSourceConfig> aConfig, 
-        shared_ptr<SenderConfig> rConfig) : 
+        const shared_ptr<AudioSourceConfig> &aConfig,
+        const shared_ptr<SenderConfig> &rConfig) :
     SenderBase(rConfig),
     audioConfig_(aConfig), 
     pipeline_(pipeline),

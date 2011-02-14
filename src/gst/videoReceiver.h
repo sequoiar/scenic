@@ -26,7 +26,7 @@
 #include "mediaBase.h"
 #include "rtpReceiver.h"
 
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 
 class RtpPay;
 class VideoDecoder;
@@ -42,8 +42,8 @@ class VideoReceiver
 {
     public:
         VideoReceiver(Pipeline &pipeline,
-                boost::shared_ptr<VideoSinkConfig> vConfig, 
-                boost::shared_ptr<ReceiverConfig> rConfig);
+                const std::tr1::shared_ptr<VideoSinkConfig> &vConfig,
+                const std::tr1::shared_ptr<ReceiverConfig> &rConfig);
 
         ~VideoReceiver();
         void toggleFullscreen();
@@ -54,8 +54,8 @@ class VideoReceiver
         void createSink(Pipeline &pipeline);
         void setCaps();
 
-        boost::shared_ptr<VideoSinkConfig> videoConfig_;
-        boost::shared_ptr<ReceiverConfig> remoteConfig_;
+        std::tr1::shared_ptr<VideoSinkConfig> videoConfig_;
+        std::tr1::shared_ptr<ReceiverConfig> remoteConfig_;
         RtpReceiver session_;
 
         RtpPay *depayloader_; 

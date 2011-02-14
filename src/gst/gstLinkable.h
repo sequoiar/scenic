@@ -62,13 +62,7 @@ namespace gstlinkable
     template <typename T>
     void link(T &src, GstElement *sink)
     {
-        GstElement *srcElement = src.srcElement();
-        //FIXME: this conditional is a hack to deal with leaf classes that don't implement srcElement
-        //and/or sinkElement
-        if (srcElement != 0)
-            tryLink(srcElement, sink);
-        else
-            LOG_WARNING("Source element is 0");
+        tryLink(src.srcElement(), sink);
     }
 
     template <typename T>
@@ -80,13 +74,7 @@ namespace gstlinkable
     template <typename T, typename U>
     void link(T &src, U &sink)
     {
-        GstElement *srcElement = src.srcElement();
-        GstElement *sinkElement = sink.sinkElement();
-
-        //FIXME: this conditional is a hack to deal with leaf classes that don't implement srcElement
-        //and/or sinkElement
-        if (srcElement and sinkElement)
-            tryLink(srcElement, sinkElement);
+        tryLink(src.srcElement(), sink.sinkElement());
     }
 
     template <typename T>

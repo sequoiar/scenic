@@ -33,14 +33,14 @@
 #include "caps/capsParser.h"
 #include "messageDispatcher.h"
 
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 /// Constructor
 VideoSender::VideoSender(Pipeline &pipeline,
-        shared_ptr<VideoSourceConfig> vConfig, 
-        shared_ptr<SenderConfig> rConfig) : 
+        const shared_ptr<VideoSourceConfig> &vConfig,
+        const shared_ptr<SenderConfig> &rConfig) :
     SenderBase(rConfig), 
     videoConfig_(vConfig), 
     session_(pipeline), 

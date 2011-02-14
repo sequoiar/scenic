@@ -35,12 +35,12 @@
 
 #include "dv1394.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 /// Constructor
 LocalVideo::LocalVideo(Pipeline &pipeline, 
-        shared_ptr<VideoSourceConfig> sourceConfig, 
-        shared_ptr<VideoSinkConfig> sinkConfig) : 
+        const shared_ptr<VideoSourceConfig> &sourceConfig,
+        const shared_ptr<VideoSinkConfig> &sinkConfig) :
     pipeline_(pipeline),
     sourceConfig_(sourceConfig),
     sinkConfig_(sinkConfig),
