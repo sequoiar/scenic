@@ -154,7 +154,7 @@ def run():
         app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restoration, log_file_name=log_file_name)
         app.start()
     except error.CannotListenError, e:
-        msg = "There must be an other Scenic running."
+        msg = "There must be another Scenic running."
         log.error(msg)
         log.error(str(e))
         print(msg)
