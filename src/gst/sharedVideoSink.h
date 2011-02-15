@@ -42,7 +42,7 @@ class SharedVideoSink : public VideoSink
         void prepareSink(int width, int height);
         static std::tr1::shared_ptr<boost::interprocess::shared_memory_object> createSharedMemory(const std::string &id);
         static bool removeSharedMemory(const std::string &id);
-        _GstElement *sinkElement() { return colorspc_; }
+        virtual _GstElement *sinkElement() { return colorspc_; }
 
         const std::string id_;
         static const int MAX_BUFFERS = 1;

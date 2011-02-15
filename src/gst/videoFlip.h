@@ -39,7 +39,7 @@ class VideoFlip : private boost::noncopyable
     public:
         VideoFlip(const Pipeline &pipeline, const std::string &flipMethod);
         ~VideoFlip();
-        _GstElement *sinkElement() { return colorspace_; }
+        virtual _GstElement *sinkElement() { return colorspace_; }
         _GstElement *srcElement() { return videoflip_; }
 
 

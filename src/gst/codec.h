@@ -238,7 +238,7 @@ class CeltDecoder : public Decoder
         CeltDecoder(const Pipeline &pipeline);
     private: 
         ~CeltDecoder();
-        _GstElement* srcElement() { return audioconvert_; }
+        virtual _GstElement* srcElement() { return audioconvert_; }
         RtpPay* createDepayloader() const;
         _GstElement *audioconvert_;
 };
@@ -251,7 +251,7 @@ class VorbisEncoder : public Encoder
 
     private:
         ~VorbisEncoder();
-        _GstElement *sinkElement() { return queue_; }
+        virtual _GstElement *sinkElement() { return queue_; }
         Pay* createPayloader() const;
         _GstElement *queue_;
 };
@@ -274,8 +274,8 @@ class RawEncoder : public Encoder
     public:
         RawEncoder(const Pipeline &pipeline);
         ~RawEncoder();
-        _GstElement *sinkElement() { return aconv_; }
-        _GstElement *srcElement() { return aconv_; }
+        virtual _GstElement *sinkElement() { return aconv_; }
+        virtual _GstElement *srcElement() { return aconv_; }
 
     private:
         _GstElement *aconv_;
@@ -294,8 +294,8 @@ class RawDecoder : public Decoder
         _GstElement *aconv_;
         _GstElement *capsfilter_;
 
-        _GstElement *sinkElement() { return aconv_; }
-        _GstElement *srcElement() { return capsfilter_; }
+        virtual _GstElement *sinkElement() { return aconv_; }
+        virtual _GstElement *srcElement() { return capsfilter_; }
 };
 
 
@@ -310,8 +310,8 @@ class LameEncoder : public Encoder
         _GstElement *aconv_;
         _GstElement *mp3parse_;
         Pay* createPayloader() const;
-        _GstElement *sinkElement() { return aconv_; }
-        _GstElement *srcElement() { return mp3parse_; }
+        virtual _GstElement *sinkElement() { return aconv_; }
+        virtual _GstElement *srcElement() { return mp3parse_; }
 };
 
 /// Decoder that decodes mpeg to raw audio.
@@ -322,7 +322,7 @@ class MadDecoder : public Decoder
         MadDecoder(const Pipeline &pipeline);
         ~MadDecoder();
     private:
-        _GstElement *srcElement() { return aconv_; }
+        virtual _GstElement *srcElement() { return aconv_; }
         _GstElement *aconv_;
         RtpPay* createDepayloader() const;
 };

@@ -41,7 +41,7 @@ class GLImageSink
 
     private:
         ~GLImageSink();
-        _GstElement *sinkElement() { return sink_; }
+        virtual _GstElement *sinkElement() { return sink_; }
 
         /** 
          * This method resets all of our static variables used for positioning our texture, 

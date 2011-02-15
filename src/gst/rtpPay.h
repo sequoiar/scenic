@@ -33,8 +33,8 @@ class RtpPay : private boost::noncopyable
     public:
         explicit RtpPay(const Pipeline &pipeline) : pipeline_(pipeline), rtpPay_(0) {}
         virtual ~RtpPay();
-        _GstElement *srcElement() { return rtpPay_; }
-        _GstElement *sinkElement() { return rtpPay_; }
+        virtual _GstElement *srcElement() { return rtpPay_; }
+        virtual _GstElement *sinkElement() { return rtpPay_; }
 
     protected:
         const Pipeline &pipeline_;

@@ -97,7 +97,7 @@ class XvImageSink
         bool handleBusMsg(_GstMessage *msg);
 
     private:
-        _GstElement *sinkElement() { return sink_; }
+        virtual _GstElement *sinkElement() { return sink_; }
         ~XvImageSink();
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
@@ -113,7 +113,7 @@ class XImageSink
 
     private:
         ~XImageSink();
-        _GstElement *sinkElement() { return colorspc_; }
+        virtual _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;
 };
 

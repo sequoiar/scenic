@@ -91,7 +91,7 @@ class InterleavedAudioSource : public AudioSource
                 void set_channel_layout();
         };
 
-        GstElement *srcElement() { return interleave_.srcElement(); }
+        virtual GstElement *srcElement() { return interleave_.srcElement(); }
 
     protected:
         InterleavedAudioSource(const Pipeline &pipeline, const AudioSourceConfig &config);
@@ -148,7 +148,7 @@ class AudioFileSource : public AudioSource, private BusMsgHandler
         bool handleBusMsg(GstMessage *msg);
 
         void loop(int nTimes);
-        GstElement *srcElement() { return aconv_; }
+        virtual GstElement *srcElement() { return aconv_; }
 
         void restartPlayback();
         GstElement *aconv_;
@@ -169,7 +169,7 @@ class AudioAlsaSource : public AudioSource
     private:
         ~AudioAlsaSource();
 
-        GstElement *srcElement() { return capsFilter_; }
+        virtual GstElement *srcElement() { return capsFilter_; }
 
         GstElement *capsFilter_;
         GstElement *aconv_;
@@ -187,7 +187,7 @@ class AudioPulseSource : public AudioSource
     private:
         ~AudioPulseSource();
 
-        GstElement *srcElement() { return capsFilter_; }
+        virtual GstElement *srcElement() { return capsFilter_; }
 
         GstElement *capsFilter_;
         GstElement *aconv_;
@@ -207,7 +207,7 @@ class AudioJackSource : public AudioSource, public MessageHandler
         ~AudioJackSource();
 
         bool handleMessage(const std::string &path, const std::string &arguments);
-        GstElement *srcElement() { return queue_; }
+        virtual GstElement *srcElement() { return queue_; }
         /// Caps used by any source with a capsfilter
         std::string getCapsFilterCapsString();
 
@@ -235,7 +235,7 @@ class AudioDvSource : public AudioSource
 
         GstElement *queue_;
         GstElement *aconv_;
-        GstElement *srcElement() { return aconv_; }
+        virtual GstElement *srcElement() { return aconv_; }
 };
 
 #endif //_AUDIO_SOURCE_H_
