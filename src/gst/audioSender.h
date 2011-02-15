@@ -60,11 +60,11 @@ class AudioSender
         std::tr1::shared_ptr<AudioSourceConfig> audioConfig_;
         Pipeline &pipeline_;
         RtpSender session_;
-        AudioSource *source_;
-        AudioLevel *level_;
+        std::tr1::shared_ptr<AudioSource> source_;
+        std::tr1::shared_ptr<AudioLevel> level_;
 
-        Encoder *encoder_;
-        Pay *payloader_;
+        std::tr1::shared_ptr<Encoder> encoder_;
+        std::tr1::shared_ptr<Pay> payloader_;
 };
 
 #endif // _AUDIO_SENDER_H_

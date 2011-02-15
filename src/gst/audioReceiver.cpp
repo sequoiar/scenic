@@ -41,14 +41,14 @@ using std::tr1::shared_ptr;
 AudioReceiver::AudioReceiver(Pipeline &pipeline,
         const shared_ptr<AudioSinkConfig> &aConfig,
         const shared_ptr<ReceiverConfig> &rConfig) :
-    audioConfig_(aConfig), 
-    remoteConfig_(rConfig), 
-    session_(pipeline), 
+    audioConfig_(aConfig),
+    remoteConfig_(rConfig),
+    session_(pipeline),
     gotCaps_(false),
-    depayloader_(0), 
-    decoder_(0), 
-    level_(0),
-    sink_(0)
+    depayloader_(),
+    decoder_(),
+    level_(),
+    sink_()
 { 
     assert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
@@ -59,43 +59,39 @@ AudioReceiver::AudioReceiver(Pipeline &pipeline,
 AudioReceiver::~AudioReceiver()
 {
     remoteConfig_->cleanupPorts();
-    delete sink_;
-    delete level_;
-    delete decoder_;
-    delete depayloader_;
 }
 
 
 void AudioReceiver::createCodec(Pipeline &pipeline)
 {
-    decoder_ = remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels());
+    decoder_.reset(remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels()));
     assert(decoder_);
-    level_ = audioConfig_->createLevel(pipeline);
+    level_.reset(audioConfig_->createLevel(pipeline));
     if (level_ != 0)
-            gstlinkable::link(*decoder_, *level_);
+        gstlinkable::link(*decoder_, *level_);
 }
 
 
 void AudioReceiver::createDepayloader()
 {
-    depayloader_ = decoder_->createDepayloader();
+    depayloader_.reset(decoder_->createDepayloader());
     assert(depayloader_);
     gstlinkable::link(*depayloader_, *decoder_);
-    session_.add(depayloader_, *remoteConfig_);
+    session_.add(depayloader_.get(), *remoteConfig_);
 }
 
 
 void AudioReceiver::createSink(Pipeline &pipeline)
 {
-    sink_ = audioConfig_->createSink(pipeline);
+    sink_.reset(audioConfig_->createSink(pipeline));
     assert(sink_);
     if (level_ != 0)
-        gstlinkable::link(*level_, *sink_);   
+        gstlinkable::link(*level_, *sink_);
     else
-        gstlinkable::link(*decoder_, *sink_);   
+        gstlinkable::link(*decoder_, *sink_);
     setCaps();
     assert(gotCaps_);
-    if (not remoteConfig_->capsMatchCodec()) 
+    if (not remoteConfig_->capsMatchCodec())
         THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
 
     if (decoder_->adjustsBufferTime())

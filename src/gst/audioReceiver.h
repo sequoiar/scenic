@@ -63,10 +63,10 @@ class AudioReceiver
 
         RtpReceiver session_;
         bool gotCaps_;
-        RtpPay *depayloader_;
-        Decoder *decoder_;
-        AudioLevel *level_;
-        AudioSink *sink_;
+        std::tr1::shared_ptr<RtpPay> depayloader_;
+        std::tr1::shared_ptr<Decoder> decoder_;
+        std::tr1::shared_ptr<AudioLevel> level_;
+        std::tr1::shared_ptr<AudioSink> sink_;
 };
 
 #endif // _AUDIO_RECEIVER_H_
