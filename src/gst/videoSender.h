@@ -54,9 +54,9 @@ class VideoSender
 
         std::tr1::shared_ptr<VideoSourceConfig> videoConfig_;
         RtpSender session_;
-        VideoSource *source_;
-        VideoEncoder *encoder_;
-        Pay *payloader_; 
+        std::tr1::shared_ptr<VideoSource> source_;
+        std::tr1::shared_ptr<VideoEncoder> encoder_;
+        std::tr1::shared_ptr<Pay> payloader_;
 };
 
 #endif

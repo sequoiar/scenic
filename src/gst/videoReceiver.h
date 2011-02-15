@@ -58,12 +58,12 @@ class VideoReceiver
         std::tr1::shared_ptr<ReceiverConfig> remoteConfig_;
         RtpReceiver session_;
 
-        RtpPay *depayloader_; 
-        VideoDecoder *decoder_;
-        TextOverlay *textoverlay_;
-        VideoScale *videoscale_;
-        VideoFlip *videoflip_;
-        VideoSink *sink_;
+        std::tr1::shared_ptr<RtpPay> depayloader_;
+        std::tr1::shared_ptr<VideoDecoder> decoder_;
+        std::tr1::shared_ptr<TextOverlay> textoverlay_;
+        std::tr1::shared_ptr<VideoScale> videoscale_;
+        std::tr1::shared_ptr<VideoFlip> videoflip_;
+        std::tr1::shared_ptr<VideoSink> sink_;
         bool gotCaps_;
 };
 

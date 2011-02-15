@@ -43,16 +43,16 @@ using std::tr1::shared_ptr;
 VideoReceiver::VideoReceiver(Pipeline &pipeline,
         const shared_ptr<VideoSinkConfig> &vConfig,
         const shared_ptr<ReceiverConfig> &rConfig) :
-    videoConfig_(vConfig), 
-    remoteConfig_(rConfig), 
-    session_(pipeline), 
-    depayloader_(0), 
-    decoder_(0), 
-    textoverlay_(0),
-    videoscale_(0), 
-    videoflip_(0), 
-    sink_(0), 
-    gotCaps_(false) 
+    videoConfig_(vConfig),
+    remoteConfig_(rConfig),
+    session_(pipeline),
+    depayloader_(),
+    decoder_(),
+    textoverlay_(),
+    videoscale_(),
+    videoflip_(),
+    sink_(),
+    gotCaps_(false)
 {
     assert(remoteConfig_->hasCodec()); 
     remoteConfig_->checkPorts();
@@ -62,42 +62,36 @@ VideoReceiver::VideoReceiver(Pipeline &pipeline,
 VideoReceiver::~VideoReceiver()
 {
     remoteConfig_->cleanupPorts();
-    delete sink_;
-    delete videoflip_;
-    delete videoscale_;
-    delete textoverlay_;
-    delete depayloader_;
-    delete decoder_;
 }
 
 
 void VideoReceiver::createCodec(Pipeline &pipeline)
 {
-    decoder_ = remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace());
+    decoder_.reset(remoteConfig_->createVideoDecoder(pipeline, videoConfig_->doDeinterlace()));
     assert(decoder_);
 }
 
 
 void VideoReceiver::createDepayloader()
 {
-    depayloader_ = decoder_->createDepayloader();
+    depayloader_.reset(decoder_->createDepayloader());
     assert(depayloader_);
 
     gstlinkable::link(*depayloader_, *decoder_);
 
-    session_.add(depayloader_, *remoteConfig_);
+    session_.add(depayloader_.get(), *remoteConfig_);
 }
 
 
 void VideoReceiver::createSink(Pipeline &pipeline)
 {
     // avoid creating the videoflip as it has a colorspace converter
-    videoscale_ = videoConfig_->createVideoScale(pipeline);
+    videoscale_.reset(videoConfig_->createVideoScale(pipeline));
     assert(videoscale_);
 
     if (videoConfig_->hasText())
     {
-        textoverlay_ = videoConfig_->createTextOverlay(pipeline);
+        textoverlay_.reset(videoConfig_->createTextOverlay(pipeline));
         gstlinkable::link(*decoder_, *textoverlay_);
         gstlinkable::link(*textoverlay_, *videoscale_);
     }
@@ -106,10 +100,10 @@ void VideoReceiver::createSink(Pipeline &pipeline)
 
     if (videoConfig_->flipMethod() != "none")
     {
-        videoflip_ = videoConfig_->createVideoFlip(pipeline);
+        videoflip_.reset(videoConfig_->createVideoFlip(pipeline));
         assert(videoflip_);
     }
-    sink_ = videoConfig_->createSink(pipeline);
+    sink_.reset(videoConfig_->createSink(pipeline));
     assert(sink_);
 
     if (remoteConfig_->jitterbufferControlEnabled())

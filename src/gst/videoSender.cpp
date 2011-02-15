@@ -41,12 +41,12 @@ using std::tr1::shared_ptr;
 VideoSender::VideoSender(Pipeline &pipeline,
         const shared_ptr<VideoSourceConfig> &vConfig,
         const shared_ptr<SenderConfig> &rConfig) :
-    SenderBase(rConfig), 
-    videoConfig_(vConfig), 
-    session_(pipeline), 
-    source_(0), 
-    encoder_(0), 
-    payloader_(0) 
+    SenderBase(rConfig),
+    videoConfig_(vConfig),
+    session_(pipeline),
+    source_(),
+    encoder_(),
+    payloader_()
 {
     createPipeline(pipeline);
 }
@@ -59,23 +59,19 @@ bool VideoSender::checkCaps() const
 }
 
 VideoSender::~VideoSender()
-{
-    delete payloader_;
-    delete encoder_;
-    delete source_;
-}
+{}
 
 
 void VideoSender::createSource(Pipeline &pipeline)
 {
-    source_ = videoConfig_->createSource(pipeline);
+    source_.reset(videoConfig_->createSource(pipeline));
     assert(source_);
 }
 
 
 void VideoSender::createCodec(Pipeline &pipeline)
 {
-    encoder_ = remoteConfig_->createVideoEncoder(pipeline, videoConfig_->bitrate(), videoConfig_->quality());
+    encoder_.reset(remoteConfig_->createVideoEncoder(pipeline, videoConfig_->bitrate(), videoConfig_->quality()));
     assert(encoder_);
     bool linked = false;
     int framerateIndex = 0;
@@ -98,12 +94,12 @@ void VideoSender::createCodec(Pipeline &pipeline)
 
 void VideoSender::createPayloader()       
 {
-    payloader_ = encoder_->createPayloader();
+    payloader_.reset(encoder_->createPayloader());
     assert(payloader_);
     // tell rtpmp4vpay not to send config string in header since we're sending caps
     if (remoteConfig_->capsOutOfBand() and remoteConfig_->codec() == "mpeg4") 
         MessageDispatcher::sendMessage("disable-send-config");
     gstlinkable::link(*encoder_, *payloader_);
-    session_.add(payloader_, *remoteConfig_);
+    session_.add(payloader_.get(), *remoteConfig_);
 }
 
