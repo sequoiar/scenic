@@ -37,10 +37,13 @@ LocalAudio::LocalAudio(Pipeline &pipeline,
         const shared_ptr<AudioSourceConfig> &sourceConfig) :
     pipeline_(pipeline),
     sourceConfig_(sourceConfig),
-    source_(sourceConfig_->createSource(pipeline_)), 
-    level_(sourceConfig_->createLevel(pipeline_)),
+    source_(),
+    level_(),
     fakesink_(pipeline_.makeElement("fakesink", NULL))
 {
+    source_.reset(sourceConfig_->createSource(pipeline_));
+    level_.reset(sourceConfig_->createLevel(pipeline_));
+
     if (level_ != 0)
     {
         gstlinkable::link(*source_, *level_);
@@ -58,6 +61,4 @@ LocalAudio::LocalAudio(Pipeline &pipeline,
 LocalAudio::~LocalAudio()
 {
     pipeline_.remove(&fakesink_);
-    delete level_;
-    delete source_;
 }

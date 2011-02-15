@@ -44,13 +44,19 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     pipeline_(pipeline),
     sourceConfig_(sourceConfig),
     sinkConfig_(sinkConfig),
-    source_(sourceConfig_->createSource(pipeline_)), 
+    source_(),
     colourspace_(0),
-    videoscale_(sinkConfig_->createVideoScale(pipeline_)),
-    textoverlay_(0),
-    videoflip_(sinkConfig_->createVideoFlip(pipeline_)),
-    sink_(sinkConfig_->createSink(pipeline_))
+    videoscale_(),
+    textoverlay_(),
+    videoflip_(),
+    sink_()
 {
+    source_.reset(sourceConfig_->createSource(pipeline_));
+    videoscale_.reset(sinkConfig_->createVideoScale(pipeline_));
+    videoflip_.reset(sinkConfig_->createVideoFlip(pipeline_));
+    textoverlay_.reset(sinkConfig_->createTextOverlay(pipeline));
+    sink_.reset(sinkConfig_->createSink(pipeline_));
+
     // dc1394src needs an extra colourspace converter if not being encoded or flipped
     // FIXME: maybe it just needs a capsfilter?
     if (sourceConfig_->sourceString() == "dc1394src" and videoflip_ == 0)
@@ -78,8 +84,6 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
             }
         }
     }
-
-    textoverlay_ = sinkConfig_->createTextOverlay(pipeline);
     
     gstlinkable::link(*videoscale_, *textoverlay_);
     gstlinkable::link(*textoverlay_, *videoflip_);
@@ -93,10 +97,6 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
 /// Destructor 
 LocalVideo::~LocalVideo()
 {
-    delete sink_;
     pipeline_.remove(&colourspace_);
-    delete videoflip_;
-    delete videoscale_;
-    delete source_;
 }
 

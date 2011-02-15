@@ -41,8 +41,8 @@ class LocalAudio : boost::noncopyable
     private:
         Pipeline &pipeline_;
         std::tr1::shared_ptr<AudioSourceConfig> sourceConfig_;
-        AudioSource *source_;
-        AudioLevel *level_;
+        std::tr1::shared_ptr<AudioSource> source_;
+        std::tr1::shared_ptr<AudioLevel> level_;
         _GstElement *fakesink_;
 };
 

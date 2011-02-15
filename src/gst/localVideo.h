@@ -47,12 +47,12 @@ class LocalVideo : boost::noncopyable
         Pipeline &pipeline_;
         std::tr1::shared_ptr<VideoSourceConfig> sourceConfig_;
         std::tr1::shared_ptr<VideoSinkConfig> sinkConfig_;
-        VideoSource *source_;
+        std::tr1::shared_ptr<VideoSource> source_;
         _GstElement *colourspace_;
-        VideoScale *videoscale_;
-        TextOverlay *textoverlay_;
-        VideoFlip *videoflip_;
-        VideoSink *sink_;
+        std::tr1::shared_ptr<VideoScale> videoscale_;
+        std::tr1::shared_ptr<TextOverlay> textoverlay_;
+        std::tr1::shared_ptr<VideoFlip> videoflip_;
+        std::tr1::shared_ptr<VideoSink> sink_;
 };
 
 #endif // _LOCAL_VIDEO_H_
