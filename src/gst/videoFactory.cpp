@@ -23,6 +23,7 @@
 
 #include "util.h"
 #include "videoFactory.h"
+#include <boost/program_options.hpp>
 #include "videoSender.h"
 #include "videoReceiver.h"
 #include "localVideo.h"
