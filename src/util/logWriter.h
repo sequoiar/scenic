@@ -34,16 +34,16 @@
 #if !ENABLE_LOG
 #define LOG(msg, level)
 #else
-#define LOG(msg, level)     LOG_(msg,level)
+#define LOG(msg, level)         LOG_(msg,level)
 #endif
 
-#define THROW_ERROR(msg)      THROW_(msg, ERROR)
-#define THROW_CRITICAL(msg)   THROW_(msg, CRITICAL)
+#define THROW_ERROR(msg)        THROW_(msg, ERROR)
+#define THROW_CRITICAL(msg)     THROW_(msg, CRITICAL)
 #define LOG_PRINT(msg)          LOG(msg, PRINT)
-#define LOG_INFO(msg)       LOG(msg, INFO)
-#define LOG_ERROR(msg)       LOG(msg, ERROR)
-#define LOG_WARNING(msg)    LOG(msg, WARNING)
-#define LOG_DEBUG(msg)      LOG(msg, DEBUG)
+#define LOG_INFO(msg)           LOG(msg, INFO)
+#define LOG_ERROR(msg)          LOG(msg, ERROR)
+#define LOG_WARNING(msg)        LOG(msg, WARNING)
+#define LOG_DEBUG(msg)          LOG(msg, DEBUG)
 
 /**  
  *      Utility functions for logWriter 
@@ -78,17 +78,22 @@ namespace Log
 // use the name logger__FUNCTION____LINE___ 
 // to avoid shadowing other local variables
 
-#define LOG_(msg, level)                                                                        \
-    do {                                                                                        \
-        std::ostringstream logger ## __FUNCTION__ ## __LINE__;                                  \
-        logger ## __FUNCTION__ ## __LINE__ << msg;                                              \
+#define LOG_(msg, level)    \
+    do {                    \
+        std::ostringstream logger ## __FUNCTION__ ## __LINE__;  \
+        logger ## __FUNCTION__ ## __LINE__ << msg;              \
         cerr_log_throw(logger ## __FUNCTION__ ## __LINE__.str(), level, __FILE__, __LINE__);    \
     } while (0)
 
-std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
+
+std::string log_(const std::string &msg,
+        LogLevel level,
+        const std::string &fileName,
         int lineNum);
 
-void cerr_log_throw(const std::string &msg, LogLevel level, const std::string &fileName,
+void cerr_log_throw(const std::string &msg, 
+        LogLevel level, 
+        const std::string &fileName,
         int lineNum);
 
 #endif //  _LOG_WRITER_H_
