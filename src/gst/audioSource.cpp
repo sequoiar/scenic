@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include <cassert>
 
 #include "gstLinkable.h"
 #include "audioSource.h"
