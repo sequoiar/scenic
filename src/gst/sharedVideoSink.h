@@ -23,7 +23,6 @@
 #define _SHARED_VIDEO_SINK_H_
 
 #include "./videoSink.h"
-#include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <tr1/memory>
 
@@ -31,6 +30,11 @@ class _GtkWidget;
 class _GstElement;
 class SharedVideoBuffer;
 
+namespace boost {
+    namespace interprocess {
+        class shared_memory_object;
+    }
+}
 class SharedVideoSink : public VideoSink 
 {
     public:

@@ -24,6 +24,7 @@
 
 #include <gst/gst.h>
 
+#include <jack/jack.h>
 #include "jackUtils.h"
 #include "pipeline.h"
 

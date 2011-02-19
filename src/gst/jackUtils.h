@@ -22,7 +22,7 @@
 #ifndef _JACK_UTILS_H_
 #define _JACK_UTILS_H_
 
-#include <jack/jack.h>
+#include <jack/types.h> // for jack_nframes_t
 
 class _GstElement;
 class Pipeline;
