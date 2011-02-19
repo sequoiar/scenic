@@ -20,9 +20,10 @@
  *
  */
 
+#include "localVideo.h"
 #include "util.h"
 
-#include "localVideo.h"
+#include "gstLinkable.h"
 #include <boost/shared_ptr.hpp>
 #include "pipeline.h"
 
