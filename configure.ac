@@ -275,7 +275,7 @@ py/scenic/test/Makefile
 py/scripts/Makefile
 src/include/Makefile
 src/util/Makefile
-src/gutil/Makefile
+src/gtk_utils/Makefile
 src/shared_video/Makefile
 src/vumeter/Makefile
 src/vumeter/test/Makefile
