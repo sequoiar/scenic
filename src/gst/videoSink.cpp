@@ -26,7 +26,7 @@
 #include "videoSink.h"
 #include "pipeline.h"
 #include "rtpReceiver.h"
-#include "gutil.h"
+#include "gtk_utils.h"
 
 // for filesystem ops
 #include <boost/filesystem/operations.hpp>

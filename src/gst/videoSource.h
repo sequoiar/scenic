@@ -21,8 +21,6 @@
 #ifndef _VIDEO_SOURCE_H_
 #define _VIDEO_SOURCE_H_
 
-#include "gstLinkable.h"
-
 #include "noncopyable.h"
 
 #include <string>
@@ -69,7 +67,7 @@ class VideoFileSource
 
     private:
         ~VideoFileSource();
-        virtual GstElement *srcElement() { return identity_; }      
+        virtual _GstElement *srcElement() { return identity_; }      
 
         // FIXME: maybe just use the queue we acquire?
         _GstElement *identity_;

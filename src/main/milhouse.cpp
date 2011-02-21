@@ -24,7 +24,7 @@
 
 #include "util.h"
 
-#include "gutil.h"
+#include "gtk_utils.h"
 
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"

@@ -26,7 +26,7 @@
 #include <cstring>
 #include <cmath>
 #include <gst/gst.h>
-#include "gutil.h"
+#include "gtk_utils.h"
 #include "audioLevel.h"
 #include "vumeter.h"
 #include "pipeline.h"

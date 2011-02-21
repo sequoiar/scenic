@@ -23,7 +23,7 @@
 #include <gst/gst.h>
 #include <gtk/gtk.h>
 #include "util.h"
-#include "gutil.h"
+#include "gtk_utils.h"
     
 // extend namespace gutil
 namespace gutil {

@@ -26,13 +26,19 @@
 
 #include <string>
 #include <tr1/memory>
-#include <boost/program_options.hpp>
 
 class AudioSender;
 class AudioReceiver;
 class LocalAudio;
-
 class Pipeline;
+
+namespace boost
+{
+    namespace program_options
+    {
+        class variables_map;
+    }
+}
 
 namespace audiofactory
 {

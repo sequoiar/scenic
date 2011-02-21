@@ -25,7 +25,12 @@
 #define _VIDEO_FACTORY_H_
 
 #include <tr1/memory>
-#include <boost/program_options.hpp>
+
+namespace boost {
+    namespace program_options {
+        class variables_map;
+    }
+}
 
 class Pipeline;
 class VideoSender;

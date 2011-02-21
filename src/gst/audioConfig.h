@@ -25,14 +25,21 @@
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
-#include <gdk/gdktypes.h>
-#include <boost/program_options.hpp>
+#include <gdk/gdktypes.h> // for GdkNativeWindow
 
 // forward declarations
 class Pipeline;
 class AudioSource;
 class AudioLevel;
 class AudioSink;
+
+namespace boost
+{
+    namespace program_options
+    {
+        class variables_map;
+    }
+}
 
 /// Immutable class that is used to parameterize AudioSender objects. 
 class AudioSourceConfig

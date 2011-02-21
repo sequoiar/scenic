@@ -2,9 +2,7 @@
 
 #include "vumeter.h"
 #include <cmath>
-#include <cstdlib> // for abs
-#include <string>
-#include <cstring>
+#include <algorithm> // for max
 
 static void gtk_vumeter_class_init (GtkVumeterClass * klass);
 static void gtk_vumeter_init (GtkVumeter * vumeter);

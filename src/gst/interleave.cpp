@@ -21,6 +21,8 @@
  */
 
 #include "util.h"
+#pragma GCC diagnostic ignored "-pedantic"
+#include <gst/audio/multichannel.h>
 
 #include <cstring>      // for memset
 #include <gst/audio/multichannel.h>
@@ -28,58 +30,9 @@
 #include "pipeline.h"
 #include "audioConfig.h"
 
-InterleavedAudioSource::Interleave::~Interleave()
-{
-    pipeline_.remove(&interleave_);
-}
-
-
-void InterleavedAudioSource::Interleave::set_channel_layout()
-{
-    GValue val;
-    memset(&val, 0, sizeof(val));
-
-    GValueArray *arr;           // for channel position layout
-    arr = g_value_array_new(config_.numChannels());
-
-    g_object_set(interleave_, "channel-positions-from-input", FALSE, NULL);
-
-    g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
-
-    /// VORBIS_CHANNEL_POSITIONS only goes up to 8 channels
-    if (config_.numChannels() > 8)
-        for (int channelIdx = 0; channelIdx < 8; channelIdx++)
-        {
-            g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_NONE);
-            g_value_array_append(arr, &val);
-            g_value_reset(&val);
-        }
-    else
-        for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-        {
-            g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);
-            g_value_array_append(arr, &val);
-            g_value_reset(&val);
-        }
-
-    g_value_unset(&val);
-
-    g_object_set(interleave_, "channel-positions", arr, NULL);
-    g_value_array_free(arr);
-}
-
-
-InterleavedAudioSource::Interleave::Interleave(const Pipeline &pipeline, const AudioSourceConfig &config)
-    : pipeline_(pipeline),
-      interleave_(pipeline_.makeElement("interleave", NULL)), 
-    config_(config)
-{
-    set_channel_layout();
-}
-
-
+namespace {
 // courtesy of vorbisenc.c
-const GstAudioChannelPosition InterleavedAudioSource::Interleave::VORBIS_CHANNEL_POSITIONS[][8] = {
+const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8] = {
     {                           /* Mono */
         GST_AUDIO_CHANNEL_POSITION_FRONT_MONO
     },
@@ -135,4 +88,56 @@ const GstAudioChannelPosition InterleavedAudioSource::Interleave::VORBIS_CHANNEL
     }
     ,
 };
+} // end anonymous namespace
+
+
+InterleavedAudioSource::Interleave::~Interleave()
+{
+    pipeline_.remove(&interleave_);
+}
+
+
+void InterleavedAudioSource::Interleave::set_channel_layout()
+{
+    GValue val;
+    memset(&val, 0, sizeof(val));
+
+    GValueArray *arr;           // for channel position layout
+    arr = g_value_array_new(config_.numChannels());
+
+    g_object_set(interleave_, "channel-positions-from-input", FALSE, NULL);
+
+    g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
+
+    /// VORBIS_CHANNEL_POSITIONS only goes up to 8 channels
+    if (config_.numChannels() > 8)
+        for (int channelIdx = 0; channelIdx < 8; channelIdx++)
+        {
+            g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_NONE);
+            g_value_array_append(arr, &val);
+            g_value_reset(&val);
+        }
+    else
+        for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
+        {
+            g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);
+            g_value_array_append(arr, &val);
+            g_value_reset(&val);
+        }
+
+    g_value_unset(&val);
+
+    g_object_set(interleave_, "channel-positions", arr, NULL);
+    g_value_array_free(arr);
+}
+
+
+InterleavedAudioSource::Interleave::Interleave(const Pipeline &pipeline, const AudioSourceConfig &config)
+    : pipeline_(pipeline),
+      interleave_(pipeline_.makeElement("interleave", NULL)), 
+    config_(config)
+{
+    set_channel_layout();
+}
+
 

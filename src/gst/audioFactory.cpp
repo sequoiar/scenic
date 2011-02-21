@@ -24,6 +24,7 @@
 #include "util.h"
 
 #include "audioFactory.h"
+#include <boost/program_options.hpp>
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "localAudio.h"

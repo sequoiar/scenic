@@ -22,7 +22,6 @@
 #ifndef _DC1394_H_
 #define _DC1394_H_
 
-#include <gst/gst.h>
 #include <string>
 
 namespace Dc1394 
