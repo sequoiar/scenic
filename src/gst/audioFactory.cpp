@@ -32,6 +32,7 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "caps/capsParser.h"
+#include "caps/CapsServer.h"
 #include "pipeline.h"
 
 using std::tr1::shared_ptr;

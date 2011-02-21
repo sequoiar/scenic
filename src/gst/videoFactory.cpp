@@ -24,6 +24,7 @@
 #include "util.h"
 #include "videoFactory.h"
 #include <boost/program_options.hpp>
+#include "caps/CapsServer.h"
 #include "videoSender.h"
 #include "videoReceiver.h"
 #include "localVideo.h"
