@@ -12,6 +12,7 @@
 class TcpConnection : public boost::enable_shared_from_this<TcpConnection>
 {
     public:
+        // this MUST be boost::shared_ptr...will error out if we try to use std::tr1::shared_ptr
         typedef boost::shared_ptr<TcpConnection> connection_ptr;
 
         static connection_ptr create(boost::asio::io_service& io_service, const std::string &message);

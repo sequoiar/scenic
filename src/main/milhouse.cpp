@@ -137,7 +137,7 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
         localVideo = videofactory::buildLocalVideo(pipeline, options);
     }
 
-    shared_ptr<LocalAudio> localAudio; // FIXME: doesn't exist (yet)
+    shared_ptr<LocalAudio> localAudio;
     if (enableAudio)
     {
         LOG_DEBUG("LOCAL AUDIO");

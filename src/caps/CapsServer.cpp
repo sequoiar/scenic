@@ -26,9 +26,8 @@
 #include <boost/bind.hpp>
 
 using boost::asio::ip::tcp;
-typedef boost::shared_ptr<TcpConnection> connection_ptr;
         
-connection_ptr TcpConnection::create(boost::asio::io_service& io_service, const std::string &message)
+TcpConnection::connection_ptr TcpConnection::create(boost::asio::io_service& io_service, const std::string &message)
 {
     return connection_ptr(new TcpConnection(io_service, message));
 }

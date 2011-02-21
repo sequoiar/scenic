@@ -70,7 +70,7 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for #143
+    // FIXME: temporary workaround for ticket #143
     if (remoteHost == "localhost")
         remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();
