@@ -82,6 +82,12 @@ if test "x${have_gstreamer_video}" = "xfalse" ; then
     AC_MSG_ERROR([missing package:  libgstreamer-plugins-video0.10-dev  ])
 fi
 
+#Trying to set GSTRTSP using pkg-config
+PKG_CHECK_MODULES(GSTRTSP, gstreamer-rtsp-0.10, have_gstreamer_rtsp=true, have_gstreamer_rtsp=false)
+if test "x${have_gstreamer_rtsp}" = "xfalse" ; then
+    AC_MSG_ERROR([missing package:  libgstrtsp-server-0.10-dev])
+fi
+
 #Trying to set JACK using pkg-config
 PKG_CHECK_MODULES(JACK, jack >= 0.99.10, have_jack=true, have_jack=false)
 if test "x${have_jack}" = "xfalse" ; then
