@@ -94,7 +94,6 @@ SenderConfig::SenderConfig(Pipeline &pipeline,
     RemoteConfig(codec__, remoteHost__, port__),
     BusMsgHandler(&pipeline),
     message_(""), 
-    capsOutOfBand_(false),    // this will be determined later
     capsServer_(),
     multicastInterface_(multicastInterface__)
 {}
@@ -175,15 +174,13 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
 
         if (!capsMatchCodec(encodingName, codec()))
             return false;   // not our caps, ignore it
-        else if (capsOutOfBand_) 
+        else
         { 
             LOG_DEBUG("Creating caps server for codec " << codec());
             message_ = std::string(newCapsStr);
             sendCaps();
             return true;
         }
-        else
-            return true;       // was our caps, but we don't need to send caps for it
     }
 
     return false;           // this wasn't our msg, someone else should handle it
@@ -227,25 +224,19 @@ ReceiverConfig::ReceiverConfig(const std::string &codec__,
         const std::string &remoteHost__,
         int port__,
         const std::string &multicastInterface__,
-        bool negotiateCaps,
-        bool enableControls,
-        const std::string &caps__) :
+        bool enableControls) :
     RemoteConfig(codec__, remoteHost__, port__), 
     multicastInterface_(multicastInterface__),
-    caps_(caps__), 
-    capsOutOfBand_(negotiateCaps or caps_ == ""),
+    caps_(""), 
     jitterbufferControlEnabled_(enableControls)
 {
-    if (capsOutOfBand_) // couldn't find caps, need them from other host or we've explicitly been told to send caps
-    {
-        if (isSupportedCodec(codec_))   // this would fail later but we want to make sure we don't wait with a bogus codec
-        { 
-            LOG_INFO("Waiting for " << codec_ << " caps from other host");
-            receiveCaps();  // wait for new caps from sender
-        }
-        else
-            THROW_ERROR("Codec " << codec_ << " is not supported");
+    if (isSupportedCodec(codec_))   // this would fail later but we want to make sure we don't wait with a bogus codec
+    { 
+        LOG_INFO("Waiting for " << codec_ << " caps from other host");
+        receiveCaps();  // wait for new caps from sender
     }
+    else
+        THROW_ERROR("Codec " << codec_ << " is not supported");
 }
 
 VideoDecoder * ReceiverConfig::createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const

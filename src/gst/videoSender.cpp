@@ -30,7 +30,6 @@
 #include "videoConfig.h"
 #include "remoteConfig.h"
 #include "codec.h"
-#include "caps/capsParser.h"
 #include "messageDispatcher.h"
 
 #include <tr1/memory>
@@ -49,13 +48,6 @@ VideoSender::VideoSender(Pipeline &pipeline,
     payloader_()
 {
     createPipeline(pipeline);
-}
-
-bool VideoSender::checkCaps() const
-{
-    return CapsParser::getVideoCaps(remoteConfig_->codec(), 
-            videoConfig_->captureWidth(), videoConfig_->captureHeight(),
-            videoConfig_->pictureAspectRatio()) != ""; 
 }
 
 VideoSender::~VideoSender()
@@ -97,7 +89,7 @@ void VideoSender::createPayloader()
     payloader_.reset(encoder_->createPayloader());
     assert(payloader_);
     // tell rtpmp4vpay not to send config string in header since we're sending caps
-    if (remoteConfig_->capsOutOfBand() and remoteConfig_->codec() == "mpeg4") 
+    if (remoteConfig_->codec() == "mpeg4") 
         MessageDispatcher::sendMessage("disable-send-config");
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_.get(), *remoteConfig_);

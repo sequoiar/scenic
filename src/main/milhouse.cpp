@@ -184,11 +184,7 @@ short Milhouse::run(int argc, char **argv)
 
     if (options["version"].as<bool>())
     {
-#ifdef SVNVERSION
-        LOG_PRINT("milhouse version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
-#else
         LOG_PRINT("milhouse version " << PACKAGE_VERSION << std::endl);
-#endif
         return 0;
     }
 

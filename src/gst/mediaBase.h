@@ -34,14 +34,11 @@ class SenderBase
     public: 
         SenderBase(const std::tr1::shared_ptr<SenderConfig> &rConfig);
         virtual ~SenderBase();
-        bool capsAreCached() { return checkCaps(); }
-
     protected:
         std::tr1::shared_ptr<SenderConfig> remoteConfig_;
         void createPipeline(Pipeline &pipeline);
 
     private:
-        virtual bool checkCaps() const = 0;
         virtual void createSource(Pipeline &pipeline) = 0;
         virtual void createCodec(Pipeline &pipeline) = 0;
         virtual void createPayloader() = 0;

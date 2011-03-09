@@ -33,7 +33,6 @@
 #include "codec.h"
 #include "rtpPay.h"
 #include "gstLinkable.h"
-#include "caps/capsParser.h"
 
 using std::tr1::shared_ptr;
 
@@ -74,14 +73,6 @@ AudioSender::AudioSender(Pipeline &pipeline,
     validateChannels(*aConfig, *rConfig);
     LOG_DEBUG("Creating audio sender pipeline");
     createPipeline(pipeline);
-}
-
-
-bool AudioSender::checkCaps() const
-{
-    return CapsParser::getAudioCaps(remoteConfig_->codec(), 
-            audioConfig_->numChannels(), 
-            pipeline_.actualSampleRate()) != "";
 }
 
 

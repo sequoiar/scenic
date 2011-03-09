@@ -54,8 +54,6 @@ class AudioSender
         void createSource(Pipeline &pipeline);
         void createCodec(Pipeline &pipeline);
         void createPayloader();
-        virtual bool checkCaps() const;
-
 
         std::tr1::shared_ptr<AudioSourceConfig> audioConfig_;
         Pipeline &pipeline_;

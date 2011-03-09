@@ -86,14 +86,11 @@ class SenderConfig : public RemoteConfig, private BusMsgHandler
 
         VideoEncoder* createVideoEncoder(const Pipeline &pipeline, int bitrate, int quality) const;
         Encoder* createAudioEncoder(const Pipeline &pipeline, int bitrate, double quality) const;
-        bool capsOutOfBand() { return capsOutOfBand_; }
-        void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
 
     private:
         void sendCaps();
 
         std::string message_;
-        bool capsOutOfBand_;
         bool handleBusMsg(_GstMessage *msg);
         boost::scoped_ptr<CapsServer> capsServer_;
         const std::string multicastInterface_;
@@ -107,9 +104,7 @@ class ReceiverConfig : public RemoteConfig
                 const std::string &remoteHost, 
                 int port,
                 const std::string &multicastInterface,
-                bool negotiateCaps,
-                bool enableControls,
-                const std::string &caps); 
+                bool enableControls);
 
         VideoDecoder* createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const;
         Decoder* createAudioDecoder(const Pipeline &pipeline, int numChannels) const;
@@ -125,7 +120,6 @@ class ReceiverConfig : public RemoteConfig
         static bool isSupportedCodec(const std::string &codec);
         const std::string multicastInterface_;
         std::string caps_;
-        bool capsOutOfBand_;
         bool jitterbufferControlEnabled_;
 };
 

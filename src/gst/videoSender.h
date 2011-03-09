@@ -50,7 +50,6 @@ class VideoSender
         void createSource(Pipeline &pipeline);
         void createCodec(Pipeline &pipeline);
         void createPayloader();
-        virtual bool checkCaps() const;
 
         std::tr1::shared_ptr<VideoSourceConfig> videoConfig_;
         RtpSender session_;

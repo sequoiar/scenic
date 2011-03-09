@@ -31,7 +31,6 @@
 #include "codec.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
-#include "caps/capsParser.h"
 #include "caps/CapsServer.h"
 #include "pipeline.h"
 
@@ -60,8 +59,6 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
 
     shared_ptr<AudioSender> tx(new AudioSender(pipeline, aConfig, rConfig));
 
-    rConfig->capsOutOfBand(not options["disable-caps-negotiation"].as<bool>() or !tx->capsAreCached());
-
     return tx;
 }
 
@@ -76,14 +73,10 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
         remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
-    bool negotiateCaps = not options["disable-caps-negotiation"].as<bool>();
     bool enableControls = options["enable-controls"].as<bool>();
 
-    std::string caps(CapsParser::getAudioCaps(codec,
-                options["numchannels"].as<int>(), pipeline.actualSampleRate()));
-
     shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, remoteHost, port, 
-                multicastInterface, negotiateCaps, enableControls, caps));
+                multicastInterface, enableControls));
 
     return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));
 }

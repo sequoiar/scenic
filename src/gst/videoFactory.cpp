@@ -31,7 +31,6 @@
 
 #include "videoConfig.h"
 #include "remoteConfig.h"
-#include "caps/capsParser.h"
 
 using std::tr1::shared_ptr;
 namespace po = boost::program_options;
@@ -47,19 +46,10 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
         remoteHost = "127.0.0.1";
     int port = options["videoport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
-    bool negotiateCaps = not options["disable-caps-negotiation"].as<bool>();
     bool enableControls = options["enable-controls"].as<bool>();
 
-    // get caps here, based on codec, capture width and capture height
-    std::string caps(CapsParser::getVideoCaps(codec, 
-                options["width"].as<int>(), 
-                options["height"].as<int>(), 
-                options["aspect-ratio"].as<std::string>()));
-
-
     shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, 
-                remoteHost, port, multicastInterface, negotiateCaps, 
-                enableControls, caps)); 
+                remoteHost, port, multicastInterface, enableControls));
 
     return shared_ptr<VideoReceiver>(new VideoReceiver(pipeline, vConfig, rConfig));
 }
@@ -78,9 +68,6 @@ shared_ptr<VideoSender> videofactory::buildVideoSender(Pipeline &pipeline, const
 
     shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface)); 
     shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, rConfig));
-
-    rConfig->capsOutOfBand(not options["disable-caps-negotiation"].as<bool>() 
-            or !tx->capsAreCached());
 
     return tx;
 }
