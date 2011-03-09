@@ -24,14 +24,12 @@
 
 #include <jack/types.h> // for jack_nframes_t
 
-class _GstElement;
 class Pipeline;
 
 /// Utility functions for jack related issues. 
 namespace Jack {
         void assertReady(Pipeline &pipeline);
         bool is_running();
-        bool autoForcedSupported(_GstElement *jackElement);
         jack_nframes_t samplerate();
         unsigned int framesPerPeriod();
         unsigned long long minBufferTime();

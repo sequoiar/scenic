@@ -22,8 +22,6 @@
 
 #include "util.h"
 
-#include <gst/gst.h>
-
 #include <jack/jack.h>
 #include "jackUtils.h"
 #include "pipeline.h"
@@ -99,7 +97,7 @@ bool Jack::is_running()
 jack_nframes_t Jack::samplerate() 
 {
     if (!is_running())
-        THROW_ERROR("JACK server not running, cannot compare sample rates.");
+        THROW_ERROR("JACK server not running, cannot get sample rate.");
 
     jack_client_t *client;
     jack_status_t status;
@@ -108,31 +106,6 @@ jack_nframes_t Jack::samplerate()
     jack_client_close(client);
 
     return jackRate;
-}
-
-
-bool Jack::autoForcedSupported(GstElement *jackElement)
-{
-    const std::string PROPERTY_NAME("auto-forced");
-    GParamSpecEnum *enum_property; 
-    enum_property = G_PARAM_SPEC_ENUM(g_object_class_find_property(G_OBJECT_GET_CLASS(jackElement), "connect"));
-    GEnumClass *enum_class = enum_property->enum_class;
-    GEnumValue *enum_value;
-    gint value;
-    bool found = false;
-
-    for (value = enum_class->minimum; !found and value <= enum_class->maximum; value++) 
-    {
-        if ((enum_value = g_enum_get_value(enum_class, value))) 
-        {
-            if (PROPERTY_NAME == enum_value->value_nick)
-                found = true;
-        }
-    }
-    if (!found)
-        LOG_WARNING("Jack element " << GST_ELEMENT_NAME(jackElement) << "is out of date, please update gst-plugins-bad");
-
-    return found;
 }
 
 

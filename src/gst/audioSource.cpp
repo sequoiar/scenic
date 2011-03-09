@@ -28,7 +28,6 @@
 #include "audioConfig.h"
 #include "jackUtils.h"
 #include "pipeline.h"
-#include "alsa.h"
 #include "dv1394.h"
 #include "fileSource.h"
 
@@ -235,8 +234,6 @@ AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConf
 
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
-    else
-        g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
 
     initCapsFilter(aconv_, capsFilter_);
 }
@@ -257,8 +254,6 @@ AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceCo
     source_ = pipeline_.makeElement(config_.source(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
-    else
-        g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
 
     initCapsFilter(aconv_, capsFilter_);
 }
@@ -281,8 +276,7 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     source_ = pipeline_.makeElement(config_.source(), config_.sourceName());
 
     // use auto-forced connect mode if available
-    if (Jack::autoForcedSupported(source_))
-        g_object_set(G_OBJECT(source_), "connect", 2, NULL);
+    g_object_set(G_OBJECT(source_), "connect", 2, NULL);
 
     // setup capsfilter
     GstCaps *caps = 0;

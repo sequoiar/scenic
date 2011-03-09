@@ -30,7 +30,6 @@
 #include "audioConfig.h"
 #include "jackUtils.h"
 #include "pipeline.h"
-#include "alsa.h"
 
 /// Constructor 
 AudioSink::AudioSink(Pipeline &pipeline) : 
@@ -105,17 +104,11 @@ AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) 
     aconv_(pipeline_.makeElement("audioconvert", NULL)), 
     config_(config)
 {
-    if (Jack::is_running())
-        THROW_CRITICAL("Jack is running, you must stop jack server before using alsasink");
-
     sink_ = pipeline_.makeElement("alsasink", NULL);
 
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
-    else
-        g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
-
 
     gstlinkable::link(aconv_, sink_);
 }
@@ -136,8 +129,6 @@ AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
-    else
-        g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
 
     gstlinkable::link(aconv_, sink_);
 }
@@ -158,8 +149,7 @@ AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) 
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
     // use auto-forced connect mode if available
-    if (Jack::autoForcedSupported(sink_))
-        g_object_set(G_OBJECT(sink_), "connect", 2, NULL);
+    g_object_set(G_OBJECT(sink_), "connect", 2, NULL);
 
     if (config_.bufferTime() < Jack::safeBufferTime())
     {

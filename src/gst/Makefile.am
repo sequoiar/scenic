@@ -10,7 +10,7 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   audioLevel.cpp glVideoSink.cpp playback.cpp dv1394.cpp v4l2util.cpp fileSource.cpp \
 				   sharedVideoSink.cpp busMsgHandler.cpp videoFlip.cpp videoScale.cpp videoFactory.cpp textOverlay.cpp \
                    audioFactory.cpp mediaBase.h messageDispatcher.h messageHandler.h busMsgHandler.h portOffsets.h \
-				   audioSender.h audioReceiver.h $(top_srcdir)/src/include/alsa.h \
+				   audioSender.h audioReceiver.h \
 				   videoConfig.h rtpBin.h pipeline.h \
 				   rtpSender.h rtpReceiver.h audioSource.h \
 				   gstLinkable.h videoSink.h audioSink.h jackUtils.h \
