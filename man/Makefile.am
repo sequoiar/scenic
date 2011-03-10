@@ -18,8 +18,8 @@ scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  
 midistream.1: $(top_srcdir)/py/scripts/midistream.in $(top_srcdir)/py/rtpmidi/runner.py $(common_mandeps) $(top_srcdir)/man/midistream-man.txt
 	$(HELP2MAN) --include=$(top_srcdir)/man/midistream-man.txt --name="Streams MIDI notes and controls over RTP" --no-info $(top_builddir)/py/scripts/midistream -o $@
 
-firereset.1: $(top_srcdir)/src/firereset/firereset.c $(top_srcdir)/man/firereset-man.txt
-	$(HELP2MAN) --include=$(top_srcdir)/man/firereset-man.txt --name="Resets a IEEE 1394 bus to help in case of problems" --no-info $(top_builddir)/src/firereset/firereset -o $@
+firereset.1: $(top_srcdir)/utils/firereset/firereset.c $(top_srcdir)/man/firereset-man.txt
+	$(HELP2MAN) --include=$(top_srcdir)/man/firereset-man.txt --name="Resets a IEEE 1394 bus to help in case of problems" --no-info $(top_builddir)/utils/firereset/firereset -o $@
 
 jack-info.1: $(top_srcdir)/utils/jack-info/jack_info.c $(top_srcdir)/man/jack-info-man.txt
 	$(HELP2MAN) --include=$(top_srcdir)/man/jack-info-man.txt --name="Prints informations about running JACK servers" --no-info $(top_builddir)/utils/jack-info/jack-info -o $@

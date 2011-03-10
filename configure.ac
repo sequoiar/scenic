@@ -264,6 +264,7 @@ doc/docbook/installation-manual.xml
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile
+utils/firereset/Makefile
 utils/jack-info/Makefile
 src/Makefile
 py/Makefile
@@ -287,7 +288,6 @@ src/vumeter/Makefile
 src/vumeter/test/Makefile
 src/caps/Makefile
 src/gst/Makefile
-src/firereset/Makefile
 src/rtsp/Makefile
 src/rtsp/examples/Makefile
 src/main/Makefile

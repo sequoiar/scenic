@@ -1,1 +1,1 @@
-SUBDIRS = include util gst gtk_utils shared_video caps vumeter main firereset rtsp
+SUBDIRS = include util gst gtk_utils shared_video caps vumeter main rtsp

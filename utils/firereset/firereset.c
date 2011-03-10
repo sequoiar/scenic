@@ -29,7 +29,7 @@
 #include <string.h> /* for strcmp */
 #include <stdlib.h> /* for getenv */
 #include <libraw1394/raw1394.h>
-#include "../config.h" /* for PACKAGE_VERSION */
+#include "config.h" /* for PACKAGE_VERSION */
 
 /**
  * Callback for when raw1394_reset_bus_new() is called.
