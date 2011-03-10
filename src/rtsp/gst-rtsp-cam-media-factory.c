@@ -1,4 +1,5 @@
 /* GStreamer
+ * Copyright (C) 2011 Tristan Matthews <le.businessman@gmail.com>
  * Copyright (C) 2010 Alessandro Decina <alessandro.d@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
@@ -19,10 +20,6 @@
 
 #include <string.h>
 #include "gst-rtsp-cam-media-factory.h"
-
-#define DEFAULT_LOCATION NULL
-#define DEFAULT_TIMEOUT 10 * GST_SECOND
-#define DEFAULT_LATENCY 2 * GST_SECOND
 
 enum
 {
@@ -61,7 +58,7 @@ static GstElement * gst_rtsp_cam_media_factory_get_element (GstRTSPMediaFactory 
     const GstRTSPUrl *url);
 static gchar *gst_rtsp_cam_media_factory_gen_key (GstRTSPMediaFactory *factory, const GstRTSPUrl *url);
 
-G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP_MEDIA_FACTORY);
+G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP_MEDIA_FACTORY)
   
 #define DEFAULT_VIDEO TRUE
 #define DEFAULT_VIDEO_DEVICE NULL
@@ -69,24 +66,19 @@ G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP
 #define DEFAULT_VIDEO_HEIGHT -1
 #define DEFAULT_VIDEO_FRAMERATE_N 0
 #define DEFAULT_VIDEO_FRAMERATE_D 1
-#define DEFAULT_VIDEO_CODEC "theora"
+#define DEFAULT_VIDEO_CODEC "mpeg4"
 #define DEFAULT_AUDIO TRUE
 #define DEFAULT_AUDIO_DEVICE NULL
-#define DEFAULT_AUDIO_CODEC "vorbis"
-
-GstStaticCaps rtp_h264_video_caps =
-    GST_STATIC_CAPS ("application/x-rtp, "
-        "encoding-name=(string)H264, media=(string)video");
-
-GstStaticCaps rtp_mpeg4_generic_audio_caps =
-    GST_STATIC_CAPS ("application/x-rtp, "
-        "encoding-name=(string)MPEG4-GENERIC, media=(string)audio");
+#define DEFAULT_AUDIO_CODEC "raw"
 
 static CodecDescriptor codecs[] = {
+  { "mpeg4", "ffenc_mpeg4 ! rtpmp4vpay name=pay%d pt=96" },
+  { "h263", "ffenc_h263p ! rtph263ppay name=pay%d pt=96" },
   { "theora", "theoraenc ! rtptheorapay name=pay%d pt=96" },
   { "h264", "x264enc ! rtph264pay name=pay%d pt=96" },
+  { "raw", "identity ! rtpL16pay name=pay%d pt=97" },
   { "vorbis", "vorbisenc ! rtpvorbispay name=pay%d pt=97" },
-  { "amrnb", "amrnbenc ! rtpamrpay name=pay%d pt=97" },
+  { "celt", "celtenc ! rtpceltpay name=pay%d pt=97" },
   { NULL, NULL }
 };
 
@@ -132,15 +124,15 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
           G_PARAM_READWRITE | G_PARAM_CONSTRUCT));  
 
   g_object_class_install_property (gobject_class, PROP_AUDIO,
-      g_param_spec_boolean ("audio", "Audio", "video",
+      g_param_spec_boolean ("audio", "Audio", "audio",
           DEFAULT_AUDIO, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
   g_object_class_install_property (gobject_class, PROP_AUDIO_DEVICE,
-      g_param_spec_string ("audio-device", "Video device", "audio device",
+      g_param_spec_string ("audio-device", "Audio device", "audio device",
           DEFAULT_AUDIO_DEVICE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
   g_object_class_install_property (gobject_class, PROP_AUDIO_CODEC,
-      g_param_spec_string ("audio-codec", "Video codec", "audio codec",
+      g_param_spec_string ("audio-codec", "Audio codec", "audio codec",
           DEFAULT_AUDIO_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
 
@@ -269,7 +261,7 @@ GstRTSPCamMediaFactory * gst_rtsp_cam_media_factory_new ()
 }
 
 static CodecDescriptor *
-find_codec (GstRTSPCamMediaFactory *factory, gchar *codec_name)
+find_codec (gchar *codec_name)
 {
   int i;
   CodecDescriptor *codec = NULL;
@@ -293,7 +285,7 @@ create_payloader (GstRTSPCamMediaFactory *factory,
   gchar *description;
   gchar *name;
 
-  codec = find_codec (factory, codec_name);
+  codec = find_codec (codec_name);
   if (codec == NULL) {
     GST_ERROR_OBJECT (factory, "invalid codec %s", codec_name);
 
@@ -394,7 +386,6 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
 
   audioconvert = gst_element_factory_make ("audioconvert", NULL);
   audiorate = gst_element_factory_make ("audiorate", NULL);
-  audiorate = gst_element_factory_make ("audiorate", NULL);
 
   gst_bin_add_many (GST_BIN (bin), audiosrc, audioconvert, audiorate, pay, NULL);
   gst_element_link_many (audiosrc, audioconvert, audiorate, pay, NULL);
@@ -411,6 +402,7 @@ gst_rtsp_cam_media_factory_get_element (GstRTSPMediaFactory *media_factory,
   GstElement *bin = NULL;
   gint payloader_number = 0;
   GstRTSPCamMediaFactory *factory = GST_RTSP_CAM_MEDIA_FACTORY (media_factory);
+  (void) url; /* unused */
 
   bin = gst_bin_new (NULL);
 
@@ -443,6 +435,7 @@ gst_rtsp_cam_media_factory_get_element (GstRTSPMediaFactory *media_factory,
 static gchar *
 gst_rtsp_cam_media_factory_gen_key (GstRTSPMediaFactory *factory, const GstRTSPUrl *url)
 {
+  (void) factory; /* unused */
   return g_strdup (url->abspath);
 }
 
