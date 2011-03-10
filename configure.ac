@@ -83,7 +83,7 @@ if test "x${have_gstreamer_video}" = "xfalse" ; then
 fi
 
 #Trying to set GSTRTSP using pkg-config
-PKG_CHECK_MODULES(GSTRTSP, gstreamer-rtsp-0.10, have_gstreamer_rtsp=true, have_gstreamer_rtsp=false)
+PKG_CHECK_MODULES(GST_RTSP_SERVER, gst-rtsp-server-0.10, have_gstreamer_rtsp=true, have_gstreamer_rtsp=false)
 if test "x${have_gstreamer_rtsp}" = "xfalse" ; then
     AC_MSG_ERROR([missing package:  libgstrtsp-server-0.10-dev])
 fi
@@ -289,6 +289,7 @@ src/caps/Makefile
 src/gst/Makefile
 src/firereset/Makefile
 src/rtsp/Makefile
+src/rtsp/examples/Makefile
 src/main/Makefile
 src/main/test/Makefile
 ])
