@@ -79,7 +79,6 @@ main(int argc, char **argv)
   GstRTSPServer *server;
   GstRTSPMediaMapping *mapping;
   GstRTSPCamMediaFactory *factory;
-  gchar *name;
   GstRTSPUrl *local_url; 
   GOptionContext *ctx;
   GOptionGroup *gst_group;
@@ -105,13 +104,7 @@ main(int argc, char **argv)
     return 1;
   }
 
-  if (argc != 2) {
-    g_printerr ("missing rtsp url argument\n");
-
-    return 1;
-  }
-
-  if (gst_rtsp_url_parse (argv[1], &local_url) != GST_RTSP_OK) {
+  if (gst_rtsp_url_parse (argc != 2 ? "rtsp://localhost:8554/test" : argv[1], &local_url) != GST_RTSP_OK) {
     g_printerr ("invalid rtsp url\n");
 
     return 1;
@@ -122,10 +115,7 @@ main(int argc, char **argv)
   server = gst_rtsp_server_new ();
   gst_rtsp_server_set_port (server, local_url->port);
 
-  name = g_strdup_printf ("rtsp-cam-factory-%s", argv[2]);
   factory = gst_rtsp_cam_media_factory_new ();
-  gst_object_set_name (GST_OBJECT (factory), name);
-  g_free (name);
   g_object_set (factory, "video-device", video_device,
       "video", !no_video,
       "video-width", video_width,
