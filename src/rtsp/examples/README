@@ -1,0 +1,4 @@
+run the server with:
+./gst-rtsp-cam rtsp://localhost:8554/test
+run client:
+./test-client

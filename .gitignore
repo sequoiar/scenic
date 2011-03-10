@@ -87,6 +87,8 @@ py/scripts/scenic
 src/caps/caps.cpp
 src/firereset/firereset
 src/main/milhouse
+src/rtsp/examples/gst-rtsp-cam
+src/rtsp/examples/test-client
 src/vumeter/test/meter
 utils/dc-ctl/dc-ctl
 utils/jack-info/jack-info
