@@ -288,6 +288,7 @@ src/vumeter/test/Makefile
 src/caps/Makefile
 src/gst/Makefile
 src/firereset/Makefile
+src/rtsp/Makefile
 src/main/Makefile
 src/main/test/Makefile
 ])
