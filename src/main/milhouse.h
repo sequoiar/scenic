@@ -36,6 +36,8 @@ class Milhouse {
     private:
         short usage(const boost::program_options::options_description &desc);
         boost::program_options::options_description createOptionsDescription();
+        void runAsRTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
+        void runAsRTSPServer(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
         void runAsReceiver(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
         void runAsSender(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
         void runAsLocal(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
