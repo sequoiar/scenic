@@ -280,7 +280,6 @@ py/scenic/devices/Makefile
 po/Makefile.in
 py/scenic/test/Makefile
 py/scripts/Makefile
-src/include/Makefile
 src/util/Makefile
 src/gtk_utils/Makefile
 src/shared_video/Makefile
