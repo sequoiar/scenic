@@ -76,7 +76,6 @@ po::options_description ProgramOptions::createDefaultOptions()
             ("disable-jack-autoconnect,J", po::bool_switch(), "make sure milhouse's "
                     "jack audio ports don't connect on startup")
             ("jack-client-name,O", po::value<string>()->default_value(""), "name of jack-client")
-            ("disable-caps-negotiation", po::bool_switch(), "prevent media capabilities (caps) from being communicated over tcp")
             ("debug,D", po::value<string>()->default_value("info"), "level of logging verbosity (string/int) "
                     "(critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6)")
             ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
