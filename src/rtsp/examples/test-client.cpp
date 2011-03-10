@@ -42,15 +42,13 @@ void attachInterruptHandlers()
     signal(SIGTERM, &terminateSignalHandler);
 }
 
+static bool latency_set = false;
+
 gboolean
 timeout (Client *client, gboolean /*ignored*/)
 {
-    static bool latency_set = false;
     if (!latency_set)
-    {
         g_object_set(client->rtpbin, "latency", 5, NULL);
-        latency_set = true;
-    }
 
     if (interrupted)
     {
@@ -104,7 +102,10 @@ gboolean bus_call(GstBus * /*bus*/, GstMessage *msg, void *user_data)
                 // to explicitly tell the pipeline to recalculate its latency
                 // FIXME: this never works!
                 if (gst_bin_recalculate_latency (GST_BIN(context->pipeline)) == TRUE)
+                {
                     g_print("Reconfigured latency.\n");
+                    latency_set = true;
+                }
                 else
                     g_print("Could not reconfigure latency.\n");
                 break;
@@ -151,7 +152,7 @@ int main (int argc, char *argv[])
     client.loop = g_main_loop_new (NULL, FALSE);
 
     /* add a timeout to check the interrupted variable */
-    g_timeout_add_seconds(10, (GSourceFunc) timeout, &client);
+    g_timeout_add_seconds(5, (GSourceFunc) timeout, &client);
     
     /* start loop */
     g_main_loop_run (client.loop);

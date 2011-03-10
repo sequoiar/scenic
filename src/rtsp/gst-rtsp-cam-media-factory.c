@@ -71,6 +71,8 @@ G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP
 #define DEFAULT_AUDIO_DEVICE NULL
 #define DEFAULT_AUDIO_CODEC "raw"
 
+/* TODO: this should be returned from a function, so that we can pre-configure
+ properties for the codecs and payloaders. */
 static CodecDescriptor codecs[] = {
   { "mpeg4", "ffenc_mpeg4 ! rtpmp4vpay name=pay%d pt=96" },
   { "h263", "ffenc_h263p ! rtph263ppay name=pay%d pt=96" },
