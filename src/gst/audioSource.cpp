@@ -134,37 +134,7 @@ AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConf
     }
 
     gst_caps_unref(caps);
-
-    //static const int PERIOD_MS = 1000;
-    //callback_ = g_timeout_add(PERIOD_MS, timedCallback, this);
 }
-
-
-/// Asynchronous timed callback which will periodically toggle the frequency output by each channel 
-gboolean AudioTestSource::timedCallback(gpointer user_data)
-{
-    AudioTestSource * context = static_cast<AudioTestSource*>(user_data);
-    context->toggle_frequency();
-    return TRUE;
-}
-
-
-void AudioTestSource::toggle_frequency()
-{
-    int i = 0;
-    offset_ = (offset_ == 0) ? 1 : 0;
-
-    for (gstlinkable::GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
-        g_object_set(G_OBJECT(*iter), "freq", frequencies_[offset_][i++], NULL);
-}
-
-
-/// Destructor 
-AudioTestSource::~AudioTestSource()
-{
-    //g_source_remove(callback_);
-}
-
 
 const int AudioFileSource::LOOP_INFINITE = -1;
 

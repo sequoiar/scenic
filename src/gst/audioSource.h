@@ -115,13 +115,7 @@ class AudioTestSource : public InterleavedAudioSource
         AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
-        ~AudioTestSource();
-
-        static int timedCallback(void *data);
-        void toggle_frequency();
-
         std::vector< std::vector <double> > frequencies_;
-        unsigned int callback_;
         int offset_;
 };
 
