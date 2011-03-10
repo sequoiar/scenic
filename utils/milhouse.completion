@@ -12,7 +12,7 @@ _milhouse()
         else
             case "$prev" in
             --videosource ) COMPREPLY=($(compgen -W "videotestsrc v4l2src v4lsrc dc1394src dv1394src filesrc" -- $cur ) ) ;;
-            --videosink )   COMPREPLY=($(compgen -W "xvimagesink ximagesink glimagesink sharedvideosink" -- $cur ) ) ;;
+            --videosink )   COMPREPLY=($(compgen -W "xvimagesink ximagesink sharedvideosink" -- $cur ) ) ;;
             --videocodec )  COMPREPLY=($(compgen -W "mpeg4 h263 h264 theora" -- $cur ) ) ;;
             --videodevice ) COMPREPLY=($(compgen -W "$(milhouse --list-cameras | awk '/Video4/ { sub(/:/, "");print $3 }')" -- $cur ) ) ;;
             --audiosource ) COMPREPLY=($(compgen -W "audiotestsrc jackaudiosrc alsasrc pulsesrc filesrc" -- $cur ) ) ;;

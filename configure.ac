@@ -160,18 +160,6 @@ else
     HELP2MAN=:
 fi
 
-AX_CHECK_GL
-if test "x${no_gl}" = "xyes" ; then
-    AC_MSG_WARN(["Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev."])
-fi
-
-AX_CHECK_GLU
-if test "x${no_glu}" = "xyes" ; then
-    AC_MSG_WARN(["Missing GLU install libglu1-mesa-dev"])
-else
-    AC_DEFINE(CONFIG_GL,[],[GL define from configure])
-fi
-
 # Check for python modules, if second arg is non-empty,
 # configure exits with an error (NOTE: it will not print this argument!)
 
@@ -242,7 +230,7 @@ AS_AC_EXPAND(DATADIR, $datadir)
 PIXMAPS_DIR=$DATADIR/scenic/pixmaps
 AC_SUBST(PIXMAPS_DIR)
 
-AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
+AS_AC_EXPAND(PKLIBDIR, $pkglibdir)
 
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
@@ -290,7 +278,6 @@ src/gst/Makefile
 src/rtsp/Makefile
 src/rtsp/examples/Makefile
 src/main/Makefile
-src/main/test/Makefile
 ])
 
 AC_OUTPUT

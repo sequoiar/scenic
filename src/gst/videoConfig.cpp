@@ -34,10 +34,6 @@
 #include "textOverlay.h"
 #include "sharedVideoSink.h"
 
-#ifdef CONFIG_GL
-#include "glVideoSink.h"
-#endif
-
 // for list cameras
 #include "dc1394.h"
 #include "v4l2util.h"
@@ -283,10 +279,6 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
         return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_);
     else if (sink_ == "ximagesink")
         return new XImageSink(pipeline, display_);
-#ifdef CONFIG_GL
-    else if (sink_ == "glimagesink")
-        return new GLImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_);
-#endif
     else if (sink_ == "sharedvideosink")
         return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
     else
