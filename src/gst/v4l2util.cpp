@@ -63,7 +63,7 @@ static v4l2_format getCaptureFormat(int fd)
 static std::string getDriverInfo(int fd, const std::string &device)
 {
     std::string result;
-	struct v4l2_capability vcap;	/* list_cap */
+	v4l2_capability vcap;	/* list_cap */
 	memset(&vcap, 0, sizeof(vcap));
 
     if (doioctl(fd, VIDIOC_QUERYCAP, &vcap, "VIDIOC_QUERYCAP") < 0)
@@ -86,7 +86,7 @@ static std::string getInputName(int fd)
 {
     std::string result;
     int input;
-    struct v4l2_input vin;		/* list_inputs */
+    v4l2_input vin;		/* list_inputs */
     memset(&vin, 0, sizeof(vin));
 
     if (doioctl(fd, VIDIOC_G_INPUT, &input, "VIDIOC_G_INPUT") == 0) 
@@ -436,7 +436,7 @@ void v4l2util::setFormatVideo(const std::string &device, int width, int height)
     set_fmts |= FmtWidth;
     vfmt.fmt.pix.height = height;
     set_fmts |= FmtHeight;
-    struct v4l2_format in_vfmt;
+    v4l2_format in_vfmt;
 
     in_vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -460,7 +460,7 @@ void v4l2util::setStandard(const std::string &device, const std::string &standar
     int fd = -1;
     bool usingDefault;
     v4l2_std_id std;		/* get_std/set_std */
-    struct v4l2_standard vs;	/* list_std */
+    v4l2_standard vs;	/* list_std */
     const std::string DEFAULT_STANDARD("NTSC");
     memset(&vs, 0, sizeof(vs));
 
@@ -498,7 +498,7 @@ void v4l2util::setStandard(const std::string &device, const std::string &standar
 void v4l2util::setInput(const std::string &device, int input)
 {
     int fd = -1;
-    struct v4l2_input vin;		/* list_inputs */
+    v4l2_input vin;		/* list_inputs */
     memset(&vin, 0, sizeof(vin));
 
     if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
@@ -520,7 +520,7 @@ void v4l2util::setInput(const std::string &device, int input)
 
 std::string v4l2util::inputsPerDevice(int fd)
 {
-    struct v4l2_input vin;		/* list_inputs */
+    v4l2_input vin;		/* list_inputs */
     memset(&vin, 0, sizeof(vin));
     vin.index = 0;
     std::string result;
