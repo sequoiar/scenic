@@ -33,7 +33,7 @@ class RTSPServer
 {
     public:
         RTSPServer(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
-        void run();
+        void run(int timeout);
 };
 
 

@@ -51,7 +51,7 @@ void Milhouse::runAsRTSPServer(const po::variables_map &options, bool enableVide
     LOG_DEBUG("Running as RTSP server");
     // TODO: create a server that uses rtsp-cam-media-factory, see rtsp/examples/gst-rtsp-cam.c
     RTSPServer server(options, enableVideo, enableAudio);
-    server.run();
+    server.run(options["timeout"].as<int>());
 }
 
 void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo, bool enableAudio)
@@ -224,6 +224,13 @@ short Milhouse::run(int argc, char **argv)
 
     // wrapper so main doesn't need to know about gst and gtk
     gutil::init_gst_gtk(argc, argv);
+
+    if (options["rtsp-server"].as<bool>())
+    {
+        runAsRTSPServer(options, true, true);
+        return 0;
+    }
+
     if (options["gst-version"].as<bool>())
     {
         // this was handled internally by gst_init's argv parsing

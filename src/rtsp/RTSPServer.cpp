@@ -22,12 +22,81 @@
  */
 
 #include "RTSPServer.h"
+#include <cstring>
+#include <gst/gst.h>
+#pragma GCC diagnostic ignored "-pedantic"
+#include <gst/rtsp-server/rtsp-server.h>
 
-RTSPServer::RTSPServer(const boost::program_options::variables_map &/*options*/, bool /*enableVideo*/, bool /*enableAudio*/)
+#include <boost/program_options.hpp>
+
+#include "gst-rtsp-cam-media-factory.h"
+#include "logWriter.h"
+#include "gtk_utils.h"
+
+namespace {
+static gboolean
+timeout (GstRTSPServer *server, gboolean ignored)
 {
+  GstRTSPSessionPool *pool;
+  (void) ignored; /* unused */
+
+  pool = gst_rtsp_server_get_session_pool (server);
+  gst_rtsp_session_pool_cleanup (pool);
+  g_object_unref (pool);
+
+  return TRUE;
+}
+}
+
+RTSPServer::RTSPServer(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio)
+{
+  using std::string;
+  GstRTSPServer *server;
+  GstRTSPMediaMapping *mapping;
+  GstRTSPCamMediaFactory *factory;
+  GstRTSPUrl *local_url; 
+  static const char *DEFAULT_URL = "rtsp://localhost:8554/test";
+
+  if (gst_rtsp_url_parse (DEFAULT_URL, &local_url) != GST_RTSP_OK) {
+    THROW_ERROR("Invalid uri " << DEFAULT_URL);
+  }
+
+  server = gst_rtsp_server_new ();
+  gst_rtsp_server_set_port (server, local_url->port);
+
+  factory = gst_rtsp_cam_media_factory_new ();
+  g_object_set (factory,
+      "video", enableVideo,
+      "video-source", options["videosource"].as<string>().c_str(),
+      "video-device", options["videodevice"].as<string>().c_str(),
+      "video-width", options["width"].as<int>(),
+      "video-height", options["height"].as<int>(),
+      "video-codec", options["videocodec"].as<string>().c_str(),
+      "video-framerate", options["framerate"].as<int>(), 1,
+      "audio", enableAudio,
+      "audio-source", options["audiosource"].as<string>().c_str(),
+      "audio-device", options["audiodevice"].as<string>().c_str(),
+      "audio-codec", options["audiocodec"].as<string>().c_str(),
+      NULL);
+
+  // let multiple client connect to this server
+  gst_rtsp_media_factory_set_shared (GST_RTSP_MEDIA_FACTORY (factory), TRUE);
+
+  mapping = gst_rtsp_server_get_media_mapping (server);
+  gst_rtsp_media_mapping_add_factory (mapping, local_url->abspath,
+      GST_RTSP_MEDIA_FACTORY (factory));
+  g_object_unref (mapping);
+
+  gst_rtsp_url_free (local_url);
+
+  gst_rtsp_server_attach (server, NULL);
+
+  g_timeout_add_seconds (10, (GSourceFunc) timeout, server); 
 }
         
-void RTSPServer::run()
+void RTSPServer::run(int timeout)
 {
+  /* start main loop */
+  gutil::runMainLoop(timeout);
 }
 
