@@ -37,6 +37,7 @@
 #include "milhouse.h"
 #include "milhouseLogger.h"
 #include "programOptions.h"
+#include "rtsp/RTSPServer.h"
 
 namespace po = boost::program_options;
 void Milhouse::runAsRTSPClient(const po::variables_map &/*options*/, bool /*enableVideo*/, bool /*enableAudio*/)
@@ -45,11 +46,12 @@ void Milhouse::runAsRTSPClient(const po::variables_map &/*options*/, bool /*enab
     // TODO: create a client with a uridecodebin and video or audio outs, see rtsp/examples/test-client.cpp
 }
 
-void Milhouse::runAsRTSPServer(const po::variables_map &/*options*/, bool /*enableVideo*/, bool /*enableAudio*/)
+void Milhouse::runAsRTSPServer(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     LOG_DEBUG("Running as RTSP server");
     // TODO: create a server that uses rtsp-cam-media-factory, see rtsp/examples/gst-rtsp-cam.c
-    
+    RTSPServer server(options, enableVideo, enableAudio);
+    server.run();
 }
 
 void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo, bool enableAudio)
