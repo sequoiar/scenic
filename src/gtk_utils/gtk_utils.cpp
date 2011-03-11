@@ -72,6 +72,10 @@ void gutil::runMainLoop(int ms)
 
 void gutil::init_gst_gtk(int argc, char **argv)
 {
+    // must initialise the threading system before using any other GLib funtion
+    if (!g_thread_supported ())
+        g_thread_init (NULL);
+
     gst_init(&argc, &argv);
     if (getenv("DISPLAY") != NULL)
         gtk_init(&argc, &argv);

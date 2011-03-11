@@ -48,7 +48,8 @@ void Milhouse::runAsRTSPClient(const po::variables_map &/*options*/, bool /*enab
 void Milhouse::runAsRTSPServer(const po::variables_map &/*options*/, bool /*enableVideo*/, bool /*enableAudio*/)
 {
     LOG_DEBUG("Running as RTSP server");
-    // TODO: create a server that uses rtsp-cam-media-factory, see rtsp/examples/rtsp-cam.c
+    // TODO: create a server that uses rtsp-cam-media-factory, see rtsp/examples/gst-rtsp-cam.c
+    
 }
 
 void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo, bool enableAudio)
