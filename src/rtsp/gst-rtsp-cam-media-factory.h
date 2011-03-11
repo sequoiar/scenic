@@ -45,6 +45,7 @@ struct _GstRTSPCamMediaFactory {
   gboolean video;
   gboolean audio;
 
+  gchar *video_source;
   gchar *video_device;
   gint video_width;
   gint video_height;
@@ -52,6 +53,7 @@ struct _GstRTSPCamMediaFactory {
   gint fps_d;
   gchar *video_codec;
 
+  gchar *audio_source;
   gchar *audio_device;
   gchar *audio_codec;
 };

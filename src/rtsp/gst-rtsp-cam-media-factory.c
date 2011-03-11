@@ -25,12 +25,14 @@ enum
 {
   PROP_0,
   PROP_VIDEO,
+  PROP_VIDEO_SOURCE,
   PROP_VIDEO_DEVICE,
   PROP_VIDEO_WIDTH,
   PROP_VIDEO_HEIGHT,
   PROP_VIDEO_FRAMERATE,
   PROP_VIDEO_CODEC,
   PROP_AUDIO,
+  PROP_AUDIO_SOURCE,
   PROP_AUDIO_DEVICE,
   PROP_AUDIO_CODEC
 };
@@ -61,6 +63,7 @@ static gchar *gst_rtsp_cam_media_factory_gen_key (GstRTSPMediaFactory *factory, 
 G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP_MEDIA_FACTORY)
   
 #define DEFAULT_VIDEO TRUE
+#define DEFAULT_VIDEO_SOURCE "v4l2src"
 #define DEFAULT_VIDEO_DEVICE NULL
 #define DEFAULT_VIDEO_WIDTH -1
 #define DEFAULT_VIDEO_HEIGHT -1
@@ -68,6 +71,7 @@ G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP
 #define DEFAULT_VIDEO_FRAMERATE_D 1
 #define DEFAULT_VIDEO_CODEC "mpeg4"
 #define DEFAULT_AUDIO TRUE
+#define DEFAULT_AUDIO_SOURCE "autoaudiosrc"
 #define DEFAULT_AUDIO_DEVICE NULL
 #define DEFAULT_AUDIO_CODEC "raw"
 
@@ -102,6 +106,10 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
   g_object_class_install_property (gobject_class, PROP_VIDEO,
       g_param_spec_boolean ("video", "Video", "video",
           DEFAULT_VIDEO, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+  
+  g_object_class_install_property (gobject_class, PROP_VIDEO_SOURCE,
+      g_param_spec_string ("video-source", "Video source", "video source",
+          DEFAULT_VIDEO_SOURCE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
   g_object_class_install_property (gobject_class, PROP_VIDEO_DEVICE,
       g_param_spec_string ("video-device", "Video device", "video device",
@@ -129,6 +137,10 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
       g_param_spec_boolean ("audio", "Audio", "audio",
           DEFAULT_AUDIO, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
+  g_object_class_install_property (gobject_class, PROP_AUDIO_SOURCE,
+      g_param_spec_string ("audio-source", "Audio source", "audio source",
+          DEFAULT_AUDIO_SOURCE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
   g_object_class_install_property (gobject_class, PROP_AUDIO_DEVICE,
       g_param_spec_string ("audio-device", "Audio device", "audio device",
           DEFAULT_AUDIO_DEVICE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
@@ -154,8 +166,10 @@ gst_rtsp_cam_media_factory_finalize (GObject * obj)
 {
   GstRTSPCamMediaFactory *factory = GST_RTSP_CAM_MEDIA_FACTORY (obj);
 
+  g_free (factory->video_source);
   g_free (factory->video_device);
   g_free (factory->video_codec);
+  g_free (factory->audio_source);
   g_free (factory->audio_device);
   g_free (factory->audio_codec);
 
@@ -175,6 +189,9 @@ gst_rtsp_cam_media_factory_get_property (GObject *object, guint propid,
     case PROP_AUDIO:
       g_value_set_boolean (value, factory->audio);
       break;
+    case PROP_VIDEO_SOURCE:
+      g_value_set_string (value, factory->video_source);
+      break;
     case PROP_VIDEO_DEVICE:
       g_value_set_string (value, factory->video_device);
       break;
@@ -189,6 +206,9 @@ gst_rtsp_cam_media_factory_get_property (GObject *object, guint propid,
       break;
     case PROP_VIDEO_CODEC:
       g_value_set_string (value, factory->video_codec);
+      break;
+    case PROP_AUDIO_SOURCE:
+      g_value_set_string (value, factory->audio_source);
       break;
     case PROP_AUDIO_DEVICE:
       g_value_set_string (value, factory->audio_device);
@@ -214,6 +234,12 @@ gst_rtsp_cam_media_factory_set_property (GObject *object, guint propid,
     case PROP_AUDIO:
       factory->audio = g_value_get_boolean (value);
       break;
+    case PROP_VIDEO_SOURCE:
+      g_free (factory->video_source);
+      factory->video_source = g_value_dup_string (value);
+      if (factory->video_source == NULL)
+        factory->video_source = g_strdup (DEFAULT_VIDEO_SOURCE);
+      break;
     case PROP_VIDEO_DEVICE:
       g_free (factory->video_device);
       factory->video_device = g_value_dup_string (value);
@@ -235,6 +261,12 @@ gst_rtsp_cam_media_factory_set_property (GObject *object, guint propid,
       factory->video_codec = g_value_dup_string (value);
       if (factory->video_codec == NULL)
         factory->video_codec = g_strdup (DEFAULT_VIDEO_CODEC);
+      break;
+    case PROP_AUDIO_SOURCE:
+      g_free (factory->audio_source);
+      factory->audio_source = g_value_dup_string (value);
+      if (factory->audio_source == NULL)
+        factory->audio_source = g_strdup (DEFAULT_AUDIO_SOURCE);
       break;
     case PROP_AUDIO_DEVICE:
       g_free (factory->audio_device);
@@ -324,7 +356,7 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
   if (pay == NULL)
     return NULL;
 
-  videosrc = gst_element_factory_make ("v4l2src", NULL);
+  videosrc = gst_element_factory_make (factory->video_source, NULL);
   if (factory->video_device)
     g_object_set (videosrc, "device", factory->video_device, NULL);
 
@@ -378,7 +410,7 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   if (pay == NULL)
     return NULL;
 
-  audiosrc = gst_element_factory_make("pulsesrc", NULL);
+  audiosrc = gst_element_factory_make(factory->audio_source, NULL);
   if (audiosrc == NULL) {
     GST_WARNING_OBJECT (factory, "couldn't create audio source");
     gst_object_unref (pay);
