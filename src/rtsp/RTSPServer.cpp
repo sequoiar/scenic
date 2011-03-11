@@ -35,10 +35,9 @@
 
 namespace {
 static gboolean
-timeout (GstRTSPServer *server, gboolean ignored)
+timeout (GstRTSPServer *server)
 {
   GstRTSPSessionPool *pool;
-  (void) ignored; /* unused */
 
   pool = gst_rtsp_server_get_session_pool (server);
   gst_rtsp_session_pool_cleanup (pool);
