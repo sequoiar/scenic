@@ -45,7 +45,8 @@ enum
 typedef struct
 {
   gchar *name;
-  gchar *bin;
+  gchar *encoder;
+  gchar *payloader;
 } CodecDescriptor;
 
 GST_DEBUG_CATEGORY_STATIC (rtsp_cam_media_factory_debug);
@@ -74,18 +75,20 @@ G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP
 #define DEFAULT_AUDIO_SOURCE "autoaudiosrc"
 #define DEFAULT_AUDIO_DEVICE NULL
 #define DEFAULT_AUDIO_CODEC "raw"
+static const int VIDEO_PAYLOAD_TYPE = 96;
+static const int AUDIO_PAYLOAD_TYPE = 97;
 
 /* TODO: this should be returned from a function, so that we can pre-configure
  properties for the codecs and payloaders. */
 static CodecDescriptor codecs[] = {
-  { "mpeg4", "ffenc_mpeg4 ! rtpmp4vpay name=pay%d pt=96" },
-  { "h263", "ffenc_h263p ! rtph263ppay name=pay%d pt=96" },
-  { "theora", "theoraenc ! rtptheorapay name=pay%d pt=96" },
-  { "h264", "x264enc ! rtph264pay name=pay%d pt=96" },
-  { "raw", "rtpL16pay name=pay%d pt=97" },
-  { "vorbis", "vorbisenc ! rtpvorbispay name=pay%d pt=97" },
-  { "celt", "celtenc ! rtpceltpay name=pay%d pt=97" },
-  { NULL, NULL }
+  { "mpeg4", "ffenc_mpeg4", "rtpmp4vpay" },
+  { "h263", "ffenc_h263p", "rtph263ppay" },
+  { "theora", "theoraenc", "rtptheorapay" },
+  { "h264", "x264enc", "rtph264pay" },
+  { "raw", "identity", "rtpL16pay" },
+  { "vorbis", "vorbisenc", "rtpvorbispay" },
+  { "celt", "celtenc", "rtpceltpay" },
+  { NULL, NULL, NULL }
 };
 
 static void
@@ -300,7 +303,7 @@ find_codec (gchar *codec_name)
   int i;
   CodecDescriptor *codec = NULL;
 
-  for (i = 0; codecs[i].bin != NULL; i++) {
+  for (i = 0; codecs[i].payloader != NULL; i++) {
     codec = &codecs[i];
 
     if (!g_strcmp0 (codec->name, codec_name))
@@ -311,40 +314,50 @@ find_codec (gchar *codec_name)
 }
 
 static GstElement *
-create_payloader (GstRTSPCamMediaFactory *factory,
-    gchar *codec_name, gint payloader_number)
+create_encoder (GstRTSPCamMediaFactory *factory,
+    gchar *codec_name)
 {
   CodecDescriptor *codec;
-  GstElement *bin;
-  gchar *description;
+  GstElement *encoder;
+
+  codec = find_codec (codec_name);
+  if (codec == NULL) {
+    GST_ERROR_OBJECT (factory, "invalid codec %s", codec_name);
+    return NULL;
+  }
+
+  encoder = gst_element_factory_make(codec->encoder, NULL);
+
+  return encoder;
+}
+
+static GstElement *
+create_payloader (GstRTSPCamMediaFactory *factory,
+    gchar *codec_name, gint payloader_number, gint payload_type)
+{
+  CodecDescriptor *codec;
+  GstElement *payloader;
   gchar *name;
 
   codec = find_codec (codec_name);
   if (codec == NULL) {
     GST_ERROR_OBJECT (factory, "invalid codec %s", codec_name);
-
     return NULL;
   }
 
-  description = g_strdup_printf (codec->bin, payloader_number);
-  GST_DEBUG_OBJECT (factory, "creating bin %s", codec->bin);
-  bin = gst_parse_bin_from_description (description, TRUE, NULL);
-  g_free (description);
-
-  /* FIXME: this names our bin pay%d, which means that rtsp-client will
-   * mistakenly think that the bin is the actual payloader and thus will fail at
-   * parsing RTP-Info */
   name = g_strdup_printf ("pay%d", payloader_number);
-  gst_object_set_name (GST_OBJECT (bin), name);
+  payloader = gst_element_factory_make(codec->payloader, name);
   g_free (name);
+  g_object_set(payloader, "pt", payload_type, NULL);
 
-  return bin;
+  return payloader;
 }
 
 static GstElement *
 create_video_payloader (GstRTSPCamMediaFactory *factory,
     GstElement *bin, gint payloader_number)
 {
+  GstElement *encoder;
   GstElement *pay;
   GstElement *videosrc;
   GstElement *queue, *ffmpegcolorspace, *videoscale, *videorate;
@@ -355,7 +368,11 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
   gchar *capss;
   int i;
 
-  pay = create_payloader (factory, factory->video_codec, payloader_number);
+  encoder = create_encoder (factory, factory->video_codec);
+  if (encoder == NULL)
+    return NULL;
+
+  pay = create_payloader (factory, factory->video_codec, payloader_number, VIDEO_PAYLOAD_TYPE);
   if (pay == NULL)
     return NULL;
 
@@ -372,9 +389,9 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
   capsfilter = gst_element_factory_make ("capsfilter", NULL);
 
   gst_bin_add_many (GST_BIN (bin), videosrc, queue, ffmpegcolorspace, videoscale,
-      videorate, capsfilter, pay, NULL);
+      videorate, capsfilter, encoder, pay, NULL);
   gst_element_link_many (videosrc, queue, videorate, ffmpegcolorspace, videoscale,
-      capsfilter, pay, NULL);
+      capsfilter, encoder, pay, NULL);
 
   video_caps = gst_caps_new_empty ();
   for (i = 0; image_formats[i] != NULL; i++) {
@@ -406,12 +423,17 @@ static GstElement *
 create_audio_payloader (GstRTSPCamMediaFactory *factory,
     GstElement *bin, gint payloader_number)
 {
+  GstElement *encoder;
   GstElement *pay;
   GstElement *audiosrc;
   GstElement *audioconvert;
   GstElement *audiorate;
+  
+  encoder = create_encoder (factory, factory->audio_codec);
+  if (encoder == NULL)
+    return NULL;
 
-  pay = create_payloader (factory, factory->audio_codec, payloader_number);
+  pay = create_payloader (factory, factory->audio_codec, payloader_number, AUDIO_PAYLOAD_TYPE);
   if (pay == NULL)
     return NULL;
 
@@ -426,8 +448,8 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   audioconvert = gst_element_factory_make ("audioconvert", NULL);
   audiorate = gst_element_factory_make ("audiorate", NULL);
 
-  gst_bin_add_many (GST_BIN (bin), audiosrc, audioconvert, audiorate, pay, NULL);
-  gst_element_link_many (audiosrc, audioconvert, audiorate, pay, NULL);
+  gst_bin_add_many (GST_BIN (bin), audiosrc, audioconvert, audiorate, encoder, pay, NULL);
+  gst_element_link_many (audiosrc, audioconvert, audiorate, encoder, pay, NULL);
   
   return pay;
 }
