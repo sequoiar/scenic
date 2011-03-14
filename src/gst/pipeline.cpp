@@ -175,7 +175,7 @@ void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gc
         /* let's not print these out for excluded properties... */
         while (excluded_props != NULL && *excluded_props != NULL) 
         {
-            if (strcmp (pspec->name, *excluded_props) == 0)
+            if (g_strcmp0 (pspec->name, *excluded_props) == 0)
                 return;
             excluded_props++;
         }
@@ -194,9 +194,8 @@ void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gc
             g_type_class_unref (klass);
         } 
         else 
-        {
             str = g_strdup_value_contents (&value);
-        }
+
         name = gst_object_get_path_string (orig);
         LOG_DEBUG(name << ": " << pspec->name << " = " << str);
         g_free(name);
