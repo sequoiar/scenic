@@ -303,7 +303,7 @@ find_codec (gchar *codec_name)
   for (i = 0; codecs[i].bin != NULL; i++) {
     codec = &codecs[i];
 
-    if (!strcmp (codec->name, codec_name))
+    if (!g_strcmp0 (codec->name, codec_name))
       return codec;
   }
 
