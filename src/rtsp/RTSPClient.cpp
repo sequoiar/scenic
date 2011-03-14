@@ -26,6 +26,7 @@
 #include <string>
 #include <boost/program_options.hpp>
 
+#include "sigint.h"
 #include "logWriter.h"
 #include "gtk_utils.h"
 
@@ -77,13 +78,14 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
 }
 
 gboolean
-RTSPClient::timeout (RTSPClient *client)
+RTSPClient::timeout (RTSPClient * /*client*/)
 {
     // this will be false until the recalculate latency call is made in the bus callback
-    if (!client->latencySet_)
-        g_object_set(client->rtpbin_, "latency", 5, NULL);
+    /*if (!client->latencySet_)
+        g_object_set(client->rtpbin_, "latency", 15, NULL);
     else
         return FALSE; // don't call again if we've already recalculated latency
+        */
 
     return TRUE;
 }
@@ -94,11 +96,26 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     using std::string;
     string launchLine("uridecodebin uri=rtsp://localhost:8554/test name=decode ");
     if (enableVideo)
+    {
+        LOG_DEBUG("Video enabled");
         launchLine += " decode. ! queue ! ffmpegcolorspace ! timeoverlay halignment=right ! " + options["videosink"].as<string>(); 
+    }
     if (enableAudio)
-        launchLine += " decode. ! queue ! audioconvert ! autoaudiosink";
+    {
+        LOG_DEBUG("Audio enabled");
+        launchLine += " decode. ! queue ! audioconvert ! " + options["audiosink"].as<string>();
+    }
 
-    pipeline_ = gst_parse_launch(launchLine.c_str(), NULL /* TODO add error checking */);
+    GError *error = NULL;
+    pipeline_ = gst_parse_launch(launchLine.c_str(), &error);
+    if (error != NULL) 
+    {
+        /* a recoverable error was encountered */
+        LOG_WARNING("recoverable parsing error: " << error->message);
+        g_error_free (error);
+    }
+    if (pipeline_ == 0)
+        THROW_CRITICAL("Could not create pipeline from description " << launchLine);
 
     // add bus call
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
@@ -109,16 +126,28 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
 void RTSPClient::run(int timeToLive)
 {
     /* run */
-    GstStateChangeReturn ret = gst_element_set_state (pipeline_, GST_STATE_PLAYING);
-    if (ret == GST_STATE_CHANGE_FAILURE)
-        THROW_CRITICAL("Failed to change state of pipeline");
-    LOG_INFO("Waiting for rtsp server");
-    while (rtpbin_ == 0) 
+    bool running = false;
+    while (!running and !signal_handlers::signalFlag())
+    {
+        LOG_INFO("Waiting for rtsp server");
+        GstStateChangeReturn ret = gst_element_set_state (pipeline_, GST_STATE_PLAYING);
+        if (ret == GST_STATE_CHANGE_FAILURE)
+        {
+            LOG_WARNING("Failed to change state of pipeline");
+            gst_element_set_state (pipeline_, GST_STATE_NULL);
+            g_usleep(G_USEC_PER_SEC);
+        }
+        else
+            running = true;
+    }
+
+    while (rtpbin_ == 0 and !signal_handlers::signalFlag()) 
     {
         rtpbin_ = gst_bin_get_by_name (GST_BIN(pipeline_),
                 "rtpbin0");
-        usleep(1000);
+        g_usleep(G_USEC_PER_SEC);
     }
+    LOG_DEBUG("Got rtpbin");
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, this);
 

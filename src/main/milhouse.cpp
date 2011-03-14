@@ -227,14 +227,19 @@ short Milhouse::run(int argc, char **argv)
     // wrapper so main doesn't need to know about gst and gtk
     gutil::init_gst_gtk(argc, argv);
 
+    bool enableVideo = options.count("videoport") or 
+        not options["disable-video"].as<bool>();
+    bool enableAudio = options.count("audioport") or
+        not options["disable-audio"].as<bool>();
+
     if (options["rtsp-server"].as<bool>())
     {
-        runAsRTSPServer(options, true, true);
+        runAsRTSPServer(options, enableVideo, enableAudio);
         return 0;
     }
     else if (options["rtsp-client"].as<bool>())
     {
-        runAsRTSPClient(options, true, true);
+        runAsRTSPClient(options, enableVideo, enableAudio);
         return 0;
     }
 
@@ -264,10 +269,6 @@ short Milhouse::run(int argc, char **argv)
         LOG_ERROR("argument error: must be sender OR receiver OR localvideo."); 
         return 1;
     }
-
-    bool enableVideo = options.count("videoport");
-    bool enableAudio = options.count("audioport");
-
 
     if (not enableVideo and not enableAudio)
     {

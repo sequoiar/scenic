@@ -60,6 +60,11 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options, boo
     THROW_ERROR("Invalid uri " << DEFAULT_URL);
   }
 
+  if (enableVideo)
+      LOG_DEBUG("Video enabled");
+  if (enableAudio)
+      LOG_DEBUG("Audio enabled");
+
   server = gst_rtsp_server_new ();
   gst_rtsp_server_set_port (server, local_url->port);
 

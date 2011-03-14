@@ -102,6 +102,8 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("gst-version", po::bool_switch(), "prints the version number of the GStreamer (core) library currently installed")
         ("rtsp-server", po::bool_switch(), "run in RTSP server mode")
         ("rtsp-client", po::bool_switch(), "run in RTSP client mode")
+        ("disable-video", po::bool_switch(), "run without video")
+        ("disable-audio", po::bool_switch(), "run withou audio")
         ;
 
     return desc;

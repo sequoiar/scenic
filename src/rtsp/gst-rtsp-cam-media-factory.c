@@ -82,7 +82,7 @@ static CodecDescriptor codecs[] = {
   { "h263", "ffenc_h263p ! rtph263ppay name=pay%d pt=96" },
   { "theora", "theoraenc ! rtptheorapay name=pay%d pt=96" },
   { "h264", "x264enc ! rtph264pay name=pay%d pt=96" },
-  { "raw", "identity ! rtpL16pay name=pay%d pt=97" },
+  { "raw", "rtpL16pay name=pay%d pt=97" },
   { "vorbis", "vorbisenc ! rtpvorbispay name=pay%d pt=97" },
   { "celt", "celtenc ! rtpceltpay name=pay%d pt=97" },
   { NULL, NULL }
@@ -331,6 +331,9 @@ create_payloader (GstRTSPCamMediaFactory *factory,
   bin = gst_parse_bin_from_description (description, TRUE, NULL);
   g_free (description);
 
+  /* FIXME: this names our bin pay%d, which means that rtsp-client will
+   * mistakenly think that the bin is the actual payloader and thus will fail at
+   * parsing RTP-Info */
   name = g_strdup_printf ("pay%d", payloader_number);
   gst_object_set_name (GST_OBJECT (bin), name);
   g_free (name);
@@ -357,7 +360,9 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
     return NULL;
 
   videosrc = gst_element_factory_make (factory->video_source, NULL);
-  if (factory->video_device)
+  if (g_strcmp0(factory->video_source, "videotestsrc") == 0)
+      g_object_set (videosrc, "is-live", TRUE, NULL);
+  else if (factory->video_device) /* don't set device for testsrc */
     g_object_set (videosrc, "device", factory->video_device, NULL);
 
   queue = gst_element_factory_make ("queue", NULL);
