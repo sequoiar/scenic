@@ -54,11 +54,12 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options, boo
   GstRTSPMediaMapping *mapping;
   GstRTSPCamMediaFactory *factory;
   GstRTSPUrl *local_url; 
-  static const char *DEFAULT_URL = "rtsp://localhost:8554/test";
+  std::string urlStr("rtsp://");
+  urlStr += options["address"].as<string>();
+  urlStr += ":8554/test";
 
-  if (gst_rtsp_url_parse (DEFAULT_URL, &local_url) != GST_RTSP_OK) {
-    THROW_ERROR("Invalid uri " << DEFAULT_URL);
-  }
+  if (gst_rtsp_url_parse (urlStr.c_str(), &local_url) != GST_RTSP_OK)
+    THROW_ERROR("Invalid uri " << urlStr);
 
   if (enableVideo)
       LOG_DEBUG("Video enabled");
@@ -96,7 +97,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options, boo
 
   gst_rtsp_server_attach (server, NULL);
 
-  g_timeout_add_seconds (10, (GSourceFunc) timeout, server); 
+  g_timeout_add_seconds (5, (GSourceFunc) timeout, server); 
 }
         
 void RTSPServer::run(int timeout)

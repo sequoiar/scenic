@@ -94,7 +94,10 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     rtpbin_(0), pipeline_(0), latencySet_(false)
 {
     using std::string;
-    string launchLine("uridecodebin uri=rtsp://localhost:8554/test name=decode ");
+    string launchLine("uridecodebin uri=rtsp://");
+    launchLine += options["address"].as<string>(); // i.e. localhost
+    launchLine += ":8554/test name=decode ";
+
     if (enableVideo)
     {
         LOG_DEBUG("Video enabled");
