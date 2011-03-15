@@ -56,6 +56,7 @@ struct _GstRTSPCamMediaFactory {
   gchar *audio_source;
   gchar *audio_device;
   gchar *audio_codec;
+  gint audio_channels;
 };
 
 struct _GstRTSPCamMediaFactoryClass {

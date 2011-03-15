@@ -81,6 +81,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options, boo
       "audio-source", options["audiosource"].as<string>().c_str(),
       "audio-device", options["audiodevice"].as<string>().c_str(),
       "audio-codec", options["audiocodec"].as<string>().c_str(),
+      "audio-channels", options["numchannels"].as<int>(),
       NULL);
 
   // let multiple client connect to this server

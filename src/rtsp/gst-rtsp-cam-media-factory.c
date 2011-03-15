@@ -34,7 +34,8 @@ enum
   PROP_AUDIO,
   PROP_AUDIO_SOURCE,
   PROP_AUDIO_DEVICE,
-  PROP_AUDIO_CODEC
+  PROP_AUDIO_CODEC,
+  PROP_AUDIO_CHANNELS
 };
 
 enum
@@ -75,6 +76,7 @@ G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP
 #define DEFAULT_AUDIO_SOURCE "autoaudiosrc"
 #define DEFAULT_AUDIO_DEVICE NULL
 #define DEFAULT_AUDIO_CODEC "raw"
+#define DEFAULT_AUDIO_CHANNELS -1
 static const int VIDEO_PAYLOAD_TYPE = 96;
 static const int AUDIO_PAYLOAD_TYPE = 97;
 
@@ -152,6 +154,9 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
       g_param_spec_string ("audio-codec", "Audio codec", "audio codec",
           DEFAULT_AUDIO_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
+  g_object_class_install_property (gobject_class, PROP_AUDIO_CHANNELS,
+      g_param_spec_int ("audio-channels", "Audio channels", "audio channels",
+          -1, G_MAXINT32, DEFAULT_AUDIO_CHANNELS, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
   GST_DEBUG_CATEGORY_INIT (rtsp_cam_media_factory_debug,
       "rtspcammediafactory", 0, "RTSP Cam Media Factory");
@@ -219,6 +224,9 @@ gst_rtsp_cam_media_factory_get_property (GObject *object, guint propid,
     case PROP_AUDIO_CODEC:
       g_value_set_string (value, factory->audio_codec);
       break;
+    case PROP_AUDIO_CHANNELS:
+      g_value_set_int (value, factory->audio_channels);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, propid, pspec);
   }
@@ -282,6 +290,9 @@ gst_rtsp_cam_media_factory_set_property (GObject *object, guint propid,
       factory->audio_codec = g_value_dup_string (value);
       if (factory->audio_codec == NULL)
         factory->audio_codec = g_strdup (DEFAULT_AUDIO_CODEC);
+      break;
+    case PROP_AUDIO_CHANNELS:
+      factory->audio_channels = g_value_get_int (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, propid, pspec);
@@ -366,6 +377,7 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
       "video/x-raw-yuv", "video/x-raw-gray", NULL};
   GstCaps *video_caps;
   gchar *capss;
+  gboolean linked;
   int i;
 
   encoder = create_encoder (factory, factory->video_codec);
@@ -390,8 +402,9 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
 
   gst_bin_add_many (GST_BIN (bin), videosrc, queue, ffmpegcolorspace, videoscale,
       videorate, capsfilter, encoder, pay, NULL);
-  gst_element_link_many (videosrc, queue, videorate, ffmpegcolorspace, videoscale,
+  linked = gst_element_link_many (videosrc, queue, videorate, ffmpegcolorspace, videoscale,
       capsfilter, encoder, pay, NULL);
+  g_assert(linked);
 
   video_caps = gst_caps_new_empty ();
   for (i = 0; image_formats[i] != NULL; i++) {
@@ -428,6 +441,13 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   GstElement *audiosrc;
   GstElement *audioconvert;
   GstElement *audiorate;
+  GstElement *capsfilter;
+  gchar *audio_formats[] = {"audio/x-raw-float",
+      "audio/x-raw-int", NULL};
+  GstCaps *audio_caps;
+  gchar *capss;
+  gboolean linked;
+  int i;
   
   encoder = create_encoder (factory, factory->audio_codec);
   if (encoder == NULL)
@@ -447,9 +467,27 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
 
   audioconvert = gst_element_factory_make ("audioconvert", NULL);
   audiorate = gst_element_factory_make ("audiorate", NULL);
+  capsfilter = gst_element_factory_make ("capsfilter", NULL);
 
-  gst_bin_add_many (GST_BIN (bin), audiosrc, audioconvert, audiorate, encoder, pay, NULL);
-  gst_element_link_many (audiosrc, audioconvert, audiorate, encoder, pay, NULL);
+  gst_bin_add_many (GST_BIN (bin), audiosrc, audioconvert, audiorate, capsfilter, encoder, pay, NULL);
+  linked = gst_element_link_many (audiosrc, audioconvert, audiorate, capsfilter, encoder, pay, NULL);
+  g_assert(linked);
+
+  audio_caps = gst_caps_new_empty ();
+  for (i = 0; audio_formats[i] != NULL; i++) {
+    GstStructure *structure = gst_structure_new (audio_formats[i], NULL);
+
+    if (factory->audio_channels != -1)
+      gst_structure_set (structure, "channels", G_TYPE_INT, factory->audio_channels, NULL);
+  
+    gst_caps_append_structure (audio_caps, structure);
+  }
+
+  capss = gst_caps_to_string (audio_caps);
+  GST_INFO_OBJECT (factory, "setting audio caps %s", capss);
+  g_free (capss);
+
+  g_object_set (capsfilter, "caps", audio_caps, NULL);
   
   return pay;
 }
