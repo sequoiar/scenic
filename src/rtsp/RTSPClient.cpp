@@ -104,7 +104,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     if (enableAudio)
     {
         LOG_DEBUG("Audio enabled");
-        launchLine += " decode. ! queue ! audioconvert ! " + options["audiosink"].as<string>();
+        launchLine += " decode. ! queue ! audioconvert ! audioresample ! " + options["audiosink"].as<string>();
     }
 
     GError *error = NULL;
