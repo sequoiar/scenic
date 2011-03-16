@@ -20,10 +20,10 @@
 //
 
 #include "util.h"
+#include <glib/gfileutils.h>
 #include "dc1394.h"
 #include "noncopyable.h"
 
-#include <boost/filesystem/operations.hpp>
 #include <fstream>
 #include <dc1394/control.h>
 #include <libraw1394/raw1394.h>
@@ -374,9 +374,9 @@ bool Dc1394::listCameras()
     {
         // if module is present but permissions aren't good, print a warning
         // otherwise don't do anything
-        if (boost::filesystem::exists("/dev/raw1394"))
+        if (g_file_test("/dev/raw1394", G_FILE_TEST_EXISTS))
         {
-            if (boost::filesystem::exists("/dev/video1394"))
+            if (g_file_test("/dev/video1394", G_FILE_TEST_EXISTS))
             {
                 if (not isModuleReadable("raw1394"))
                     LOG_WARNING("Module raw1394 is not readable");
@@ -388,7 +388,7 @@ bool Dc1394::listCameras()
             else
                 LOG_WARNING("Module video1394 is not loaded.");
         }
-        else if (boost::filesystem::exists("/dev/video1394"))
+        else if (g_file_test("/dev/video1394", G_FILE_TEST_EXISTS))
             LOG_WARNING("Module raw1394 is not loaded.");
         else
             LOG_DEBUG("Neither raw1394 nor video1394 modules are loaded");

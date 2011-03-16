@@ -293,7 +293,7 @@ std::string VideoDc1394Source::srcCaps(unsigned int /*framerateIndex*/) const
     } 
     spaces.push_back("gray");
 
-    for (ColourspaceList::iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space)
+    for (ColourspaceList::const_iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space)
     {
         colourSpace = *space;
         mode = Dc1394::capsToMode(cameraNumber, config_.captureWidth(),

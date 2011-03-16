@@ -24,7 +24,7 @@
 #include "videoSize.h"
 
 #include <fstream>
-#include <boost/filesystem/operations.hpp>
+#include <glib/gfileutils.h>
 #include <boost/program_options.hpp>
 #include "videoConfig.h"
 #include "videoSource.h"
@@ -119,14 +119,14 @@ bool VideoSourceConfig::forceGrayscale() const
 
 bool VideoSourceConfig::locationExists() const
 {
-    return boost::filesystem::exists(location_);
+    return g_file_test(location_.c_str(), G_FILE_TEST_EXISTS);
 }
 
 
 
 bool VideoSourceConfig::deviceExists() const
 {
-    return boost::filesystem::exists(deviceName_);
+    return g_file_test(deviceName_.c_str(), G_FILE_TEST_EXISTS);
 }
 
 

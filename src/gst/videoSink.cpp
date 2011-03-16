@@ -28,10 +28,6 @@
 #include "rtpReceiver.h"
 #include "gtk_utils.h"
 
-// for filesystem ops
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
@@ -73,14 +69,15 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
     gtk_widget_set_double_buffered(drawingArea_, FALSE);
     if (hasWindow())
     {
-        namespace fs = boost::filesystem;
         gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
         gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
 
         gtk_container_add(GTK_CONTAINER(window_), hbox_);
-        fs::path iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
-        if (fs::exists(iconPath))
-            gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.string().c_str(), NULL);
+        std::string iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
+        // This test isn't very reliable since the icon file could be moved 
+        // in between the test and the function call.
+        if (g_file_test(iconPath.c_str(), G_FILE_TEST_EXISTS))
+            gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.c_str(), NULL);
 
         // add listener for window-state-event to detect fullscreenness
         g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);
