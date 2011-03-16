@@ -76,6 +76,59 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
     return TRUE;
 }
 
+    namespace {
+    void print_pipeline(GstElement *pipeline)
+    {
+        gboolean done = FALSE;
+        gpointer item;
+        GstIterator *it = gst_bin_iterate_recurse(GST_BIN(pipeline));
+        while (!done) {
+            switch (gst_iterator_next (it, &item)) {
+                case GST_ITERATOR_OK:
+                    if (g_strcmp0("decode", gst_object_get_name(GST_OBJECT(item))) == 0) {
+                        g_print("decode has %d childproxy elements\n", gst_child_proxy_get_children_count(GST_CHILD_PROXY(item)));
+                        gboolean ddone = FALSE;
+                        gpointer ditem;
+                        GstIterator *dit = gst_bin_iterate_elements(GST_BIN(item));
+
+                        while (!ddone) {
+                            switch (gst_iterator_next (dit, &ditem)) {
+                                case GST_ITERATOR_OK:
+                                    g_print("%s", G_OBJECT_CLASS_NAME(G_OBJECT(ditem)));
+                                    gst_object_unref (ditem);
+                                    break;
+                                case GST_ITERATOR_RESYNC:
+                                    gst_iterator_resync (dit);
+                                    break;
+                                case GST_ITERATOR_ERROR:
+                                    ddone = TRUE;
+                                    break;
+                                case GST_ITERATOR_DONE:
+                                    ddone = TRUE;
+                                    break;
+                            }
+                        }
+                    }
+                    else
+                        g_print("%s\n", gst_object_get_name(GST_OBJECT(item)));
+                    gst_object_unref (item);
+                    break;
+                case GST_ITERATOR_RESYNC:
+                    gst_iterator_resync (it);
+                    break;
+                case GST_ITERATOR_ERROR:
+                    done = TRUE;
+                    break;
+                case GST_ITERATOR_DONE:
+                    done = TRUE;
+                    break;
+            }
+        }
+        gst_iterator_free (it);
+    }
+}
+
+
 gboolean
 RTSPClient::timeout (RTSPClient * client)
 {
@@ -85,6 +138,7 @@ RTSPClient::timeout (RTSPClient * client)
     else
         return FALSE; // don't call again if we've already recalculated latency
 
+    print_pipeline(client->pipeline_);
     return TRUE;
 }
 
@@ -123,7 +177,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     gst_bus_add_watch(bus, busCall, this);
     gst_object_unref(bus);
 }
-        
+
 void RTSPClient::run(int timeToLive)
 {
     /* run */
@@ -151,6 +205,14 @@ void RTSPClient::run(int timeToLive)
     LOG_DEBUG("Got rtpbin");
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, this);
+
+    GstObject *obj = 0;
+    GParamSpec *pspec;
+    bool result = gst_child_proxy_lookup (GST_OBJECT(pipeline_), "port-range", &obj, &pspec);
+    if (obj)
+        gst_object_unref(obj);
+    if (result)
+        LOG_INFO("Found property port-range");
 
     /* start main loop */
     gutil::runMainLoop(timeToLive);
