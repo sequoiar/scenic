@@ -21,8 +21,6 @@
  */
 
 #include "playback.h"
-#include "util.h"
-
 #include "pipeline.h"
 #include "gtk_utils.h"
 

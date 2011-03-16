@@ -20,7 +20,6 @@
  *
  */
 
-#include "util.h"
 #include "gtk_utils.h"
 
 #include <list>

@@ -21,7 +21,6 @@
  */
 
 #include <gst/gst.h>
-#include "util.h"
 #include "videoScale.h"
 #include <boost/assign.hpp>
 #include <sstream>

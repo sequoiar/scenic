@@ -20,8 +20,6 @@
  *
  */
 
-#include "util.h"
-
 #include "pipeline.h"
 #include "gstLinkable.h"
 #include "videoSender.h"

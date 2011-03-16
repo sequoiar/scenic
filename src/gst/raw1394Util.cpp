@@ -20,10 +20,9 @@
  *
  */
 
-#include "util.h"
-
 #include <cerrno>
 #include <cstring>
+#include "util/logWriter.h"
 #ifdef CONFIG_IEEE1394
 #include <libavc1394/avc1394.h>
 #include <libavc1394/rom1394.h>

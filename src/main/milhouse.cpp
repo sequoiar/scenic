@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "util.h"
+#include "util/logWriter.h"
 
 #include "gtk_utils.h"
 

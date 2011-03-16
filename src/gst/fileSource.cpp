@@ -26,7 +26,6 @@ else create new filesrc and plug into it */
 
 #include <gst/gst.h>
 #include <cassert>
-#include "util.h"
 #include "pipeline.h"
 #include "gstLinkable.h"
 #include "fileSource.h"

@@ -21,13 +21,13 @@
  */
 
 #include "pipeline.h"
+#include "util/logWriter.h"
 #include <gst/gst.h>
 #include <gtk/gtk.h>
 #include <cstring>
 #include <string>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
-#include "util.h"
 #include "gtk_utils.h"
 
 #include "dv1394.h"

@@ -20,8 +20,6 @@
  *
  */
 
-#include "util.h"
-
 #include "pipeline.h"
 #include "mediaBase.h"
 #include "gstLinkable.h"
@@ -35,8 +33,6 @@
 #include "codec.h"
 #include "rtpPay.h"
 #include "messageDispatcher.h"
-
-#include <boost/shared_ptr.hpp>
 
 using std::tr1::shared_ptr;
     

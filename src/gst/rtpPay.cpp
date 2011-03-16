@@ -20,13 +20,11 @@
  *
  */
 
-#include "util.h"
-
 #include <cassert>
 #include <gst/gst.h>
 #include "rtpPay.h"
 #include "pipeline.h"
-
+#include "util/logWriter.h"
 
 RtpPay::~RtpPay()
 {

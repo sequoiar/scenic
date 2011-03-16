@@ -21,8 +21,6 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "util.h"
-
 #include "audioFactory.h"
 #include <boost/program_options.hpp>
 #include "audioSender.h"
@@ -32,6 +30,7 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "caps/CapsServer.h"
+#include "util/logWriter.h"
 #include "pipeline.h"
 
 using std::tr1::shared_ptr;

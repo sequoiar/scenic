@@ -68,7 +68,7 @@ class Decoder : private boost::noncopyable
         virtual RtpPay* createDepayloader() const = 0;
         virtual void adjustJitterBuffer() {}; // buy default, do nothing
         virtual bool adjustsBufferTime() { return false; }
-        virtual unsigned long long minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
+        virtual unsigned long long minimumBufferTime();
         virtual _GstElement *srcElement() { return decoder_; }
         virtual _GstElement *sinkElement() { return decoder_; }
         

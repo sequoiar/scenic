@@ -20,8 +20,6 @@
  *
  */
 
-#include "util.h"
-
 #include "mediaBase.h"
 #include "remoteConfig.h"
 #include <gst/gst.h>

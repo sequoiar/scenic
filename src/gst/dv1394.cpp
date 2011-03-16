@@ -26,7 +26,6 @@
 #include "raw1394Util.h"
 #include "gstLinkable.h"
 #include "pipeline.h"
-#include "util.h"
 
 Dv1394 *Dv1394::instance_ = 0;
 

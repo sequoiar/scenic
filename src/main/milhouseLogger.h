@@ -25,7 +25,7 @@
 #define _MILHOUSE_LOGGER_H_
 
 #include "ConcurrentQueue.h"
-#include "util.h"
+#include "util/logWriter.h"
 
 class MilhouseLogger
     : public Log::Subscriber

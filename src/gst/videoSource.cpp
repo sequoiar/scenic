@@ -27,8 +27,6 @@
 #include <vector>
 #include <boost/lexical_cast.hpp>
 
-#include "util.h"
-
 #include "gstLinkable.h"
 #include "pipeline.h"
 #include "videoConfig.h"

@@ -20,8 +20,6 @@
  *
  */
 
-#include "util.h"
-
 #include <gst/gst.h>
 #include <algorithm>
 #include <sstream>

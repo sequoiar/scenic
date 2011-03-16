@@ -22,7 +22,8 @@
 
 #include <gst/gst.h>
 #include <gtk/gtk.h>
-#include "util.h"
+#include "util/logWriter.h"
+#include "util/sigint.h"
 #include "gtk_utils.h"
     
 // extend namespace gutil

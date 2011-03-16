@@ -20,7 +20,6 @@
  *
  */
 
-#include "util.h"
 #pragma GCC diagnostic ignored "-pedantic"
 #include <gst/audio/multichannel.h>
 

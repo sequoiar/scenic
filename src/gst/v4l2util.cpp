@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include "util/logWriter.h"
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>  // for O_RDWR
@@ -36,7 +37,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
-#include "util.h"
 #include "v4l2util.h"
 
 #include <boost/lexical_cast.hpp>

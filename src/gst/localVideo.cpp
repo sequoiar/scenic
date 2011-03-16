@@ -21,7 +21,6 @@
  */
 
 #include "localVideo.h"
-#include "util.h"
 
 #include "gstLinkable.h"
 #include <boost/shared_ptr.hpp>

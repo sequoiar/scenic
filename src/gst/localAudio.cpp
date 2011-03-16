@@ -20,8 +20,6 @@
  *
  */
 
-#include "util.h"
-
 #include "localAudio.h"
 #include "pipeline.h"
 #include "audioSource.h"

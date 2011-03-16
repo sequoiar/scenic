@@ -26,8 +26,8 @@
 
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
+#include "util/logWriter.h"
 
-#include "util.h"
 #include "gstLinkable.h"
 
 #include <boost/thread/thread.hpp>
@@ -103,6 +103,7 @@ Decoder::~Decoder()
     pipeline_.remove(&decoder_);
 }
 
+unsigned long long Decoder::minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
 
 VideoEncoder::VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced) :
     Encoder(pipeline, encoder),

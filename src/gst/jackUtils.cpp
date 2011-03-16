@@ -20,9 +20,8 @@
  *
  */
 
-#include "util.h"
-
 #include <jack/jack.h>
+#include "util/logWriter.h"
 #include "jackUtils.h"
 #include "pipeline.h"
 

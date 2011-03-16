@@ -30,8 +30,8 @@
 #include <boost/program_options.hpp>
 
 #include "gst-rtsp-cam-media-factory.h"
-#include "logWriter.h"
-#include "gtk_utils.h"
+#include "util/logWriter.h"
+#include "gtk_utils/gtk_utils.h"
 
 namespace {
 static gboolean

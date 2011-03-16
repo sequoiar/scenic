@@ -20,12 +20,11 @@
  *
  */
 
-#include "util.h"
-
 #include <algorithm>
 #include <boost/assign.hpp>
 #include <boost/lexical_cast.hpp>
 #include <gst/gst.h>
+#include "util/logWriter.h"
 #include "pipeline.h"
 #include "caps/CapsServer.h"
 #include "caps/MulticastCapsServer.h"

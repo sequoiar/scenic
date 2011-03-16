@@ -19,9 +19,11 @@
  *
  */
 
+#include "config.h"
 #include <iostream>
 #include "milhouse.h"
-#include "util.h"
+#include "util/sigint.h"
+#include "except.h"
 
 int main(int argc, char **argv)
 {

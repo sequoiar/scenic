@@ -26,9 +26,9 @@
 #include <string>
 #include <boost/program_options.hpp>
 
-#include "sigint.h"
-#include "logWriter.h"
-#include "gtk_utils.h"
+#include "util/sigint.h"
+#include "util/logWriter.h"
+#include "gtk_utils/gtk_utils.h"
 
 gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
 {

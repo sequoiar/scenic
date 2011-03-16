@@ -24,6 +24,7 @@
 #define _RTP_BIN_H_
 
 #include <map>
+#include <string>
 
 #include "noncopyable.h"
 

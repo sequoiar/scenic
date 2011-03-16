@@ -19,8 +19,6 @@
  *
  */
 
-#include "util.h"
-
 #include <gst/interfaces/xoverlay.h>
 #include "gstLinkable.h"
 #include "videoSink.h"

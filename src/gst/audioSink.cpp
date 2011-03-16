@@ -20,7 +20,6 @@
  *
  */
 
-#include "util.h"
 #include <cassert>
 
 #include <gst/gst.h>

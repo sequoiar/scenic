@@ -20,8 +20,8 @@
  *
  */
 
-#include "util.h"
 #include <boost/program_options.hpp>
+#include "util/logWriter.h"
 
 #include "audioConfig.h"
 #include "audioSource.h"

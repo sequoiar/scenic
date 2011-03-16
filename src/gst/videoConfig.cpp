@@ -20,12 +20,12 @@
  *
  */
 
-#include "util.h"
 #include "videoSize.h"
 
 #include <fstream>
 #include <glib/gfileutils.h>
 #include <boost/program_options.hpp>
+#include "util/logWriter.h"
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"

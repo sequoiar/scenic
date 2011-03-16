@@ -1,5 +1,6 @@
 #include "CapsClient.h"
-#include "util.h"
+#include "util/logWriter.h"
+#include "util/sigint.h"
 #include <iterator>
 #include <boost/asio.hpp>
 #include <boost/asio/read_until.hpp>
