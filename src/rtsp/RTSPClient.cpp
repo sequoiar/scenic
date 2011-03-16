@@ -60,7 +60,6 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
             {
                 // when pipeline latency is changed, this msg is posted on the bus. we then have
                 // to explicitly tell the pipeline to recalculate its latency
-                // FIXME: this never works!
                 if (gst_bin_recalculate_latency (GST_BIN(context->pipeline_)) == TRUE)
                 {
                     LOG_DEBUG("Reconfigured latency.");
@@ -78,14 +77,13 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
 }
 
 gboolean
-RTSPClient::timeout (RTSPClient * /*client*/)
+RTSPClient::timeout (RTSPClient * client)
 {
     // this will be false until the recalculate latency call is made in the bus callback
-    /*if (!client->latencySet_)
+    if (!client->latencySet_)
         g_object_set(client->rtpbin_, "latency", 15, NULL);
     else
         return FALSE; // don't call again if we've already recalculated latency
-        */
 
     return TRUE;
 }
