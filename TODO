@@ -11,6 +11,7 @@ add vumeters.
 
 RTSPClient
 ----
+investigate "source" property of uridecodebin
 see how we can specify explicitly which ports to use.
 use fancier overlay like in GtkVideoSink.
 add vumeters.
