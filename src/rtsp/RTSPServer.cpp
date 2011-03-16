@@ -76,6 +76,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options, boo
       "video-device", options["videodevice"].as<string>().c_str(),
       "video-width", options["width"].as<int>(),
       "video-height", options["height"].as<int>(),
+      "video-bitrate", options["videobitrate"].as<int>(),
       "video-codec", options["videocodec"].as<string>().c_str(),
       "video-framerate", options["framerate"].as<int>(), 1,
       "audio", enableAudio,

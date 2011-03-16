@@ -29,6 +29,7 @@ enum
   PROP_VIDEO_DEVICE,
   PROP_VIDEO_WIDTH,
   PROP_VIDEO_HEIGHT,
+  PROP_VIDEO_BITRATE,
   PROP_VIDEO_FRAMERATE,
   PROP_VIDEO_CODEC,
   PROP_AUDIO,
@@ -69,6 +70,7 @@ G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP
 #define DEFAULT_VIDEO_DEVICE NULL
 #define DEFAULT_VIDEO_WIDTH -1
 #define DEFAULT_VIDEO_HEIGHT -1
+#define DEFAULT_VIDEO_BITRATE -1
 #define DEFAULT_VIDEO_FRAMERATE_N 0
 #define DEFAULT_VIDEO_FRAMERATE_D 1
 #define DEFAULT_VIDEO_CODEC "mpeg4"
@@ -131,6 +133,10 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
   g_object_class_install_property (gobject_class, PROP_VIDEO_HEIGHT,
       g_param_spec_int ("video-height", "Video height", "video height",
           -1, G_MAXINT32, DEFAULT_VIDEO_HEIGHT, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+  g_object_class_install_property (gobject_class, PROP_VIDEO_BITRATE,
+      g_param_spec_int ("video-bitrate", "Video bitrate", "video bitrate",
+          -1, G_MAXINT32, DEFAULT_VIDEO_BITRATE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
   g_object_class_install_property (gobject_class, PROP_VIDEO_FRAMERATE,
       gst_param_spec_fraction ("video-framerate", "Video framerate", "video framerate",
@@ -209,6 +215,9 @@ gst_rtsp_cam_media_factory_get_property (GObject *object, guint propid,
     case PROP_VIDEO_HEIGHT:
       g_value_set_int (value, factory->video_height);
       break;
+    case PROP_VIDEO_BITRATE:
+      g_value_set_int (value, factory->video_bitrate);
+      break;
     case PROP_VIDEO_FRAMERATE:
       gst_value_set_fraction (value, factory->fps_n, factory->fps_d);
       break;
@@ -262,6 +271,9 @@ gst_rtsp_cam_media_factory_set_property (GObject *object, guint propid,
       break;
     case PROP_VIDEO_HEIGHT:
       factory->video_height = g_value_get_int (value);
+      break;
+    case PROP_VIDEO_BITRATE:
+      factory->video_bitrate = g_value_get_int (value);
       break;
     case PROP_VIDEO_FRAMERATE:
       factory->fps_n = gst_value_get_fraction_numerator (value);
@@ -383,6 +395,8 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
   encoder = create_encoder (factory, factory->video_codec);
   if (encoder == NULL)
     return NULL;
+  if (factory->video_bitrate != -1)
+    g_object_set (encoder, "bitrate", factory->video_bitrate, NULL);
 
   pay = create_payloader (factory, factory->video_codec, payloader_number, VIDEO_PAYLOAD_TYPE);
   if (pay == NULL)

@@ -49,6 +49,7 @@ struct _GstRTSPCamMediaFactory {
   gchar *video_device;
   gint video_width;
   gint video_height;
+  gint video_bitrate;
   gint fps_n;
   gint fps_d;
   gchar *video_codec;
