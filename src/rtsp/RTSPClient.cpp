@@ -120,7 +120,10 @@ bool validPortRange(const std::string &ports)
     // this is the minimum if audio AND video are present, so we may want to change it
     // if the client knows in advance that it will not grab both streams
     static const int MINIMUM_PORT_RANGE = 5; // RTP=n, RTCP1=n+1, RTCP2=n+3
-    return second - first >= MINIMUM_PORT_RANGE;
+    if (first >= 1 and first <= 65535 and second >= 1 and second <= 65535)
+        if ((second - first) >= MINIMUM_PORT_RANGE)
+            return true;
+    return false;
 }
 }
 
