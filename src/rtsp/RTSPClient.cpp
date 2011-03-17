@@ -76,79 +76,49 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
     return TRUE;
 }
 
-    namespace {
-    void print_pipeline(GstElement *pipeline)
+gboolean
+RTSPClient::timeout()
+{
+    if (signal_handlers::signalFlag())
     {
-        gboolean done = FALSE;
-        gpointer item;
-        GstIterator *it = gst_bin_iterate_recurse(GST_BIN(pipeline));
-        while (!done) {
-            switch (gst_iterator_next (it, &item)) {
-                case GST_ITERATOR_OK:
-                    if (g_strcmp0("decode", gst_object_get_name(GST_OBJECT(item))) == 0) {
-                        g_print("decode has %d childproxy elements\n", gst_child_proxy_get_children_count(GST_CHILD_PROXY(item)));
-                        gboolean ddone = FALSE;
-                        gpointer ditem;
-                        GstIterator *dit = gst_bin_iterate_elements(GST_BIN(item));
-
-                        while (!ddone) {
-                            switch (gst_iterator_next (dit, &ditem)) {
-                                case GST_ITERATOR_OK:
-                                    g_print("%s", G_OBJECT_CLASS_NAME(G_OBJECT(ditem)));
-                                    gst_object_unref (ditem);
-                                    break;
-                                case GST_ITERATOR_RESYNC:
-                                    gst_iterator_resync (dit);
-                                    break;
-                                case GST_ITERATOR_ERROR:
-                                    ddone = TRUE;
-                                    break;
-                                case GST_ITERATOR_DONE:
-                                    ddone = TRUE;
-                                    break;
-                            }
-                        }
-                    }
-                    else
-                        g_print("%s\n", gst_object_get_name(GST_OBJECT(item)));
-                    gst_object_unref (item);
-                    break;
-                case GST_ITERATOR_RESYNC:
-                    gst_iterator_resync (it);
-                    break;
-                case GST_ITERATOR_ERROR:
-                    done = TRUE;
-                    break;
-                case GST_ITERATOR_DONE:
-                    done = TRUE;
-                    break;
-            }
-        }
-        gst_iterator_free (it);
+        gutil::killMainLoop();
+        return FALSE;
     }
+    else
+        return TRUE;
 }
 
-
 gboolean
-RTSPClient::timeout (RTSPClient * client)
+RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpointer data)
 {
-    // this will be false until the recalculate latency call is made in the bus callback
-    if (!client->latencySet_)
-        g_object_set(client->rtpbin_, "latency", 15, NULL);
-    else
-        return FALSE; // don't call again if we've already recalculated latency
+    GstElement *src;
+    RTSPClient *context = static_cast<RTSPClient*>(data);
 
-    print_pipeline(client->pipeline_);
+    g_object_get (uridecodebin, "source", &src, NULL);
+
+    /* set your properties (check for existance of
+     * property first if you use different protocols
+     * or sources) */
+    LOG_DEBUG("Setting properties on rtspsrc");
+    g_object_set (src, "latency", 15, NULL);
+    if (not context->portRange_.empty())
+        g_object_set (src, "port-range", context->portRange_.c_str(), NULL);
+
+    gst_object_unref (src); 
     return TRUE;
 }
 
 RTSPClient::RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio) :
-    rtpbin_(0), pipeline_(0), latencySet_(false)
+    pipeline_(0), latencySet_(false), portRange_("")
 {
     using std::string;
     string launchLine("uridecodebin uri=rtsp://");
     launchLine += options["address"].as<string>(); // i.e. localhost
     launchLine += ":8554/test name=decode ";
+
+    // get port range
+    if (options.count("port-range"))
+        portRange_ = options["port-range"].as<std::string>();
 
     if (enableVideo)
     {
@@ -171,6 +141,10 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     }
     if (pipeline_ == 0)
         THROW_CRITICAL("Could not create pipeline from description " << launchLine);
+
+    GstElement *decodebin = gst_bin_get_by_name (GST_BIN(pipeline_),
+                "decode");
+    g_signal_connect(decodebin, "notify::source", G_CALLBACK(onNotifySource), this);
 
     // add bus call
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
@@ -205,24 +179,8 @@ void RTSPClient::run(int timeToLive)
         else
             running = true;
     }
-
-    while (rtpbin_ == 0 and not signal_handlers::signalFlag()) 
-    {
-        rtpbin_ = gst_bin_get_by_name (GST_BIN(pipeline_),
-                "rtpbin0");
-        g_usleep(G_USEC_PER_SEC);
-    }
-    LOG_DEBUG("Got rtpbin");
     /* add a timeout to check the interrupted variable */
-    g_timeout_add_seconds(5, (GSourceFunc) timeout, this);
-
-    GstObject *obj = 0;
-    GParamSpec *pspec;
-    bool result = gst_child_proxy_lookup (GST_OBJECT(pipeline_), "port-range", &obj, &pspec);
-    if (obj)
-        gst_object_unref(obj);
-    if (result)
-        LOG_INFO("Found property port-range");
+    g_timeout_add_seconds(5, (GSourceFunc) timeout, NULL);
 
     /* start main loop */
     if (not signal_handlers::signalFlag())

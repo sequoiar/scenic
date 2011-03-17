@@ -24,10 +24,12 @@
 #define _RTSP_CLIENT_H_
 
 #include "noncopyable.h"
+#include <string>
 
 class _GstElement;
 class _GstMessage;
 class _GstBus;
+class _GParamSpec;
 
 namespace boost {
     namespace program_options {
@@ -43,10 +45,11 @@ class RTSPClient : private boost::noncopyable
         void run(int timeout);
     private:
         static int busCall(_GstBus * /*bus*/, _GstMessage *msg, void *user_data);
-        static int timeout(RTSPClient *client);
-        _GstElement *rtpbin_;
+        static int timeout();
+        static int onNotifySource(_GstElement *uridecodebin, _GParamSpec * /*pspec*/, void *data);
         _GstElement *pipeline_;
         bool latencySet_;
+        std::string portRange_;
 };
 
 #endif // _RTSP_CLIENT_H_
