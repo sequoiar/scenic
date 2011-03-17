@@ -24,6 +24,7 @@
 #include "RTSPClient.h"
 #include <gst/gst.h>
 #include <string>
+#include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 
 #include "util/sigint.h"
@@ -86,6 +87,7 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
                 break;
             }
         default:
+            // Unhandled message
             break;
     }
 
@@ -104,6 +106,24 @@ RTSPClient::timeout()
         return TRUE;
 }
 
+namespace 
+{
+bool validPortRange(const std::string &ports)
+{
+    std::vector<std::string> strs;
+    boost::split(strs, ports, boost::is_any_of("- "));
+    if (strs.size() != 2)
+        return false;
+    int first = boost::lexical_cast<int>(strs[0]);
+    int second = boost::lexical_cast<int>(strs[1]);
+    // TODO Thu Mar 17 17:53:46 EDT 2011:tmatth 
+    // this is the minimum if audio AND video are present, so we may want to change it
+    // if the client knows in advance that it will not grab both streams
+    static const int MINIMUM_PORT_RANGE = 5; // RTP=n, RTCP1=n+1, RTCP2=n+3
+    return second - first >= MINIMUM_PORT_RANGE;
+}
+}
+
 gboolean
 RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpointer data)
 {
@@ -118,7 +138,12 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
     LOG_DEBUG("Setting properties on rtspsrc");
     g_object_set (src, "latency", 15, NULL);
     if (not context->portRange_.empty())
-        g_object_set (src, "port-range", context->portRange_.c_str(), NULL);
+    {
+        if (validPortRange(context->portRange_))
+            g_object_set (src, "port-range", context->portRange_.c_str(), NULL);
+        else
+            LOG_WARNING("Invalid port-range " << context->portRange_ << ", ignoring.");
+    }
 
     gst_object_unref (src); 
     return TRUE;
@@ -158,14 +183,14 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     if (pipeline_ == 0)
         THROW_CRITICAL("Could not create pipeline from description " << launchLine);
 
-    GstElement *decodebin = gst_bin_get_by_name (GST_BIN(pipeline_),
-                "decode");
-    g_signal_connect(decodebin, "notify::source", G_CALLBACK(onNotifySource), this);
-
     // add bus call
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
     gst_bus_add_watch(bus, busCall, this);
     gst_object_unref(bus);
+
+    GstElement *decodebin = gst_bin_get_by_name (GST_BIN(pipeline_),
+                "decode");
+    g_signal_connect(decodebin, "notify::source", G_CALLBACK(onNotifySource), this);
 }
 
 RTSPClient::~RTSPClient()
