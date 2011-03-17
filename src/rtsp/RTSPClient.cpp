@@ -178,11 +178,21 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     gst_object_unref(bus);
 }
 
+RTSPClient::~RTSPClient()
+{
+    /* clean up */
+    if (pipeline_)
+    {
+        gst_element_set_state (pipeline_, GST_STATE_NULL);
+        gst_object_unref (pipeline_);
+    }
+}
+
 void RTSPClient::run(int timeToLive)
 {
     /* run */
     bool running = false;
-    while (!running and !signal_handlers::signalFlag())
+    while (!running and not signal_handlers::signalFlag())
     {
         LOG_INFO("Waiting for rtsp server");
         GstStateChangeReturn ret = gst_element_set_state (pipeline_, GST_STATE_PLAYING);
@@ -196,7 +206,7 @@ void RTSPClient::run(int timeToLive)
             running = true;
     }
 
-    while (rtpbin_ == 0 and !signal_handlers::signalFlag()) 
+    while (rtpbin_ == 0 and not signal_handlers::signalFlag()) 
     {
         rtpbin_ = gst_bin_get_by_name (GST_BIN(pipeline_),
                 "rtpbin0");
@@ -215,11 +225,8 @@ void RTSPClient::run(int timeToLive)
         LOG_INFO("Found property port-range");
 
     /* start main loop */
-    gutil::runMainLoop(timeToLive);
-
-    /* clean up */
-    gst_element_set_state (pipeline_, GST_STATE_NULL);
-    gst_object_unref (pipeline_);
+    if (not signal_handlers::signalFlag())
+        gutil::runMainLoop(timeToLive);
 
     LOG_DEBUG("Client exitting...\n");
 }

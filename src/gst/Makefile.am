@@ -19,6 +19,6 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   audioLevel.h $(top_srcdir)/src/include/playback.h dv1394.h v4l2util.h \
 				   fileSource.h sharedVideoSink.h \
 				   dc1394.cpp dc1394.h videoScale.h localAudio.h localVideo.h \
-				   noncopyable.h videoFlip.h videoFactory.h audioFactory.h textOverlay.h
+				   $(top_srcdir)/include/noncopyable.h videoFlip.h videoFactory.h audioFactory.h textOverlay.h
 		
 libgst_la_CPPFLAGS=$(GLIB_CFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) $(DC1394_CFLAGS) -DPIXMAPS_DIR=\"$(PIXMAPS_DIR)\" -I$(top_srcdir)/src/include -I$(top_srcdir)/src

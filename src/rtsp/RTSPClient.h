@@ -23,6 +23,8 @@
 #ifndef _RTSP_CLIENT_H_
 #define _RTSP_CLIENT_H_
 
+#include "noncopyable.h"
+
 class _GstElement;
 class _GstMessage;
 class _GstBus;
@@ -33,10 +35,11 @@ namespace boost {
     }
 }
 
-class RTSPClient
+class RTSPClient : private boost::noncopyable
 {
     public:
         RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
+        ~RTSPClient();
         void run(int timeout);
     private:
         static int busCall(_GstBus * /*bus*/, _GstMessage *msg, void *user_data);
