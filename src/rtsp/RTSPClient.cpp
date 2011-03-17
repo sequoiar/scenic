@@ -48,6 +48,22 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
 
                 return FALSE;
             }
+        case GST_MESSAGE_WARNING:
+            {
+                gchar *debug = NULL;
+                GError *err = NULL;
+
+                gst_message_parse_warning(msg, &err, &debug);
+
+                LOG_WARNING(gst_object_get_name(msg->src) << ":" << err->message);
+                g_error_free(err);
+
+                if (debug) {
+                    LOG_DEBUG("Debug details: " << debug);
+                    g_free(debug);
+                }
+                break;
+            }
 
         case GST_MESSAGE_EOS: 
             {
