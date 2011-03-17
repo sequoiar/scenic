@@ -137,7 +137,10 @@
     </para>
     <para>Now install Scenic on Ubuntu 10.04, for this, download the package associated to your computer architecture at: <ulink url="http://ppa.launchpad.net/sat-metalab/metalab/ubuntu/pool/main/s/scenic/">Download Scenic Package</ulink>
     </para>
-
+    <para>Actually, installing Scenic on Ubuntu Lucid (10.04) is quite simple with the packages that are on the PPA of the SAT Metalab. You just need to issue those commands in a Terminal:</para>
+    <para><userinput>sudo apt-add-repository ppa:sat-metalab/metalab</userinput></para>
+    <para><userinput>sudo apt-get update</userinput></para>
+    <para><userinput>sudo apt-get install scenic</userinput></para>
     <para>note that to use more than 8 audio channel in raw, you need to install our scenic-dependency package, wich will compile gstreamer
     </para>
 
