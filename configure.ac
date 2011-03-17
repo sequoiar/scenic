@@ -123,7 +123,7 @@ dnl check for python
 AM_PATH_PYTHON([2.5])
 
 dnl BOOST m4 tests
-AX_BOOST_BASE([1.35], [], [echo "libboost-1.35 or greater required"; exit -1])
+AX_BOOST_BASE([1.35], [], AC_MSG_ERROR(["libboost-1.35 or greater required"]))
 AX_BOOST_THREAD
 if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
@@ -223,14 +223,7 @@ AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 AC_SUBST(LOCALE_DIR, $localedir)
 
-AS_AC_EXPAND(LIBDIR, $libdir)
-
 AS_AC_EXPAND(DATADIR, $datadir)
-
-PIXMAPS_DIR=$DATADIR/scenic/pixmaps
-AC_SUBST(PIXMAPS_DIR)
-
-AS_AC_EXPAND(PKLIBDIR, $pkglibdir)
 
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
