@@ -41,7 +41,8 @@
 
 #include <boost/lexical_cast.hpp>
 
-static int doioctl(int fd, long request, void *data, const std::string &name)
+namespace {
+int doioctl(int fd, long request, void *data, const std::string &name)
 {
     int result = ioctl(fd, request, data);
     if (result < 0)
@@ -50,115 +51,7 @@ static int doioctl(int fd, long request, void *data, const std::string &name)
     return result;
 }
 
-static v4l2_format getCaptureFormat(int fd)
-{
-    v4l2_format vfmt;
-    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-
-    doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT");
-
-    return vfmt;
-}
-
-static std::string getDriverInfo(int fd, const std::string &device)
-{
-    std::string result;
-	v4l2_capability vcap;	/* list_cap */
-	memset(&vcap, 0, sizeof(vcap));
-
-    if (doioctl(fd, VIDIOC_QUERYCAP, &vcap, "VIDIOC_QUERYCAP") < 0)
-    {
-        LOG_PRINT("\n");
-        LOG_WARNING("Cannot get capabilities for device " << device 
-                << ",\n    it isn't a v4l2 driver. Check if it is a v4l1 driver.");
-        return "";
-    }
-
-    result += "    Driver name   : " +  boost::lexical_cast<std::string>(vcap.driver) + "\n";
-    result += "    Card type     : " + boost::lexical_cast<std::string>(vcap.card) + "\n";
-    result += "    Bus info      : " + boost::lexical_cast<std::string>(vcap.bus_info) + "\n";
-    result += "    Driver version: " +  boost::lexical_cast<std::string>(vcap.version) + "\n";
-
-    return result;
-}
-
-static std::string getInputName(int fd)
-{
-    std::string result;
-    int input;
-    v4l2_input vin;		/* list_inputs */
-    memset(&vin, 0, sizeof(vin));
-
-    if (doioctl(fd, VIDIOC_G_INPUT, &input, "VIDIOC_G_INPUT") == 0) 
-    {
-        result += boost::lexical_cast<std::string>(input);
-        vin.index = input;
-        if (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0)
-            result += " (" + boost::lexical_cast<std::string>(vin.name) + ")";
-    }
-
-    return result;
-}
-
-static void setCaptureFormat(int fd, v4l2_format format)
-{
-    format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    doioctl(fd, VIDIOC_S_FMT, &format, "VIDIOC_S_FMT");
-}
-
-/// Check current standard of v4l2 device to make sure it is what we expect
-// FIXME: replace with a function that just returns the actual standard
-// and then the client can compare against the expected standard
-bool v4l2util::checkStandard(const std::string &expected, 
-        std::string &actual,
-        const std::string &device)
-{
-    using namespace boost::assign;
-    bool result = false;
-    v4l2_std_id std;
-    int fd = -1;
-
-    // map of format codes
-    static std::map<std::string, unsigned long long> FORMATS = map_list_of
-        ("PAL", 0xfff)
-        ("NTSC", 0xf000)
-        ("SECAM", 0xff0000)
-        ("ATSC/HDTV", 0xf000000);
-
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-
-    if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
-    {
-        std::map<std::string, unsigned long long>::const_iterator iter;
-        for (iter = FORMATS.begin(); iter != FORMATS.end(); ++iter)
-            if (std & (*iter).second)    // true if current format matches this iter's key
-            {
-                result = (result or (expected == (*iter).first)); // can have multiple positives, hence the or
-                actual = (*iter).first; // save the actual standard
-            }
-    }
-
-    close(fd);
-    return result;
-}
-
-
-/// public version
-std::string v4l2util::getStandard(const std::string &device)
-{
-    int fd = -1;
-
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-
-    std::string result = getStandard(fd);
-
-    close(fd);
-    return result;
-}
-
-std::string v4l2util::getStandard(int fd)
+std::string getStandard(int fd)
 {
     using namespace boost::assign;
     std::string result;
@@ -181,8 +74,40 @@ std::string v4l2util::getStandard(int fd)
     return result;
 }
 
+std::string num2s(unsigned num)
+{
+    std::ostringstream buf;
+    buf << std::hex << num;
 
-std::string v4l2util::field2s(int val)
+    return buf.str();
+}
+
+std::string colorspace2s(int val)
+{
+    switch (val) {
+        case V4L2_COLORSPACE_SMPTE170M:
+            return "Broadcast NTSC/PAL (SMPTE170M/ITU601)";
+        case V4L2_COLORSPACE_SMPTE240M:
+            return "1125-Line (US) HDTV (SMPTE240M)";
+        case V4L2_COLORSPACE_REC709:
+            return "HDTV and modern devices (ITU709)";
+        case V4L2_COLORSPACE_BT878:
+            return "Broken Bt878";
+        case V4L2_COLORSPACE_470_SYSTEM_M:
+            return "NTSC/M (ITU470/ITU601)";
+        case V4L2_COLORSPACE_470_SYSTEM_BG:
+            return "PAL/SECAM BG (ITU470/ITU601)";
+        case V4L2_COLORSPACE_JPEG:
+            return "JPEG (JFIF/ITU601)";
+        case V4L2_COLORSPACE_SRGB:
+            return "SRGB";
+        default:
+            return "Unknown (" + num2s(val) + ")";
+    }
+}
+
+
+std::string field2s(int val)
 {
     switch (val) {
         case V4L2_FIELD_ANY:
@@ -210,15 +135,7 @@ std::string v4l2util::field2s(int val)
     }
 }
 
-std::string v4l2util::num2s(unsigned num)
-{
-    std::ostringstream buf;
-    buf << std::hex << num;
-
-    return buf.str();
-}
-
-std::string v4l2util::fcc2s(unsigned int val)
+std::string fcc2s(unsigned int val)
 {
     std::string s;
 
@@ -229,78 +146,60 @@ std::string v4l2util::fcc2s(unsigned int val)
     return s;
 }
 
-void v4l2util::printCaptureFormat(const std::string &device)
+v4l2_format getCaptureFormat(int fd)
 {
-    int fd = -1;
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-    v4l2_format vfmt = getCaptureFormat(fd);
+    v4l2_format vfmt;
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    // this will be empty if we're dealing with a non v4l2 device
-    std::string driverInfo(getDriverInfo(fd, device));
-    if (not driverInfo.empty())
+    doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT");
+
+    return vfmt;
+}
+
+std::string getDriverInfo(int fd, const std::string &device)
+{
+    std::string result;
+	v4l2_capability vcap;	/* list_cap */
+	memset(&vcap, 0, sizeof(vcap));
+
+    if (doioctl(fd, VIDIOC_QUERYCAP, &vcap, "VIDIOC_QUERYCAP") < 0)
     {
-        LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
-        LOG_PRINT(driverInfo);
-        LOG_PRINT("    Video input   : " << getInputName(fd) << "\n");
-        LOG_PRINT("    All inputs    : " << inputsPerDevice(fd) << "\n");
-        LOG_PRINT("    Standard      : " << getStandard(fd) << "\n");
-        LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "x" << vfmt.fmt.pix.height << "\n");
-        LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
-        LOG_PRINT("    Capture Type  : " << vfmt.type << "\n");
-        LOG_PRINT("    Field         : " << field2s(vfmt.fmt.pix.field) << "\n");
-        LOG_PRINT("    Bytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
-        LOG_PRINT("    Size Image    : " << vfmt.fmt.pix.sizeimage << "\n");
-        LOG_PRINT("    Colorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
-        printSupportedSizes(fd);
+        LOG_PRINT("\n");
+        LOG_WARNING("Cannot get capabilities for device " << device 
+                << ",\n    it isn't a v4l2 driver. Check if it is a v4l1 driver.");
+        return "";
     }
-    close(fd);
+
+    result += "    Driver name   : " +  boost::lexical_cast<std::string>(vcap.driver) + "\n";
+    result += "    Card type     : " + boost::lexical_cast<std::string>(vcap.card) + "\n";
+    result += "    Bus info      : " + boost::lexical_cast<std::string>(vcap.bus_info) + "\n";
+    result += "    Driver version: " +  boost::lexical_cast<std::string>(vcap.version) + "\n";
+
+    return result;
 }
 
-
-unsigned v4l2util::captureWidth(const std::string &device)
+std::string getInputName(int fd)
 {
-    int fd = -1;
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-    v4l2_format vfmt = getCaptureFormat(fd);
-    close(fd);
-    return vfmt.fmt.pix.width;
-}
+    std::string result;
+    int input;
+    v4l2_input vin;		/* list_inputs */
+    memset(&vin, 0, sizeof(vin));
 
-
-unsigned v4l2util::captureHeight(const std::string &device)
-{
-    int fd = -1;
-    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-    v4l2_format vfmt = getCaptureFormat(fd);
-    close(fd);
-    return vfmt.fmt.pix.height;
-}
-
-std::string v4l2util::colorspace2s(int val)
-{
-    switch (val) {
-        case V4L2_COLORSPACE_SMPTE170M:
-            return "Broadcast NTSC/PAL (SMPTE170M/ITU601)";
-        case V4L2_COLORSPACE_SMPTE240M:
-            return "1125-Line (US) HDTV (SMPTE240M)";
-        case V4L2_COLORSPACE_REC709:
-            return "HDTV and modern devices (ITU709)";
-        case V4L2_COLORSPACE_BT878:
-            return "Broken Bt878";
-        case V4L2_COLORSPACE_470_SYSTEM_M:
-            return "NTSC/M (ITU470/ITU601)";
-        case V4L2_COLORSPACE_470_SYSTEM_BG:
-            return "PAL/SECAM BG (ITU470/ITU601)";
-        case V4L2_COLORSPACE_JPEG:
-            return "JPEG (JFIF/ITU601)";
-        case V4L2_COLORSPACE_SRGB:
-            return "SRGB";
-        default:
-            return "Unknown (" + num2s(val) + ")";
+    if (doioctl(fd, VIDIOC_G_INPUT, &input, "VIDIOC_G_INPUT") == 0) 
+    {
+        result += boost::lexical_cast<std::string>(input);
+        vin.index = input;
+        if (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0)
+            result += " (" + boost::lexical_cast<std::string>(vin.name) + ")";
     }
+
+    return result;
+}
+
+void setCaptureFormat(int fd, v4l2_format format)
+{
+    format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    doioctl(fd, VIDIOC_S_FMT, &format, "VIDIOC_S_FMT");
 }
 
 typedef std::vector<std::string> DeviceList;
@@ -338,39 +237,6 @@ DeviceList getDevices()
 }
 #endif
 
-/// Returns true if cameras were found
-bool v4l2util::listCameras()
-{
-    DeviceList names(getDevices());
-
-    for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
-        printCaptureFormat(*deviceName);
-
-    return not names.empty();
-}
-
-bool v4l2util::isInterlaced(const std::string &device)
-{
-    if (boost::filesystem::exists(device))
-    {
-        int fd = -1;
-        if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
-            THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
-        v4l2_format vfmt = getCaptureFormat(fd);
-        close(fd);
-        if (vfmt.fmt.pix.field == V4L2_FIELD_INTERLACED)
-            return true;
-        else
-            return false;
-    }
-    else
-    {
-        LOG_ERROR("No device " << device);
-        return false;
-    }
-}
-
-
 bool formatsMatch(const v4l2_format &lhs, const v4l2_format &rhs)
 {
     return lhs.type == rhs.type and
@@ -378,8 +244,7 @@ bool formatsMatch(const v4l2_format &lhs, const v4l2_format &rhs)
         lhs.fmt.pix.height == rhs.fmt.pix.height;
 }
 
-
-void v4l2util::printSupportedSizes(int fd)
+void printSupportedSizes(int fd)
 {
     typedef std::pair<int, int> Size;
     typedef std::vector< Size > SizeList;
@@ -420,6 +285,144 @@ void v4l2util::printSupportedSizes(int fd)
     v4l2_format currentFormat = getCaptureFormat(fd);
     if (!formatsMatch(format, currentFormat))
         LOG_WARNING("Format " << oldWidth << "x" << oldHeight << "not reverted correctly");
+}
+
+std::string inputsPerDevice(int fd)
+{
+    v4l2_input vin;		/* list_inputs */
+    memset(&vin, 0, sizeof(vin));
+    vin.index = 0;
+    std::string result;
+
+    while (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0) 
+    {
+        if (vin.index)
+            result += ", ";
+        result += boost::lexical_cast<std::string>(vin.index) + " (" + boost::lexical_cast<std::string>(vin.name) + ")";
+        vin.index++;
+    }
+    return result;
+}
+
+void printCaptureFormat(const std::string &device)
+{
+    int fd = -1;
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+    v4l2_format vfmt = getCaptureFormat(fd);
+
+    // this will be empty if we're dealing with a non v4l2 device
+    std::string driverInfo(getDriverInfo(fd, device));
+    if (not driverInfo.empty())
+    {
+        LOG_PRINT("\nVideo4Linux Camera " << device << ":" << std::endl);
+        LOG_PRINT(driverInfo);
+        LOG_PRINT("    Video input   : " << getInputName(fd) << "\n");
+        LOG_PRINT("    All inputs    : " << inputsPerDevice(fd) << "\n");
+        LOG_PRINT("    Standard      : " << getStandard(fd) << "\n");
+        LOG_PRINT("    Width/Height  : " << vfmt.fmt.pix.width << "x" << vfmt.fmt.pix.height << "\n");
+        LOG_PRINT("    Pixel Format  : " << fcc2s(vfmt.fmt.pix.pixelformat) << "\n");
+        LOG_PRINT("    Capture Type  : " << vfmt.type << "\n");
+        LOG_PRINT("    Field         : " << field2s(vfmt.fmt.pix.field) << "\n");
+        LOG_PRINT("    Bytes per Line: " << vfmt.fmt.pix.bytesperline << "\n");
+        LOG_PRINT("    Size Image    : " << vfmt.fmt.pix.sizeimage << "\n");
+        LOG_PRINT("    Colorspace    : " << colorspace2s(vfmt.fmt.pix.colorspace) << "\n");
+        printSupportedSizes(fd);
+    }
+    close(fd);
+}
+
+
+} // end anonymous namespace
+
+/// Check current standard of v4l2 device to make sure it is what we expect
+// FIXME: replace with a function that just returns the actual standard
+// and then the client can compare against the expected standard
+bool v4l2util::checkStandard(const std::string &expected, 
+        std::string &actual,
+        const std::string &device)
+{
+    using namespace boost::assign;
+    bool result = false;
+    v4l2_std_id std;
+    int fd = -1;
+
+    // map of format codes
+    static std::map<std::string, unsigned long long> FORMATS = map_list_of
+        ("PAL", 0xfff)
+        ("NTSC", 0xf000)
+        ("SECAM", 0xff0000)
+        ("ATSC/HDTV", 0xf000000);
+
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+
+    if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
+    {
+        std::map<std::string, unsigned long long>::const_iterator iter;
+        for (iter = FORMATS.begin(); iter != FORMATS.end(); ++iter)
+            if (std & (*iter).second)    // true if current format matches this iter's key
+            {
+                result = (result or (expected == (*iter).first)); // can have multiple positives, hence the or
+                actual = (*iter).first; // save the actual standard
+            }
+    }
+
+    close(fd);
+    return result;
+}
+
+unsigned v4l2util::captureWidth(const std::string &device)
+{
+    int fd = -1;
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+    v4l2_format vfmt = getCaptureFormat(fd);
+    close(fd);
+    return vfmt.fmt.pix.width;
+}
+
+
+unsigned v4l2util::captureHeight(const std::string &device)
+{
+    int fd = -1;
+    if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+    v4l2_format vfmt = getCaptureFormat(fd);
+    close(fd);
+    return vfmt.fmt.pix.height;
+}
+
+/// Returns true if cameras were found
+bool v4l2util::listCameras()
+{
+    DeviceList names(getDevices());
+
+    for (DeviceList::const_iterator deviceName = names.begin(); deviceName != names.end(); ++deviceName)
+        printCaptureFormat(*deviceName);
+
+    return not names.empty();
+}
+
+bool v4l2util::isInterlaced(const std::string &device)
+{
+    if (boost::filesystem::exists(device))
+    {
+        int fd = -1;
+        if ((fd = open(device.c_str(), O_RDONLY)) < 0) 
+            THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+        v4l2_format vfmt = getCaptureFormat(fd);
+        close(fd);
+        if (vfmt.fmt.pix.field == V4L2_FIELD_INTERLACED)
+            return true;
+        else
+            return false;
+    }
+    else
+    {
+        LOG_ERROR("No device " << device);
+        return false;
+    }
 }
 
 void v4l2util::setFormatVideo(const std::string &device, int width, int height)
@@ -515,22 +518,4 @@ void v4l2util::setInput(const std::string &device, int input)
     else
         THROW_ERROR("Failed to set input to " << input << " on device " << device);
     close(fd);
-}
-
-
-std::string v4l2util::inputsPerDevice(int fd)
-{
-    v4l2_input vin;		/* list_inputs */
-    memset(&vin, 0, sizeof(vin));
-    vin.index = 0;
-    std::string result;
-
-    while (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0) 
-    {
-        if (vin.index)
-            result += ", ";
-        result += boost::lexical_cast<std::string>(vin.index) + " (" + boost::lexical_cast<std::string>(vin.name) + ")";
-        vin.index++;
-    }
-    return result;
 }
