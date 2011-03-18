@@ -139,14 +139,9 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
      * property first if you use different protocols
      * or sources) */
     LOG_DEBUG("Setting properties on rtspsrc");
-    g_object_set (src, "latency", 15, NULL);
+    g_object_set (src, "latency", 5, NULL);
     if (not context->portRange_.empty())
-    {
-        if (validPortRange(context->portRange_))
-            g_object_set (src, "port-range", context->portRange_.c_str(), NULL);
-        else
-            LOG_WARNING("Invalid port-range " << context->portRange_ << ", ignoring.");
-    }
+        g_object_set (src, "port-range", context->portRange_.c_str(), NULL);
 
     gst_object_unref (src); 
     return TRUE;
@@ -162,7 +157,12 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
 
     // get port range
     if (options.count("port-range"))
-        portRange_ = options["port-range"].as<std::string>();
+    {
+        if (validPortRange(options["port-range"].as<std::string>()))
+            portRange_ = options["port-range"].as<std::string>();
+        else
+            LOG_WARNING("Invalid port-range " << options["port-range"].as<std::string>() << ", ignoring.");
+    }
 
     if (enableVideo)
     {
