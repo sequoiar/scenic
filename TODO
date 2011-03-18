@@ -1,6 +1,5 @@
 General: simplify and refactor stuff in gst/ so that it can be reused in rtsp/
-(where possible/reasonable). Try to reproduce as much functionality as possible
-in rtsp/ as in gst/.
+(where reasonable). Try to reproduce functionality from gst/ in rtsp/.
 
 RTSPServer
 ----
@@ -11,7 +10,10 @@ add vumeters.
 
 RTSPClient
 ----
-investigate "source" property of uridecodebin
-see how we can specify explicitly which ports to use.
 use fancier overlay like in GtkVideoSink.
 add vumeters.
+
+Done
+----
+investigate "source" property of uridecodebin: done by handling the notify::source signal
+see how we can specify explicitly which ports to use: ""
