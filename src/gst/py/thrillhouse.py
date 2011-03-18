@@ -76,9 +76,9 @@ class AudioArg(Arg):
 class VideoSendArg(VideoArg):
     """ Class for video only sending args """
     def __init__(self):
-        """ Default for videosource is v4l2src, the video4linux2 plugin """
+        """ Default for videosource is videotestsrc """
         VideoArg.__init__(self)
-        self.videosource = 'v4l2src'
+        self.videosource = 'videotestsrc'
 
 
 class VideoRecvArg(VideoArg):
@@ -86,7 +86,6 @@ class VideoRecvArg(VideoArg):
     def __init__(self):
         """ Default for videosink is xvimagesink, the xvideo output plugin """
         VideoArg.__init__(self)
-        self.screen = 0
         self.videosink = 'xvimagesink'
 
 
@@ -633,7 +632,7 @@ class MilhouseTests():
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_51')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
