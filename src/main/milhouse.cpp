@@ -227,22 +227,6 @@ short Milhouse::run(int argc, char **argv)
     // wrapper so main doesn't need to know about gst and gtk
     gutil::init_gst_gtk(argc, argv);
 
-    bool enableVideo = options.count("videoport") or 
-        not options["disable-video"].as<bool>();
-    bool enableAudio = options.count("audioport") or
-        not options["disable-audio"].as<bool>();
-
-    if (options["rtsp-server"].as<bool>())
-    {
-        runAsRTSPServer(options, enableVideo, enableAudio);
-        return 0;
-    }
-    else if (options["rtsp-client"].as<bool>())
-    {
-        runAsRTSPClient(options, enableVideo, enableAudio);
-        return 0;
-    }
-
     if (options["gst-version"].as<bool>())
     {
         // this was handled internally by gst_init's argv parsing
@@ -254,14 +238,43 @@ short Milhouse::run(int argc, char **argv)
         audiofactory::printMaxChannels(options["audiocodec"].as<std::string>());
         return 0;
     }
+
+    /*----------------------------------------------*/
+    // RTSP mode
+    /*----------------------------------------------*/
+
+    bool enableVideo = not options["disable-video"].as<bool>();
+    bool enableAudio = not options["disable-audio"].as<bool>();
+
+    if (options["rtsp-server"].as<bool>())
+    {
+        LOG_DEBUG("Running as RTSP server");
+        runAsRTSPServer(options, enableVideo, enableAudio);
+        return 0;
+    }
+    else if (options["rtsp-client"].as<bool>())
+    {
+        LOG_DEBUG("Running as RTSP client");
+        runAsRTSPClient(options, enableVideo, enableAudio);
+        return 0;
+    }
+    
+    /*----------------------------------------------*/
+    // Local preview mode
+    /*----------------------------------------------*/
     
     bool enableLocalVideo = options["localvideo"].as<bool>();
     bool enableLocalAudio = options["localaudio"].as<bool>();
     if (enableLocalVideo or enableLocalAudio)
     {
+        LOG_DEBUG("Running as local preview");
         runAsLocal(options, enableLocalVideo, enableLocalAudio);
         return 0;
     }
+
+    /*----------------------------------------------*/
+    // Send/receive mode
+    /*----------------------------------------------*/
 
     if ((not options["sender"].as<bool>() and not options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
@@ -269,6 +282,9 @@ short Milhouse::run(int argc, char **argv)
         LOG_ERROR("argument error: must be sender OR receiver OR localvideo."); 
         return 1;
     }
+
+    enableVideo = enableVideo and options.count("videoport");
+    enableAudio = enableAudio and options.count("audioport");
 
     if (not enableVideo and not enableAudio)
     {
