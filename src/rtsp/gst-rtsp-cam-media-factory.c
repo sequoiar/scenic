@@ -464,28 +464,39 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   int i;
   
   encoder = create_encoder (factory, factory->audio_codec);
-  if (encoder == NULL)
+  if (encoder == NULL) {
+    GST_WARNING_OBJECT (factory, "couldn't create encoder ");
     return NULL;
+  }
 
   pay = create_payloader (factory, factory->audio_codec, payloader_number, AUDIO_PAYLOAD_TYPE);
-  if (pay == NULL)
+  if (pay == NULL) {
+    GST_WARNING_OBJECT (factory, "couldn't create payloader ");
+    gst_object_unref (encoder);
     return NULL;
+  }
 
   audiosrc = gst_element_factory_make(factory->audio_source, NULL);
   if (audiosrc == NULL) {
     GST_WARNING_OBJECT (factory, "couldn't create audio source");
+    gst_object_unref (encoder);
     gst_object_unref (pay);
 
     return NULL;
   }
+  else /* FIXME: this is only valid for jackaudiosrc, we should proxy these elements' properties */
+      g_object_set(audiosrc, "connect", 0, NULL);
 
   audioconvert = gst_element_factory_make ("audioconvert", NULL);
   audiorate = gst_element_factory_make ("audiorate", NULL);
   capsfilter = gst_element_factory_make ("capsfilter", NULL);
 
-  gst_bin_add_many (GST_BIN (bin), audiosrc, audioconvert, audiorate, capsfilter, encoder, pay, NULL);
-  linked = gst_element_link_many (audiosrc, audioconvert, audiorate, capsfilter, encoder, pay, NULL);
-  g_assert(linked);
+  gst_bin_add_many (GST_BIN (bin), audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
+  linked = gst_element_link_many (audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
+  if (!linked) {
+      gst_object_unref(bin);
+      return NULL;
+  }
 
   audio_caps = gst_caps_new_empty ();
   for (i = 0; audio_formats[i] != NULL; i++) {
