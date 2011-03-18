@@ -39,15 +39,11 @@ enum
   PROP_AUDIO_CHANNELS
 };
 
-enum
-{
-  SIGNAL_LAST
-};
-
 typedef struct
 {
   gchar *name;
   gchar *encoder;
+  gchar *encoder_settings;
   gchar *payloader;
 } CodecDescriptor;
 
@@ -85,14 +81,14 @@ static const int AUDIO_PAYLOAD_TYPE = 97;
 /* TODO: this should be returned from a function, so that we can pre-configure
  properties for the codecs and payloaders. */
 static CodecDescriptor codecs[] = {
-  { "mpeg4", "ffenc_mpeg4", "rtpmp4vpay" },
-  { "h263", "ffenc_h263p", "rtph263ppay" },
-  { "theora", "theoraenc", "rtptheorapay" },
-  { "h264", "x264enc", "rtph264pay" },
-  { "raw", "identity", "rtpL16pay" },
-  { "vorbis", "vorbisenc", "rtpvorbispay" },
-  { "celt", "celtenc", "rtpceltpay" },
-  { NULL, NULL, NULL }
+  { "mpeg4", "ffenc_mpeg4", NULL, "rtpmp4vpay" },
+  { "h263", "ffenc_h263p", NULL, "rtph263ppay" },
+  { "theora", "theoraenc", NULL, "rtptheorapay" },
+  { "h264", "x264enc", "tune=zerolatency vbv-buf-capacity=300 pass=qual intra-refresh=true", "rtph264pay" },
+  { "raw", "identity", NULL, "rtpL16pay" },
+  { "vorbis", "vorbisenc", NULL, "rtpvorbispay" },
+  { "celt", "celtenc", NULL, "rtpceltpay" },
+  { NULL, NULL, NULL, NULL }
 };
 
 static void
@@ -337,6 +333,19 @@ find_codec (gchar *codec_name)
   return NULL;
 }
 
+static void
+set_encoder_settings (GstElement *encoder, gchar *settings)
+{
+    int i;
+    gchar **params = g_strsplit_set(settings, "= ", -1);
+    (void) encoder;
+    for (i = 0; params[i] != NULL; i+=2) {
+        /*g_print("setting %s to %s", params[i], params[i+1]);*/
+        gst_util_set_object_arg (G_OBJECT(encoder), params[i], params[i+1]);
+    }
+    g_strfreev(params);
+}
+
 static GstElement *
 create_encoder (GstRTSPCamMediaFactory *factory,
     gchar *codec_name)
@@ -351,6 +360,8 @@ create_encoder (GstRTSPCamMediaFactory *factory,
   }
 
   encoder = gst_element_factory_make(codec->encoder, NULL);
+  if (codec->encoder_settings)
+      set_encoder_settings(encoder, codec->encoder_settings);
 
   return encoder;
 }
