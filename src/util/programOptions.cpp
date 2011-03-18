@@ -40,7 +40,7 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("audiocodec,a", po::value<string>()->default_value("raw"), "audiocodec (raw,vorbis,mp3)")
         ("videosink,k", po::value<string>()->default_value("xvimagesink"), "video output "
          "(xvimagesink,ximagesink,sharedvideosink)")
-        ("audiosink,l", po::value<string>()->default_value("autoaudiosink"), "audio output (autoaudiosink, jackaudiosink,alsasink,pulsesink)")
+        ("audiosink,l", po::value<string>()->default_value("jackaudiosink"), "audio output (autoaudiosink, jackaudiosink,alsasink,pulsesink)")
         ("audioport,t", po::value<int>(), "audioport number (1024-65535")
         ("videoport,p", po::value<int>(), "videoport number (1024-65535)")
         ("fullscreen,f", po::bool_switch(), "display video in fullscreen")
@@ -59,8 +59,8 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("audioquality", po::value<double>()->default_value(-1.0), "quality for compressed audio (0.0-1.0)")
         ("audiobitrate", po::value<int>()->default_value(0), "bitrate for compressed audio in kbps "
          "(7,16,24,32,40,48,56,64,80,96,112,128,160,192,224,256,320)")
-        ("audiosource,e", po::value<string>()->default_value("autoaudiosrc"), 
-         "audio input (autoaudiosrc, jackaudiosrc,alsasrc,pulsesrc)")
+        ("audiosource,e", po::value<string>()->default_value("jackaudiosrc"), 
+         "audio input (autoaudiosrc,jackaudiosrc,alsasrc,pulsesrc)")
         ("videosource,u", po::value<string>()->default_value("videotestsrc"), 
          "video input (v4l2src,dc1394src,v4lsrc,dv1394src)")
         ("timeout,z", po::value<int>()->default_value(0), "time in ms to wait before quitting, 0=run indefinitely")
