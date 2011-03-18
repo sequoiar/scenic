@@ -50,6 +50,7 @@ class RTSPClient : private boost::noncopyable
         _GstElement *pipeline_;
         bool latencySet_;
         std::string portRange_;
+        int latency_;
 };
 
 #endif // _RTSP_CLIENT_H_

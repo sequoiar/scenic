@@ -139,7 +139,7 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
      * property first if you use different protocols
      * or sources) */
     LOG_DEBUG("Setting properties on rtspsrc");
-    g_object_set (src, "latency", 5, NULL);
+    g_object_set (src, "latency", context->latency_, NULL);
     if (not context->portRange_.empty())
         g_object_set (src, "port-range", context->portRange_.c_str(), NULL);
 
@@ -147,8 +147,10 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
     return TRUE;
 }
 
+static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
+
 RTSPClient::RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio) :
-    pipeline_(0), latencySet_(false), portRange_("")
+    pipeline_(0), latencySet_(false), portRange_(""), latency_(options["jitterbuffer"].as<int>())
 {
     using std::string;
     string launchLine("uridecodebin uri=rtsp://");
@@ -172,7 +174,9 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     if (enableAudio)
     {
         LOG_DEBUG("Audio enabled");
-        launchLine += " decode. ! queue ! audioconvert ! audioresample ! " + options["audiosink"].as<string>();
+        launchLine += " decode. ! queue ! audioconvert ! audioresample ! " + 
+            options["audiosink"].as<string>() + " buffer-time=" + 
+            boost::lexical_cast<string>(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC);
     }
 
     GError *error = NULL;
