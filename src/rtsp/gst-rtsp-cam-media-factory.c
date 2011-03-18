@@ -485,7 +485,7 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
     return NULL;
   }
   else /* FIXME: this is only valid for jackaudiosrc, we should proxy these elements' properties */
-      g_object_set(audiosrc, "connect", 0, NULL);
+      g_object_set(audiosrc, "connect", 2, NULL);
 
   audioconvert = gst_element_factory_make ("audioconvert", NULL);
   audiorate = gst_element_factory_make ("audiorate", NULL);
