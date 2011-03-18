@@ -171,6 +171,7 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
 static void
 gst_rtsp_cam_media_factory_init (GstRTSPCamMediaFactory * factory)
 {
+  /* multiple clients can connect to this server */
   gst_rtsp_media_factory_set_shared (GST_RTSP_MEDIA_FACTORY (factory),
       TRUE);
 }

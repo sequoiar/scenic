@@ -86,9 +86,6 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options, boo
       "audio-channels", options["numchannels"].as<int>(),
       NULL);
 
-  // let multiple client connect to this server
-  gst_rtsp_media_factory_set_shared (GST_RTSP_MEDIA_FACTORY (factory), TRUE);
-
   mapping = gst_rtsp_server_get_media_mapping (server);
   gst_rtsp_media_mapping_add_factory (mapping, local_url->abspath,
       GST_RTSP_MEDIA_FACTORY (factory));
