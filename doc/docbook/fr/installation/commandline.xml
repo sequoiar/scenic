@@ -137,7 +137,7 @@
               <para>-k, --videosink</para>
             </entry>
             <entry>
-              <para>video output (xvimagesink, glimagesink,
+              <para>video output (xvimagesink,
               sharedvideosink, ximagesink)</para>
             </entry>
           </row>

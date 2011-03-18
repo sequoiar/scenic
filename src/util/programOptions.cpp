@@ -39,7 +39,7 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("videocodec,v", po::value<string>()->default_value("mpeg4"), "videocodec (mpeg4,h263,h264,theora)")
         ("audiocodec,a", po::value<string>()->default_value("raw"), "audiocodec (raw,vorbis,mp3)")
         ("videosink,k", po::value<string>()->default_value("xvimagesink"), "video output "
-         "(xvimagesink,ximagesink,glimagesink,sharedvideosink)")
+         "(xvimagesink,ximagesink,sharedvideosink)")
         ("audiosink,l", po::value<string>()->default_value("autoaudiosink"), "audio output (autoaudiosink, jackaudiosink,alsasink,pulsesink)")
         ("audioport,t", po::value<int>(), "audioport number (1024-65535")
         ("videoport,p", po::value<int>(), "videoport number (1024-65535)")

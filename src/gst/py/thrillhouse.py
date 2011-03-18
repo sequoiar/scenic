@@ -272,14 +272,6 @@ class MilhouseTests():
         recv.videocodec = videocodec
         self.run(recv, send) 
         
-    def test_09_testsrc_glimagesink(self):
-        """ Test glimagesink """
-
-        recv, send = self.argfactory('video')
-        send.videosource = 'videotestsrc'
-        recv.videosink = 'glimagesink'
-        self.run(recv, send)
-
     def test_12_ximagesink(self):
         """ Test with ximagesink"""
         recv, send = self.argfactory('video')
@@ -287,13 +279,6 @@ class MilhouseTests():
         recv.videosink = 'ximagesink'
         self.run(recv, send)
     
-    def test_13_glimagesink(self):
-        """ Test with glimagesink """
-
-        recv, send = self.argfactory('video')
-        recv.videosink = 'glimagesink'
-        self.run(recv, send)
-
     def test_14_dv1394src_ximagesink(self):
         """ Test dv with ximagesink """
 
@@ -302,27 +287,11 @@ class MilhouseTests():
         recv.videosink = 'ximagesink'
         self.run(recv, send)
 
-    def test_15_dv1394src_glimagesink(self):
-        """ Test dv with glimagesink """
-
-        recv, send = self.argfactory('video')
-        send.videosource = 'dv1394src'
-        recv.videosink = 'glimagesink'
-        self.run(recv, send)
-
     def test_16_deinterlace(self):
         """ Test with just video deinterlaced """
 
         recv, send = self.argfactory('video')
         recv.deinterlace = True
-        self.run(recv, send)
-
-    def test_17_deinterlace_glimagesink(self):
-        """ Test with just video deinterlaced to glimagesink """
-
-        recv, send = self.argfactory('video')
-        recv.deinterlace = True
-        recv.videosink = 'glimagesink'
         self.run(recv, send)
 
     def test_18_videotestsrc(self):
@@ -576,17 +545,6 @@ class MilhouseTests():
             send.numchannels = chan
             self.run(recv, send)
 
-    def test_43_v4l2src_theora_glimagesink(self):
-        """ Test with 1-8 channels for vorbis with a 5 second timeout """
-        self.countdown('START')
-
-        recv, send = self.argfactory('video')
-        send.videosource= 'v4l2src'
-        send.videocodec = 'theora'
-        recv.videocodec = send.videocodec
-        recv.videosink = 'glimagesink'
-        self.run(recv, send)
-    
     def test_44_v4l2src_theora_deinterlace_xvimagesink(self):
         """ Test with 1-8 channels for vorbis with a 5 second timeout """
         self.countdown('START')

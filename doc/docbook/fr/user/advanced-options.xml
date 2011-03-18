@@ -188,7 +188,7 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
               <para>-k, --videosink</para>
             </entry>
             <entry>
-              <para>Sortie vidéo (xvimagesink, glimagesink, sharedvideosink, ximagesink)</para>
+              <para>Sortie vidéo (xvimagesink, sharedvideosink, ximagesink)</para>
             </entry>
           </row>
           <row>
