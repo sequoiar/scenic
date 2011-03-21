@@ -1,5 +1,5 @@
 SUBDIRS = fig installation user
-docbookdir = $(datadir)/scenic/docbook/fr
+docbookdir = $(datadir)/scenic/docbook/en
 docbook_DATA = \
 	glossary.xml \
 	installation-manual.xml \

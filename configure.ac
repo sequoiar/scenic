@@ -185,6 +185,8 @@ AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"],
         [AC_MSG_ERROR([The Scenic graphical user interface requires one of json or simplejson])]))
 
 # check for programs
+# TODO: move those checks for programs up. (it should always be second in the configure.ac file)
+# FIXME: some checks should be done at runtime, not build time
 # Maybe $PATH does not contain /sbin
 AC_CHECK_PROG(IFCONFIG, ifconfig, yes, no, "${PATH}:/sbin")
 AS_IF([test "x${IFCONFIG}" = "xno"],
@@ -241,6 +243,7 @@ AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
+# TODO: indent the following list of files:
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
@@ -250,11 +253,18 @@ data/themes/Makefile
 data/themes/Darklooks/Makefile
 doc/Makefile
 doc/docbook/Makefile
-doc/docbook/fig/Makefile
-doc/docbook/user/Makefile
-doc/docbook/user-manual.xml
-doc/docbook/installation/Makefile
-doc/docbook/installation-manual.xml
+doc/docbook/en/Makefile
+doc/docbook/en/fig/Makefile
+doc/docbook/en/user/Makefile
+doc/docbook/en/user-manual.xml
+doc/docbook/en/installation/Makefile
+doc/docbook/en/installation-manual.xml
+doc/docbook/fr/Makefile
+doc/docbook/fr/fig/Makefile
+doc/docbook/fr/user/Makefile
+doc/docbook/fr/user-manual.xml
+doc/docbook/fr/installation/Makefile
+doc/docbook/fr/installation-manual.xml
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile

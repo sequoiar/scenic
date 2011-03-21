@@ -1,4 +1,4 @@
-figdir = $(datadir)/scenic/docbook/fig
+figdir = $(datadir)/scenic/docbook/fr/fig
 fig_DATA = \
 	add_contact_edit_dialog.png \
 	bidirectional_setup.png \
