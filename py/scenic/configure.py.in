@@ -28,7 +28,7 @@ LOCALE_DIR = os.path.join("@DATADIR@", "locale")
 GLADE_DIR = os.path.join("@DATADIR@", 'scenic', 'glade')
 PIXMAPS_DIR = os.path.join("@DATADIR@", 'scenic', 'pixmaps')
 THEMES_DIR = os.path.join("@DATADIR@", 'scenic', "themes")
-DOCBOOK_DIR = os.path.join("@DATADIR@", 'scenic', "docbook", "en") #TODO: en/fr should be according to locale, if dir exists
+DOCBOOK_DIR = os.path.join("@DATADIR@", 'scenic', "docbook")
 
 def replace_install_paths_with_devel_paths():
     """
