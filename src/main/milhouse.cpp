@@ -248,13 +248,11 @@ short Milhouse::run(int argc, char **argv)
 
     if (options["rtsp-server"].as<bool>())
     {
-        LOG_DEBUG("Running as RTSP server");
         runAsRTSPServer(options, enableVideo, enableAudio);
         return 0;
     }
     else if (options["rtsp-client"].as<bool>())
     {
-        LOG_DEBUG("Running as RTSP client");
         runAsRTSPClient(options, enableVideo, enableAudio);
         return 0;
     }
