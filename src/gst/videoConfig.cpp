@@ -20,8 +20,6 @@
  *
  */
 
-#include "videoSize.h"
-
 #include <fstream>
 #include <glib/gfileutils.h>
 #include <boost/program_options.hpp>
@@ -40,15 +38,14 @@
 #include "raw1394Util.h"
 
 
-template <class T>
-T fromString(const std::string& s, 
+unsigned long long fromString(const std::string& s, 
                  std::ios_base& (*f)(std::ios_base&))
 {
-    T t;
+    unsigned long long result;
     std::istringstream iss(s);
-    if ((iss >> f >> t).fail())
-        THROW_ERROR("Could not convert string " << s << " to hex");
-    return t;
+    if ((iss >> f >> result).fail())
+        THROW_ERROR("Could not convert string " << s << " to unsigned long long");
+    return result;
 }
 
 
@@ -59,7 +56,7 @@ VideoSourceConfig::VideoSourceConfig(const boost::program_options::variables_map
     deviceName_(options["videodevice"].as<std::string>()),
     location_(options["videolocation"].as<std::string>()), 
     cameraNumber_(options["camera-number"].as<int>()),
-    GUID_(fromString<unsigned long long>(options["camera-guid"].as<std::string>(), std::hex)),
+    GUID_(fromString(options["camera-guid"].as<std::string>(), std::hex)),
     framerate_(options["framerate"].as<int>()),
     captureWidth_(options["width"].as<int>()),
     captureHeight_(options["height"].as<int>()),
@@ -152,7 +149,7 @@ int VideoSourceConfig::listCameras()
         if (not foundCameras)
             LOG_PRINT("No cameras found" << std::endl);
     }
-    catch (ErrorExcept &e)
+    catch (const ErrorExcept &e)
     {
         LOG_DEBUG("Got exception " << e.what());
     }
