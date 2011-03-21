@@ -176,17 +176,7 @@ H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) :
     VideoEncoder(pipeline, "x264enc", true),
     bitrate_(bitrate) 
 {
-    // hardware threads: 1-n, 0 for automatic 
-    int numThreads = boost::thread::hardware_concurrency();
-
-    // numthreads should be 2 or 1.
-    if (numThreads > 3) // don't hog all the cores
-        numThreads--;
-    else if (numThreads == 0)
-        numThreads = 1;
-
-    LOG_DEBUG("Using " << numThreads << " threads");
-    g_object_set(encoder_, "threads", numThreads, NULL);
+    g_object_set(encoder_, "threads", 0 /* automatic */, NULL);
     // See gst-plugins-good/tests/examples/rtp/*h264*.sh
     // if you use non-byte stream mode, the encoder willl need to add 
     // three bytes to start and end, which the payerloader will promptly 
@@ -195,6 +185,11 @@ H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) :
     // i.e. (x264enc ! filesink)
     // vbv-bufsize / vbv-maxrate = the number of seconds the client must buffer before playback
     g_object_set(encoder_, "byte-stream", TRUE, NULL);  
+    g_object_set(encoder_, "vbv-buf-capacity", 300, "intra-refresh", TRUE, NULL);
+    // These are x264enc types (i.e. enums) so we can't use g_object_set 
+    // directly
+    gst_util_set_object_arg (G_OBJECT(encoder_), "tune", "zerolatency");
+    gst_util_set_object_arg (G_OBJECT(encoder_), "pass", "qual");
 
     // subme: subpixel motion estimation 1=fast, 6=best
 
