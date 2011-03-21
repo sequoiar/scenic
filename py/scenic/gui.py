@@ -1569,7 +1569,7 @@ class Gui(object):
         """
         lang = "en"
         try:
-            lang = os.environ["LANG"].split("_")[0]
+            lang = os.environ["LANG"].split("_")[0].split(".")[0]
         except KeyError, e:
             log.error('Key %s is missing in environment variables' % (e))
         path = os.path.join(configure.DOCBOOK_DIR, lang)
