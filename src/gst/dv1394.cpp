@@ -61,8 +61,6 @@ Dv1394::Dv1394(const Pipeline &pipeline) :
 
 Dv1394::~Dv1394()
 {
-    pipeline_.remove(&dvdemux_);
-    pipeline_.remove(&dv1394src_);
 }
 
 

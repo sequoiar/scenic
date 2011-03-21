@@ -67,11 +67,3 @@ VideoScale::VideoScale(const Pipeline &pipeline, int width, int height) :
     if (videoCaps)
         gst_caps_unref(videoCaps);
 }
-
-/// Destructor 
-VideoScale::~VideoScale()
-{
-    pipeline_.remove(&capsfilter_);
-    pipeline_.remove(&videoscale_);
-}
-

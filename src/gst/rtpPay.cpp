@@ -26,19 +26,9 @@
 #include "pipeline.h"
 #include "util/logWriter.h"
 
-RtpPay::~RtpPay()
-{
-    pipeline_.remove(&rtpPay_);
-}
-
-
 Pay::Pay(const Pipeline &pipeline) : 
     RtpPay(pipeline)
 {}
-
-Pay::~Pay()
-{
-}
 
 Depay::Depay(const Pipeline &pipeline) : 
     RtpPay(pipeline)

@@ -33,7 +33,7 @@ class VideoSource
     : private boost::noncopyable
 {
     public:
-        virtual ~VideoSource();
+        virtual ~VideoSource(){};
         virtual std::string srcCaps(unsigned framerateIndex = 0) const;
         void setCapsFilter(const std::string &srcCaps);
         virtual _GstElement *srcElement() { return source_; }
@@ -55,7 +55,6 @@ class VideoTestSource
         void filterCaps();
 
     private:
-        ~VideoTestSource();
         virtual _GstElement *srcElement() { return capsFilter_; }
 };
 

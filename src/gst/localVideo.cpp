@@ -97,6 +97,5 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
 /// Destructor 
 LocalVideo::~LocalVideo()
 {
-    pipeline_.remove(&colourspace_);
 }
 

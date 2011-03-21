@@ -54,9 +54,3 @@ LocalAudio::LocalAudio(Pipeline &pipeline,
     if (sourceConfig_->sourceString() == "dv1394src")
         Dv1394::Instance(pipeline)->doTimestamp();
 }
-
-/// Destructor 
-LocalAudio::~LocalAudio()
-{
-    pipeline_.remove(&fakesink_);
-}

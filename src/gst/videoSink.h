@@ -40,11 +40,10 @@ class VideoSink : private boost::noncopyable
 {
     public:
         explicit VideoSink(const Pipeline &pipeline) : pipeline_(pipeline), sink_(0) {};
-        virtual ~VideoSink() {};
+        virtual ~VideoSink(){};
         virtual _GstElement* sinkElement() { return sink_; }
 
     protected:
-        virtual void destroySink();
         const Pipeline &pipeline_;
         _GstElement *sink_;
 };
@@ -55,7 +54,6 @@ class GtkVideoSink
     public:
         GtkVideoSink(const Pipeline &pipeline, unsigned long xid);
         void createControl();
-        virtual ~GtkVideoSink(){};
         void showWindow();
 
     protected:
@@ -112,7 +110,6 @@ class XImageSink
         XImageSink(const Pipeline &pipeline, const std::string &display);
 
     private:
-        ~XImageSink();
         virtual _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;
 };

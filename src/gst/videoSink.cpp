@@ -33,11 +33,6 @@
 #include <gdk/gdkx.h>
 
 
-void VideoSink::destroySink()
-{
-    pipeline_.remove(&sink_);
-}
-
 /// true if we're not using some external xwindow
 bool GtkVideoSink::hasWindow() const
 {
@@ -318,7 +313,6 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned lon
 
 XvImageSink::~XvImageSink()
 {
-    GtkVideoSink::destroySink();
     if (hasWindow() and window_ != 0)
     {
         gtk_widget_destroy(window_);
@@ -338,11 +332,5 @@ XImageSink::XImageSink(const Pipeline &pipeline, const std::string &display) :
         g_object_set(sink_, "display", display.c_str(), NULL);
 
     gstlinkable::link(colorspc_, sink_);
-}
-
-XImageSink::~XImageSink()
-{
-    VideoSink::destroySink();
-    pipeline_.remove(&colorspc_);
 }
 

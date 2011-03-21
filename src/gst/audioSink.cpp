@@ -47,7 +47,6 @@ AudioSink::AudioSink(Pipeline &pipeline) :
 /// Destructor 
 AudioSink::~AudioSink()
 {
-    pipeline_.remove(&sink_);
 }
 
 
@@ -115,7 +114,6 @@ AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) 
 /// Destructor
 AudioAlsaSink::~AudioAlsaSink()
 {
-    pipeline_.remove(&aconv_);
 }
 
 /// Constructor 
@@ -135,7 +133,6 @@ AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config
 /// Destructor 
 AudioPulseSink::~AudioPulseSink()
 {
-    pipeline_.remove(&aconv_);
 }
 
 /// Constructor 

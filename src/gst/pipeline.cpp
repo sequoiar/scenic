@@ -377,38 +377,6 @@ void Pipeline::add(GstElement *element) const
     gst_bin_add(GST_BIN(pipeline_), element);
 }
 
-
-void Pipeline::remove(GstElement **element) const // guarantees that original pointer will be zeroed
-{                                           // and not reusable
-    stop();
-    if (*element and pipeline_)
-    {
-        if (!gst_bin_remove(GST_BIN(pipeline_), *element))
-            LOG_WARNING("Could not remove element " << GST_ELEMENT_NAME(element));
-        *element = NULL;
-    }
-}
-
-
-void Pipeline::remove(std::vector<GstElement*> &elementVec) const
-{
-    stop();
-    std::vector<GstElement *>::iterator iter;
-    if (!elementVec.empty())
-    {
-        for (iter = elementVec.begin(); iter != elementVec.end(); ++iter)
-        {
-            if (*iter)
-            {
-                if (!gst_bin_remove(GST_BIN(pipeline_), *iter))
-                    LOG_WARNING("Could not remove element " << GST_ELEMENT_NAME(*iter));
-                *iter = NULL;
-            }
-        }
-    }
-}
-
-
 GstBus* Pipeline::getBus() const
 {
     return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
@@ -427,7 +395,7 @@ GstElement *Pipeline::makeElement(const char *factoryName, const char *elementNa
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
     if (element == 0)
-        THROW_ERROR("No such element or pluging " << factoryName <<
+        THROW_ERROR("No such element or plugin " << factoryName <<
                 ".Check that all necessary plugins are installed with " <<
                 "gst-check.py");
 

@@ -40,7 +40,6 @@ AudioSource::AudioSource(const Pipeline &pipeline, const AudioSourceConfig &conf
 /// Destructor 
 AudioSource::~AudioSource()
 {
-    pipeline_.remove(&source_);
 }
 
 
@@ -91,8 +90,6 @@ InterleavedAudioSource::InterleavedAudioSource(const Pipeline &pipeline, const A
 /// Destructor 
 InterleavedAudioSource::~InterleavedAudioSource() 
 {
-    pipeline_.remove(aconvs_);
-    pipeline_.remove(sources_);
 }
 
 
@@ -186,7 +183,6 @@ void AudioFileSource::restartPlayback()
 /// Destructor 
 AudioFileSource::~AudioFileSource()
 {
-    AudioSource::pipeline_.remove(&aconv_);
     FileSource::releaseAudio(config_.location());
 }
 
@@ -206,8 +202,6 @@ AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConf
 /// Destructor 
 AudioAlsaSource::~AudioAlsaSource()
 {
-    pipeline_.remove(&aconv_);
-    pipeline_.remove(&capsFilter_);
 }
 
 /// Constructor 
@@ -227,8 +221,6 @@ AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceCo
 /// Destructor 
 AudioPulseSource::~AudioPulseSource()
 {
-    pipeline_.remove(&aconv_);
-    pipeline_.remove(&capsFilter_);
 }
 
 
@@ -271,7 +263,6 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
 /// Destructor 
 AudioJackSource::~AudioJackSource()
 {
-    pipeline_.remove(&capsFilter_);
 }
 
 std::string AudioJackSource::getCapsFilterCapsString()
@@ -315,7 +306,6 @@ AudioDvSource::AudioDvSource(const Pipeline &pipeline, const AudioSourceConfig &
 /// Destructor 
 AudioDvSource::~AudioDvSource()
 {
-    pipeline_.remove(&queue_);
     Dv1394::Instance(pipeline_)->unsetAudioSink();
 }
 

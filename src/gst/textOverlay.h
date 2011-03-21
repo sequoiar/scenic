@@ -39,7 +39,6 @@ class TextOverlay: private boost::noncopyable
 {
     public:
         TextOverlay(const Pipeline &pipeline, const std::string &text);
-        ~TextOverlay();
         _GstElement *sinkElement() { return textoverlay_; }
         _GstElement *srcElement() { return textoverlay_; }
 

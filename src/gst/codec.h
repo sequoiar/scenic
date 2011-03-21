@@ -82,7 +82,6 @@ class VideoEncoder : public Encoder
 {
     public: 
         VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced);
-        ~VideoEncoder();
         virtual _GstElement *sinkElement() 
         { 
             return colorspace_;
@@ -98,7 +97,6 @@ class VideoDecoder : public Decoder
 {
     public: 
         VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace);
-        ~VideoDecoder();
         virtual void adjustJitterBuffer();
         virtual _GstElement *srcElement() 
         { 
@@ -124,7 +122,6 @@ class H264Encoder : public VideoEncoder
         void setBitrate(int bitrate);
 
     private:
-        ~H264Encoder();
         Pay* createPayloader() const;
         int bitrate_;
 };
@@ -148,8 +145,6 @@ class H263Encoder : public VideoEncoder
 
     private:
         int bitrate_;
-        ~H263Encoder();
-
         Pay* createPayloader() const;
 };
 
@@ -169,7 +164,6 @@ class Mpeg4Encoder : public VideoEncoder
 {
     public:
         Mpeg4Encoder(const Pipeline &pipeline, int bitrate);
-        ~Mpeg4Encoder();
 
     private:
         int bitrate_;
@@ -192,7 +186,6 @@ class TheoraEncoder : public VideoEncoder
 {
     public:
         TheoraEncoder(const Pipeline &pipeline, int bitrate, int quality);
-        ~TheoraEncoder();
         void setBitrate(int bitrate);
         void setQuality(int quality);
         void setSpeedLevel(int speedLevel);
@@ -225,7 +218,6 @@ class CeltEncoder : public Encoder
         CeltEncoder(const Pipeline &pipeline, int bitrate);
 
     private:
-        ~CeltEncoder();
         Pay* createPayloader() const;
         virtual _GstElement *sinkElement() { return audioconvert_; }
         _GstElement *audioconvert_;
@@ -237,7 +229,6 @@ class CeltDecoder : public Decoder
     public: 
         CeltDecoder(const Pipeline &pipeline);
     private: 
-        ~CeltDecoder();
         virtual _GstElement* srcElement() { return audioconvert_; }
         RtpPay* createDepayloader() const;
         _GstElement *audioconvert_;
@@ -250,7 +241,6 @@ class VorbisEncoder : public Encoder
         VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality);
 
     private:
-        ~VorbisEncoder();
         virtual _GstElement *sinkElement() { return queue_; }
         Pay* createPayloader() const;
         _GstElement *queue_;
@@ -273,7 +263,6 @@ class RawEncoder : public Encoder
 {
     public:
         RawEncoder(const Pipeline &pipeline);
-        ~RawEncoder();
         virtual _GstElement *sinkElement() { return aconv_; }
         virtual _GstElement *srcElement() { return aconv_; }
 
@@ -287,7 +276,6 @@ class RawDecoder : public Decoder
 {
     public:
         RawDecoder(const Pipeline &pipeline, int numChannels);
-        ~RawDecoder();
 
     private:
         RtpPay* createDepayloader() const;
@@ -304,7 +292,6 @@ class LameEncoder : public Encoder
 {
     public:
         LameEncoder(const Pipeline &pipeline, int bitrate, double quality);
-        ~LameEncoder();
 
     private:
         _GstElement *aconv_;
@@ -320,7 +307,6 @@ class MadDecoder : public Decoder
 {
     public:
         MadDecoder(const Pipeline &pipeline);
-        ~MadDecoder();
     private:
         virtual _GstElement *srcElement() { return aconv_; }
         _GstElement *aconv_;

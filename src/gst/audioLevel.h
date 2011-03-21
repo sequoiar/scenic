@@ -43,7 +43,6 @@ class AudioLevel : private BusMsgHandler
 {
     public:
         AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID);
-        ~AudioLevel();
         _GstElement *srcElement() { return level_; }
         _GstElement *sinkElement() { return level_; }
 

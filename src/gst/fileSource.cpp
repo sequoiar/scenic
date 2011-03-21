@@ -56,8 +56,6 @@ FileSource::~FileSource()
 {
     if (isLinked())
         LOG_WARNING("Deleting FileSource that is still linked");
-    pipeline_.remove(&decodebin_);
-    pipeline_.remove(&filesrc_);
 }
 
 
@@ -101,8 +99,6 @@ void FileSource::releaseAudio(const std::string &location)
         return;
     }
 
-    fileSources_[location]->removeAudio();
-
     if (not fileSources_[location]->isLinked()) // no more objects using the filesource
         fileSources_.erase(location);
 }
@@ -117,23 +113,9 @@ void FileSource::releaseVideo(const std::string &location)
         return;
     }
 
-    fileSources_[location]->removeVideo();
-
     if (not fileSources_[location]->isLinked()) // no more objects using the filesource
         fileSources_.erase(location);
 }
-
-void FileSource::removeVideo()
-{
-    pipeline_.remove(&videoQueue_);
-}
-
-
-void FileSource::removeAudio()
-{
-    pipeline_.remove(&audioQueue_);
-}
-
 
 bool FileSource::isLinked()
 {

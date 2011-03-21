@@ -32,7 +32,7 @@ class RtpPay : private boost::noncopyable
 {
     public:
         explicit RtpPay(const Pipeline &pipeline) : pipeline_(pipeline), rtpPay_(0) {}
-        virtual ~RtpPay();
+        virtual ~RtpPay(){};
         virtual _GstElement *srcElement() { return rtpPay_; }
         virtual _GstElement *sinkElement() { return rtpPay_; }
 
@@ -44,7 +44,6 @@ class RtpPay : private boost::noncopyable
 class Pay : public RtpPay
 {
     public:
-        virtual ~Pay();
 
     protected:
         Pay(const Pipeline &pipeline);

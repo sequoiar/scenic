@@ -52,10 +52,3 @@ TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) :
                 textoverlay_);
     }
 }
-
-/// Destructor 
-TextOverlay::~TextOverlay()
-{
-    pipeline_.remove(&textoverlay_);
-}
-

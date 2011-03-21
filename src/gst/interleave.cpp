@@ -90,12 +90,6 @@ const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8] = {
 } // end anonymous namespace
 
 
-InterleavedAudioSource::Interleave::~Interleave()
-{
-    pipeline_.remove(&interleave_);
-}
-
-
 void InterleavedAudioSource::Interleave::set_channel_layout()
 {
     GValue val;

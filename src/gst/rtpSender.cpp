@@ -34,9 +34,6 @@
 
 RtpSender::~RtpSender()
 {
-    /// rtcp_sender and rtcp_receiver are removed in RtpBin base class
-    pipeline_.remove(&rtp_sender_);
-    
     /// remove request pads
     if (send_rtp_sink_)
         gst_object_unref(send_rtp_sink_);

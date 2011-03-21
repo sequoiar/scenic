@@ -36,7 +36,6 @@ class LocalAudio : boost::noncopyable
 {
     public:
         LocalAudio(Pipeline &pipeline, const std::tr1::shared_ptr<AudioSourceConfig> &sourceConfig);
-        ~LocalAudio();
 
     private:
         Pipeline &pipeline_;

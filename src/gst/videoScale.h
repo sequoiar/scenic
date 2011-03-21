@@ -38,7 +38,6 @@ class VideoScale : private boost::noncopyable
 {
     public:
         VideoScale(const Pipeline &pipeline, int width, int height);
-        ~VideoScale();
         /// Found by trial and error, neither width nor height may exceed this value
         static const int MAX_SCALE = 2046;
         _GstElement *sinkElement() { return videoscale_; }

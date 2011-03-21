@@ -43,8 +43,6 @@ class FileSource : boost::noncopyable
         FileSource(const Pipeline &pipeline, const std::string &location);
         ~FileSource();
         bool isLinked();
-        void removeVideo();
-        void removeAudio();
         
         static bool instanceExists(const std::string &location);
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,

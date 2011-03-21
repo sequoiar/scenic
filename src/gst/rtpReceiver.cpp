@@ -40,8 +40,6 @@ std::list<GstElement *> RtpReceiver::depayloaders_;
 
 RtpReceiver::~RtpReceiver()
 {
-    pipeline_.remove(&rtp_receiver_);
-
     // find this->depayloader in the static list of depayloaders
     if (depayloader_) // in case destructor was called before depayloader was created
     {

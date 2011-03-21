@@ -67,11 +67,3 @@ VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) :
     g_object_set(G_OBJECT(videoflip_), "method", flipMethodToInt(flipMethod), NULL);
     gstlinkable::link(colorspace_, videoflip_);    
 }
-
-/// Destructor 
-VideoFlip::~VideoFlip()
-{
-    pipeline_.remove(&videoflip_);
-    pipeline_.remove(&colorspace_);
-}
-

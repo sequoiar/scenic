@@ -54,7 +54,6 @@ Encoder::Encoder(const Pipeline &pipeline) :
 /// Destructor 
 Encoder::~Encoder()
 {
-    pipeline_.remove(&encoder_);
 }
 
 /// Returns bitrate property for this encoder
@@ -100,7 +99,6 @@ Decoder::Decoder(const Pipeline &pipeline) :
 /// Destructor 
 Decoder::~Decoder()
 {
-    pipeline_.remove(&decoder_);
 }
 
 unsigned long long Decoder::minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
@@ -117,26 +115,12 @@ VideoEncoder::VideoEncoder(const Pipeline &pipeline, const char *encoder, bool s
     gstlinkable::link(colorspace_, encoder_);
 }
 
-/// Destructor 
-VideoEncoder::~VideoEncoder()
-{
-    pipeline_.remove(&colorspace_);
-}
-
 VideoDecoder::VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace) : 
     Decoder(pipeline, decoder),
     doDeinterlace_(doDeinterlace), 
     colorspace_(0), 
     deinterlace_(0)
 {}
-
-
-/// Destructor 
-VideoDecoder::~VideoDecoder()
-{
-    pipeline_.remove(&colorspace_);
-    pipeline_.remove(&deinterlace_);
-}
 
 
 /// Sets up either decoder->colorspace->deinterlace
@@ -197,10 +181,6 @@ H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) :
 }
 
 
-/// Destructor 
-H264Encoder::~H264Encoder()
-{}
-
 void Encoder::setBitrateInKbs(int newBitrate)
 {
     static const double KB_PER_BIT = 0.001;
@@ -252,11 +232,6 @@ H263Encoder::H263Encoder(const Pipeline &pipeline, int bitrate) :
 }
 
 
-/// Destructor 
-H263Encoder::~H263Encoder()
-{}
-
-
 /// Creates an h.263 rtp payloader 
 Pay* H263Encoder::createPayloader() const
 {
@@ -285,11 +260,6 @@ Mpeg4Encoder::Mpeg4Encoder(const Pipeline &pipeline, int bitrate) :
 {
     setBitrate(bitrate_);
 }
-
-
-/// Destructor 
-Mpeg4Encoder::~Mpeg4Encoder()
-{}
 
 
 /// Creates an h.264 rtp payloader 
@@ -326,11 +296,6 @@ TheoraEncoder::TheoraEncoder(const Pipeline &pipeline, int bitrate, int quality)
     else
         setQuality(quality_);
 }
-
-
-/// Destructor 
-TheoraEncoder::~TheoraEncoder()
-{}
 
 
 /// Overridden to convert from bit/s to kbit/s
@@ -389,12 +354,6 @@ CeltEncoder::CeltEncoder(const Pipeline &pipeline, int /*bitrate*/)
     /// FIXME: check and set bitrate
 }
 
-/// Destructor 
-CeltEncoder::~CeltEncoder() 
-{
-    pipeline_.remove(&audioconvert_);
-}
-
 /// Creates an RtpCeltPay 
 Pay* CeltEncoder::createPayloader() const
 {
@@ -406,12 +365,6 @@ CeltDecoder::CeltDecoder(const Pipeline &pipeline) :
     audioconvert_(pipeline_.makeElement("audioconvert", 0))
 {
     gstlinkable::link(decoder_, audioconvert_);
-}
-
-/// Destructor 
-CeltDecoder::~CeltDecoder() 
-{
-    pipeline_.remove(&audioconvert_);
 }
 
 /// Creates an RtpCeltDepay 
@@ -435,12 +388,6 @@ VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quali
         g_object_set(encoder_, "quality", quality, NULL);
     else if (bitrate > MIN_BITRATE)
         g_object_set(encoder_, "bitrate", bitrate * BITS_PER_KB, NULL);
-}
-
-/// Destructor 
-VorbisEncoder::~VorbisEncoder() 
-{
-    pipeline_.remove(&queue_);
 }
 
 /// Creates an RtpVorbisPay 
@@ -470,12 +417,6 @@ RawEncoder::RawEncoder(const Pipeline &pipeline) :
     aconv_(pipeline_.makeElement("audioconvert", NULL))
 {}
 
-/// Destructor
-RawEncoder::~RawEncoder()
-{
-    pipeline_.remove(&aconv_);
-}
-
 /// Creates an RtpL16Pay 
 Pay* RawEncoder::createPayloader() const
 {
@@ -498,12 +439,6 @@ RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     g_object_set(G_OBJECT(capsfilter_), "caps", caps, NULL);
     gst_caps_unref(caps);
     gstlinkable::link(aconv_, capsfilter_);
-}
-
-/// Destructor
-RawDecoder::~RawDecoder()
-{
-    pipeline_.remove(&aconv_);
 }
 
 /// Creates an RtpL16Depay 
@@ -549,24 +484,12 @@ LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality)
     gstlinkable::link(encoder_, mp3parse_);
 }
 
-/// Destructor
-LameEncoder::~LameEncoder()
-{
-    pipeline_.remove(&mp3parse_);
-    pipeline_.remove(&aconv_);
-}
-
 /// Constructor
 MadDecoder::MadDecoder(const Pipeline &pipeline) :
     Decoder(pipeline, "mad"),
     aconv_(pipeline_.makeElement("audioconvert", NULL))
 {
     gstlinkable::link(decoder_, aconv_);
-}
-
-MadDecoder::~MadDecoder()
-{
-    pipeline_.remove(&aconv_);
 }
 
 /// Creates an RtpMpaPay

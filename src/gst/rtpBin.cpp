@@ -197,14 +197,11 @@ const char *RtpBin::padStr(const char *padName) const
 RtpBin::~RtpBin()
 {
     unregisterSession();
-    pipeline_.remove(&rtcp_sender_);    // a pair for each session
-    pipeline_.remove(&rtcp_receiver_);
 
     --sessionCount_;
     if (sessionCount_ == 0) // destroy if no streams are present
     {
         LOG_DEBUG("No rtp sessions left, destroying rtpbin");
-        pipeline_.remove(&rtpbin_); // one shared by all sessions
         rtpbin_ = 0;
         destroyed_ = true;
     }

@@ -86,12 +86,6 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     g_object_set(G_OBJECT(level_), "peak-ttl", PEAK_TTL, NULL);
 }
 
-/// Destructor 
-AudioLevel::~AudioLevel()
-{
-    pipeline_.remove(&level_);
-}
-
 /**
  * Toggles whether or not this AudioLevel will post messages on the bus. */
 void AudioLevel::emitMessages(bool doEmit)

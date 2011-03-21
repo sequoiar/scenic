@@ -48,8 +48,6 @@ class Pipeline : boost::noncopyable
         void unsubscribe(BusMsgHandler *obj);
 
         void updateSampleRate(unsigned newRate);
-        void remove(_GstElement ** element) const;
-        void remove(std::vector < _GstElement * >&elementVec) const;
         bool isPlaying() const;
         unsigned actualSampleRate() const;
         bool isReady() const;

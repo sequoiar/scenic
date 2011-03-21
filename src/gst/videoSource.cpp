@@ -46,14 +46,6 @@ VideoSource::VideoSource(const Pipeline &pipeline, const VideoSourceConfig &conf
         capsFilter_(0)
 {}
 
-
-/// Destructor
-VideoSource::~VideoSource()
-{
-    pipeline_.remove(&capsFilter_);
-    pipeline_.remove(&source_);
-}
-
 std::string VideoSource::defaultSrcCaps() const
 {
     std::ostringstream capsStr;
@@ -96,11 +88,6 @@ VideoTestSource::VideoTestSource(const Pipeline &pipeline,
     setCapsFilter(srcCaps());
 }
 
-/// Destructor
-VideoTestSource::~VideoTestSource()
-{}
-
-
 /// Constructor
 VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConfig &config) 
     :
@@ -118,7 +105,6 @@ VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConf
 /// Destructor
 VideoFileSource::~VideoFileSource()
 {
-    pipeline_.remove(&identity_);
     FileSource::releaseVideo(config_.location());
 }
 
@@ -138,8 +124,6 @@ VideoDvSource::VideoDvSource(const Pipeline &pipeline,
 /// Destructor
 VideoDvSource::~VideoDvSource()
 {
-    pipeline_.remove(&queue_);
-    pipeline_.remove(&dvdec_);
     Dv1394::Instance(pipeline_)->unsetVideoSink();
 }
 

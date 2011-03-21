@@ -78,7 +78,6 @@ class InterleavedAudioSource : public AudioSource
                  * InterleavedAudioSource's internals are safe
                  * as InterleavedAudioSource's children will not have access here. */
                 Interleave(const Pipeline &pipeline, const AudioSourceConfig &config);
-                ~Interleave();
 
                 _GstElement *srcElement() { return interleave_; }
                 _GstElement *sinkElement() { return interleave_; }

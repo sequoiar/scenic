@@ -166,8 +166,6 @@ void SharedVideoSink::prepareSink(int width, int height)
 SharedVideoSink::~SharedVideoSink()
 {
     // using boost::interprocess::interprocess_mutex;
-    destroySink();
-    pipeline_.remove(&colorspc_);
     // lock the mutex
     // boost::interprocess::scoped_lock<interprocess_mutex> lock(sharedBuffer_->getMutex());
     // sharedBuffer_->stopPushing();
