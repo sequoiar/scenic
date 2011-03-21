@@ -259,23 +259,31 @@ bool Pipeline::isStopped() const
 namespace {
 bool checkStateChange(GstStateChangeReturn ret)
 {
-    if (ret == GST_STATE_CHANGE_SUCCESS)
+    switch (ret)
     {
-        LOG_DEBUG("Element state change was successful");
-        return true;
+        case GST_STATE_CHANGE_SUCCESS:
+        {
+            LOG_DEBUG("Element state change was successful");
+            return true;
+        }
+        case GST_STATE_CHANGE_ASYNC:
+        {
+            LOG_DEBUG("Element will change state asynchronously");
+            return true;
+        }
+        case GST_STATE_CHANGE_NO_PREROLL:
+        {
+            LOG_DEBUG("Element is live, no preroll");
+            return true;
+        }
+        case GST_STATE_CHANGE_FAILURE:
+        {
+            LOG_WARNING("Failed to change state of pipeline");
+            return false;
+        }
+        default:
+            return false;
     }
-    else if (ret == GST_STATE_CHANGE_NO_PREROLL)
-    {
-        LOG_DEBUG("Element is live, no preroll");
-        return true;
-    }
-    else if (ret == GST_STATE_CHANGE_FAILURE) 
-    {
-        LOG_WARNING("Failed to change state of pipeline");
-        return false;
-    }
-    else
-        return false;
 }
 }
 
