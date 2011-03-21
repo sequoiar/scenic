@@ -28,6 +28,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+#include <gdk/gdkcursor.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
 
@@ -140,12 +141,15 @@ void GtkVideoSink::showWindow()
 
 void GtkVideoSink::hideCursor()
 {
-    // FIXME: this is because gtk doesn't support GDK_BLANK_CURSOR before gtk-2.16
-    char invisible_cursor_bits[] = { 0x0 };
     static GdkCursor* cursor = 0;
 
     if (cursor == 0)
     {
+// GDK_BLANK_CURSOR is available in gtk-2.16 and later
+#if GTK_CHECK_VERSION (2,16,0)
+        cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
+#else
+        char invisible_cursor_bits[] = { 0x0 };
         static GdkBitmap *empty_bitmap;
         const static GdkColor color = {0, 0, 0, 0};
         empty_bitmap = gdk_bitmap_create_from_data(GDK_WINDOW(drawingArea_->window),
@@ -153,6 +157,7 @@ void GtkVideoSink::hideCursor()
                 1, 1);
         cursor = gdk_cursor_new_from_pixmap(empty_bitmap, empty_bitmap, &color,
                 &color, 0, 0);
+#endif
     }
 
     gdk_window_set_cursor(GDK_WINDOW(drawingArea_->window), cursor);

@@ -195,6 +195,8 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     gst_bus_add_watch(bus, busCall, this);
     gst_object_unref(bus);
 
+    // Register notify::source callback, which will be called when the uridecodebin is
+    // preparing a new source.
     GstElement *decodebin = gst_bin_get_by_name (GST_BIN(pipeline_),
                 "decode");
     g_signal_connect(decodebin, "notify::source", G_CALLBACK(onNotifySource), this);
