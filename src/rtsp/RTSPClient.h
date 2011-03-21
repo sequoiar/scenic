@@ -25,11 +25,14 @@
 
 #include "noncopyable.h"
 #include <string>
+#include <tr1/memory>
 
 class _GstElement;
 class _GstMessage;
 class _GstBus;
 class _GParamSpec;
+class _GstPad;
+class Pipeline;
 
 namespace boost {
     namespace program_options {
@@ -44,13 +47,16 @@ class RTSPClient : private boost::noncopyable
         ~RTSPClient();
         void run(int timeout);
     private:
-        static int busCall(_GstBus * /*bus*/, _GstMessage *msg, void *user_data);
+        //static int busCall(_GstBus * /*bus*/, _GstMessage *msg, void *user_data);
         static int timeout();
         static int onNotifySource(_GstElement *uridecodebin, _GParamSpec * /*pspec*/, void *data);
-        _GstElement *pipeline_;
+        static void onPadAdded(_GstElement *uridecodebin, _GstPad * newPad, void *data);
+        std::tr1::shared_ptr<Pipeline> pipeline_;
         bool latencySet_;
         std::string portRange_;
         int latency_;
+        bool enableVideo_;
+        bool enableAudio_;
 };
 
 #endif // _RTSP_CLIENT_H_

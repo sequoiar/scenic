@@ -30,7 +30,10 @@
 #include "util/sigint.h"
 #include "util/logWriter.h"
 #include "gtk_utils/gtk_utils.h"
+#include "gst/pipeline.h"
+#include "gst/gstLinkable.h"
 
+#if 0
 gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
 {
     RTSPClient *context = static_cast<RTSPClient*>(user_data);
@@ -93,6 +96,7 @@ gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
 
     return TRUE;
 }
+#endif
 
 gboolean
 RTSPClient::timeout()
@@ -147,15 +151,123 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
     return TRUE;
 }
 
+void
+RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *pad, gpointer data)
+{
+    RTSPClient *context = static_cast<RTSPClient*>(data);
+    GstCaps *caps = gst_pad_get_caps (pad);
+    const gchar *mime = gst_structure_get_name (gst_caps_get_structure (caps, 0));
+    if (g_strrstr (mime, "video"))
+    {
+        if (context->enableVideo_)
+        {
+            GstElement *videoQueue = context->pipeline_->findElementByName("video_queue");
+            if (videoQueue == 0) 
+            {
+                LOG_WARNING("No element named video_queue, not linking");
+                gst_caps_unref (caps);
+                return;
+            }
+            GstPad *videoPad = gst_element_get_static_pad(videoQueue, "sink");
+            if (GST_PAD_IS_LINKED(videoPad))
+            {
+                GstObject *parent = GST_OBJECT (GST_OBJECT_PARENT (videoPad));
+                LOG_WARNING("Omitting link for pad " << GST_OBJECT_NAME(parent) << 
+                        ":" << GST_OBJECT_NAME(videoPad) << " because it's already linked");
+                gst_object_unref (GST_OBJECT (videoPad));
+                gst_caps_unref (caps);
+                return;
+            }
+            /* can it link to the videopad ? */
+            GstCaps *videoCaps = gst_pad_get_caps (videoPad);
+            GstCaps *res = gst_caps_intersect (caps, videoCaps);
+            bool linked = false;
+            if (res && !gst_caps_is_empty (res)) 
+            {
+                LOG_DEBUG("Found pad to link to videoqueue - plugging is now done");
+                linked = gstlinkable::link_pads(pad, videoPad);
+            }
+            if (not linked) 
+                LOG_WARNING("Could not link new pad to videoqueue");
+            gst_caps_unref (videoCaps);
+            gst_caps_unref (res);
+            gst_object_unref (GST_OBJECT (videoPad));
+            gst_caps_unref (caps);
+        }
+        else
+        {
+            LOG_WARNING("Got video stream even though we've disabled video");
+            gst_caps_unref (caps);
+        }
+    }
+    else if (g_strrstr (mime, "audio"))
+    {
+        if (context->enableAudio_)
+        {
+            GstElement *audioQueue = context->pipeline_->findElementByName("audio_queue");
+            if (audioQueue == 0) 
+            {
+                LOG_WARNING("No element named audio_queue, not linking");
+                gst_caps_unref (caps);
+                return;
+            }
+            GstPad *audioPad = gst_element_get_static_pad(audioQueue, "sink");
+            if (GST_PAD_IS_LINKED(audioPad))
+            {
+                GstObject *parent = GST_OBJECT (GST_OBJECT_PARENT (audioPad));
+                LOG_WARNING("Omitting link for pad " << GST_OBJECT_NAME(parent) << 
+                        ":" << GST_OBJECT_NAME(audioPad) << " because it's already linked");
+                gst_object_unref (GST_OBJECT (audioPad));
+                gst_caps_unref (caps);
+                return;
+            }
+            /* can it link to the audiopad? */
+            GstCaps *audioCaps = gst_pad_get_caps (audioPad);
+            GstCaps *res = gst_caps_intersect (caps, audioCaps);
+            bool linked = false;
+            if (res && !gst_caps_is_empty (res)) 
+            {
+                LOG_DEBUG("Found pad to link to audioqueue - plugging is now done");
+                linked = gstlinkable::link_pads(pad, audioPad);
+            }
+            if (not linked)
+                LOG_WARNING("Could not link new pad to audioqueue");
+            gst_caps_unref (audioCaps);
+            gst_caps_unref (res);
+            gst_object_unref (GST_OBJECT (audioPad));
+        }
+        else
+        {
+            LOG_WARNING("Got audio stream even though we've disabled audio");
+            gst_caps_unref (caps);
+        }
+    }
+    else
+    {
+        LOG_WARNING("Got unknown mimetype " << mime);
+        gst_caps_unref (caps);
+    }
+}
+
 static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
 
 RTSPClient::RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio) :
-    pipeline_(0), latencySet_(false), portRange_(""), latency_(options["jitterbuffer"].as<int>())
+    pipeline_(new Pipeline), 
+    latencySet_(false), 
+    portRange_(""),
+    latency_(options["jitterbuffer"].as<int>()), 
+    enableVideo_(enableVideo), 
+    enableAudio_(enableAudio)
 {
     using std::string;
-    string launchLine("uridecodebin uri=rtsp://");
-    launchLine += options["address"].as<string>(); // i.e. localhost
-    launchLine += ":8554/test name=decode ";
+    if (options["debug"].as<std::string>() == "gst-debug")
+        pipeline_->makeVerbose();
+
+    GstElement *uridecodebin = pipeline_->makeElement("uridecodebin", "decode");
+    string uri("rtsp://" + options["address"].as<string>() + ":8554/test");
+    g_object_set(uridecodebin, "uri", uri.c_str(), NULL);
+    g_signal_connect(uridecodebin, "notify::source", G_CALLBACK(onNotifySource), this);
+    g_signal_connect(uridecodebin, "pad-added", G_CALLBACK(onPadAdded), this);
 
     // get port range
     if (options.count("port-range"))
@@ -166,51 +278,32 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
             LOG_WARNING("Invalid port-range " << options["port-range"].as<std::string>() << ", ignoring.");
     }
 
-    if (enableVideo)
+    if (enableVideo_)
     {
         LOG_DEBUG("Video enabled");
-        launchLine += " decode. ! queue ! ffmpegcolorspace ! timeoverlay halignment=right ! " + options["videosink"].as<string>(); 
+        GstElement *queue = pipeline_->makeElement("queue", "video_queue");
+        GstElement *colorspace = pipeline_->makeElement("ffmpegcolorspace", 0);
+        GstElement *videosink = pipeline_->makeElement(options["videosink"].as<string>().c_str(), 0);
+        gstlinkable::link(queue, colorspace);
+        gstlinkable::link(colorspace, videosink);
     }
-    if (enableAudio)
+    if (enableAudio_)
     {
         LOG_DEBUG("Audio enabled");
-        launchLine += " decode. ! queue ! audioconvert ! audioresample ! " + 
-            options["audiosink"].as<string>() + " buffer-time=" + 
-            boost::lexical_cast<string>(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC);
+        GstElement *queue = pipeline_->makeElement("queue", "audio_queue");
+        GstElement *audioconvert = pipeline_->makeElement("audioconvert", 0);
+        GstElement *audioresample = pipeline_->makeElement("audioresample", 0);
+        GstElement *audiosink = pipeline_->makeElement(options["audiosink"].as<string>().c_str(), 0);
+        g_object_set(audiosink, "buffer-time", options["audio-buffer"].as<int>() *
+                USEC_PER_MILLISEC, NULL);
+        gstlinkable::link(queue, audioconvert);
+        gstlinkable::link(audioconvert, audioresample);
+        gstlinkable::link(audioresample, audiosink);
     }
-
-    GError *error = NULL;
-    pipeline_ = gst_parse_launch(launchLine.c_str(), &error);
-    if (error != NULL) 
-    {
-        /* a recoverable error was encountered */
-        LOG_WARNING("recoverable parsing error: " << error->message);
-        g_error_free (error);
-    }
-    if (pipeline_ == 0)
-        THROW_CRITICAL("Could not create pipeline from description " << launchLine);
-
-    // add bus call
-    GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
-    gst_bus_add_watch(bus, busCall, this);
-    gst_object_unref(bus);
-
-    // Register notify::source callback, which will be called when the uridecodebin is
-    // preparing a new source.
-    GstElement *decodebin = gst_bin_get_by_name (GST_BIN(pipeline_),
-                "decode");
-    g_signal_connect(decodebin, "notify::source", G_CALLBACK(onNotifySource), this);
 }
 
 RTSPClient::~RTSPClient()
-{
-    /* clean up */
-    if (pipeline_)
-    {
-        gst_element_set_state (pipeline_, GST_STATE_NULL);
-        gst_object_unref (pipeline_);
-    }
-}
+{}
 
 void RTSPClient::run(int timeToLive)
 {
@@ -219,11 +312,10 @@ void RTSPClient::run(int timeToLive)
     while (!running and not signal_handlers::signalFlag())
     {
         LOG_INFO("Waiting for rtsp server");
-        GstStateChangeReturn ret = gst_element_set_state (pipeline_, GST_STATE_PLAYING);
-        if (ret == GST_STATE_CHANGE_FAILURE)
+        if (not pipeline_->start())
         {
             LOG_WARNING("Failed to change state of pipeline");
-            gst_element_set_state (pipeline_, GST_STATE_NULL);
+            //pipeline_->makeNull();
             g_usleep(G_USEC_PER_SEC);
         }
         else
@@ -235,6 +327,8 @@ void RTSPClient::run(int timeToLive)
     /* start main loop */
     if (not signal_handlers::signalFlag())
         gutil::runMainLoop(timeToLive);
+
+    pipeline_->stop();
 
     LOG_DEBUG("Client exitting...\n");
 }
