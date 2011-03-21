@@ -32,6 +32,7 @@ class _GstMessage;
 class _GstBus;
 class _GParamSpec;
 class _GstPad;
+class _GstCaps;
 class Pipeline;
 
 namespace boost {
@@ -47,7 +48,7 @@ class RTSPClient : private boost::noncopyable
         ~RTSPClient();
         void run(int timeout);
     private:
-        //static int busCall(_GstBus * /*bus*/, _GstMessage *msg, void *user_data);
+        void linkNewPad(_GstPad *pad, const _GstCaps *caps, const char *queue_name);
         static int timeout();
         static int onNotifySource(_GstElement *uridecodebin, _GParamSpec * /*pspec*/, void *data);
         static void onPadAdded(_GstElement *uridecodebin, _GstPad * newPad, void *data);

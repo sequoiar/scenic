@@ -151,8 +151,40 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
     return TRUE;
 }
 
-void
-RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *pad, gpointer data)
+void RTSPClient::linkNewPad(GstPad *pad, const GstCaps *caps, const gchar *queue_name)
+{
+    GstElement *queue = pipeline_->findElementByName(queue_name);
+    if (queue == 0) 
+    {
+        LOG_WARNING("No element named " << queue_name << ", not linking");
+        return;
+    }
+    GstPad *sinkPad = gst_element_get_static_pad(queue, "sink");
+    if (GST_PAD_IS_LINKED(sinkPad))
+    {
+        GstObject *parent = GST_OBJECT (GST_OBJECT_PARENT (sinkPad));
+        LOG_WARNING("Omitting link for pad " << GST_OBJECT_NAME(parent) << 
+                ":" << GST_OBJECT_NAME(sinkPad) << " because it's already linked");
+        gst_object_unref (GST_OBJECT (sinkPad));
+        return;
+    }
+    /* can it link to the new pad? */
+    GstCaps *sinkCaps = gst_pad_get_caps (sinkPad);
+    GstCaps *res = gst_caps_intersect (caps, sinkCaps);
+    bool linked = false;
+    if (res && !gst_caps_is_empty (res)) 
+    {
+        LOG_DEBUG("Found pad to link to pipeline - plugging is now done");
+        linked = gstlinkable::link_pads(pad, sinkPad);
+    }
+    if (not linked) 
+        LOG_WARNING("Could not link new pad to pipelien");
+    gst_caps_unref (sinkCaps);
+    gst_caps_unref (res);
+    gst_object_unref (GST_OBJECT (sinkPad));
+}
+
+void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *pad, gpointer data)
 {
     RTSPClient *context = static_cast<RTSPClient*>(data);
     GstCaps *caps = gst_pad_get_caps (pad);
@@ -160,93 +192,20 @@ RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *pad, gpointer data
     if (g_strrstr (mime, "video"))
     {
         if (context->enableVideo_)
-        {
-            GstElement *videoQueue = context->pipeline_->findElementByName("video_queue");
-            if (videoQueue == 0) 
-            {
-                LOG_WARNING("No element named video_queue, not linking");
-                gst_caps_unref (caps);
-                return;
-            }
-            GstPad *videoPad = gst_element_get_static_pad(videoQueue, "sink");
-            if (GST_PAD_IS_LINKED(videoPad))
-            {
-                GstObject *parent = GST_OBJECT (GST_OBJECT_PARENT (videoPad));
-                LOG_WARNING("Omitting link for pad " << GST_OBJECT_NAME(parent) << 
-                        ":" << GST_OBJECT_NAME(videoPad) << " because it's already linked");
-                gst_object_unref (GST_OBJECT (videoPad));
-                gst_caps_unref (caps);
-                return;
-            }
-            /* can it link to the videopad ? */
-            GstCaps *videoCaps = gst_pad_get_caps (videoPad);
-            GstCaps *res = gst_caps_intersect (caps, videoCaps);
-            bool linked = false;
-            if (res && !gst_caps_is_empty (res)) 
-            {
-                LOG_DEBUG("Found pad to link to videoqueue - plugging is now done");
-                linked = gstlinkable::link_pads(pad, videoPad);
-            }
-            if (not linked) 
-                LOG_WARNING("Could not link new pad to videoqueue");
-            gst_caps_unref (videoCaps);
-            gst_caps_unref (res);
-            gst_object_unref (GST_OBJECT (videoPad));
-            gst_caps_unref (caps);
-        }
+            context->linkNewPad(pad, caps, "video_queue");
         else
-        {
             LOG_WARNING("Got video stream even though we've disabled video");
-            gst_caps_unref (caps);
-        }
     }
     else if (g_strrstr (mime, "audio"))
     {
         if (context->enableAudio_)
-        {
-            GstElement *audioQueue = context->pipeline_->findElementByName("audio_queue");
-            if (audioQueue == 0) 
-            {
-                LOG_WARNING("No element named audio_queue, not linking");
-                gst_caps_unref (caps);
-                return;
-            }
-            GstPad *audioPad = gst_element_get_static_pad(audioQueue, "sink");
-            if (GST_PAD_IS_LINKED(audioPad))
-            {
-                GstObject *parent = GST_OBJECT (GST_OBJECT_PARENT (audioPad));
-                LOG_WARNING("Omitting link for pad " << GST_OBJECT_NAME(parent) << 
-                        ":" << GST_OBJECT_NAME(audioPad) << " because it's already linked");
-                gst_object_unref (GST_OBJECT (audioPad));
-                gst_caps_unref (caps);
-                return;
-            }
-            /* can it link to the audiopad? */
-            GstCaps *audioCaps = gst_pad_get_caps (audioPad);
-            GstCaps *res = gst_caps_intersect (caps, audioCaps);
-            bool linked = false;
-            if (res && !gst_caps_is_empty (res)) 
-            {
-                LOG_DEBUG("Found pad to link to audioqueue - plugging is now done");
-                linked = gstlinkable::link_pads(pad, audioPad);
-            }
-            if (not linked)
-                LOG_WARNING("Could not link new pad to audioqueue");
-            gst_caps_unref (audioCaps);
-            gst_caps_unref (res);
-            gst_object_unref (GST_OBJECT (audioPad));
-        }
+            context->linkNewPad(pad, caps, "audio_queue");
         else
-        {
             LOG_WARNING("Got audio stream even though we've disabled audio");
-            gst_caps_unref (caps);
-        }
     }
     else
-    {
         LOG_WARNING("Got unknown mimetype " << mime);
-        gst_caps_unref (caps);
-    }
+    gst_caps_unref (caps);
 }
 
 static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
@@ -313,11 +272,7 @@ void RTSPClient::run(int timeToLive)
     {
         LOG_INFO("Waiting for rtsp server");
         if (not pipeline_->start())
-        {
-            LOG_WARNING("Failed to change state of pipeline");
-            //pipeline_->makeNull();
-            g_usleep(G_USEC_PER_SEC);
-        }
+            g_usleep(G_USEC_PER_SEC); // sleep a bit
         else
             running = true;
     }
