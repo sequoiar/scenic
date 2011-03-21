@@ -23,7 +23,7 @@
 #ifndef _RTSP_CLIENT_H_
 #define _RTSP_CLIENT_H_
 
-#include "noncopyable.h"
+#include "gst/busMsgHandler.h"
 #include <string>
 #include <tr1/memory>
 
@@ -41,13 +41,14 @@ namespace boost {
     }
 }
 
-class RTSPClient : private boost::noncopyable
+class RTSPClient : private BusMsgHandler
 {
     public:
         RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
         ~RTSPClient();
         void run(int timeout);
     private:
+        bool handleBusMsg(_GstMessage *msg);
         bool validPortRange(const std::string &ports);
         void linkNewPad(_GstPad *pad, const _GstCaps *caps, const char *queue_name);
         static int timeout();

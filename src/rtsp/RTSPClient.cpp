@@ -140,6 +140,7 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *pad, gpointer
 static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
 
 RTSPClient::RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio) :
+    BusMsgHandler(),
     pipeline_(new Pipeline), 
     latencySet_(false), 
     portRange_(""),
@@ -147,6 +148,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     enableVideo_(enableVideo), 
     enableAudio_(enableAudio)
 {
+    BusMsgHandler::setPipeline(pipeline_.get()); // this is how we subscribe to the pipeline's bus messages
     using std::string;
     if (options["debug"].as<string>() == "gst-debug")
         pipeline_->makeVerbose();
@@ -214,3 +216,12 @@ void RTSPClient::run(int timeToLive)
     LOG_DEBUG("Client exitting...\n");
 }
 
+bool RTSPClient::handleBusMsg(GstMessage *msg)
+{
+    if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
+    {
+        LOG_DEBUG("Got end of stream, quitting the main loop");
+        gutil::killMainLoop();
+    }
+    return false; // other objects might want this message
+}

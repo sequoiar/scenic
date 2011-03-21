@@ -102,7 +102,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
         case GST_MESSAGE_EOS:
             {
                 LOG_DEBUG("End-of-stream");
-                context->updateListeners(msg);
+                context->updateListeners(msg); // forward message to subscribers
                 break;
             }
         case GST_MESSAGE_ERROR:
@@ -452,6 +452,8 @@ void Pipeline::unsubscribe(BusMsgHandler *obj)
 void Pipeline::updateListeners(GstMessage *msg)
 {
     // TODO: are we guaranteed that these are in a callable state?
+    // this loop goes through our listeners until it finds one that returns
+    // true upon receiving this message
     for (std::set<BusMsgHandler*>::iterator iter = handlers_.begin(); 
             iter != handlers_.end(); ++iter)
         if ((*iter)->handleBusMsg(msg))

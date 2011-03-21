@@ -169,8 +169,6 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
         }
         else if (loopCount_ != 0)
             THROW_ERROR("Invalid loop count");
-
-        return true;
     }
     return false;
 }
