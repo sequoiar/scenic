@@ -338,9 +338,8 @@ set_encoder_settings (GstElement *encoder, gchar *settings)
 {
     int i;
     gchar **params = g_strsplit_set(settings, "= ", -1);
-    (void) encoder;
+    /* for each property=value pair, we set it on our encoder */
     for (i = 0; params[i] != NULL; i+=2) {
-        /*g_print("setting %s to %s", params[i], params[i+1]);*/
         gst_util_set_object_arg (G_OBJECT(encoder), params[i], params[i+1]);
     }
     g_strfreev(params);

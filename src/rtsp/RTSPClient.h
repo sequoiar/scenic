@@ -48,6 +48,7 @@ class RTSPClient : private boost::noncopyable
         ~RTSPClient();
         void run(int timeout);
     private:
+        bool validPortRange(const std::string &ports);
         void linkNewPad(_GstPad *pad, const _GstCaps *caps, const char *queue_name);
         static int timeout();
         static int onNotifySource(_GstElement *uridecodebin, _GParamSpec * /*pspec*/, void *data);

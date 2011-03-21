@@ -33,71 +33,6 @@
 #include "gst/pipeline.h"
 #include "gst/gstLinkable.h"
 
-#if 0
-gboolean RTSPClient::busCall(GstBus * /*bus*/, GstMessage *msg, void *user_data)
-{
-    RTSPClient *context = static_cast<RTSPClient*>(user_data);
-    switch (GST_MESSAGE_TYPE(msg)) 
-    {
-        case GST_MESSAGE_ERROR: 
-            {
-                GError *err;
-                gchar *debug;
-                gst_message_parse_error(msg, &err, &debug);
-                LOG_WARNING("GOT ERROR " << err->message);
-                g_error_free(err);
-                g_free (debug);
-
-                gutil::killMainLoop();
-
-                return FALSE;
-            }
-        case GST_MESSAGE_WARNING:
-            {
-                gchar *debug = NULL;
-                GError *err = NULL;
-
-                gst_message_parse_warning(msg, &err, &debug);
-
-                LOG_WARNING(gst_object_get_name(msg->src) << ":" << err->message);
-                g_error_free(err);
-
-                if (debug) {
-                    LOG_DEBUG("Debug details: " << debug);
-                    g_free(debug);
-                }
-                break;
-            }
-
-        case GST_MESSAGE_EOS: 
-            {
-                LOG_INFO("End-of-stream");
-                gutil::killMainLoop();
-                break;
-            }
-
-        case GST_MESSAGE_LATENCY:
-            {
-                // when pipeline latency is changed, this msg is posted on the bus. we then have
-                // to explicitly tell the pipeline to recalculate its latency
-                if (gst_bin_recalculate_latency (GST_BIN(context->pipeline_)) == TRUE)
-                {
-                    LOG_DEBUG("Reconfigured latency.");
-                    context->latencySet_ = true;
-                }
-                else
-                    LOG_DEBUG("Could not reconfigure latency.\n");
-                break;
-            }
-        default:
-            // Unhandled message
-            break;
-    }
-
-    return TRUE;
-}
-#endif
-
 gboolean
 RTSPClient::timeout()
 {
@@ -110,9 +45,7 @@ RTSPClient::timeout()
         return TRUE;
 }
 
-namespace 
-{
-bool validPortRange(const std::string &ports)
+bool RTSPClient::validPortRange(const std::string &ports)
 {
     std::vector<std::string> strs;
     boost::split(strs, ports, boost::is_any_of("- "));
@@ -120,15 +53,11 @@ bool validPortRange(const std::string &ports)
         return false;
     int first = boost::lexical_cast<int>(strs[0]);
     int second = boost::lexical_cast<int>(strs[1]);
-    // TODO Thu Mar 17 17:53:46 EDT 2011:tmatth 
-    // this is the minimum if audio AND video are present, so we may want to change it
-    // if the client knows in advance that it will not grab both streams
-    static const int MINIMUM_PORT_RANGE = 5; // RTP=n, RTCP1=n+1, RTCP2=n+3
+    static const int MINIMUM_PORT_RANGE = enableVideo_ and enableAudio_ ? 5 : 3; // RTP=n, RTCP1=n+1, RTCP2=n+3
     if (first >= 1 and first <= 65535 and second >= 1 and second <= 65535)
         if ((second - first) >= MINIMUM_PORT_RANGE)
             return true;
     return false;
-}
 }
 
 gboolean
@@ -219,7 +148,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     enableAudio_(enableAudio)
 {
     using std::string;
-    if (options["debug"].as<std::string>() == "gst-debug")
+    if (options["debug"].as<string>() == "gst-debug")
         pipeline_->makeVerbose();
 
     GstElement *uridecodebin = pipeline_->makeElement("uridecodebin", "decode");
@@ -231,10 +160,10 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     // get port range
     if (options.count("port-range"))
     {
-        if (validPortRange(options["port-range"].as<std::string>()))
-            portRange_ = options["port-range"].as<std::string>();
+        if (validPortRange(options["port-range"].as<string>()))
+            portRange_ = options["port-range"].as<string>();
         else
-            LOG_WARNING("Invalid port-range " << options["port-range"].as<std::string>() << ", ignoring.");
+            LOG_WARNING("Invalid port-range " << options["port-range"].as<string>() << ", ignoring.");
     }
 
     if (enableVideo_)
