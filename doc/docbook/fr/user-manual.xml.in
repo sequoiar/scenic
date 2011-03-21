@@ -26,7 +26,7 @@
 ]>
 
 <!-- =============Document Header ============================= -->
-<book id="Manuel de l'utilisateur" lang="fr">
+<book id="User-Manual" lang="fr">
 
    &About;
    &Introduction;
