@@ -196,14 +196,11 @@ RTSPClient::~RTSPClient()
 void RTSPClient::run(int timeToLive)
 {
     /* run */
-    bool running = false;
-    while (!running and not signal_handlers::signalFlag())
+    while (!pipeline_->isPlaying() and not signal_handlers::signalFlag())
     {
         LOG_INFO("Waiting for rtsp server");
-        if (not pipeline_->start())
-            g_usleep(G_USEC_PER_SEC); // sleep a bit
-        else
-            running = true;
+        pipeline_->start();
+        g_usleep(G_USEC_PER_SEC); // sleep a bit
     }
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, NULL);
