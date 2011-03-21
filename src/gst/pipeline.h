@@ -43,6 +43,7 @@ class Pipeline : boost::noncopyable
 
         bool isAlive() { return pipeline_ == 0; }
         _GstElement *makeElement(const char *factoryName, const char *elementName) const;
+        _GstElement *findElementByName(const char *elementName);
         void subscribe(BusMsgHandler *obj);
         void unsubscribe(BusMsgHandler *obj);
 
@@ -55,15 +56,18 @@ class Pipeline : boost::noncopyable
         bool isPaused() const;
         bool isStopped() const;
         void seekTo(gint64 pos);
-        void start() const;
+        bool start() const;
         void pause() const;
         void makeReady() const;
+        bool makeNull() const;
         void stop() const;
         void quit() const;
         void makeVerbose() const;
 
     private:
         void add(_GstElement * element) const;
+        /// Returns our pipeline's bus. 
+        /// Bus must be unreffed after use!
         _GstBus* getBus() const;
 
         static int bus_call(_GstBus *bus, _GstMessage *msg, void *data);

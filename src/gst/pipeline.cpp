@@ -85,11 +85,11 @@ void translateMessage(GstObject *src, const std::string &errStr)
                  deviceName << " is probably already in use.");
         }
         else 
-            LOG_WARNING(srcName << ":" << errStr);
+            THROW_CRITICAL(srcName << ":" << errStr);
         return;
     }
 
-    THROW_CRITICAL(srcName << ":" << errStr);
+    LOG_WARNING(srcName << ":" << errStr);
 }
 }
 
@@ -257,45 +257,46 @@ bool Pipeline::isStopped() const
 }
 
 namespace {
-bool checkStateChange(GstBus *bus, GstStateChangeReturn ret)
+bool checkStateChange(GstStateChangeReturn ret)
 {
-    if (ret == GST_STATE_CHANGE_NO_PREROLL)
+    if (ret == GST_STATE_CHANGE_SUCCESS)
+    {
+        LOG_DEBUG("Element state change was successful");
+        return true;
+    }
+    else if (ret == GST_STATE_CHANGE_NO_PREROLL)
     {
         LOG_DEBUG("Element is live, no preroll");
         return true;
     }
     else if (ret == GST_STATE_CHANGE_FAILURE) 
     {
-        /* check if there is an error message with details on the bus */
-        GstMessage *msg = gst_bus_poll(bus, GST_MESSAGE_ERROR, 0);
-        if (msg) 
-        {
-            GError *err = NULL;
-
-            gst_message_parse_error(msg, &err, NULL);
-            LOG_ERROR(err->message);
-            g_error_free(err);
-            gst_message_unref(msg);
-        }
-        gst_object_unref(bus);
+        LOG_WARNING("Failed to change state of pipeline");
         return false;
     }
     else
-        return true;
+        return false;
 }
 }
 
 
-void Pipeline::start() const
+bool Pipeline::start() const
 {
     if (isPlaying())        // only needs to be started once
-        return;
+    {
+        LOG_WARNING("Already playing, this call to Pipeline::start() was redundant"); 
+        return true;
+    }
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    if (checkStateChange(getBus(), ret) == 0) // set it to playing
-        THROW_ERROR("Could not set pipeline state to PLAYING");
+    if (not checkStateChange(ret)) // set it to playing
+    {
+        LOG_WARNING("Could not set pipeline state to PLAYING");
+        return false;
+    }
 
     LOG_DEBUG("Now playing");
     GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS(GST_BIN(pipeline_), GST_DEBUG_GRAPH_SHOW_ALL, "milhouse");
+    return true;
 }
 
 
@@ -305,11 +306,26 @@ void Pipeline::makeReady() const
     if (isReady())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    if (checkStateChange(getBus(), ret)) 
-        THROW_ERROR("Could not set pipeline state to READY");
-    LOG_DEBUG("Now ready");
+    if (checkStateChange(ret)) 
+        LOG_WARNING("Could not set pipeline state to READY");
+    else
+        LOG_DEBUG("Now ready");
 }
 
+bool Pipeline::makeNull() const
+{
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
+    if (not checkStateChange(ret)) 
+    {
+        LOG_WARNING("Could not set pipeline state to NULL");
+        return false;
+    }
+    else
+    {
+        LOG_DEBUG("pipeline state Now NULL");
+        return true;
+    }
+}
 
 
 void Pipeline::pause() const
@@ -318,9 +334,10 @@ void Pipeline::pause() const
         return;
     makeReady();
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-    if (checkStateChange(getBus(), ret) == 0) // set it to paused
+    if (not checkStateChange(ret)) // set it to paused
         THROW_ERROR("Could not set pipeline state to PAUSED");
-    LOG_DEBUG("Now paused");
+    else
+        LOG_DEBUG("Now paused");
 }
 
 
@@ -335,15 +352,15 @@ void Pipeline::stop() const
 {
     if (isStopped())        // only needs to be stopped once
         return;
-    if (pipeline_)
+    else if (pipeline_)
     {
-        GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-        if (checkStateChange(getBus(), ret) == 0) // set it to NULL
-            THROW_ERROR("Could not set pipeline state to NULL");
-        LOG_DEBUG("Now stopped/null");
+        if (not makeNull())
+            LOG_WARNING("Could not set pipeline state to NULL");
+        else
+            LOG_DEBUG("Now stopped/null");
     }
     else
-        THROW_CRITICAL("PIPELINE == 0!");
+        LOG_WARNING("PIPELINE == 0!");
 }
 
 
@@ -387,6 +404,15 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec) const
 GstBus* Pipeline::getBus() const
 {
     return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
+}
+
+GstElement *Pipeline::findElementByName(const char *elementName)
+{
+    GstElement *element = gst_bin_get_by_name(GST_BIN(pipeline_), elementName);
+    if (element == 0)
+        LOG_WARNING("No element named " << elementName);
+
+    return element;
 }
 
 GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) const
