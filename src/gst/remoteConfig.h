@@ -48,7 +48,6 @@ class RemoteConfig
                 const std::string &remoteHost, 
                 int port);
         
-        virtual ~RemoteConfig(){};
         static bool capsMatchCodec(const std::string &encodingName, const std::string &codec);
 
         int port() const { return port_; }
