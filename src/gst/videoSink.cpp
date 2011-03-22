@@ -71,7 +71,12 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
         // This test isn't very reliable since the icon file could be moved 
         // in between the test and the function call.
         if (g_file_test(iconPath.c_str(), G_FILE_TEST_EXISTS))
+        {
+            LOG_DEBUG("Using icon " << iconPath << " for window");
             gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.c_str(), NULL);
+        }
+        else
+            LOG_DEBUG(iconPath << " does not exist");
 
         // add listener for window-state-event to detect fullscreenness
         g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);

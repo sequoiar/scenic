@@ -225,6 +225,9 @@ AC_SUBST(LOCALE_DIR, $localedir)
 
 AS_AC_EXPAND(DATADIR, $datadir)
 
+PIXMAPS_DIR=$DATADIR/scenic/pixmaps
+AC_SUBST(PIXMAPS_DIR)
+
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
