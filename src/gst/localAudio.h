@@ -35,11 +35,10 @@ class _GstElement;
 class LocalAudio : private boost::noncopyable
 {
     public:
-        LocalAudio(Pipeline &pipeline, const std::tr1::shared_ptr<AudioSourceConfig> &sourceConfig);
+        LocalAudio(Pipeline &pipeline, const AudioSourceConfig &sourceConfig);
 
     private:
         Pipeline &pipeline_;
-        std::tr1::shared_ptr<AudioSourceConfig> sourceConfig_;
         std::tr1::shared_ptr<AudioSource> source_;
         std::tr1::shared_ptr<AudioLevel> level_;
         _GstElement *fakesink_;

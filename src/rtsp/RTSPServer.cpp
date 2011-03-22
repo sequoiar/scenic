@@ -47,7 +47,7 @@ timeout (GstRTSPServer *server)
 }
 }
 
-RTSPServer::RTSPServer(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio)
+RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
 {
   using std::string;
   GstRTSPServer *server;
@@ -61,6 +61,8 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options, boo
   if (gst_rtsp_url_parse (urlStr.c_str(), &local_url) != GST_RTSP_OK)
     THROW_ERROR("Invalid uri " << urlStr);
 
+  bool enableVideo = not options["disable-video"].as<bool>();
+  bool enableAudio = not options["disable-audio"].as<bool>();
   if (enableVideo)
       LOG_DEBUG("Video enabled");
   if (enableAudio)

@@ -32,16 +32,12 @@ using std::tr1::shared_ptr;
 
 /// Constructor
 LocalAudio::LocalAudio(Pipeline &pipeline,
-        const shared_ptr<AudioSourceConfig> &sourceConfig) :
+        const AudioSourceConfig &sourceConfig) :
     pipeline_(pipeline),
-    sourceConfig_(sourceConfig),
-    source_(),
-    level_(),
+    source_(sourceConfig.createSource(pipeline_)),
+    level_(sourceConfig.createLevel(pipeline_)),
     fakesink_(pipeline_.makeElement("fakesink", NULL))
 {
-    source_.reset(sourceConfig_->createSource(pipeline_));
-    level_.reset(sourceConfig_->createLevel(pipeline_));
-
     if (level_ != 0)
     {
         gstlinkable::link(*source_, *level_);
@@ -51,6 +47,6 @@ LocalAudio::LocalAudio(Pipeline &pipeline,
         gstlinkable::link(*source_, fakesink_);
 
     /// FIXME: hack for dv1394src
-    if (sourceConfig_->sourceString() == "dv1394src")
+    if (sourceConfig.sourceString() == "dv1394src")
         Dv1394::Instance(pipeline)->doTimestamp();
 }

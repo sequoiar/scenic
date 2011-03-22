@@ -41,18 +41,18 @@
 #include "rtsp/RTSPClient.h"
 
 namespace po = boost::program_options;
-void Milhouse::runAsRTSPClient(const po::variables_map &options, bool enableVideo, bool enableAudio)
+void Milhouse::runAsRTSPClient(const po::variables_map &options)
 {
     LOG_DEBUG("Running as RTSP client");
-    RTSPClient client(options, enableVideo, enableAudio);
+    RTSPClient client(options);
     client.run(options["timeout"].as<int>());
 }
 
-void Milhouse::runAsRTSPServer(const po::variables_map &options, bool enableVideo, bool enableAudio)
+void Milhouse::runAsRTSPServer(const po::variables_map &options)
 {
     LOG_DEBUG("Running as RTSP server");
     // TODO: create a server that uses rtsp-cam-media-factory, see rtsp/examples/gst-rtsp-cam.c
-    RTSPServer server(options, enableVideo, enableAudio);
+    RTSPServer server(options);
     server.run(options["timeout"].as<int>());
 }
 
@@ -243,17 +243,14 @@ short Milhouse::run(int argc, char **argv)
     // RTSP mode
     /*----------------------------------------------*/
 
-    bool enableVideo = not options["disable-video"].as<bool>();
-    bool enableAudio = not options["disable-audio"].as<bool>();
-
     if (options["rtsp-server"].as<bool>())
     {
-        runAsRTSPServer(options, enableVideo, enableAudio);
+        runAsRTSPServer(options);
         return 0;
     }
     else if (options["rtsp-client"].as<bool>())
     {
-        runAsRTSPClient(options, enableVideo, enableAudio);
+        runAsRTSPClient(options);
         return 0;
     }
     
@@ -281,6 +278,9 @@ short Milhouse::run(int argc, char **argv)
         return 1;
     }
 
+
+    bool enableVideo = not options["disable-video"].as<bool>();
+    bool enableAudio = not options["disable-audio"].as<bool>();
     enableVideo = enableVideo and options.count("videoport");
     enableAudio = enableAudio and options.count("audioport");
 

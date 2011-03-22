@@ -145,16 +145,14 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpoin
 
 static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
 
-RTSPClient::RTSPClient(const boost::program_options::variables_map &options, 
-        bool enableVideo, 
-        bool enableAudio) :
+RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     BusMsgHandler(),
     pipeline_(new Pipeline), 
     latencySet_(false), 
     portRange_(""),
     latency_(options["jitterbuffer"].as<int>()), 
-    enableVideo_(enableVideo), 
-    enableAudio_(enableAudio),
+    enableVideo_(not options["disable-video"].as<bool>()), 
+    enableAudio_(not options["disable-audio"].as<bool>()),
     fullscreenAtStartup_(options["fullscreen"].as<bool>()),
     windowTitle_(options["window-title"].as<std::string>())
 {
@@ -170,6 +168,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options,
     if (options["debug"].as<string>() == "gst-debug")
         pipeline_->makeVerbose();
 
+    // setup uridecodbin with the address parameter
     GstElement *uridecodebin = pipeline_->makeElement("uridecodebin", "decode");
     string uri("rtsp://" + options["address"].as<string>() + ":8554/test");
     g_object_set(uridecodebin, "uri", uri.c_str(), NULL);

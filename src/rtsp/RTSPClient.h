@@ -48,7 +48,7 @@ namespace boost {
 class RTSPClient : private BusMsgHandler
 {
     public:
-        RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
+        RTSPClient(const boost::program_options::variables_map &options);
         void run(int timeout);
     private:
         bool handleBusMsg(_GstMessage *msg);

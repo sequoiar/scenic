@@ -32,7 +32,7 @@ namespace boost {
 class RTSPServer
 {
     public:
-        RTSPServer(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
+        RTSPServer(const boost::program_options::variables_map &options);
         void run(int timeout);
 };
 
