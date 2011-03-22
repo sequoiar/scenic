@@ -23,7 +23,6 @@
 #include "localVideo.h"
 
 #include "gstLinkable.h"
-#include <boost/shared_ptr.hpp>
 #include "pipeline.h"
 
 #include "videoSource.h"
@@ -44,19 +43,13 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     pipeline_(pipeline),
     sourceConfig_(sourceConfig),
     sinkConfig_(sinkConfig),
-    source_(),
+    source_(sourceConfig_->createSource(pipeline_)),
     colourspace_(0),
-    videoscale_(),
-    textoverlay_(),
-    videoflip_(),
-    sink_()
+    videoscale_(sinkConfig_->createVideoScale(pipeline_)),
+    textoverlay_(sinkConfig_->createTextOverlay(pipeline)),
+    videoflip_(sinkConfig_->createVideoFlip(pipeline_)),
+    sink_(sinkConfig_->createSink(pipeline_))
 {
-    source_.reset(sourceConfig_->createSource(pipeline_));
-    videoscale_.reset(sinkConfig_->createVideoScale(pipeline_));
-    videoflip_.reset(sinkConfig_->createVideoFlip(pipeline_));
-    textoverlay_.reset(sinkConfig_->createTextOverlay(pipeline));
-    sink_.reset(sinkConfig_->createSink(pipeline_));
-
     // dc1394src needs an extra colourspace converter if not being encoded or flipped
     // FIXME: maybe it just needs a capsfilter?
     if (sourceConfig_->sourceString() == "dc1394src" and videoflip_ == 0)
@@ -93,9 +86,3 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     if (sourceConfig_->sourceString() == "dv1394src")
         Dv1394::Instance(pipeline)->doTimestamp();
 }
-
-/// Destructor 
-LocalVideo::~LocalVideo()
-{
-}
-

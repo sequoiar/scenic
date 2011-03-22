@@ -41,7 +41,6 @@ class LocalVideo : boost::noncopyable
     public:
         LocalVideo(Pipeline &pipeline, const std::tr1::shared_ptr<VideoSourceConfig> &sourceConfig,
                 const std::tr1::shared_ptr<VideoSinkConfig> &sinkConfig);
-        ~LocalVideo();
 
     private:
         Pipeline &pipeline_;
