@@ -59,7 +59,9 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned lon
 	horizontalSlider_(0),
 	sliderFrame_(0)
 {
-    gtk_widget_set_size_request(drawingArea_, width, height);
+    // don't set widget size, it needs to be resized dynamically
+    //gtk_widget_set_size_request(drawingArea_, width, height);
+    
     // Make drawing area black by default, since it's used for video
     GdkColor black;
     gdk_color_parse ("Black", &black);
