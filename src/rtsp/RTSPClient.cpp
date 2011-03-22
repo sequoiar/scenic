@@ -80,7 +80,7 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
     return TRUE;
 }
 
-void RTSPClient::linkNewPad(GstPad *pad, const GstCaps *caps, const gchar *queue_name)
+void RTSPClient::linkNewPad(GstPad *newPad, const GstCaps *caps, const gchar *queue_name)
 {
     GstElement *queue = pipeline_->findElementByName(queue_name);
     if (queue == 0) 
@@ -104,31 +104,31 @@ void RTSPClient::linkNewPad(GstPad *pad, const GstCaps *caps, const gchar *queue
     if (res && !gst_caps_is_empty (res)) 
     {
         LOG_DEBUG("Found pad to link to pipeline - plugging is now done");
-        linked = gstlinkable::link_pads(pad, sinkPad);
+        linked = gstlinkable::link_pads(newPad, sinkPad);
     }
     if (not linked) 
-        LOG_WARNING("Could not link new pad to pipelien");
+        LOG_WARNING("Could not link new pad to pipeline");
     gst_caps_unref (sinkCaps);
     gst_caps_unref (res);
     gst_object_unref (GST_OBJECT (sinkPad));
 }
 
-void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *pad, gpointer data)
+void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpointer data)
 {
     RTSPClient *context = static_cast<RTSPClient*>(data);
-    GstCaps *caps = gst_pad_get_caps (pad);
+    GstCaps *caps = gst_pad_get_caps (newPad);
     const gchar *mime = gst_structure_get_name (gst_caps_get_structure (caps, 0));
     if (g_strrstr (mime, "video"))
     {
         if (context->enableVideo_)
-            context->linkNewPad(pad, caps, "video_queue");
+            context->linkNewPad(newPad, caps, "video_queue");
         else
             LOG_WARNING("Got video stream even though we've disabled video");
     }
     else if (g_strrstr (mime, "audio"))
     {
         if (context->enableAudio_)
-            context->linkNewPad(pad, caps, "audio_queue");
+            context->linkNewPad(newPad, caps, "audio_queue");
         else
             LOG_WARNING("Got audio stream even though we've disabled audio");
     }
