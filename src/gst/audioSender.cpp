@@ -43,17 +43,9 @@ validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
     if (rConfig.codec() == "mp3")
     {
         if (aConfig.numChannels() > 2)
-            throw std::range_error("MP3 only accepts 1 or 2 channels, not " +
+            throw std::runtime_error("MP3 only accepts 1 or 2 channels, not " +
                    lexical_cast<string>(aConfig.numChannels()));
     }
-#if 0
-    else if (rConfig.codec() == "raw")
-    {
-        if (aConfig.numChannels() > 11)
-            throw std::range_error("Raw only accepts 1-11 channels, not " +
-                   lexical_cast<string>(aConfig.numChannels()));
-    }
-#endif
 }
 
 /// Constructor 

@@ -190,11 +190,6 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options,
         LOG_DEBUG("Video enabled");
         GstElement *queue = pipeline_->makeElement("queue", "video_queue");
         GstElement *colorspace = pipeline_->makeElement("ffmpegcolorspace", 0);
-#if 0
-        GstElement *videosink = pipeline_->makeElement(options["videosink"].as<string>().c_str(), 0);
-        gstlinkable::link(queue, colorspace);
-        gstlinkable::link(colorspace, videosink);
-#endif
         gstlinkable::link(queue, colorspace);
         gstlinkable::link(colorspace, *videoscale_);
         gstlinkable::link(*videoscale_, *textoverlay_);
