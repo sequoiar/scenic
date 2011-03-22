@@ -35,7 +35,7 @@ class Pipeline;
 * the Observer and Chain of Responsibility patterns.
 */
 
-class BusMsgHandler : boost::noncopyable
+class BusMsgHandler : private boost::noncopyable
 {
     public:
         /// This method is called by the GstBus listener when it has a new msg. 

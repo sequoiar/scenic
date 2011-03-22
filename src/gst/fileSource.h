@@ -31,7 +31,7 @@ class Pipeline;
 class _GstElement;
 class _GstPad;
 
-class FileSource : boost::noncopyable
+class FileSource : private boost::noncopyable
 {
     public:
         static _GstElement * acquireAudio(const Pipeline &pipeline, const std::string &location);

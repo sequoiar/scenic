@@ -42,7 +42,7 @@ class ReceiverConfig;
  * decodes/converts it as needed and pushes it to its sink.
  */
 class AudioReceiver
-    : public ReceiverBase, boost::noncopyable
+    : public ReceiverBase, private boost::noncopyable
 {
     public:
         AudioReceiver(Pipeline &pipeline,

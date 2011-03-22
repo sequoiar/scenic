@@ -41,7 +41,7 @@ class _GstMessage;
 
 
 class AudioSender
-    : public SenderBase, boost::noncopyable
+    : public SenderBase, private boost::noncopyable
 {
     public:
         AudioSender(Pipeline &pipeline,

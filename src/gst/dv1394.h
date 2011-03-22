@@ -28,7 +28,7 @@ class Pipeline;
 class _GstElement;
 class _GstPad;
 
-class Dv1394 : boost::noncopyable
+class Dv1394 : private boost::noncopyable
 {
     public:
         /// This is the single point of access to the singleton instance of this Dv1394 object

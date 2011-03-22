@@ -32,7 +32,7 @@ class AudioSourceConfig;
 class AudioLevel;
 class _GstElement;
 
-class LocalAudio : boost::noncopyable
+class LocalAudio : private boost::noncopyable
 {
     public:
         LocalAudio(Pipeline &pipeline, const std::tr1::shared_ptr<AudioSourceConfig> &sourceConfig);

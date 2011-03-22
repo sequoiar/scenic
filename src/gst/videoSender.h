@@ -38,7 +38,7 @@ class Pay;
 class _GstMessage;
 
 class VideoSender
-    : public SenderBase, boost::noncopyable
+    : public SenderBase, private boost::noncopyable
 {
     public:
         VideoSender(Pipeline &pipeline,

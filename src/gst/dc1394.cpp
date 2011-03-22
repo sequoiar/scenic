@@ -29,7 +29,7 @@
 #include <libraw1394/raw1394.h>
 #include <iomanip>
 
-class Dc1394Handle : boost::noncopyable {
+class Dc1394Handle : private boost::noncopyable {
     public:
         // camera-less version
         Dc1394Handle() : cameraId_(0), dc1394_(0), cameras_(0), camera_(0)

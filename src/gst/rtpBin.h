@@ -33,7 +33,7 @@ class _GstElement;
 class _GstStructure;
 class _GObject;
 
-class RtpBin : boost::noncopyable
+class RtpBin : private boost::noncopyable
 {
     public:
         virtual ~RtpBin();

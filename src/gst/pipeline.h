@@ -35,7 +35,7 @@ class _GstBus;
 class _GstMessage;
 class BusMsgHandler;
 
-class Pipeline : boost::noncopyable
+class Pipeline : private boost::noncopyable
 {
     public:
         Pipeline();

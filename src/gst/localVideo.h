@@ -36,7 +36,7 @@ class VideoSink;
 class VideoSinkConfig;
 class _GstElement;
 
-class LocalVideo : boost::noncopyable
+class LocalVideo : private boost::noncopyable
 {
     public:
         LocalVideo(Pipeline &pipeline, const std::tr1::shared_ptr<VideoSourceConfig> &sourceConfig,
