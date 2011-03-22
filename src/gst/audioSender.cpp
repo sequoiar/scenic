@@ -74,11 +74,6 @@ AudioSender::AudioSender(Pipeline &pipeline,
     createPipeline(pipeline);
 }
 
-
-/// Destructor 
-AudioSender::~AudioSender()
-{}
-
 void AudioSender::createSource(Pipeline &pipeline)
 {
     source_.reset(audioConfig_->createSource(pipeline));

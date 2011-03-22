@@ -94,8 +94,6 @@ class InterleavedAudioSource : public AudioSource
     protected:
         InterleavedAudioSource(const Pipeline &pipeline, const AudioSourceConfig &config);
 
-        ~InterleavedAudioSource();
-
         /// Object which performs the interleaving of this source's channels 
         Interleave interleave_;
         std::vector<_GstElement*> sources_, aconvs_;
@@ -159,8 +157,6 @@ class AudioAlsaSource : public AudioSource
         AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
-        ~AudioAlsaSource();
-
         virtual _GstElement *srcElement() { return capsFilter_; }
 
         _GstElement *capsFilter_;
@@ -177,8 +173,6 @@ class AudioPulseSource : public AudioSource
     public:
         AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config);
     private:
-        ~AudioPulseSource();
-
         virtual _GstElement *srcElement() { return capsFilter_; }
 
         _GstElement *capsFilter_;
@@ -196,8 +190,6 @@ class AudioJackSource : public AudioSource, public MessageHandler
         AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
-        ~AudioJackSource();
-
         bool handleMessage(const std::string &path, const std::string &arguments);
         virtual _GstElement *srcElement() { return queue_; }
         /// Caps used by any source with a capsfilter

@@ -87,12 +87,6 @@ InterleavedAudioSource::InterleavedAudioSource(const Pipeline &pipeline, const A
     gstlinkable::link(aconvs_, interleave_);
 }
 
-/// Destructor 
-InterleavedAudioSource::~InterleavedAudioSource() 
-{
-}
-
-
 /// Constructor 
 AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     InterleavedAudioSource(pipeline, config), 
@@ -199,11 +193,6 @@ AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConf
     initCapsFilter(aconv_, capsFilter_);
 }
 
-/// Destructor 
-AudioAlsaSource::~AudioAlsaSource()
-{
-}
-
 /// Constructor 
 AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), 
@@ -216,13 +205,6 @@ AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceCo
 
     initCapsFilter(aconv_, capsFilter_);
 }
-
-
-/// Destructor 
-AudioPulseSource::~AudioPulseSource()
-{
-}
-
 
 /// Constructor 
 AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
@@ -259,11 +241,6 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     gstlinkable::link(capsFilter_, queue_);
 }
 
-
-/// Destructor 
-AudioJackSource::~AudioJackSource()
-{
-}
 
 std::string AudioJackSource::getCapsFilterCapsString()
 {
@@ -308,5 +285,3 @@ AudioDvSource::~AudioDvSource()
 {
     Dv1394::Instance(pipeline_)->unsetAudioSink();
 }
-
-

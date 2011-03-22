@@ -111,11 +111,6 @@ AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) 
     gstlinkable::link(aconv_, sink_);
 }
 
-/// Destructor
-AudioAlsaSink::~AudioAlsaSink()
-{
-}
-
 /// Constructor 
 AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config) : 
     AudioSink(pipeline),
@@ -128,11 +123,6 @@ AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
 
     gstlinkable::link(aconv_, sink_);
-}
-
-/// Destructor 
-AudioPulseSink::~AudioPulseSink()
-{
 }
 
 /// Constructor 
@@ -159,11 +149,6 @@ AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) 
     g_object_get(sink_, "buffer-time", &val, NULL);
     LOG_DEBUG("Buffer time is " << val);
 }
-
-/// Destructor 
-AudioJackSink::~AudioJackSink() 
-{}
-
 
 bool AudioJackSink::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {

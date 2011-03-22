@@ -48,8 +48,6 @@ class AudioSender
                 const std::tr1::shared_ptr<AudioSourceConfig> &aConfig,
                 const std::tr1::shared_ptr<SenderConfig> &rConfig);
 
-        ~AudioSender();
-
     private:
         void createSource(Pipeline &pipeline);
         void createCodec(Pipeline &pipeline);

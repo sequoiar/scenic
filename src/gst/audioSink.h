@@ -61,8 +61,6 @@ class AudioAlsaSink : public AudioSink
         AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config);
         
     private:
-        ~AudioAlsaSink();
-        
         /** Returns this AudioAlsaSink's sink, which is an audioconverter, as 
          * raw-audio conversion happens before audio is output to ALSA */
         _GstElement *sinkElement() { return aconv_; }
@@ -76,7 +74,6 @@ class AudioPulseSink : public AudioSink
 {
     public:
         AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config);
-        ~AudioPulseSink();
     private:
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *aconv_;
@@ -88,7 +85,6 @@ class AudioJackSink : public AudioSink, public MessageHandler
 {
     public:
         AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config);
-        ~AudioJackSink();
     private:
         bool handleMessage(const std::string &message, const std::string &arguments);
         const AudioSinkConfig &config_;
