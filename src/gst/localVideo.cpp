@@ -38,21 +38,19 @@ using std::tr1::shared_ptr;
 
 /// Constructor
 LocalVideo::LocalVideo(Pipeline &pipeline, 
-        const shared_ptr<VideoSourceConfig> &sourceConfig,
-        const shared_ptr<VideoSinkConfig> &sinkConfig) :
+        const VideoSourceConfig &sourceConfig,
+        const VideoSinkConfig &sinkConfig) :
     pipeline_(pipeline),
-    sourceConfig_(sourceConfig),
-    sinkConfig_(sinkConfig),
-    source_(sourceConfig_->createSource(pipeline_)),
+    source_(sourceConfig.createSource(pipeline_)),
     colourspace_(0),
-    videoscale_(sinkConfig_->createVideoScale(pipeline_)),
-    textoverlay_(sinkConfig_->createTextOverlay(pipeline)),
-    videoflip_(sinkConfig_->createVideoFlip(pipeline_)),
-    sink_(sinkConfig_->createSink(pipeline_))
+    videoscale_(sinkConfig.createVideoScale(pipeline_)),
+    textoverlay_(sinkConfig.createTextOverlay(pipeline)),
+    videoflip_(sinkConfig.createVideoFlip(pipeline_)),
+    sink_(sinkConfig.createSink(pipeline_))
 {
     // dc1394src needs an extra colourspace converter if not being encoded or flipped
     // FIXME: maybe it just needs a capsfilter?
-    if (sourceConfig_->sourceString() == "dc1394src" and videoflip_ == 0)
+    if (sourceConfig.sourceString() == "dc1394src" and videoflip_ == 0)
     {
         colourspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
         gstlinkable::link(*source_, colourspace_);
@@ -83,6 +81,6 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     gstlinkable::link(*videoflip_, *sink_);
 
     /// FIXME: hack for dv1394src
-    if (sourceConfig_->sourceString() == "dv1394src")
+    if (sourceConfig.sourceString() == "dv1394src")
         Dv1394::Instance(pipeline)->doTimestamp();
 }

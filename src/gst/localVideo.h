@@ -39,13 +39,11 @@ class _GstElement;
 class LocalVideo : private boost::noncopyable
 {
     public:
-        LocalVideo(Pipeline &pipeline, const std::tr1::shared_ptr<VideoSourceConfig> &sourceConfig,
-                const std::tr1::shared_ptr<VideoSinkConfig> &sinkConfig);
+        LocalVideo(Pipeline &pipeline, const VideoSourceConfig &sourceConfig,
+                const VideoSinkConfig &sinkConfig);
 
     private:
         Pipeline &pipeline_;
-        std::tr1::shared_ptr<VideoSourceConfig> sourceConfig_;
-        std::tr1::shared_ptr<VideoSinkConfig> sinkConfig_;
         std::tr1::shared_ptr<VideoSource> source_;
         _GstElement *colourspace_;
         std::tr1::shared_ptr<VideoScale> videoscale_;
