@@ -32,14 +32,13 @@
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
 
-
 /// true if we're not using some external xwindow
-bool GtkVideoSink::hasWindow() const
+bool XvImageSink::hasWindow() const
 {
     return xid_ == 0;
 }
 
-void GtkVideoSink::updateDisplay(const std::string &display)
+void XvImageSink::updateDisplay(const std::string &display)
 {
     GdkDisplay *disp = gdk_display_open(display.c_str());
     if (disp == 0)
@@ -49,7 +48,7 @@ void GtkVideoSink::updateDisplay(const std::string &display)
 }
         
 
-GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) : 
+XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned long xid, const std::string &display) : 
     VideoSink(pipeline), 
     xid_(xid),
     isFullscreen_(false),
@@ -60,9 +59,29 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
 	horizontalSlider_(0),
 	sliderFrame_(0)
 {
+    gtk_widget_set_size_request(drawingArea_, width, height);
+    // Make drawing area black by default, since it's used for video
+    GdkColor black;
+    gdk_color_parse ("Black", &black);
+    gtk_widget_modify_bg (drawingArea_, GTK_STATE_NORMAL, &black);
+    gtk_widget_modify_bg (drawingArea_, GTK_STATE_ACTIVE, &black);
+    gtk_widget_modify_bg (drawingArea_, GTK_STATE_PRELIGHT, &black);
+    gtk_widget_modify_bg (drawingArea_, GTK_STATE_SELECTED, &black);
+    gtk_widget_modify_bg (drawingArea_, GTK_STATE_INSENSITIVE, &black);
+
+    sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
+    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
+    if (not display.empty())
+    {
+        g_object_set(sink_, "display", display.c_str(), NULL);
+        updateDisplay(display);
+    }
+
     gtk_widget_set_double_buffered(drawingArea_, FALSE);
     if (hasWindow())
     {
+        LOG_DEBUG("Setting default window size to " << width << "x" << height);
+        gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
         gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
         gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
 
@@ -80,6 +99,15 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
 
         // add listener for window-state-event to detect fullscreenness
         g_signal_connect(G_OBJECT(window_), "window-state-event", G_CALLBACK(onWindowStateEvent), this);
+        g_signal_connect (G_OBJECT (window_), "delete-event",
+                G_CALLBACK (window_closed), this);
+        // grab key press events
+        gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
+        g_signal_connect(G_OBJECT(window_), "key-press-event",
+                G_CALLBACK(XvImageSink::key_press_event_cb), this);
+
+        gtk_widget_show_all (window_);
+        gtk_widget_realize (window_);
     }
     else
     {
@@ -90,14 +118,18 @@ GtkVideoSink::GtkVideoSink(const Pipeline &pipeline, unsigned long xid) :
         g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
         /* show window and log its id */
         gtk_widget_show_all(plug);
+        gtk_widget_realize (plug);
         LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
     }
+
+    GdkWindow *drawingAreaXWindow = gtk_widget_get_window (drawingArea_);
+    gulong embed_xid = GDK_WINDOW_XID (drawingAreaXWindow);
+    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (sink_), embed_xid);
 }
 
-
-gboolean GtkVideoSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindowState *event, gpointer data)
+gboolean XvImageSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindowState *event, gpointer data)
 {
-    GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
+    XvImageSink *context = static_cast<XvImageSink*>(data);
     context->isFullscreen_ = (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN);
     if (context->isFullscreen_)
         context->hideCursor();
@@ -106,46 +138,22 @@ gboolean GtkVideoSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindow
     return TRUE;
 }
 
-
-Window GtkVideoSink::getXWindow()
-{ 
-    // FIXME: see https://bugzilla.gnome.org/show_bug.cgi?id=599885
-    return GDK_WINDOW_XWINDOW(drawingArea_->window);
-}
-
-
-void GtkVideoSink::destroy_cb(GtkWidget * /*widget*/, gpointer data)
+void XvImageSink::window_closed(GtkWidget * widget, GdkEvent * /*event*/, gpointer data)
 {
-
     LOG_DEBUG("Window closed, quitting.");
-    GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
-    context->pipeline_.quit();
+    gtk_widget_hide_all (widget);
+    XvImageSink *context = static_cast<XvImageSink*>(data);
+    context->VideoSink::pipeline_.quit();
     context->window_ = 0;
 }
 
-
-void GtkVideoSink::makeDrawingAreaBlack()
-{
-    GdkColor color;
-    gdk_color_parse ("black", &color);
-    gtk_widget_modify_bg(drawingArea_, GTK_STATE_NORMAL, &color);    // needed to ensure black background
-}
-
-
-void GtkVideoSink::showWindow()
-{
-    makeDrawingAreaBlack();
-    gtk_widget_show_all(window_);
-}
-
-
-void GtkVideoSink::hideCursor()
+void XvImageSink::hideCursor()
 {
     static GdkCursor* cursor = 0;
 
     if (cursor == 0)
     {
-// GDK_BLANK_CURSOR is available in gtk-2.16 and later
+        // GDK_BLANK_CURSOR is available in gtk-2.16 and later
 #if GTK_CHECK_VERSION (2,16,0)
         cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
 #else
@@ -164,20 +172,20 @@ void GtkVideoSink::hideCursor()
 }
 
 
-void GtkVideoSink::showCursor()
+void XvImageSink::showCursor()
 {
     /// sets to default
     gdk_window_set_cursor(GDK_WINDOW(drawingArea_->window), NULL);
 }
 
-void GtkVideoSink::toggleFullscreen(GtkWidget *widget)
+void XvImageSink::toggleFullscreen(GtkWidget *widget)
 {
     // toggle fullscreen state
     isFullscreen_ ? makeUnfullscreen(widget) : makeFullscreen(widget);
 }
 
 
-void GtkVideoSink::makeFullscreen(GtkWidget *widget)
+void XvImageSink::makeFullscreen(GtkWidget *widget)
 {
     gtk_window_stick(GTK_WINDOW(widget));           // window is visible on all workspaces
     gtk_window_fullscreen(GTK_WINDOW(widget));
@@ -188,11 +196,11 @@ void GtkVideoSink::makeFullscreen(GtkWidget *widget)
 }
 
 
-void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
+void XvImageSink::makeUnfullscreen(GtkWidget *widget)
 {
     gtk_window_unstick(GTK_WINDOW(widget));           // window is not visible on all workspaces
     gtk_window_unfullscreen(GTK_WINDOW(widget));
-    /// show controls
+    // show controls
     if (horizontalSlider_)
         gtk_widget_show(horizontalSlider_);
     if (sliderFrame_)
@@ -200,7 +208,7 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 }
 
 
-bool GtkVideoSink::handleMessage(const std::string &path, const std::string &arguments)
+bool XvImageSink::handleMessage(const std::string &path, const std::string &arguments)
 {
     if (path == "fullscreen")
     {
@@ -226,7 +234,7 @@ bool GtkVideoSink::handleMessage(const std::string &path, const std::string &arg
 
 
 /* makes the latency window */
-void GtkVideoSink::createControl()
+void XvImageSink::createControl()
 {
     LOG_INFO("Creating controls");
     sliderFrame_ = gtk_frame_new("Jitterbuffer Latency (ms)");
@@ -240,7 +248,6 @@ void GtkVideoSink::createControl()
     gtk_box_pack_start(GTK_BOX(vbox_), sliderFrame_, FALSE, FALSE, 0);
     g_signal_connect(G_OBJECT(horizontalSlider_), "value-changed",
             G_CALLBACK(RtpReceiver::updateLatencyCb), NULL);
-    showWindow();
 }
 
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
@@ -270,51 +277,6 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
 
     return TRUE;
 }
-
-
-bool XvImageSink::handleBusMsg(GstMessage * message)
-{
-    // ignore anything but 'prepare-xwindow-id' element messages
-    if (GST_MESSAGE_TYPE (message) != GST_MESSAGE_ELEMENT)
-        return false;
-
-    if (!gst_structure_has_name(message->structure, "prepare-xwindow-id"))
-        return false;
-
-    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), getXWindow());
-
-    LOG_DEBUG("Got prepare-xwindow-id msg");
-    return true;
-}
-
-XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned long xid, const std::string &display) : 
-    GtkVideoSink(pipeline, xid),
-    BusMsgHandler(&pipeline)
-{
-    sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
-    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
-    if (not display.empty())
-    {
-        g_object_set(sink_, "display", display.c_str(), NULL);
-        updateDisplay(display);
-    }
-    if (hasWindow())
-    {
-        LOG_DEBUG("Setting default window size to " << width << "x" << height);
-        gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
-        //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-
-        gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
-        g_signal_connect(G_OBJECT(window_), "key-press-event",
-                G_CALLBACK(XvImageSink::key_press_event_cb), this);
-        g_signal_connect(G_OBJECT(window_), "destroy",
-                G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
-
-        gtk_widget_set_size_request(drawingArea_, width, height);
-        showWindow();
-    }
-}
-
 
 XvImageSink::~XvImageSink()
 {

@@ -23,8 +23,7 @@
 #define _VIDEO_SINK_H_
 
 #include <string>
-#include <X11/Xlib.h>
-#include "busMsgHandler.h"
+#include <gdk/gdkevents.h>
 #include "messageHandler.h"
 
 #include "noncopyable.h"
@@ -48,23 +47,22 @@ class VideoSink : private boost::noncopyable
         _GstElement *sink_;
 };
 
-class GtkVideoSink
-: public VideoSink, MessageHandler
+class XvImageSink
+: public VideoSink, private MessageHandler
 {
     public:
-        GtkVideoSink(const Pipeline &pipeline, unsigned long xid);
-        void createControl();
-        void showWindow();
+        XvImageSink(Pipeline &pipeline, int width, int height, 
+                unsigned long xid, const std::string &display);
 
-    protected:
+    private:
+        void createControl();
+
         void updateDisplay(const std::string &display);
 
-    private:     /// other member vars depend on xid
         unsigned long xid_;
         virtual bool handleMessage(const std::string &path, const std::string &arguments);
         bool isFullscreen_;
 
-    protected:
         void toggleFullscreen() { toggleFullscreen(window_); }
         _GtkWidget *window_;
         _GtkWidget *drawingArea_;
@@ -74,32 +72,17 @@ class GtkVideoSink
         _GtkWidget *sliderFrame_;
 
         static int onWindowStateEvent(_GtkWidget *widget, _GdkEventWindowState *event, void *data);
-        static void destroy_cb(_GtkWidget * /*widget*/, void *data);
-        Window getXWindow();
-        void makeDrawingAreaBlack();
+        static void window_closed(_GtkWidget * widget, _GdkEvent *event, void *data);
         void makeFullscreen(_GtkWidget *widget);
         void makeUnfullscreen(_GtkWidget *widget);
         void toggleFullscreen(_GtkWidget *widget);
         void hideCursor();
         void showCursor();
         bool hasWindow() const;
-};
 
-
-class XvImageSink
-: public GtkVideoSink, private BusMsgHandler
-{
-    public:
-        XvImageSink(Pipeline &pipeline, int width, int height, 
-                unsigned long xid, const std::string &display);
-        bool handleBusMsg(_GstMessage *msg);
-
-    private:
-        virtual _GstElement *sinkElement() { return sink_; }
-        ~XvImageSink();
+        virtual ~XvImageSink();
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
-
 };
 
 

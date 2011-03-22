@@ -26,7 +26,9 @@
 #include "logWriter.h"
 
 // FIXME: this is shared!!!!
-static volatile bool signal_flag = false;
+namespace  {
+volatile bool signal_flag = false;
+} // end anonymous namespace
 
 bool signal_handlers::signalFlag()
 {
