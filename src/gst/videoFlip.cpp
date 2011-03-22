@@ -27,43 +27,12 @@
 #include "gstLinkable.h"
 #include "pipeline.h"
 
-/// converts flip method to corresponding
-int flipMethodToInt(const std::string &flipMethod)
-{
-    using std::map;
-    using std::string;
-
-    static map<string, int> FLIP_METHOD_TO_INT;
-    if (FLIP_METHOD_TO_INT.empty())
-    {
-        FLIP_METHOD_TO_INT["none"] = 0;
-        FLIP_METHOD_TO_INT["clockwise"] = 1;
-        FLIP_METHOD_TO_INT["rotate-180"] = 2;
-        FLIP_METHOD_TO_INT["counterclockwise"] = 3;
-        FLIP_METHOD_TO_INT["horizontal-flip"] = 4;
-        FLIP_METHOD_TO_INT["vertical-flip"] = 5;
-        FLIP_METHOD_TO_INT["upper-left-diagonal"] = 6;
-        FLIP_METHOD_TO_INT["upper-right-diagonal"] = 7;
-    }
-
-    // this is a hack because if the key isn't found, this map will return 0
-    int result = FLIP_METHOD_TO_INT[flipMethod];
-    if (flipMethod != "none")
-    {
-        if (result == 0)
-            THROW_ERROR("Unknown flipmethod " << flipMethod);
-        return result;
-    }
-    else
-        return result;
-}
-
 VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) : 
     pipeline_(pipeline),
     colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
     videoflip_(pipeline_.makeElement("videoflip", NULL))
 {
     LOG_DEBUG("using flip method " << flipMethod);
-    g_object_set(G_OBJECT(videoflip_), "method", flipMethodToInt(flipMethod), NULL);
+    gst_util_set_object_arg (G_OBJECT(videoflip_), "method", flipMethod.c_str());
     gstlinkable::link(colorspace_, videoflip_);    
 }

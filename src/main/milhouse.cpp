@@ -59,10 +59,11 @@ void Milhouse::runAsRTSPServer(const po::variables_map &options)
 void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo, bool enableAudio)
 {
     using std::tr1::shared_ptr;
+    using std::string;
 
     LOG_DEBUG("Running as receiver");
     Pipeline pipeline; // Pipeline will go out of scope last
-    if (options["debug"].as<std::string>() == "gst-debug")
+    if (options["debug"].as<string>() == "gst-debug")
         pipeline.makeVerbose();
 
     Playback playback(pipeline);
@@ -91,7 +92,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     {
         if(options["fullscreen"].as<bool>())
             MessageDispatcher::sendMessage("fullscreen");
-        MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
+        MessageDispatcher::sendMessage("window-title", options["window-title"].as<string>());
     }
 
     LOG_DEBUG("Running main loop");
@@ -186,6 +187,7 @@ short Milhouse::usage(const po::options_description &desc)
 
 short Milhouse::run(int argc, char **argv)
 {
+    using std::string;
     po::options_description desc(ProgramOptions::createDefaultOptions());
     po::variables_map options;
     po::store(po::parse_command_line(argc, argv, desc), options);
@@ -194,7 +196,7 @@ short Milhouse::run(int argc, char **argv)
     if (options.count("help") or argc == 1) 
         return usage(desc);
 
-    MilhouseLogger logger(options["debug"].as<std::string>()); // just instantiate, his base class will know what to do 
+    MilhouseLogger logger(options["debug"].as<string>()); // just instantiate, his base class will know what to do 
 
     LOG_DEBUG("Built on " << __DATE__ << " at " << __TIME__);
 
@@ -212,12 +214,12 @@ short Milhouse::run(int argc, char **argv)
         return VideoSourceConfig::listCameras();
     else if (options.count("v4l2-standard"))
     {
-        VideoSourceConfig::setStandard(options["videodevice"].as<std::string>(), options["v4l2-standard"].as<std::string>());
+        VideoSourceConfig::setStandard(options["videodevice"].as<string>(), options["v4l2-standard"].as<string>());
         return 0;
     }
     else if (options.count("v4l2-input"))
     {
-        VideoSourceConfig::setInput(options["videodevice"].as<std::string>(), options["v4l2-input"].as<int>());
+        VideoSourceConfig::setInput(options["videodevice"].as<string>(), options["v4l2-input"].as<int>());
         return 0;
     }
 
@@ -235,7 +237,7 @@ short Milhouse::run(int argc, char **argv)
 
     if (options["max-channels"].as<bool>())
     { 
-        audiofactory::printMaxChannels(options["audiocodec"].as<std::string>());
+        audiofactory::printMaxChannels(options["audiocodec"].as<string>());
         return 0;
     }
 

@@ -148,7 +148,6 @@ static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
 RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     BusMsgHandler(),
     pipeline_(new Pipeline), 
-    latencySet_(false), 
     portRange_(""),
     latency_(options["jitterbuffer"].as<int>()), 
     enableVideo_(not options["disable-video"].as<bool>()), 
@@ -170,7 +169,11 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
 
     // setup uridecodbin with the address parameter
     GstElement *uridecodebin = pipeline_->makeElement("uridecodebin", "decode");
-    string uri("rtsp://" + options["address"].as<string>() + ":8554/test");
+    std::string remoteHost(options["address"].as<std::string>());
+    // FIXME: temporary workaround for trac issue #143
+    if (remoteHost == "localhost")
+        remoteHost = "127.0.0.1";
+    string uri("rtsp://" + remoteHost + ":8554/test");
     g_object_set(uridecodebin, "uri", uri.c_str(), NULL);
     g_signal_connect(uridecodebin, "notify::source", G_CALLBACK(onNotifySource), this);
     g_signal_connect(uridecodebin, "pad-added", G_CALLBACK(onPadAdded), this);

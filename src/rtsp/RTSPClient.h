@@ -58,7 +58,6 @@ class RTSPClient : private BusMsgHandler
         static int onNotifySource(_GstElement *uridecodebin, _GParamSpec * /*pspec*/, void *data);
         static void onPadAdded(_GstElement *uridecodebin, _GstPad * newPad, void *data);
         std::tr1::shared_ptr<Pipeline> pipeline_;
-        bool latencySet_;
         std::string portRange_;
         int latency_;
         const bool enableVideo_;

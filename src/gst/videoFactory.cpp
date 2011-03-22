@@ -40,7 +40,7 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
 
     std::string codec(options["videocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for trac bug #143
+    // FIXME: temporary workaround for trac issue #143
     if (remoteHost == "localhost")
         remoteHost = "127.0.0.1";
     int port = options["videoport"].as<int>();
@@ -59,7 +59,7 @@ shared_ptr<VideoSender> videofactory::buildVideoSender(Pipeline &pipeline, const
     shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(options));
     std::string codec(options["videocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for #143
+    // FIXME: temporary workaround for trac issue #143
     if (remoteHost == "localhost")
         remoteHost = "127.0.0.1";
     int port = options["videoport"].as<int>();
