@@ -27,6 +27,10 @@
 #include <string>
 #include <tr1/memory>
 
+class VideoScale;
+class TextOverlay;
+class VideoFlip; 
+class VideoSink;
 class _GstElement;
 class _GstMessage;
 class _GstBus;
@@ -45,7 +49,6 @@ class RTSPClient : private BusMsgHandler
 {
     public:
         RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio);
-        ~RTSPClient();
         void run(int timeout);
     private:
         bool handleBusMsg(_GstMessage *msg);
@@ -58,8 +61,14 @@ class RTSPClient : private BusMsgHandler
         bool latencySet_;
         std::string portRange_;
         int latency_;
-        bool enableVideo_;
-        bool enableAudio_;
+        const bool enableVideo_;
+        const bool enableAudio_;
+        const bool fullscreenAtStartup_;
+        const std::string windowTitle_;
+        std::tr1::shared_ptr<VideoScale> videoscale_;
+        std::tr1::shared_ptr<TextOverlay> textoverlay_;
+        std::tr1::shared_ptr<VideoFlip> videoflip_;
+        std::tr1::shared_ptr<VideoSink> videosink_;
 };
 
 #endif // _RTSP_CLIENT_H_

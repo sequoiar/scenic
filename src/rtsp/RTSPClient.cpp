@@ -31,6 +31,12 @@
 #include "util/logWriter.h"
 #include "gtk_utils/gtk_utils.h"
 #include "gst/pipeline.h"
+#include "gst/messageDispatcher.h"
+#include "gst/videoConfig.h"
+#include "gst/videoScale.h"
+#include "gst/videoFlip.h"
+#include "gst/videoSink.h"
+#include "gst/textOverlay.h"
 #include "gst/gstLinkable.h"
 
 gboolean
@@ -139,17 +145,28 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpoin
 
 static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
 
-RTSPClient::RTSPClient(const boost::program_options::variables_map &options, bool enableVideo, bool enableAudio) :
+RTSPClient::RTSPClient(const boost::program_options::variables_map &options, 
+        bool enableVideo, 
+        bool enableAudio) :
     BusMsgHandler(),
     pipeline_(new Pipeline), 
     latencySet_(false), 
     portRange_(""),
     latency_(options["jitterbuffer"].as<int>()), 
     enableVideo_(enableVideo), 
-    enableAudio_(enableAudio)
+    enableAudio_(enableAudio),
+    fullscreenAtStartup_(options["fullscreen"].as<bool>()),
+    windowTitle_(options["window-title"].as<std::string>())
 {
-    BusMsgHandler::setPipeline(pipeline_.get()); // this is how we subscribe to the pipeline's bus messages
     using std::string;
+    BusMsgHandler::setPipeline(pipeline_.get()); // this is how we subscribe to the pipeline's bus messages
+
+    VideoSinkConfig vConfig(options);
+    videoscale_.reset(vConfig.createVideoScale(*pipeline_));
+    textoverlay_.reset(vConfig.createTextOverlay(*pipeline_));
+    videoflip_.reset(vConfig.createVideoFlip(*pipeline_));
+    videosink_.reset(vConfig.createSink(*pipeline_));
+
     if (options["debug"].as<string>() == "gst-debug")
         pipeline_->makeVerbose();
 
@@ -173,9 +190,16 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
         LOG_DEBUG("Video enabled");
         GstElement *queue = pipeline_->makeElement("queue", "video_queue");
         GstElement *colorspace = pipeline_->makeElement("ffmpegcolorspace", 0);
+#if 0
         GstElement *videosink = pipeline_->makeElement(options["videosink"].as<string>().c_str(), 0);
         gstlinkable::link(queue, colorspace);
         gstlinkable::link(colorspace, videosink);
+#endif
+        gstlinkable::link(queue, colorspace);
+        gstlinkable::link(colorspace, *videoscale_);
+        gstlinkable::link(*videoscale_, *textoverlay_);
+        gstlinkable::link(*textoverlay_, *videoflip_);
+        gstlinkable::link(*videoflip_, *videosink_);
     }
     if (enableAudio_)
     {
@@ -192,9 +216,6 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options, boo
     }
 }
 
-RTSPClient::~RTSPClient()
-{}
-
 void RTSPClient::run(int timeToLive)
 {
     /* run */
@@ -206,6 +227,13 @@ void RTSPClient::run(int timeToLive)
     }
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, NULL);
+    
+    if (enableVideo_)
+    {
+        if(fullscreenAtStartup_)
+            MessageDispatcher::sendMessage("fullscreen");
+        MessageDispatcher::sendMessage("window-title", windowTitle_);
+    }
 
     /* start main loop */
     if (not signal_handlers::signalFlag())
