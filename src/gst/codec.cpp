@@ -431,13 +431,23 @@ RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     // something is broken in gst
     capsfilter_(pipeline_.makeElement("capsfilter", NULL))
 {
-    std::ostringstream capsStr;
-    capsStr << "audio/x-raw-float, channels=" << numChannels;
-    LOG_DEBUG("Raw decoder caps = " << capsStr.str());
-    GstCaps *caps = gst_caps_from_string(capsStr.str().c_str());
-    assert(caps);
-    g_object_set(G_OBJECT(capsfilter_), "caps", caps, NULL);
-    gst_caps_unref(caps);
+    const gchar *audioFormats[] = {"audio/x-raw-float",
+        "audio/x-raw-int", NULL};
+
+    GstCaps *audioCaps = gst_caps_new_empty ();
+    for (int i = 0; audioFormats[i] != NULL; i++)
+    {
+        GstStructure *structure = gst_structure_new (audioFormats[i], NULL);
+        gst_structure_set (structure, "channels", G_TYPE_INT, numChannels, NULL);
+        gst_caps_append_structure (audioCaps, structure);
+    }
+    gchar *capsStr = gst_caps_to_string (audioCaps);
+    LOG_DEBUG("Setting audio caps " << capsStr);
+    g_free (capsStr);
+
+    assert(audioCaps);
+    g_object_set(G_OBJECT(capsfilter_), "caps", audioCaps, NULL);
+    gst_caps_unref(audioCaps);
     gstlinkable::link(aconv_, capsfilter_);
 }
 
@@ -506,7 +516,6 @@ RtpPay* MadDecoder::createDepayloader() const
 
 // anonymous namespace to hide this function
 namespace {
-
 int maxRawChannels()
 {
     if (not Jack::is_running())
@@ -541,7 +550,6 @@ int maxRawChannels()
     gst_object_unref(GST_OBJECT(fakePipeline));
     return result;
 }
-
 }
 
 /// FIXME: this is audio specific but could go anywhere
