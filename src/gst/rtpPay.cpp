@@ -75,8 +75,6 @@ H263Depay::H263Depay(const Pipeline &pipeline) : Depay(pipeline)
 Mpeg4Pay::Mpeg4Pay(const Pipeline &pipeline) : Pay(pipeline)
 {
     rtpPay_ = pipeline_.makeElement("rtpmp4vpay", NULL);
-    // this will send config header in rtp packets
-    g_object_set(rtpPay_, "send-config", TRUE, NULL);
 
     // this means that our payloader will output bufferlists instead of
     // 1 packet per buffer. this will allow downstream elements that are bufferlist aware
@@ -94,19 +92,6 @@ Mpeg4Pay::Mpeg4Pay(const Pipeline &pipeline) : Pay(pipeline)
     // g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
     // The default of true works fine for perfect-rtptime
     // g_object_set(rtpPay_, "perfect-rtptime", FALSE, NULL);
-}
-
-
-bool Mpeg4Pay::handleMessage(const std::string &path, const std::string &/*arguments*/)
-{
-    if (path == "disable-send-config")
-    {
-        assert(rtpPay_);
-        LOG_DEBUG("setting send-config to false in rtpmp4vpay");
-        g_object_set(rtpPay_, "send-config", FALSE, NULL);
-        return true;
-    }
-    return false;
 }
 
 

@@ -88,13 +88,6 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     if (options.count("jitterbuffer"))
         RtpReceiver::setLatency(options["jitterbuffer"].as<int>());
 
-    if (enableVideo)
-    {
-        if(options["fullscreen"].as<bool>())
-            MessageDispatcher::sendMessage("fullscreen");
-        MessageDispatcher::sendMessage("window-title", options["window-title"].as<string>());
-    }
-
     LOG_DEBUG("Running main loop");
     gutil::runMainLoop(options["timeout"].as<int>());
     LOG_DEBUG("main loop has finished");
@@ -164,13 +157,6 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
     }
 
     playback.start();
-
-    if (enableVideo)
-    {
-        if(options["fullscreen"].as<bool>())
-            MessageDispatcher::sendMessage("fullscreen");
-        MessageDispatcher::sendMessage("window-title", options["window-title"].as<std::string>());
-    }
 
     gutil::runMainLoop(options["timeout"].as<int>());
 

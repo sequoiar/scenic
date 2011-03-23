@@ -48,22 +48,19 @@ class VideoSink : private boost::noncopyable
 };
 
 class XvImageSink
-: public VideoSink, private MessageHandler
+: public VideoSink
 {
     public:
         XvImageSink(Pipeline &pipeline, int width, int height, 
-                unsigned long xid, const std::string &display);
+                unsigned long xid, const std::string &display, const std::string &title);
+        void toggleFullscreen();
 
     private:
-        void createControl();
-
         void updateDisplay(const std::string &display);
 
         unsigned long xid_;
-        virtual bool handleMessage(const std::string &path, const std::string &arguments);
         bool isFullscreen_;
 
-        void toggleFullscreen() { toggleFullscreen(window_); }
         _GtkWidget *window_;
         _GtkWidget *drawingArea_;
         _GtkWidget *vbox_;

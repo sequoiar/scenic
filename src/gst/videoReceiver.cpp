@@ -81,37 +81,23 @@ void VideoReceiver::createDepayloader()
 
 void VideoReceiver::createSink(Pipeline &pipeline)
 {
-    // avoid creating the videoflip as it has a colorspace converter
     videoscale_.reset(videoConfig_->createVideoScale(pipeline));
     assert(videoscale_);
 
-    if (videoConfig_->hasText())
-    {
-        textoverlay_.reset(videoConfig_->createTextOverlay(pipeline));
-        gstlinkable::link(*decoder_, *textoverlay_);
-        gstlinkable::link(*textoverlay_, *videoscale_);
-    }
-    else
-        gstlinkable::link(*decoder_, *videoscale_);
+    textoverlay_.reset(videoConfig_->createTextOverlay(pipeline));
 
-    if (videoConfig_->flipMethod() != "none")
-    {
-        videoflip_.reset(videoConfig_->createVideoFlip(pipeline));
-        assert(videoflip_);
-    }
+    videoflip_.reset(videoConfig_->createVideoFlip(pipeline));
+    assert(videoflip_);
     sink_.reset(videoConfig_->createSink(pipeline));
     assert(sink_);
 
     if (remoteConfig_->jitterbufferControlEnabled())
         MessageDispatcher::sendMessage("create-control");
-
-    if (videoflip_ != 0)
-    {
-        gstlinkable::link(*videoscale_, *videoflip_);
-        gstlinkable::link(*videoflip_, *sink_);
-    }
-    else
-        gstlinkable::link(*videoscale_, *sink_);
+    
+    gstlinkable::link(*decoder_, *textoverlay_);
+    gstlinkable::link(*textoverlay_, *videoscale_);
+    gstlinkable::link(*videoscale_, *videoflip_);
+    gstlinkable::link(*videoflip_, *sink_);
 
     setCaps();
     assert(gotCaps_);

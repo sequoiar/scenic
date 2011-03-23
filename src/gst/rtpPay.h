@@ -22,7 +22,6 @@
 #ifndef _PAY_H_
 #define _PAY_H_
 
-#include "messageHandler.h"
 #include "noncopyable.h"
 
 class Pipeline;
@@ -102,10 +101,8 @@ class H263Depay : public Depay
 };
 
 
-class Mpeg4Pay : public Pay, public MessageHandler
+class Mpeg4Pay : public Pay
 {
-    private: 
-        bool handleMessage(const std::string &path, const std::string &arguments); 
     public:
         explicit Mpeg4Pay(const Pipeline &pipeline);
 };

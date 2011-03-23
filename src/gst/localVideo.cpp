@@ -50,7 +50,7 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
 {
     // dc1394src needs an extra colourspace converter if not being encoded or flipped
     // FIXME: maybe it just needs a capsfilter?
-    if (sourceConfig.sourceString() == "dc1394src" and videoflip_ == 0)
+    if (sourceConfig.sourceString() == "dc1394src")
     {
         colourspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
         gstlinkable::link(*source_, colourspace_);

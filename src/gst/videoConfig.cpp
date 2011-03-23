@@ -242,7 +242,9 @@ VideoSinkConfig::VideoSinkConfig(const boost::program_options::variables_map &op
     flipMethod_(options["flip-video"].as<std::string>()),
     xid_(options["x-window-id"].as<unsigned long>()), 
     display_(options.count("videodisplay") ? options["videodisplay"].as<std::string>() : ""),
-    text_(options.count("text-overlay") ? options["text-overlay"].as<std::string>() : "")
+    text_(options.count("text-overlay") ? options["text-overlay"].as<std::string>() : ""),
+    title_(options["window-title"].as<std::string>()),
+    startInFullscreen_(options["fullscreen"].as<bool>())
 {}
 
 
@@ -272,17 +274,23 @@ int VideoSinkConfig::effectiveDisplayHeight() const
 
 VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
 {
+    VideoSink *result = 0;
     if (sink_ == "xvimagesink")
-        return new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_);
+    {
+        XvImageSink *xv = new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_, title_);
+        if (startInFullscreen_)
+            xv->toggleFullscreen();
+        result = xv;
+    }
     else if (sink_ == "ximagesink")
-        return new XImageSink(pipeline, display_);
+        result = new XImageSink(pipeline, display_);
     else if (sink_ == "sharedvideosink")
-        return new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
+        result = new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid videosink");
 
     LOG_DEBUG("Video sink " << sink_ << " built"); 
-    return 0;
+    return result;
 }
 
 

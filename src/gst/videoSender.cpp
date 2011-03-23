@@ -86,9 +86,6 @@ void VideoSender::createPayloader()
 {
     payloader_.reset(encoder_->createPayloader());
     assert(payloader_);
-    // tell rtpmp4vpay not to send config string in header since we're sending caps
-    if (remoteConfig_->codec() == "mpeg4") 
-        MessageDispatcher::sendMessage("disable-send-config");
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_.get(), *remoteConfig_);
 }

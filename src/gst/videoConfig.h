@@ -114,6 +114,8 @@ class VideoSinkConfig
         const unsigned long xid_;
         const std::string display_;
         const std::string text_;
+        const std::string title_;
+        const bool startInFullscreen_;
 };
 
 #endif // _VIDEO_CONFIG_H_

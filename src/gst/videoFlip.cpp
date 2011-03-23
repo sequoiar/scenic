@@ -20,19 +20,43 @@
  *
  */
 
-#include <glib-object.h>
 #include <string>
-#include <map>
 #include "videoFlip.h"
 #include "gstLinkable.h"
 #include "pipeline.h"
 
 VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) : 
     pipeline_(pipeline),
-    colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
-    videoflip_(pipeline_.makeElement("videoflip", NULL))
+    identity_(0),
+    colorspace_(0),
+    videoflip_(0)
 {
     LOG_DEBUG("using flip method " << flipMethod);
-    gst_util_set_object_arg (G_OBJECT(videoflip_), "method", flipMethod.c_str());
-    gstlinkable::link(colorspace_, videoflip_);    
+    // We avoid using the flip method chain if possible since it may cause extra 
+    // colourspace conversions
+    if (flipMethod != "none")
+    {
+        colorspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
+        videoflip_ = pipeline_.makeElement("videoflip", NULL);
+        gstlinkable::link(colorspace_, videoflip_);    
+        gst_util_set_object_arg (G_OBJECT(videoflip_), "method", flipMethod.c_str());
+    }
+    else
+        identity_ = pipeline_.makeElement("identity", NULL);
+}
+
+GstElement * VideoFlip::sinkElement()
+{
+    if (identity_)
+        return identity_;
+    else
+        return colorspace_;
+}
+
+GstElement *VideoFlip::srcElement()
+{
+    if (identity_)
+        return identity_;
+    else
+        return videoflip_;
 }

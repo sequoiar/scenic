@@ -241,14 +241,6 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 }
 
 
-void RtpReceiver::updateLatencyCb(GtkWidget *scale)
-{
-    unsigned val = static_cast<unsigned>(gtk_range_get_value(GTK_RANGE(scale)));
-    LOG_DEBUG("Setting latency to " << val);
-    setLatency(val);
-}
-
-
 void RtpReceiver::subParseSourceStats(GstStructure *stats)
 {
 

@@ -224,13 +224,6 @@ void RTSPClient::run(int timeToLive)
     }
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, NULL);
-    
-    if (enableVideo_)
-    {
-        if(fullscreenAtStartup_)
-            MessageDispatcher::sendMessage("fullscreen");
-        MessageDispatcher::sendMessage("window-title", windowTitle_);
-    }
 
     /* start main loop */
     if (not signal_handlers::signalFlag())

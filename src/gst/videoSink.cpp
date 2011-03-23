@@ -47,8 +47,25 @@ void XvImageSink::updateDisplay(const std::string &display)
     gtk_window_set_screen(GTK_WINDOW(window_), gdk_display_get_default_screen(disp));
 }
         
+namespace {
+void makeWidgetBlack(GtkWidget *widget)
+{
+    GdkColor black;
+    gdk_color_parse ("Black", &black);
+    gtk_widget_modify_bg (widget, GTK_STATE_NORMAL, &black);
+    gtk_widget_modify_bg (widget, GTK_STATE_ACTIVE, &black);
+    gtk_widget_modify_bg (widget, GTK_STATE_PRELIGHT, &black);
+    gtk_widget_modify_bg (widget, GTK_STATE_SELECTED, &black);
+    gtk_widget_modify_bg (widget, GTK_STATE_INSENSITIVE, &black);
+}
+}
 
-XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned long xid, const std::string &display) : 
+XvImageSink::XvImageSink(Pipeline &pipeline,
+        int width,
+        int height,
+        unsigned long xid,
+        const std::string &display,
+        const std::string &title) :
     VideoSink(pipeline), 
     xid_(xid),
     isFullscreen_(false),
@@ -63,13 +80,7 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned lon
     //gtk_widget_set_size_request(drawingArea_, width, height);
     
     // Make drawing area black by default, since it's used for video
-    GdkColor black;
-    gdk_color_parse ("Black", &black);
-    gtk_widget_modify_bg (drawingArea_, GTK_STATE_NORMAL, &black);
-    gtk_widget_modify_bg (drawingArea_, GTK_STATE_ACTIVE, &black);
-    gtk_widget_modify_bg (drawingArea_, GTK_STATE_PRELIGHT, &black);
-    gtk_widget_modify_bg (drawingArea_, GTK_STATE_SELECTED, &black);
-    gtk_widget_modify_bg (drawingArea_, GTK_STATE_INSENSITIVE, &black);
+    makeWidgetBlack(drawingArea_);
 
     sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
@@ -82,6 +93,7 @@ XvImageSink::XvImageSink(Pipeline &pipeline, int width, int height, unsigned lon
     gtk_widget_set_double_buffered(drawingArea_, FALSE);
     if (hasWindow())
     {
+        gtk_window_set_title(GTK_WINDOW(window_), title.c_str());
         LOG_DEBUG("Setting default window size to " << width << "x" << height);
         gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
         gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
@@ -208,48 +220,11 @@ void XvImageSink::makeUnfullscreen(GtkWidget *widget)
     if (sliderFrame_)
         gtk_widget_show(sliderFrame_);
 }
+ 
 
-
-bool XvImageSink::handleMessage(const std::string &path, const std::string &arguments)
+void XvImageSink::toggleFullscreen()
 {
-    if (path == "fullscreen")
-    {
-        if (hasWindow())
-            toggleFullscreen();
-        return true;
-    }
-    else if (path == "window-title")
-    {
-        if (hasWindow())
-            gtk_window_set_title(GTK_WINDOW(window_), arguments.c_str());
-        return true;
-    }
-    else if (path == "create-control")
-    {
-        if (hasWindow())
-            createControl();
-        return true;
-    }
-
-    return false;
-}
-
-
-/* makes the latency window */
-void XvImageSink::createControl()
-{
-    LOG_INFO("Creating controls");
-    sliderFrame_ = gtk_frame_new("Jitterbuffer Latency (ms)");
-    // min, max, step-size
-    horizontalSlider_ = gtk_hscale_new_with_range(RtpReceiver::MIN_LATENCY, RtpReceiver::MAX_LATENCY, 1.0);
-
-    // set initial value
-    gtk_range_set_value(GTK_RANGE(horizontalSlider_), RtpReceiver::INIT_LATENCY);
-
-    gtk_container_add(GTK_CONTAINER(sliderFrame_), horizontalSlider_);
-    gtk_box_pack_start(GTK_BOX(vbox_), sliderFrame_, FALSE, FALSE, 0);
-    g_signal_connect(G_OBJECT(horizontalSlider_), "value-changed",
-            G_CALLBACK(RtpReceiver::updateLatencyCb), NULL);
+    toggleFullscreen(window_);
 }
 
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
