@@ -27,6 +27,7 @@
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
 #include "util/logWriter.h"
+#include "gtk_utils/gtk_utils.h"
 
 #include "gstLinkable.h"
 
@@ -431,23 +432,7 @@ RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     // something is broken in gst
     capsfilter_(pipeline_.makeElement("capsfilter", NULL))
 {
-    const gchar *audioFormats[] = {"audio/x-raw-float",
-        "audio/x-raw-int", NULL};
-
-    GstCaps *audioCaps = gst_caps_new_empty ();
-    for (int i = 0; audioFormats[i] != NULL; i++)
-    {
-        GstStructure *structure = gst_structure_new (audioFormats[i], NULL);
-        gst_structure_set (structure, "channels", G_TYPE_INT, numChannels, NULL);
-        gst_caps_append_structure (audioCaps, structure);
-    }
-    gchar *capsStr = gst_caps_to_string (audioCaps);
-    LOG_DEBUG("Setting audio caps " << capsStr);
-    g_free (capsStr);
-
-    assert(audioCaps);
-    g_object_set(G_OBJECT(capsfilter_), "caps", audioCaps, NULL);
-    gst_caps_unref(audioCaps);
+    gutil::initAudioCapsFilter(capsfilter_, numChannels);
     gstlinkable::link(aconv_, capsfilter_);
 }
 

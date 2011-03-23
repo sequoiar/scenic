@@ -31,11 +31,12 @@
 #include "util/logWriter.h"
 #include "gtk_utils/gtk_utils.h"
 #include "gst/pipeline.h"
-#include "gst/messageDispatcher.h"
 #include "gst/videoConfig.h"
+#include "gst/audioConfig.h"
 #include "gst/videoScale.h"
 #include "gst/videoFlip.h"
 #include "gst/videoSink.h"
+#include "gst/audioSink.h"
 #include "gst/textOverlay.h"
 #include "gst/gstLinkable.h"
 
@@ -202,15 +203,19 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     if (enableAudio_)
     {
         LOG_DEBUG("Audio enabled");
+        AudioSinkConfig aConfig(*pipeline_, options);
+
         GstElement *queue = pipeline_->makeElement("queue", "audio_queue");
         GstElement *audioconvert = pipeline_->makeElement("audioconvert", 0);
+        GstElement *capsfilter = pipeline_->makeElement("capsfilter", 0);
+        gutil::initAudioCapsFilter(capsfilter, options["numchannels"].as<int>());
         GstElement *audioresample = pipeline_->makeElement("audioresample", 0);
-        GstElement *audiosink = pipeline_->makeElement(options["audiosink"].as<string>().c_str(), 0);
-        g_object_set(audiosink, "buffer-time", options["audio-buffer"].as<int>() *
-                USEC_PER_MILLISEC, NULL);
+        audiosink_.reset(aConfig.createSink(*pipeline_));
+
         gstlinkable::link(queue, audioconvert);
-        gstlinkable::link(audioconvert, audioresample);
-        gstlinkable::link(audioresample, audiosink);
+        gstlinkable::link(audioconvert, capsfilter);
+        gstlinkable::link(capsfilter, audioresample);
+        gstlinkable::link(audioresample, *audiosink_);
     }
 }
 

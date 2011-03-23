@@ -164,7 +164,8 @@ AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &op
     socketID_(options["vumeter-id"].as<unsigned long>()),
     numChannels_(options["numchannels"].as<int>())
 { 
-    // (before waiting on caps) but having it here is pretty gross
+    // FIXME: (before waiting on caps) but having it here is pretty gross
+    // just use an audioresample
     if (sink_ == "jackaudiosink") 
     {
         Jack::assertReady(pipeline);

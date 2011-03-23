@@ -25,11 +25,6 @@
 #include "util/logWriter.h"
 #include "util/sigint.h"
 #include "gtk_utils.h"
-    
-// extend namespace gutil
-namespace gutil {
-    int checkSignal(gpointer data = NULL);
-}
 
 int gutil::killMainLoop(gpointer /*data*/)
 {
@@ -44,15 +39,17 @@ int gutil::killMainLoop(gpointer /*data*/)
     return FALSE;       // won't be called again
 }
 
-int gutil::checkSignal(gpointer /*data*/)
+namespace {
+int checkSignal(gpointer /*data*/)
 {
     if (signal_handlers::signalFlag())
     {
-        killMainLoop();
+        gutil::killMainLoop();
         return FALSE; // won't be called again
     }
 
     return TRUE; // keep calling
+}
 }
 
 /// ms to run - 0 is forever
@@ -65,7 +62,7 @@ void gutil::runMainLoop(int ms)
     // FIXME: this isn't very smart
     // poll signal status every quarter second
     g_timeout_add(300 /*ms*/,
-            static_cast<GSourceFunc>(gutil::checkSignal),
+            static_cast<GSourceFunc>(::checkSignal),
             NULL);
 
     gtk_main();
@@ -84,3 +81,23 @@ void gutil::init_gst_gtk(int argc, char **argv)
         LOG_DEBUG("DISPLAY variable has not been set");
 }
 
+void gutil::initAudioCapsFilter(GstElement *capsfilter, int numChannels)
+{
+    const gchar *audioFormats[] = {"audio/x-raw-float",
+        "audio/x-raw-int", NULL};
+
+    GstCaps *audioCaps = gst_caps_new_empty ();
+    for (int i = 0; audioFormats[i] != NULL; i++)
+    {
+        GstStructure *structure = gst_structure_new (audioFormats[i], NULL);
+        gst_structure_set (structure, "channels", G_TYPE_INT, numChannels, NULL);
+        gst_caps_append_structure (audioCaps, structure);
+    }
+    gchar *capsStr = gst_caps_to_string (audioCaps);
+    LOG_DEBUG("Setting audio caps " << capsStr);
+    g_free (capsStr);
+
+    g_assert(audioCaps);
+    g_object_set(G_OBJECT(capsfilter), "caps", audioCaps, NULL);
+    gst_caps_unref(audioCaps);
+}

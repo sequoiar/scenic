@@ -23,12 +23,15 @@
 #ifndef __GUTIL_H__
 #define __GUTIL_H__
 
-namespace gutil {
+class _GstElement;
+
+struct gutil {
     /// ms to run - 0 is forever
-    void runMainLoop(int ms);
-    int killMainLoop(void *data = 0);
-    void init_gst_gtk(int argc, char **argv);
-}
+    static void runMainLoop(int ms);
+    static int killMainLoop(void *data = 0);
+    static void init_gst_gtk(int argc, char **argv);
+    static void initAudioCapsFilter(_GstElement *capsfilter, int numChannels);
+};
 
 #endif // __GUTIL_H__
 

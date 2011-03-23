@@ -31,6 +31,7 @@ class VideoScale;
 class TextOverlay;
 class VideoFlip; 
 class VideoSink;
+class AudioSink;
 class _GstElement;
 class _GstMessage;
 class _GstBus;
@@ -66,6 +67,7 @@ class RTSPClient : private BusMsgHandler
         std::tr1::shared_ptr<TextOverlay> textoverlay_;
         std::tr1::shared_ptr<VideoFlip> videoflip_;
         std::tr1::shared_ptr<VideoSink> videosink_;
+        std::tr1::shared_ptr<AudioSink> audiosink_;
 };
 
 #endif // _RTSP_CLIENT_H_
