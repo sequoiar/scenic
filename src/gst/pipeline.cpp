@@ -28,7 +28,7 @@
 #include <string>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
-#include "gtk_utils.h"
+#include "gutil/gutil.h"
 
 #include "dv1394.h"
 #include "busMsgHandler.h"

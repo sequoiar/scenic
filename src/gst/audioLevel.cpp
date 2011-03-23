@@ -24,7 +24,7 @@
 #include <cmath>
 #include <gst/gst.h>
 #include "util/logWriter.h"
-#include "gtk_utils.h"
+#include "gutil/gutil.h"
 #include "audioLevel.h"
 #include "vumeter.h"
 #include "pipeline.h"

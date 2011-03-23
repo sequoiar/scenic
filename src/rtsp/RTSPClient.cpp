@@ -29,7 +29,7 @@
 
 #include "util/sigint.h"
 #include "util/logWriter.h"
-#include "gtk_utils/gtk_utils.h"
+#include "gutil/gutil.h"
 #include "gst/pipeline.h"
 #include "gst/videoConfig.h"
 #include "gst/audioConfig.h"

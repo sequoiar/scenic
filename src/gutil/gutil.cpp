@@ -24,7 +24,7 @@
 #include <gtk/gtk.h>
 #include "util/logWriter.h"
 #include "util/sigint.h"
-#include "gtk_utils.h"
+#include "gutil/gutil.h"
 
 int gutil::killMainLoop(gpointer /*data*/)
 {

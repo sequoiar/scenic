@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
 "Report-Msgid-Bugs-To: http://svn.sat.qc.ca/trac/scenic/wiki/BugReport\n"
-"POT-Creation-Date: 2010-07-27 16:58-0400\n"
+"POT-Creation-Date: 2011-03-23 17:45-0400\n"
 "PO-Revision-Date: 2010-06-22 11:53-0500\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: French\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -39,8 +40,8 @@ msgid ""
 msgstr ""
 "Les taux d'échantillonage audio de chacun des serveurs JACK ne concordent "
 "pas. \n"
-"Le taux local est de %(local)s, alors que celui du contact distant est de %"
-"(remote)s."
+"Le taux local est de %(local)s, alors que celui du contact distant est de "
+"%(remote)s."
 
 #: py/scenic/application.py:679 py/scenic/application.py:761
 msgid ""
@@ -478,11 +479,11 @@ msgstr "Lignes de commanes:"
 #: py/scenic/gui.py:1488
 #, python-format
 msgid ""
-"Could not change V4L2 standard from %(current_standard)s to %"
-"(desired_standard)s for device %(device_name)s."
+"Could not change V4L2 standard from %(current_standard)s to "
+"%(desired_standard)s for device %(device_name)s."
 msgstr ""
-"La tentative de changer le standard vidéo de %(current_standard)s à %"
-"(desired_standard)s pour l'appareil %(device_name)s a échoué."
+"La tentative de changer le standard vidéo de %(current_standard)s à "
+"%(desired_standard)s pour l'appareil %(device_name)s a échoué."
 
 #: py/scenic/gui.py:1530
 #, python-format
@@ -490,8 +491,8 @@ msgid ""
 "Could not change V4L2 input from %(current_input)s to %(desired_input)s for "
 "device %(device_name)s."
 msgstr ""
-"La tentative de changer l'entrée vidéo de %(current_input)s à %"
-"(desired_input)s pour l'appareil %(device_name)s a échoué."
+"La tentative de changer l'entrée vidéo de %(current_input)s à "
+"%(desired_input)s pour l'appareil %(device_name)s a échoué."
 
 #: py/scenic/gui.py:1654
 msgid "<b>Zombie</b>"
@@ -663,7 +664,7 @@ msgid "View informations about Scenic features on your system."
 msgstr ""
 "Voir des informations sur les fonctionnalités de Scenic sur votre système."
 
-#: data/glade/scenic.glade:757
+#: data/glade/scenic.glade:757 data/glade/scenic.glade:4414
 msgid "Detailed Status"
 msgstr "Détails"
 
@@ -981,9 +982,8 @@ msgstr "Débogage"
 msgid "Details"
 msgstr "Détails"
 
-#: data/glade/scenic.glade:4414
-msgid "Detailled Status"
-msgstr "Détails"
+#~ msgid "Detailled Status"
+#~ msgstr "Détails"
 
 #~ msgid "Error : Could not find the Glade file %(filename)s. Exitting."
 #~ msgstr ""

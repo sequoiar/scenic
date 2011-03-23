@@ -31,7 +31,7 @@
 
 #include "gst-rtsp-cam-media-factory.h"
 #include "util/logWriter.h"
-#include "gtk_utils/gtk_utils.h"
+#include "gutil/gutil.h"
 
 namespace {
 static gboolean

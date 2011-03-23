@@ -22,9 +22,10 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "milhouse.h"
 #include "util/logWriter.h"
 
-#include "gtk_utils.h"
+#include "gutil/gutil.h"
 
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
@@ -34,7 +35,6 @@
 #include "gst/videoConfig.h"
 #include "playback.h"
 
-#include "milhouse.h"
 #include "milhouseLogger.h"
 #include "programOptions.h"
 #include "rtsp/RTSPServer.h"

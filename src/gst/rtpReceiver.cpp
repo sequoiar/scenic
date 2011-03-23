@@ -20,17 +20,16 @@
  *
  */
 
-#include "gtk_utils.h"
-
+#include "rtpReceiver.h"
 #include <list>
 #include <algorithm>
 #include <cstring>
 #include <gst/gst.h>
 
+#include "gutil/gutil.h"
 #include "gstLinkable.h"
 #include "pipeline.h"
 #include "rtpPay.h"
-#include "rtpReceiver.h"
 #include "remoteConfig.h"
 
 #include <gtk/gtk.h>

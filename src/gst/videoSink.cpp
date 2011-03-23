@@ -24,7 +24,7 @@
 #include "videoSink.h"
 #include "pipeline.h"
 #include "rtpReceiver.h"
-#include "gtk_utils.h"
+#include "gutil/gutil.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
