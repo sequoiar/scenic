@@ -21,7 +21,6 @@
  */
 
 #include "pipeline.h"
-#include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
 #include "videoScale.h"
@@ -34,7 +33,7 @@
 #include "rtpPay.h"
 #include "messageDispatcher.h"
 
-using std::tr1::shared_ptr;
+using std::tr1::shared_ptr; 
     
 VideoReceiver::VideoReceiver(Pipeline &pipeline,
         const shared_ptr<VideoSinkConfig> &vConfig,
