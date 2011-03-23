@@ -62,8 +62,6 @@ class RTSPClient : private BusMsgHandler
         int latency_;
         const bool enableVideo_;
         const bool enableAudio_;
-        const bool fullscreenAtStartup_;
-        const std::string windowTitle_;
         std::tr1::shared_ptr<VideoScale> videoscale_;
         std::tr1::shared_ptr<TextOverlay> textoverlay_;
         std::tr1::shared_ptr<VideoFlip> videoflip_;

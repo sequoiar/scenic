@@ -151,18 +151,10 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     portRange_(""),
     latency_(options["jitterbuffer"].as<int>()), 
     enableVideo_(not options["disable-video"].as<bool>()), 
-    enableAudio_(not options["disable-audio"].as<bool>()),
-    fullscreenAtStartup_(options["fullscreen"].as<bool>()),
-    windowTitle_(options["window-title"].as<std::string>())
+    enableAudio_(not options["disable-audio"].as<bool>())
 {
     using std::string;
     BusMsgHandler::setPipeline(pipeline_.get()); // this is how we subscribe to the pipeline's bus messages
-
-    VideoSinkConfig vConfig(options);
-    videoscale_.reset(vConfig.createVideoScale(*pipeline_));
-    textoverlay_.reset(vConfig.createTextOverlay(*pipeline_));
-    videoflip_.reset(vConfig.createVideoFlip(*pipeline_));
-    videosink_.reset(vConfig.createSink(*pipeline_));
 
     if (options["debug"].as<string>() == "gst-debug")
         pipeline_->makeVerbose();
@@ -190,6 +182,12 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     if (enableVideo_)
     {
         LOG_DEBUG("Video enabled");
+        VideoSinkConfig vConfig(options);
+        videoscale_.reset(vConfig.createVideoScale(*pipeline_));
+        textoverlay_.reset(vConfig.createTextOverlay(*pipeline_));
+        videoflip_.reset(vConfig.createVideoFlip(*pipeline_));
+        videosink_.reset(vConfig.createSink(*pipeline_));
+
         GstElement *queue = pipeline_->makeElement("queue", "video_queue");
         GstElement *colorspace = pipeline_->makeElement("ffmpegcolorspace", 0);
         gstlinkable::link(queue, colorspace);
