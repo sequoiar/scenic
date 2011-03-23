@@ -425,12 +425,6 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
   videoscale = gst_element_factory_make ("videoscale", NULL);
   capsfilter = gst_element_factory_make ("capsfilter", NULL);
 
-  gst_bin_add_many (GST_BIN (bin), videosrc, queue, ffmpegcolorspace, videoscale,
-      videorate, capsfilter, encoder, pay, NULL);
-  linked = gst_element_link_many (videosrc, queue, videorate, ffmpegcolorspace, videoscale,
-      capsfilter, encoder, pay, NULL);
-  g_assert(linked);
-
   video_caps = gst_caps_new_empty ();
   for (i = 0; image_formats[i] != NULL; i++) {
     GstStructure *structure = gst_structure_new (image_formats[i], NULL);
@@ -453,6 +447,13 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
   g_free (capss);
 
   g_object_set (capsfilter, "caps", video_caps, NULL);
+  gst_caps_unref(video_caps);
+
+  gst_bin_add_many (GST_BIN (bin), videosrc, queue, ffmpegcolorspace, videoscale,
+      videorate, capsfilter, encoder, pay, NULL);
+  linked = gst_element_link_many (videosrc, queue, videorate, ffmpegcolorspace, videoscale,
+      capsfilter, encoder, pay, NULL);
+  g_assert(linked);
 
   return pay;
 }
@@ -502,13 +503,6 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   audiorate = gst_element_factory_make ("audiorate", NULL);
   capsfilter = gst_element_factory_make ("capsfilter", NULL);
 
-  gst_bin_add_many (GST_BIN (bin), audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
-  linked = gst_element_link_many (audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
-  if (!linked) {
-      gst_object_unref(bin);
-      return NULL;
-  }
-
   audio_caps = gst_caps_new_empty ();
   for (i = 0; audio_formats[i] != NULL; i++) {
     GstStructure *structure = gst_structure_new (audio_formats[i], NULL);
@@ -524,7 +518,14 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   g_free (capss);
 
   g_object_set (capsfilter, "caps", audio_caps, NULL);
+  gst_caps_unref (audio_caps);
   
+  gst_bin_add_many (GST_BIN (bin), audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
+  linked = gst_element_link_many (audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
+  if (!linked) {
+      gst_object_unref(bin);
+      return NULL;
+  }
   return pay;
 }
 
