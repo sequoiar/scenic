@@ -32,13 +32,13 @@ VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) :
     videoflip_(0)
 {
     LOG_DEBUG("using flip method " << flipMethod);
-    // We avoid using the flip method chain if possible since it may cause extra 
+    // We avoid using the flip method chain if possible since it may cause extra
     // colourspace conversions
     if (flipMethod != "none")
     {
         colorspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
         videoflip_ = pipeline_.makeElement("videoflip", NULL);
-        gstlinkable::link(colorspace_, videoflip_);    
+        gstlinkable::link(colorspace_, videoflip_);
         gst_util_set_object_arg (G_OBJECT(videoflip_), "method", flipMethod.c_str());
     }
     else
