@@ -42,7 +42,10 @@ VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) :
         gst_util_set_object_arg (G_OBJECT(videoflip_), "method", flipMethod.c_str());
     }
     else
+    {
         identity_ = pipeline_.makeElement("identity", NULL);
+        g_object_set(identity_, "silent", TRUE, NULL);
+    }
 }
 
 GstElement * VideoFlip::sinkElement()

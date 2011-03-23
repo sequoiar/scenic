@@ -52,5 +52,8 @@ TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) :
                 textoverlay_);
     }
     else // just a passthrough element
+    {
         textoverlay_ = pipeline_.makeElement("identity", NULL);
+        g_object_set(textoverlay_, "silent", TRUE, NULL);
+    }
 }
