@@ -20,7 +20,6 @@
  *
  */
 
-#include <fstream>
 #include <glib/gfileutils.h>
 #include <boost/program_options.hpp>
 #include "util/logWriter.h"
@@ -103,7 +102,6 @@ unsigned VideoSourceConfig::captureHeight() const
 
 std::string VideoSourceConfig::pictureAspectRatio() const
 {
-    /// FIXME: have this be settable
     return pictureAspectRatio_;
 }
 
@@ -302,7 +300,7 @@ VideoScale* VideoSinkConfig::createVideoScale(const Pipeline &pipeline) const
 
 VideoFlip* VideoSinkConfig::createVideoFlip(const Pipeline &pipeline) const
 {
-    return new VideoFlip(pipeline, flipMethod_);
+    return new VideoFlip(pipeline, flipMethod_); 
 }
 
 TextOverlay* VideoSinkConfig::createTextOverlay(const Pipeline &pipeline) const
