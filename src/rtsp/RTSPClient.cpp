@@ -55,7 +55,7 @@ RTSPClient::timeout()
 bool RTSPClient::validPortRange(const std::string &ports)
 {
     std::vector<std::string> strs;
-    boost::split(strs, ports, boost::is_any_of("- "));
+    boost::split(strs, ports, boost::is_any_of(std::string("- ")));
     if (strs.size() != 2)
         return false;
     int first = boost::lexical_cast<int>(strs[0]);
