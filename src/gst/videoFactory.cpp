@@ -42,7 +42,7 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
     std::string remoteHost(options["address"].as<std::string>());
     // FIXME: temporary workaround for trac issue #143
     if (remoteHost == "localhost")
-        remoteHost = "127.0.0.1";
+        remoteHost = "localhost.localdomain";
     int port = options["videoport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
     bool enableControls = options["enable-controls"].as<bool>();
@@ -61,7 +61,7 @@ shared_ptr<VideoSender> videofactory::buildVideoSender(Pipeline &pipeline, const
     std::string remoteHost(options["address"].as<std::string>());
     // FIXME: temporary workaround for trac issue #143
     if (remoteHost == "localhost")
-        remoteHost = "127.0.0.1";
+        remoteHost = "localhost.localdomain";
     int port = options["videoport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
 

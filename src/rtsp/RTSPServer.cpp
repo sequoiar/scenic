@@ -58,7 +58,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
   string remoteHost(options["address"].as<string>());
   // FIXME: temporary workaround for trac issue #143
   if (remoteHost == "localhost")
-      remoteHost = "127.0.0.1";
+      remoteHost = "localhost.localdomain";
   urlStr += remoteHost;
   urlStr += ":8554/test";
 

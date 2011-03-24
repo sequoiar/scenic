@@ -168,7 +168,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     std::string remoteHost(options["address"].as<std::string>());
     // FIXME: temporary workaround for trac issue #143
     if (remoteHost == "localhost")
-        remoteHost = "127.0.0.1";
+        remoteHost = "localhost.localdomain";
     string uri("rtsp://" + remoteHost + ":8554/test");
     g_object_set(uridecodebin, "uri", uri.c_str(), NULL);
     g_signal_connect(uridecodebin, "notify::source", G_CALLBACK(onNotifySource), this);
