@@ -246,19 +246,19 @@ short Milhouse::run(int argc, char **argv)
     if ((not options["sender"].as<bool>() and not options["receiver"].as<bool>()) 
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
-        LOG_ERROR("argument error: must be sender OR receiver OR localvideo."); 
+        LOG_ERROR("Must be run as "
+                "-s, -r, --localvideo, --localaudio, --rtsp-server OR --rtsp-client."
+                " See --help.");
         return 1;
     }
 
 
     bool enableVideo = not options["disable-video"].as<bool>();
     bool enableAudio = not options["disable-audio"].as<bool>();
-    enableVideo = enableVideo and options.count("videoport");
-    enableAudio = enableAudio and options.count("audioport");
 
     if (not enableVideo and not enableAudio)
     {
-        LOG_ERROR("argument error: must provide videoport and/or audioport. see --help");
+        LOG_ERROR("argument error: cannot disable video and audio. see --help");
         return 1;
     }
 

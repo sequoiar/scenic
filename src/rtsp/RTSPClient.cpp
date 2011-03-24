@@ -31,6 +31,7 @@
 #include "util/logWriter.h"
 #include "gutil/gutil.h"
 #include "gst/pipeline.h"
+#include "gst/portOffsets.h"
 #include "gst/videoConfig.h"
 #include "gst/audioConfig.h"
 #include "gst/videoScale.h"
@@ -60,10 +61,10 @@ bool RTSPClient::validPortRange(const std::string &ports)
         return false;
     int first = boost::lexical_cast<int>(strs[0]);
     int second = boost::lexical_cast<int>(strs[1]);
-    // If using audio and video, we need a range of [0-5]. If one of the two is
-    // disabled, then we just need a range of [0-3]
-    // RTP=n, RTCP1=n+1, RTCP2=n+3
-    static const int MINIMUM_PORT_RANGE = enableVideo_ and enableAudio_ ? 5 : 3;
+    
+    static const int MINIMUM_PORT_RANGE = enableVideo_ and enableAudio_ ?
+        ports::MINIMUM_RANGE_FOR_TWO_STREAMS : ports::MINIMUM_RANGE_FOR_ONE_STREAM;
+
     if (first >= 1 and first <= 65535 and second >= 1 and second <= 65535)
         if ((second - first) >= MINIMUM_PORT_RANGE)
             return true;
