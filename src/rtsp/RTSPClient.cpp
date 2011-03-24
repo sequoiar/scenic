@@ -207,6 +207,8 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
 
         GstElement *queue = pipeline_->makeElement("queue", "audio_queue");
         GstElement *audioconvert = pipeline_->makeElement("audioconvert", 0);
+        // FIXME: we need this capsfilter because the raw depayloader doesn't work properly
+        // for > 8 channels
         GstElement *capsfilter = pipeline_->makeElement("capsfilter", 0);
         gutil::initAudioCapsFilter(capsfilter, options["numchannels"].as<int>());
         GstElement *audioresample = pipeline_->makeElement("audioresample", 0);

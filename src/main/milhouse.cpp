@@ -29,7 +29,6 @@
 
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
-#include "gst/messageDispatcher.h"
 #include "gst/pipeline.h"
 #include "gst/rtpReceiver.h"
 #include "gst/videoConfig.h"
@@ -71,16 +70,10 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     shared_ptr<AudioReceiver> aRx;
 
     if (enableVideo)       
-    {
         vRx = videofactory::buildVideoReceiver(pipeline, options);
-    }
-    if (enableAudio)
-    {
-        aRx = audiofactory::buildAudioReceiver(pipeline, options);
 
-        if (options["disable-jack-autoconnect"].as<bool>())
-            MessageDispatcher::sendMessage("disable-jack-autoconnect");
-    }
+    if (enableAudio)
+        aRx = audiofactory::buildAudioReceiver(pipeline, options);
 
     playback.start();
 
@@ -110,17 +103,10 @@ void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, b
     shared_ptr<AudioSender> aTx;
 
     if (enableVideo)
-    {
         vTx = videofactory::buildVideoSender(pipeline, options);
-    }
 
     if (enableAudio)
-    {
         aTx = audiofactory::buildAudioSender(pipeline, options);
-
-        if (options["disable-jack-autoconnect"].as<bool>())
-            MessageDispatcher::sendMessage("disable-jack-autoconnect");
-    }
 
     playback.start();
 
@@ -152,8 +138,6 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
     {
         LOG_DEBUG("LOCAL AUDIO");
         localAudio = audiofactory::buildLocalAudio(pipeline, options);
-        if (options["disable-jack-autoconnect"].as<bool>())
-            MessageDispatcher::sendMessage("disable-jack-autoconnect");
     }
 
     playback.start();

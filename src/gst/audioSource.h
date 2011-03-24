@@ -23,8 +23,8 @@
 #define _AUDIO_SOURCE_H_
 
 #include <vector>
+#include <string>
 #include "busMsgHandler.h"
-#include "messageHandler.h"
 
 #include "noncopyable.h"
 
@@ -184,13 +184,13 @@ class AudioPulseSource : public AudioSource
  *  and interleaves incoming jack buffers into one multichannel stream.
  */
 
-class AudioJackSource : public AudioSource, public MessageHandler
+class AudioJackSource : public AudioSource
 {
     public:
         AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config);
+        void disableAutoConnect();
 
     private:
-        bool handleMessage(const std::string &path, const std::string &arguments);
         virtual _GstElement *srcElement() { return queue_; }
         /// Caps used by any source with a capsfilter
         std::string getCapsFilterCapsString();

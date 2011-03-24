@@ -24,7 +24,6 @@
 
 #include <string>
 #include <gdk/gdkevents.h>
-#include "messageHandler.h"
 
 #include "noncopyable.h"
 

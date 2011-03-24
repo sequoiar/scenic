@@ -23,8 +23,6 @@
 #define _AUDIO_SINK_H_
 
 #include <string>
-#include "messageHandler.h"
-
 #include "noncopyable.h"
 
 // forward declarations
@@ -80,16 +78,14 @@ class AudioPulseSink : public AudioSink
         const AudioSinkConfig &config_;
 };
 
-/// Concrete AudioSink class representing a sink to the JACK audio connection kit 
-class AudioJackSink : public AudioSink, public MessageHandler
+/// Concrete AudioSink class representing a sink to the JACK audio connection kit
+class AudioJackSink : public AudioSink
 {
     public:
         AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config);
+        void disableAutoConnect();
     private:
-        bool handleMessage(const std::string &message, const std::string &arguments);
         const AudioSinkConfig &config_;
 };
-          
-
 #endif //_AUDIO_SINK_H_
 

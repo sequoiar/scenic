@@ -42,7 +42,8 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
     location_(options["audiolocation"].as<std::string>()), 
     numChannels_(options["numchannels"].as<int>()),
     bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC),
-    socketID_(options["vumeter-id"].as<unsigned long>())
+    socketID_(options["vumeter-id"].as<unsigned long>()),
+    disableAutoConnect_(options["disable-jack-autoconnect"].as<bool>())
 {
     using boost::lexical_cast;
     using std::string;
@@ -95,7 +96,10 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
     else if (source_ == "jackaudiosrc") 
     {
         Jack::assertReady(pipeline);
-        return new AudioJackSource(pipeline, *this);
+        AudioJackSource *result = new AudioJackSource(pipeline, *this);
+        if (disableAutoConnect_)
+            result->disableAutoConnect();
+        return result;
     }
     else if (source_ == "dv1394src")
         return new AudioDvSource(pipeline, *this);
@@ -156,17 +160,18 @@ bool AudioSourceConfig::locationExists() const
 
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &options) : 
-    sink_(options["audiosink"].as<std::string>()), 
+AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &options) :
+    sink_(options["audiosink"].as<std::string>()),
     sinkName_(options["jack-client-name"].as<std::string>()),
-    deviceName_(options["audiodevice"].as<std::string>()), 
+    deviceName_(options["audiodevice"].as<std::string>()),
     bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC),
     socketID_(options["vumeter-id"].as<unsigned long>()),
-    numChannels_(options["numchannels"].as<int>())
-{ 
+    numChannels_(options["numchannels"].as<int>()),
+    disableAutoConnect_(options["disable-jack-autoconnect"].as<bool>())
+{
     // FIXME: (before waiting on caps) but having it here is pretty gross
     // just use an audioresample
-    if (sink_ == "jackaudiosink") 
+    if (sink_ == "jackaudiosink")
     {
         Jack::assertReady(pipeline);
         pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
@@ -177,7 +182,12 @@ AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &op
 AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")
-        return new AudioJackSink(pipeline, *this);
+    {
+        AudioJackSink * result = new AudioJackSink(pipeline, *this);
+        if (disableAutoConnect_)
+            result->disableAutoConnect();
+        return result;
+    }
     else if (sink_ == "alsasink")
         return new AudioAlsaSink(pipeline, *this);
     else if (sink_ == "pulsesink")

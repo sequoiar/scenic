@@ -28,7 +28,6 @@
 #include "videoConfig.h"
 #include "remoteConfig.h"
 #include "codec.h"
-#include "messageDispatcher.h"
 
 #include <tr1/memory>
 

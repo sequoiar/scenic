@@ -31,10 +31,9 @@
 #include "videoSink.h"
 #include "codec.h"
 #include "rtpPay.h"
-#include "messageDispatcher.h"
 
-using std::tr1::shared_ptr; 
-    
+using std::tr1::shared_ptr;
+
 VideoReceiver::VideoReceiver(Pipeline &pipeline,
         const shared_ptr<VideoSinkConfig> &vConfig,
         const shared_ptr<ReceiverConfig> &rConfig) :
@@ -49,7 +48,7 @@ VideoReceiver::VideoReceiver(Pipeline &pipeline,
     sink_(),
     gotCaps_(false)
 {
-    assert(remoteConfig_->hasCodec()); 
+    assert(remoteConfig_->hasCodec());
     remoteConfig_->checkPorts();
     createPipeline(pipeline);
 }
@@ -90,9 +89,6 @@ void VideoReceiver::createSink(Pipeline &pipeline)
     sink_.reset(videoConfig_->createSink(pipeline));
     assert(sink_);
 
-    if (remoteConfig_->jitterbufferControlEnabled())
-        MessageDispatcher::sendMessage("create-control");
-    
     gstlinkable::link(*decoder_, *textoverlay_);
     gstlinkable::link(*textoverlay_, *videoscale_);
     gstlinkable::link(*videoscale_, *videoflip_);
@@ -100,15 +96,15 @@ void VideoReceiver::createSink(Pipeline &pipeline)
 
     setCaps();
     assert(gotCaps_);
-    if (not remoteConfig_->capsMatchCodec()) 
+    if (not remoteConfig_->capsMatchCodec())
         THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
     decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed
 }
 
-/// Used to set this VideoReceiver's RtpReceiver's caps 
-void VideoReceiver::setCaps() 
-{ 
-    session_.setCaps(remoteConfig_->caps()); 
+/// Used to set this VideoReceiver's RtpReceiver's caps
+void VideoReceiver::setCaps()
+{
+    session_.setCaps(remoteConfig_->caps());
     gotCaps_ = true;
 }
 

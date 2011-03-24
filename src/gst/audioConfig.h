@@ -79,6 +79,7 @@ class AudioSourceConfig
         const int numChannels_;
         const unsigned long long bufferTime_;
         GdkNativeWindow socketID_;
+        const bool disableAutoConnect_;
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  
@@ -102,6 +103,7 @@ class AudioSinkConfig
         const unsigned long long bufferTime_;
         GdkNativeWindow socketID_;
         const int numChannels_;
+        const bool disableAutoConnect_;
 };
 
 #endif // _AUDIO_LOCAL_CONFIG_H_
