@@ -39,12 +39,11 @@ gboolean textPositionCallback(gpointer data)
 }
 
 /** Constructor sets text */
-TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) : 
-    pipeline_(pipeline)
+TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text)
 {
     if (not text.empty())
     {
-        textoverlay_ = pipeline_.makeElement("textoverlay", NULL);
+        textoverlay_ = pipeline.makeElement("textoverlay", NULL);
         g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "sans 50",
                 NULL);
         g_timeout_add(50 /* ms */, 
@@ -53,7 +52,7 @@ TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) :
     }
     else // just a passthrough element
     {
-        textoverlay_ = pipeline_.makeElement("identity", NULL);
+        textoverlay_ = pipeline.makeElement("identity", NULL);
         g_object_set(textoverlay_, "silent", TRUE, NULL);
     }
 }

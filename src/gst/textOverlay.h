@@ -44,7 +44,6 @@ class TextOverlay: private boost::noncopyable
 
 
     private:
-        const Pipeline &pipeline_;
         _GstElement *textoverlay_;
 };
 

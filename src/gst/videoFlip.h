@@ -43,7 +43,6 @@ class VideoFlip : private boost::noncopyable
 
 
     private:
-        const Pipeline &pipeline_;
         _GstElement *identity_;
         _GstElement *colorspace_;
         _GstElement *videoflip_;

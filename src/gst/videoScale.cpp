@@ -31,9 +31,8 @@ const int VideoScale::MAX_SCALE;
 
 /** Constructor sets width and height */
 VideoScale::VideoScale(const Pipeline &pipeline, int width, int height) : 
-    pipeline_(pipeline),
-    videoscale_(pipeline_.makeElement("videoscale", NULL)),
-    capsfilter_(pipeline_.makeElement("capsfilter", NULL))
+    videoscale_(pipeline.makeElement("videoscale", NULL)),
+    capsfilter_(pipeline.makeElement("capsfilter", NULL))
 {
     using namespace boost::assign;
     using std::string;

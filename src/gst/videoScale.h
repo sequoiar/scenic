@@ -45,7 +45,6 @@ class VideoScale : private boost::noncopyable
 
 
     private:
-        const Pipeline &pipeline_;
         _GstElement *videoscale_;
         _GstElement *capsfilter_;
 };
