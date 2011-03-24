@@ -55,11 +55,6 @@ class AudioSource : private boost::noncopyable
         const AudioSourceConfig &config_;
         
         _GstElement *source_;
-
-        /// Caps used by any source with a capsfilter
-        virtual std::string getCapsFilterCapsString();
-
-        void initCapsFilter(_GstElement* &aconv, _GstElement* &capsfilter);
 };
 
 /** 
@@ -102,8 +97,7 @@ class InterleavedAudioSource : public AudioSource
 /** 
  *  Concrete InterleavedAudioSource which gives us an array of sine-wave generating sources.
  *
- *  AudioTestSource generates sine-tones, each of which alternate between two hard-coded frequencies. Their
- *  combined output is then interleaved.
+ *  AudioTestSource generates sine-tones, a different frequency on each channel.
  */
 
 class AudioTestSource : public InterleavedAudioSource
@@ -112,7 +106,6 @@ class AudioTestSource : public InterleavedAudioSource
         AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
-        std::vector< std::vector <double> > frequencies_;
         int offset_;
 };
 
@@ -192,8 +185,6 @@ class AudioJackSource : public AudioSource
 
     private:
         virtual _GstElement *srcElement() { return queue_; }
-        /// Caps used by any source with a capsfilter
-        std::string getCapsFilterCapsString();
 
         _GstElement *capsFilter_;
         _GstElement *queue_;
@@ -223,5 +214,4 @@ class AudioDvSource : public AudioSource
 };
 
 #endif //_AUDIO_SOURCE_H_
-
 
