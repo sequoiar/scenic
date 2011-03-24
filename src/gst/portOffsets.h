@@ -28,9 +28,9 @@
 namespace ports {
     // If using audio and video, we need a range of [0-5]. If one of the two is
     // disabled, then we just need a range of [0-3]
-    // RTP=n, RTCP1=n+1, RTCP2=n+3
+    // RTP=n, RTCP1=n+1, RTCP2=n+5
     static const int RTCP_FIRST_OFFSET = 1;
-    static const int RTCP_SECOND_OFFSET = 3;
+    static const int RTCP_SECOND_OFFSET = 5;
     static const int MINIMUM_RANGE_FOR_ONE_STREAM = 3;
     static const int MINIMUM_RANGE_FOR_TWO_STREAMS = 5;
     static const int CAPS_OFFSET = 9;
