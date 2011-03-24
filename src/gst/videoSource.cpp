@@ -38,9 +38,8 @@
 #include "fileSource.h"
 
 /// Constructor
-VideoSource::VideoSource(const Pipeline &pipeline, const VideoSourceConfig &config)
+VideoSource::VideoSource(const VideoSourceConfig &config)
     :
-        pipeline_(pipeline),
         config_(config),
         source_(0),
         capsFilter_(0)
@@ -78,12 +77,12 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
 VideoTestSource::VideoTestSource(const Pipeline &pipeline,
         const VideoSourceConfig &config)
     :
-        VideoSource(pipeline, config)
+        VideoSource(config)
 {
-    source_ = pipeline_.makeElement(config_.source(), NULL);
+    source_ = pipeline.makeElement(config_.source(), NULL);
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
-    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
     setCapsFilter(srcCaps());
 }
@@ -91,8 +90,8 @@ VideoTestSource::VideoTestSource(const Pipeline &pipeline,
 /// Constructor
 VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConfig &config) 
     :
-        VideoSource(pipeline, config),
-        identity_(pipeline_.makeElement("identity", NULL))
+        VideoSource(config),
+        identity_(pipeline.makeElement("identity", NULL))
 {
     if (not config_.locationExists())
         THROW_ERROR("File \"" << config_.location() << "\" does not exist");
@@ -110,9 +109,11 @@ VideoFileSource::~VideoFileSource()
 
 
 /// Constructor
+// FIXME: this should not hold onto pipeline reference
 VideoDvSource::VideoDvSource(const Pipeline &pipeline, 
         const VideoSourceConfig &config) :
-    VideoSource(pipeline, config),
+    VideoSource(config),
+    pipeline_(pipeline),
     queue_(pipeline_.makeElement("queue", NULL)),
     dvdec_(pipeline_.makeElement("dvdec", NULL))
 {
@@ -136,10 +137,10 @@ bool VideoV4lSource::willModifyCaptureResolution() const
 
 
 VideoV4lSource::VideoV4lSource(const Pipeline &pipeline, 
-        const VideoSourceConfig &config)
-: VideoSource(pipeline, config), expectedStandard_("NTSC"), actualStandard_("")
+        const VideoSourceConfig &config) :
+    VideoSource(config), expectedStandard_("NTSC"), actualStandard_("")
 {
-    source_ = pipeline_.makeElement(config_.source(), NULL);
+    source_ = pipeline.makeElement(config_.source(), NULL);
     // set a v4l2src if given to config as an arg, otherwise use default
     if (config_.hasDeviceName() && config_.deviceExists())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
@@ -159,7 +160,7 @@ VideoV4lSource::VideoV4lSource(const Pipeline &pipeline,
         v4l2util::setFormatVideo(deviceStr(), config_.captureWidth(), config_.captureHeight());
     }
 
-    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline.makeElement("capsfilter", NULL);
     setCapsFilter(srcCaps());
     gstlinkable::link(source_, capsFilter_);
 }
@@ -233,12 +234,12 @@ std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
 
 
 VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config) :
-    VideoSource(pipeline, config)
+    VideoSource(config)
 {
     if (not Dc1394::areCamerasConnected())
         THROW_CRITICAL("No dc1394 camera connected");
 
-    source_ = pipeline_.makeElement(config_.source(), NULL);
+    source_ = pipeline.makeElement(config_.source(), NULL);
     if (config_.hasGUID())
         g_object_set(G_OBJECT(source_), "camera-number", Dc1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
@@ -249,7 +250,7 @@ VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSource
     enum {DMA_BUFFER_SIZE_IN_FRAMES = 2};
     g_object_set(G_OBJECT(source_), "buffer-size", DMA_BUFFER_SIZE_IN_FRAMES, NULL);
 
-    capsFilter_ = pipeline_.makeElement("capsfilter", NULL);
+    capsFilter_ = pipeline.makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
     setCapsFilter(srcCaps());

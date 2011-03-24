@@ -39,8 +39,7 @@ class VideoSource
         virtual _GstElement *srcElement() { return source_; }
 
     protected:
-        VideoSource(const Pipeline &pipeline, const VideoSourceConfig &config);
-        const Pipeline &pipeline_;
+        VideoSource(const VideoSourceConfig &config);
         const VideoSourceConfig &config_;
         _GstElement *source_;
         _GstElement *capsFilter_;
@@ -79,6 +78,7 @@ class VideoDvSource
         VideoDvSource(const Pipeline &pipeline, const VideoSourceConfig &config);
 
     private:
+        const Pipeline &pipeline_;
         ~VideoDvSource();
         
         virtual _GstElement *srcElement() { return dvdec_; }
