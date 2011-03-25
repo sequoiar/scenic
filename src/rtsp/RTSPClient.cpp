@@ -170,7 +170,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     // FIXME: temporary workaround for trac issue #143
     if (remoteHost == "localhost")
         remoteHost = "localhost.localdomain";
-    string uri("rtsp://" + remoteHost + ":8554/test");
+    string uri("rtsp://" + remoteHost + ":8554/milhouse");
     g_object_set(uridecodebin, "uri", uri.c_str(), NULL);
     g_signal_connect(uridecodebin, "notify::source", G_CALLBACK(onNotifySource), this);
     g_signal_connect(uridecodebin, "pad-added", G_CALLBACK(onPadAdded), this);

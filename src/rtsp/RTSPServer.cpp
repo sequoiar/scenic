@@ -60,7 +60,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
   if (remoteHost == "localhost")
       remoteHost = "localhost.localdomain";
   urlStr += remoteHost;
-  urlStr += ":8554/test";
+  urlStr += ":8554/milhouse";
 
   if (gst_rtsp_url_parse (urlStr.c_str(), &local_url) != GST_RTSP_OK)
       THROW_ERROR("Invalid uri " << urlStr);
