@@ -1,3 +1,2 @@
 Milhouse:
     * For Ubuntu 9.04, one must use 127.0.0.1 instead of localhost for local connections
-    * Audio test source might use 100% of your CPU power!
