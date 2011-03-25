@@ -33,10 +33,9 @@ using std::tr1::shared_ptr;
 /// Constructor
 LocalAudio::LocalAudio(Pipeline &pipeline,
         const AudioSourceConfig &sourceConfig) :
-    pipeline_(pipeline),
-    source_(sourceConfig.createSource(pipeline_)),
-    level_(sourceConfig.createLevel(pipeline_)),
-    fakesink_(pipeline_.makeElement("fakesink", NULL))
+    source_(sourceConfig.createSource(pipeline)),
+    level_(sourceConfig.createLevel(pipeline)),
+    fakesink_(pipeline.makeElement("fakesink", NULL))
 {
     if (level_ != 0)
     {

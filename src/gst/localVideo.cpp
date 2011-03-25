@@ -40,19 +40,18 @@ using std::tr1::shared_ptr;
 LocalVideo::LocalVideo(Pipeline &pipeline, 
         const VideoSourceConfig &sourceConfig,
         const VideoSinkConfig &sinkConfig) :
-    pipeline_(pipeline),
-    source_(sourceConfig.createSource(pipeline_)),
+    source_(sourceConfig.createSource(pipeline)),
     colourspace_(0),
-    videoscale_(sinkConfig.createVideoScale(pipeline_)),
+    videoscale_(sinkConfig.createVideoScale(pipeline)),
     textoverlay_(sinkConfig.createTextOverlay(pipeline)),
-    videoflip_(sinkConfig.createVideoFlip(pipeline_)),
-    sink_(sinkConfig.createSink(pipeline_))
+    videoflip_(sinkConfig.createVideoFlip(pipeline)),
+    sink_(sinkConfig.createSink(pipeline))
 {
     // dc1394src needs an extra colourspace converter if not being encoded or flipped
     // FIXME: maybe it just needs a capsfilter?
     if (sourceConfig.sourceString() == "dc1394src")
     {
-        colourspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
+        colourspace_ = pipeline.makeElement("ffmpegcolorspace", NULL);
         gstlinkable::link(*source_, colourspace_);
         gstlinkable::link(colourspace_, *videoscale_);
     }

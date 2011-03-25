@@ -32,7 +32,6 @@
 #include "gst/pipeline.h"
 #include "gst/rtpReceiver.h"
 #include "gst/videoConfig.h"
-#include "playback.h"
 
 #include "milhouseLogger.h"
 #include "programOptions.h"
@@ -65,7 +64,6 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     if (options["debug"].as<string>() == "gst-debug")
         pipeline.makeVerbose();
 
-    Playback playback(pipeline);
     shared_ptr<VideoReceiver> vRx;
     shared_ptr<AudioReceiver> aRx;
 
@@ -75,7 +73,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     if (enableAudio)
         aRx = audiofactory::buildAudioReceiver(pipeline, options);
 
-    playback.start();
+    pipeline.start();
 
     /// These options are more like commands, they are dispatched after playback starts
     if (options.count("jitterbuffer"))
@@ -85,7 +83,7 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     gutil::runMainLoop(options["timeout"].as<int>());
     LOG_DEBUG("main loop has finished");
 
-    playback.stop();
+    pipeline.stop();
 }
 
 
@@ -98,7 +96,6 @@ void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, b
     if (options["debug"].as<std::string>() == "gst-debug")
         pipeline.makeVerbose();
 
-    Playback playback(pipeline);
     shared_ptr<VideoSender> vTx;
     shared_ptr<AudioSender> aTx;
 
@@ -108,11 +105,11 @@ void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, b
     if (enableAudio)
         aTx = audiofactory::buildAudioSender(pipeline, options);
 
-    playback.start();
+    pipeline.start();
 
     gutil::runMainLoop(options["timeout"].as<int>());
 
-    playback.stop();
+    pipeline.stop();
 }
 
 
@@ -125,7 +122,6 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
     if (options["debug"].as<std::string>() == "gst-debug")
         pipeline.makeVerbose();
 
-    Playback playback(pipeline);
     shared_ptr<LocalVideo> localVideo;
     if (enableVideo)
     {
@@ -140,11 +136,11 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
         localAudio = audiofactory::buildLocalAudio(pipeline, options);
     }
 
-    playback.start();
+    pipeline.start();
 
     gutil::runMainLoop(options["timeout"].as<int>());
 
-    playback.stop();
+    pipeline.stop();
 }
 
 
