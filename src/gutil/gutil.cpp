@@ -21,6 +21,7 @@
  */
 
 #include <gst/gst.h>
+#include <gst/audio/multichannel.h>
 #include <gtk/gtk.h>
 #include "util/logWriter.h"
 #include "util/sigint.h"
@@ -91,8 +92,23 @@ void gutil::initAudioCapsFilter(GstElement *capsfilter, int numChannels)
     {
         GstStructure *structure = gst_structure_new (audioFormats[i], NULL);
         gst_structure_set (structure, "channels", G_TYPE_INT, numChannels, NULL);
+
+        // set channel layout to none for more than 8 channels
+        if (numChannels > 8)
+        {
+            GstAudioChannelPosition *ch_layout;
+
+            ch_layout = g_new (GstAudioChannelPosition, numChannels);
+            for (int j = 0; j < numChannels; ++j)
+                ch_layout[j] = GST_AUDIO_CHANNEL_POSITION_NONE;
+
+            gst_audio_set_channel_positions (structure, ch_layout);
+            g_free (ch_layout);
+        }
+
         gst_caps_append_structure (audioCaps, structure);
     }
+
     gchar *capsStr = gst_caps_to_string (audioCaps);
     LOG_DEBUG("Setting audio caps " << capsStr);
     g_free (capsStr);

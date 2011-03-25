@@ -37,8 +37,7 @@ class _GstMessage;
 /** 
  *  Abstract base class from which our audio sources are derived.
  *  Uses template method to define the initialization process that subclasses will have to
- *  implement (in part) and/or override. Any direct, concrete descendant of this class will not
- *  need to have its audio frames interleaved.
+ *  implement (in part) and/or override.
  */
 
 class AudioSource : private boost::noncopyable
@@ -58,55 +57,18 @@ class AudioSource : private boost::noncopyable
 };
 
 /** 
- * Abstract child of AudioSource whose audio frames must be interleaved before pushing audio further down pipeline.
- */
-
-class InterleavedAudioSource : public AudioSource
-{
-    private:
-        class Interleave : private boost::noncopyable
-        {
-            public:
-                /** The interleave functionality used to be part of the same class
-                 * as InterleavedAudioSource. When subdividing one class into two
-                 * separate classes, it make sense for them to be friends. Also
-                 * InterleavedAudioSource's internals are safe
-                 * as InterleavedAudioSource's children will not have access here. */
-                Interleave(const Pipeline &pipeline, const AudioSourceConfig &config);
-
-                _GstElement *srcElement() { return interleave_; }
-                _GstElement *sinkElement() { return interleave_; }
-
-            private:
-                const Pipeline &pipeline_;
-                _GstElement *interleave_;
-                const AudioSourceConfig &config_;
-                void set_channel_layout();
-        };
-
-        virtual _GstElement *srcElement() { return interleave_.srcElement(); }
-
-    protected:
-        InterleavedAudioSource(const Pipeline &pipeline, const AudioSourceConfig &config);
-
-        /// Object which performs the interleaving of this source's channels 
-        Interleave interleave_;
-        std::vector<_GstElement*> sources_, aconvs_;
-};
-
-/** 
- *  Concrete InterleavedAudioSource which gives us an array of sine-wave generating sources.
+ *  Concrete AudioSource which gives us an array of sine-wave generating sources.
  *
- *  AudioTestSource generates sine-tones, a different frequency on each channel.
+ *  AudioTestSource generates sine-tones
  */
 
-class AudioTestSource : public InterleavedAudioSource
+class AudioTestSource : public AudioSource
 {
     public:
         AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config);
-
     private:
-        int offset_;
+        _GstElement *capsfilter_;
+        _GstElement *srcElement();
 };
 
 /** 
@@ -131,10 +93,10 @@ class AudioFileSource : public AudioSource, private BusMsgHandler
         bool handleBusMsg(_GstMessage *msg);
 
         void loop(int nTimes);
-        virtual _GstElement *srcElement() { return aconv_; }
+        virtual _GstElement *srcElement() { return audioconvert_; }
 
         void restartPlayback();
-        _GstElement *aconv_;
+        _GstElement *audioconvert_;
         int loopCount_;
         static const int LOOP_INFINITE;
 };
@@ -150,10 +112,10 @@ class AudioAlsaSource : public AudioSource
         AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConfig &config);
 
     private:
-        virtual _GstElement *srcElement() { return capsFilter_; }
+        virtual _GstElement *srcElement() { return capsfilter_; }
 
-        _GstElement *capsFilter_;
-        _GstElement *aconv_;
+        _GstElement *capsfilter_;
+        _GstElement *audioconvert_;
 };
 
 /** 
@@ -166,10 +128,10 @@ class AudioPulseSource : public AudioSource
     public:
         AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config);
     private:
-        virtual _GstElement *srcElement() { return capsFilter_; }
+        virtual _GstElement *srcElement() { return capsfilter_; }
 
-        _GstElement *capsFilter_;
-        _GstElement *aconv_;
+        _GstElement *capsfilter_;
+        _GstElement *audioconvert_;
 };
 
 /** 
@@ -186,7 +148,7 @@ class AudioJackSource : public AudioSource
     private:
         virtual _GstElement *srcElement() { return queue_; }
 
-        _GstElement *capsFilter_;
+        _GstElement *capsfilter_;
         _GstElement *queue_;
 };
 
@@ -209,8 +171,8 @@ class AudioDvSource : public AudioSource
         ~AudioDvSource();
 
         _GstElement *queue_;
-        _GstElement *aconv_;
-        virtual _GstElement *srcElement() { return aconv_; }
+        _GstElement *audioconvert_;
+        virtual _GstElement *srcElement() { return audioconvert_; }
 };
 
 #endif //_AUDIO_SOURCE_H_

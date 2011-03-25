@@ -34,7 +34,7 @@
 /// Constructor 
 AudioSource::AudioSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
     pipeline_(pipeline),
-    config_(config), 
+    config_(config),
     source_(0)
 {}
 
@@ -43,68 +43,43 @@ AudioSource::~AudioSource()
 {
 }
 
-
 /// Constructor 
-InterleavedAudioSource::InterleavedAudioSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
-    AudioSource(pipeline, config), 
-    interleave_(pipeline, config_), 
-    sources_(), 
-    aconvs_()
+AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
+AudioSource(pipeline, config),
+capsfilter_(pipeline_.makeElement("capsfilter", 0))
 {
+    gutil::initAudioCapsFilter(capsfilter_, config_.numChannels());
+    GstElement *interleave = pipeline_.makeElement("interleave", NULL);
+
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        sources_.push_back(pipeline_.makeElement(config_.source(), NULL));
-        aconvs_.push_back(pipeline_.makeElement("audioconvert", NULL));
+        GstElement *source = pipeline_.makeElement(config_.source(), NULL);
+        GstElement *aconv = pipeline_.makeElement("audioconvert", NULL);
+        gstlinkable::link(source, aconv);
+        gstlinkable::link(aconv, interleave);
     }
-    gstlinkable::link(sources_, aconvs_);
-    gstlinkable::link(aconvs_, interleave_);
+
+    gstlinkable::link(interleave, capsfilter_);
 }
 
-/// Constructor 
-AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
-    InterleavedAudioSource(pipeline, config), 
-    offset_(0) 
+GstElement *AudioTestSource::srcElement()
 {
-    std::vector<double> frequencies;
-    for (int channel = 0; channel < config_.numChannels(); ++channel)
-        frequencies.push_back((100 * channel) + 200);
-
-    gstlinkable::GstIter src;
-
-    int channelIdx = 0;
-
-    GstCaps *caps = gst_caps_new_simple("audio/x-raw-int", "endianness", G_TYPE_INT, 1234, "signed",
-            G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT,
-            pipeline_.actualSampleRate(), "channels", G_TYPE_INT, 1, NULL);
-
-    for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
-    {
-        GstPad *pad;
-        g_object_set(G_OBJECT(*src), "freq", frequencies[channelIdx], "is-live", FALSE, NULL);
-        pad = gst_element_get_static_pad(*src, "src");
-        g_assert(pad);
-        bool capsSet = gst_pad_set_caps(pad, caps);
-        g_assert(capsSet);
-        g_object_unref(pad);
-
-    }
-
-    gst_caps_unref(caps);
+    return capsfilter_;
 }
 
 const int AudioFileSource::LOOP_INFINITE = -1;
 
 /// Constructor 
 AudioFileSource::AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
-    AudioSource(pipeline, config), BusMsgHandler(&pipeline), aconv_(0), loopCount_(0) 
+    AudioSource(pipeline, config), BusMsgHandler(&pipeline), audioconvert_(0), loopCount_(0)
 {
     if (not config_.locationExists())
         THROW_ERROR("File \"" << config_.location() << "\" does not exist");
 
-    aconv_ = AudioSource::pipeline_.makeElement("audioconvert", NULL);
+    audioconvert_ = AudioSource::pipeline_.makeElement("audioconvert", NULL);
 
     GstElement * queue = FileSource::acquireAudio(pipeline, config_.location());
-    gstlinkable::link(queue, aconv_);
+    gstlinkable::link(queue, audioconvert_);
 }
 
 void AudioFileSource::loop(int nTimes)
@@ -152,39 +127,39 @@ AudioFileSource::~AudioFileSource()
 /// Constructor 
 AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config),
-    capsFilter_(pipeline_.makeElement("capsfilter", 0)),
-    aconv_(pipeline_.makeElement("audioconvert", 0))
+    capsfilter_(pipeline_.makeElement("capsfilter", 0)),
+    audioconvert_(pipeline_.makeElement("audioconvert", 0))
 {
     source_ = pipeline_.makeElement(config_.source(), NULL);
 
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
-    gutil::initAudioCapsFilter(capsFilter_, config_.numChannels());
-    gstlinkable::link(source_, aconv_);
-    gstlinkable::link(aconv_, capsFilter_);
+    gutil::initAudioCapsFilter(capsfilter_, config_.numChannels());
+    gstlinkable::link(source_, audioconvert_);
+    gstlinkable::link(audioconvert_, capsfilter_);
 }
 
 /// Constructor 
 AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), 
-    capsFilter_(pipeline_.makeElement("capsfilter", 0)),
-    aconv_(pipeline_.makeElement("audioconvert", 0))
+    capsfilter_(pipeline_.makeElement("capsfilter", 0)),
+    audioconvert_(pipeline_.makeElement("audioconvert", 0))
 {
     source_ = pipeline_.makeElement(config_.source(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
-    gutil::initAudioCapsFilter(capsFilter_, config_.numChannels());
-    gstlinkable::link(source_, aconv_);
-    gstlinkable::link(aconv_, capsFilter_);
+    gutil::initAudioCapsFilter(capsfilter_, config_.numChannels());
+    gstlinkable::link(source_, audioconvert_);
+    gstlinkable::link(audioconvert_, capsfilter_);
 }
 
 /// Constructor 
-AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
-    AudioSource(pipeline, config), 
-    capsFilter_(pipeline_.makeElement("capsfilter", 0)), 
-    queue_(pipeline_.makeElement("queue", 0)) 
+AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
+    AudioSource(pipeline, config),
+    capsfilter_(pipeline_.makeElement("capsfilter", 0)),
+    queue_(pipeline_.makeElement("queue", 0))
 {
     source_ = pipeline_.makeElement(config_.source(), config_.sourceName());
 
@@ -192,7 +167,7 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     g_object_set(G_OBJECT(source_), "connect", 2, NULL);
 
     // setup capsfilter
-    gutil::initAudioCapsFilter(capsFilter_, config_.numChannels());
+    gutil::initAudioCapsFilter(capsfilter_, config_.numChannels());
 
     if (config_.bufferTime() < Jack::safeBufferTime())
     {
@@ -206,8 +181,8 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     g_object_get(source_, "buffer-time", &val, NULL);
     LOG_DEBUG("Buffer time is " << val);
 
-    gstlinkable::link(source_, capsFilter_);
-    gstlinkable::link(capsFilter_, queue_);
+    gstlinkable::link(source_, capsfilter_);
+    gstlinkable::link(capsfilter_, queue_);
 }
 
 
@@ -222,14 +197,14 @@ void AudioJackSource::disableAutoConnect()
 AudioDvSource::AudioDvSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
     AudioSource(pipeline, config), 
     queue_(0),
-    aconv_(0)
+    audioconvert_(0)
 {
     queue_ = pipeline_.makeElement("queue", NULL);
-    aconv_ = pipeline_.makeElement("audioconvert", NULL);
+    audioconvert_ = pipeline_.makeElement("audioconvert", NULL);
 
     // Now the Dv1394 will be able to link this queue to the dvdemux when the audio pad is created
     Dv1394::Instance(pipeline_)->setAudioSink(queue_);
-    gstlinkable::link(queue_, aconv_);
+    gstlinkable::link(queue_, audioconvert_);
 }
 
 

@@ -4,7 +4,7 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp \
 				   videoConfig.cpp rtpBin.cpp pipeline.cpp \
 				   rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
-				   interleave.cpp gstLinkable.cpp videoSink.cpp audioSink.cpp jackUtils.cpp \
+				   gstLinkable.cpp videoSink.cpp audioSink.cpp jackUtils.cpp \
 				   codec.cpp rtpPay.cpp audioConfig.cpp remoteConfig.cpp \
 				   videoReceiver.cpp videoSender.cpp localAudio.cpp localVideo.cpp videoSource.cpp raw1394Util.cpp \
 				   audioLevel.cpp playback.cpp dv1394.cpp v4l2util.cpp fileSource.cpp \
