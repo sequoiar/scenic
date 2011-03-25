@@ -48,7 +48,7 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for #143
+    // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
     if (remoteHost == "localhost")
         remoteHost = "localhost.localdomain";
     int port = options["audioport"].as<int>();

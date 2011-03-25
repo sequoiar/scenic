@@ -56,7 +56,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
   GstRTSPUrl *local_url; 
   string urlStr("rtsp://");
   string remoteHost(options["address"].as<string>());
-  // FIXME: temporary workaround for trac issue #143
+  // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
   if (remoteHost == "localhost")
       remoteHost = "localhost.localdomain";
   urlStr += remoteHost;

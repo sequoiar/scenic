@@ -168,7 +168,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     // setup uridecodbin with the address parameter
     GstElement *uridecodebin = pipeline_->makeElement("uridecodebin", "decode");
     std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for trac issue #143
+    // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
     if (remoteHost == "localhost")
         remoteHost = "localhost.localdomain";
     string uri("rtsp://" + remoteHost + ":8554/milhouse");
