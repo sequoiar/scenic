@@ -37,12 +37,11 @@ class _GdkEventWindowState;
 class VideoSink : private boost::noncopyable
 {
     public:
-        explicit VideoSink(const Pipeline &pipeline) : pipeline_(pipeline), sink_(0) {};
+        VideoSink() : sink_(0) {};
         virtual ~VideoSink(){};
         virtual _GstElement* sinkElement() { return sink_; }
 
     protected:
-        const Pipeline &pipeline_;
         _GstElement *sink_;
 };
 
@@ -89,8 +88,8 @@ class XImageSink
         XImageSink(const Pipeline &pipeline, const std::string &display);
 
     private:
-        virtual _GstElement *sinkElement() { return colorspc_; }
-        _GstElement *colorspc_;
+        virtual _GstElement *sinkElement();
+        _GstElement *colorspace_;
 };
 
 #endif //_VIDEO_SINK_H_

@@ -23,7 +23,6 @@
 #include "gstLinkable.h"
 #include "videoSink.h"
 #include "pipeline.h"
-#include "rtpReceiver.h"
 #include "gutil/gutil.h"
 
 #include <gtk/gtk.h>
@@ -66,10 +65,10 @@ XvImageSink::XvImageSink(Pipeline &pipeline,
         unsigned long xid,
         const std::string &display,
         const std::string &title) :
-    VideoSink(pipeline), 
+    VideoSink(),
     xid_(xid),
     isFullscreen_(false),
-    window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0), 
+    window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0),
     drawingArea_(gtk_drawing_area_new()),
 	vbox_(hasWindow() ? gtk_vbox_new(FALSE, 0) : 0),
 	hbox_(hasWindow() ? gtk_hbox_new(FALSE, 0) : 0),
@@ -82,7 +81,7 @@ XvImageSink::XvImageSink(Pipeline &pipeline,
     // Make drawing area black by default, since it's used for video
     makeWidgetBlack(drawingArea_);
 
-    sink_ = VideoSink::pipeline_.makeElement("xvimagesink", NULL);
+    sink_ = pipeline.makeElement("xvimagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
     if (not display.empty())
     {
@@ -157,7 +156,7 @@ void XvImageSink::window_closed(GtkWidget * widget, GdkEvent * /*event*/, gpoint
     LOG_DEBUG("Window closed, quitting.");
     gtk_widget_hide_all (widget);
     XvImageSink *context = static_cast<XvImageSink*>(data);
-    context->VideoSink::pipeline_.quit();
+    gutil::killMainLoop();
     context->window_ = 0;
 }
 
@@ -244,7 +243,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             if (event->state & GDK_CONTROL_MASK)
             {
                 LOG_INFO("Ctrl-Q key pressed, quitting.");
-                context->VideoSink::pipeline_.quit();
+                gutil::killMainLoop();
             }
             break;
 
@@ -265,16 +264,21 @@ XvImageSink::~XvImageSink()
 }
 
 
-XImageSink::XImageSink(const Pipeline &pipeline, const std::string &display) : 
-    VideoSink(pipeline),
-    colorspc_(pipeline_.makeElement("ffmpegcolorspace", NULL)) 
+// FIXME: this should be refactored to use the xoverlay interface/gtk stuff
+XImageSink::XImageSink(const Pipeline &pipeline, const std::string &display) :
+    VideoSink(),
+    colorspace_(pipeline.makeElement("ffmpegcolorspace", NULL))
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
-    sink_ = pipeline_.makeElement("ximagesink", NULL);
+    sink_ = pipeline.makeElement("ximagesink", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
     if (not display.empty())
         g_object_set(sink_, "display", display.c_str(), NULL);
 
-    gstlinkable::link(colorspc_, sink_);
+    gstlinkable::link(colorspace_, sink_);
 }
 
+GstElement *XImageSink::sinkElement()
+{
+    return colorspace_;
+}
