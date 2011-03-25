@@ -447,7 +447,7 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
   g_free (capss);
 
   g_object_set (capsfilter, "caps", video_caps, NULL);
-  gst_caps_unref(video_caps);
+  gst_caps_unref (video_caps);
 
   gst_bin_add_many (GST_BIN (bin), videosrc, queue, ffmpegcolorspace, videoscale,
       videorate, capsfilter, encoder, pay, NULL);
@@ -523,7 +523,7 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   gst_bin_add_many (GST_BIN (bin), audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
   linked = gst_element_link_many (audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
   if (!linked) {
-      gst_object_unref(bin);
+      gst_object_unref (bin);
       return NULL;
   }
   return pay;

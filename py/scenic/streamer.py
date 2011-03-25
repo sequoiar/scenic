@@ -342,6 +342,8 @@ class StreamerManager(object):
                 milhouse_send_cmd_video.extend(["--videodevice", v4l2_dev_name])
             if details["send"]["video"]["codec"] != "theora":
                 milhouse_send_cmd_video.extend(['--videobitrate', str(int(details["send"]["video"]["bitrate"] * 1000000))])
+        else:
+            milhouse_send_cmd_common.extend(['--disable-video'])
 
         # send audio:
         if send_audio_enabled:
@@ -357,6 +359,8 @@ class StreamerManager(object):
                 milhouse_send_cmd_audio.extend([
                     "--disable-jack-autoconnect"
                     ])
+        else:
+            milhouse_send_cmd_common.extend(['--disable-audio'])
 
         # ------------------- recv ----------------
         milhouse_recv_cmd_common.extend([
@@ -382,6 +386,8 @@ class StreamerManager(object):
                 milhouse_recv_cmd_video.append('--fullscreen')
             if details["receive"]["video"]["deinterlace"]:
                 milhouse_recv_cmd_video.append('--deinterlace')
+        else:
+            milhouse_recv_cmd_common.extend(['--disable-video'])
 
         # recv audio:
         if recv_audio_enabled:
@@ -398,6 +404,8 @@ class StreamerManager(object):
                 milhouse_recv_cmd_audio.extend([
                     "--disable-jack-autoconnect"
                     ])
+        else:
+            milhouse_recv_cmd_common.extend(['--disable-audio'])
 
         self._prepare_stats_and_errors_dicts()
         # every element in the lists must be strings since we join them 
