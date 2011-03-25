@@ -26,55 +26,47 @@
 #include "pipeline.h"
 #include "util/logWriter.h"
 
-Pay::Pay(const Pipeline &pipeline) : 
-    RtpPay(pipeline)
-{}
-
-Depay::Depay(const Pipeline &pipeline) : 
-    RtpPay(pipeline)
-{}
-
-TheoraPay::TheoraPay(const Pipeline &pipeline) : Pay(pipeline)
+TheoraPay::TheoraPay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtptheorapay", NULL);
+    rtpPay_ = pipeline.makeElement("rtptheorapay", NULL);
 }
 
 
-TheoraDepay::TheoraDepay(const Pipeline &pipeline) : Depay(pipeline)
+TheoraDepay::TheoraDepay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtptheoradepay", NULL);
+    rtpPay_ = pipeline.makeElement("rtptheoradepay", NULL);
 }
 
-H264Pay::H264Pay(const Pipeline &pipeline) : Pay(pipeline)
+H264Pay::H264Pay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtph264pay", NULL);
+    rtpPay_ = pipeline.makeElement("rtph264pay", NULL);
     // FIXME: Find out why setting buffer-list to true breaks rtp so badly, DON'T SET THIS TO TRUE
     //g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
 }
 
 
-H264Depay::H264Depay(const Pipeline &pipeline) : Depay(pipeline)
+H264Depay::H264Depay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtph264depay", NULL);
+    rtpPay_ = pipeline.makeElement("rtph264depay", NULL);
 }
 
 
 
-H263Pay::H263Pay(const Pipeline &pipeline) : Pay(pipeline)
+H263Pay::H263Pay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtph263ppay", NULL);
+    rtpPay_ = pipeline.makeElement("rtph263ppay", NULL);
 }
 
 
-H263Depay::H263Depay(const Pipeline &pipeline) : Depay(pipeline)
+H263Depay::H263Depay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtph263pdepay", NULL);
+    rtpPay_ = pipeline.makeElement("rtph263pdepay", NULL);
 }
 
 
-Mpeg4Pay::Mpeg4Pay(const Pipeline &pipeline) : Pay(pipeline)
+Mpeg4Pay::Mpeg4Pay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpmp4vpay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpmp4vpay", NULL);
 
     // this means that our payloader will output bufferlists instead of
     // 1 packet per buffer. this will allow downstream elements that are bufferlist aware
@@ -95,56 +87,56 @@ Mpeg4Pay::Mpeg4Pay(const Pipeline &pipeline) : Pay(pipeline)
 }
 
 
-Mpeg4Depay::Mpeg4Depay(const Pipeline &pipeline) : Depay(pipeline)
+Mpeg4Depay::Mpeg4Depay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpmp4vdepay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpmp4vdepay", NULL);
 }
 
 
-VorbisPay::VorbisPay(const Pipeline &pipeline) : Pay(pipeline)
+VorbisPay::VorbisPay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpvorbispay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpvorbispay", NULL);
     g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
 
-VorbisDepay::VorbisDepay(const Pipeline &pipeline) : Depay(pipeline)
+VorbisDepay::VorbisDepay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpvorbisdepay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpvorbisdepay", NULL);
 }
 
-CeltPay::CeltPay(const Pipeline &pipeline) : Pay(pipeline)
+CeltPay::CeltPay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpceltpay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpceltpay", NULL);
     g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
-CeltDepay::CeltDepay(const Pipeline &pipeline) : Depay(pipeline)
+CeltDepay::CeltDepay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpceltdepay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpceltdepay", NULL);
 }
 
-L16Pay::L16Pay(const Pipeline &pipeline) : Pay(pipeline)
+L16Pay::L16Pay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpL16pay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpL16pay", NULL);
     g_object_set(G_OBJECT(rtpPay_), "max-ptime", Pay::MAX_PTIME, NULL);
 }
 
 
-L16Depay::L16Depay(const Pipeline &pipeline) : Depay(pipeline)
+L16Depay::L16Depay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpL16depay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpL16depay", NULL);
 }
 
 
-MpaPay::MpaPay(const Pipeline &pipeline) : Pay(pipeline)
+MpaPay::MpaPay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpmpapay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpmpapay", NULL);
 }
 
 
-MpaDepay::MpaDepay(const Pipeline &pipeline) : Depay(pipeline)
+MpaDepay::MpaDepay(const Pipeline &pipeline)
 {
-    rtpPay_ = pipeline_.makeElement("rtpmpadepay", NULL);
+    rtpPay_ = pipeline.makeElement("rtpmpadepay", NULL);
 }
 

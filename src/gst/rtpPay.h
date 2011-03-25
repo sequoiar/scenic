@@ -30,22 +30,17 @@ class _GstElement;
 class RtpPay : private boost::noncopyable
 {
     public:
-        explicit RtpPay(const Pipeline &pipeline) : pipeline_(pipeline), rtpPay_(0) {}
-        virtual ~RtpPay(){};
+        virtual ~RtpPay() {}
         virtual _GstElement *srcElement() { return rtpPay_; }
         virtual _GstElement *sinkElement() { return rtpPay_; }
 
     protected:
-        const Pipeline &pipeline_;
         _GstElement *rtpPay_;
 };
 
 class Pay : public RtpPay
 {
-    public:
-
     protected:
-        Pay(const Pipeline &pipeline);
         // Use max-ptime to limit the amount of 
         // encoded media packets in an RTP packet. Reduces latency
         static const long long MAX_PTIME = 2000000LL;
@@ -54,8 +49,6 @@ class Pay : public RtpPay
 
 class Depay : public RtpPay
 {
-    protected:
-        Depay(const Pipeline &pipeline);
 };
 
 
@@ -165,4 +158,3 @@ class MpaDepay : public Depay
 };
 
 #endif //_PAY_H_
-
