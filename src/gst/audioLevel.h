@@ -56,7 +56,6 @@ class AudioLevel : private BusMsgHandler
         static void setValue(gdouble peak, gdouble decayPeak, _GtkWidget *vumeter);
         void print(const std::vector<double> &rmsValues) const;
 
-        Pipeline &pipeline_;
         _GstElement *level_;
         bool emitMessages_;
         std::vector<_GtkWidget *> vumeters_;

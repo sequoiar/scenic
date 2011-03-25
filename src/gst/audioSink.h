@@ -34,7 +34,7 @@ class _GstElement;
 class AudioSink : private boost::noncopyable
 {
     public:
-        AudioSink(Pipeline &pipeline);
+        AudioSink();
         virtual _GstElement *sinkElement() { return sink_; }
         
         virtual ~AudioSink();
@@ -42,12 +42,8 @@ class AudioSink : private boost::noncopyable
         virtual void adjustBufferTime(unsigned long long);
 
     protected:
-        Pipeline &pipeline_;
         _GstElement *sink_;
         const static unsigned long long BUFFER_TIME;
-
-    private:
-        static void FPE_ExceptionHandler(int nSig, int nErrType, int *pnReglist);
 };
 
 // FIXME: DRY!!! Either merge alsasink and pulsesink or pull out a common base class.

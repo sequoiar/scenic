@@ -36,8 +36,7 @@
  * and message interval to one second */
 AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID) : 
     BusMsgHandler(&pipeline),
-    pipeline_(pipeline),
-    level_(pipeline_.makeElement("level", NULL)),
+    level_(pipeline.makeElement("level", NULL)),
     emitMessages_(true)
 {
     static const int SPACING = 1;

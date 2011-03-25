@@ -24,67 +24,20 @@
 
 #include <gst/gst.h>
 #include <gstLinkable.h>
-#include <signal.h>
 #include "audioSink.h"
 #include "audioConfig.h"
 #include "jackUtils.h"
 #include "pipeline.h"
 
 /// Constructor 
-AudioSink::AudioSink(Pipeline &pipeline) : 
-    pipeline_(pipeline),
+AudioSink::AudioSink() : 
     sink_(0)
 {
-    // attach floating point exception signal handler
-    static bool signalHandlerAttached = false; // thread-safe in gcc
-    if (not signalHandlerAttached)
-    {
-        signal(SIGFPE, (void (*)(int))FPE_ExceptionHandler);
-        signalHandlerAttached = true;
-    }
 }
 
 /// Destructor 
 AudioSink::~AudioSink()
 {
-}
-
-
-/// This is just declared here because if the buffer-time property for our sink is 
-/// set to low it causes a system level floating point exception, that can only be
-/// caught by a signal hander.
-void AudioSink::FPE_ExceptionHandler(int /*nSig*/, int nErrType, int * /*pnReglist*/)
-{
-    static const std::string jackWarning(": this COULD be because the buffer-time of an audiosink is too low");
-    switch(nErrType)
-    {
-        case FPE_INTDIV:  
-            THROW_ERROR("Integer divide by zero" << jackWarning);
-            break;
-        case FPE_INTOVF:  
-            THROW_ERROR("Integer overflow" << jackWarning);
-            break;
-        case FPE_FLTDIV:  
-            THROW_ERROR("Floating-point divide by zero" << jackWarning);
-            break;
-        case FPE_FLTOVF:  
-            THROW_ERROR("Floating-point overflow" << jackWarning);
-            break;
-        case FPE_FLTUND: 
-            THROW_ERROR("Floating-point underflow" << jackWarning);
-            break;
-        case FPE_FLTRES:
-            THROW_ERROR("Floating-point inexact result" << jackWarning);
-            break;
-        case FPE_FLTINV: 
-            THROW_ERROR("Invalid floating-point operation" << jackWarning);
-            break;
-        case FPE_FLTSUB:
-            THROW_ERROR("Subscript out of range" << jackWarning);
-            break;
-        default:
-            THROW_ERROR("Got floating point exception" << jackWarning);
-    }
 }
 
 void AudioSink::adjustBufferTime(unsigned long long bufferTime)
@@ -95,14 +48,12 @@ void AudioSink::adjustBufferTime(unsigned long long bufferTime)
     LOG_DEBUG("Buffer time is " << val);
 }
 
-
 /// Constructor 
 AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) : 
-    AudioSink(pipeline),
-    aconv_(pipeline_.makeElement("audioconvert", NULL)), 
+    aconv_(pipeline.makeElement("audioconvert", NULL)), 
     config_(config)
 {
-    sink_ = pipeline_.makeElement("alsasink", NULL);
+    sink_ = pipeline.makeElement("alsasink", NULL);
 
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
@@ -113,11 +64,10 @@ AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) 
 
 /// Constructor 
 AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config) : 
-    AudioSink(pipeline),
-    aconv_(pipeline_.makeElement("audioconvert", NULL)), 
+    aconv_(pipeline.makeElement("audioconvert", NULL)), 
     config_(config) 
 {
-    sink_ = pipeline_.makeElement("pulsesink", NULL);
+    sink_ = pipeline.makeElement("pulsesink", NULL);
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
@@ -127,10 +77,9 @@ AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config
 
 /// Constructor 
 AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) :  
-    AudioSink(pipeline),
     config_(config)
 {
-    sink_ = pipeline_.makeElement("jackaudiosink", config_.sinkName());
+    sink_ = pipeline.makeElement("jackaudiosink", config_.sinkName());
 
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
