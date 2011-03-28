@@ -34,7 +34,6 @@ class TextOverlay;
 class VideoFlip;
 class VideoSink;
 class VideoSinkConfig;
-class _GstElement;
 
 class LocalVideo : private boost::noncopyable
 {
@@ -44,7 +43,6 @@ class LocalVideo : private boost::noncopyable
 
     private:
         std::tr1::shared_ptr<VideoSource> source_;
-        _GstElement *colourspace_;
         std::tr1::shared_ptr<VideoScale> videoscale_;
         std::tr1::shared_ptr<TextOverlay> textoverlay_;
         std::tr1::shared_ptr<VideoFlip> videoflip_;

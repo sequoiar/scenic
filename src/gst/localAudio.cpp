@@ -28,22 +28,20 @@
 #include "dv1394.h"
 #include "gstLinkable.h"
 
-using std::tr1::shared_ptr;
-
 /// Constructor
 LocalAudio::LocalAudio(Pipeline &pipeline,
         const AudioSourceConfig &sourceConfig) :
     source_(sourceConfig.createSource(pipeline)),
-    level_(sourceConfig.createLevel(pipeline)),
-    fakesink_(pipeline.makeElement("fakesink", NULL))
+    level_(sourceConfig.createLevel(pipeline))
 {
+    GstElement *fakesink = pipeline.makeElement("fakesink", NULL);
     if (level_ != 0)
     {
         gstlinkable::link(*source_, *level_);
-        gstlinkable::link(*level_, fakesink_);
+        gstlinkable::link(*level_, fakesink);
     }
     else
-        gstlinkable::link(*source_, fakesink_);
+        gstlinkable::link(*source_, fakesink);
 
     /// FIXME: hack for dv1394src
     if (sourceConfig.sourceString() == "dv1394src")

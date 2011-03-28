@@ -25,7 +25,7 @@
 #define _AUDIO_LEVEL_H_
 
 #include <vector>
-#include <gdk/gdktypes.h>
+#include <gdk/gdktypes.h> // for GdkNativeWindow
 #include "busMsgHandler.h"
 
 // forward declarations
@@ -45,12 +45,7 @@ class AudioLevel : private BusMsgHandler
         AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID);
         _GstElement *srcElement() { return level_; }
         _GstElement *sinkElement() { return level_; }
-
-        void interval(unsigned long long newInterval);
-
         bool handleBusMsg(_GstMessage *msg);
-
-        void emitMessages(bool doEmit);
 
     private:
         static void setValue(gdouble peak, gdouble decayPeak, _GtkWidget *vumeter);

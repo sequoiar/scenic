@@ -85,15 +85,6 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     g_object_set(G_OBJECT(level_), "peak-ttl", PEAK_TTL, NULL);
 }
 
-/**
- * Toggles whether or not this AudioLevel will post messages on the bus. */
-void AudioLevel::emitMessages(bool doEmit)
-{
-    emitMessages_ = doEmit;
-    g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
-}
-
-
 void
 AudioLevel::setValue(gdouble peak, gdouble decayPeak, GtkWidget *vumeter)
 {
@@ -152,12 +143,5 @@ void AudioLevel::print(const std::vector<double> &rmsValues) const
     std::copy(rmsValues.begin(), rmsValues.end(), std::ostream_iterator<double>(os, " "));
 
     LOG_DEBUG("rms values: " << os.str());
-}
-
-/// Sets the reporting interval in nanoseconds. 
-void AudioLevel::interval(unsigned long long newInterval)
-{
-    g_assert(newInterval > 0);
-    g_object_set (G_OBJECT(level_), "interval", newInterval, "message", emitMessages_, NULL);
 }
 

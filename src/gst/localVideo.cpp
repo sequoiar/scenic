@@ -34,14 +34,11 @@
 
 #include "dv1394.h"
 
-using std::tr1::shared_ptr;
-
 /// Constructor
 LocalVideo::LocalVideo(Pipeline &pipeline, 
         const VideoSourceConfig &sourceConfig,
         const VideoSinkConfig &sinkConfig) :
     source_(sourceConfig.createSource(pipeline)),
-    colourspace_(0),
     videoscale_(sinkConfig.createVideoScale(pipeline)),
     textoverlay_(sinkConfig.createTextOverlay(pipeline)),
     videoflip_(sinkConfig.createVideoFlip(pipeline)),
@@ -51,14 +48,17 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
     // FIXME: maybe it just needs a capsfilter?
     if (sourceConfig.sourceString() == "dc1394src")
     {
-        colourspace_ = pipeline.makeElement("ffmpegcolorspace", NULL);
-        gstlinkable::link(*source_, colourspace_);
-        gstlinkable::link(colourspace_, *videoscale_);
+        GstElement *colourspace = pipeline.makeElement("ffmpegcolorspace", NULL);
+        gstlinkable::link(*source_, colourspace);
+        gstlinkable::link(colourspace, *videoscale_);
     }
     else
     {
         bool linked = false;
         int framerateIndex = 0;
+        // FIXME: this is really hackish, we try and link it with various
+        // framerates until it works...we should try and set this bit of the
+        // pipeline to ready (assuming that works).
         while (not linked)
         {
             try 
