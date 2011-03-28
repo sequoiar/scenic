@@ -144,7 +144,6 @@ Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, int bitrate
 
 void SenderConfig::sendCaps() 
 {
-    /// FIXME: maybe these should have a common base class, so only one pointer is needed?
     if (multicastInterface_.empty())
         capsServer_.reset(new TcpCapsServer(capsPort(), message_));
     else
@@ -159,6 +158,7 @@ void SenderConfig::sendCaps()
  * received by this audiosender, and sent to our other host if needed. */
 bool SenderConfig::handleBusMsg(GstMessage *msg)
 {
+    bool result = false;
     const GstStructure *s = gst_message_get_structure(msg);
     if (s != NULL and gst_structure_has_name(s, "caps-changed"))
     {   
@@ -167,22 +167,27 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
         assert(newCapsStr);
         std::string str(newCapsStr);
 
-        GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(str.c_str()), 0);
+        GstCaps *newCaps = gst_caps_from_string(str.c_str());
+        GstStructure *structure = gst_caps_get_structure(newCaps, 0);
         const GValue *encodingStr = gst_structure_get_value(structure, "encoding-name");
         std::string encodingName(g_value_get_string(encodingStr));
 
-        if (!capsMatchCodec(encodingName, codec()))
-            return false;   // not our caps, ignore it
-        else
-        { 
+        if (capsMatchCodec(encodingName, codec()))
+        {
             LOG_DEBUG("Creating caps server for codec " << codec());
-            message_ = std::string(newCapsStr);
+            // Strip unwanted fields before sending
+            gst_structure_remove_fields(structure, "ssrc", "seqnum-base", "clock-base", NULL);
+
+            gchar *sstr = gst_structure_to_string(structure);
+            message_ = std::string(sstr);
+            g_free(sstr);
             sendCaps();
-            return true;
+            result = true;
         }
+        gst_caps_unref(newCaps);
     }
 
-    return false;           // this wasn't our msg, someone else should handle it
+    return result;
 }
 
 static const std::vector<std::string> AUDIO_CODECS = 
