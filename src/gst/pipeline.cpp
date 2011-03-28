@@ -89,7 +89,7 @@ void translateMessage(GstObject *src, const std::string &errStr)
         return;
     }
 
-    THROW_CRITICAL(srcName << ":" << errStr);
+    LOG_WARNING(srcName << ":" << errStr);
 }
 }
 
