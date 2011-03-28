@@ -237,7 +237,7 @@ void RTSPClient::run(int timeToLive)
     {
         LOG_INFO("Waiting for rtsp server");
         pipeline_->start();
-        g_usleep(G_USEC_PER_SEC); // sleep a bit
+        g_usleep(G_USEC_PER_SEC * 2); // sleep a bit
     }
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, NULL);
