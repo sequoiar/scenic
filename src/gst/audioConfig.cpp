@@ -172,6 +172,7 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")
     {
+        Jack::assertReady();
         AudioJackSink * result = new AudioJackSink(pipeline, *this);
         if (disableAutoConnect_)
             result->disableAutoConnect();

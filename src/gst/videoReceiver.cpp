@@ -104,6 +104,7 @@ void VideoReceiver::createSink(Pipeline &pipeline)
 /// Used to set this VideoReceiver's RtpReceiver's caps
 void VideoReceiver::setCaps()
 {
+    remoteConfig_->receiveCaps();
     session_.setCaps(remoteConfig_->caps());
     gotCaps_ = true;
 }

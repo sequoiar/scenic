@@ -112,6 +112,7 @@ class ReceiverConfig : public RemoteConfig
         const char *caps() const { return caps_.c_str(); }
         bool capsMatchCodec() const;
         bool hasMulticastInterface() const { return multicastInterface_ != ""; }
+        // This method will block while waiting for caps
         void receiveCaps();
         bool jitterbufferControlEnabled() const { return jitterbufferControlEnabled_; }
 

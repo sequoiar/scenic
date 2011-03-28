@@ -64,14 +64,14 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     if (options["debug"].as<string>() == "gst-debug")
         pipeline.makeVerbose();
 
-    shared_ptr<VideoReceiver> vRx;
     shared_ptr<AudioReceiver> aRx;
-
-    if (enableVideo)       
-        vRx = videofactory::buildVideoReceiver(pipeline, options);
+    shared_ptr<VideoReceiver> vRx;
 
     if (enableAudio)
         aRx = audiofactory::buildAudioReceiver(pipeline, options);
+
+    if (enableVideo)
+        vRx = videofactory::buildVideoReceiver(pipeline, options);
 
     pipeline.start();
 
@@ -96,14 +96,14 @@ void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, b
     if (options["debug"].as<std::string>() == "gst-debug")
         pipeline.makeVerbose();
 
-    shared_ptr<VideoSender> vTx;
     shared_ptr<AudioSender> aTx;
-
-    if (enableVideo)
-        vTx = videofactory::buildVideoSender(pipeline, options);
+    shared_ptr<VideoSender> vTx;
 
     if (enableAudio)
         aTx = audiofactory::buildAudioSender(pipeline, options);
+
+    if (enableVideo)
+        vTx = videofactory::buildVideoSender(pipeline, options);
 
     pipeline.start();
 

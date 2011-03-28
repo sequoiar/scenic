@@ -234,13 +234,6 @@ ReceiverConfig::ReceiverConfig(const std::string &codec__,
     caps_(""), 
     jitterbufferControlEnabled_(enableControls)
 {
-    if (isSupportedCodec(codec_))   // this would fail later but we want to make sure we don't wait with a bogus codec
-    { 
-        LOG_INFO("Waiting for " << codec_ << " caps from other host");
-        receiveCaps();  // wait for new caps from sender
-    }
-    else
-        THROW_ERROR("Codec " << codec_ << " is not supported");
 }
 
 VideoDecoder * ReceiverConfig::createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const
@@ -315,6 +308,11 @@ bool ReceiverConfig::capsMatchCodec() const
 
 void ReceiverConfig::receiveCaps()
 {
+    if (isSupportedCodec(codec_))   // this would fail later but we want to make sure we don't wait with a bogus codec
+        LOG_INFO("Waiting for " << codec_ << " caps from other host");
+    else
+        THROW_ERROR("Codec " << codec_ << " is not supported");
+
     // this blocks
     LOG_DEBUG("Creating new caps client to get caps from " << remoteHost_);
     if (multicastInterface_.empty())

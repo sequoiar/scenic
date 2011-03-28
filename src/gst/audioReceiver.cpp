@@ -103,6 +103,7 @@ void AudioReceiver::createSink(Pipeline &pipeline)
 /// Used to set this AudioReceiver's RtpReceiver's caps 
 void AudioReceiver::setCaps() 
 { 
+    remoteConfig_->receiveCaps();
     session_.setCaps(remoteConfig_->caps()); 
     gotCaps_ = true;
 }
