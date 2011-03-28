@@ -205,7 +205,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     if (enableAudio_)
     {
         LOG_DEBUG("Audio enabled");
-        AudioSinkConfig aConfig(*pipeline_, options);
+        AudioSinkConfig aConfig(options);
 
         GstElement *queue = pipeline_->makeElement("queue", "audio_queue");
         GstElement *audioconvert = pipeline_->makeElement("audioconvert", 0);

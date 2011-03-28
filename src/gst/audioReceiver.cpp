@@ -83,10 +83,14 @@ void AudioReceiver::createSink(Pipeline &pipeline)
 {
     sink_.reset(audioConfig_->createSink(pipeline));
     assert(sink_);
+    // Add an audioresample in case we're being sent audio at a different samplerate
+    GstElement *audioresample = pipeline.makeElement("audioresample", NULL);
     if (level_ != 0)
-        gstlinkable::link(*level_, *sink_);
+        gstlinkable::link(*level_, audioresample);
     else
-        gstlinkable::link(*decoder_, *sink_);
+        gstlinkable::link(*decoder_, audioresample);
+
+    gstlinkable::link(audioresample, *sink_);
     setCaps();
     assert(gotCaps_);
     if (not remoteConfig_->capsMatchCodec())

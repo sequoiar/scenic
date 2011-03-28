@@ -23,7 +23,6 @@
 #include <jack/jack.h>
 #include "util/logWriter.h"
 #include "jackUtils.h"
-#include "pipeline.h"
 
 bool Jack::is_running()
 {
@@ -108,18 +107,11 @@ jack_nframes_t Jack::samplerate()
 }
 
 
-/// Check that jack is running and is at the right sample rate
-void Jack::assertReady(Pipeline &pipeline)
+/// Check that jack is running
+void Jack::assertReady()
 {
     if (!Jack::is_running())
         THROW_CRITICAL("Jack is not running");
-
-    if (pipeline.actualSampleRate() != samplerate())
-    {
-        LOG_WARNING("Jack's sample rate of " << samplerate()
-                << " does not match pipeline sample rate " << pipeline.actualSampleRate());
-        pipeline.updateSampleRate(samplerate());
-    }
 }
 
 

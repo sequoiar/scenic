@@ -86,7 +86,7 @@ class AudioSourceConfig
 class AudioSinkConfig
 {
     public:
-        AudioSinkConfig(Pipeline &pipeline, const boost::program_options::variables_map &options);
+        AudioSinkConfig(const boost::program_options::variables_map &options);
         
         AudioLevel* createLevel(Pipeline &pipeline) const;
         AudioSink* createSink(Pipeline &pipeline) const;

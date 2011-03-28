@@ -63,7 +63,7 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
 
 shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, const po::variables_map &options)
 {
-    shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(pipeline, options));
+    shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(options));
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());

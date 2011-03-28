@@ -84,9 +84,6 @@ unsigned long long AudioSourceConfig::bufferTime() const
 /// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 {
-    if ((source_ == "jackaudiosrc" or source_ == "audiotestsrc") and Jack::is_running())
-        pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
-
     if (source_ == "audiotestsrc")
         return new AudioTestSource(pipeline, *this);
     else if (source_ == "filesrc")
@@ -95,7 +92,7 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioAlsaSource(pipeline, *this);
     else if (source_ == "jackaudiosrc") 
     {
-        Jack::assertReady(pipeline);
+        Jack::assertReady();
         AudioJackSource *result = new AudioJackSource(pipeline, *this);
         if (disableAutoConnect_)
             result->disableAutoConnect();
@@ -160,7 +157,7 @@ bool AudioSourceConfig::locationExists() const
 
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &options) :
+AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) :
     sink_(options["audiosink"].as<std::string>()),
     sinkName_(options["jack-client-name"].as<std::string>()),
     deviceName_(options["audiodevice"].as<std::string>()),
@@ -168,15 +165,7 @@ AudioSinkConfig::AudioSinkConfig(Pipeline &pipeline, const po::variables_map &op
     socketID_(options["vumeter-id"].as<unsigned long>()),
     numChannels_(options["numchannels"].as<int>()),
     disableAutoConnect_(options["disable-jack-autoconnect"].as<bool>())
-{
-    // FIXME: (before waiting on caps) but having it here is pretty gross
-    // just use an audioresample
-    if (sink_ == "jackaudiosink")
-    {
-        Jack::assertReady(pipeline);
-        pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
-    }
-}
+{}
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
 AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
