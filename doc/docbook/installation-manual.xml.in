@@ -13,6 +13,7 @@
    <!ENTITY Software_Installation SYSTEM "installation/software.xml">
    <!ENTITY Audio_Video SYSTEM "installation/audio-video.xml">
    <!ENTITY Network_Test SYSTEM "installation/network.xml">
+   <!ENTITY Advanced SYSTEM "installation/advanced.xml">
    <!ENTITY About SYSTEM "installation/about.xml">
    <!ENTITY Nvidia_Settings SYSTEM "installation/nvidia-settings.xml">
    <!ENTITY Ati_Settings SYSTEM "installation/ati-settings.xml">
@@ -37,6 +38,7 @@
    &Software_Installation;
    &Audio_Video;
    &Network_Test;
+   &Advanced;
    &Nvidia_Settings;
    &Ati_Settings;
    &Edirol_FA101;
