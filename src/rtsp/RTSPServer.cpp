@@ -58,7 +58,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
   string remoteHost(options["address"].as<string>());
   // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
   if (remoteHost == "localhost")
-      remoteHost = "localhost.localdomain";
+      remoteHost = "127.0.0.1";
   urlStr += remoteHost;
   urlStr += ":8554/milhouse";
 

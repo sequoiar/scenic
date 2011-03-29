@@ -35,7 +35,7 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("help,h", "produce help")
         ("receiver,r", po::bool_switch(), "this process is a receiver")
         ("sender,s", po::bool_switch(), "this process is a sender")
-        ("address,i", po::value<string>()->default_value("localhost.localdomain"), "provide ip address of remote host")
+        ("address,i", po::value<string>()->default_value("127.0.0.1"), "provide ip address of remote host")
         ("videocodec,v", po::value<string>()->default_value("mpeg4"), "videocodec (mpeg4,h263,h264,theora)")
         ("audiocodec,a", po::value<string>()->default_value("raw"), "audiocodec (raw,vorbis,mp3)")
         ("videosink,k", po::value<string>()->default_value("xvimagesink"), "video output "

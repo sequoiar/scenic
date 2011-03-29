@@ -50,7 +50,7 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
     std::string remoteHost(options["address"].as<std::string>());
     // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
     if (remoteHost == "localhost")
-        remoteHost = "localhost.localdomain";
+        remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
 

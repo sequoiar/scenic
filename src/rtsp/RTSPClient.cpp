@@ -172,7 +172,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     std::string remoteHost(options["address"].as<std::string>());
     // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
     if (remoteHost == "localhost")
-        remoteHost = "localhost.localdomain";
+        remoteHost = "127.0.0.1";
     string uri("rtsp://" + remoteHost + ":8554/milhouse");
     g_object_set(uridecodebin, "uri", uri.c_str(), NULL);
     g_signal_connect(uridecodebin, "notify::source", G_CALLBACK(onNotifySource), this);
