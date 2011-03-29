@@ -1,116 +1,5 @@
-<chapter id="installation.software-installation.ad">
-  <title>Software Installation</title>
-  <para>A standard &app; installation always requires at least two
-  computers with identical linux operating systems, the required
-  libraries and development packages, and a build of the most
-  recent release of the &app; software.</para>
-  <para>The computers must meet these 
-     <link linkend='installation.hardware-requirements'>minimum
-     requirements </link>.
-  </para>
-  <para>Note that prior to using &app; you also need to meet the 
-  <link linkend='installation.network-test'>required network
-  specification </link>
-  </para>
-  <sect1 id="installation.os-installation.ad">
-    <title>Operating System Installation</title>
-    <para>&app; operates on the Linux based desktop operating
-    system and is tested on the following Linux
-    distribution:</para>
-    <informaltable frame="all">
-      <tgroup cols="2">
-        <tbody>
-          <row>
-            <entry>
-              <para>Distribution</para>
-            </entry>
-            <entry>
-              <para>Status</para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>Ubuntu 8.04 LTS (Hardy)</para>
-            </entry>
-            <entry>
-              <para>Fully working</para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>Ubuntu 9.04 (Jaunty)</para>
-            </entry>
-            <entry>
-              <para>Not Working</para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>Ubuntu 9.10 (Karmic)</para>
-            </entry>
-            <entry>
-              <para>Working, less well tested and mostly
-              documented
-              </para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>Ubuntu 10.04 (Lucid)</para>
-            </entry>
-            <entry>
-              <para>Working, still in testing</para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>Debian 5.0.4 (Lenny)</para>
-            </entry>
-            <entry>
-              <para>Working, not much tested and getting more
-              documented
-              </para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>Debian (Squeze)</para>
-            </entry>
-            <entry>
-              <para>Untested</para>
-            </entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </informaltable>
-    <para>To install Ubuntu, please follow the instructions found
-    on the 
-    <ulink url="http://www.ubuntu.com/getubuntu">Get
-    Ubuntu </ulink>page.
-    </para>
-    <para>To install Debian, please follow the instructions found
-    on the 
-    <ulink url="http://www.debian.org/distrib/">Get
-    Debian </ulink>page.
-    </para>
-  </sect1>
-  <sect1 id="installation.lib-packages-installation.ad">
-    <title>Libraries and Development Packages Installation</title>
-    <para>Before performing the scenic installation, please perform
-    an update of your linux distribution:
-    </para>
-    <para>
-    <userinput>sudo aptitude update</userinput>
-    </para>
-    <para>
-    <userinput>sudo aptitude upgrade</userinput>
-    </para>
-    <para>&app; need various package to be installed. You can have
-    a detailed view of the required library and dependency on our 
-    <ulink url="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
-    Library and Package </ulink>page. To install the required these
-    libraries and their dependencies run the following command in
-    the terminal:</para>
+<chapter id="advanced.installation">
+  <title> Advanced Installation</title>
     <para>
       <emphasis role="strong">For Ubuntu 8.04 LTS (Hardy) install
       the following package:</emphasis>
@@ -169,7 +58,7 @@
       again.</emphasis>
     </para>
   </sect1>
-  <sect1 id="installation.midi-component-installation.ad">
+  <sect1 id="advanced.midi-component-installation">
     <title>Installing the midi component </title>
     <para>The midi component in &app; is available on the unstable
     branch (0.5). You can skip this if you install &app; 0.4.x and
@@ -183,7 +72,7 @@
     bindings that comes with portmidi.
     </para>
   </sect1>
-  <sect1 id="installation.building-scenic.ad">
+  <sect1 id="advanced.building-scenic">
     <title>Building &app; </title>
     <para>To get the latest &app; version, go to 
        <ulink url="http://scenic.sat.qc.ca/download">
