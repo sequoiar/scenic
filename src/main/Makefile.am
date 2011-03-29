@@ -1,6 +1,8 @@
 bin_PROGRAMS = milhouse
 
-milhouse_SOURCES = main.cpp milhouse.cpp milhouseLogger.cpp milhouseLogger.h $(top_srcdir)/src/include/ConcurrentQueue.h milhouse.h
+milhouse_SOURCES = main.cpp milhouse.cpp milhouseLogger.cpp milhouseLogger.h \
+                   $(top_srcdir)/src/include/ConcurrentQueue.h milhouse.h \
+                   programOptions.cpp programOptions.h
 #FIXME GLIB_CFLAGS only here because pipeline.h has include glib/gtypes.h, also GDK flags because of audioSender.h->audioLevel.h
 milhouse_CPPFLAGS = $(GLIB_CFLAGS) -I$(top_srcdir)/src/include -I$(top_srcdir)/src
 
