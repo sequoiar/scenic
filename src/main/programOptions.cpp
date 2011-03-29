@@ -96,7 +96,6 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("vumeter-id", po::value<unsigned long>()->default_value(0), "id of the socket where the vumeters will be displayed")
         ("max-channels", po::bool_switch(), "print the maximum number of "
          "channels milhouse can send for the selected audiocodec")
-        ("dump-pipeline", po::bool_switch(), "outputs a dotfile representation of this process' pipeline")
         ("text-overlay", po::value<string>(), "overlays given text on video sink (receiver side only)")
         ("gst-version", po::bool_switch(), "prints the version number of the GStreamer (core) library currently installed")
         ("rtsp-server", po::bool_switch(), "run in RTSP server mode")

@@ -189,9 +189,6 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    if (options["dump-pipeline"].as<bool>())
-        setenv("GST_DEBUG_DUMP_DOT_DIR", ".", 0 /* don't override current value if present*/);
-
     // wrapper so main doesn't need to know about gst and gtk
     gutil::init_gst_gtk(argc, argv);
 
