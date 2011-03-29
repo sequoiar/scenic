@@ -96,11 +96,11 @@ void AudioReceiver::createSink(Pipeline &pipeline)
         sink_->adjustBufferTime(decoder_->minimumBufferTime()); // increase jitterbuffer as needed
 }
 
-/// Used to set this AudioReceiver's RtpReceiver's caps 
-void AudioReceiver::setCaps() 
-{ 
-    remoteConfig_->receiveCaps();
-    session_.setCaps(remoteConfig_->caps()); 
+/// Used to set this AudioReceiver's RtpReceiver's caps
+void AudioReceiver::setCaps()
+{
+    remoteConfig_->receiveCaps(); // this call will block
+    session_.setCaps(remoteConfig_->caps());
     gotCaps_ = true;
 }
 

@@ -117,10 +117,7 @@ AudioLevel* AudioSourceConfig::createLevel(Pipeline &pipeline) const
 /// Factory method that creates an AudioLevel based on this object's socketID
 AudioLevel* AudioSinkConfig::createLevel(Pipeline &pipeline) const
 {
-    if (socketID_ != 0)
-        return new AudioLevel(pipeline, numChannels_, socketID_);
-    else 
-        return 0;
+    return new AudioLevel(pipeline, numChannels_, socketID_);
 }
 
 /// Returns c-style string specifying the location (filename) 
