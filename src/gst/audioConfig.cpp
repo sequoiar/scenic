@@ -110,10 +110,7 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 /// Factory method that creates an AudioLevel based on this object's socketID
 AudioLevel* AudioSourceConfig::createLevel(Pipeline &pipeline) const
 {
-    if (socketID_ != 0)
-        return new AudioLevel(pipeline, numChannels_, socketID_);
-    else 
-        return 0;
+    return new AudioLevel(pipeline, numChannels_, socketID_);
 }
 
 /// Fixme: abstract the common stuff into baseclass

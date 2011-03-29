@@ -4,6 +4,9 @@
 #include <cmath>
 #include <algorithm> // for max
 
+static const int VUMETER_DEFAULT_WIDTH = 35;
+static const int VUMETER_DEFAULT_HEIGHT = 100;
+
 static void gtk_vumeter_class_init (GtkVumeterClass * klass);
 static void gtk_vumeter_init (GtkVumeter * vumeter);
 static void gtk_vumeter_size_request (GtkWidget * widget,
@@ -83,8 +86,8 @@ gtk_vumeter_size_request (GtkWidget * widget, GtkRequisition * requisition)
   g_return_if_fail (GTK_IS_VUMETER (widget));
   g_return_if_fail (requisition != NULL);
 
-  requisition->width = 37;
-  requisition->height = 100;
+  requisition->width = VUMETER_DEFAULT_WIDTH;
+  requisition->height = VUMETER_DEFAULT_HEIGHT;
 }
 
 static void
@@ -106,18 +109,19 @@ static void
 gtk_vumeter_realize (GtkWidget * widget)
 {
   GdkWindowAttr attributes;
-  guint attributes_mask;
+  gint attributes_mask;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_VUMETER (widget));
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
 
-  attributes.window_type = GDK_WINDOW_CHILD;
   attributes.x = widget->allocation.x;
   attributes.y = widget->allocation.y;
-
+  attributes.width = widget->allocation.width;
+  attributes.height = widget->allocation.height;
   attributes.wclass = GDK_INPUT_OUTPUT;
+  attributes.window_type = GDK_WINDOW_CHILD;
   attributes.event_mask = gtk_widget_get_events (widget) | GDK_EXPOSURE_MASK;
 
   attributes_mask = GDK_WA_X | GDK_WA_Y;
@@ -125,9 +129,10 @@ gtk_vumeter_realize (GtkWidget * widget)
   widget->window = gdk_window_new (gtk_widget_get_parent_window (widget),
       &attributes, attributes_mask);
 
+  widget->style = gtk_style_attach (widget->style, widget->window);
+
   gdk_window_set_user_data (widget->window, widget);
 
-  widget->style = gtk_style_attach (widget->style, widget->window);
   gtk_style_set_background (widget->style, widget->window, GTK_STATE_NORMAL);
 }
 

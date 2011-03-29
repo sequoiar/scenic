@@ -99,14 +99,11 @@ XvImageSink::XvImageSink(Pipeline &pipeline,
         gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
 
         gtk_container_add(GTK_CONTAINER(window_), hbox_);
+
+        // set icon
         std::string iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
-        // This test isn't very reliable since the icon file could be moved 
-        // in between the test and the function call.
-        if (g_file_test(iconPath.c_str(), G_FILE_TEST_EXISTS))
-        {
+        if (gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.c_str(), NULL))
             LOG_DEBUG("Using icon " << iconPath << " for window");
-            gtk_window_set_icon_from_file(GTK_WINDOW(window_), iconPath.c_str(), NULL);
-        }
         else
             LOG_DEBUG(iconPath << " does not exist");
 

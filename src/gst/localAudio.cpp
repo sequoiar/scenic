@@ -35,13 +35,8 @@ LocalAudio::LocalAudio(Pipeline &pipeline,
     level_(sourceConfig.createLevel(pipeline))
 {
     GstElement *fakesink = pipeline.makeElement("fakesink", NULL);
-    if (level_ != 0)
-    {
-        gstlinkable::link(*source_, *level_);
-        gstlinkable::link(*level_, fakesink);
-    }
-    else
-        gstlinkable::link(*source_, fakesink);
+    gstlinkable::link(*source_, *level_);
+    gstlinkable::link(*level_, fakesink);
 
     /// FIXME: hack for dv1394src
     if (sourceConfig.sourceString() == "dv1394src")

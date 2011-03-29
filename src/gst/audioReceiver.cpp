@@ -65,8 +65,7 @@ void AudioReceiver::createCodec(Pipeline &pipeline)
     decoder_.reset(remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels()));
     assert(decoder_);
     level_.reset(audioConfig_->createLevel(pipeline));
-    if (level_ != 0)
-        gstlinkable::link(*decoder_, *level_);
+    gstlinkable::link(*decoder_, *level_);
 }
 
 
@@ -85,10 +84,7 @@ void AudioReceiver::createSink(Pipeline &pipeline)
     assert(sink_);
     // Add an audioresample in case we're being sent audio at a different samplerate
     GstElement *audioresample = pipeline.makeElement("audioresample", NULL);
-    if (level_ != 0)
-        gstlinkable::link(*level_, audioresample);
-    else
-        gstlinkable::link(*decoder_, audioresample);
+    gstlinkable::link(*level_, audioresample);
 
     gstlinkable::link(audioresample, *sink_);
     setCaps();
