@@ -83,6 +83,14 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     {
         GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
         gtk_window_set_title(GTK_WINDOW(window), "Milhouse");
+
+        // set icon
+        std::string iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
+        if (gtk_window_set_icon_from_file(GTK_WINDOW(window), iconPath.c_str(), NULL))
+            LOG_DEBUG("Using icon " << iconPath << " for window");
+        else
+            LOG_DEBUG(iconPath << " does not exist");
+
         gtk_window_set_default_size(GTK_WINDOW(window), 80, 480);
         g_signal_connect(G_OBJECT (scrolled), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
         LOG_DEBUG("Created window for vumeters");
