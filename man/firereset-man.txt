@@ -17,7 +17,7 @@ RAW1394DEV=/dev/raw1394 firereset
 2009 - Written by Alexandre Quessy <alexandre@quessy.net>.
 
 [REPORTING BUGS]
-http://svn.sat.qc.ca/trac/scenic
+http://code.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
 Scenic

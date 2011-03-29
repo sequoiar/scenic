@@ -11,4 +11,5 @@ The streaming is done over RTP with the GStreamer multimedia framework. Users ca
   * firereset: Resets a IEEE 1394 bus to help in case of problems
   * jack-info: Prints informations about running JACK servers
 
-See http://svn.sat.qc.ca/trac/scenic/
+See http://code.sat.qc.ca/trac/scenic/
+
