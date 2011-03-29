@@ -220,13 +220,8 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
         gstlinkable::link(queue, audioconvert);
         gstlinkable::link(audioconvert, capsfilter);
         gstlinkable::link(capsfilter, audioresample);
-        if (audiolevel_.get())
-        {
-            gstlinkable::link(audioresample, *audiolevel_);
-            gstlinkable::link(*audiolevel_, *audiosink_);
-        }
-        else
-            gstlinkable::link(audioresample, *audiosink_);
+        gstlinkable::link(audioresample, *audiolevel_);
+        gstlinkable::link(*audiolevel_, *audiosink_);
     }
 }
 

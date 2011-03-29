@@ -60,10 +60,6 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
                 GTK_SHRINK, 0, 0);
     }
 
-    /* make plug */
-    GtkWidget *plug = gtk_plug_new(socketID);
-    /* end main loop when plug is destroyed */
-    g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
     GtkWidget *scrolled = gtk_scrolled_window_new(0, 0);
     g_object_set(scrolled, "vscrollbar-policy", GTK_POLICY_NEVER, NULL);
     g_object_set(scrolled, "hscrollbar-policy", GTK_POLICY_AUTOMATIC, NULL);
@@ -71,10 +67,28 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     g_object_set(viewport, "shadow-type", GTK_SHADOW_NONE, NULL);
     gtk_container_add(GTK_CONTAINER(viewport), table);
     gtk_container_add(GTK_CONTAINER(scrolled), viewport);
-    gtk_container_add(GTK_CONTAINER (plug), scrolled);
-    /* show window and log its id */
-    gtk_widget_show_all(plug);
-    LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
+
+    // either make plug...
+    if (socketID != 0)
+    {
+        GtkWidget *plug = gtk_plug_new(socketID);
+        /* end main loop when plug is destroyed */
+        g_signal_connect(G_OBJECT (plug), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
+        gtk_container_add(GTK_CONTAINER (plug), scrolled);
+        /* show window and log its id */
+        gtk_widget_show_all(plug);
+        LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
+    }
+    else // make a window
+    {
+        GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+        gtk_window_set_title(GTK_WINDOW(window), "Milhouse");
+        gtk_window_set_default_size(GTK_WINDOW(window), 80, 480);
+        g_signal_connect(G_OBJECT (scrolled), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
+        LOG_DEBUG("Created window for vumeters");
+        gtk_container_add(GTK_CONTAINER (window), scrolled);
+        gtk_widget_show_all(window);
+    }
 
     g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
     static const guint64 INTERVAL_NS = 75000000;
@@ -85,17 +99,21 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     g_object_set(G_OBJECT(level_), "peak-ttl", PEAK_TTL, NULL);
 }
 
-void
-AudioLevel::setValue(gdouble peak, gdouble decayPeak, GtkWidget *vumeter)
+void AudioLevel::setValue(gdouble peak, gdouble decayPeak, GtkWidget *vumeter)
 {
-  GdkRegion *region;
+    GdkRegion *region;
+    if (!vumeter->window)
+        return;
 
-  GTK_VUMETER(vumeter)->peak = peak;
-  GTK_VUMETER(vumeter)->decay_peak = decayPeak;
+    GTK_VUMETER(vumeter)->peak = peak;
+    GTK_VUMETER(vumeter)->decay_peak = decayPeak;
+    LOG_DEBUG("Redrawing Vumeter");
 
-  region = gdk_drawable_get_clip_region (vumeter->window);
-  gdk_window_invalidate_region (vumeter->window, region, TRUE);
-  gdk_window_process_updates (vumeter->window, TRUE);
+    region = gdk_drawable_get_clip_region (vumeter->window);
+    gdk_window_invalidate_region (vumeter->window, region, TRUE);
+    gdk_window_process_updates (vumeter->window, TRUE);
+
+    gdk_region_destroy (region);
 }
 
 /** 
