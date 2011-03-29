@@ -73,7 +73,6 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
       LOG_DEBUG("Audio enabled");
 
   server = gst_rtsp_server_new ();
-  gst_rtsp_server_set_port (server, local_url->port);
 
   factory = gst_rtsp_cam_media_factory_new ();
   g_object_set (factory,

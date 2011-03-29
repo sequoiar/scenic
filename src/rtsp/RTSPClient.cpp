@@ -120,6 +120,8 @@ void RTSPClient::linkNewPad(GstPad *newPad, const GstCaps *caps, const gchar *qu
         LOG_DEBUG("Found pad to link to pipeline - plugging is now done");
     else
         LOG_WARNING("Could not link new pad to pipeline");
+
+    // cleanup
     gst_caps_unref (sinkCaps);
     gst_caps_unref (res);
     gst_object_unref (GST_OBJECT (sinkPad));
