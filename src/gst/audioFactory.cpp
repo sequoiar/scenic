@@ -72,10 +72,9 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
         remoteHost = "localhost.localdomain";
     int port = options["audioport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
-    bool enableControls = options["enable-controls"].as<bool>();
 
     shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, remoteHost, port, 
-                multicastInterface, enableControls));
+                multicastInterface));
 
     return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));
 }

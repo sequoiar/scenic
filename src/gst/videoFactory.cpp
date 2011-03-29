@@ -45,10 +45,9 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
         remoteHost = "localhost.localdomain";
     int port = options["videoport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
-    bool enableControls = options["enable-controls"].as<bool>();
 
     shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, 
-                remoteHost, port, multicastInterface, enableControls));
+                remoteHost, port, multicastInterface));
 
     return shared_ptr<VideoReceiver>(new VideoReceiver(pipeline, vConfig, rConfig));
 }

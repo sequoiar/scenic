@@ -102,8 +102,7 @@ class ReceiverConfig : public RemoteConfig
         ReceiverConfig(const std::string &codec, 
                 const std::string &remoteHost, 
                 int port,
-                const std::string &multicastInterface,
-                bool enableControls);
+                const std::string &multicastInterface);
 
         VideoDecoder* createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const;
         Decoder* createAudioDecoder(const Pipeline &pipeline, int numChannels) const;
@@ -114,13 +113,11 @@ class ReceiverConfig : public RemoteConfig
         bool hasMulticastInterface() const { return multicastInterface_ != ""; }
         // This method will block while waiting for caps
         void receiveCaps();
-        bool jitterbufferControlEnabled() const { return jitterbufferControlEnabled_; }
 
     private:
         static bool isSupportedCodec(const std::string &codec);
         const std::string multicastInterface_;
         std::string caps_;
-        bool jitterbufferControlEnabled_;
 };
 
 #endif // _REMOTE_CONFIG_H_

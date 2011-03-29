@@ -227,12 +227,10 @@ bool ReceiverConfig::isSupportedCodec(const std::string &codec)
 ReceiverConfig::ReceiverConfig(const std::string &codec__,
         const std::string &remoteHost__,
         int port__,
-        const std::string &multicastInterface__,
-        bool enableControls) :
-    RemoteConfig(codec__, remoteHost__, port__), 
+        const std::string &multicastInterface__) :
+    RemoteConfig(codec__, remoteHost__, port__),
     multicastInterface_(multicastInterface__),
-    caps_(""), 
-    jitterbufferControlEnabled_(enableControls)
+    caps_("")
 {
 }
 

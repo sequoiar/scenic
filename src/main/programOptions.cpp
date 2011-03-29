@@ -69,7 +69,6 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("camera-number,G", po::value<int>()->default_value(-1), "camera id for dc1394src")
         ("camera-guid,U", po::value<std::string>()->default_value("0"), "camera guid for dc1394src")
         ("multicast-interface,I", po::value<string>()->default_value(""), "interface to use for multicast (eth0,eth1)")
-        ("enable-controls,j", po::bool_switch(), "enable gui controls for adjusting the jitterbuffer")
         ("disable-jack-autoconnect,J", po::bool_switch(), "make sure milhouse's "
          "jack audio ports don't connect on startup")
         ("jack-client-name,O", po::value<string>()->default_value(""), "name of jack-client")
