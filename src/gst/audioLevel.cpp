@@ -115,7 +115,6 @@ void AudioLevel::setValue(gdouble peak, gdouble decayPeak, GtkWidget *vumeter)
 
     GTK_VUMETER(vumeter)->peak = peak;
     GTK_VUMETER(vumeter)->decay_peak = decayPeak;
-    LOG_DEBUG("Redrawing Vumeter");
 
     region = gdk_drawable_get_clip_region (vumeter->window);
     gdk_window_invalidate_region (vumeter->window, region, TRUE);
