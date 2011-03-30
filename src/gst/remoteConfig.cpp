@@ -20,17 +20,17 @@
  *
  */
 
+#include "remoteConfig.h"
 #include <algorithm>
 #include <boost/assign.hpp>
 #include <boost/lexical_cast.hpp>
 #include <gst/gst.h>
 #include "util/logWriter.h"
 #include "pipeline.h"
-#include "caps/CapsServer.h"
-#include "caps/MulticastCapsServer.h"
-#include "caps/CapsClient.h"
-#include "caps/MulticastCapsClient.h"
-#include "remoteConfig.h"
+#include "caps/caps_server.h"
+#include "caps/multicast_caps_server.h"
+#include "caps/caps_client.h"
+#include "caps/multicast_caps_client.h"
 #include "codec.h"
 
 const int RemoteConfig::PORT_MIN = 1024;

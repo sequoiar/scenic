@@ -29,7 +29,7 @@
 #include "codec.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
-#include "caps/CapsServer.h"
+#include "caps/caps_server.h"
 #include "util/logWriter.h"
 #include "pipeline.h"
 

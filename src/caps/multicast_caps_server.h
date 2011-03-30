@@ -31,7 +31,7 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
-#include "CapsServer.h"
+#include "caps_server.h"
 
 class MulticastCapsServer : public CapsServer
 {

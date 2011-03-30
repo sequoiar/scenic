@@ -25,7 +25,7 @@
  * file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) */
 
 #include "util/logWriter.h"
-#include "MulticastCapsClient.h"
+#include "multicast_caps_client.h"
 #include <boost/lexical_cast.hpp>
 
 MulticastCapsClient::MulticastCapsClient(boost::asio::io_service& io_service,

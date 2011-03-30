@@ -1,4 +1,4 @@
-#include "CapsClient.h"
+#include "caps_client.h"
 #include "util/logWriter.h"
 #include "util/sigint.h"
 #include <iterator>

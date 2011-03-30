@@ -23,13 +23,13 @@
 
 #include "videoFactory.h"
 #include <boost/program_options.hpp>
-#include "caps/CapsServer.h"
 #include "videoSender.h"
 #include "videoReceiver.h"
 #include "localVideo.h"
 
 #include "videoConfig.h"
 #include "remoteConfig.h"
+#include "caps/caps_server.h"
 
 using std::tr1::shared_ptr;
 namespace po = boost::program_options;

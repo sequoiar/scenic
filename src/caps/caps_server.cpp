@@ -22,7 +22,7 @@
  */
 
 #include "util/logWriter.h"
-#include "CapsServer.h"
+#include "caps_server.h"
 #include <boost/bind.hpp>
 
 using boost::asio::ip::tcp;
