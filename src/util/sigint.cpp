@@ -23,7 +23,7 @@
 
 #include <signal.h>
 #include "sigint.h"
-#include "logWriter.h"
+#include "log_writer.h"
 
 // FIXME: this is shared!!!!
 namespace  {

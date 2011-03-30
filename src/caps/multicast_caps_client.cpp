@@ -24,7 +24,7 @@
  * Distributed under the Boost Software License, Version 1.0. (See accompanying
  * file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt) */
 
-#include "util/logWriter.h"
+#include "util/log_writer.h"
 #include "multicast_caps_client.h"
 #include <boost/lexical_cast.hpp>
 

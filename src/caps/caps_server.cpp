@@ -21,7 +21,7 @@
  *
  */
 
-#include "util/logWriter.h"
+#include "util/log_writer.h"
 #include "caps_server.h"
 #include <boost/bind.hpp>
 

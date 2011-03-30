@@ -1,4 +1,4 @@
-// dc1394.cpp
+//
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
@@ -22,7 +22,7 @@
 #include <glib/gfileutils.h>
 #include "dc1394.h"
 #include "noncopyable.h"
-#include "util/logWriter.h"
+#include "util/log_writer.h"
 
 #include <fstream>
 #include <dc1394/control.h>

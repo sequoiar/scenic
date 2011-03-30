@@ -9,7 +9,7 @@ common_mandeps = $(top_srcdir)/configure.ac
 # Depend on the source, not the binary; we don't need to regenerate the
 # binary when any source file changes, only the main one.
 # Use -o so that the `missing' program can infer the output file.
-milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/main/programOptions.cpp $(common_mandeps) $(top_srcdir)/man/milhouse-man.txt
+milhouse.1: $(top_srcdir)/src/main/milhouse.cpp $(top_srcdir)/src/main/program_options.cpp $(common_mandeps) $(top_srcdir)/man/milhouse-man.txt
 	$(HELP2MAN) --include=$(top_srcdir)/man/milhouse-man.txt --name="Streams audio and video with GStreamer over RTP" --no-info $(top_builddir)/src/main/milhouse -o $@
 
 scenic.1: $(top_srcdir)/py/scenic/runner.py $(top_srcdir)/py/scripts/scenic.in  $(top_srcdir)/py/scenic/configure.py.in $(common_mandeps) $(top_srcdir)/man/scenic-man.txt

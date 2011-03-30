@@ -23,7 +23,7 @@
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
 #include <gtk/gtk.h>
-#include "util/logWriter.h"
+#include "util/log_writer.h"
 #include "util/sigint.h"
 #include "gutil/gutil.h"
 

@@ -1,4 +1,4 @@
-/* dv1394.cpp
+/*
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -23,8 +23,8 @@
 #include <gst/gst.h>
 #include <cassert>
 #include "dv1394.h"
-#include "raw1394Util.h"
-#include "gstLinkable.h"
+#include "raw1394_util.h"
+#include "gst_linkable.h"
 #include "pipeline.h"
 
 Dv1394 *Dv1394::instance_ = 0;

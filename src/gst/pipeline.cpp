@@ -1,4 +1,4 @@
-/* pipeline.cpp
+/*
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -21,7 +21,7 @@
  */
 
 #include "pipeline.h"
-#include "util/logWriter.h"
+#include "util/log_writer.h"
 #include <gst/gst.h>
 #include <gtk/gtk.h>
 #include <cstring>
@@ -31,7 +31,7 @@
 #include "gutil/gutil.h"
 
 #include "dv1394.h"
-#include "busMsgHandler.h"
+#include "bus_msg_handler.h"
 
 
 // NOTES:

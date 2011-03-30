@@ -1,4 +1,4 @@
-/* codec.cpp
+/*
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -26,21 +26,21 @@
 
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
-#include "util/logWriter.h"
+#include "util/log_writer.h"
 #include "gutil/gutil.h"
 
-#include "gstLinkable.h"
+#include "gst_linkable.h"
 
 #include <boost/thread/thread.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/assign.hpp>
 
 #include "codec.h"
-#include "jackUtils.h"
-#include "rtpPay.h"
+#include "jack_util.h"
+#include "rtp_pay.h"
 #include "pipeline.h"
 
-#include "rtpReceiver.h"
+#include "rtp_receiver.h"
 
 /// Constructor
 Encoder::Encoder(const Pipeline &pipeline, const char *encoder) :

@@ -23,20 +23,20 @@
 #include <iostream>
 
 #include "milhouse.h"
-#include "util/logWriter.h"
+#include "util/log_writer.h"
 
 #include "gutil/gutil.h"
 
-#include "gst/videoFactory.h"
-#include "gst/audioFactory.h"
+#include "gst/video_factory.h"
+#include "gst/audio_factory.h"
 #include "gst/pipeline.h"
-#include "gst/rtpReceiver.h"
-#include "gst/videoConfig.h"
+#include "gst/rtp_receiver.h"
+#include "gst/video_config.h"
 
-#include "milhouseLogger.h"
-#include "programOptions.h"
-#include "rtsp/RTSPServer.h"
-#include "rtsp/RTSPClient.h"
+#include "milhouse_logger.h"
+#include "program_options.h"
+#include "rtsp/rtsp_server.h"
+#include "rtsp/rtsp_client.h"
 
 namespace po = boost::program_options;
 void Milhouse::runAsRTSPClient(const po::variables_map &options)
