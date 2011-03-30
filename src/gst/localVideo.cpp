@@ -75,9 +75,11 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
         }
     }
 
+    GstElement *videorate = pipeline.makeElement("videorate", 0);
     gstlinkable::link(*videoscale_, *textoverlay_);
     gstlinkable::link(*textoverlay_, *videoflip_);
-    gstlinkable::link(*videoflip_, *sink_);
+    gstlinkable::link(*videoflip_, videorate);
+    gstlinkable::link(videorate, *sink_);
 
     /// FIXME: hack for dv1394src
     if (sourceConfig.sourceString() == "dv1394src")
