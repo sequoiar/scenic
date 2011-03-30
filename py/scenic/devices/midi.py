@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -93,11 +93,11 @@ def list_midi_devices():
         #print text
         ret = _parse_miditream_list_devices(text)
         deferred.callback(ret)
-        
+
     def _eb(reason, deferred):
         deferred.errback(reason)
         log.error("Error listing MIDI devices: %s" % (reason))
-    
+
     command_name = "midistream"
     args = ['--list-devices']
     try:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Unit tests for the camera listing.
-""" 
+"""
 from twisted.trial import unittest
 from scenic.devices import cameras
 

@@ -1,6 +1,6 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -22,7 +22,7 @@
 """
 JACK driver
 
-Attributes of its (jackd) devices: 
+Attributes of its (jackd) devices:
 * sample rate
 * buffer size
 """
@@ -38,32 +38,32 @@ log = logger.start(name="jackd")
 def _parse_jack_info(text):
     """
     Parses the results of the jack-info command.
-    
-    Returns a list of dict : 
+
+    Returns a list of dict :
     [{
     'period': 1024,
-    'rate': 44100, 
+    'rate': 44100,
     'latency': 32
     }]
     @rettype: list
     """
-    #FIXME: I think jack-info currently only supports reporting 
+    #FIXME: I think jack-info currently only supports reporting
     # infos one a single JACK server. It's rather rare to see someone
     # using more than one. (it typically needs an audio device for each)
     #FIXME: we don't have the nperiod
     #FIXME: we don't have the backend
     #FIXME: we don't know if jackd is zombie
-    
+
     ret = []
     in_system_capture = False
     in_system_playback = False
     max_system_capture = 0.0
     max_system_playback = 0.0
-    
+
     for line in text.splitlines():
         line = line.strip()
         if line.startswith("JACK server not running"):
-            ret = [] # clear the list in case some extra lines 
+            ret = [] # clear the list in case some extra lines
             # of text are found at the beginning of jack-info's output
             break
         elif line.startswith("Cannot lock down memory area"):
@@ -100,12 +100,12 @@ def _parse_jack_info(text):
 
 def jackd_get_infos():
     """
-    Calls jack-info to retrieve info about jackd servers. 
-    
-    Returns a Deferred whose result is list of dict: 
-    [{ 
+    Calls jack-info to retrieve info about jackd servers.
+
+    Returns a Deferred whose result is list of dict:
+    [{
     'period': 1024,
-    'rate': 44100, 
+    'rate': 44100,
     'latency': 32
     }]
     @rtype: Deferred
@@ -114,11 +114,11 @@ def jackd_get_infos():
         #print text
         ret = _parse_jack_info(text)
         deferred.callback(ret)
-        
+
     def _eb(reason, deferred):
         deferred.errback(reason)
         print("Error listing jackd servers: %s" % (reason))
-    
+
     command_name = "jack-info"
     args = []
     try:

@@ -29,9 +29,9 @@ class Pipeline;
 class _GstMessage;
 class SenderConfig;
 
-class SenderBase 
+class SenderBase
 {
-    public: 
+    public:
         SenderBase(const std::tr1::shared_ptr<SenderConfig> &rConfig);
         virtual ~SenderBase();
     protected:
@@ -44,9 +44,9 @@ class SenderBase
         virtual void createPayloader() = 0;
 };
 
-class ReceiverBase 
+class ReceiverBase
 {
-    public: 
+    public:
         ReceiverBase(){};
         virtual ~ReceiverBase(){};
     protected:

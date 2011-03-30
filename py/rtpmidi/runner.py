@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -61,12 +61,12 @@ class Config(object):
 def list_midi_devices():
     """
     Lists MIDI devices.
-    
+
     @return: None
     """
     rtp_control = RTPControl()
     #FIXME: We should not need to instanciated all those session objects to simply list MIDI devices!
-    # we give it dummy port numbers, just to enable sending and receiving. 
+    # we give it dummy port numbers, just to enable sending and receiving.
     midi_session = rtp_control.add_session(MidiSession("127.0.0.1", rport=1, sport=1))
     midi_session = rtp_control.get_session(midi_session)
     dev_in, dev_out = midi_session.get_devices()
@@ -99,7 +99,7 @@ def before_shutdown():
     """
     cleanup_everything() # FIXME: does it return a Deferred?
     return defer.succeed(None)
-    
+
 def run(version):
     """
     MAIN of the application.
@@ -110,7 +110,7 @@ def run(version):
     details = """Example: midistream -a 10.0.1.29 -r 44000 -s 44000 -i 1 -o 0
 
 This command creates a bi-directional connection with 10.0.1.29 on port 44000, midi device 1 is the source for sending data, and all received data are sent to midi device 0.
-Caution: If the stream is bi-directionnal receiving port and sending port must be equal.""" 
+Caution: If the stream is bi-directionnal receiving port and sending port must be equal."""
     parser = OptionParser(usage="%prog", version=version, description=description, epilog=details)
     parser.add_option("-a", "--address", type="string", help="Specify the address of the peer (mandatory)")
     parser.add_option("-l", "--list-devices", action="store_true", help="Show a complete list of midi devices")
@@ -132,7 +132,7 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
         sys.exit(1)
 
     config = Config()
-    
+
     if options.list_devices:
         list_midi_devices()
         sys.exit(0)
@@ -203,11 +203,11 @@ Caution: If the stream is bi-directionnal receiving port and sending port must b
             sys.exit(2)
     # start the app:
     midi_session_c = RTPControl().add_session(MidiSession(
-        config.peer_address, 
-        sport=config.sending_port, 
-        rport=config.receiving_port, 
-        latency=config.latency, 
-        jitter_buffer_size=config.jitter_buffer, 
+        config.peer_address,
+        sport=config.sending_port,
+        rport=config.receiving_port,
+        latency=config.latency,
+        jitter_buffer_size=config.jitter_buffer,
         safe_keyboard=config.safe_keyboard,
         recovery=config.disable_recovery_journal,
         follow_standard=config.follow_standard,

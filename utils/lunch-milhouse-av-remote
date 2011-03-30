@@ -15,13 +15,13 @@ NUMCHANNELS = 2
 VIDEO_SOURCE = "v4l2src"
 VIDEO_DEVICE = "/dev/video0"
 DISPLAY = ":0.0"
-#VIDEO_BITRATE = 
+#VIDEO_BITRATE =
 
 # audio commands
 # audio local ----------------------------------
 add_command(
     command="milhouse -r --audioport %s --audiocodec %s --address %s --audiosink jackaudiosink" % (R_AUDIO_PORT, AUDIO_CODEC, REMOTE_HOST),
-    title="local_audio_receiver" 
+    title="local_audio_receiver"
     )
 add_command(
     command="milhouse -s --audioport %s --audiocodec %s --audiosource jackaudiosrc -c %s --address %s" % (S_AUDIO_PORT, AUDIO_CODEC, NUMCHANNELS, REMOTE_HOST),

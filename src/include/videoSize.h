@@ -22,7 +22,7 @@
 #ifndef _VIDEO_SIZE_H_
 #define _VIDEO_SIZE_H_
 
-namespace videosize 
+namespace videosize
 {
     const int WIDTH = 640;
     const int HEIGHT = 480;

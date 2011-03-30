@@ -37,17 +37,17 @@ bool Jack::is_running()
 
     if (client == NULL and (status & JackServerFailed))
         return false;
-    if (client == NULL) 
+    if (client == NULL)
     {
         switch (status)
         {
-           case JackInvalidOption:   
+           case JackInvalidOption:
                 THROW_ERROR("The operation contained an invalid or unsupported option.");
                 break;
-           case JackNameNotUnique:  
+           case JackNameNotUnique:
                 THROW_ERROR("The desired client name was not unique. With the JackUseExactName option "
                             "this situation is fatal. Otherwise, the name was modified by appending a "
-                            "dash and a two-digit number in the range -01 to -99. The jack_get_client_name()" 
+                            "dash and a two-digit number in the range -01 to -99. The jack_get_client_name()"
                             "function will return the exact string that was used. If the specified client_name "
                             "plus these extra characters would be too long, the open fails instead.");
                 break;
@@ -56,28 +56,28 @@ bool Jack::is_running()
                         "running already. In either case the caller is now connected to jackd, so there is no race condition."
                         " When the server shuts down, the client will find out.");
                 break;
-           case JackServerFailed:   
+           case JackServerFailed:
                 THROW_ERROR("Unable to connect to the JACK server.");
                 break;
-           case JackServerError:     
+           case JackServerError:
                 THROW_ERROR("Communication error with the JACK server.");
                 break;
-            case JackNoSuchClient:    
-                THROW_ERROR("Requested client does not exist."); 
+            case JackNoSuchClient:
+                THROW_ERROR("Requested client does not exist.");
                 break;
-            case JackLoadFailure:     
+            case JackLoadFailure:
                 THROW_ERROR("Unable to load internal client");
                 break;
-            case JackInitFailure:     
+            case JackInitFailure:
                 THROW_ERROR("Unable to initialize client");
                 break;
-            case JackShmFailure:  
+            case JackShmFailure:
                 THROW_ERROR("Unable to access shared memory");
                 break;
-            case JackVersionError:   
+            case JackVersionError:
                 THROW_ERROR("Client's protocol version does not match");
                 break;
-            case JackFailure:   
+            case JackFailure:
                 THROW_ERROR("Overall operation failed.");
                 break;
             default:
@@ -92,7 +92,7 @@ bool Jack::is_running()
 }
 
 
-jack_nframes_t Jack::samplerate() 
+jack_nframes_t Jack::samplerate()
 {
     if (!is_running())
         THROW_ERROR("JACK server not running, cannot get sample rate.");
@@ -115,7 +115,7 @@ void Jack::assertReady()
 }
 
 
-unsigned int Jack::framesPerPeriod() 
+unsigned int Jack::framesPerPeriod()
 {
     if (!is_running())
         THROW_ERROR("JACK server not running, cannot compare sample rates.");
@@ -133,7 +133,7 @@ unsigned int Jack::framesPerPeriod()
 unsigned long long Jack::minBufferTime()
 {
     const unsigned long long USECS_PER_SEC = 1000000LL;
-    return  ((framesPerPeriod() / static_cast<float>(samplerate())) * USECS_PER_SEC); 
+    return  ((framesPerPeriod() / static_cast<float>(samplerate())) * USECS_PER_SEC);
 }
 
 unsigned long long Jack::safeBufferTime()

@@ -44,7 +44,7 @@ class JitterBuffer(object):
 
         self.lock.release()
 
-        
+
     def has_seq(self, seq):
         """Looking for a special seqNum"""
         res = False
@@ -61,7 +61,7 @@ class JitterBuffer(object):
         last_time = 0
         self.lock.acquire()
         while ( i < len(self.buffer)):
-            #if buffer time passed or 
+            #if buffer time passed or
             if self.buffer[i][1] <= time:
                 to_send.append(self.buffer[i][0])
                 del self.buffer[i]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -30,7 +30,7 @@ import smtplib
 import gtk.gdk
 import webbrowser
 from twisted.internet import reactor
-from twisted.internet import utils 
+from twisted.internet import utils
 from twisted.python import procutils
 from twisted.internet import defer
 from twisted.internet import task
@@ -111,7 +111,7 @@ def _get_combobox_value(widget):
         tree_model_row = tree_model[index]
     except IndexError:
         raise RuntimeError("Cannot get ComboBox's value. Its tree model %s doesn't have row number %s." % (widget, index))
-    return tree_model_row[0] 
+    return tree_model_row[0]
 
 def _set_combobox_choices(widget, choices=[]):
     """
@@ -191,7 +191,7 @@ def format_contact_markup(contact):
     auto_accept = ""
     if contact["auto_accept"]:
         auto_accept = "\n  " + _("Automatically accept invitations")
-    return "<b>%s</b>\n  IP: %s%s" % (contact["name"], contact["address"], auto_accept) 
+    return "<b>%s</b>\n  IP: %s%s" % (contact["name"], contact["address"], auto_accept)
 
 
 class Gui(object):
@@ -204,14 +204,14 @@ class Gui(object):
         self.app = app
         self.kiosk_mode_on = kiosk_mode
         widgets_tree = glade.get_widgets_tree()
-        
+
         self._widgets_changed_by_user = True # if False, we are changing some widget's value programmatically.
         # connects callbacks to widgets automatically
         glade_signal_slots = {}
         for method in prefixedMethods(self, "on_"):
             glade_signal_slots[method.__name__] = method
         widgets_tree.signal_autoconnect(glade_signal_slots)
-        
+
         # Get all the widgets that we use
         self.main_window = widgets_tree.get_widget("main_window")
         self.main_window.connect('delete-event', self.on_main_window_deleted)
@@ -219,7 +219,7 @@ class Gui(object):
         self.main_tabs_widget = widgets_tree.get_widget("mainTabs")
         def _on_keypress(unused_widget, event):
             """
-            On ctrl-Tab, go to next tab. Wraps around. 
+            On ctrl-Tab, go to next tab. Wraps around.
             """
             if event.keyval == gtk.keysyms.Tab and (event.state & gtk.gdk.CONTROL_MASK):
                 page_num = (self.main_tabs_widget.get_current_page() + 1) % self.main_tabs_widget.get_n_pages()
@@ -230,32 +230,32 @@ class Gui(object):
         self.system_tab_contents_widget = widgets_tree.get_widget("system_tab_contents")
         self.debug_tab_contents_widget = widgets_tree.get_widget("debug_tab_contents")
         self.main_window.connect("window-state-event", self.on_window_state_event)
-        
+
         # ------------------------------ dialogs:
         # confirm_dialog: (a simple yes/no)
         self.confirm_dialog = dialogs.ConfirmDialog(parent=self.main_window)
 
         # calling_dialog: (this widget is created and destroyed really often !!
         self.calling_dialog = None
-        
+
         # invited_dialog:
         self.invited_dialog = dialogs.InvitedDialog(parent=self.main_window)
-        
+
         # edit_contact_window:
         self.edit_contact_window = widgets_tree.get_widget("edit_contact_window")
         self.edit_contact_window.set_transient_for(self.main_window) # child of main window
         self.edit_contact_window.connect('delete-event', self.edit_contact_window.hide_on_delete)
-        
+
         # fields in the edit contact window:
         self.contact_name_widget = widgets_tree.get_widget("contact_name")
         self.contact_addr_widget = widgets_tree.get_widget("contact_addr")
         self.contact_auto_accept_widget = widgets_tree.get_widget("contact_auto_accept")
-        
+
         # -------------------- main window widgets:
         # invite button:
         self.invite_label_widget = widgets_tree.get_widget("invite_label")
         self.invite_icon_widget = widgets_tree.get_widget("invite_icon")
-        
+
         # addressbook buttons:
         self.edit_contact_widget = widgets_tree.get_widget("edit_contact")
         self.add_contact_widget = widgets_tree.get_widget("add_contact")
@@ -334,7 +334,7 @@ class Gui(object):
         in_socket.show()
         self.audio_levels_input_widget.add(in_socket)
         self.audio_levels_input_socket_id = in_socket.get_id()
-        
+
         self.audio_levels_output_widget = widgets_tree.get_widget("audio_levels_output")
         out_socket = gtk.Socket()
         out_socket.connect("plug-removed", _plug_removed_cb)
@@ -365,26 +365,26 @@ class Gui(object):
         if self.kiosk_mode_on:
             self.main_window.set_decorated(False)
         else:
-            # Removes the sytem_tab 
+            # Removes the sytem_tab
             tab_num = self.main_tabs_widget.page_num(self.system_tab_contents_widget)
             log.debug("Removing tab number %d." % (tab_num))
             self.main_tabs_widget.remove_page(tab_num)
 
         self.enable_debug = enable_debug
         if not self.enable_debug: # hide the tab if not in debug
-            # Removes the debug_tab 
+            # Removes the debug_tab
             tab_num = self.main_tabs_widget.page_num(self.debug_tab_contents_widget)
             log.debug("Removing tab number %d." % (tab_num))
             self.main_tabs_widget.remove_page(tab_num)
-        
+
         self.is_fullscreen = False
         if fullscreen:
             log.debug("Making the main window fullscreen.")
             self.toggle_fullscreen()
-        
+
         # ------------------ contact list view
         self.selection = self.contact_list_widget.get_selection()
-        self.selection.connect("changed", self.on_contact_list_changed, None) 
+        self.selection.connect("changed", self.on_contact_list_changed, None)
         self.contact_tree = gtk.ListStore(str)
         self.contact_list_widget.set_model(self.contact_tree)
         column = gtk.TreeViewColumn(_("Contacts"), gtk.CellRendererText(), markup=0)
@@ -395,7 +395,7 @@ class Gui(object):
         self.video_preview_icon_widget = widgets_tree.get_widget("video_preview_icon")
         self.preview_manager.state_changed_signal.connect(self.on_preview_manager_state_changed)
         self.main_window.show()
-        
+
         # recurring calls:
         self._streaming_state_check_task = task.LoopingCall(self.update_streaming_state)
         self._streaming_state_check_task.start(1.0, now=False)
@@ -410,7 +410,7 @@ class Gui(object):
 
     def _disable_audio_test_source(self):
         _set_combobox_choices(self.audio_source_widget, AUDIO_SOURCES.keys())
-   
+
     def _disable_unsupported_codecs(self):
         """
         Checks if codecs for which not Gstreamer elements are found, and disabled them.
@@ -432,7 +432,7 @@ class Gui(object):
                 readable_working_video_codecs.append(readable)
             else:
                 broken_video_codecs.append(readable)
-        
+
         # audio codecs:
         for readable, codec in AUDIO_CODECS.iteritems():
             if gstreamer.is_codec_supported(codec):
@@ -444,9 +444,9 @@ class Gui(object):
         # set combo boxes choices:
         _set_combobox_choices(self.audio_codec_widget, readable_working_audio_codecs)
         _set_combobox_choices(self.video_codec_widget, readable_working_video_codecs)
-        
+
         #if len(broken_audio_codecs) != 0 or len(broken_video_codecs) != 0:
-        #    msg = _("Some codecs are not supported on your system. They are currently disabled.") 
+        #    msg = _("Some codecs are not supported on your system. They are currently disabled.")
         #    details = _("You should consider installing the Gstreamer elements to benefit from those codecs.")
         #    details += "\n"
         #    if len(broken_video_codecs) != 0:
@@ -480,14 +480,14 @@ class Gui(object):
         self.is_fullscreen = event.new_window_state & gtk.gdk.WINDOW_STATE_FULLSCREEN != 0
         #print('fullscreen %s' % (self.is_fullscreen))
         return True
-    
+
     def on_main_window_deleted(self, *unused_args):
         """
         Destroy method causes application to exit
         when main window closed
         """
         return self._confirm_and_quit()
-        
+
     def _confirm_and_quit(self):
         def _cb(result):
             if result:
@@ -499,7 +499,7 @@ class Gui(object):
         # GTK will emit the "destroy" signal. Returning TRUE means
         # you don't want the window to be destroyed.
         # This is useful for popping up 'are you sure you want to quit?'
-        # type dialogs. 
+        # type dialogs.
         if self.app.config.confirm_quit and self.app.has_session():
             d = dialogs.YesNoDialog.create(_("Really quit ?\nAll streaming processes will quit as well."), parent=self.main_window)
             d.addCallback(_cb)
@@ -507,7 +507,7 @@ class Gui(object):
         else:
             _cb(True)
             return False
-    
+
     def on_main_window_destroyed(self, *unused_args):
         # TODO: confirm dialog!
         if reactor.running:
@@ -544,7 +544,7 @@ class Gui(object):
             return deferred
         else:
             return defer.succeed(None)
-        
+
     def on_video_view_preview_toggled(self, widget):
         """
         Shows a preview of the video input.
@@ -560,7 +560,7 @@ class Gui(object):
                 self.preview_manager.start()
             except RuntimeError, e:
                 log.warning("The user started or stopped the preview very quickly. " + str(e))
-            
+
         if self._widgets_changed_by_user:
             if widget.get_active():
                 deferred = self.app.poll_jack_now()
@@ -571,7 +571,7 @@ class Gui(object):
     def on_main_tabs_switch_page(self, widget, unused_notebook_page, page_number):
         """
         Called when the user switches to a different page.
-        Pages names are : 
+        Pages names are :
          * video_tab_contents
          * audio_tab_contents
          * system_tab_contents
@@ -596,10 +596,10 @@ class Gui(object):
 
     def on_contact_list_changed(self, *args):
         """
-        Called when the selected contact has changed. 
-        
-        We'll also call this when a new contact has just been added. 
-        """ 
+        Called when the selected contact has changed.
+
+        We'll also call this when a new contact has just been added.
+        """
         #print("on_contact_list_changed")
         # FIXME: what is args?
         tree_list, self.selected_contact_row = args[0].get_selected()
@@ -626,10 +626,10 @@ class Gui(object):
             self.invite_contact_widget.set_sensitive(True)
 
     # ---------------------- slots for addressbook widgets events --------
-    
+
     def on_contact_double_clicked(self, *args):
         """
-        When a contact in the list is double-clicked, 
+        When a contact in the list is double-clicked,
         shows the edit contact dialog.
         """
         self.on_edit_contact_clicked(args)
@@ -637,7 +637,7 @@ class Gui(object):
     def on_add_contact_clicked(self, *unused_args):
         """
         Pops up a dialog to be filled with new contact infos.
-        
+
         The add_contact buttons has been clicked.
         """
         self.app.address_book.current_contact_is_new = True
@@ -757,7 +757,7 @@ class Gui(object):
 
     def on_maintenance_send_info_clicked(self, *unused_args):
         """
-        Sends an email to SAT with this information : 
+        Sends an email to SAT with this information :
          * milhouse version
          * kernel version
          * Loaded kernel modules
@@ -801,7 +801,7 @@ class Gui(object):
                 except:
                     self.show_error_dialog(_("Could not send info.\nCheck your internet connection."))
                 server.quit()
-        
+
         text = _("<b><big>Send the settings?</big></b>\n\nAre you sure you want to send your computer settings to the administrator of scenic?")
         self.show_confirm_dialog(text, _on_confirm_result)
 
@@ -849,7 +849,7 @@ class Gui(object):
         _set_config("video_jitterbuffer", self.video_jitterbuffer_widget.get_value_as_int()) # spinbutton
         _set_config("video_bitrate", float(self.video_bitrate_widget.get_value())) # spinbutton (float)
         _set_config("preview_in_window", self.preview_in_window_widget.get_active())
-        
+
         # AUDIO:
         _set_config("audio_send_enabled", self.audio_send_enabled_widget.get_active())
         _set_config("audio_recv_enabled", self.audio_receive_enabled_widget.get_active())
@@ -861,7 +861,7 @@ class Gui(object):
         _set_config("audio_output_buffer", self.audio_output_buffer_widget.get_value_as_int())
         _set_config("audio_jitterbuffer", self.audio_jitterbuffer_widget.get_value_as_int()) # spinbutton
         _set_config("audio_jack_enable_autoconnect", self.audio_jack_enable_autoconnect_widget.get_active())
-        
+
         # MIDI:
         if not self.app.midi_is_supported():
             log.info("MIDI is not supported, since python-portmidi is not found.")
@@ -873,7 +873,7 @@ class Gui(object):
             _set_config("midi_input_device", _get_combobox_value(self.midi_input_device_widget))
             _set_config("midi_output_device", _get_combobox_value(self.midi_output_device_widget))
             _set_config("midi_jitterbuffer", self.midi_jitterbuffer_widget.get_value_as_int())
-        
+
     def update_widgets_with_saved_config(self):
         """
         Called once at startup.
@@ -912,7 +912,7 @@ class Gui(object):
         video_codec = _get_key_for_value(VIDEO_CODECS, self.app.config.video_codec)
         _set_combobox_value(self.video_codec_widget, video_codec)
         log.debug(' * video_codec: %s' % (video_codec))
-        
+
         # ADDRESSBOOK:
         # Init addressbook contact list:
         self.app.address_book.selected_contact = None
@@ -953,7 +953,7 @@ class Gui(object):
         log.debug(" * audio_codec: %s" % (audio_codec))
         _set_combobox_value(self.audio_codec_widget, audio_codec)
         self.make_audio_jitterbuffer_enabled_or_not()
-        
+
         # MIDI:
         log.debug("MIDI jitterbuffer: %s" % (self.app.config.midi_jitterbuffer))
         if self.app.midi_is_supported():
@@ -966,7 +966,7 @@ class Gui(object):
             self.midi_send_enabled_widget.set_active(False)
             self.midi_recv_enabled_widget.set_active(False)
         self.make_midi_widget_sensitive_or_not()
-            
+
 
         # IMPORTANT: (to be done last)
         self._widgets_changed_by_user = True
@@ -974,7 +974,7 @@ class Gui(object):
     def update_streaming_state(self):
         """
         Changes the sensitivity and state of many widgets according to if we are streaming or not.
-        
+
         Makes most of the audio/video buttons and widgets sensitive or not.
         Changes the invite button:
          * the icon
@@ -990,11 +990,11 @@ class Gui(object):
             self.video_source_widget,
             self.aspect_ratio_widget,
             self.video_view_preview_widget,
-            self.preview_in_window_widget, 
+            self.preview_in_window_widget,
             self.v4l2_input_widget,
             self.v4l2_standard_widget,
             ]
-        
+
         _other_widgets_to_toggle_sensitivity = [
             self.audio_source_widget,
             self.audio_codec_widget,
@@ -1011,9 +1011,9 @@ class Gui(object):
             self.video_jitterbuffer_widget,
             self.video_codec_widget,
             self.video_display_widget,
-            self.midi_input_device_widget, 
+            self.midi_input_device_widget,
             self.midi_output_device_widget,
-            self.midi_send_enabled_widget, 
+            self.midi_send_enabled_widget,
             self.midi_recv_enabled_widget,
             self.midi_jitterbuffer_widget,
             self.audio_send_enabled_widget,
@@ -1022,9 +1022,9 @@ class Gui(object):
             self.video_send_enabled_widget,
             self.video_receive_enabled_widget,
             ]
-        
+
         self.update_bitrate_and_codec()
-        
+
         is_streaming = self.app.has_session()
         if is_streaming:
             details = self.app.streamer_manager.session_details
@@ -1040,10 +1040,10 @@ class Gui(object):
             else:
                 self.update_invite_button_with_contact_name()
                 icon = gtk.STOCK_DISCONNECT
-                if len(self.app.address_book.contact_list) == 0: 
+                if len(self.app.address_book.contact_list) == 0:
                     self.invite_contact_widget.set_sensitive(False)
             self.invite_icon_widget.set_from_stock(icon, 4)
-            
+
             # Toggle sensitivity of many widgets:
             new_sensitivity = not is_streaming
             log.debug('Got to change the sensitivity of many widgets to %s' % (new_sensitivity))
@@ -1051,8 +1051,8 @@ class Gui(object):
                 widget.set_sensitive(new_sensitivity)
             for widget in _video_widgets_to_toggle_sensitivity:
                 widget.set_sensitive(new_sensitivity)
-                
-            # Update the summary: 
+
+            # Update the summary:
             # peer: --------------------------------
             if is_streaming:
                 peer_name = details["peer"]["name"]
@@ -1061,9 +1061,9 @@ class Gui(object):
                 self.info_peer_widget.set_text(peer_name)
             else:
                 self.info_peer_widget.set_text(_("Not connected"))
-            
-            self.make_midi_widget_sensitive_or_not()       
-        
+
+            self.make_midi_widget_sensitive_or_not()
+
         # also clean up the preview drawing area every second
         if self.preview_manager.is_busy():
             if self.preview_in_window_widget.get_property('sensitive'): # check if we have to change their state.
@@ -1099,7 +1099,7 @@ class Gui(object):
                     self.midi_input_device_widget.set_sensitive(False)
                 else:
                     self.midi_input_device_widget.set_sensitive(True)
-                    
+
                 if not self.app.config.midi_recv_enabled:
                     self.midi_output_device_widget.set_sensitive(False)
                     self.midi_jitterbuffer_widget.set_sensitive(False)
@@ -1117,7 +1117,7 @@ class Gui(object):
         if self._widgets_changed_by_user:
             self._gather_configuration()
             self.make_midi_widget_sensitive_or_not()
-    
+
     def on_midi_recv_enabled_toggled(self, *unused_args):
         if self._widgets_changed_by_user:
             self._gather_configuration()
@@ -1154,9 +1154,9 @@ class Gui(object):
             _info_send_video = ""
             if details["send"]["video"]["enabled"]:
                 _info_send_video += _("%(width)dx%(height)d %(codec)s") % {
-                    "width": details["send"]["video"]["width"], 
-                    "height": details["send"]["video"]["height"], 
-                    "codec": details["send"]["video"]["codec"], 
+                    "width": details["send"]["video"]["width"],
+                    "height": details["send"]["video"]["height"],
+                    "codec": details["send"]["video"]["codec"],
                     }
                 _info_send_video += _format_bitrate(rtcp_stats["send"]["video"]["bitrate"])
                 _info_send_video += "\n"
@@ -1175,13 +1175,13 @@ class Gui(object):
                 _info_send_video += _("Disabled")
 
             self.info_send_video_widget.set_text(_info_send_video)
-            
+
             # send audio: --------------------------------
             _info_send_audio = ""
             if details["send"]["audio"]["enabled"]:
                 _info_send_audio += _("%(numchannels)d-channel %(codec)s") % {
-                    "numchannels": details["send"]["audio"]["numchannels"], 
-                    "codec": details["send"]["audio"]["codec"] 
+                    "numchannels": details["send"]["audio"]["numchannels"],
+                    "codec": details["send"]["audio"]["codec"]
                     }
                 _info_send_audio += _format_bitrate(rtcp_stats["send"]["audio"]["bitrate"])
                 _info_send_audio += "\n"
@@ -1198,9 +1198,9 @@ class Gui(object):
             _info_recv_video = ""
             if details["receive"]["video"]["enabled"]:
                 _info_recv_video += _("%(width)dx%(height)d %(codec)s") % {
-                    "width": details["receive"]["video"]["width"], 
-                    "height": details["receive"]["video"]["height"], 
-                    "codec": details["receive"]["video"]["codec"], 
+                    "width": details["receive"]["video"]["width"],
+                    "height": details["receive"]["video"]["height"],
+                    "codec": details["receive"]["video"]["codec"],
                     }
                 _info_recv_video += _format_bitrate(rtcp_stats["receive"]["video"]["bitrate"])
                 _info_recv_video += "\n" + _("Display: %(display)s") % {"display": details["receive"]["video"]["display"]}
@@ -1208,15 +1208,15 @@ class Gui(object):
                     _info_recv_video += "\n" + _("Fullscreen is enabled.")
             else:
                 _info_recv_video += _("Disabled.")
-                
+
             #print("info recv video: " + _info_recv_video)
             self.info_receive_video_widget.set_text(_info_recv_video)
             # recv audio: --------------------------------
             _info_recv_audio = ''
             if details["receive"]["audio"]["enabled"]:
                 _info_recv_audio = _("%(numchannels)d-channel %(codec)s") % {
-                    "numchannels": details["receive"]["audio"]["numchannels"], 
-                    "codec": details["receive"]["audio"]["codec"] 
+                    "numchannels": details["receive"]["audio"]["numchannels"],
+                    "codec": details["receive"]["audio"]["codec"]
                     }
                 _info_recv_audio += _format_bitrate(rtcp_stats["receive"]["audio"]["bitrate"])
                 _info_recv_audio += "\n"
@@ -1240,7 +1240,7 @@ class Gui(object):
                 #_info_send_midi += _("Input device: %(name)s" % {"name": self.app.config.midi_input_device})
             else:
                 _info_send_midi += _("Disabled")
-                
+
             self.info_receive_midi_widget.set_text(_info_recv_midi)
             self.info_send_midi_widget.set_text(_info_send_midi)
 
@@ -1254,7 +1254,7 @@ class Gui(object):
 
     def write_info_in_debug_tab(self):
         """
-        Writes some information in the debug textview, if debugging is enabled. 
+        Writes some information in the debug textview, if debugging is enabled.
         """
         def _format_command_line(cmd):
             """
@@ -1264,13 +1264,13 @@ class Gui(object):
             #words = cmd.split()
             #length = 0
             #text = ""
-            #for word in words: 
+            #for word in words:
             #    length += len(word)
             #    if length >= 40:
             #        text += "\n"
             #        length = 0
             #    text += word + " "
-            return _("$ %(command)s") % {"command": text} 
+            return _("$ %(command)s") % {"command": text}
         if self.enable_debug:
             _debug_text = ""
             _debug_text += _("Command lines:") + "\n"
@@ -1281,7 +1281,7 @@ class Gui(object):
             pass
             #if self.enable_debug:
             #    self.debug_textview_widget.get_buffer().set_text(u"")
-        
+
     def update_local_ip(self):
         """
         Updates the local IP addresses widgets.
@@ -1304,7 +1304,7 @@ class Gui(object):
 
     def on_audio_video_synchronized_toggled(self, *unused_args):
         """
-        Called when the user toggles on/off the synchronization of audio and video. 
+        Called when the user toggles on/off the synchronization of audio and video.
         """
         #if self._widgets_changed_by_user:
         self.make_audio_jitterbuffer_enabled_or_not()
@@ -1322,7 +1322,7 @@ class Gui(object):
             self.audio_jitterbuffer_widget.set_sensitive(False)
         else:
             self.audio_jitterbuffer_widget.set_sensitive(True)
-        
+
     def on_audio_codec_changed(self, unused_widget):
         """
         Called when the user selects a different audio codec, updates
@@ -1336,9 +1336,9 @@ class Gui(object):
             max_channels = self.app.max_channels_in_raw
         elif _get_combobox_value(self.audio_codec_widget) == "Vorbis":
             max_channels = 64 #256
-        # update range and clamp numchannels to new range 
+        # update range and clamp numchannels to new range
         self.audio_numchannels_widget.set_range(1, max_channels)
-        self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels)) 
+        self.audio_numchannels_widget.set_value(min(old_numchannels, max_channels))
 
     def update_bitrate_and_codec(self):
         old_bitrate = self.video_bitrate_widget.get_value()
@@ -1355,10 +1355,10 @@ class Gui(object):
             self.video_bitrate_widget.set_value(min(maxi, max(old_bitrate, mini)))
         else:
             self.video_bitrate_widget.set_sensitive(False)
-    
+
     def on_video_codec_changed(self, _widget):
         self.update_bitrate_and_codec()
-        
+
     def update_x11_devices(self):
         """
         Called once Application.poll_x11_devices has been run
@@ -1393,7 +1393,7 @@ class Gui(object):
 
     def update_v4l2_inputs_size_and_norm(self):
         """
-        Called when : 
+        Called when :
          * user chooses a different video source.
         If the selected is not a V4L2, disables the input and norm widgets.
         """
@@ -1432,8 +1432,8 @@ class Gui(object):
                 else:
                     self.v4l2_input_widget.set_sensitive(False)
                     self.v4l2_input_widget.set_active(-1)
-                
-                # STANDARD: 
+
+                # STANDARD:
                 current_standard = cam["standard"]
                 if current_standard is not None: # check if device supports different standards
                     self.v4l2_standard_widget.set_sensitive(True)
@@ -1448,13 +1448,13 @@ class Gui(object):
                 _set_combobox_choices(self.video_capture_size_widget, cam["supported_sizes"]) # TODO: more test sizes
         # once done:
         self._widgets_changed_by_user = True
-            
+
     def on_video_source_changed(self, unused_widget):
         """
         Called when the user changes the video source.
          * updates the input
         """
-        if self._widgets_changed_by_user: 
+        if self._widgets_changed_by_user:
             full_name = _get_combobox_value(self.video_source_widget)
             if full_name != VIDEO_TEST_INPUT:
                 #dev = self.app.parse_v4l2_device_name(full_name)
@@ -1467,7 +1467,7 @@ class Gui(object):
         Calls `milhouse --videodevice /dev/videoX --v4l2-standard XXX
         Values are either NTSC or PAL.
         """
-        if self._widgets_changed_by_user: 
+        if self._widgets_changed_by_user:
             # change standard for device
             full_name = _get_combobox_value(self.video_source_widget)
             if full_name != VIDEO_TEST_INPUT:
@@ -1488,7 +1488,7 @@ class Gui(object):
                             msg = _("Could not change V4L2 standard from %(current_standard)s to %(desired_standard)s for device %(device_name)s.") % {"current_standard": actual_standard, "desired_standard": standard_name, "device_name": current_camera_name}
                             log.error(msg)
                             self.show_error_dialog(msg)
-                            
+
                             self._widgets_changed_by_user = False
                             _set_combobox_value(self.v4l2_standard_widget, actual_standard)
                             self._widgets_changed_by_user = True
@@ -1497,7 +1497,7 @@ class Gui(object):
                             log.info("Successfully changed standard to %s for device %s." % (actual_standard, current_camera_name))
                             log.debug("Now polling cameras.")
                     self.v4l2_standard_widget.set_sensitive(True)
-                
+
                 standard_name = _get_combobox_value(widget)
                 #cam = self.app.devices["cameras"][current_camera_name]
                 self.v4l2_standard_widget.set_sensitive(False)
@@ -1505,9 +1505,9 @@ class Gui(object):
                 def _cb(result):
                     d2 = self.app.poll_camera_devices()
                     d2.addCallback(_cb2)
-                    
+
                 d.addCallback(_cb)
-        
+
     def on_v4l2_input_changed(self, widget):
         """
         When the user changes the V4L2 input, we actually change this input using milhouse.
@@ -1552,17 +1552,17 @@ class Gui(object):
                     d.addCallback(_cb)
 
     # -------------------------- menu items -----------------
-    
+
     def on_about_menu_item_activated(self, unused_menu_item):
         About.create() # TODO: set parent window ?
-    
+
     def on_quit_menu_item_activated(self, unused_menu_item):
         """
         Quits the application.
         """
         log.info("Menu item 'Quit' chosen")
         self._confirm_and_quit()
-    
+
     def on_installation_manual_menu_item_activated(self, unused_menu_item):
         """
         Opens the docbook doc
@@ -1570,7 +1570,7 @@ class Gui(object):
         log.info("Menu item 'Installatin manual' chosen")
         docbook_file = os.path.join(configure.DOCBOOK_DIR, "installation-manual.xml")
         process.run_once("yelp", docbook_file)
-    
+
     def on_help_menu_item_activated(self, unused_menu_item):
         """
         Opens the docbook doc
@@ -1595,10 +1595,10 @@ class Gui(object):
             log.error("Invite button clicked but we have a negotiation in progress.")
         else:
             self.app.send_invite()
-    
+
     def show_error_dialog(self, text, details=None):
         """
-        Simply shows an error dialog. 
+        Simply shows an error dialog.
         @rettype: L{Deferred}
         """
         return dialogs.ErrorDialog.create(text, parent=self.main_window, details=details)
@@ -1612,7 +1612,7 @@ class Gui(object):
             deferred.addCallback(callback)
 
     def show_invited_dialog(self, text):
-        """ 
+        """
         This could be replaced by a yes/no dialog. That's actually what it is.
         @rtype: L{Deferred}
         """
@@ -1629,7 +1629,7 @@ class Gui(object):
         #self.calling_dialog.set_parent(self.main_window)
         self.calling_dialog.connect('delete-event', self.on_invite_contact_cancelled)
         self.calling_dialog.show()
-    
+
     def on_invite_contact_cancelled(self, *unused_args):
         """
         Sends a CANCEL to the remote peer when invite contact window is closed.
@@ -1662,7 +1662,7 @@ class Gui(object):
                 self.audio_jack_state_widget.set_markup(_("<b>Not running</b>"))
                 self.audio_jack_icon_widget.set_from_stock(gtk.STOCK_NO, 4)
         if fill_stats:
-            j = self.app.devices["jack_servers"][0] 
+            j = self.app.devices["jack_servers"][0]
             try:
                 latency = j["latency"]
             except KeyError, e:
@@ -1673,7 +1673,7 @@ class Gui(object):
         else:
             self.jack_latency_widget.set_text("")
             self.jack_sampling_rate_widget.set_text("")
-            
+
 
 class About(object):
     """
@@ -1688,9 +1688,9 @@ class About(object):
         self.about_dialog.set_name(configure.APPNAME)
         self.about_dialog.set_role('about')
         self.about_dialog.set_version(configure.VERSION)
-        commentlabel = ONE_LINE_DESCRIPTION 
+        commentlabel = ONE_LINE_DESCRIPTION
         self.about_dialog.set_comments(commentlabel)
-        self.about_dialog.set_copyright(COPYRIGHT_SHORT) 
+        self.about_dialog.set_copyright(COPYRIGHT_SHORT)
         self.about_dialog.set_license(LICENSE_TEXT)
         self.about_dialog.set_authors(AUTHORS_LIST)
         #self.about_dialog.set_artists(['Public domain'])
@@ -1713,7 +1713,7 @@ class About(object):
         """
         dialog = About()
         return dialog.show_about_dialog()
-     
+
     def show_website(self, unused_widget, data):
         webbrowser.open(data)
 
@@ -1738,7 +1738,7 @@ class StatusWindow(object):
             self.status_window.set_icon_from_file(self.icon_file)
         # populate the info
         self._populate_info()
-    
+
         # show it
         self.status_window.show_all()
 
@@ -1754,7 +1754,7 @@ class StatusWindow(object):
 
         txt = ""
         txt += _format_text_and_yesno(_("MIDI is supported..."), self.app._midi_is_supported)
-        
+
         for readable, codec in VIDEO_CODECS.iteritems():
             txt += _format_text_and_yesno(_("Video codec %(codec)s is supported...") % {"codec": readable}, codec in self.app._supported_codecs["video"])
         for readable, codec in AUDIO_CODECS.iteritems():
@@ -1783,4 +1783,4 @@ class StatusWindow(object):
         d = utils.getProcessOutput(executable, args=['--gst-version'], env=os.environ, errortoo=True)
         d.addCallback(_cb, txt)
         d.addErrback(_eb, d)
-    
+

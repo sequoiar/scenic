@@ -212,7 +212,7 @@ class MediaDescription:
         payload = 96
         fmtp = "%d streamtype=%d; mode=%s; profile-level-id=%d; config=%d" % (payload, streamtype, mode, profile_level, config)
         self._a.setdefault('fmtp', OrderedDict())[96]= fmtp
-        
+
     def intersect(self, other):
         # See RFC 3264
         map1 = self.rtpmap
@@ -370,12 +370,12 @@ if __name__ == "__main__":
     s.addMediaDescription(md)
     md.setServerIP("127.0.0.1")
     md.setLocalPort(44000)
-    
+
     #Payload Type
     md.addRtpMap(PT_AVP)
     md.addFMTP(5)
     #FMTP
-    
+
     #md.addRtpMap(PT_PCMU)
     res = s.show()
 
@@ -383,7 +383,7 @@ if __name__ == "__main__":
     tmp_sdp = SDP()
     tmp_sdp.parse(res)
     app_conf = tmp_sdp.getMediaDescription("audio").rtpmap
-    
+
     print app_conf.items()[0][1][0]
 
     #Compare
@@ -395,5 +395,5 @@ if __name__ == "__main__":
     md.setLocalPort(4420)
     md.addFMTP(10)
 
-   
+
 

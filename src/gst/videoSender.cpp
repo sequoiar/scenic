@@ -66,7 +66,7 @@ void VideoSender::createCodec(Pipeline &pipeline)
     int framerateIndex = 0;
     while (not linked)
     {
-        try 
+        try
         {
             gstlinkable::link(*source_, *encoder_);
             linked = true;
@@ -81,7 +81,7 @@ void VideoSender::createCodec(Pipeline &pipeline)
 }
 
 
-void VideoSender::createPayloader()       
+void VideoSender::createPayloader()
 {
     payloader_.reset(encoder_->createPayloader());
     assert(payloader_);

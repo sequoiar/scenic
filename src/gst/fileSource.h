@@ -38,12 +38,12 @@ class FileSource : private boost::noncopyable
         static _GstElement * acquireVideo(const Pipeline &pipeline, const std::string &location);
         static void releaseAudio(const std::string &location);
         static void releaseVideo(const std::string &location);
-        
+
     private:
         FileSource(const Pipeline &pipeline, const std::string &location);
         ~FileSource();
         bool isLinked();
-        
+
         static bool instanceExists(const std::string &location);
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
                                    void *data);

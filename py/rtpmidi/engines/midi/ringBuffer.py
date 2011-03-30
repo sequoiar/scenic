@@ -31,8 +31,8 @@ class myRingBuffer(object):
         self.start = 0
         self.end = 0
         self.buffer = []
-    
-    #get the total len of the ring    
+
+    #get the total len of the ring
     def len(self):
         return len(self.buffer)
 
@@ -67,7 +67,7 @@ class myRingBuffer(object):
         else:
             copied = self.buffer
             self.buffer = []
-                
+
         return copied
 
 

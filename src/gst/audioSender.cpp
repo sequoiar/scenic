@@ -35,7 +35,7 @@
 
 using std::tr1::shared_ptr;
 
-static void 
+static void
 validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
 {
     using boost::lexical_cast;
@@ -48,7 +48,7 @@ validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
     }
 }
 
-/// Constructor 
+/// Constructor
 AudioSender::AudioSender(Pipeline &pipeline,
         const shared_ptr<AudioSourceConfig> &aConfig,
         const shared_ptr<SenderConfig> &rConfig) :
@@ -82,7 +82,7 @@ void AudioSender::createCodec(Pipeline &pipeline)
 }
 
 
-void AudioSender::createPayloader()   
+void AudioSender::createPayloader()
 {
     payloader_.reset(encoder_->createPayloader());
     assert(payloader_);

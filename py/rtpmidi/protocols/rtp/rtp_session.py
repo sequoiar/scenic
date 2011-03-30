@@ -8,9 +8,9 @@ from rtpmidi.protocols.rtp.rtp_control import RTPControl
 class RTPSession(object):
     """RTP Session prototype
     """
-    def __init__(self, peerAddress, sport, rport, payload, 
+    def __init__(self, peerAddress, sport, rport, payload,
                  jitter_buffer_size, tool_name="", fqdn="", user_name=""):
-        #RTP utils     
+        #RTP utils
         self.sport = sport
         self.rport = rport
 
@@ -38,11 +38,11 @@ class RTPSession(object):
         #checkpoint received
         #A dict of that link with member table
         self.checkpoint = 0
-        
+
         #checkpoint sent
         self.last_checkpoint = 0
         self.seq = 0
-        
+
         #stat
         self.last_send = 0
 
@@ -50,25 +50,25 @@ class RTPSession(object):
         """If override by daughters must call:
         """
         RTPControl().start_session(self.cookie)
- 
+
     def stop(self):
         """If override by daughters must call:
         """
         RTPControl().stop_session(self.cookie)
-    
+
     def incoming_rtp(self, cookie, timestamp, packet,
                      read_recovery_journal = 0):
-        """Function called by RTPProtocol when incoming 
+        """Function called by RTPProtocol when incoming
         data coming out from jitter buffer
         """
         raise NotImplementedError
-        	
+
     def send_empty_packet(self, chunk=0):
         RTPControl().send_empty_packet(self.cookie, chunk)
 
-            
+
     def send_data(self, data, ts):
-        #Selecting RTP session 
+        #Selecting RTP session
         RTPControl().send_data_packet(self.cookie, data, ts)
 
 

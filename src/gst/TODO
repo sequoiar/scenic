@@ -2,7 +2,7 @@ NTA:
 -do more initialization in constructors, RAII
 -support for raw video (does work with smaller <200 jitter buffer)
 provide info
--use boost signals2 instead of current msg passing/handling 
+-use boost signals2 instead of current msg passing/handling
 -if we have a sender and receiver going, the receiver should for now either 1) gracefully ignore subsequent senders after the first sender goes out 2) go out when the sender goes out
 
 HELLO_WORLD:

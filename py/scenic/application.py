@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -27,12 +27,12 @@ Summary of events
  - At startup, the config file is read.
  - Next, we need to disable the interactivity of widgets
  - We then set the widget's values, and make them interactive again.
- - Some widgets do things when they are changed. Some toggle the sensitivity (gray out) of some other widgets, whereas some other will call external processes to change video and audio devices properties. 
- - When the user decides to start a streaming session, the value of all widgets is read, and we save those values in the config file. 
- - Next, the offerer connects to the answerer and sends it a dict of its configuration options, serialized in JSON. 
- - If the answerer accepts, he sends back its options. Each peer decides which port he listens to for each service. (audio, video, MIDI streams) 
- - Next, the streamer manager store a summary of both peer's options in a large dict. That's where we check which processes we will need to start. 
- - The streamer manager starts the processes. 
+ - Some widgets do things when they are changed. Some toggle the sensitivity (gray out) of some other widgets, whereas some other will call external processes to change video and audio devices properties.
+ - When the user decides to start a streaming session, the value of all widgets is read, and we save those values in the config file.
+ - Next, the offerer connects to the answerer and sends it a dict of its configuration options, serialized in JSON.
+ - If the answerer accepts, he sends back its options. Each peer decides which port he listens to for each service. (audio, video, MIDI streams)
+ - Next, the streamer manager store a summary of both peer's options in a large dict. That's where we check which processes we will need to start.
+ - The streamer manager starts the processes.
  - Some processes' output might be checked for error messages, which can be shown to the user in error dialogs.
  - As soon as one process dies or the user wants to stop the streaming session, we kill all streamer processes and send "BYE" to the other peer. The other peer also stops all its streamer processes.
  - When a session is in progress, many widgets are grayed out. It is not the case when there is no session in progress.
@@ -40,7 +40,7 @@ Summary of events
 
 The preview
 ===========
-The preview works a little like the streamer manager, but is simpler since it does not involve a remote peer. It is a process that is started. When it dies, we toggle the start of the start/stop button. 
+The preview works a little like the streamer manager, but is simpler since it does not involve a remote peer. It is a process that is started. When it dies, we toggle the start of the start/stop button.
 
 Negotiation sequence
 ====================
@@ -55,9 +55,9 @@ Negotiation sequence
 
 Devices names
 =============
-Identifying the devices is a difficult task. The users prefers to see the name of the device, not its number. That's what we show to the user and keep in the state saving. That makes it easier to identify them when there number changes. 
+Identifying the devices is a difficult task. The users prefers to see the name of the device, not its number. That's what we show to the user and keep in the state saving. That makes it easier to identify them when there number changes.
 
-For example, a given V4L2 video device can be mounted as /dev/video0 once and as /dev/video1 at an other time. Same for MIDI devices. 
+For example, a given V4L2 video device can be mounted as /dev/video0 once and as /dev/video1 at an other time. Same for MIDI devices.
 
 But what if we have two devices with same name? Here are two examples:
 
@@ -73,9 +73,9 @@ V4L2 example
  - BT878 video (Osprey 210/220/230 (/dev/video1)
  - UVC Camera (046d:0990) (/dev/video2)
 
-It's nice to show the device number/identifier to the user. In the worst case, the user can test the device to see if it's the right one or not. 
+It's nice to show the device number/identifier to the user. In the worst case, the user can test the device to see if it's the right one or not.
 
-So, our choice is to store both the name of the device and its number in the combo box widget and in the state saving. When we load the device name and number from the config file, we first check for the device with that name and number. If it does not exist, we try to find the first device with that name that we can find. If it does not exist, it defaults to the first choice in the list of devices of that kind. 
+So, our choice is to store both the name of the device and its number in the combo box widget and in the state saving. When we load the device name and number from the config file, we first check for the device with that name and number. If it does not exist, we try to find the first device with that name that we can find. If it does not exist, it defaults to the first choice in the list of devices of that kind.
 """
 import os
 from twisted.internet import defer
@@ -107,9 +107,9 @@ class Config(saving.ConfigStateSaving):
     def __init__(self):
         # Default values
         self.negotiation_port = 17446 # receiving TCP (SIC) messages on it.
-        self.smtpserver = "smtp.sat.qc.ca" 
+        self.smtpserver = "smtp.sat.qc.ca"
         # ----------- MISC --------------
-        self.email_info = "scenic@sat.qc.ca" 
+        self.email_info = "scenic@sat.qc.ca"
         # ----------- AUDIO --------------
         self.audio_send_enabled = True
         self.audio_recv_enabled = True
@@ -137,7 +137,7 @@ class Config(saving.ConfigStateSaving):
         self.video_capture_size = "640x480"
         self.preview_in_window = False
         #video_window_size = "640x480"
-        self.video_aspect_ratio = "4:3" 
+        self.video_aspect_ratio = "4:3"
         self.confirm_quit = True
         #self.theme = "Darklooks"
         self.video_bitrate = 3.0
@@ -148,7 +148,7 @@ class Config(saving.ConfigStateSaving):
         self.midi_input_device = "" # ID and name
         self.midi_output_device = "" # ID and name
         self.midi_jitterbuffer = 10 # ms
-        
+
         # Done with the configuration entries.
         config_file = 'configuration.json'
         config_dir = os.path.expanduser("~/.scenic")
@@ -158,7 +158,7 @@ class Config(saving.ConfigStateSaving):
 def _format_device_name_and_identifier(name, identifier):
     """
     Formats a device name to show it to the user and save it to the state saving.
-    
+
     If you change the format here, change the parsing in the device name parsing method.
     See _parse_device_name_and_identifier.
     @param name: Name of the device.
@@ -206,12 +206,12 @@ class Application(object):
         self.streamer_manager = StreamerManager(self)
         self.streamer_manager.state_changed_signal.connect(self.on_streamer_state_changed) # XXX
         self._is_negotiating = False
-        log.info("Starting SIC server on port %s" % (self.config.negotiation_port)) 
+        log.info("Starting SIC server on port %s" % (self.config.negotiation_port))
         self.server = communication.Server(self, self.config.negotiation_port) # XXX
         self.client = communication.Client()
         self.client.connection_error_signal.connect(self.on_connection_error)
         self.protocol_version = "SIC 0.1"
-        self.got_bye = False 
+        self.got_bye = False
         # starting the GUI:
         internationalization.setup_i18n()
         self.devices = {
@@ -226,7 +226,7 @@ class Application(object):
             "midi_output_devices": [],
             }
         self._supported_codecs = { # populated by the gui.py. See Gui._disable_unsupported_codecs
-            "audio": [], 
+            "audio": [],
             "video": []
         }
         self.gui = gui.Gui(self, kiosk_mode=kiosk_mode, fullscreen=fullscreen, enable_debug=self.enable_debug)
@@ -254,7 +254,7 @@ class Application(object):
         self._supported_codecs["audio"] = audio_codecs
         self._supported_codecs["video"] = video_codecs
         log.info("Supported codecs are %s %s" % (audio_codecs, video_codecs))
-    
+
     def format_midi_device_name(self, midi_device_dict):
         """
         Formats a MIDI device name to show it to the user and save it to the state saving.
@@ -266,13 +266,13 @@ class Application(object):
 
     def midi_is_supported(self):
         return self._midi_is_supported
-    
+
     def on_connection_error(self, unused_err, unused_mess):
         """
         Called by the communication.Client in case of an error.
         """
         self._is_negotiating = False #important
-    
+
     def format_v4l2_device_name(self, device_dict):
         log.debug("formatting v4l2 device name %s" % (device_dict))
         return _format_device_name_and_identifier(device_dict["card"], device_dict["name"])
@@ -295,12 +295,12 @@ class Application(object):
                 if dev["card"] == name:
                     ret = dev
         return ret
-    
+
     def parse_midi_device_name(self, formatted_name, is_input=False):
         """
         Parses a MIDI device name shown to the user, and return the device's number, or None if it is not found.
-        
-        It will not be found in the system if it doesn't exist anymore.        
+
+        It will not be found in the system if it doesn't exist anymore.
         See format_midi_device_name.
 
         @param formatted_name: Name of the device, as given by the format_midi_device_name method.
@@ -365,9 +365,9 @@ class Application(object):
             d = self._restore_v4l2_settings()
             d.addCallback(_cb2)
         deferred_list = defer.DeferredList([
-            self.poll_x11_devices(), 
+            self.poll_x11_devices(),
             self.poll_xvideo_extension(),
-            self.poll_camera_devices(), 
+            self.poll_camera_devices(),
             self.poll_jack_now(),
             self.poll_midi_devices(),
             self.poll_milhouse_maxchannels()
@@ -376,7 +376,7 @@ class Application(object):
 
     def _restore_v4l2_settings(self):
         """
-        Restores settings previously saved, if desired. 
+        Restores settings previously saved, if desired.
         @rettype: L{Deferred}
         """
         # if current video source is V4L2, set it to the previous input and norm, if self.
@@ -399,7 +399,7 @@ class Application(object):
                         cameras.set_v4l2_input_number(device_name=camera_name, input_number=input_number)
                         ])
                     return deferred_list
-        
+
     def poll_midi_devices(self):
         """
         Called once at startup, and then the GUI can call it.
@@ -483,7 +483,7 @@ class Application(object):
             return xvideo_is_present
         deferred.addCallback(_callback)
         return deferred
-    
+
     def poll_milhouse_maxchannels(self):
         """
         Called once at startup.
@@ -499,7 +499,7 @@ class Application(object):
             self.gui.audio_numchannels_widget.set_range(1, channels)
         deferred.addCallback(_callback)
         return deferred
-                
+
     def poll_jack_now(self):
         """
         Polls the JACK servers.
@@ -517,12 +517,12 @@ class Application(object):
             self.gui.update_jackd_status()
         def _eb(reason):
             print "Error calling jackd_get_infos: ", reason
-                
+
         deferred = jackd.jackd_get_infos()
         deferred.addCallback(_cb)
         deferred.addErrback(_eb)
         return deferred
-    
+
     def before_shutdown(self):
         """
         Last things done before quitting.
@@ -547,7 +547,7 @@ class Application(object):
         d1 = self.server.close()
         d2 = self.gui.close_preview_if_running()
         return defer.DeferredList([deferred, d1, d2])
-        
+
     # ------------------------- session occuring -------------
     def has_session(self):
         """
@@ -562,17 +562,17 @@ class Application(object):
         @rtype: bool
         """
         return self._is_negotiating
-    
+
     # -------------------- streamer ports -----------------
     def prepare_before_rtp_stream(self):
         #TODO: return a Deferred
         #self.save_configuration()
         self._allocate_ports()
-        
+
     def cleanup_after_rtp_stream(self):
         #FIXME: is this useful at all?
         self._free_ports()
-    
+
     def _allocate_ports(self):
         # TODO: start_session
         self.recv_video_port = self.ports_allocator.allocate()
@@ -604,7 +604,7 @@ class Application(object):
     def _check_protocol_version(self, message):
         """
         Checks if the remote peer's SIC protocol matches.
-        @param message: dict messages received in an INVITE or ACCEPT SIC message. 
+        @param message: dict messages received in an INVITE or ACCEPT SIC message.
         @rtype: bool
         """
         # TODO: break if not compatible in a next release.
@@ -619,8 +619,8 @@ class Application(object):
 
     def handle_invite(self, message, addr):
         """
-        handles the INVITE message. 
-        Refuses if : 
+        handles the INVITE message.
+        Refuses if :
          * jackd is not running
          * We already just got an INVITE and didn't answer yet.
         """
@@ -633,10 +633,10 @@ class Application(object):
         if self.has_session():
             _simply_refuse(communication.REFUSE_REASON_BUSY)
             return
-        
+
         self.got_bye = False
         self._check_protocol_version(message)
-        
+
         def _on_contact_request_dialog_response(response):
             """
             User is accepting or declining an offer.
@@ -645,11 +645,11 @@ class Application(object):
             if response:
                 self.send_accept(addr)
             else:
-                self.send_refuse_and_disconnect() 
+                self.send_refuse_and_disconnect()
         # check if the contact is in the addressbook
         contact = self._get_contact_by_addr(addr)
         invited_by = addr
-        
+
         if contact is not None:
             invited_by = contact["name"]
         if self.has_negotiation_in_progress():
@@ -657,7 +657,7 @@ class Application(object):
             _simply_refuse(communication.REFUSE_REASON_BUSY)
             return
         self._is_negotiating = True
-        
+
         def _preflight_check_cb(result):
             if result is False:
                 _simply_refuse(communication.REFUSE_REASON_PROBLEMS, True)
@@ -700,10 +700,10 @@ class Application(object):
                     dialog_deferred.addCallback(_on_contact_request_dialog_response)
             else:
                 _simply_refuse(result, True) # passing it the reason
-        
+
         flight_check_deferred = self.check_if_ready_to_stream(role="answerer")
         flight_check_deferred.addCallback(_preflight_check_cb)
-    
+
     def _get_contact_by_addr(self, addr):
         """
         Returns a contact dict or None if not in the addressbook.
@@ -714,7 +714,7 @@ class Application(object):
                 ret = contact
                 break
         return ret
-    
+
     def handle_cancel(self, message, addr):
         self._is_negotiating = False
         # If had previously sent ACCEPT and receive CANCEL, abort the session.
@@ -788,7 +788,7 @@ class Application(object):
         self._free_ports()
         text = _("The remote peer refused to stream with you for an unknown reason")
         if reason == communication.REFUSE_REASON_REFUSED:
-            text = _("The remote peer refused to stream with you.") 
+            text = _("The remote peer refused to stream with you.")
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_RATE_MISMATCH:
             text = _("The remote peer cannot stream with you since its JACK sampling rate is not the same as yours.")
         elif reason == communication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING:
@@ -898,7 +898,7 @@ class Application(object):
         recv_midi = self.remote_config["midi"]["send_enabled"] and self.config.midi_recv_enabled
         send_midi = self.remote_config["midi"]["recv_enabled"] and self.config.midi_send_enabled
         return not send_video and not send_audio and not recv_audio and not recv_video and not send_midi and not recv_midi
-    
+
     def start_streamers(self, addr):
         if self._check_if_all_disabled():
             error_msg = _("Cannot start streaming if all the streams are disabled.")
@@ -910,11 +910,11 @@ class Application(object):
         self._is_negotiating = False
 
     def stop_streamers(self):
-        # TODO: return a deferred. 
+        # TODO: return a deferred.
         self.streamer_manager.stop()
         self._is_negotiating = False
 
-    def on_streamers_stopped(self): 
+    def on_streamers_stopped(self):
         """
         We call this when all streamers are stopped.
         """
@@ -923,7 +923,7 @@ class Application(object):
         self.cleanup_after_rtp_stream()
 
     # ---------------------- sending messages -----------
-        
+
     def disconnect_client(self):
         """
         Disconnects the SIC sender.
@@ -942,9 +942,9 @@ class Application(object):
             d = defer.Deferred()
             reactor.callLater(0, _cl, d)
             return d
-        else: 
+        else:
             return defer.succeed(True)
-    
+
     def get_local_sampling_rate(self):
         """
         Returns JACK's sampling rate or None.
@@ -955,7 +955,7 @@ class Application(object):
         log.debug("Local sampling rate is %s" % (ret))
         return ret
         # XXX
-    
+
     def _get_local_config_message_items(self):
         """
         Returns a dict with keys 'audio', 'midi' and 'video' to send to remote peer.
@@ -968,8 +968,8 @@ class Application(object):
                 "codec": self.config.video_codec,
                 "bitrate": self.config.video_bitrate, # float Mbps
                 "port": self.recv_video_port,
-                "aspect_ratio": self.config.video_aspect_ratio, 
-                "capture_size": self.config.video_capture_size 
+                "aspect_ratio": self.config.video_aspect_ratio,
+                "capture_size": self.config.video_capture_size
                 },
             "audio": {
                 "synchronized": self.config.audio_video_synchronized,
@@ -978,7 +978,7 @@ class Application(object):
                 "codec": self.config.audio_codec,
                 "numchannels": self.config.audio_channels,
                 "max_channels_in_raw": self.max_channels_in_raw, #useful to tell remote peer how many we can send
-                "port": self.recv_audio_port, 
+                "port": self.recv_audio_port,
                 "sampling_rate": self.get_local_sampling_rate()
                 },
             "midi": {
@@ -991,8 +991,8 @@ class Application(object):
     def check_if_ready_to_stream(self, role="offerer"):
         """
         Does the flight check, checking if ready to stream.
-        
-        Checks if ready to stream. 
+
+        Checks if ready to stream.
         Will pop up error dialog if there are errors.
         Calls the deferred with a result that either True (ok) False (technical problems) or one of the communication.REFUSE_REASON_* constant value.
         @rtype: L{Deferred}
@@ -1014,20 +1014,20 @@ class Application(object):
                 error_msg = _("Impossible to accept an invitation to stream.")
             else:
                 raise RuntimeError("Invalid role value : %s" % (role))
-            
+
             x11_displays = [display["name"] for display in self.devices["x11_displays"]]
             #midi_input_devices = [device["name"] for device in self.devices["midi_input_devices"]]
             #midi_output_devices = [device["name"] for device in self.devices["midi_output_devices"]]
             #cameras = self.devices["cameras"].keys()
 
             #TODO: if video receive is enabled and video codec is not supported: error
-                
+
             if self.config.video_display not in x11_displays: #TODO: do not test if not receiving video
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X11 display %(display)s disappeared!") % {"display": self.config.video_display}, parent=self.gui.main_window) # not very likely to happen !
                 return deferred.callback(communication.REFUSE_REASON_DISPLAY_NOT_FOUND)
-            
+
             elif self.config.video_source == "v4l2src" and self.parse_v4l2_device_name(self.config.video_device) is None: #TODO: do not test if not sending video
-                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window) 
+                dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The video source %(camera)s disappeared!") % {"camera": self.config.video_source}, parent=self.gui.main_window)
                 return deferred.callback(communication.REFUSE_REASON_CAMERA_NOT_FOUND)
 
             elif (not self.devices["jackd_is_running"]) and (self.config.audio_send_enabled or self.config.audio_recv_enabled):
@@ -1036,30 +1036,30 @@ class Application(object):
                 # TODO: Actually poll jackd right now.
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("JACK is not running."), parent=self.gui.main_window)
                 return deferred.callback(communication.REFUSE_REASON_PROBLEM_JACKD_NOT_RUNNING)
-            
+
             elif self.streamer_manager.is_busy():
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("A streaming session is already in progress."), parent=self.gui.main_window)
                 deferred.callback(False)
-            
+
             elif self.config.midi_recv_enabled and self.parse_midi_device_name(self.config.midi_output_device, is_input=False) is None:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI output device %(device)s disappeared!") % {"device": self.config.midi_output_device}, parent=self.gui.main_window)
                 deferred.callback(communication.REFUSE_REASON_MIDI_DEVICE_NOT_FOUND)
-            
+
             elif self.config.midi_send_enabled and self.parse_midi_device_name(self.config.midi_input_device, is_input=True) is None:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The MIDI input device %(device)s disappeared!") % {"device": self.config.midi_input_device}, parent=self.gui.main_window)
                 deferred.callback(communication.REFUSE_REASON_MIDI_DEVICE_NOT_FOUND)
-            
+
             # "cameras": {}, # dict of dicts (only V4L2 cameras for now)
             elif not self.devices["xvideo_is_present"] and self.config.video_recv_enabled:
                 dialogs.ErrorDialog.create(error_msg + "\n\n" + _("The X video extension is not present."), parent=self.gui.main_window)
                 deferred.callback(communication.REFUSE_REASON_XVIDEO_NOT_FOUND)
-            
+
             else:
                 deferred.callback(True)
-        
+
         deferred_list = defer.DeferredList([
-            self.poll_x11_devices(), 
-            self.poll_midi_devices(), 
+            self.poll_x11_devices(),
+            self.poll_midi_devices(),
             self.poll_xvideo_extension(),
             self.poll_jack_now(),
             self.poll_camera_devices()
@@ -1078,7 +1078,7 @@ class Application(object):
             return  # important
         else:
             ip = contact["address"]
-            
+
         def _check_cb(result):
             #TODO: use the Deferred it will return
             if result is True:
@@ -1086,12 +1086,12 @@ class Application(object):
                 msg = {
                     "msg":"INVITE",
                     "protocol": self.protocol_version,
-                    "sid":0, 
+                    "sid":0,
                     "please_send_to_port": self.config.negotiation_port, # FIXME: rename to listening_port
                     }
                 msg.update(self._get_local_config_message_items())
                 port = self.config.negotiation_port
-                
+
                 def _on_connected(proto):
                     self.client.send(msg)
                     return proto
@@ -1114,7 +1114,7 @@ class Application(object):
                     #    log.debug("Not showing an error since we were not negotiating.")
                     self._is_negotiating = False
                     return None
-                   
+
                 log.debug("sending %s to %s:%s" % (msg, ip, port))
                 deferred = self.client.connect(ip, port)
                 deferred.addCallback(_on_connected).addErrback(_on_error)
@@ -1126,7 +1126,7 @@ class Application(object):
 
         check_deferred = self.check_if_ready_to_stream(role="offerer")
         check_deferred.addCallback(_check_cb)
-   
+
     def send_idle(self):
         msg = {
             "msg": "IDLE",
@@ -1135,13 +1135,13 @@ class Application(object):
             }
         if self.client.is_connected():
             self.client.send(msg)
-   
+
     def send_accept(self, unused_addr):
         # UPDATE config once we accept the invitie
         #TODO: use the Deferred it will return
         #self.prepare_before_rtp_stream()
         msg = {
-            "msg":"ACCEPT", 
+            "msg":"ACCEPT",
             "protocol": self.protocol_version,
             "sid":0,
             }
@@ -1154,7 +1154,7 @@ class Application(object):
 
     def get_last_message_received(self):
         return self.server.last_message_received
-    
+
     def send_ack(self):
         """
         Sends ACK.
@@ -1169,7 +1169,7 @@ class Application(object):
         """
         self.client.send({"msg":"BYE", "sid":0, "reason":reason})
         self._is_negotiating = False
-    
+
     def send_cancel_and_disconnect(self, reason=""):
         """
         Sends CANCEL
@@ -1182,7 +1182,7 @@ class Application(object):
             self.client.disconnect()
         self.cleanup_after_rtp_stream()
         self._is_negotiating = False
-    
+
     def send_refuse_and_disconnect(self):
         """
         Sends REFUSE since the user clicked no.
@@ -1193,20 +1193,20 @@ class Application(object):
         self._is_negotiating = False
 
     # ------------------- streaming events handlers ----------------
-    
+
     def on_streamer_state_changed(self, unused_streamer, new_state):
         """
         Slot for scenic.streamer.StreamerManager.state_changed_signal
         """
         if new_state in [process.STATE_STOPPED]:
             if not self.got_bye:
-                # got_bye means our peer sent us a BYE, so we shouldn't send one back 
+                # got_bye means our peer sent us a BYE, so we shouldn't send one back
                 log.info("Local StreamerManager stopped. Sending BYE")
                 self.send_bye()
             self.on_streamers_stopped()
         elif new_state == process.STATE_RUNNING:
             self.gui.write_info_in_debug_tab()
-            
+
     #def on_connection_error(self, err, msg):
     #    """
     #    @param err: Exception message.

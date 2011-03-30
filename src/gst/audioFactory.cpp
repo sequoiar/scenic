@@ -38,13 +38,13 @@ namespace po = boost::program_options;
 
 void audiofactory::printMaxChannels(const std::string &codec)
 {
-    LOG_PRINT(codec << " supports up to " << 
+    LOG_PRINT(codec << " supports up to " <<
             Encoder::maxChannels(codec) << " channels\n");
 }
 
 shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const po::variables_map &options)
 {
-    shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(options));           
+    shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(options));
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
@@ -73,7 +73,7 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
     int port = options["audioport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
-    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, remoteHost, port, 
+    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, remoteHost, port,
                 multicastInterface));
 
     return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));

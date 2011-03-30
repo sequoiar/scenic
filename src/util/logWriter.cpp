@@ -78,7 +78,7 @@ Log::Subscriber::Subscriber()
 }
 
 
-std::string log_(const std::string &msg, LogLevel level, 
+std::string log_(const std::string &msg, LogLevel level,
         const std::string &fileName, int lineNum)
 {
     std::ostringstream logMsg;
@@ -92,7 +92,7 @@ std::string log_(const std::string &msg, LogLevel level,
     if(level >= INFO and level < WARNING)
         logMsg << logLevelStr(level) << ":" << msg << std::endl;
     else
-        logMsg << fileName << ":" << 
+        logMsg << fileName << ":" <<
             lineNum << ":" << logLevelStr(level) << ":" << msg << std::endl;
 #else
     logMsg <<  logLevelStr(level) << ":" << msg <<  std::endl;
@@ -102,7 +102,7 @@ std::string log_(const std::string &msg, LogLevel level,
 }
 
 //TODO DOCUMENT THIS
-void cerr_log_throw(const std::string &msg, LogLevel level, 
+void cerr_log_throw(const std::string &msg, LogLevel level,
         const std::string &fileName, int lineNum)
 {
     std::string strerr = log_(msg, level, fileName, lineNum);

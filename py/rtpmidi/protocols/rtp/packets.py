@@ -83,7 +83,7 @@ class RTPPacket:
 
 
 
-    
+
 def parse_rtppacket(bytes, authtaglen=0):
     # Most variables are named for the fields in the RTP RFC.
     hdrpieces = struct.unpack('!BBHII', bytes[:12])
@@ -281,7 +281,7 @@ class RTCPPacket:
         if len(packet)%4:
             pad = '\0' * (4-(len(packet)%4))
             packet += pad
-            
+
         return packet
 
     def _patchLengthHeader(self, packet):
@@ -452,26 +452,26 @@ class RTCPPacket:
         ntp_m = int(ntp)
         ntp_l = ntp - ntp_m
         ntp_l = int(ntp_l * ( 10 ** 9))
-        
+
         #SR parts
         packet = struct.pack('!IIIIII', ssrc, ntp_m, ntp_l, ts, total_packets, total_bytes)
-        
+
         #Processing blocks
         block_packets, count = self._encodeRRSRReportBlocks(ssrc, members)
-        starter = version | padding | count 
+        starter = version | padding | count
         packet += block_packets
 
         #+ 4 is for header (see page 36 of RFC 3550)
         #length = len(packet) + 4
         header = struct.pack('!BBH', starter, type, 0)
-        
+
         packet = header + packet
 
         #Checking padding
         packet = self._padIfNeeded(packet)
         packet = self._patchLengthHeader(packet)
 
-        return packet 
+        return packet
 
     def decode_RR(self):
         ssrc, = struct.unpack('!I', self._body[:4])
@@ -493,7 +493,7 @@ class RTCPPacket:
        +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
        + blocks
        """
-        
+
         #header
         #Version 1 ou 2
         version = RTP_VERSION * (2**6)
@@ -544,7 +544,7 @@ class RTCPPacket:
         packet = ""
         count = 0
         ref_time = time()
-        for ssrc in members: 
+        for ssrc in members:
             if ssrc != my_ssrc:
             #ssrc_1, frac_lost, lost, highest, jitter, lsr, dlsr
                 lost = members[ssrc]['lost']
@@ -560,22 +560,22 @@ class RTCPPacket:
                 #Take care about lsr and dlsr
                 lsr = members[ssrc]['lsr']
                 lsr = ext_32_out_of_64(lsr)
-  
+
                 if lsr != 0:
                     dlsr = ref_time - lsr
                 else:
                     dlsr = 0
-                
+
                 dlsr = ext_32_out_of_64(dlsr)
-            
+
                 highest = members[ssrc]['last_seq']
                 jitter = members[ssrc]['jitter']
-            
+
                 arg_list = (ssrc, lost_part, highest, jitter, lsr, dlsr)
-                
+
                 packet += struct.pack('!IIIIII', *arg_list)
                 count += 1
-            
+
                 #Max 31 members in a report
                 if count == 31:
                     break
@@ -590,7 +590,7 @@ class RTCPPacket:
             c = dict(zip(names,bits))
 
             #Take care about lost part
-            c['fraclost'] = c['lost'] >> 24 
+            c['fraclost'] = c['lost'] >> 24
             c['packlost'] = (c['lost'] & 0x00FFFFFF)
             del c['lost']
 
@@ -664,7 +664,7 @@ class RTCPCompound:
             p = RTCPPacket(PT, ptcode=pt)
             p.decode(count, body)
             self._rtcp.append(p)
-            
+
         return p
 
     def encode(self):

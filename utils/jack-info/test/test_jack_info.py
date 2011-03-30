@@ -9,8 +9,8 @@ class TestJackInfo(unittest.TestCase):
             Check that jack-info prints backend, device, name, nperiods, period, pid, rate
         """
         # redirect stderr to stdout
-        proc = subprocess.Popen(['../jack-info', '"to stdout"'], 
-                shell=True, 
+        proc = subprocess.Popen(['../jack-info', '"to stdout"'],
+                shell=True,
                 stderr=subprocess.STDOUT,
                 stdout=subprocess.PIPE)
 

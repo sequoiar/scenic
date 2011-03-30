@@ -14,7 +14,7 @@ def is_gstreamer_element_found(name):
     Checks if a given Gstreamer element is installed.
     @rettype: bool
     """
-    ok = gst.element_factory_find(name) is not None 
+    ok = gst.element_factory_find(name) is not None
     if not ok:
         log.info("Could not find Gstreamer element %s." % (name))
     return ok

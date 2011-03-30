@@ -30,8 +30,8 @@ class RtpPay;
 class Pay;
 class Pipeline;
 
-/** 
- *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
+/**
+ *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink
  *  and whose concrete subclasses will provide specifc encoding of raw media streams.
  */
 class Encoder : private boost::noncopyable
@@ -40,7 +40,7 @@ class Encoder : private boost::noncopyable
         Encoder(const Pipeline &pipeline, const char *encoder);
         Encoder(const Pipeline &pipeline);
         virtual ~Encoder();
-        /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
+        /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type
         virtual Pay* createPayloader() const = 0;
         int getBitrate() const;
         virtual void setBitrate(int bitrate);
@@ -54,8 +54,8 @@ class Encoder : private boost::noncopyable
         _GstElement *encoder_;
 };
 
-/** 
- *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
+/**
+ *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink
  *  and whose concrete subclasses will provide specifc decoding of encoded media streams.
  */
 class Decoder : private boost::noncopyable
@@ -64,26 +64,26 @@ class Decoder : private boost::noncopyable
         Decoder(const Pipeline &pipeline, const char *decoder);
         Decoder(const Pipeline &pipeline);
         virtual ~Decoder();
-        /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
+        /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type
         virtual RtpPay* createDepayloader() const = 0;
         virtual void adjustJitterBuffer() {}; // buy default, do nothing
         virtual bool adjustsBufferTime() { return false; }
         virtual unsigned long long minimumBufferTime();
         virtual _GstElement *srcElement() { return decoder_; }
         virtual _GstElement *sinkElement() { return decoder_; }
-        
+
     protected:
         const Pipeline &pipeline_;
         _GstElement *decoder_;
 };
 
 
-class VideoEncoder : public Encoder 
+class VideoEncoder : public Encoder
 {
-    public: 
+    public:
         VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced);
-        virtual _GstElement *sinkElement() 
-        { 
+        virtual _GstElement *sinkElement()
+        {
             return colorspace_;
         }
 
@@ -93,19 +93,19 @@ class VideoEncoder : public Encoder
 };
 
 
-class VideoDecoder : public Decoder 
+class VideoDecoder : public Decoder
 {
-    public: 
+    public:
         VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace);
         virtual void adjustJitterBuffer();
-        virtual _GstElement *srcElement() 
-        { 
+        virtual _GstElement *srcElement()
+        {
             if (!doDeinterlace_)
                 return decoder_;
-            else 
+            else
                 return deinterlace_;
         }
-    
+
     protected:
         void addDeinterlace();
         bool doDeinterlace_;
@@ -117,7 +117,7 @@ class VideoDecoder : public Decoder
 /// Encoder that encodes raw video into H.264 using the x264 encoder
 class H264Encoder : public VideoEncoder
 {
-    public: 
+    public:
         H264Encoder(const Pipeline &pipeline, int bitrate);
         void setBitrate(int bitrate);
 
@@ -130,9 +130,9 @@ class H264Encoder : public VideoEncoder
 class H264Decoder : public VideoDecoder {
     public:
         H264Decoder(const Pipeline &pipeline, bool doDeinterlace);
-    private: 
+    private:
         RtpPay* createDepayloader() const;
-        void adjustJitterBuffer(); 
+        void adjustJitterBuffer();
 };
 
 
@@ -140,7 +140,7 @@ class H264Decoder : public VideoDecoder {
 /// Encoder that encodes raw video into H.263 using the ffmpeg h263 encoder
 class H263Encoder : public VideoEncoder
 {
-    public: 
+    public:
         H263Encoder(const Pipeline &pipeline, int bitrate);
 
     private:
@@ -153,7 +153,7 @@ class H263Decoder : public VideoDecoder
 {
     public:
         H263Decoder(const Pipeline &pipeline, bool doDeinterlace);
-    private: 
+    private:
         RtpPay* createDepayloader() const;
 };
 
@@ -176,7 +176,7 @@ class Mpeg4Decoder: public VideoDecoder
 {
     public:
         Mpeg4Decoder(const Pipeline &pipeline, bool doDeinterlace);
-    private: 
+    private:
         RtpPay* createDepayloader() const;
 };
 
@@ -207,14 +207,14 @@ class TheoraDecoder: public VideoDecoder
 {
     public:
         TheoraDecoder(const Pipeline &pipeline, bool doDeinterlace);
-    private: 
+    private:
         RtpPay* createDepayloader() const;
 };
 
 /// Encoder that encodes raw audio using the celt encoder.
 class CeltEncoder : public Encoder
 {
-    public: 
+    public:
         CeltEncoder(const Pipeline &pipeline, int bitrate);
 
     private:
@@ -226,9 +226,9 @@ class CeltEncoder : public Encoder
 /// Decoder that decodes vorbis into raw audio using the celt decoder.
 class CeltDecoder : public Decoder
 {
-    public: 
+    public:
         CeltDecoder(const Pipeline &pipeline);
-    private: 
+    private:
         virtual _GstElement* srcElement() { return audioconvert_; }
         RtpPay* createDepayloader() const;
         _GstElement *audioconvert_;
@@ -237,7 +237,7 @@ class CeltDecoder : public Decoder
 /// Encoder that encodes raw audio using the vorbis encoder.
 class VorbisEncoder : public Encoder
 {
-    public: 
+    public:
         VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality);
 
     private:
@@ -249,11 +249,11 @@ class VorbisEncoder : public Encoder
 /// Decoder that decodes vorbis into raw audio using the vorbis decoder.
 class VorbisDecoder : public Decoder
 {
-    public: 
+    public:
         VorbisDecoder(const Pipeline &pipeline);
         bool adjustsBufferTime() { return true; }
         unsigned long long minimumBufferTime();
-    private: 
+    private:
         RtpPay* createDepayloader() const;
         static const unsigned long long MIN_BUFFER_USEC = 100000;
 };

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 """
-Backport of some twisted functionnalities. 
+Backport of some twisted functionnalities.
 
 This file should be renamed to something like "twisted_backport.py"
 """
@@ -71,7 +71,7 @@ def textFromEventDict(eventDict):
      - C{format}: string format used in place of C{message} to customize
        the event. It uses all keys present in C{eventDict} to format
        the text.
-       
+
     Other keys will be used when applying the C{format}, or ignored.
     """
     edm = eventDict['message']

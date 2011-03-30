@@ -1,11 +1,11 @@
 Release notes for Scenic 0.6.3
 
 This release is the fourth of the stable 0.6 branch. This branch introduces
-many new features developed during 0.5 series. Those features include MIDI 
-streaming support and the hability to customize what each peer receives as 
-audio and video. 
+many new features developed during 0.5 series. Those features include MIDI
+streaming support and the hability to customize what each peer receives as
+audio and video.
 
-This version should work with every version in the stable 0.6 series. 
+This version should work with every version in the stable 0.6 series.
 
 See the NEWS and ChangeLog files for a complete history of changes.
 
@@ -22,7 +22,7 @@ See the NEWS and ChangeLog files for a complete history of changes.
         This fix adds receiver side bitrate estimation. Note that milhouse
         will function fine without it, as will scenic.
     *   Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
-        Install them with aptitude. 
+        Install them with aptitude.
 
     Backward compatibility:
         Each release in the 0.4 series should be interoperable with each other.
@@ -32,12 +32,12 @@ See the NEWS and ChangeLog files for a complete history of changes.
         needs milhouse 0.4.5
 
     Limitations:
-    *   While milhouse supports many video and audio input types, Scenic only 
-        supports a subset of them. 
-    *   Each release version in the 0.5 branch is considered unstable and will 
-        not be supported in the future. Each version is not interoperable with 
-        any other version of the unstable 0.5 branch. Wait for the next release 
-        in the 0.6 branch to benefit from long term support of the new features 
+    *   While milhouse supports many video and audio input types, Scenic only
+        supports a subset of them.
+    *   Each release version in the 0.5 branch is considered unstable and will
+        not be supported in the future. Each version is not interoperable with
+        any other version of the unstable 0.5 branch. Wait for the next release
+        in the 0.6 branch to benefit from long term support of the new features
         of the 0.5 branch.
 
 New features in milhouse:
@@ -51,7 +51,7 @@ New features in milhouse:
 New features in scenic:
     -fixed python packaging
 
-Bug fixes in milhouse: 
+Bug fixes in milhouse:
     * #589 Add AM_MAINTAINER_MODE to configure.ac
     * Fixed /man Makefile.am
     * #594 Be able to write text overlay in milhouse's texture
@@ -59,7 +59,7 @@ Bug fixes in milhouse:
     * #592 test and probably fix multicast in milhouse
     * #577 Add GStreamer version in the detailed status
 
-Bug fixes in scenic: 
+Bug fixes in scenic:
     * (none)
 
 HISTORY
@@ -104,6 +104,6 @@ HISTORY
     * 2009-11-27: 0.3
     * 2009-10-14: 0.2
     * 2009-05-08: 0.1.3-a1
-          * Now using boost1.35 
+          * Now using boost1.35
     * 2009-05-08: 0.1.2-rc1
     * 2009-02-10: 0.1.2-a1

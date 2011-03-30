@@ -43,20 +43,20 @@ int main(int argc, char **argv)
             printf("  --help                                 Show help and exit\n");
             printf("  --version                              Show version and exit\n");
             return 0;
-        } 
+        }
         else if (strncmp(argv[arg_num], "--version", strlen("--version")) == 0)
         {
             printf("jack-info %s\n", PACKAGE_VERSION);
             return 0;
         }
     }
-    
+
     client = jack_client_open("jack-info", JackNoStartServer, &status);
-	if (client == NULL) 
+	if (client == NULL)
     {
-		if (status & JackServerFailed) 
+		if (status & JackServerFailed)
 			fprintf(stderr, "JACK server not running\n");
-		else 
+		else
 			fprintf(stderr, "jack_client_open() failed, "
 				 "status = 0x%2.0x\n", status);
 		return 1;
@@ -66,11 +66,11 @@ int main(int argc, char **argv)
     rate = jack_get_sample_rate(client);
 
 	ports = jack_get_ports(client, NULL, NULL, 0);
-   
-	for (i = 0; ports[i] != 0; ++i) 
+
+	for (i = 0; ports[i] != 0; ++i)
     {
 		jack_port_t *port = jack_port_by_name(client, ports[i]);
-        if (port != 0) 
+        if (port != 0)
         {
             int flags = jack_port_flags (port);
             if (flags & JackPortIsPhysical)

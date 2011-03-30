@@ -45,15 +45,15 @@
 #define LOG_WARNING(msg)        LOG(msg, WARNING)
 #define LOG_DEBUG(msg)          LOG(msg, DEBUG)
 
-/**  
- *      Utility functions for logWriter 
+/**
+ *      Utility functions for logWriter
  *
  *      Log writer macro, usage:
  *
  *      LOG_DEBUG("This is a log");
- *      
+ *
  *      LOG_INFO("Got Error errno: " << 100);
- *      
+ *
  *      THROW_ERROR(99);
  *
  *      To disable logging, define the macro ENABLE_LOG (in this file) to 0.
@@ -62,7 +62,7 @@
 
 namespace Log
 {
-    /// log Subscriber 
+    /// log Subscriber
     class Subscriber
     {
         public:
@@ -75,7 +75,7 @@ namespace Log
 
 #define THROW_(msg, level)     LOG_(msg, level)
 // FIXME: find a way to do this without macros
-// use the name logger__FUNCTION____LINE___ 
+// use the name logger__FUNCTION____LINE___
 // to avoid shadowing other local variables
 
 #define LOG_(msg, level)    \
@@ -91,8 +91,8 @@ std::string log_(const std::string &msg,
         const std::string &fileName,
         int lineNum);
 
-void cerr_log_throw(const std::string &msg, 
-        LogLevel level, 
+void cerr_log_throw(const std::string &msg,
+        LogLevel level,
         const std::string &fileName,
         int lineNum);
 

@@ -29,7 +29,7 @@
 
 class VideoScale;
 class TextOverlay;
-class VideoFlip; 
+class VideoFlip;
 class VideoSink;
 class AudioLevel;
 class AudioSink;

@@ -5,7 +5,7 @@
 #utils
 import random
 import os
-import hashlib 
+import hashlib
 import socket
 from time import sleep
 from time import time
@@ -14,12 +14,12 @@ import struct
 #twisted
 from twisted.internet import reactor
 from twisted.internet import defer
-from twisted.python import log 
+from twisted.python import log
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet.error import MessageLengthError
 from twisted.internet.error import CannotListenError
 
-#rtp 
+#rtp
 from rtpmidi.protocols.rtp.packets import RTPPacket, parse_rtppacket
 from rtpmidi.protocols.rtp import rtcp
 
@@ -75,7 +75,7 @@ class RTPProtocol(DatagramProtocol):
         self._silent = True
         # only for debugging -- the way to prevent the sending of RTP packets
         # onto the Net is to reopen the audio device with a None (default)
-        # media sample handler instead of this RTP object as the media sample 
+        # media sample handler instead of this RTP object as the media sample
         #handler.
         self.sending = False
         #SR infos
@@ -157,7 +157,7 @@ class RTPProtocol(DatagramProtocol):
                 rtpPort = rtpPort + 2
                 rtcpPort = rtpPort + 1
                 continue
-            else:                
+            else:
                 break
         #self.rtpListener.stopReading()
         if self.needSTUN is False:
@@ -180,10 +180,10 @@ class RTPProtocol(DatagramProtocol):
         ''' returns the local IP address used for RTP (as visible from the
             outside world if STUN applies) as ( 'w.x.y.z', rtpPort)
         '''
-        # XXX got an exception at runtime here as mapper hasn't finished yet 
-        #and 
+        # XXX got an exception at runtime here as mapper hasn't finished yet
+        #and
         #attribute _extIP doesn't exist.  I guess this means this should be
-        #triggered by 
+        #triggered by
         #the mapper instead of being a return value... --Zooko 2005-04-05
         return (self._extIP, self._extRTPPort)
 
@@ -313,7 +313,7 @@ class RTPProtocol(DatagramProtocol):
         packet = RTPPacket(self.ssrc, self.seq, self.ts, data, pt=pt,
                            marker=marker, xhdrtype=xhdrtype, xhdrdata=xhdrdata)
         self.seq += 1
-	rtp, session = self.app.currentRecordings[self.cookie] 
+	rtp, session = self.app.currentRecordings[self.cookie]
 	session.seq = self.seq
         # Note that seqno gets modulo 2^16 in RTPPacket, so it doesn't need
         # to be wrapped at 16 bits here.
@@ -337,7 +337,7 @@ class RTPProtocol(DatagramProtocol):
                 self.last_sent_time = time()
 
     def _send_cn_packet(self, logit=False, recovery=0):
-        """Send empty packet in order to signal a silence and detect any 
+        """Send empty packet in order to signal a silence and detect any
         loss of packet (also usefull fro the first packet"""
         assert hasattr(self, 'dest'), "_send_cn_packet called before start %r" \
             % (self,)
@@ -412,7 +412,7 @@ class RTPProtocol(DatagramProtocol):
                             self.app.incoming_rtp(self.cookie, packet.header.ts,
                                                   packet, 1)
             sleep(0.001)
-                    
+
     def datagramReceived(self, datagram, addr, t=time):
         """Handle packets arriving"""
         if self.rport == 0:
@@ -420,7 +420,7 @@ class RTPProtocol(DatagramProtocol):
         if not self.checksum(datagram):
             if VERBOSE:
                 print "Warning: Packet received with wrong checksum RTP"
-            return 
+            return
         #parse the packet
         packet = parse_rtppacket(datagram)
         #Checking SSRC
@@ -431,15 +431,15 @@ class RTPProtocol(DatagramProtocol):
             cname = ""
         if not self.RTCP.check_ssrc(ssrc, addr, "DATA", cname):
             if VERBOSE:
-                print "Warning: Bad SSRC leaving packet on the floor" 
+                print "Warning: Bad SSRC leaving packet on the floor"
             return
         else:
             #Update last_seq and lastreceivetime
             self.RTCP.members_table[ssrc]['total_received_bytes'] += len(datagram)
             self.RTCP.members_table[ssrc]['total_received_packets'] += 1
-            self.RTCP.members_table[ssrc]['last_rtp_receive'] = time() 
+            self.RTCP.members_table[ssrc]['last_rtp_receive'] = time()
 
-            if self.RTCP.members_table[ssrc]['last_seq'] != 0 : 
+            if self.RTCP.members_table[ssrc]['last_seq'] != 0 :
                 if packet.data == "p":
                     #Silent without recovery
                     if DEBUG :
@@ -488,14 +488,14 @@ class RTPProtocol(DatagramProtocol):
                         #Adjusting latency (based on round trip time/jitter)
                         #self.test_jitter()
                         #self.test_delay()
-                        
+
                     #Adding packet to the jitter buffer
                     if DEBUG:
                         print "Adding packet to jitter buffer"
                     self.jitter_buffer.add([packet, time()*1000])
                 else:
                     if VERBOSE:
-                        print "Incompatible payload type"  
+                        print "Incompatible payload type"
             else:
                 #this is the first packet
                 if VERBOSE:
@@ -537,7 +537,7 @@ class RTPProtocol(DatagramProtocol):
         #return 0
         #sinon
         #
-        #TEst : packet must be consistent with CC ? and 
+        #TEst : packet must be consistent with CC ? and
         #payload type(chek midi payload)
         return True
 
@@ -579,7 +579,7 @@ class RTPProtocol(DatagramProtocol):
 #           rt_time = self.rt_time * 1000
 #           rt_time_ref = self.rt_time_ref * 1000
 #           if rt_time > rt_time_ref:
-#                           #latency MUST be > to the split between initial 
+#                           #latency MUST be > to the split between initial
 #                           #rt_time and rt_time_ref
 #               self.app.midi_out.latency += \
 #                   int(rt_time - rt_time_ref) + 10

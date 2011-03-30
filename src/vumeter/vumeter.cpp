@@ -15,7 +15,7 @@ static void gtk_vumeter_size_allocate (GtkWidget * widget,
     GtkAllocation * allocation);
 static void gtk_vumeter_realize (GtkWidget * widget);
 static gboolean gtk_vumeter_expose (GtkWidget * widget, GdkEventExpose * event);
-static void gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr); 
+static void gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr);
 static void gtk_vumeter_destroy (GtkObject * object);
 
 GtkType
@@ -155,7 +155,7 @@ gtk_vumeter_expose (GtkWidget * widget, GdkEventExpose * event)
 static gdouble db_to_vertical_offset(GtkWidget *widget, gdouble db)
 {
     gfloat def = 0.0f; /* Meter deflection %age */
- 
+
     if (db < -70.0f) {
         def = 0.0f;
     } else if (db < -60.0f) {
@@ -174,7 +174,7 @@ static gdouble db_to_vertical_offset(GtkWidget *widget, gdouble db)
         def = 115.0f;
     }
 
-    /* 115 is the deflection %age that would be 
+    /* 115 is the deflection %age that would be
        when db=6.0. this is an arbitrary
 	    endpoint for our scaling.
      */
@@ -185,7 +185,7 @@ static gdouble db_to_vertical_offset(GtkWidget *widget, gdouble db)
 static void
 gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
 {
-	static const int db_points[] = { -50, -40, -30, -24, -18, -12, -6, -3, 
+	static const int db_points[] = { -50, -40, -30, -24, -18, -12, -6, -3,
         0, 4 };
 
     cairo_paint (cr);
@@ -232,26 +232,26 @@ gtk_vumeter_paint (GtkWidget * widget, cairo_t *cr)
     const gdouble green_rect_height = db_to_vertical_offset(widget, -18.0);
     static const int BOTTOM_PADDING = LEFT_PADDING;
     cairo_rectangle(cr, LEFT_PADDING, green_rect_height /* top */,
-            RECT_WIDTH, 
+            RECT_WIDTH,
             widget->allocation.height - green_rect_height - BOTTOM_PADDING /* bottom */);
     cairo_fill(cr);
 
-    // yellow 
+    // yellow
     cairo_set_source_rgb (cr, 0.8, 1.0, 0.0);
     const gdouble yellow_rect_height = db_to_vertical_offset(widget, 0.0);
     cairo_rectangle(cr, LEFT_PADDING, yellow_rect_height /* top */,
             RECT_WIDTH,
             green_rect_height - yellow_rect_height/* bottom */);
     cairo_fill(cr);
-    
-    // red 
+
+    // red
     cairo_set_source_rgb (cr, 1.0, 0.0, 0.0);
     const gdouble red_rect_height = db_to_vertical_offset(widget, 8.0);
     cairo_rectangle(cr, LEFT_PADDING, red_rect_height /* top */,
             RECT_WIDTH,
             yellow_rect_height - red_rect_height/* bottom */);
     cairo_fill(cr);
-    
+
     // Draw a black rectangle that covers everything but the part of the
     // vumeter corresponding to the current amplitude
     cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);

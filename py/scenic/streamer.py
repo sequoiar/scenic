@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -41,11 +41,11 @@ class StreamerManager(object):
     """
     def __init__(self, app):
         self.app = app
-        self.sender = None 
-        self.receiver = None 
+        self.sender = None
+        self.receiver = None
         self.extra_sender = None # extra sender/receiver used only if not synchronized
         self.extra_receiver = None
-        
+
         self.midi_receiver = None
         self.midi_sender = None
         self.state = process.STATE_STOPPED
@@ -70,11 +70,11 @@ class StreamerManager(object):
                 log.error("Could not figure out how many channels in raw are supported.")
                 ret = 8
             deferred.callback(ret)
-            
+
         def _eb(reason, deferred):
             deferred.errback(reason)
             print("Error getting max channels: %s" % (reason))
-        
+
         command_name = "milhouse"
         args = ['--max-channels']
         try:
@@ -90,30 +90,30 @@ class StreamerManager(object):
     def _gather_config_to_stream(self, addr):
         """
         Gathers all settings in a big dict.
-        
+
         Useful for feedback to the user.
         """
         contact_name = addr
         contact = self.app._get_contact_by_addr(addr)
         if contact is not None:
             contact_name = contact["name"]
-        
+
         remote_config = self.app.remote_config # FIXME: should the remote config be passed as a param to this method?
         send_width, send_height = self.app.config.video_capture_size.split("x")
         receive_width, receive_height = remote_config["video"]["capture_size"].split("x")
-        
+
         # MIDI
         midi_send_enabled = self.app.config.midi_send_enabled and remote_config["midi"]["recv_enabled"]
         midi_recv_enabled = self.app.config.midi_recv_enabled and remote_config["midi"]["send_enabled"]
         midi_input_device = self.app.config.midi_input_device
         midi_output_device = self.app.config.midi_output_device
-        
+
         audio_jitterbuffer = self.app.config.audio_jitterbuffer
         if self.app.config.audio_video_synchronized and self.app.config.video_recv_enabled:
             audio_jitterbuffer = self.app.config.video_jitterbuffer
-        
+
         log.debug("remote_config: %s" % (remote_config))
-        
+
         self.session_details = {
             "peer": {
                 "address": addr,
@@ -124,20 +124,20 @@ class StreamerManager(object):
                 "video": {
                     # Decided by both:
                     "enabled": self.app.config.video_send_enabled and remote_config["video"]["recv_enabled"],
-                    
+
                     # Decided locally:
                     "source": self.app.config.video_source,
                     "device": self.app.config.video_device,
                     "width": int(send_width), # int
                     "height": int(send_height), # int
                     "aspect-ratio": self.app.config.video_aspect_ratio,
-                    
+
                     # Decided by remote peer:
-                    "port": remote_config["video"]["port"], 
-                    "bitrate": remote_config["video"]["bitrate"], 
-                    "codec": remote_config["video"]["codec"], 
+                    "port": remote_config["video"]["port"],
+                    "bitrate": remote_config["video"]["bitrate"],
+                    "codec": remote_config["video"]["codec"],
                 },
-                
+
                 "audio": {
                     # Decided by both:
                     "enabled": self.app.config.audio_send_enabled and remote_config["audio"]["recv_enabled"],
@@ -151,9 +151,9 @@ class StreamerManager(object):
                     # Decided by remote peer:
                     "numchannels": remote_config["audio"]["numchannels"],
                     "codec": remote_config["audio"]["codec"],
-                    "port": remote_config["audio"]["port"], 
+                    "port": remote_config["audio"]["port"],
                     "synchronized": remote_config["audio"]["synchronized"],
-                }, 
+                },
                 "midi": {
                     "enabled": midi_send_enabled,
                     "input_device": midi_input_device,
@@ -172,11 +172,11 @@ class StreamerManager(object):
                     "codec": self.app.config.video_codec,
                     "deinterlace": self.app.config.video_deinterlace, # bool
                     "window-title": "\"From %s\"" % (contact_name), #TODO: i18n
-                    "jitterbuffer": self.app.config.video_jitterbuffer, 
+                    "jitterbuffer": self.app.config.video_jitterbuffer,
                     "fullscreen": self.app.config.video_fullscreen, # bool
                     "display": self.app.config.video_display,
                     "bitrate": self.app.config.video_bitrate, # float
-                    
+
                     # Decided by remote peer:
                     "aspect-ratio": remote_config["video"]["aspect_ratio"],
                     "width": int(receive_width), # int
@@ -185,11 +185,11 @@ class StreamerManager(object):
                 "audio": {
                     # Decided by both:
                     "enabled": self.app.config.audio_recv_enabled and remote_config["audio"]["send_enabled"],
-                    
+
                     # decided locally:
                     "numchannels": self.app.config.audio_channels, # int
                     "vumeter-id": self.app.gui.audio_levels_output_socket_id,
-                    "codec": self.app.config.audio_codec, 
+                    "codec": self.app.config.audio_codec,
                     "port": self.app.recv_audio_port,
                     "sink": self.app.config.audio_sink,
                     "buffer": self.app.config.audio_output_buffer,
@@ -209,7 +209,7 @@ class StreamerManager(object):
             self.session_details["send"]["video"]["device"] = None
         if self.session_details["send"]["video"]["codec"] == "theora":
             self.session_details["send"]["video"]["bitrate"] = None
-        
+
         # limit to max numchannels if in raw
         # ...according to remote's max
         if self.session_details["receive"]["audio"]["codec"] == "raw":
@@ -229,7 +229,7 @@ class StreamerManager(object):
                 log.warning(msg)
                 log.warning(details)
                 self.app.gui.show_error_dialog(msg, details=details)
-        
+
         log.debug(str(self.session_details))
 
     def _prepare_stats_and_errors_dicts(self):
@@ -256,11 +256,11 @@ class StreamerManager(object):
             "receive": {
                 "video": {
                     "connected": False,
-                    "bitrate": None 
+                    "bitrate": None
                 },
                 "audio": {
                     "connected": False,
-                    "bitrate": None 
+                    "bitrate": None
                 }
             }
         }
@@ -272,17 +272,17 @@ class StreamerManager(object):
             "send": [], # list of strings
             "receive": [], # list of strings
             }
-        
+
     def start(self, host):
         """
         Starts the sender and receiver processes.
-        
+
         @param host: str ip addr
         Raises a RuntimeError if a sesison is already in progress.
         """
         if self.state != process.STATE_STOPPED:
             raise RuntimeError("Cannot start streamers since they are %s." % (self.state)) # the programmer has done something wrong if we're here.
-        
+
         self._gather_config_to_stream(host)
         details = self.session_details
         send_video_enabled = self.session_details["send"]["video"]["enabled"]
@@ -318,8 +318,8 @@ class StreamerManager(object):
         # every element in the lists must be strings since we join them .
         # int elements are converted to str.
         milhouse_send_cmd_common.extend([
-            "milhouse", 
-            '--sender', 
+            "milhouse",
+            '--sender',
             '--address', details["peer"]["address"]
             ])
 
@@ -329,7 +329,7 @@ class StreamerManager(object):
                 '--videosource', details["send"]["video"]["source"],
                 '--videocodec', details["send"]["video"]["codec"],
                 '--videoport', str(details["send"]["video"]["port"]),
-                '--width', str(details["send"]["video"]["width"]), 
+                '--width', str(details["send"]["video"]["width"]),
                 '--height', str(details["send"]["video"]["height"]),
                 '--aspect-ratio', str(details["send"]["video"]["aspect-ratio"]),
                 ])
@@ -365,7 +365,7 @@ class StreamerManager(object):
         # ------------------- recv ----------------
         milhouse_recv_cmd_common.extend([
             "milhouse",
-            '--receiver', 
+            '--receiver',
             '--address', details["peer"]["address"]
             ])
 
@@ -408,14 +408,14 @@ class StreamerManager(object):
             milhouse_recv_cmd_common.extend(['--disable-audio'])
 
         self._prepare_stats_and_errors_dicts()
-        # every element in the lists must be strings since we join them 
+        # every element in the lists must be strings since we join them
         # TODO: not sync
         # TODO: if both disabled, do not start sender/receiver
         # ---- audio/video receiver ----
         if recv_audio_enabled or recv_video_enabled: # receiver(s)
             milhouse_recv_cmd_final = []
             milhouse_recv_cmd_extra = []
-            
+
             milhouse_recv_cmd_final.extend(milhouse_recv_cmd_common)
             milhouse_recv_cmd_extra.extend(milhouse_recv_cmd_common)
             milhouse_recv_cmd_final.extend(milhouse_recv_cmd_video)
@@ -450,7 +450,7 @@ class StreamerManager(object):
         if send_audio_enabled or send_video_enabled: # sender(s)
             milhouse_send_cmd_final = []
             milhouse_send_cmd_extra = []
-            
+
             milhouse_send_cmd_final.extend(milhouse_send_cmd_common)
             milhouse_send_cmd_extra.extend(milhouse_send_cmd_common) # only used if we have to
             milhouse_send_cmd_final.extend(milhouse_send_cmd_video)
@@ -471,7 +471,7 @@ class StreamerManager(object):
                 self.extra_sender.stdout_line_signal.connect(self.on_sender_stdout_line)
                 self.extra_sender.stderr_line_signal.connect(self.on_sender_stderr_line)
                 # FIXME: too much code duplication
-        
+
         if midi_recv_enabled:
             midi_out_device = self.app.parse_midi_device_name(details["receive"]["midi"]["output_device"], is_input=False)
             #TODO: check if is None
@@ -483,12 +483,12 @@ class StreamerManager(object):
                 "--output-device", str(midi_out_device["number"])
                 ]
                 #"--verbose",
-            midi_recv_command = " ".join(midi_recv_args) 
+            midi_recv_command = " ".join(midi_recv_args)
             self.midi_receiver = process.ProcessManager(command=midi_recv_command, identifier="midi_receiver")
             self.midi_receiver.state_changed_signal.connect(self.on_process_state_changed)
             self.midi_receiver.stdout_line_signal.connect(self.on_midi_stdout_line)
             self.midi_receiver.stderr_line_signal.connect(self.on_midi_stderr_line)
-        
+
         if midi_send_enabled:
             midi_in_device = self.app.parse_midi_device_name(details["send"]["midi"]["input_device"], is_input=True)
             #TODO: check if is None
@@ -499,12 +499,12 @@ class StreamerManager(object):
                 "--input-device", str(midi_in_device["number"])
                 ]
                 #"--verbose",
-            midi_send_command = " ".join(midi_send_args) 
+            midi_send_command = " ".join(midi_send_args)
             self.midi_sender = process.ProcessManager(command=midi_send_command, identifier="midi_sender")
             self.midi_sender.state_changed_signal.connect(self.on_process_state_changed)
             self.midi_sender.stdout_line_signal.connect(self.on_midi_stdout_line)
             self.midi_sender.stderr_line_signal.connect(self.on_midi_stderr_line)
-        
+
         # starting
         self._set_state(process.STATE_STARTING)
         if send_audio_enabled or send_video_enabled:
@@ -544,7 +544,7 @@ class StreamerManager(object):
         """
         Handles a new line from our receiver process' stdout
         """
-        
+
         try:
             if "stream connected" in line:
                 if "audio" in line:
@@ -581,7 +581,7 @@ class StreamerManager(object):
                 lines = lines[0:2]
                 lines.append("...")
             self.warnings["receive"].extend(lines)
-    
+
     def on_sender_stdout_line(self, process_manager, line):
         """
         Handles a new line from our receiver process' stdout
@@ -695,7 +695,7 @@ class StreamerManager(object):
 
     def on_stopped(self):
         """
-        When the state changes to stopped, 
+        When the state changes to stopped,
          * check for errors and display them to the user.
         """
         msg = ""
@@ -736,7 +736,7 @@ class StreamerManager(object):
         self.midi_receiver = None
         self.midi_sender = None
         log.debug("Done stopping steaming")
-    
+
     def _set_state(self, new_state):
         """
         Handles state changes.
@@ -748,7 +748,7 @@ class StreamerManager(object):
                 self.on_stopped()
         else:
             raise RuntimeError("Setting state to %s, which is already the current state." % (self.state))
-            
+
     def stop(self):
         """
         Stops the sender and receiver processes.

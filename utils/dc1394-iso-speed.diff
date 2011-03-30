@@ -11,11 +11,11 @@ index 7cae5bd..f566bf7 100644
 +  PROP_ISO_SPEED
        /* FILL ME */
  };
- 
+
 @@ -153,6 +154,12 @@ gst_dc1394_class_init (GstDc1394Class * klass)
            "The number of frames in the dma ringbuffer", 1,
            G_MAXINT, 10, G_PARAM_READWRITE));
- 
+
 +  g_object_class_install_property (G_OBJECT_CLASS (klass),
 +      PROP_ISO_SPEED, g_param_spec_int ("iso-speed",
 +          "The iso bandwidth in Mbps (100, 200, 400, 800, 1600, 3200)",
@@ -24,7 +24,7 @@ index 7cae5bd..f566bf7 100644
 +
    gstbasesrc_class->get_caps = gst_dc1394_getcaps;
    gstbasesrc_class->set_caps = gst_dc1394_setcaps;
- 
+
 @@ -172,6 +179,7 @@ gst_dc1394_init (GstDc1394 * src, GstDc1394Class * g_class)
    src->timestamp_offset = 0;
    src->caps = gst_dc1394_get_all_dc1394_caps ();
@@ -32,7 +32,7 @@ index 7cae5bd..f566bf7 100644
 +  src->iso_speed = 400;
    src->camnum = 0;
    src->n_frames = 0;
- 
+
 @@ -217,6 +225,24 @@ gst_dc1394_set_property (GObject * object, guint prop_id,
        break;
      case PROP_BUFSIZE:
@@ -75,12 +75,12 @@ index 7cae5bd..f566bf7 100644
 -  gint err;
 +  gint err = 0;
    int framerateconst;
- 
+
    GST_LOG_OBJECT (src, "Opening the camera!!!");
 @@ -1057,8 +1086,43 @@ gst_dc1394_open_cam_with_best_caps (GstDc1394 * src)
    GST_LOG_OBJECT (src, "The dma buffer queue size is %d  buffers",
        src->bufsize);
- 
+
 -  //FIXME HAVE THIS AUTOMATIC OR AS A PARAMETER ?
 -  err = dc1394_video_set_iso_speed (src->camera, DC1394_ISO_SPEED_400);
 +  switch (src->iso_speed) {
@@ -120,27 +120,27 @@ index 7cae5bd..f566bf7 100644
 +      goto error;
 +      break;
 +  }
- 
+
    if (err != DC1394_SUCCESS) {
      GST_ELEMENT_ERROR (src, RESOURCE, FAILED, ("Could not set ISO speed"),
 @@ -1066,8 +1130,6 @@ gst_dc1394_open_cam_with_best_caps (GstDc1394 * src)
      goto error;
    }
- 
+
 -
 -
    GST_LOG_OBJECT (src, "Setting mode :  %d", src->vmode);
    err = dc1394_video_set_mode (src->camera, src->vmode);
- 
+
 diff --git a/ext/dc1394/gstdc1394.h b/ext/dc1394/gstdc1394.h
 index 4cc3b96..1144e8a 100644
 --- a/ext/dc1394/gstdc1394.h
 +++ b/ext/dc1394/gstdc1394.h
 @@ -62,6 +62,7 @@ struct _GstDc1394 {
    gboolean segment;
-   gint camnum; 
-   gint bufsize; 
+   gint camnum;
+   gint bufsize;
 +  gint iso_speed;
- 
+
    dc1394_t * dc1394;
-   dc1394camera_t * camera; 
+   dc1394camera_t * camera;

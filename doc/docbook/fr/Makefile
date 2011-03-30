@@ -7,7 +7,7 @@ html-local:
 		gnome-doc-tool html -o html/$${doc}/$${doc}.html $${doc}.xml ; \
 		sed -i 's!src="fig/!src="../fig/!' html/$${doc}/*.html ; \
 		( cd html/$${doc} ; ln -sf $${doc}.html index.html ) ; \
-	done 
+	done
 
 clean-local:
 	rm -rf html installation-manual.xml user-manual.xml

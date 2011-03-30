@@ -211,7 +211,7 @@ class ControlsTable(gtk.Frame):
             'full_luma_range': 'Full Luma Range',
         }
         self.add(self._vbox)
-    
+
         for control, label in sorted(self._table.iteritems()):
             toggle = gtk.CheckButton(label)
             if (v4l2_ctl_get(self._device, control) == "1"):

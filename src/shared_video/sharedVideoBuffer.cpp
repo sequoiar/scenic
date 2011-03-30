@@ -11,7 +11,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Scenic is distributed in the hope that it will be useful, 
+ * Scenic is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -83,7 +83,7 @@ void SharedVideoBuffer::notifyConsumer()
 
 void SharedVideoBuffer::notifyProducer()
 {
-    // Notify the other process that the buffer needs a refill 
+    // Notify the other process that the buffer needs a refill
     bufferIn_ = false;
     conditionFull_.notify_one();
 }
@@ -94,7 +94,7 @@ bool SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
     const boost::system_time timeout = boost::get_system_time() +
         boost::posix_time::milliseconds(10);
 
-    if (bufferIn_)   // XXX: this must be an if, not a while, otherwise process hangs 
+    if (bufferIn_)   // XXX: this must be an if, not a while, otherwise process hangs
     {
         return conditionFull_.timed_wait(lock, timeout);
     }
@@ -126,7 +126,7 @@ int SharedVideoBuffer::getHeight()
 {
     return height_;
 }
- 
+
 // Used by AC_CHECK_LIB in configure.ac
 void shared_video_is_present()
 {

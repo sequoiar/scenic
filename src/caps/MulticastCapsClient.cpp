@@ -10,7 +10,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Scenic is distributed in the hope that it will be useful, 
+ * Scenic is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -30,8 +30,8 @@
 
 MulticastCapsClient::MulticastCapsClient(boost::asio::io_service& io_service,
         const std::string& listenAddress,
-        const std::string& multicastAddress, 
-        short multicastPort) : 
+        const std::string& multicastAddress,
+        short multicastPort) :
     socket_(io_service),
     listenAddress_(boost::asio::ip::address::from_string(listenAddress)),
     multicastAddress_(boost::asio::ip::address::from_string(multicastAddress)),
@@ -54,7 +54,7 @@ std::string MulticastCapsClient::getCaps()
     }
     catch (const boost::system::system_error& error)
     {
-        LOG_ERROR("Got socket error \"" << error.what() << 
+        LOG_ERROR("Got socket error \"" << error.what() <<
                 "\" for multicast address " << multicastAddress_);
         throw;
     }
@@ -78,7 +78,7 @@ std::string MulticastCapsClient::getCaps()
         capsEnd = result.find(SENTINEL);
         bytesDeclared = boost::lexical_cast<int>(result.substr(capsEnd + SENTINEL.length(), result.length()));
         if (bytesDeclared != capsEnd - 1)
-            LOG_WARNING("MISMATCH BETWEEN DECLARED CAPS LENGTH " << 
+            LOG_WARNING("MISMATCH BETWEEN DECLARED CAPS LENGTH " <<
                     bytesDeclared <<  " AND RECEIVED CAPS LENGTH" <<
                     capsEnd - 1);
         if (capsEnd != std::string::npos)

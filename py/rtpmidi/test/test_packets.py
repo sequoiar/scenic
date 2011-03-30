@@ -16,7 +16,7 @@ class TestRTCPPacket(unittest.TestCase):
                        'addr':0, 'rtp_port':0, 'rtcp_port':0,
                        'last_rtp_received':0, 'last_rtcp_received':0,
                        'total_received_bytes':0, 'total_received_packets':0,
-                       'last_seq':0, 'lost':0, 'last_ts':0, 'last_time':0, 
+                       'last_seq':0, 'lost':0, 'last_ts':0, 'last_time':0,
                        'jitter':0, 'lsr':0, 'dlsr': 0,
                        'rt_time':0}
 
@@ -28,14 +28,14 @@ class TestRTCPPacket(unittest.TestCase):
         res = ext_32_out_of_64(ref)
         ref = 10 << 16
         assert(res==ref), self.fail("Wrong encoding")
-        
+
 
     def test_unformat_from_32(self):
         ref = 10
         res = ext_32_out_of_64(ref)
         res_2 = unformat_from_32(res)
         assert(res_2==ref), self.fail("Wrong encoding or decoding")
-        
+
         ref = 10.245
         res = ext_32_out_of_64(ref)
         res_2 = unformat_from_32(res)
@@ -63,7 +63,7 @@ class TestRTCPPacket(unittest.TestCase):
                     total_packets,
                     total_bytes, members_table)
 
-        
+
 
         rtcp = RTCPPacket("SR", ptcode=200, contents=arg_list)
         rtcp_pac = rtcp.encode()
@@ -93,7 +93,7 @@ class TestRTCPPacket(unittest.TestCase):
         new_member['lost'] = lost
         new_member['lsr'] = lsr
         new_member['dlsr'] = dlsr
-        
+
         members_table = {}
         members_table[ssrc_1] = new_member
 
@@ -159,7 +159,7 @@ class TestRTCPPacket(unittest.TestCase):
         new_member['lost'] = lost
         new_member['lsr'] = lsr
         new_member['dlsr'] = dlsr
-        
+
         members_table = {}
         members_table[ssrc_1] = new_member
 
@@ -191,7 +191,7 @@ class TestRTCPPacket(unittest.TestCase):
         new_member['lost'] = lost
         new_member['lsr'] = lsr
         new_member['dlsr'] = dlsr
-        
+
         members_table = {}
         members_table[ssrc_1] = new_member
 
@@ -206,7 +206,7 @@ class TestRTCPPacket(unittest.TestCase):
 
         #Getting content of the first block
         cont = packet._rtcp[0].getContents()
-        
+
         lsr = ext_32_out_of_64(lsr)
         lsr = unformat_from_32(lsr)
 
@@ -258,7 +258,7 @@ class TestRTCPPacket(unittest.TestCase):
         assert(cont[1]==reason), \
             self.fail("Reason is not correctly encode or decode")
 
-    
+
     def test_encode_SDES(self):
 
         item = []
@@ -282,7 +282,7 @@ class TestRTCPPacket(unittest.TestCase):
         assert(len(rtcp_pac) == length_wait), \
             self.fail("Wrong size returned by encode RTCP SDES packet")
 
-        
+
     def test_decode_SDES(self):
         item = []
         cont = []
@@ -293,7 +293,7 @@ class TestRTCPPacket(unittest.TestCase):
 
         rtcp = RTCPPacket("SDES", ptcode=202, contents=cont)
         rtcp_pac = rtcp.encode()
-        
+
         packets = RTCPCompound(rtcp_pac)
 
         for packet in packets:
@@ -305,7 +305,7 @@ class TestRTCPPacket(unittest.TestCase):
             for elt in cont[0][1]:
                 if elt[0] == "CNAME":
                     assert(elt[1]=="me@myself.mine"), self.fail("wrong encoded for Cname")
-                    
+
                 elif elt[0] == "NAME":
                     assert(elt[1]=="memyselfandi"), self.fail("wrong encoded for Name")
 
@@ -350,13 +350,13 @@ class TestRTPPacket(unittest.TestCase):
         def test_netbytes(self):
             pass
 
-        
+
     def test_init(self):
         #params: ssrc, seq, ts, data, pt=None, ct=None, marker=0,
         #         authtag='', xhdrtype=None, xhdrdata=''
         #
         test = "some data"
-        ssrc, seq, ts, data, marker  = (424242, 1, 143, test, 1) 
+        ssrc, seq, ts, data, marker  = (424242, 1, 143, test, 1)
         packet = RTPPacket(ssrc, seq, ts, data, marker=marker)
         #assert(len(packet)==
 
@@ -366,7 +366,7 @@ class TestRTPPacket(unittest.TestCase):
     def test_parse_rtppacket(self):
         pass
 
-    
+
 
 class TestNTE(unittest.TestCase):
     def test_init(self):

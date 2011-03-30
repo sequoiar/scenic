@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -36,10 +36,10 @@ from twisted.python import procutils
 def _list_x11_displays(verbose):
     """
     Returns a list of X11 display/screen names.
-    
+
     Not using Twisted, since this should be pretty fast.
     It is also a lot easier to debug this way.
-    
+
     Returns a list of dict whose keys are : name, dimensions, resolution
     @rtype: list of dict
     """
@@ -68,7 +68,7 @@ def _list_x11_displays(verbose):
         if not found_screen_for_display:
             break
     dev_null.close()
-    
+
     # add current DISPLAY variable if not in the list of detected displays. (most likely because it's a ssh -X session)
     if os.environ.has_key("DISPLAY"):
         display = os.environ["DISPLAY"]
@@ -92,7 +92,7 @@ def xvideo_extension_is_present():
     """
     Checks for XV extension.
     Result is boolean.
-    
+
     @rtype: Deferred
     """
     def _cb(result, deferred):
@@ -103,7 +103,7 @@ def xvideo_extension_is_present():
             if line.find("no adaptor present") != -1: # Karmic
                 ret = False
         deferred.callback(ret)
-        
+
     def _eb(reason, deferred):
         deferred.errback(reason)
 
@@ -117,7 +117,7 @@ def xvideo_extension_is_present():
     d.addCallback(_cb, deferred)
     d.addErrback(_eb, deferred)
     return deferred
-    
+
 
 if __name__ == "__main__":
     def _cb(result):

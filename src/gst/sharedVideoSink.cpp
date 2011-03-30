@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  *
  * http://www.sat.qc.ca
@@ -45,11 +45,11 @@ shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory(const std::
     using boost::interprocess::interprocess_exception;
     shared_ptr<shared_memory_object> shm;
 
-    try 
+    try
     {
         removeSharedMemory(id);
         // create a shared memory object
-        shm.reset(new shared_memory_object(create_only, id.c_str(), read_write)); 
+        shm.reset(new shared_memory_object(create_only, id.c_str(), read_write));
         // set size
         shm->truncate(sizeof(SharedVideoBuffer));
     }
@@ -69,13 +69,13 @@ bool SharedVideoSink::removeSharedMemory(const std::string &id)
 }
 
 
-SharedVideoSink::SharedVideoSink(const Pipeline &pipeline, 
-        int width, int height, const std::string &id) 
+SharedVideoSink::SharedVideoSink(const Pipeline &pipeline,
+        int width, int height, const std::string &id)
 :
     VideoSink(),
     id_(id),
-    colorspc_(0), 
-    shm_(createSharedMemory(id_)), 
+    colorspc_(0),
+    shm_(createSharedMemory(id_)),
     region_(*shm_, read_write), // map the whole shared memory in this process
     sharedBuffer_(0)
 {
@@ -147,13 +147,13 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
 
 void SharedVideoSink::prepareSink(int width, int height)
 {
-    GstCaps *videoCaps; 
+    GstCaps *videoCaps;
 
     std::ostringstream capsStr;
 
     /// FIXME: should detect caps from preceding element in pipeline if possible
-    capsStr << "video/x-raw-rgb, width=" << width 
-        << ", height=" << height << ",bpp=16, depth=16"; 
+    capsStr << "video/x-raw-rgb, width=" << width
+        << ", height=" << height << ",bpp=16, depth=16";
     videoCaps = gst_caps_from_string(capsStr.str().c_str());
 
     g_object_set(G_OBJECT(sink_), "emit-signals", TRUE, "caps", videoCaps, NULL);

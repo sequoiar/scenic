@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -42,7 +42,7 @@ ugly_to_beautiful_camera_names = {
 def _beautify_camera_name(name):
     """
     Renames a camera with a better name if it's in our list of know camera names.
-    
+
     @rtype: str
     @type name: str
     """
@@ -151,19 +151,19 @@ def _parse_milhouse_list_cameras(text):
 
 def list_cameras():
     """
-    Calls the Deferred with the dict of devices as argument. 
-    
+    Calls the Deferred with the dict of devices as argument.
+
     @rtype: Deferred
     """
     def _cb(text, deferred):
         #print text
         ret = _parse_milhouse_list_cameras(text)
         deferred.callback(ret)
-        
+
     def _eb(reason, deferred):
         deferred.errback(reason)
         print("Error listing cameras: %s" % (reason))
-    
+
     command_name = "milhouse"
     args = ['--list-v4l2']
     try:
@@ -209,14 +209,14 @@ Supported modes :
     Framerates: 7.5,15,30
 
 Video4Linux Camera /dev/video1:
-    Driver name   : 
-    Card type     : 
-    Bus info      : 
+    Driver name   :
+    Card type     :
+    Bus info      :
     Driver version: 0
-    Video input   : 
-    Standard      : 
+    Video input   :
+    Standard      :
     Width/Height  : 0x0
-    Pixel Format  : 
+    Pixel Format  :
     Capture Type  : 1
     Field         : Any
     Bytes per Line: 0

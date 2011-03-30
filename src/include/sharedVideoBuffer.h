@@ -1,5 +1,5 @@
 
-/* 
+/*
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  *
  * http://www.sat.qc.ca
@@ -39,7 +39,7 @@ class SharedVideoBuffer
         boost::interprocess::interprocess_mutex & getMutex();
 
         unsigned char* pixelsAddress();
-        
+
         void pushBuffer(unsigned char *newBuffer, size_t size);
 
         void notifyConsumer();
@@ -56,7 +56,7 @@ class SharedVideoBuffer
 
     private:
 
-        enum { 
+        enum {
             MAX_BUFFER_SIZE = videosize::MAX_WIDTH * videosize::MAX_HEIGHT * sizeof(short),
             BUFFER_SIZE = videosize::WIDTH * videosize::HEIGHT * sizeof(short)
         };
@@ -68,22 +68,22 @@ class SharedVideoBuffer
         const int width_;
         const int height_;
 
-        // mutex to protect access to the queue 
+        // mutex to protect access to the queue
         boost::interprocess::interprocess_mutex mutex_;
 
         // condition to wait when the queue is empty
         boost::interprocess::interprocess_condition conditionEmpty_;
 
-        // condition to wait when the queue is full 
+        // condition to wait when the queue is full
         boost::interprocess::interprocess_condition conditionFull_;
 
         // is there a buffer ready to be consumed
-        // in our shared memory? 
+        // in our shared memory?
         bool bufferIn_;
 };
 
 // use in configure.ac like so:
-// AC_CHECK_LIB([shared_video], [shared_video_is_present], 
+// AC_CHECK_LIB([shared_video], [shared_video_is_present],
 // AC_MSG_NOTICE([found libshared_video]), AC_MSG_ERROR([didn't find libshared_video]), [-pthread])
 
 extern "C" {

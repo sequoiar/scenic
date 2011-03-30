@@ -37,17 +37,17 @@ class VideoDecoder;
 class Decoder;
 class CapsServer;
 
-/** 
+/**
  *      Immutable class that is used to setup rtp
  */
 
-class RemoteConfig 
+class RemoteConfig
 {
     public:
-        RemoteConfig(const std::string &codec, 
-                const std::string &remoteHost, 
+        RemoteConfig(const std::string &codec,
+                const std::string &remoteHost,
                 int port);
-        
+
         static bool capsMatchCodec(const std::string &encodingName, const std::string &codec);
 
         int port() const { return port_; }
@@ -78,8 +78,8 @@ class SenderConfig : public RemoteConfig, private BusMsgHandler
 {
     public:
         SenderConfig(Pipeline &pipeline,
-                const std::string &codec, 
-                const std::string &remoteHost, 
+                const std::string &codec,
+                const std::string &remoteHost,
                 int port,
                 const std::string &multicastInterface);
 
@@ -99,8 +99,8 @@ class SenderConfig : public RemoteConfig, private BusMsgHandler
 class ReceiverConfig : public RemoteConfig
 {
     public:
-        ReceiverConfig(const std::string &codec, 
-                const std::string &remoteHost, 
+        ReceiverConfig(const std::string &codec,
+                const std::string &remoteHost,
                 int port,
                 const std::string &multicastInterface);
 

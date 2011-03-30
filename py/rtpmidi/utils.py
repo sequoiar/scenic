@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -25,17 +25,17 @@ import re
 
 def check_ip(address):
     """
-    Check address format 
+    Check address format
     """
     if re.match('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address):
 	    values = [int(i) for i in address.split('.')]
 	    if ip_range(values):
-		    return True 
+		    return True
 	    else:
-		    return False 
+		    return False
     else:
 	    return False
-            
+
 def ip_range(nums):
     for num in nums:
         if num < 0 or num > 255:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -43,7 +43,7 @@ from time import time
 #Constants
 DEFAULT_PORT = 44000
 PAYLOAD = 96
-#RTP Timeout is 60 (need it because 
+#RTP Timeout is 60 (need it because
 #midi data are not sent when no note are played)
 MIDI_RTP_TIME_OUT = 40
 TOOL_NAME = "Sropulpof_midi" #FIXME: rename this
@@ -54,11 +54,11 @@ class MidiSession(RTPSession):
     """
     Control RTP for MIDI payload.
     """
-    def __init__(self, peer_address, sport=0, rport=0, latency=20, 
-                 jitter_buffer_size=10, safe_keyboard=0, recovery=1, 
+    def __init__(self, peer_address, sport=0, rport=0, latency=20,
+                 jitter_buffer_size=10, safe_keyboard=0, recovery=1,
                  follow_standard=0, verbose=0):
         #Init mother class
-        RTPSession.__init__(self, peer_address, sport, rport, PAYLOAD, 
+        RTPSession.__init__(self, peer_address, sport, rport, PAYLOAD,
                             jitter_buffer_size, TOOL_NAME)
         self.verbose = verbose
         if verbose:
@@ -128,7 +128,7 @@ class MidiSession(RTPSession):
 
     def incoming_rtp(self, cookie, timestamp, packet, read_recovery_journal=0):
         """
-        Function called by RTPControl when incoming 
+        Function called by RTPControl when incoming
         data comes out from jitter buffer.
         """
         #Parsing RTP MIDI Header
@@ -148,7 +148,7 @@ class MidiSession(RTPSession):
             #Saving feed history
             packet_to_save = OldPacket(self.seq, midi_list, 0)
             self.packets_received_list.to_list(packet_to_save)
-        #Extract Midi Recovery Journal if is present in the packet and 
+        #Extract Midi Recovery Journal if is present in the packet and
         #the previous packet has been lost
         if self.recovery:
             if marker_j and read_recovery_journal:
@@ -164,7 +164,7 @@ class MidiSession(RTPSession):
                 #compare it with history feed
                 #Extract midi notes from checkpoint sent to actual seq
                 midi_history = self.packets_received_list.get_packets(self.last_checkpoint,self.seq)
-                #Selecting only notes present in recovery 
+                #Selecting only notes present in recovery
                 #that are not in feed history
                 midi_cmd_history = []
                 for i in range(len(midi_history)):
@@ -200,7 +200,7 @@ class MidiSession(RTPSession):
         """
         recovery_journal = ""
         marker_j = 0
-        #Getting recovery 
+        #Getting recovery
         if self.recovery:
             recovery_journal = self.recovery_journal_system.content
             if recovery_journal != "":
@@ -215,7 +215,7 @@ class MidiSession(RTPSession):
         #sending silent packet with recovery journal
         RTPSession.send_empty_packet(self, chunk)
         #RTPControl().send_empty_packet(self.cookie, chunk)
-    
+
     def send_midi_data(self, data, midi_time, recovery=1, timestamp=1):
         """
         Sends MIDI data through the RTP session.
@@ -226,12 +226,12 @@ class MidiSession(RTPSession):
         self.sending_data = 1
         #midi Cmd List
         midi_list = data
-        #Saving packet 
+        #Saving packet
         packet = OldPacket(self.seq, midi_list, 0)
         chunk = ""
         recovery_journal = ""
         if recovery:
-            #Recovery Journal (can be empty) 
+            #Recovery Journal (can be empty)
             #TODO customize it for each member of the feed
             if self.recovery_journal_system is not None:
                 recovery_journal = self.recovery_journal_system.content
@@ -240,7 +240,7 @@ class MidiSession(RTPSession):
         #Packing All
         #Testing length of midi list ( in nb notes )
         if len(midi_list) < 1:
-            return 
+            return
         #Formating commands for network
         midi_list_formated, length = \
             MidiCommand().encode_midi_commands(midi_list)
@@ -294,21 +294,21 @@ class MidiSession(RTPSession):
     def set_device_in(self, dev):
         """
         Selects the MIDI device to be polled.
-        
+
         @param dev: The device number to choose.
         @type dev: int
         @rtype: bool
         @return: Success or not
-        """ 
-        return self.midi_in.set_device(dev) 
+        """
+        return self.midi_in.set_device(dev)
 
     def set_device_out(self, dev):
         """
         Selects the MIDI output device to send data to.
-        
+
         @param dev: The device number to choose.
         @type dev: int
         @rtype: bool
         @return: Success or not
-        """ 
+        """
         return self.midi_out.set_device(dev)

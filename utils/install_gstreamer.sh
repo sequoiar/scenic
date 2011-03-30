@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script will (try to) download proper version of gstreamer for 
+# This script will (try to) download proper version of gstreamer for
 # milhouse installation
 #
 # The current needed modules are:
@@ -49,8 +49,8 @@ cd $DOWNLOAD_DIR
 #wget -c http://www.tortall.net/projects/yasm/releases/$YASM.tar.gz
 #tar xzf $YASM.tar.gz
 #pushd $YASM
-#./configure 
-#make 
+#./configure
+#make
 #sudo $MAKEINSTALL
 #popd
 
@@ -63,7 +63,7 @@ cd $DOWNLOAD_DIR
 ### added enable-shared flag to make sure that we can build the gstreamer x264enc
 ### plugin on 64 bit platforms
 #./configure --enable-shared
-#make 
+#make
 #sudo $MAKEINSTALL
 #sudo ldconfig
 #popd

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -25,7 +25,7 @@
 #include <stdexcept>
 
 /**
- * exception classes 
+ * exception classes
  * refer to
  * http://www.boost.org/community/error_handling.html
  * for best practices
@@ -35,14 +35,14 @@
  */
 
 
-/// higher values are more severe 
+/// higher values are more severe
 enum LogLevel {
     NONE = 0,
     DEBUG = 10,
     INFO = 20,
     PRINT = 25,
     WARNING = 30,
-    THROW = 35,         //those below can throw 
+    THROW = 35,         //those below can throw
     ERROR = 40,
     CRITICAL = 50,
     ASSERT_FAIL = 60
@@ -78,7 +78,7 @@ class CriticalExcept : public Except
 {
     public:
         CriticalExcept(const char* log_msg) : Except(log_msg)
-    { 
+    {
         log_ = CRITICAL;
     }
 };
@@ -87,7 +87,7 @@ class CriticalExcept : public Except
 class AssertExcept : public CriticalExcept
 {
     public:
-        AssertExcept(const char* log_msg) : 
+        AssertExcept(const char* log_msg) :
             CriticalExcept(log_msg)
     {
         log_ = ASSERT_FAIL;

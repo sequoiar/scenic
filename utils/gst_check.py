@@ -52,7 +52,7 @@ if (sink_ == "xvimagesink")
 *coder(pipeline, "mad")
 """
 matches = [
-    re.compile(r"^.*makeElement\(\""), 
+    re.compile(r"^.*makeElement\(\""),
     re.compile(r"^.*source_ == \""),
     re.compile(r"^.*sink_ == \""),
     re.compile(r"^.*coder\(pipeline, \""),
@@ -70,11 +70,11 @@ for source_file in cpp_files:
         for line in f:
             for m in matches:
                 if (m.search(line) is not None):
-                    """ 
+                    """
                     We want to push the element name in the gst_plugins list:
                     1) We strip the line
                     2) We substitute the match with the empty string
-                    3) We strip all characters after the double quote    
+                    3) We strip all characters after the double quote
                     """
                     gst_plugins.append((end.sub("", m.sub("", line.strip()))))
 
@@ -94,7 +94,7 @@ except:
 optional_plugins = ["dc1394src", "dv1394src", "dvdemux", "dvdec", "alsasrc", "alsasink", "pulsesrc", "pulsesink", "theoraenc", "theoradec", "lamemp3enc", "mp3parse", "mad", "x264enc", "ffenc_mpeg4", "ffenc_h263p", "celtenc", "celtdec"]
 
 for plugin in gst_plugins:
-    if gst.element_factory_find(plugin) is None: 
+    if gst.element_factory_find(plugin) is None:
         if plugin in optional_plugins:
             print("Warning: optional plugin " + plugin + " is NOT installed")
         else:

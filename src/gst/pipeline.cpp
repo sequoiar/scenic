@@ -38,7 +38,7 @@
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
 
-Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(), 
+Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(),
     sampleRate_(SAMPLE_RATE)
 {
     /* watch for messages on the pipeline's bus (note that this will only
@@ -84,7 +84,7 @@ void translateMessage(GstObject *src, const std::string &errStr)
             THROW_CRITICAL(srcName << ":" << errStr <<
                  deviceName << " is probably already in use.");
         }
-        else 
+        else
             THROW_CRITICAL(srcName << ":" << errStr);
         return;
     }
@@ -120,7 +120,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
                     g_free(debug);
                 }
                 // this will either throw or log a warning
-                translateMessage(msg->src, errStr); 
+                translateMessage(msg->src, errStr);
                 break;
             }
         case GST_MESSAGE_WARNING:
@@ -170,10 +170,10 @@ void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gc
     gchar *str = NULL;
     gchar *name = NULL;
 
-    if (pspec->flags & G_PARAM_READABLE) 
+    if (pspec->flags & G_PARAM_READABLE)
     {
         /* let's not print these out for excluded properties... */
-        while (excluded_props != NULL && *excluded_props != NULL) 
+        while (excluded_props != NULL && *excluded_props != NULL)
         {
             if (g_strcmp0 (pspec->name, *excluded_props) == 0)
                 return;
@@ -183,7 +183,7 @@ void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gc
         g_object_get_property (G_OBJECT (orig), pspec->name, &value);
 
         /* FIXME: handle flags */
-        if (G_IS_PARAM_SPEC_ENUM (pspec)) 
+        if (G_IS_PARAM_SPEC_ENUM (pspec))
         {
             GEnumValue *enum_value;
             GEnumClass *klass = G_ENUM_CLASS (g_type_class_ref (pspec->value_type));
@@ -192,8 +192,8 @@ void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gc
             str = g_strdup_printf ("%s (%d)", enum_value->value_nick,
                     enum_value->value);
             g_type_class_unref (klass);
-        } 
-        else 
+        }
+        else
             str = g_strdup_value_contents (&value);
 
         name = gst_object_get_path_string (orig);
@@ -201,8 +201,8 @@ void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gc
         g_free(name);
         g_free(str);
         g_value_unset (&value);
-    } 
-    else 
+    }
+    else
     {
         name = gst_object_get_path_string (orig);
         LOG_WARNING("Parameter " << pspec->name << " not readable in " << name << ".");
@@ -292,7 +292,7 @@ bool Pipeline::start() const
 {
     if (isPlaying())        // only needs to be started once
     {
-        LOG_WARNING("Already playing, this call to Pipeline::start() was redundant"); 
+        LOG_WARNING("Already playing, this call to Pipeline::start() was redundant");
         return true;
     }
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
@@ -314,7 +314,7 @@ void Pipeline::makeReady() const
     if (isReady())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    if (checkStateChange(ret)) 
+    if (checkStateChange(ret))
         LOG_WARNING("Could not set pipeline state to READY");
     else
         LOG_DEBUG("Now ready");
@@ -323,7 +323,7 @@ void Pipeline::makeReady() const
 bool Pipeline::makeNull() const
 {
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-    if (not checkStateChange(ret)) 
+    if (not checkStateChange(ret))
     {
         LOG_WARNING("Could not set pipeline state to NULL");
         return false;
@@ -422,7 +422,7 @@ void Pipeline::updateListeners(GstMessage *msg)
     // TODO: are we guaranteed that these are in a callable state?
     // this loop goes through our listeners until it finds one that returns
     // true upon receiving this message
-    for (std::set<BusMsgHandler*>::iterator iter = handlers_.begin(); 
+    for (std::set<BusMsgHandler*>::iterator iter = handlers_.begin();
             iter != handlers_.end(); ++iter)
         if ((*iter)->handleBusMsg(msg))
             break;

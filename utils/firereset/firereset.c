@@ -2,17 +2,17 @@
    Copyright (C) 2008 Société des arts technologiques (SAT)
    http://www.sat.qc.ca
    All rights reserved.
-  
+
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 2 of the License, or
    (at your option) any later version.
-  
+
    Scenic is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-  
+
    You should have received a copy of the GNU General Public License
    along with Scenic .  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -20,7 +20,7 @@
 /**
  * Raw1394 (Firewire on GNU/Linux) bus reset.
  *
- * to compile : 
+ * to compile :
  * gcc -Wall -lraw1394 -o resetbus resetbus.c
  * TODO: add bus number argument
  */
@@ -39,8 +39,8 @@
 static int bus_reset_handler(struct raw1394_handle *handle, unsigned int gen)
 {
     printf("INFO: Bus reset occurred.\nINFO: New generation number: %d, \nINFO: %d nodes on the bus\nINFO: local ID: %d\a\n",
-        gen, 
-        raw1394_get_nodecount(handle), 
+        gen,
+        raw1394_get_nodecount(handle),
         raw1394_get_local_id(handle) & 0x3f);
     printf("SUCCESS !\n");
     /* TODO: check for errors ? */
@@ -61,7 +61,7 @@ void print_help()
     printf("Use at your own risks.\n");
     printf("\n");
     printf("The default device node is /dev/raw1394, but one can override the default by \nsetting environment variable RAW1394DEV. However, if RAW1394DEV points to a \nnon-existant or invalid device node, then it also attempts to open the default \ndevice node. \n");
-    
+
 }
 
 int main(int argc, char **argv)
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     int result;
     int type = RAW1394_LONG_RESET;
     int adapter_number = 0; /* see firecontrol/commander.c */
-    
+
     if (argc >= 2)
     {
         if (strcmp(argv[1], "--help") != 0)
@@ -81,9 +81,9 @@ int main(int argc, char **argv)
         print_help();
         return 0;
     }
-    
+
 #if 0
-    TODO: add a --device argument (-d) which would change the envrionment variable 
+    TODO: add a --device argument (-d) which would change the envrionment variable
     int setenv(const char *envname, const char *envval, int overwrite);
 #endif
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
         return 1;
     }
     /*
-    *  If RAW1394DEV points to a non-existant or invalid device node, then it also attempts to open the default device node. 
+    *  If RAW1394DEV points to a non-existant or invalid device node, then it also attempts to open the default device node.
     */
     printf("INFO: $RAW1394DEV=%s\n", getenv("RAW1394DEV"));
     printf("INFO: Current generation number (driver): %d.\n", raw1394_get_generation(handle));
@@ -109,14 +109,14 @@ int main(int argc, char **argv)
     printf("Got %d ports\n", nports);
 #endif
 
-    if (raw1394_set_port(handle, adapter_number) < 0) 
+    if (raw1394_set_port(handle, adapter_number) < 0)
     {
         printf("ERROR: Could not set port.\n");
         printf("FAILURE.");
         return 1;
     }
     result = raw1394_reset_bus_new(handle, type);
-    if (result == -1) 
+    if (result == -1)
     {
         printf("ERROR: Could not reset bus.\n");
         printf("FAILURE.");
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 #endif
     raw1394_loop_iterate(handle);
     raw1394_destroy_handle(handle);
-    
+
     return 0;
 }
 

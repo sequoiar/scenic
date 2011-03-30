@@ -79,7 +79,7 @@ main(int argc, char **argv)
   GstRTSPServer *server;
   GstRTSPMediaMapping *mapping;
   GstRTSPCamMediaFactory *factory;
-  GstRTSPUrl *local_url; 
+  GstRTSPUrl *local_url;
   GOptionContext *ctx;
   GOptionGroup *gst_group;
   gboolean res;
@@ -137,7 +137,7 @@ main(int argc, char **argv)
 
   gst_rtsp_server_attach (server, NULL);
 
-  g_timeout_add_seconds (5, (GSourceFunc) timeout, server); 
+  g_timeout_add_seconds (5, (GSourceFunc) timeout, server);
   /* start serving */
   g_main_loop_run (loop);
 

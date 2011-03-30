@@ -34,12 +34,12 @@ static const int USEC_PER_MILLISEC = 1000;
 namespace po = boost::program_options;
 
 AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
-    source_(options["audiosource"].as<std::string>()), 
-    bitrate_(options["audiobitrate"].as<int>()), 
-    quality_(options["audioquality"].as<double>()), 
+    source_(options["audiosource"].as<std::string>()),
+    bitrate_(options["audiobitrate"].as<int>()),
+    quality_(options["audioquality"].as<double>()),
     sourceName_(options["jack-client-name"].as<std::string>()),
-    deviceName_(options["audiodevice"].as<std::string>()), 
-    location_(options["audiolocation"].as<std::string>()), 
+    deviceName_(options["audiodevice"].as<std::string>()),
+    location_(options["audiolocation"].as<std::string>()),
     numChannels_(options["numchannels"].as<int>()),
     bufferTime_(options["audio-buffer"].as<int>() * USEC_PER_MILLISEC),
     socketID_(options["vumeter-id"].as<unsigned long>()),
@@ -48,7 +48,7 @@ AudioSourceConfig::AudioSourceConfig(const po::variables_map &options) :
     using boost::lexical_cast;
     using std::string;
     if (numChannels_ < 1)
-        throw std::range_error("Invalid number of channels=" + 
+        throw std::range_error("Invalid number of channels=" +
                 lexical_cast<string>(numChannels_));
 }
 
@@ -63,16 +63,16 @@ double AudioSourceConfig::quality() const
     return quality_;
 }
 
-/// Returns c-style string specifying the source 
+/// Returns c-style string specifying the source
 const char *AudioSourceConfig::source() const
 {
     return source_.c_str();
 }
 
-/// Returns number of channels 
-int AudioSourceConfig::numChannels() const 
-{ 
-    return numChannels_; 
+/// Returns number of channels
+int AudioSourceConfig::numChannels() const
+{
+    return numChannels_;
 }
 
 /// Returns buffer time, which must be an unsigned long long for gstreamer's audiosink to accept it safely
@@ -81,7 +81,7 @@ unsigned long long AudioSourceConfig::bufferTime() const
     return bufferTime_;
 }
 
-/// Factory method that creates an AudioSource based on this object's source_ string 
+/// Factory method that creates an AudioSource based on this object's source_ string
 AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 {
     if (source_ == "audiotestsrc")
@@ -90,7 +90,7 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioFileSource(pipeline, *this);
     else if (source_ == "alsasrc")
         return new AudioAlsaSource(pipeline, *this);
-    else if (source_ == "jackaudiosrc") 
+    else if (source_ == "jackaudiosrc")
     {
         Jack::assertReady();
         AudioJackSource *result = new AudioJackSource(pipeline, *this);
@@ -102,7 +102,7 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioDvSource(pipeline, *this);
     else if (source_ == "pulsesrc")
         return new AudioPulseSource(pipeline, *this);
-    else 
+    else
         THROW_ERROR(source_ << " is an invalid audiosource");
     return 0;
 }
@@ -120,7 +120,7 @@ AudioLevel* AudioSinkConfig::createLevel(Pipeline &pipeline) const
     return new AudioLevel(pipeline, numChannels_, socketID_);
 }
 
-/// Returns c-style string specifying the location (filename) 
+/// Returns c-style string specifying the location (filename)
 const char* AudioSourceConfig::location() const
 {
     return location_.c_str();
@@ -143,14 +143,14 @@ const char* AudioSourceConfig::sourceName() const
 }
 
 
-/// Returns true if location indicates an existing, readable file/device. 
+/// Returns true if location indicates an existing, readable file/device.
 bool AudioSourceConfig::locationExists() const
 {
     return g_file_test(location_.c_str(), G_FILE_TEST_EXISTS);
 }
 
 
-/// Constructor 
+/// Constructor
 AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) :
     sink_(options["audiosink"].as<std::string>()),
     sinkName_(options["jack-client-name"].as<std::string>()),
@@ -161,7 +161,7 @@ AudioSinkConfig::AudioSinkConfig(const po::variables_map &options) :
     disableAutoConnect_(options["disable-jack-autoconnect"].as<bool>())
 {}
 
-/// Factory method that creates an AudioSink based on this object's sink_ string 
+/// Factory method that creates an AudioSink based on this object's sink_ string
 AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")

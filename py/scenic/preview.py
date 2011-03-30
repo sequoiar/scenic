@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -40,13 +40,13 @@ class Preview(object):
         self.state_changed_signal = sig.Signal()
         self.error_messages = None # either None or a list
         self.warnings = None # either None or a list
-            
+
     def is_busy(self):
         """
         Retuns True if a preview is in progress.
         """
         return self.state != process.STATE_STOPPED
-        
+
     def _create_command(self):
         """
         Looks in the settings, and returns a bash command to run for the preview.
@@ -67,7 +67,7 @@ class Preview(object):
             else:
                 x_window_id = self.app.gui.preview_socket.get_id()
         command = "milhouse --videosource %s --localvideo --window-title \"%s\" --width %s --height %s --aspect-ratio %s" % (self.app.config.video_source, window_title, width, height, aspect_ratio, )
-        if self.app.devices["jackd_is_running"] and numchannels > 0: 
+        if self.app.devices["jackd_is_running"] and numchannels > 0:
             command += " --localaudio --audiosource %s --numchannels %s --vumeter-id %s --audio-buffer %s" % (self.app.config.audio_source, numchannels, vumeter_id, audio_buffer)
             if not jack_autoconnect:
                 command += " --disable-jack-autoconnect"
@@ -85,7 +85,7 @@ class Preview(object):
             video_device = dev["name"]
             command += " --videodevice %s" % (video_device)
         return command
-        
+
     def start(self):
         log.info("Starting the preview")
         if self.state != process.STATE_STOPPED:
@@ -114,7 +114,7 @@ class Preview(object):
         if "WARNING" in line:
             log.warning(line)
             self.warnings.append(line)
-        
+
     def on_process_state_changed(self, process_manager, process_state):
         """
         Slot for the ProcessManager.state_changed_signal
@@ -130,7 +130,7 @@ class Preview(object):
             pass
         elif process_state == process.STATE_STOPPED:
             self._set_state(process.STATE_STOPPED)
-    
+
     def _set_state(self, new_state):
         """
         Handles state changes.
@@ -159,7 +159,7 @@ class Preview(object):
         if show_error_dialog:
             msg = _("Some errors occured while looking at the local preview.")
             self.app.gui.show_error_dialog(msg, details=details)
-            
+
     def stop(self):
         """
         Stops the preview process.
@@ -172,4 +172,4 @@ class Preview(object):
                     self.process_manager.stop()
         else:
             log.debug("Warning: preview state is %s" % (self.state))
-    
+

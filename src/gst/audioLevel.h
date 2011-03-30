@@ -34,8 +34,8 @@ class _GstElement;
 class _GstMessage;
 class _GtkWidget;
 
-/** 
- *  A filter that calculates and periodically reports 
+/**
+ *  A filter that calculates and periodically reports
  *  the rms value of each audio channel passing through it.
  */
 

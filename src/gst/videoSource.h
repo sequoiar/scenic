@@ -65,7 +65,7 @@ class VideoFileSource
 
     private:
         ~VideoFileSource();
-        virtual _GstElement *srcElement() { return identity_; }      
+        virtual _GstElement *srcElement() { return identity_; }
 
         // FIXME: maybe just use the queue we acquire?
         _GstElement *identity_;
@@ -80,7 +80,7 @@ class VideoDvSource
     private:
         const Pipeline &pipeline_;
         ~VideoDvSource();
-        
+
         virtual _GstElement *srcElement() { return dvdec_; }
 
         _GstElement *queue_, *dvdec_;

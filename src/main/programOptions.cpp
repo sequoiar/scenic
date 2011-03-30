@@ -54,14 +54,14 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("version,w", po::bool_switch(), "display version info")
         ("numchannels,c", po::value<int>()->default_value(2), "number of audio channels")
         ("videobitrate,x", po::value<int>()->default_value(3000000), "video bitrate (1000000,3000000)")
-        ("videoquality,X", po::value<int>()->default_value(32), 
+        ("videoquality,X", po::value<int>()->default_value(32),
          "use specified video quality instead of bitrate for theora (0-63)")
         ("audioquality", po::value<double>()->default_value(-1.0), "quality for compressed audio (0.0-1.0)")
         ("audiobitrate", po::value<int>()->default_value(0), "bitrate for compressed audio in kbps "
          "(7,16,24,32,40,48,56,64,80,96,112,128,160,192,224,256,320)")
-        ("audiosource,e", po::value<string>()->default_value("jackaudiosrc"), 
+        ("audiosource,e", po::value<string>()->default_value("jackaudiosrc"),
          "audio input (autoaudiosrc,jackaudiosrc,alsasrc,pulsesrc)")
-        ("videosource,u", po::value<string>()->default_value("videotestsrc"), 
+        ("videosource,u", po::value<string>()->default_value("videotestsrc"),
          "video input (v4l2src,dc1394src,v4lsrc,dv1394src)")
         ("timeout,z", po::value<int>()->default_value(0), "time in ms to wait before quitting, 0=run indefinitely")
         ("audio-buffer,b", po::value<int>()->default_value(15), "size of audio buffer in milliseconds, must be >= 10")

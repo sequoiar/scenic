@@ -33,7 +33,7 @@
 
 
 /** Open the raw1394 device and get a handle.
- *  
+ *
  * \return number of ports found
  */
 #ifdef CONFIG_IEEE1394
@@ -60,7 +60,7 @@ int raw1394_get_num_ports()
 
 
 /** Open the raw1394 device and get a handle.
- *  
+ *
  * \param port A 0-based number indicating which host adapter to use.
  * \return a raw1394 handle.
  */
@@ -139,13 +139,13 @@ std::vector<std::string> discoverAVC(int* port, octlet_t* guid)
                     rom1394_free_directory(&rom_dir);
                     LOG_WARNING("error reading config rom directory for node " << i);
                 }
-                if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) and 
-                         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or 
+                if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) and
+                         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or
                        (rom_dir.unit_spec_id == MOTDCT_SPEC_ID))
                 {
                     octlet_t my_guid, *pguid = (*guid == 1)? guid : &my_guid;
                     *pguid = rom1394_get_guid( handle, i );
-                    stream << rom_dir.label << ": GUID 0x" << 
+                    stream << rom_dir.label << ": GUID 0x" <<
                         (quadlet_t) (*pguid>>32) << (quadlet_t) (*pguid & 0xffffffff) << std::endl;
                     results.push_back(stream.str());
                     LOG_DEBUG(stream.str());
@@ -180,7 +180,7 @@ std::vector<std::string> Raw1394::getDeviceList()
 }
 
 
-bool Raw1394::cameraIsReady() 
+bool Raw1394::cameraIsReady()
 {
     std::vector<std::string> devices(getDeviceList());
 
@@ -194,7 +194,7 @@ bool Raw1394::cameraIsReady()
 }
 
 /// Returns true if one or more cameras were found
-bool Raw1394::listCameras() 
+bool Raw1394::listCameras()
 {
     using std::vector;
     using std::string;

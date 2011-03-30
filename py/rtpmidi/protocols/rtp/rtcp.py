@@ -53,14 +53,14 @@ class RTCPProtocol(DatagramProtocol):
         self.members = 1
         self.avg_rtcp_size = 52 #32 if RR is the first packet
         self.transmission_interval = 0 #(T)
-        
+
 
         #Total bandwidth that will be used for
         #RTCP packets by all members of this sessions
-        #Value of this var is a fractionnal part of the total session bw 
+        #Value of this var is a fractionnal part of the total session bw
         #5% is RECOMMANDED to start
         self.init_time = time()
-        self.rtcp_bw = 5 
+        self.rtcp_bw = 5
         self.tmin = 2.5
         self.timeout = 30
         self.m_timeout = 5
@@ -68,7 +68,7 @@ class RTCPProtocol(DatagramProtocol):
 
         #Members of the session and senders
         jitter_values = DelayCirc(50)
-        self.member = {'user_name': "name", 'cname': "user@host", 
+        self.member = {'user_name': "name", 'cname': "user@host",
                        'tool': "none", 'addr':0, 'rtp_port':0, 'rtcp_port':0,
                        'last_rtp_received':0, 'last_rtcp_received':0,
                        'total_received_bytes':0, 'total_received_packets':0,
@@ -129,7 +129,7 @@ class RTCPProtocol(DatagramProtocol):
         self.check_ssrc_timeout()
         self.we_sent_time_out()
 
-        #Building report 
+        #Building report
         compound = RTCPCompound()
 
         #Selecting type of sending
@@ -151,7 +151,7 @@ class RTCPProtocol(DatagramProtocol):
         #Sending reports
         if self.initial:
             if DEBUG:
-                print "(initial) to " + str((self.rtp.dest[0], 
+                print "(initial) to " + str((self.rtp.dest[0],
                                              self.rtp.dest[1]+1))
 
             self.transport.write(compound_enc,(self.rtp.dest[0],
@@ -160,7 +160,7 @@ class RTCPProtocol(DatagramProtocol):
 
         else:
             self.sendDatagram(compound_enc)
-            
+
         #scheduled_sending
         new_inter = self.compute_transmission_interval()
         if self.transmission_interval_ref != new_inter:
@@ -180,12 +180,12 @@ class RTCPProtocol(DatagramProtocol):
             if DEBUG:
                 print "Members=>"
                 print self.members_table
-                print 
+                print
 
         if not self.checksum(datagram):
             if DEBUG:
                 print "Wrong rtcp checksum"
-            return 
+            return
 
         if DEBUG:
             print "good rtcp checksum"
@@ -205,7 +205,7 @@ class RTCPProtocol(DatagramProtocol):
 
         else:
             return
- 
+
         #Check SSRC
         if ssrc in self.members_table:
             cname = self.members_table[ssrc]['cname']
@@ -221,7 +221,7 @@ class RTCPProtocol(DatagramProtocol):
             #var
             packet_type = packet.getPT()
             cont = packet.getContents()
-                
+
             #Dispatching thanks to packet type
             if packet_type == "SR":
                 self.members_table[ssrc]['lsr'] = time()
@@ -229,18 +229,18 @@ class RTCPProtocol(DatagramProtocol):
 
             elif packet_type == "RR":
                 self.receiveSRRR(cont[1])
-            
+
             elif packet_type == "SDES":
                 self.receiveSDES(cont)
 
             elif packet_type == "BYE":
                 self.receiveBYE(cont)
-                
+
                 #usurps the normal role of the members variable
                 #to count BYE packets instead
                 if len(self.members_table) >= 50:
                     self.members += 1
-                
+
             else:
                 if VERBOSE:
                     line = "RTCP packet with unknown type received " \
@@ -254,10 +254,10 @@ class RTCPProtocol(DatagramProtocol):
 
         if DEBUG:
             print "avg rtcp size " + str(self.avg_rtcp_size)
-        
+
 
     def checksum(self, bytes):
-       version = ord(bytes[0])>>6 
+       version = ord(bytes[0])>>6
        if version != 2:
             return 0
 
@@ -276,7 +276,7 @@ class RTCPProtocol(DatagramProtocol):
        padding = (ord(bytes[0])&32) and 1 or 0
        if padding :
            return 0
-       
+
        #Checking len on all packets of compound
        count = ord(bytes[0])&31
        try:
@@ -286,7 +286,7 @@ class RTCPProtocol(DatagramProtocol):
            print "RTCP: incorrect checksum!!"
            return
 
-        
+
        #Others test ??
        return 1
 
@@ -312,7 +312,7 @@ class RTCPProtocol(DatagramProtocol):
 
 
         return rtcp
-        
+
 
     def send_SDES(self):
         arg_list = []
@@ -322,7 +322,7 @@ class RTCPProtocol(DatagramProtocol):
             #CNAME is mandatory !
             if cname != "user@host":
                 item.append(("CNAME", cname))
-                
+
                 name = self.members_table[member]['user_name']
                 item.append(("NAME", name))
 
@@ -334,14 +334,14 @@ class RTCPProtocol(DatagramProtocol):
         return rtcp
 
     def send_BYE(self, reason):
-        """Sending a BYE packet to inform others participant that we are 
+        """Sending a BYE packet to inform others participant that we are
         leaving the session
         """
         ssrcs = self.members_table.keys()
         arg_list = ([self.rtp.ssrc], reason)
 
         rtcp = RTCPPacket("BYE", ptcode=203, contents=arg_list)
-        
+
         #ssrcs, reason
         if len(self.members_table) >= 50:
             self.last_sent_time = time()
@@ -350,7 +350,7 @@ class RTCPProtocol(DatagramProtocol):
             self.initial = True
             self.we_sent = False
             self.avg_rtcp_size = 0 #BYE packet size ??
-            
+
             self.compute_transmission_interval()
             self.next_scheduled_time = time() + self.transmission_interval
             self.rescheduled_sending()
@@ -361,7 +361,7 @@ class RTCPProtocol(DatagramProtocol):
     def sendDatagram(self, packet):
         """Send the packet to every member of the session"""
         for ssrc in list(self.members_table.keys()):
-            if ((ssrc != self.rtp.ssrc) 
+            if ((ssrc != self.rtp.ssrc)
                 and (self.members_table[ssrc]['rtcp_port'] != 0)):
                 if DEBUG:
                     print "sending RTCP to ", \
@@ -378,11 +378,11 @@ class RTCPProtocol(DatagramProtocol):
         #Compare stats received with stats of the member
         remote_ssrc = cont[0]
         member = self.members_table[remote_ssrc]
-        
+
 
         #cont[1]['ntpTS']
 
-        #Comparing octets count and packet count from the sender with 
+        #Comparing octets count and packet count from the sender with
         #stats on him
         diff_o = cont[1]['octets'] - member['total_received_bytes']
         diff_p = cont[1]['packets'] - member['total_received_packets']
@@ -404,7 +404,7 @@ class RTCPProtocol(DatagramProtocol):
 
                 #Updating check point
                 if item['highest'] != 0:
-                    rtp, session = self.rtp.app.currentRecordings[self.rtp.cookie] 
+                    rtp, session = self.rtp.app.currentRecordings[self.rtp.cookie]
                     if session.checkpoint != item['highest']:
                         session.update_checkpoint(item['highest'])
                         self.members_table[ssrc]['checkpoint'] = item['highest']
@@ -445,7 +445,7 @@ class RTCPProtocol(DatagramProtocol):
     def receiveBYE(self, cont):
         """Process operations for member leaving the session properly
         """
-        ssrc = cont[0][0] 
+        ssrc = cont[0][0]
         #Remove SSRC from members table
         if ssrc in self.members_table:
             self.members -= 1
@@ -457,7 +457,7 @@ class RTCPProtocol(DatagramProtocol):
                 print line
 
             del self.members_table[ssrc]
-            
+
 
             #Remove SSRC from senders table
             if ssrc in self.senders_table:
@@ -495,7 +495,7 @@ class RTCPProtocol(DatagramProtocol):
         port = addr[1]
 
         if not ssrc in self.members_table:
-            #build member 
+            #build member
             new_member = self.member.copy()
 
             if ptype == "DATA":
@@ -561,13 +561,13 @@ class RTCPProtocol(DatagramProtocol):
 
             return 1
 
-        elif ( ssrc in self.members_table 
+        elif ( ssrc in self.members_table
                and ip_addr != self.members_table[ssrc]['addr']):
             #Loop or collision detected
             if ssrc != self.rtp.ssrc:
                 #ssrc is not mine
-                
-                if (ptype == "SDES" 
+
+                if (ptype == "SDES"
                     and self.members_table[ssrc]['cname'] != cname):
                     #source identifier is from an RTCP SDES chunk
                     #containing a CNAME item that differs from the CNAME
@@ -590,8 +590,8 @@ class RTCPProtocol(DatagramProtocol):
                     if VERBOSE:
                         print "Own loop traffic detected"
 
-                #mark current time    
-                self.conflicting_add[ip_addr]['time'] = time() 
+                #mark current time
+                self.conflicting_add[ip_addr]['time'] = time()
 
                 #abort processing
                 return 0
@@ -606,7 +606,7 @@ class RTCPProtocol(DatagramProtocol):
                 conflict = self.conflict.copy()
                 conflict['time'] = time()
                 self.conflicting_add[ip_addr] = conflict
-            
+
                 #send RTCP BYE with old ssrc
                 bye_cont = self.send_BYE("SSRC collision detected")
 
@@ -618,7 +618,7 @@ class RTCPProtocol(DatagramProtocol):
 
                 self.rtp.ssrc = new_ssrc
 
-                #Create entry for old ssrc and ip source 
+                #Create entry for old ssrc and ip source
                 new_member = self.member.copy()
                 new_member['last_receive'] = time()
                 new_member['addr'] = ip_addr
@@ -628,19 +628,19 @@ class RTCPProtocol(DatagramProtocol):
 
                 #Process packet
                 return 1
-                
+
         else:
             #Process packet
             return 1
-        
+
 
     def check_ssrc_timeout(self):
         #interval (T)
         for member in list(self.members_table.keys()):
             if member != self.rtp.ssrc:
-            #If we doesn't have received a packet for a while 
-            #remove participant ssrc from members table 
-                if ((self.members_table[member]['last_rtcp_received'] 
+            #If we doesn't have received a packet for a while
+            #remove participant ssrc from members table
+                if ((self.members_table[member]['last_rtcp_received']
                      + self.m_timeout * 3) < time()):
 
                     if VERBOSE:
@@ -655,26 +655,26 @@ class RTCPProtocol(DatagramProtocol):
             if member in self.senders_table:
                 del self.senders_table[member]
                 self.senders -= 1
-            
+
     def we_sent_time_out(self):
         """timing out we_sent flag"""
         if self.we_sent:
-            #timeout is time() - 2 T 
-            if ((self.rtp.last_sent_time + 2 * self.transmission_interval) 
+            #timeout is time() - 2 T
+            if ((self.rtp.last_sent_time + 2 * self.transmission_interval)
                 < time()):
                 #timing out
                 self.we_sent = False
 
                 if DEBUG:
                     print "timing out we_sent"
-                
+
                 #Updating senders table
                 #del self.senders_table[self.rtp.ssrc]
 
-                
+
     def round_trip_time(self, lsr, dlsr):
         """Calcule round trip time
-        Caution: TO make this work all the users must use NTP to syncronize 
+        Caution: TO make this work all the users must use NTP to syncronize
         their wallclock"""
         #Calculate round trip time
         if lsr != 0 and dlsr != 0:
@@ -687,14 +687,14 @@ class RTCPProtocol(DatagramProtocol):
             #print "Round trip time " + str(round_trip_time)
 
             #Perform test in case ntp is not syncronize
-            #if 
+            #if
             return round_trip_time
         else:
             return None
 
-        
+
     def compute_transmission_interval(self):
-        """Dynamicaly calculate RTCP transmission interval 
+        """Dynamicaly calculate RTCP transmission interval
         based on the rtcp_bw and sender / receivers repartition
         """
         #Bandwith calculation based on RTCP BW part (in octets / seconds)
@@ -711,7 +711,7 @@ class RTCPProtocol(DatagramProtocol):
 
         else:
             #Members are treated in the same way
-            c = self.avg_rtcp_size / float(band_width) 
+            c = self.avg_rtcp_size / float(band_width)
             n = self.members
 
 
@@ -728,7 +728,7 @@ class RTCPProtocol(DatagramProtocol):
                 + str(self.transmission_interval) + " second(s)"
 
 
-    
+
 #Estimate bw
 def estimate_bandwidth(device="eth0"):
     #Envoie de donner(1 fichier de 30Mo)
@@ -747,7 +747,7 @@ def estimate_bandwidth(device="eth0"):
     match = r.search(dev_lines)
 
     parts = match.group(1).split()
-    
+
     #en octets
     return int(parts[0])
 

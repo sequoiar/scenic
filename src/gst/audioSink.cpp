@@ -29,13 +29,13 @@
 #include "jackUtils.h"
 #include "pipeline.h"
 
-/// Constructor 
-AudioSink::AudioSink() : 
+/// Constructor
+AudioSink::AudioSink() :
     sink_(0)
 {
 }
 
-/// Destructor 
+/// Destructor
 AudioSink::~AudioSink()
 {
 }
@@ -48,9 +48,9 @@ void AudioSink::adjustBufferTime(unsigned long long bufferTime)
     LOG_DEBUG("Buffer time is " << val);
 }
 
-/// Constructor 
-AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) : 
-    aconv_(pipeline.makeElement("audioconvert", NULL)), 
+/// Constructor
+AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) :
+    aconv_(pipeline.makeElement("audioconvert", NULL)),
     config_(config)
 {
     sink_ = pipeline.makeElement("alsasink", NULL);
@@ -62,10 +62,10 @@ AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) 
     gstlinkable::link(aconv_, sink_);
 }
 
-/// Constructor 
-AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config) : 
-    aconv_(pipeline.makeElement("audioconvert", NULL)), 
-    config_(config) 
+/// Constructor
+AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config) :
+    aconv_(pipeline.makeElement("audioconvert", NULL)),
+    config_(config)
 {
     sink_ = pipeline.makeElement("pulsesink", NULL);
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
@@ -75,8 +75,8 @@ AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config
     gstlinkable::link(aconv_, sink_);
 }
 
-/// Constructor 
-AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) :  
+/// Constructor
+AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) :
     config_(config)
 {
     sink_ = pipeline.makeElement("jackaudiosink", config_.sinkName());

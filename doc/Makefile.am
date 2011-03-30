@@ -1,8 +1,8 @@
-SUBDIRS = docbook 
+SUBDIRS = docbook
 EXTRA_DIST=footer.html header.html doxygen.css epydoc.css Doxyfile
 
 html-local: doxygen epydoc
-    
+
 doxygen:
 	@if [ -z `which doxygen` ]; then echo "No Doxygen!"; else doxygen; fi
 

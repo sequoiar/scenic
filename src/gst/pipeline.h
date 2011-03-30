@@ -64,7 +64,7 @@ class Pipeline : private boost::noncopyable
 
     private:
         void add(_GstElement * element) const;
-        /// Returns our pipeline's bus. 
+        /// Returns our pipeline's bus.
         /// Bus must be unreffed after use!
         _GstBus* getBus() const;
 

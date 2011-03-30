@@ -49,7 +49,7 @@ class XvImageSink
 : public VideoSink
 {
     public:
-        XvImageSink(Pipeline &pipeline, int width, int height, 
+        XvImageSink(Pipeline &pipeline, int width, int height,
                 unsigned long xid, const std::string &display, const std::string &title);
         void toggleFullscreen();
 
@@ -84,7 +84,7 @@ class XvImageSink
 class XImageSink
 : public VideoSink
 {
-    public: 
+    public:
         XImageSink(const Pipeline &pipeline, const std::string &display);
 
     private:

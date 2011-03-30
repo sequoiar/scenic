@@ -67,7 +67,7 @@ class VideoSourceConfig
         bool forceGrayscale() const;
         std::string pixelAspectRatio() const;
         /// used by other classes, that's why it's not a member function
-        static std::string calculatePixelAspectRatio(int width, int height, 
+        static std::string calculatePixelAspectRatio(int width, int height,
                 const std::string &pictureAspectRatio);
         static void setStandard(const std::string &videoDevice, std::string videoStandard);
         static void setInput(const std::string &videoDevice, int input);
@@ -88,7 +88,7 @@ class VideoSourceConfig
 };
 
 
-class VideoSinkConfig 
+class VideoSinkConfig
 {
     public:
 

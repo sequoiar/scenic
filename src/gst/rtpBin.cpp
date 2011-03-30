@@ -38,16 +38,16 @@ bool RtpBin::destroyed_ = false;
 
 std::map<int, RtpBin*> RtpBin::sessions_;
 
-RtpBin::RtpBin(const Pipeline &pipeline, bool printStats) : 
+RtpBin::RtpBin(const Pipeline &pipeline, bool printStats) :
     pipeline_(pipeline),
-    rtcp_sender_(0), 
-    rtcp_receiver_(0), 
-    sessionId_((++sessionCount_) - 1), 
-    sessionName_(), 
+    rtcp_sender_(0),
+    rtcp_receiver_(0),
+    sessionId_((++sessionCount_) - 1),
+    sessionName_(),
     printStats_(printStats)  // 0 based
 {
     // only initialize rtpbin element once per process
-    if (rtpbin_ == 0) 
+    if (rtpbin_ == 0)
     {
         rtpbin_ = pipeline_.makeElement("gstrtpbin", NULL);
         startPrintStatsCallback();
@@ -61,17 +61,17 @@ void RtpBin::startPrintStatsCallback()
     if (printStats_)
     {
     // comment this to not print stats
-    g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
+    g_timeout_add(REPORTING_PERIOD_MS /* ms */,
             static_cast<GSourceFunc>(printStatsCallback),
             this);
     }
 }
 
 
-void RtpBin::printStatsVal(const std::string &idStr, 
-        const char *key, 
-        const std::string &type, 
-        const std::string &formatStr, 
+void RtpBin::printStatsVal(const std::string &idStr,
+        const char *key,
+        const std::string &type,
+        const std::string &formatStr,
         GstStructure *stats)
 {
     std::string paramStr;
@@ -134,7 +134,7 @@ void RtpBin::parseSourceStats(GObject * source, RtpBin *context)
 }
 
 
-// callback to print the rtp stats 
+// callback to print the rtp stats
 gboolean RtpBin::printStatsCallback(gpointer data)
 {
     RtpBin *context = static_cast<RtpBin*>(data);
@@ -149,7 +149,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
         return TRUE;
     }
     else if (sessionCount_ <= 0) // no sessions to print yet
-        return TRUE; 
+        return TRUE;
     else if (not context->pipeline_.isPlaying())
         return TRUE; // not playing yet
 
@@ -239,11 +239,11 @@ int RtpBin::createSinkSocket(const char *hostname, int port)
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_DGRAM;
 
-    if ((rv = getaddrinfo(hostname, portStr.c_str(), &hints, &servinfo)) != 0) 
+    if ((rv = getaddrinfo(hostname, portStr.c_str(), &hints, &servinfo)) != 0)
         THROW_ERROR("getaddrinfo: " << gai_strerror(rv));
 
     // loop through all the results and make a socket
-    for (p = servinfo; p != NULL; p = p->ai_next) 
+    for (p = servinfo; p != NULL; p = p->ai_next)
     {
         if (p->ai_family == AF_INET or p->ai_family == AF_INET6)
         {
@@ -251,14 +251,14 @@ int RtpBin::createSinkSocket(const char *hostname, int port)
             LOG_DEBUG(family << " Socket");
             break;
         }
-        else 
+        else
             LOG_DEBUG("Unknown address family");
     }
     if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                    p->ai_protocol)) == -1) 
+                    p->ai_protocol)) == -1)
         LOG_WARNING("socket error");
 
-    if (p == NULL) 
+    if (p == NULL)
     {
         close(sockfd);
         THROW_ERROR("failed to create socket for port " << portStr);
@@ -296,14 +296,14 @@ int RtpBin::createSourceSocket(int port)
     string portStr(lexical_cast<string>(port));
     LOG_DEBUG("Trying socket for port " << portStr);
 
-    if ((rv = getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo)) != 0) 
+    if ((rv = getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo)) != 0)
         THROW_ERROR("getaddrinfo: " << gai_strerror(rv));
 
     // loop through all the results and make a socket
-    for (p = servinfo; p != NULL; p = p->ai_next) 
+    for (p = servinfo; p != NULL; p = p->ai_next)
     {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                        p->ai_protocol)) == -1) 
+                        p->ai_protocol)) == -1)
         {
             LOG_WARNING("socket error for port " << portStr);
             continue;
@@ -312,7 +312,7 @@ int RtpBin::createSourceSocket(int port)
             LOG_DEBUG("IPV4 Socket");
         else if (p->ai_family == AF_INET6)
             LOG_DEBUG("IPV6 Socket");
-        else 
+        else
             LOG_DEBUG("Unknown address family");
 #if 0
         /// GST uses this, we don't necessarily want to enable reuse
@@ -325,7 +325,7 @@ int RtpBin::createSourceSocket(int port)
         }
 #endif
 
-        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
+        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1)
         {
             close(sockfd);
             LOG_WARNING("bind error for port " << portStr);
@@ -335,7 +335,7 @@ int RtpBin::createSourceSocket(int port)
         break;
     }
 
-    if (p == NULL) 
+    if (p == NULL)
     {
         close(sockfd);
         THROW_ERROR("Failed to bind socket for port " << portStr);

@@ -24,7 +24,7 @@
 
 #include <jack/types.h> // for jack_nframes_t
 
-/// Utility functions for jack related issues. 
+/// Utility functions for jack related issues.
 struct Jack {
         static void assertReady();
         static bool is_running();

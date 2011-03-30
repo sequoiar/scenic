@@ -45,7 +45,7 @@ void XvImageSink::updateDisplay(const std::string &display)
     /// FIXME: should be able to get other screens than 0
     gtk_window_set_screen(GTK_WINDOW(window_), gdk_display_get_default_screen(disp));
 }
-        
+
 namespace {
 void makeWidgetBlack(GtkWidget *widget)
 {
@@ -77,7 +77,7 @@ XvImageSink::XvImageSink(Pipeline &pipeline,
 {
     // don't set widget size, it needs to be resized dynamically
     //gtk_widget_set_size_request(drawingArea_, width, height);
-    
+
     // Make drawing area black by default, since it's used for video
     makeWidgetBlack(drawingArea_);
 
@@ -216,7 +216,7 @@ void XvImageSink::makeUnfullscreen(GtkWidget *widget)
     if (sliderFrame_)
         gtk_widget_show(sliderFrame_);
 }
- 
+
 
 void XvImageSink::toggleFullscreen()
 {

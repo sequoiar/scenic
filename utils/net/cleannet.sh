@@ -1,6 +1,6 @@
 #!/bin/bash
 
-usage () 
+usage ()
 {
     echo "Usage: $(basename $0) <INTERFACE>"
 }

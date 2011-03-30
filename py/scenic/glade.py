@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -32,11 +32,11 @@ from scenic.internationalization import _
 def get_widgets_tree():
     """
     Returns a L{gtk.glade.XML} object.
-    
+
     Keep in mind that gtk.glade automatically caches XML trees. So don't try
     any complex tricks to reuse XML trees if you have to create the same UI
     multiple times. The correct thing to do is simply to instantiate the XML
-    multiple times with the same parameters. 
+    multiple times with the same parameters.
     """
     # Set the Glade file
     glade_file = os.path.join(configure.GLADE_DIR, 'scenic.glade')

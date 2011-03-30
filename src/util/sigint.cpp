@@ -78,12 +78,12 @@ void signal_handlers::setHandlers()
     sa.sa_flags = SA_SIGINFO;
     sigemptyset(&sa.sa_mask);
     sa.sa_sigaction = signalHandler;
-    static const int NUM_SIGNALS = 5; 
+    static const int NUM_SIGNALS = 5;
     static const int signals[NUM_SIGNALS]  = {SIGHUP, SIGINT, SIGQUIT, SIGABRT, SIGTERM};
 
     for (int sig = 0; sig != NUM_SIGNALS; ++sig)
         if (sigaction(signals[sig], &sa, NULL) == -1)
-            THROW_ERROR("Cannot register signal " << sigToString(signals[sig]) 
+            THROW_ERROR("Cannot register signal " << sigToString(signals[sig])
                     << " handler");
 }
 

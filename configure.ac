@@ -42,7 +42,7 @@ AC_CHECK_FUNCS([inet_ntoa memset socket])
 
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE([debug], [
-  --enable-debug  debug symbols, build test programs, stricter compile ],, 
+  --enable-debug  debug symbols, build test programs, stricter compile ],,
         enable_debug=yes)
 
 AC_ARG_ENABLE([svn-revision], [ --enable-svn-revision ],,enable_svn_revision=no)
@@ -164,7 +164,7 @@ fi
 # configure exits with an error (NOTE: it will not print this argument!)
 
 AX_PYTHON_MODULE([pypm], [])
-AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"], 
+AS_IF([test "x${HAVE_PYMOD_PYPM}" = "xno"],
     [AC_MSG_WARN(["The Scenic graphical user interface requires pypm, available at http://bitbucket.org/aalex/pyportmidi/wiki/Home or in python-pygame 1.9 and above."])])
     # We install midistream anyways, but the MIDI support is checked by Scenic and will be disabled if pypm if not found at runtime.
 
@@ -174,7 +174,7 @@ AX_PYTHON_MODULE([gst], [Fatal])
 AX_PYTHON_MODULE([json], [])
 AX_PYTHON_MODULE([simplejson], [])
 
-AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"], 
+AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"],
     AS_IF([test "x${HAVE_PYMOD_SIMPLEJSON}" = "xno"],
         [AC_MSG_ERROR([The Scenic graphical user interface requires one of json or simplejson])]))
 

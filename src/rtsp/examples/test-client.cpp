@@ -71,9 +71,9 @@ gboolean bus_call(GstBus * /*bus*/, GstMessage *msg, void *user_data)
         return FALSE;
     }
 
-    switch (GST_MESSAGE_TYPE(msg)) 
+    switch (GST_MESSAGE_TYPE(msg))
     {
-        case GST_MESSAGE_ERROR: 
+        case GST_MESSAGE_ERROR:
             {
                 GError *err;
                 gchar *debug;
@@ -88,7 +88,7 @@ gboolean bus_call(GstBus * /*bus*/, GstMessage *msg, void *user_data)
                 return FALSE;
             }
 
-        case GST_MESSAGE_EOS: 
+        case GST_MESSAGE_EOS:
             {
                 g_message("End-of-stream");
                 if (context->loop)
@@ -153,7 +153,7 @@ int main (int argc, char *argv[])
 
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, &client);
-    
+
     /* start loop */
     g_main_loop_run (client.loop);
 

@@ -31,7 +31,7 @@
 class Pipeline;
 class _GstElement;
 
-/** 
+/**
  *  A filter that overlays text on a video
  */
 

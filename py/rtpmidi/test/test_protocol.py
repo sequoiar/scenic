@@ -16,6 +16,6 @@ class TestRTPProtocol(unittest.TestCase):
         res = self.rtp.checksum(bytes)
         assert(res==1), self.fail("Wrong checksum for RTP packet")
 
-        
 
-        
+
+

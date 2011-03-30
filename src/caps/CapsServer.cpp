@@ -11,7 +11,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Scenic is distributed in the hope that it will be useful, 
+ * Scenic is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -26,7 +26,7 @@
 #include <boost/bind.hpp>
 
 using boost::asio::ip::tcp;
-        
+
 TcpConnection::connection_ptr TcpConnection::create(boost::asio::io_service& io_service, const std::string &message)
 {
     return connection_ptr(new TcpConnection(io_service, message));
@@ -40,7 +40,7 @@ void TcpConnection::start()
                 boost::asio::placeholders::bytes_transferred));
 }
 
-TcpConnection::TcpConnection(boost::asio::io_service& io_service, const std::string &message) : 
+TcpConnection::TcpConnection(boost::asio::io_service& io_service, const std::string &message) :
     socket_(io_service), message_(message)
 {}
 
@@ -51,14 +51,14 @@ void TcpConnection::handle_write(const boost::system::error_code& /*error*/,
 }
 
 // an async tcp server that serves caps
-TcpCapsServer::TcpCapsServer(unsigned int port, const std::string &caps) : 
+TcpCapsServer::TcpCapsServer(unsigned int port, const std::string &caps) :
     caps_(caps),
     io_service_(),
     acceptor_(io_service_, tcp::endpoint(tcp::v4(), port)),
     dummy_(start_accept()),
     serverThread_(boost::bind(&boost::asio::io_service::run, &io_service_)) {}
 
-TcpCapsServer::~TcpCapsServer() 
+TcpCapsServer::~TcpCapsServer()
 {
     io_service_.stop();
     serverThread_.join();
@@ -71,15 +71,15 @@ int TcpCapsServer::start_accept()
         TcpConnection::create(acceptor_.io_service(), caps_);
 
     acceptor_.async_accept(new_connection->socket(),
-            boost::bind(&TcpCapsServer::handle_accept, 
-                this, 
+            boost::bind(&TcpCapsServer::handle_accept,
+                this,
                 new_connection,
                 boost::asio::placeholders::error));
     // hack so that we can call this from an initalizer list
     return 0;
 }
 
-void TcpCapsServer::handle_accept(TcpConnection::connection_ptr new_connection, 
+void TcpCapsServer::handle_accept(TcpConnection::connection_ptr new_connection,
         const boost::system::error_code& error)
 {
     if (not error)

@@ -37,7 +37,7 @@ class AudioSink;
 class AudioSinkConfig;
 class ReceiverConfig;
 
-/** 
+/**
  * An audio pipeline derived from ReceiverBase that receives audio over rtp,
  * decodes/converts it as needed and pushes it to its sink.
  */
@@ -55,8 +55,8 @@ class AudioReceiver
         void createCodec(Pipeline &pipeline);
         void createDepayloader();
         void createSink(Pipeline &pipeline);
-        
-        void setCaps(); 
+
+        void setCaps();
 
         std::tr1::shared_ptr<AudioSinkConfig> audioConfig_;
         std::tr1::shared_ptr<ReceiverConfig> remoteConfig_;

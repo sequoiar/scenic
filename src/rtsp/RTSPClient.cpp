@@ -62,7 +62,7 @@ bool RTSPClient::validPortRange(const std::string &ports)
         return false;
     int first = boost::lexical_cast<int>(strs[0]);
     int second = boost::lexical_cast<int>(strs[1]);
-    
+
     static const int MINIMUM_PORT_RANGE = enableVideo_ and enableAudio_ ?
         ports::MINIMUM_RANGE_FOR_TWO_STREAMS : ports::MINIMUM_RANGE_FOR_ONE_STREAM;
 
@@ -88,14 +88,14 @@ RTSPClient::onNotifySource(GstElement *uridecodebin, GParamSpec * /*pspec*/, gpo
     if (not context->portRange_.empty())
         g_object_set (src, "port-range", context->portRange_.c_str(), NULL);
 
-    gst_object_unref (src); 
+    gst_object_unref (src);
     return TRUE;
 }
 
 void RTSPClient::linkNewPad(GstPad *newPad, const GstCaps *caps, const gchar *queue_name)
 {
     GstElement *queue = pipeline_->findElementByName(queue_name);
-    if (queue == 0) 
+    if (queue == 0)
     {
         LOG_WARNING("No element named " << queue_name << ", not linking");
         return;
@@ -104,7 +104,7 @@ void RTSPClient::linkNewPad(GstPad *newPad, const GstCaps *caps, const gchar *qu
     if (GST_PAD_IS_LINKED(sinkPad))
     {
         GstObject *parent = GST_OBJECT (GST_OBJECT_PARENT (sinkPad));
-        LOG_WARNING("Omitting link for pad " << GST_OBJECT_NAME(parent) << 
+        LOG_WARNING("Omitting link for pad " << GST_OBJECT_NAME(parent) <<
                 ":" << GST_OBJECT_NAME(sinkPad) << " because it's already linked");
         gst_object_unref (GST_OBJECT (sinkPad));
         return;
@@ -113,7 +113,7 @@ void RTSPClient::linkNewPad(GstPad *newPad, const GstCaps *caps, const gchar *qu
     GstCaps *sinkCaps = gst_pad_get_caps (sinkPad);
     GstCaps *res = gst_caps_intersect (caps, sinkCaps);
     bool linked = false;
-    if (res && !gst_caps_is_empty (res)) 
+    if (res && !gst_caps_is_empty (res))
         linked = gstlinkable::link_pads(newPad, sinkPad);
 
     if (linked)
@@ -155,10 +155,10 @@ static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
 
 RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     BusMsgHandler(),
-    pipeline_(new Pipeline), 
+    pipeline_(new Pipeline),
     portRange_(""),
-    latency_(options["jitterbuffer"].as<int>()), 
-    enableVideo_(not options["disable-video"].as<bool>()), 
+    latency_(options["jitterbuffer"].as<int>()),
+    enableVideo_(not options["disable-video"].as<bool>()),
     enableAudio_(not options["disable-audio"].as<bool>())
 {
     using std::string;

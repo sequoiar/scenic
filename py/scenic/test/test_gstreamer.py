@@ -11,4 +11,4 @@ class Test_Find_Elements(unittest.TestCase):
 
     def test_existing(self):
         assert(gstreamer.is_gstreamer_element_found("fakesink"))
-        
+

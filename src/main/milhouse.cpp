@@ -159,10 +159,10 @@ short Milhouse::run(int argc, char **argv)
     po::store(po::parse_command_line(argc, argv, desc), options);
     po::notify(options);
 
-    if (options.count("help") or argc == 1) 
+    if (options.count("help") or argc == 1)
         return usage(desc);
 
-    MilhouseLogger logger(options["debug"].as<string>()); // just instantiate, his base class will know what to do 
+    MilhouseLogger logger(options["debug"].as<string>()); // just instantiate, his base class will know what to do
 
     LOG_DEBUG("Built on " << __DATE__ << " at " << __TIME__);
 
@@ -172,7 +172,7 @@ short Milhouse::run(int argc, char **argv)
         return 0;
     }
 
-    // maybe just have a separate function that checks for all these standalone 
+    // maybe just have a separate function that checks for all these standalone
     // calls and quits instead of all here
     if (options["list-v4l2"].as<bool>())
         return VideoSourceConfig::listV4lDevices();
@@ -199,7 +199,7 @@ short Milhouse::run(int argc, char **argv)
     }
 
     if (options["max-channels"].as<bool>())
-    { 
+    {
         audiofactory::printMaxChannels(options["audiocodec"].as<string>());
         return 0;
     }
@@ -218,11 +218,11 @@ short Milhouse::run(int argc, char **argv)
         runAsRTSPClient(options);
         return 0;
     }
-    
+
     /*----------------------------------------------*/
     // Local preview mode
     /*----------------------------------------------*/
-    
+
     bool enableLocalVideo = options["localvideo"].as<bool>();
     bool enableLocalAudio = options["localaudio"].as<bool>();
     if (enableLocalVideo or enableLocalAudio)
@@ -236,7 +236,7 @@ short Milhouse::run(int argc, char **argv)
     // Send/receive mode
     /*----------------------------------------------*/
 
-    if ((not options["sender"].as<bool>() and not options["receiver"].as<bool>()) 
+    if ((not options["sender"].as<bool>() and not options["receiver"].as<bool>())
             or (options["sender"].as<bool>() and options["receiver"].as<bool>()))
     {
         LOG_ERROR("Must be run as "
@@ -259,13 +259,13 @@ short Milhouse::run(int argc, char **argv)
     if (enableAudio and enableVideo)
         if (options["videoport"].as<int>() == options["audioport"].as<int>())
         {
-            LOG_ERROR("argument error: videoport and audioport cannot be equal"); 
+            LOG_ERROR("argument error: videoport and audioport cannot be equal");
             return 1;
         }
 
-    if (options["receiver"].as<bool>()) 
+    if (options["receiver"].as<bool>())
         runAsReceiver(options, enableVideo, enableAudio);
-    else 
+    else
         runAsSender(options, enableVideo, enableAudio);
 
     return 0;

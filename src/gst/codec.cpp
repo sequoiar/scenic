@@ -42,17 +42,17 @@
 
 #include "rtpReceiver.h"
 
-/// Constructor 
-Encoder::Encoder(const Pipeline &pipeline, const char *encoder) : 
+/// Constructor
+Encoder::Encoder(const Pipeline &pipeline, const char *encoder) :
     pipeline_(pipeline), encoder_(pipeline_.makeElement(encoder, NULL))
 {}
 
-Encoder::Encoder(const Pipeline &pipeline) : 
+Encoder::Encoder(const Pipeline &pipeline) :
     pipeline_(pipeline), encoder_(0) // for encoder-less raw
 {}
 
 
-/// Destructor 
+/// Destructor
 Encoder::~Encoder()
 {
 }
@@ -61,7 +61,7 @@ Encoder::~Encoder()
 int Encoder::getBitrate() const
 {
     assert(encoder_);
-    int bitrate; 
+    int bitrate;
     g_object_get(G_OBJECT(encoder_), "bitrate", &bitrate, NULL);
     return bitrate;
 }
@@ -70,7 +70,7 @@ int Encoder::getBitrate() const
 void Encoder::setBitrate(int bitrate)
 {
     assert(encoder_);
-    // if pipeline is playing, we need to set it to ready to make 
+    // if pipeline is playing, we need to set it to ready to make
     // the bitrate change actually take effect
     if (pipeline_.isPlaying())
     {
@@ -85,19 +85,19 @@ void Encoder::setBitrate(int bitrate)
     }
 }
 
-/// Constructor 
-Decoder::Decoder(const Pipeline &pipeline, const char *decoder) : 
+/// Constructor
+Decoder::Decoder(const Pipeline &pipeline, const char *decoder) :
     pipeline_(pipeline), decoder_(pipeline_.makeElement(decoder, NULL))
 {}
 
 
-/// Constructor 
-Decoder::Decoder(const Pipeline &pipeline) : 
+/// Constructor
+Decoder::Decoder(const Pipeline &pipeline) :
     pipeline_(pipeline), decoder_(0) // for decoderless raw
 {}
 
 
-/// Destructor 
+/// Destructor
 Decoder::~Decoder()
 {
 }
@@ -106,7 +106,7 @@ unsigned long long Decoder::minimumBufferTime() { THROW_ERROR("Unimplemented"); 
 
 VideoEncoder::VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced) :
     Encoder(pipeline, encoder),
-    colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)), 
+    colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
     supportsInterlaced_(supportsInterlaced)  // most codecs don't have this property
 {
     assert(encoder_);
@@ -116,10 +116,10 @@ VideoEncoder::VideoEncoder(const Pipeline &pipeline, const char *encoder, bool s
     gstlinkable::link(colorspace_, encoder_);
 }
 
-VideoDecoder::VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace) : 
+VideoDecoder::VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace) :
     Decoder(pipeline, decoder),
-    doDeinterlace_(doDeinterlace), 
-    colorspace_(0), 
+    doDeinterlace_(doDeinterlace),
+    colorspace_(0),
     deinterlace_(0)
 {}
 
@@ -133,7 +133,7 @@ void VideoDecoder::addDeinterlace()
     assert(decoder_);
     if (doDeinterlace_)
     {
-        colorspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL); 
+        colorspace_ = pipeline_.makeElement("ffmpegcolorspace", NULL);
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = pipeline_.makeElement("deinterlace", NULL);
         g_object_set(deinterlace_, "fields", TOP, NULL);
@@ -144,7 +144,7 @@ void VideoDecoder::addDeinterlace()
 
 
 /// Increase jitterbuffer size
-void VideoDecoder::adjustJitterBuffer() 
+void VideoDecoder::adjustJitterBuffer()
 {
     if (doDeinterlace_)
         RtpReceiver::setLatency(LONGER_JITTER_BUFFER_MS);
@@ -152,26 +152,26 @@ void VideoDecoder::adjustJitterBuffer()
 
 
 
-/// Constructor 
-// POSIX specific hardware thread info 
+/// Constructor
+// POSIX specific hardware thread info
 // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
 // int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
 
-H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) : 
+H264Encoder::H264Encoder(const Pipeline &pipeline, int bitrate) :
     VideoEncoder(pipeline, "x264enc", true),
-    bitrate_(bitrate) 
+    bitrate_(bitrate)
 {
     g_object_set(encoder_, "threads", 0 /* automatic */, NULL);
     // See gst-plugins-good/tests/examples/rtp/*h264*.sh
-    // if you use non-byte stream mode, the encoder willl need to add 
-    // three bytes to start and end, which the payerloader will promptly 
+    // if you use non-byte stream mode, the encoder willl need to add
+    // three bytes to start and end, which the payerloader will promptly
     // remove (as the buffer size is givn on the buffer object). the
-    // default NALU stream is mostly useful when storing this on disk 
+    // default NALU stream is mostly useful when storing this on disk
     // i.e. (x264enc ! filesink)
     // vbv-bufsize / vbv-maxrate = the number of seconds the client must buffer before playback
-    g_object_set(encoder_, "byte-stream", TRUE, NULL);  
+    g_object_set(encoder_, "byte-stream", TRUE, NULL);
     g_object_set(encoder_, "vbv-buf-capacity", 300, "intra-refresh", TRUE, NULL);
-    // These are x264enc types (i.e. enums) so we can't use g_object_set 
+    // These are x264enc types (i.e. enums) so we can't use g_object_set
     // directly
     gst_util_set_object_arg (G_OBJECT(encoder_), "tune", "zerolatency");
     gst_util_set_object_arg (G_OBJECT(encoder_), "pass", "qual");
@@ -195,21 +195,21 @@ void H264Encoder::setBitrate(int newBitrate)
 }
 
 
-/// Creates an h.264 rtp payloader 
+/// Creates an h.264 rtp payloader
 Pay* H264Encoder::createPayloader() const
 {
     return new H264Pay(pipeline_);
 }
 
 
-H264Decoder::H264Decoder(const Pipeline &pipeline, bool doDeinterlace) : 
+H264Decoder::H264Decoder(const Pipeline &pipeline, bool doDeinterlace) :
     VideoDecoder(pipeline, "ffdec_h264", doDeinterlace)
 {
     addDeinterlace();
 }
 
 
-/// Creates an h.264 RtpDepay 
+/// Creates an h.264 RtpDepay
 RtpPay* H264Decoder::createDepayloader() const
 {
     return new H264Depay(pipeline_);
@@ -217,15 +217,15 @@ RtpPay* H264Decoder::createDepayloader() const
 
 
 /// Increase jitterbuffer size
-void H264Decoder::adjustJitterBuffer() 
+void H264Decoder::adjustJitterBuffer()
 {
     RtpReceiver::setLatency(LONGER_JITTER_BUFFER_MS);
 }
 
 
 
-/// Constructor 
-H263Encoder::H263Encoder(const Pipeline &pipeline, int bitrate) : 
+/// Constructor
+H263Encoder::H263Encoder(const Pipeline &pipeline, int bitrate) :
     VideoEncoder(pipeline, "ffenc_h263p", false),
     bitrate_(bitrate)
 {
@@ -233,29 +233,29 @@ H263Encoder::H263Encoder(const Pipeline &pipeline, int bitrate) :
 }
 
 
-/// Creates an h.263 rtp payloader 
+/// Creates an h.263 rtp payloader
 Pay* H263Encoder::createPayloader() const
 {
     return new H263Pay(pipeline_);
 }
 
 
-H263Decoder::H263Decoder(const Pipeline &pipeline, bool doDeinterlace) : 
+H263Decoder::H263Decoder(const Pipeline &pipeline, bool doDeinterlace) :
     VideoDecoder(pipeline, "ffdec_h263", doDeinterlace)
 {
     addDeinterlace();
 }
 
 
-/// Creates an h.263 RtpDepay 
+/// Creates an h.263 RtpDepay
 RtpPay* H263Decoder::createDepayloader() const
 {
     return new H263Depay(pipeline_);
 }
 
 
-/// Constructor 
-Mpeg4Encoder::Mpeg4Encoder(const Pipeline &pipeline, int bitrate) : 
+/// Constructor
+Mpeg4Encoder::Mpeg4Encoder(const Pipeline &pipeline, int bitrate) :
     VideoEncoder(pipeline, "ffenc_mpeg4", false), // FIXME: interlaced may cause stuttering
     bitrate_(bitrate)
 {
@@ -263,32 +263,32 @@ Mpeg4Encoder::Mpeg4Encoder(const Pipeline &pipeline, int bitrate) :
 }
 
 
-/// Creates an h.264 rtp payloader 
+/// Creates an h.264 rtp payloader
 Pay* Mpeg4Encoder::createPayloader() const
 {
     return new Mpeg4Pay(pipeline_);
 }
 
 
-Mpeg4Decoder::Mpeg4Decoder(const Pipeline &pipeline, bool doDeinterlace) : 
+Mpeg4Decoder::Mpeg4Decoder(const Pipeline &pipeline, bool doDeinterlace) :
     VideoDecoder(pipeline, "ffdec_mpeg4", doDeinterlace)
 {
     addDeinterlace();
 }
 
 
-/// Creates an mpeg4 RtpDepay 
+/// Creates an mpeg4 RtpDepay
 RtpPay* Mpeg4Decoder::createDepayloader() const
 {
     return new Mpeg4Depay(pipeline_);
 }
 
 
-/// Constructor 
-TheoraEncoder::TheoraEncoder(const Pipeline &pipeline, int bitrate, int quality) : 
+/// Constructor
+TheoraEncoder::TheoraEncoder(const Pipeline &pipeline, int bitrate, int quality) :
     VideoEncoder(pipeline, "theoraenc", false),
-    bitrate_(bitrate), 
-    quality_(quality) 
+    bitrate_(bitrate),
+    quality_(quality)
 {
     setSpeedLevel(MAX_SPEED_LEVEL);
     //g_object_set(encoder_, "keyframe-force", 1, NULL);
@@ -334,7 +334,7 @@ Pay* TheoraEncoder::createPayloader() const
 }
 
 
-TheoraDecoder::TheoraDecoder(const Pipeline &pipeline, bool doDeinterlace) : 
+TheoraDecoder::TheoraDecoder(const Pipeline &pipeline, bool doDeinterlace) :
     VideoDecoder(pipeline, "theoradec", doDeinterlace)
 {
     addDeinterlace();
@@ -346,8 +346,8 @@ RtpPay* TheoraDecoder::createDepayloader() const
 }
 
 
-/// Constructor 
-CeltEncoder::CeltEncoder(const Pipeline &pipeline, int /*bitrate*/) 
+/// Constructor
+CeltEncoder::CeltEncoder(const Pipeline &pipeline, int /*bitrate*/)
     : Encoder(pipeline, "celtenc"),
     audioconvert_(pipeline.makeElement("audioconvert", 0))
 {
@@ -355,7 +355,7 @@ CeltEncoder::CeltEncoder(const Pipeline &pipeline, int /*bitrate*/)
     /// FIXME: check and set bitrate
 }
 
-/// Creates an RtpCeltPay 
+/// Creates an RtpCeltPay
 Pay* CeltEncoder::createPayloader() const
 {
     return new CeltPay(pipeline_);
@@ -368,14 +368,14 @@ CeltDecoder::CeltDecoder(const Pipeline &pipeline) :
     gstlinkable::link(decoder_, audioconvert_);
 }
 
-/// Creates an RtpCeltDepay 
+/// Creates an RtpCeltDepay
 RtpPay* CeltDecoder::createDepayloader() const
 {
     return new CeltDepay(pipeline_);
 }
 
-/// Constructor 
-VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality) 
+/// Constructor
+VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quality)
     :
         Encoder(pipeline, "vorbisenc"),
         queue_(pipeline.makeElement("queue", 0))
@@ -383,15 +383,15 @@ VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quali
     gstlinkable::link(queue_, encoder_);
     static const double MIN_QUALITY = -0.1;  // from the vorbis plugin
     static const double MAX_QUALITY = 1.0;  // from the vorbis plugin
-    static const int MIN_BITRATE = 0;  
-    static const int BITS_PER_KB = 1024;  
+    static const int MIN_BITRATE = 0;
+    static const int BITS_PER_KB = 1024;
     if (quality >= MIN_QUALITY and quality <= MAX_QUALITY)
         g_object_set(encoder_, "quality", quality, NULL);
     else if (bitrate > MIN_BITRATE)
         g_object_set(encoder_, "bitrate", bitrate * BITS_PER_KB, NULL);
 }
 
-/// Creates an RtpVorbisPay 
+/// Creates an RtpVorbisPay
 Pay* VorbisEncoder::createPayloader() const
 {
     return new VorbisPay(pipeline_);
@@ -406,19 +406,19 @@ VorbisDecoder::VorbisDecoder(const Pipeline &pipeline) :
     Decoder(pipeline, "vorbisdec")
 {}
 
-/// Creates an RtpVorbisDepay 
+/// Creates an RtpVorbisDepay
 RtpPay* VorbisDecoder::createDepayloader() const
 {
     return new VorbisDepay(pipeline_);
 }
 
 /// Constructor
-RawEncoder::RawEncoder(const Pipeline &pipeline) : 
+RawEncoder::RawEncoder(const Pipeline &pipeline) :
     Encoder(pipeline),
     aconv_(pipeline_.makeElement("audioconvert", NULL))
 {}
 
-/// Creates an RtpL16Pay 
+/// Creates an RtpL16Pay
 Pay* RawEncoder::createPayloader() const
 {
     return new L16Pay(pipeline_);
@@ -428,7 +428,7 @@ Pay* RawEncoder::createPayloader() const
 RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     Decoder(pipeline),
     aconv_(pipeline_.makeElement("audioconvert", NULL)),
-    // FIXME: SUPER GROSS HACK!!!! We should not need a capsfilter here, 
+    // FIXME: SUPER GROSS HACK!!!! We should not need a capsfilter here,
     // something is broken in gst
     capsfilter_(pipeline_.makeElement("capsfilter", NULL))
 {
@@ -436,15 +436,15 @@ RawDecoder::RawDecoder(const Pipeline &pipeline, int numChannels) :
     gstlinkable::link(aconv_, capsfilter_);
 }
 
-/// Creates an RtpL16Depay 
+/// Creates an RtpL16Depay
 RtpPay* RawDecoder::createDepayloader() const
 {
     return new L16Depay(pipeline_);
 }
 
 /// Constructor
-LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality) 
-    : 
+LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality)
+    :
         Encoder(pipeline, "lamemp3enc"),
         aconv_(pipeline_.makeElement("audioconvert", NULL)),
         mp3parse_(pipeline_.makeElement("mp3parse", NULL))
@@ -471,7 +471,7 @@ LameEncoder::LameEncoder(const Pipeline &pipeline, int bitrate, double quality)
     {
         std::ostringstream str;
         std::copy(allowedBitrates.begin(), allowedBitrates.end(), std::ostream_iterator<int>(str, " "));
-        LOG_WARNING("Ignoring invalid bitrate value of " << 
+        LOG_WARNING("Ignoring invalid bitrate value of " <<
                 bitrate << ", allowed bitrates are:\n " << str.str());
     }
 
@@ -493,7 +493,7 @@ Pay* LameEncoder::createPayloader() const
     return new MpaPay(pipeline_);
 }
 
-/// Creates an RtpMpaDepay 
+/// Creates an RtpMpaDepay
 RtpPay* MadDecoder::createDepayloader() const
 {
     return new MpaDepay(pipeline_);

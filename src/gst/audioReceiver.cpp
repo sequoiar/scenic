@@ -34,7 +34,7 @@
 
 using std::tr1::shared_ptr;
 
-/** Constructor parameterized by an AudioSinkConfig 
+/** Constructor parameterized by an AudioSinkConfig
  * and a ReceiverConfig */
 AudioReceiver::AudioReceiver(Pipeline &pipeline,
         const shared_ptr<AudioSinkConfig> &aConfig,
@@ -47,13 +47,13 @@ AudioReceiver::AudioReceiver(Pipeline &pipeline,
     decoder_(),
     level_(),
     sink_()
-{ 
-    assert(remoteConfig_->hasCodec()); 
+{
+    assert(remoteConfig_->hasCodec());
     remoteConfig_->checkPorts();
     createPipeline(pipeline);
 }
 
-/// Destructor 
+/// Destructor
 AudioReceiver::~AudioReceiver()
 {
     remoteConfig_->cleanupPorts();

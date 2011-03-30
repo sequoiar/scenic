@@ -25,7 +25,7 @@
 #include "gstLinkable.h"
 #include "pipeline.h"
 
-VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) : 
+VideoFlip::VideoFlip(const Pipeline &pipeline, const std::string &flipMethod) :
     identity_(0),
     colorspace_(0),
     videoflip_(0)

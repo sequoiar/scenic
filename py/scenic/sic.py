@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -88,7 +88,7 @@ class SICProtocol(basic.LineReceiver):
         else:
             data = json.dumps(d)
             return self.transport.write(data + "\n")
-    
+
     def get_peer_ip(self):
         try:
             ip = self.transport.getPeer().host
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     def on_error(failure):
         print "SIC: Error trying to connect.", failure
         reactor.stop()
-        
+
     PORT_NUMBER = 15555
     s = ServerFactory()
     d = Dummy()

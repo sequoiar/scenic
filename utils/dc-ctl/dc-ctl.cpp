@@ -41,14 +41,14 @@ int featureMax(const dc1394featureset_t &features, dc1394feature_t feature)
     return features.feature[feature - DC1394_FEATURE_MIN].max;
 }
 
-void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features, 
+void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features,
         dc1394feature_t feature, const std::string &valueStr)
 {
     using boost::lexical_cast;
     const uint32_t MIN =  featureMin(features, feature);
     const uint32_t MAX =  featureMax(features, feature);
     dc1394error_t camerr;
-    
+
     if (valueStr == "auto")
     {
         camerr = dc1394_feature_set_mode(camera, feature, DC1394_FEATURE_MODE_AUTO);
@@ -66,7 +66,7 @@ void setFeature(dc1394camera_t *camera, const dc1394featureset_t &features,
         if (value >=  MIN and value <= MAX)
             dc1394_feature_set_value(camera, feature, value);
         else
-            std::cerr << "error: value must be in range [" << MIN <<  "," << MAX << "], ignoring\n"; 
+            std::cerr << "error: value must be in range [" << MIN <<  "," << MAX << "], ignoring\n";
     }
 }
 
@@ -78,7 +78,7 @@ void initFeatureMap()
     if (FEATURE_MAP.empty())
     {
         FEATURE_MAP["brightness"] = DC1394_FEATURE_BRIGHTNESS;
-        FEATURE_MAP["auto-exposure"] = DC1394_FEATURE_EXPOSURE; 
+        FEATURE_MAP["auto-exposure"] = DC1394_FEATURE_EXPOSURE;
         FEATURE_MAP["sharpness"] = DC1394_FEATURE_SHARPNESS;
         FEATURE_MAP["whitebalance"] = DC1394_FEATURE_WHITE_BALANCE;
         FEATURE_MAP["saturation"] = DC1394_FEATURE_SATURATION;
@@ -140,13 +140,13 @@ void printFeatureValue(const std::string &featureName, dc1394camera_t *camera)
     // special case, whitebalance has multiple values
     if (featureName == "whitebalance")
     {
-        std::cout << featureName << "=" 
+        std::cout << featureName << "="
             << getWhiteBalance(features,camera)
             << std::endl;
     }
     else
     {
-        std::cout << featureName << "=" 
+        std::cout << featureName << "="
             << getFeatureValue(features, featureNameToConstant(featureName), camera)
             << std::endl;
     }
@@ -157,7 +157,7 @@ void printAllFeatureValues(dc1394camera_t *camera)
     using std::map;
     using std::string;
     initFeatureMap();
-    for (map<string, dc1394feature_t>::iterator iter = FEATURE_MAP.begin(); 
+    for (map<string, dc1394feature_t>::iterator iter = FEATURE_MAP.begin();
             iter != FEATURE_MAP.end(); ++iter)
                 printFeatureValue(iter->first, camera);
 }
@@ -173,7 +173,7 @@ void saveSettings(const std::string &filename, dc1394camera_t * camera)
     std::cout << "Saving settings to " << filename << std::endl;
 
     std::ofstream fout;
-    try 
+    try
     {
         fout.open(filename.c_str());
         fout << "camera=" << std::hex << camera->guid << "\n" << std::dec;
@@ -215,10 +215,10 @@ std::string featureHelp(const dc1394featureset_t &features, dc1394feature_t feat
             helpStr = "Blue/U Red/V [";
             helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].min);
             helpStr += ",";
-            helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].max) + "]"; 
+            helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].max) + "]";
             helpStr += " [" + lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].min);
             helpStr += ",";
-            helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].max) + "]"; 
+            helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].max) + "]";
             return helpStr;
         case DC1394_FEATURE_SATURATION:
             helpStr = "saturation [";
@@ -239,7 +239,7 @@ std::string featureHelp(const dc1394featureset_t &features, dc1394feature_t feat
 
     helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].min);
     helpStr += ",";
-    helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].max) + "]"; 
+    helpStr += lexical_cast<string>(features.feature[feature - DC1394_FEATURE_MIN].max) + "]";
     return helpStr;
 }
 
@@ -258,7 +258,7 @@ namespace po = boost::program_options;
 
 bool showHelpOrVersion(int argc, char *argv[], const po::options_description &desc, po::variables_map &vm)
 {
-    // in case no dc1394 module is present, if we asked for help 
+    // in case no dc1394 module is present, if we asked for help
     // we'll just show that
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
@@ -281,11 +281,11 @@ int run(int argc, char *argv[])
     /// turn off error logging from library as this conflicts with our output
     void *user_data = 0;
     dc1394_log_register_handler(DC1394_LOG_ERROR, NULL, user_data);
-    dc1394_t * dc1394 = 0; 
+    dc1394_t * dc1394 = 0;
     dc1394camera_t *camera = 0;
     dc1394camera_list_t *cameras = 0;
 
-    try 
+    try
     {
         using std::string;
         using boost::lexical_cast;
@@ -306,7 +306,7 @@ int run(int argc, char *argv[])
 
         // make sure raw1394 is loaded and read/writeable
         raw1394handle_t tmp_handle = raw1394_new_handle();
-        if (tmp_handle == NULL) 
+        if (tmp_handle == NULL)
         {
             if (showHelpOrVersion(argc, argv, desc, vm))
                 return 0;
@@ -354,7 +354,7 @@ int run(int argc, char *argv[])
         // FIXME: right now we can only use camera 0. But we can't display the valid ranges in the help if we
         // don't know ahead of time which camera to use.
 
-        // using strings so that value can be "auto", set default value so that if they're not 
+        // using strings so that value can be "auto", set default value so that if they're not
         // given values we can print out their current values
         desc.add_options()
             ("brightness,b", po::value<string>()->implicit_value(""), featureHelp(features, DC1394_FEATURE_BRIGHTNESS).c_str())
@@ -396,7 +396,7 @@ int run(int argc, char *argv[])
             if (not configFile.good())
             {
                 configFile.close();
-                throw std::runtime_error("Could not open file " + vm["config"].as<string>()); 
+                throw std::runtime_error("Could not open file " + vm["config"].as<string>());
             }
             store(parse_config_file(configFile, desc), vm);
         }
@@ -417,7 +417,7 @@ int run(int argc, char *argv[])
                 }
             }
             if (not matchedGUID)
-                throw std::runtime_error("could not find camera with guid " + 
+                throw std::runtime_error("could not find camera with guid " +
                         lexical_cast<string>(vm["camera"].as<string>()));
 
 
@@ -529,9 +529,9 @@ int run(int argc, char *argv[])
                 const int u_b = lexical_cast<int>(u_b_string); // convert to ints
                 const int v_r = lexical_cast<int>(v_r_string); // convert to ints
 
-                if (u_b >= MIN_WHITE_BALANCE and 
-                        u_b <= MAX_WHITE_BALANCE and 
-                        v_r >= MIN_WHITE_BALANCE and 
+                if (u_b >= MIN_WHITE_BALANCE and
+                        u_b <= MAX_WHITE_BALANCE and
+                        v_r >= MIN_WHITE_BALANCE and
                         v_r <= MAX_WHITE_BALANCE)
                 {
                     std::cout << "Setting white balance=Blue/U=" << u_b << ", Red/V=" << v_r << "\n";
@@ -542,7 +542,7 @@ int run(int argc, char *argv[])
                 }
                 else
                 {
-                    std::cerr << "error: whitebalance values must be in range [" 
+                    std::cerr << "error: whitebalance values must be in range ["
                         << MIN_WHITE_BALANCE << "," << MAX_WHITE_BALANCE << "]" << std::endl;
                     cleanup(dc1394, camera, cameras);
                     return 1;
@@ -574,13 +574,13 @@ int run(int argc, char *argv[])
             setFeature(camera, features, DC1394_FEATURE_GAIN, vm["gain"].as<string>());
         }
     }
-    catch (const std::exception& e) 
+    catch (const std::exception& e)
     {
         std::cerr << "error: " << e.what() << "\n";
         cleanup(dc1394, camera, cameras);
         return 1;
     }
-    catch (...) 
+    catch (...)
     {
         // FIXME: is this possible?
         std::cerr << "Exception of unknown type!\n";

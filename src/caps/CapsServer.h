@@ -16,7 +16,7 @@ class TcpConnection : public boost::enable_shared_from_this<TcpConnection>
         typedef boost::shared_ptr<TcpConnection> connection_ptr;
 
         static connection_ptr create(boost::asio::io_service& io_service, const std::string &message);
-        
+
         boost::asio::ip::tcp::socket& socket()
         {
             return socket_;
@@ -52,7 +52,7 @@ class TcpCapsServer : public CapsServer {
 
         std::string caps_;
         boost::asio::io_service io_service_;
-        boost::asio::ip::tcp::acceptor acceptor_; 
+        boost::asio::ip::tcp::acceptor acceptor_;
         int dummy_;
         boost::thread serverThread_;
 };

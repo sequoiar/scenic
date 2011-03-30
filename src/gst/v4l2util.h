@@ -24,12 +24,12 @@
 #define _V4L2UTIL_H_
 
 #include <string>
- 	
+
 /// FIXME: this should be a real object that only opens a given device ONCE
 class v4l2util
 {
     public:
-        static bool checkStandard(const std::string &expected, 
+        static bool checkStandard(const std::string &expected,
                 std::string &actual, const std::string &device);
         static void setFormatVideo(const std::string &device, int width, int height);
         static unsigned captureWidth(const std::string &device);

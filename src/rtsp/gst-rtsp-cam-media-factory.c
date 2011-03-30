@@ -60,7 +60,7 @@ static GstElement * gst_rtsp_cam_media_factory_get_element (GstRTSPMediaFactory 
 static gchar *gst_rtsp_cam_media_factory_gen_key (GstRTSPMediaFactory *factory, const GstRTSPUrl *url);
 
 G_DEFINE_TYPE (GstRTSPCamMediaFactory, gst_rtsp_cam_media_factory, GST_TYPE_RTSP_MEDIA_FACTORY)
-  
+
 #define DEFAULT_VIDEO TRUE
 #define DEFAULT_VIDEO_SOURCE "v4l2src"
 #define DEFAULT_VIDEO_DEVICE NULL
@@ -109,7 +109,7 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
   g_object_class_install_property (gobject_class, PROP_VIDEO,
       g_param_spec_boolean ("video", "Video", "video",
           DEFAULT_VIDEO, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
-  
+
   g_object_class_install_property (gobject_class, PROP_VIDEO_SOURCE,
       g_param_spec_string ("video-source", "Video source", "video source",
           DEFAULT_VIDEO_SOURCE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
@@ -138,7 +138,7 @@ gst_rtsp_cam_media_factory_class_init (GstRTSPCamMediaFactoryClass * klass)
       gst_param_spec_fraction ("video-framerate", "Video framerate", "video framerate",
           0, 1, G_MAXINT, 1,
           DEFAULT_VIDEO_FRAMERATE_N, DEFAULT_VIDEO_FRAMERATE_D,
-          G_PARAM_READWRITE | G_PARAM_CONSTRUCT));  
+          G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 
   g_object_class_install_property (gobject_class, PROP_AUDIO,
       g_param_spec_boolean ("audio", "Audio", "audio",
@@ -431,7 +431,7 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
 
     if (factory->video_width != -1)
       gst_structure_set (structure, "width", G_TYPE_INT, factory->video_width, NULL);
-  
+
     if (factory->video_height != -1)
       gst_structure_set (structure, "height", G_TYPE_INT, factory->video_height, NULL);
 
@@ -474,7 +474,7 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
   gchar *capss;
   gboolean linked;
   int i;
-  
+
   encoder = create_encoder (factory, factory->audio_codec);
   if (encoder == NULL) {
     GST_WARNING_OBJECT (factory, "couldn't create encoder ");
@@ -509,7 +509,7 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
 
     if (factory->audio_channels != -1)
       gst_structure_set (structure, "channels", G_TYPE_INT, factory->audio_channels, NULL);
-  
+
     gst_caps_append_structure (audio_caps, structure);
   }
 
@@ -519,7 +519,7 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
 
   g_object_set (capsfilter, "caps", audio_caps, NULL);
   gst_caps_unref (audio_caps);
-  
+
   gst_bin_add_many (GST_BIN (bin), audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
   linked = gst_element_link_many (audiosrc, capsfilter, audioconvert, audiorate, encoder, pay, NULL);
   if (!linked) {

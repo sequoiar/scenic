@@ -21,7 +21,7 @@
 //
 
 #ifndef _RAW1394UTIL_H_
-#define _RAW1394UTIL_H_ 
+#define _RAW1394UTIL_H_
 
 #include "config.h"
 #include <string>
@@ -31,7 +31,7 @@
 #include <libraw1394/raw1394.h>
 #endif
 
-class Raw1394 
+class Raw1394
 {
 public:
 #ifdef CONFIG_IEEE1394
@@ -45,4 +45,4 @@ private:
     static std::vector<std::string> getDeviceList();
 };
 
-#endif // RAW1394UTIL_H 
+#endif // RAW1394UTIL_H

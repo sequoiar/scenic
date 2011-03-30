@@ -35,7 +35,7 @@
 #include "dv1394.h"
 
 /// Constructor
-LocalVideo::LocalVideo(Pipeline &pipeline, 
+LocalVideo::LocalVideo(Pipeline &pipeline,
         const VideoSourceConfig &sourceConfig,
         const VideoSinkConfig &sinkConfig) :
     source_(sourceConfig.createSource(pipeline)),
@@ -61,7 +61,7 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
         // pipeline to ready (assuming that works).
         while (not linked)
         {
-            try 
+            try
             {
                 gstlinkable::link(*source_, *videoscale_);
                 linked = true;
@@ -74,7 +74,7 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
             }
         }
     }
-    
+
     gstlinkable::link(*videoscale_, *textoverlay_);
     gstlinkable::link(*textoverlay_, *videoflip_);
     gstlinkable::link(*videoflip_, *sink_);

@@ -10,7 +10,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Scenic is distributed in the hope that it will be useful, 
+ * Scenic is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -39,7 +39,7 @@ class MulticastCapsClient
                 const std::string& multicast_address,
                 short multicastPort);
         std::string getCaps();
-    
+
     private:
         boost::asio::ip::udp::socket socket_;
         boost::asio::ip::address listenAddress_;

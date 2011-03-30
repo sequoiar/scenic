@@ -52,13 +52,13 @@ void RtpSender::sendCapsChanged(GstPad *pad, GParamSpec * /*pspec*/, RtpSender* 
 
     if (!caps)
         return;
-    
+
     g_return_if_fail (GST_CAPS_IS_SIMPLE(caps));
 
     // post msg with caps on bus, where some worker (thread? async callback?) will send it to the receiver
-    gst_element_post_message(context->rtp_sender_, 
-            gst_message_new_application(GST_OBJECT(context->rtp_sender_), 
-                gst_structure_new("caps-changed", "caps", G_TYPE_STRING, 
+    gst_element_post_message(context->rtp_sender_,
+            gst_message_new_application(GST_OBJECT(context->rtp_sender_),
+                gst_structure_new("caps-changed", "caps", G_TYPE_STRING,
                     gst_caps_to_string(caps), NULL)));
 
     gst_caps_unref(caps);
@@ -85,12 +85,12 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     /// FIXME: need to update config.ports() accordingly if they can change (which for now they can't)
     rtp_sender_ = pipeline_.makeElement("udpsink", NULL);
     int rtpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.port());
-    g_object_set(rtp_sender_, "sockfd", rtpsink_socket, "host", 
+    g_object_set(rtp_sender_, "sockfd", rtpsink_socket, "host",
             config.remoteHost(), "port", config.port(), NULL);
 
     rtcp_sender_ = pipeline_.makeElement("udpsink", NULL);
     int rtcpsink_socket = RtpBin::createSinkSocket(config.remoteHost(), config.rtcpFirstPort());
-    g_object_set(rtcp_sender_, "sockfd", rtcpsink_socket, "host", config.remoteHost(), 
+    g_object_set(rtcp_sender_, "sockfd", rtcpsink_socket, "host", config.remoteHost(),
             "port", config.rtcpFirstPort(), "sync", FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = pipeline_.makeElement("udpsrc", NULL);
@@ -134,7 +134,7 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src");
     assert(rtcpReceiverSrc);
     recv_rtcp_sink_ = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
-    assert(recv_rtcp_sink_); 
+    assert(recv_rtcp_sink_);
     linked = gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink_);
     assert(linked);
     gst_object_unref(rtcpReceiverSrc);

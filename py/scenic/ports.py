@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -23,7 +23,7 @@ Tools to help with choosing listening port numbers.
 """
 
 # for port_is_avaiable
-import socket 
+import socket
 from scenic import logger
 
 log = logger.start(name="ports")
@@ -50,7 +50,7 @@ class PortsAllocator(object):
         does not persist. Note that some other process could still
         bind to this port in between when this check happens and when
         we bind to the port.
-        
+
         @param port: int
         Raises a PortsAllocatorError if port is not available.
         """
@@ -71,7 +71,7 @@ class PortsAllocator(object):
             udp_socket.close()
         if busy:
             raise PortsAllocatorError("Port %d is not available. Reason:%s" % (port, e))
-        
+
     def allocate(self):
         """
         Allocates a port number and returns it.
@@ -86,13 +86,13 @@ class PortsAllocator(object):
             try:
                 self.check_port(value)
             except PortsAllocatorError, e:
-                log.error('error: %s' % (e.message)) 
+                log.error('error: %s' % (e.message))
                 value += self.increment
             else:
                 chosen = True
         self.allocated.add(value)
         return value
-    
+
     def free(self, value):
         """
         Frees an allocated port number.
@@ -110,7 +110,7 @@ class PortsAllocator(object):
         ret = list(self.allocated)
         self.allocated = set()
         return ret
-        
+
     def allocate_many(self, num=1):
         """
         Allocates many ports at once.
@@ -120,7 +120,7 @@ class PortsAllocator(object):
         for i in range(num):
             ret.append(self.allocate())
         return ret
-    
+
     def free_many(self, values):
         """
         Frees many allocated ports at a time.

@@ -24,11 +24,11 @@
 
 #include <string>
 
-namespace Dc1394 
+namespace Dc1394
 {
     bool listCameras();
-    int capsToMode(int cameraNumber, int width, 
-            int height, 
+    int capsToMode(int cameraNumber, int width,
+            int height,
             const std::string &colourspace,
             int framerate);
     int GUIDToCameraNumber(unsigned long long GUID);

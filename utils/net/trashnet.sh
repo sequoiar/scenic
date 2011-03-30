@@ -6,7 +6,7 @@
 
 usage () {
     echo "Usage: sudo $(basename $0) <INTERFACE> <DEST_HOST> [PACKET_LOSS]"
-} 
+}
 
 if [ $# -lt 1 ]
 then

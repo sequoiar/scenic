@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -55,7 +55,7 @@ class Server(object):
         self.last_message_received = ""
         self.received_command_signal = sig.Signal()
         self.received_command_signal.connect(app.on_server_receive_command)
- 
+
     def start_listening(self):
         if not self.is_listening():
             self._port_obj = reactor.listenTCP(self.port, self.server_factory)
@@ -63,7 +63,7 @@ class Server(object):
         else:
             log.error("Already listening !!!!!")
             return defer.succeed(True) #FIXME
-    
+
     def on_dict_received(self, server_proto, d):
         log.info("Received %s" % (d["msg"]))
         log.debug("Received %s" % (d))
@@ -80,7 +80,7 @@ class Server(object):
         self.port = new_port
         def _on_closed(unused_result):
             return self.start_listening()
-        
+
         deferred = self.close()
         deferred.addCallback(_on_closed)
         return deferred
@@ -88,7 +88,7 @@ class Server(object):
     def get_peer_ip(self):
         return self.remote_ip
 
-    def close(self): # TODO: important ! 
+    def close(self): # TODO: important !
         if self.is_listening():
             def _cb(result):
                 self._port_obj = None
@@ -115,7 +115,7 @@ class Client(object):
         self.clientPort = None
         self.connection_error_signal = sig.Signal()
         self.last_message_sent = ""# ACK, BYE, ACCEPT, etc.
-        
+
     def connect(self, host, port):
         """
         Connects and sends an INVITE message
@@ -125,7 +125,7 @@ class Client(object):
             log.info("Client is connected")
             self.sic_sender = proto
             return proto
-        
+
         def _on_error(reason):
             log.error("Client could not connect to %s on port %s" % (host, port))
             self._connected = False
@@ -133,14 +133,14 @@ class Client(object):
             err = str(reason.getErrorMessage())
             msg = "Could not send to remote host."
             self.connection_error_signal(err, msg)
-            return reason        
+            return reason
 
         if not self.is_connected():
             self.host = host
             self.port = port
             self.client_factory = sic.ClientFactory()
             log.debug('Trying to connect client to %s on port %s' % (self.host, self.port))
-            
+
             self.clientPort = reactor.connectTCP(self.host, self.port, self.client_factory)
             self.client_factory.connected_deferred.addCallback(_on_connected).addErrback(_on_error)
             return self.client_factory.connected_deferred
@@ -149,7 +149,7 @@ class Client(object):
             log.warning(msg)
             #TODO: return failure?
             return defer.succeed(True) # FIXME
- 
+
     def send(self, msg):
         """
         Sends a dict, which has to have the key "msg".
@@ -163,7 +163,7 @@ class Client(object):
         else:
             error = "Not connected, cannot send message " + str(msg)
             log.error(error)
-    
+
     def is_connected(self):
         return self.sic_sender is not None
 
@@ -179,7 +179,7 @@ class Client(object):
         else:
             log.warning("Already disconnected.")
             return defer.succeed(True) # FIXME
-            
+
 def connect_send_and_disconnect(host, port, mess):
     d = defer.Deferred()
     def _on_connected(sic_sender):

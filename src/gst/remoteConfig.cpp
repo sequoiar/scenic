@@ -37,17 +37,17 @@ const int RemoteConfig::PORT_MIN = 1024;
 const int RemoteConfig::PORT_MAX = 65000;
 
 std::set<int> RemoteConfig::usedPorts_;
-        
+
 RemoteConfig::RemoteConfig(const std::string &codec__,
         const std::string &remoteHost__,
         int port__) :
-    codec_(codec__), 
-    remoteHost_(remoteHost__), 
+    codec_(codec__),
+    remoteHost_(remoteHost__),
     port_(port__)
 {}
 
 
-// Can't be called from destructor, must be called by this object's owner/client, 
+// Can't be called from destructor, must be called by this object's owner/client,
 // as sometime this object is copied and we don't want the ports destroyed prematurely
 void RemoteConfig::cleanupPorts() const
 {
@@ -62,8 +62,8 @@ void RemoteConfig::cleanupPorts() const
 void RemoteConfig::checkPorts() const
 {
     if (port_ < PORT_MIN || port_ > PORT_MAX)
-        THROW_ERROR("Invalid port " << port_ << ", must be in range [" 
-                << PORT_MIN << "," << PORT_MAX << "]");  
+        THROW_ERROR("Invalid port " << port_ << ", must be in range ["
+                << PORT_MIN << "," << PORT_MAX << "]");
 
     if (usedPorts_.find(port()) != usedPorts_.end())
         THROW_ERROR("Invalid port " << port() << ", already in use");
@@ -83,7 +83,7 @@ void RemoteConfig::checkPorts() const
     usedPorts_.insert(rtcpSecondPort());
     usedPorts_.insert(capsPort());
 }
-        
+
 
 SenderConfig::SenderConfig(Pipeline &pipeline,
         const std::string &codec__,
@@ -92,7 +92,7 @@ SenderConfig::SenderConfig(Pipeline &pipeline,
         const std::string &multicastInterface__) :
     RemoteConfig(codec__, remoteHost__, port__),
     BusMsgHandler(&pipeline),
-    message_(""), 
+    message_(""),
     capsServer_(),
     multicastInterface_(multicastInterface__)
 {}
@@ -116,7 +116,7 @@ VideoEncoder * SenderConfig::createVideoEncoder(const Pipeline &pipeline, int bi
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
-    LOG_DEBUG("Video encoder " << codec_ << " built"); 
+    LOG_DEBUG("Video encoder " << codec_ << " built");
 }
 
 
@@ -138,11 +138,11 @@ Encoder * SenderConfig::createAudioEncoder(const Pipeline &pipeline, int bitrate
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
-    LOG_DEBUG("Audio encoder " << codec_ << " built"); 
+    LOG_DEBUG("Audio encoder " << codec_ << " built");
 }
 
 
-void SenderConfig::sendCaps() 
+void SenderConfig::sendCaps()
 {
     if (multicastInterface_.empty())
         capsServer_.reset(new TcpCapsServer(capsPort(), message_));
@@ -153,15 +153,15 @@ void SenderConfig::sendCaps()
     }
 }
 
-/** 
- * The new caps message is posted on the bus by the src pad of our udpsink, 
+/**
+ * The new caps message is posted on the bus by the src pad of our udpsink,
  * received by this audiosender, and sent to our other host if needed. */
 bool SenderConfig::handleBusMsg(GstMessage *msg)
 {
     bool result = false;
     const GstStructure *s = gst_message_get_structure(msg);
     if (s != NULL and gst_structure_has_name(s, "caps-changed"))
-    {   
+    {
         // this is our msg
         const gchar *newCapsStr = gst_structure_get_string(s, "caps");
         assert(newCapsStr);
@@ -190,9 +190,9 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
     return result;
 }
 
-static const std::vector<std::string> AUDIO_CODECS = 
+static const std::vector<std::string> AUDIO_CODECS =
 boost::assign::list_of<std::string>("raw")("mp3")("vorbis")("celt");
-static const std::vector<std::string> VIDEO_CODECS = 
+static const std::vector<std::string> VIDEO_CODECS =
 boost::assign::list_of<std::string>("mpeg4")("h264")("h263")("theora");
 
 /// FIXME: this method and the one below it need a list of codecs, should only have one
@@ -212,7 +212,7 @@ std::string RemoteConfig::codecMediaType() const
 
 std::string RemoteConfig::identifier() const
 {
-    return codecMediaType() + "_" + codec_;  
+    return codecMediaType() + "_" + codec_;
 }
 
 

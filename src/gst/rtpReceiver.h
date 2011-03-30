@@ -40,12 +40,12 @@ class RtpReceiver
     : RtpBin
 {
     public:
-        RtpReceiver(const Pipeline &pipeline) : 
-            RtpBin(pipeline), 
-            rtp_receiver_(0), 
-            depayloader_(0), 
-            recv_rtp_sink_(0), 
-            send_rtcp_src_(0), 
+        RtpReceiver(const Pipeline &pipeline) :
+            RtpBin(pipeline),
+            rtp_receiver_(0),
+            depayloader_(0),
+            recv_rtp_sink_(0),
+            send_rtcp_src_(0),
             recv_rtcp_sink_(0) {}
         ~RtpReceiver();
         void setCaps(const char* capsStr);

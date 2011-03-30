@@ -9,7 +9,7 @@ import warnings
 
 # HACK to raise an exception when we get a GtkWarning
 def customwarn(message, category, filename, lineno, file=None, line=None):
-        """ 
+        """
         Override warnings.showwarning to avoid importing gtk when it fails to
         open the display.
         """
@@ -49,8 +49,8 @@ class TestVumeter(unittest.TestCase):
             print "I (", widget, ") have just had a plug inserted!"
             self.plug_added = True
         def on_plug_removed(widget):
-            """ 
-                This would return True if we wanted to reuse the 
+            """
+                This would return True if we wanted to reuse the
                 socket.
             """
             print "I (", widget, ") have just had a plug removed!"
@@ -63,7 +63,7 @@ class TestVumeter(unittest.TestCase):
         # redirect stderr to stdout
         print "opening process"
         command = 'meter %ld' % (socket.get_id())
-        proc = subprocess.Popen([command, '"to stdout"'], 
+        proc = subprocess.Popen([command, '"to stdout"'],
                 shell=True)
         gtk.main()
         self.failUnless(self.plug_added)

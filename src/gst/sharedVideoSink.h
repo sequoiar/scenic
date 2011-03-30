@@ -35,14 +35,14 @@ namespace boost {
         class shared_memory_object;
     }
 }
-class SharedVideoSink : public VideoSink 
+class SharedVideoSink : public VideoSink
 {
     public:
         SharedVideoSink(const Pipeline &pipeline, int width, int height, const std::string& sharedId_);
         virtual ~SharedVideoSink();
 
     private:
-         
+
         void prepareSink(int width, int height);
         static std::tr1::shared_ptr<boost::interprocess::shared_memory_object> createSharedMemory(const std::string &id);
         static bool removeSharedMemory(const std::string &id);

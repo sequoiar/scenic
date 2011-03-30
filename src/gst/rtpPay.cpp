@@ -77,7 +77,7 @@ Mpeg4Pay::Mpeg4Pay(const Pipeline &pipeline)
     // commit 7bca2a001941798c1a4005ee37802708ed13c225
     //
     // rtp: Correct timestamping of buffers when buffer_lists are used
-    //         
+    //
     // The timestamping of buffers when buffer_lists are used failed if
     // a buffer did not have both a timestamp and an offset.
     //

@@ -88,7 +88,7 @@ VideoTestSource::VideoTestSource(const Pipeline &pipeline,
 }
 
 /// Constructor
-VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConfig &config) 
+VideoFileSource::VideoFileSource(const Pipeline &pipeline, const VideoSourceConfig &config)
     :
         VideoSource(config),
         identity_(pipeline.makeElement("identity", NULL))
@@ -110,7 +110,7 @@ VideoFileSource::~VideoFileSource()
 
 /// Constructor
 // FIXME: this should not hold onto pipeline reference
-VideoDvSource::VideoDvSource(const Pipeline &pipeline, 
+VideoDvSource::VideoDvSource(const Pipeline &pipeline,
         const VideoSourceConfig &config) :
     VideoSource(config),
     pipeline_(pipeline),
@@ -136,7 +136,7 @@ bool VideoV4lSource::willModifyCaptureResolution() const
 }
 
 
-VideoV4lSource::VideoV4lSource(const Pipeline &pipeline, 
+VideoV4lSource::VideoV4lSource(const Pipeline &pipeline,
         const VideoSourceConfig &config) :
     VideoSource(config), expectedStandard_("NTSC"), actualStandard_("")
 {
@@ -188,7 +188,7 @@ std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
     GstStructure *structure = gst_caps_get_structure(caps, 0);
     const GValue *val = gst_structure_get_value(structure, "framerate");
     LOG_DEBUG("Caps structure from v4l2src srcpad: " << gst_structure_to_string(structure));
-    gint framerate_numerator, framerate_denominator; 
+    gint framerate_numerator, framerate_denominator;
     if (GST_VALUE_HOLDS_LIST(val))
     {
         // trying another one
@@ -273,7 +273,7 @@ std::string VideoDc1394Source::srcCaps(unsigned int /*framerateIndex*/) const
         /// favour rgb because we need to be have that colourspace for shared video buffer
         spaces.push_back("rgb");
         spaces.push_back("yuv");
-    } 
+    }
     spaces.push_back("gray");
 
     for (ColourspaceList::const_iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space)

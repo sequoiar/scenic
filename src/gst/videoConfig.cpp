@@ -37,7 +37,7 @@
 #include "raw1394Util.h"
 
 
-unsigned long long fromString(const std::string& s, 
+unsigned long long fromString(const std::string& s,
                  std::ios_base& (*f)(std::ios_base&))
 {
     unsigned long long result;
@@ -48,12 +48,12 @@ unsigned long long fromString(const std::string& s,
 }
 
 
-VideoSourceConfig::VideoSourceConfig(const boost::program_options::variables_map &options) : 
-    source_(options["videosource"].as<std::string>()), 
-    bitrate_(options["videobitrate"].as<int>()), 
-    quality_(options["videoquality"].as<int>()), 
+VideoSourceConfig::VideoSourceConfig(const boost::program_options::variables_map &options) :
+    source_(options["videosource"].as<std::string>()),
+    bitrate_(options["videobitrate"].as<int>()),
+    quality_(options["videoquality"].as<int>()),
     deviceName_(options["videodevice"].as<std::string>()),
-    location_(options["videolocation"].as<std::string>()), 
+    location_(options["videolocation"].as<std::string>()),
     cameraNumber_(options["camera-number"].as<int>()),
     GUID_(fromString(options["camera-guid"].as<std::string>(), std::hex)),
     framerate_(options["framerate"].as<int>()),
@@ -79,10 +79,10 @@ VideoSource * VideoSourceConfig::createSource(const Pipeline &pipeline) const
         return new VideoFileSource(pipeline, *this);
     else if (source_ == "dc1394src")
         return new VideoDc1394Source(pipeline, *this);
-    else 
+    else
         THROW_ERROR(source_ << " is an invalid videosource!");
 
-    LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", location: " 
+    LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", location: "
             << location_ << ", device: " << deviceName_);
     return 0;
 }
@@ -200,17 +200,17 @@ std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, 
     if (PIXEL_ASPECT_RATIO_TABLE.empty())
     {
         // PAL
-        PIXEL_ASPECT_RATIO_TABLE["720x576"]["4:3"] = 
+        PIXEL_ASPECT_RATIO_TABLE["720x576"]["4:3"] =
             PIXEL_ASPECT_RATIO_TABLE["704x576"]["4:3"] = "59/54";
 
-        PIXEL_ASPECT_RATIO_TABLE["704x576"]["16:9"] = 
+        PIXEL_ASPECT_RATIO_TABLE["704x576"]["16:9"] =
             PIXEL_ASPECT_RATIO_TABLE["352x288"]["16:9"] = "118/81";
 
         // NTSC
-        PIXEL_ASPECT_RATIO_TABLE["720x480"]["4:3"] = 
+        PIXEL_ASPECT_RATIO_TABLE["720x480"]["4:3"] =
             PIXEL_ASPECT_RATIO_TABLE["704x480"]["4:3"] = "10/11";
 
-        PIXEL_ASPECT_RATIO_TABLE["704x480"]["16:9"] = 
+        PIXEL_ASPECT_RATIO_TABLE["704x480"]["16:9"] =
             PIXEL_ASPECT_RATIO_TABLE["352x240"]["16:9"] = "40/33";
 
         /// Misc. Used by us
@@ -228,17 +228,17 @@ std::string VideoSourceConfig::calculatePixelAspectRatio(int width, int height, 
 }
 
 
-VideoSinkConfig::VideoSinkConfig(const boost::program_options::variables_map &options) : 
-    sink_(options["videosink"].as<std::string>()), 
-    doDeinterlace_(options["deinterlace"].as<bool>()), 
+VideoSinkConfig::VideoSinkConfig(const boost::program_options::variables_map &options) :
+    sink_(options["videosink"].as<std::string>()),
+    doDeinterlace_(options["deinterlace"].as<bool>()),
     sharedVideoId_(options["shared-video-id"].as<std::string>()),
     /// if display-resolution is not specified, default to capture-resolution
-    displayWidth_(std::min(static_cast<int>(options.count("display-width") ? 
+    displayWidth_(std::min(static_cast<int>(options.count("display-width") ?
                     options["display-width"].as<int>() : options["width"].as<int>()), VideoScale::MAX_SCALE)),
-    displayHeight_(std::min(static_cast<int>(options.count("display-height") ? 
+    displayHeight_(std::min(static_cast<int>(options.count("display-height") ?
                     options["display-height"].as<int>() : options["height"].as<int>()), VideoScale::MAX_SCALE)),
     flipMethod_(options["flip-video"].as<std::string>()),
-    xid_(options["x-window-id"].as<unsigned long>()), 
+    xid_(options["x-window-id"].as<unsigned long>()),
     display_(options.count("videodisplay") ? options["videodisplay"].as<std::string>() : ""),
     text_(options.count("text-overlay") ? options["text-overlay"].as<std::string>() : ""),
     title_(options["window-title"].as<std::string>()),
@@ -287,7 +287,7 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
     else
         THROW_ERROR(sink_ << " is an invalid videosink");
 
-    LOG_DEBUG("Video sink " << sink_ << " built"); 
+    LOG_DEBUG("Video sink " << sink_ << " built");
     return result;
 }
 
@@ -300,7 +300,7 @@ VideoScale* VideoSinkConfig::createVideoScale(const Pipeline &pipeline) const
 
 VideoFlip* VideoSinkConfig::createVideoFlip(const Pipeline &pipeline) const
 {
-    return new VideoFlip(pipeline, flipMethod_); 
+    return new VideoFlip(pipeline, flipMethod_);
 }
 
 TextOverlay* VideoSinkConfig::createTextOverlay(const Pipeline &pipeline) const

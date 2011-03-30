@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -46,7 +46,7 @@ class GladeDialogFactory(object):
         self._destroyed = False
         self._terminating = False
         self._widgets_tree = None # different every time we call show()
-        
+
     def show(self):
         """
         Creates a new dialog using the glade XML file.
@@ -96,7 +96,7 @@ class GladeDialogFactory(object):
             self._dialog = None
         else:
             pass #print("Dialog %s is already destroyed."  % (self.name))
-        
+
     def _on_delete_event(self, *unused_args):
         if not self._terminating:
             self._terminate(False)
@@ -137,7 +137,7 @@ class InvitedDialog(GladeDialogFactory):
     def __init__(self, parent=None):
         widget_name = "invited_dialog"
         GladeDialogFactory.__init__(self, widget_name, parent=parent, modal=True)
-    
+
     def show(self, text):
         """
         @param text: Text to display in the label.
@@ -171,10 +171,10 @@ class ErrorDialog(object):
         #FIXME: error_dialog should be an attribute of this class
         self.deferredResult = deferred
         error_dialog = gtk.MessageDialog(
-            parent=parent, 
-            flags=0, 
-            type=gtk.MESSAGE_ERROR, 
-            buttons=gtk.BUTTONS_CLOSE, 
+            parent=parent,
+            flags=0,
+            type=gtk.MESSAGE_ERROR,
+            buttons=gtk.BUTTONS_CLOSE,
             message_format=message)
         if details is not None:
             error_dialog.vbox.set_spacing(14)
@@ -238,10 +238,10 @@ class YesNoDialog(object):
     def __init__(self, deferred, message, parent=None):
         self.deferredResult = deferred
         yes_no_dialog = gtk.MessageDialog(
-            parent=parent, 
-            flags=0, 
-            type=gtk.MESSAGE_QUESTION, 
-            buttons=gtk.BUTTONS_YES_NO, 
+            parent=parent,
+            flags=0,
+            type=gtk.MESSAGE_QUESTION,
+            buttons=gtk.BUTTONS_YES_NO,
             message_format=message)
         yes_no_dialog.set_modal(True)
         yes_no_dialog.connect("close", self.on_close)
@@ -279,7 +279,7 @@ class YesNoDialog(object):
         self.deferredResult.callback(answer)
 
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     d = ErrorDialog.create('BOBBBBBBBBBB')
     d.addCallback(lambda unused_result: reactor.stop())
     reactor.run()

@@ -1,4 +1,4 @@
-/* The standard CSS for doxygen 
+/* The standard CSS for doxygen
 
 	modified by RossCairns.com
 */
@@ -13,9 +13,9 @@ p, div, dl {
 }
 
 div.contents p {
-	
+
 	font-family:Monaco, courier;
-	
+
 }
 
 /* @group Heading Levels */
@@ -24,7 +24,7 @@ h1 {
 	margin-bottom: 10px;
 	font-size: 30px;
 	padding: 0px 0px 20px 0px ;
-	
+
 	border-bottom:1px dotted #E0E0E0;
 }
 
@@ -220,7 +220,7 @@ p.formulaDsp {
 }
 
 img.formulaDsp {
-	
+
 }
 
 img.formulaInl {
@@ -273,20 +273,20 @@ span.charliteral {
 	color: #008080
 }
 
-span.vhdldigit { 
-	color: #ff00ff 
+span.vhdldigit {
+	color: #ff00ff
 }
 
-span.vhdlchar { 
-	color: #000000 
+span.vhdlchar {
+	color: #000000
 }
 
-span.vhdlkeyword { 
-	color: #700070 
+span.vhdlkeyword {
+	color: #700070
 }
 
-span.vhdllogic { 
-	color: #ff0000 
+span.vhdllogic {
+	color: #ff0000
 }
 
 /* @end */

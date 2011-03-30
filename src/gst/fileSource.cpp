@@ -30,14 +30,14 @@ else create new filesrc and plug into it */
 #include "gstLinkable.h"
 #include "fileSource.h"
 
-// class holds a static map of all the existing instances of FileSources 
+// class holds a static map of all the existing instances of FileSources
 std::map<std::string, FileSource*> FileSource::fileSources_;
 
 FileSource::FileSource(const Pipeline &pipeline, const std::string & location) :
     pipeline_(pipeline),
     filesrc_(pipeline_.makeElement("filesrc", NULL)),
     decodebin_(pipeline_.makeElement("decodebin2", NULL)),
-    videoQueue_(0), 
+    videoQueue_(0),
     audioQueue_(0)
 {
     LOG_DEBUG("Init on filesource for location " << location);
@@ -52,7 +52,7 @@ FileSource::FileSource(const Pipeline &pipeline, const std::string & location) :
 }
 
 
-FileSource::~FileSource() 
+FileSource::~FileSource()
 {
     if (isLinked())
         LOG_WARNING("Deleting FileSource that is still linked");
@@ -62,7 +62,7 @@ FileSource::~FileSource()
 bool FileSource::instanceExists(const std::string &location)
 {
     return fileSources_.find(location) != fileSources_.end();
-}   
+}
 
 /// checks to see if an instance is already available, or creates a new one if needed.
 GstElement * FileSource::acquireAudio(const Pipeline &pipeline, const std::string &location)
@@ -146,7 +146,7 @@ void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, g
         LOG_DEBUG("Got audio pad");
         sinkElement = context->audioQueue_;
     }
-    else 
+    else
     {
         gst_caps_unref(caps);
         gst_object_unref(sinkPad);

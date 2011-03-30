@@ -49,7 +49,7 @@ RtpReceiver::~RtpReceiver()
         assert(iter != depayloaders_.end());
         depayloaders_.erase(iter);
     }
-    
+
     // Now we can unref our request pads
     if (recv_rtp_sink_)
         gst_object_unref(recv_rtp_sink_);
@@ -79,7 +79,7 @@ void RtpReceiver::setCaps(const char *capsStr)
         LOG_DEBUG("Got caps string " << capsStr);
     caps = gst_caps_from_string(capsStr);
     if (caps == 0)
-        THROW_ERROR("Could not generate caps from caps string\n\"" << capsStr << 
+        THROW_ERROR("Could not generate caps from caps string\n\"" << capsStr <<
             "\"\nThere is potentially a Gstreamer version mismatch between "
             "this host and the sender host");
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
@@ -114,7 +114,7 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
         }
         gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
         gst_object_unref(sinkPad);
-    
+
         LOG_INFO("New " << srcMediaType << " stream connected");
     }
 }
@@ -188,7 +188,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     // this is a multicast session
     if (config.hasMulticastInterface())
     {
-        g_object_set(rtp_receiver_, "multicast-group", config.remoteHost(), 
+        g_object_set(rtp_receiver_, "multicast-group", config.remoteHost(),
                 "multicast-iface", config.multicastInterface(), NULL);
         LOG_DEBUG("Using IFACE for multicast" << config.multicastInterface());
     }
@@ -230,12 +230,12 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     gst_object_unref(rtcpSenderSink);
 
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", 
-            G_CALLBACK(RtpReceiver::onPadAdded), 
+    g_signal_connect(rtpbin_, "pad-added",
+            G_CALLBACK(RtpReceiver::onPadAdded),
             NULL);
 
-    g_signal_connect(rtpbin_, "on-sender-timeout", 
-            G_CALLBACK(RtpReceiver::onSenderTimeout), 
+    g_signal_connect(rtpbin_, "on-sender-timeout",
+            G_CALLBACK(RtpReceiver::onSenderTimeout),
             this);
 }
 

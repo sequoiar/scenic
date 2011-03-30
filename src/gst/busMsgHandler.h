@@ -29,8 +29,8 @@ class Pipeline;
 
 #include "noncopyable.h"
 
-/** 
-* Abstract interface which requires its implementors to provide 
+/**
+* Abstract interface which requires its implementors to provide
 * functionality to handle messages posted on the bus. Variation on
 * the Observer and Chain of Responsibility patterns.
 */
@@ -38,12 +38,12 @@ class Pipeline;
 class BusMsgHandler : private boost::noncopyable
 {
     public:
-        /// This method is called by the GstBus listener when it has a new msg. 
+        /// This method is called by the GstBus listener when it has a new msg.
         virtual bool handleBusMsg(_GstMessage *msg) = 0;
-        
-        /** 
+
+        /**
          * Destructor */
-        
+
     protected:
         explicit BusMsgHandler(Pipeline *pipeline);
         BusMsgHandler();
@@ -52,5 +52,5 @@ class BusMsgHandler : private boost::noncopyable
         Pipeline *pipeline_;
 };
 
-#endif // _BUS_MSG_HANDLER_H_ 
+#endif // _BUS_MSG_HANDLER_H_
 

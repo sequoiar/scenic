@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -38,6 +38,6 @@ if __name__ == "__main__":
         sys.path.insert(0, d)
         os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
     from rtpmidi import runner
-    
+
     runner.run(VERSION)
-    
+

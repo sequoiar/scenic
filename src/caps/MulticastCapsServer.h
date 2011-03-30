@@ -10,7 +10,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Scenic is distributed in the hope that it will be useful, 
+ * Scenic is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -36,12 +36,12 @@
 class MulticastCapsServer : public CapsServer
 {
     public:
-        MulticastCapsServer(const std::string& multicast_address, 
+        MulticastCapsServer(const std::string& multicast_address,
                 short multicast_port, const std::string &message);
         ~MulticastCapsServer();
         void handle_send_to(const boost::system::error_code& error);
         void handle_timeout(const boost::system::error_code& error);
-    
+
     private:
         boost::asio::io_service io_service_;
         boost::asio::ip::udp::endpoint endpoint_;

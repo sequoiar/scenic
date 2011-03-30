@@ -1,6 +1,6 @@
 class  Singleton (object):
     instances = {}
-    def __new__(cls, *args, **kargs): 
+    def __new__(cls, *args, **kargs):
         if Singleton.instances.get(cls) is None:
             Singleton.instances[cls] = object.__new__(cls, *args, **kargs)
         return Singleton.instances[cls]
@@ -15,14 +15,14 @@ class TestSingleton(Singleton):
 
 """
 class Singleton:
-       class __OnlyOne: 
-              def __init__(self): 
+       class __OnlyOne:
+              def __init__(self):
                      pass
 
 
-       instance = {} 
-       def __init__(self): 
-              if not self.__class__ in Singleton.instance: 
+       instance = {}
+       def __init__(self):
+              if not self.__class__ in Singleton.instance:
                      Singleton.instance[self.__class__] = Singleton.__OnlyOne()
                      #return True
               else :
@@ -30,10 +30,10 @@ class Singleton:
                      #return False
 
 
-       def __getattr__(self, name): 
+       def __getattr__(self, name):
               return getattr(self.instance[self.__class__], name)
-       
-       
+
+
        def __setattr__(self, name, value):
               return setattr(self.instance[self.__class__], name, value)
 
@@ -52,11 +52,11 @@ class Singleton(object):
 
 class Singleton(object):
     _ref = None
-    
+
     def __new__(cls, *args, **kw):
         if cls._ref is None:
             cls._ref = super(Singleton, cls).__new__(cls, *args, **kw)
-            
+
         return cls._ref
 
 def pitch_cmp(x, y):
@@ -75,8 +75,8 @@ if __name__ == "__main__":
     e = TestSingleton(42)
     e.tt()
     a = TestSingleton(44)
-    
+
     print e.arg
     print e.o
     print a.o
-    
+

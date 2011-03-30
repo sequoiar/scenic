@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -109,12 +109,12 @@ class ConfigStateSaving(object):
         """
         exclude_list = ["_config_path", "_unknown_options"] # some attributes not to save
         data = {
-            "configuration": {}, 
-            "appname": configure.APPNAME, 
+            "configuration": {},
+            "appname": configure.APPNAME,
             "version": configure.VERSION
             }
         log.info("Saving config to %s" % (self._config_path))
-        for key in sorted(self.__dict__.keys()): 
+        for key in sorted(self.__dict__.keys()):
             value = self.__dict__[key]
             if key in exclude_list:
                 pass #print("Excluding attribute %s since it is in the exclude list." % (key))
@@ -147,7 +147,7 @@ class ConfigStateSaving(object):
 
 class AddressBook(object):
     """
-    READING & WRITING ADDRESS BOOK FILE 
+    READING & WRITING ADDRESS BOOK FILE
     """
     def __init__(self):
         self.current_contact_is_new = False
@@ -155,7 +155,7 @@ class AddressBook(object):
         self.selected = 0 # index of the selected contact
         self.file_name = os.path.expanduser("~/.scenic/contacts.json")
         self.load()
-    
+
     def get_currently_selected_contact(self):
         """
         @rtype: dict or None

@@ -36,17 +36,17 @@ void Dv1394::doTimestamp()
     g_object_set(dv1394src_, "do-timestamp", TRUE, NULL);
 }
 
-Dv1394::Dv1394(const Pipeline &pipeline) : 
+Dv1394::Dv1394(const Pipeline &pipeline) :
     pipeline_(pipeline),
-    dv1394src_(pipeline_.makeElement("dv1394src", NULL)), 
-    dvdemux_(pipeline_.makeElement("dvdemux", "demux")), 
-    audioSink_(0), 
-    videoSink_(0) 
+    dv1394src_(pipeline_.makeElement("dv1394src", NULL)),
+    dvdemux_(pipeline_.makeElement("dvdemux", "demux")),
+    audioSink_(0),
+    videoSink_(0)
 {
     if (!Raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
 
-    // setting this to false leads to lower latency and less 
+    // setting this to false leads to lower latency and less
     // speeding-up/slowing-down. also v4l does it. this is
     // referred to as a temporary workaround for this bug:
     // https://bugzilla.gnome.org/show_bug.cgi?id=593910

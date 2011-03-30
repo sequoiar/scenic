@@ -5,11 +5,11 @@ then
     exit 1
 fi
 if [ -f configure ]
-then 
+then
     if [ ! -f config.log ]
     then
         ./configure
     fi
     make distclean
 fi
-autoreconf -iv && ./configure && make && fakeroot make distcheck 
+autoreconf -iv && ./configure && make && fakeroot make distcheck

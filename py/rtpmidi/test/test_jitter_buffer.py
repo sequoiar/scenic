@@ -8,10 +8,10 @@ class TestJitterBuffer(unittest.TestCase):
 
     def setUp(self):
         self.jitter_buffer = JitterBuffer()
-        
+
     def tearDown(self):
         pass
-    
+
     def test_init(self):
         jitter_buffer = JitterBuffer()
         assert(len(jitter_buffer.buffer) == 0), self.fail("Wrong size at initialization")
@@ -22,7 +22,7 @@ class TestJitterBuffer(unittest.TestCase):
                                marker=0, \
                                xhdrtype=None, xhdrdata='')
         time = 0
-        
+
         self.jitter_buffer.add([packet, time])
         assert(len(self.jitter_buffer.buffer) == 1), \
             self.fail("Wrong size afther adding an element")
@@ -33,9 +33,9 @@ class TestJitterBuffer(unittest.TestCase):
                                marker=0, \
                                xhdrtype=None, xhdrdata='')
         time = 2
-        
+
         self.jitter_buffer.add([packet, time])
-        
+
     def test_has_seq(self):
         """Testing seq num existenze in the buffer"""
         #Adding packets
@@ -45,7 +45,7 @@ class TestJitterBuffer(unittest.TestCase):
         time = 0
         self.jitter_buffer.add([packet, time])
 
-        
+
         packet = RTPPacket(0, 43, 0, "", 0, \
                                marker=0, \
                                xhdrtype=None, xhdrdata='')
@@ -70,19 +70,19 @@ class TestJitterBuffer(unittest.TestCase):
         time = 0
         self.jitter_buffer.add([packet, time])
 
-        
+
         packet = RTPPacket(0, 43, 0, "", 0, \
                                marker=0, \
                                xhdrtype=None, xhdrdata='')
         time = 5
         self.jitter_buffer.add([packet, time])
-        
+
         packet = RTPPacket(0, 45, 0, "", 0, \
                                marker=0, \
                                xhdrtype=None, xhdrdata='')
         time = 8
         self.jitter_buffer.add([packet, time])
-        
+
         packet = RTPPacket(0, 44, 0, "", 0, \
                                marker=0, \
                                xhdrtype=None, xhdrdata='')
@@ -95,5 +95,5 @@ class TestJitterBuffer(unittest.TestCase):
         for i in range(len(res)):
             assert(res[i].header.seq==42+i), self.fail("Wrong seq num returned")
 
-    
+
         assert(len(self.jitter_buffer.buffer)==0), self.fail("Packets have not been erase from jitter buffer")

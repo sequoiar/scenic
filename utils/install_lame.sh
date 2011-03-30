@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script will (try to) download proper version of liblame for 
+# This script will (try to) download proper version of liblame for
 # milhouse installation on Debian
 #
 

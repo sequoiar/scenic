@@ -62,7 +62,7 @@ style "clearlooks-default"
 	text[SELECTED]    = @selected_fg_color
 	text[INSENSITIVE] = darker (@bg_color)
 
-	engine "clearlooks" 
+	engine "clearlooks"
 	{
 		colorize_scrollbar = FALSE
 		reliefstyle        = 1
@@ -123,7 +123,7 @@ style "clearlooks-menu"
 	bg[NORMAL] = shade (1.08, @bg_color)
 
 	# Radius of the menu items (inside menus)
-	engine "clearlooks" 
+	engine "clearlooks"
 	{
 		radius = 0.0
 	}
@@ -296,7 +296,7 @@ style "clearlooks-nautilus-location"
 class "GtkWidget"    style "clearlooks-default"
 
 # Increase the x/ythickness in some widgets
-class "GtkToolbar"   style "clearlooks-default" 
+class "GtkToolbar"   style "clearlooks-default"
 class "GtkRange"     style "clearlooks-wide"
 class "GtkFrame"     style "clearlooks-wide"
 class "GtkSeparator" style "clearlooks-wide"

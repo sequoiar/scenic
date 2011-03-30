@@ -46,7 +46,7 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
     int port = options["videoport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
-    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, 
+    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec,
                 remoteHost, port, multicastInterface));
 
     return shared_ptr<VideoReceiver>(new VideoReceiver(pipeline, vConfig, rConfig));
@@ -64,7 +64,7 @@ shared_ptr<VideoSender> videofactory::buildVideoSender(Pipeline &pipeline, const
     int port = options["videoport"].as<int>();
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
-    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface)); 
+    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface));
     shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, rConfig));
 
     return tx;

@@ -53,7 +53,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
   GstRTSPServer *server;
   GstRTSPMediaMapping *mapping;
   GstRTSPCamMediaFactory *factory;
-  GstRTSPUrl *local_url; 
+  GstRTSPUrl *local_url;
   string urlStr("rtsp://");
   string remoteHost(options["address"].as<string>());
   // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
@@ -100,7 +100,7 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
 
   gst_rtsp_server_attach (server, NULL);
 
-  g_timeout_add_seconds (5, (GSourceFunc) timeout, server); 
+  g_timeout_add_seconds (5, (GSourceFunc) timeout, server);
 }
 
 void RTSPServer::run(int timeout)

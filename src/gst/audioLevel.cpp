@@ -32,9 +32,9 @@
 #include <iterator>
 
 
-/** Constructor sets by default emitMessages to true 
+/** Constructor sets by default emitMessages to true
  * and message interval to one second */
-AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID) : 
+AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID) :
     BusMsgHandler(&pipeline),
     level_(pipeline.makeElement("level", NULL)),
     emitMessages_(true)
@@ -47,8 +47,8 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     for (int i = 0; i < numChannels; ++i)
     {
         vumeters_.push_back(gtk_vumeter_new());
-        gtk_table_attach(GTK_TABLE(table), vumeters_[i], i, i + 1, 0, 1, 
-                static_cast<GtkAttachOptions>(GTK_SHRINK | GTK_FILL), 
+        gtk_table_attach(GTK_TABLE(table), vumeters_[i], i, i + 1, 0, 1,
+                static_cast<GtkAttachOptions>(GTK_SHRINK | GTK_FILL),
                 static_cast<GtkAttachOptions>(GTK_EXPAND | GTK_FILL), 0, 0);
         GtkWidget *label = gtk_label_new(0);
         char *markup;
@@ -123,8 +123,8 @@ void AudioLevel::setValue(gdouble peak, gdouble decayPeak, GtkWidget *vumeter)
     gdk_region_destroy (region);
 }
 
-/** 
- * The level message is posted on the bus by the level element, 
+/**
+ * The level message is posted on the bus by the level element,
  * received by this AudioLevel, and dispatched. */
 bool AudioLevel::handleBusMsg(GstMessage *msg)
 {
@@ -161,7 +161,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
 }
 
 
-/// Prints current rms values through the LogWriter system. 
+/// Prints current rms values through the LogWriter system.
 void AudioLevel::print(const std::vector<double> &rmsValues) const
 {
     std::ostringstream os;

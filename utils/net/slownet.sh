@@ -2,7 +2,7 @@
 # run this script as root to create 150ms delay conditions between this host's ip and DESTHOST, defaults
 # to 150 000 usecs
 #
-usage () 
+usage ()
 {
     echo "Usage: sudo $(basename $0) <INTERFACE> <DEST_HOST> [DELAY_USEC]"
 }

@@ -41,7 +41,7 @@ class RtpPay : private boost::noncopyable
 class Pay : public RtpPay
 {
     protected:
-        // Use max-ptime to limit the amount of 
+        // Use max-ptime to limit the amount of
         // encoded media packets in an RTP packet. Reduces latency
         static const long long MAX_PTIME = 2000000LL;
 };
@@ -114,7 +114,7 @@ class VorbisPay : public Pay
         explicit VorbisPay(const Pipeline &pipeline);
 };
 
-class VorbisDepay : public Depay 
+class VorbisDepay : public Depay
 {
     public:
         explicit VorbisDepay(const Pipeline &pipeline);
@@ -126,7 +126,7 @@ class CeltPay : public Pay
         explicit CeltPay(const Pipeline &pipeline);
 };
 
-class CeltDepay : public Depay 
+class CeltDepay : public Depay
 {
     public:
         explicit CeltDepay(const Pipeline &pipeline);
@@ -138,7 +138,7 @@ class L16Pay : public Pay
         explicit L16Pay(const Pipeline &pipeline);
 };
 
-class L16Depay : public Depay 
+class L16Depay : public Depay
 {
     public:
         explicit L16Depay(const Pipeline &pipeline);

@@ -9,7 +9,7 @@ class TestMidiCommand(unittest.TestCase):
 
     def tearDown(self):
         del self.midi_command
-    
+
     def test_header(self):
         """Testing header for MIDICommand"""
         marker_b, recovery, timestamp, phantom, length = 0, 0, 0, 0, 10
@@ -17,7 +17,7 @@ class TestMidiCommand(unittest.TestCase):
 
         assert(type(res)==str), self.fail("Wrong type returned")
         assert(len(res)==1), self.fail("Wrong size returned")
-        
+
 
     def test_parse_header(self):
         """Testing parse header for MIDICommand"""
@@ -32,7 +32,7 @@ class TestMidiCommand(unittest.TestCase):
         assert(length==10), self.fail("Wrong value returned for length")
 
     def test_encode_midi_commands(self):
-        
+
         plist = [[[192, 120, 100],1069],[[144, 104, 50],1030],
                  [[145, 110, 0],10], [[145, 112, 0],1044],
                  [[144, 124, 50],19],[[145, 114, 0],8],
@@ -63,10 +63,10 @@ class TestMidiCommand(unittest.TestCase):
         res, nb_notes = self.midi_command.encode_midi_commands(plist)
 
         midi_cmd = self.midi_command.decode_midi_commands(res, nb_notes)
-         
+
         assert(len(plist)==len(midi_cmd)), \
             self.fail("list haven't got the same size")
-         
+
         for i in range(len(midi_cmd)):
             if midi_cmd[i][0][0] != plist[i][0][0]:
                 self.fail("Problem with event encoding")
@@ -97,13 +97,13 @@ class TestSafeKeyboard(unittest.TestCase):
 
               #Test with only one flow
               res = self.key_safe.check(plist)
-              
+
               #Verify that all note are of afther the pass (nb off == nb on)
               for i in range(len(self.key_safe.keyboard)):
                      assert(self.key_safe.keyboard[0][i] == False), \
                          self.fail("Note history is not respected")
 
-              
+
               #Checking alternate
               for i in range(len(res)):
                      if i % 2 == 0:
@@ -120,10 +120,10 @@ class TestSafeKeyboard(unittest.TestCase):
                        [[144, 120, 100],1069], [[144, 110, 100], 1069]]
 
               note_list = []
-              for i in range(16):         
+              for i in range(16):
                      for j in range(len(plist)):
-                            note_list.append([[plist[j][0][0] + i, 
-                                               plist[j][0][1], plist[j][0][2]], 
+                            note_list.append([[plist[j][0][0] + i,
+                                               plist[j][0][1], plist[j][0][2]],
                                               plist[j][1]])
 
               res = self.key_safe.check(note_list)
@@ -134,7 +134,7 @@ class TestSafeKeyboard(unittest.TestCase):
               for i in range(16):
                      note_list =  [False for i in range(127)]
                      keyboard.append(note_list)
-              
+
 
               for i in range(len(res)):
                      #Note on
@@ -154,5 +154,5 @@ class TestSafeKeyboard(unittest.TestCase):
                                    keyboard[chan][pitch] = False
                             else:
                                    self.fail("Problem of alternation")
-                     
+
 

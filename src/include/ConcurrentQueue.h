@@ -1,6 +1,6 @@
 // Written by Anthony Williams, 2008
 // Public domain based on his comment:
-// "Yes, you can just copy the code presented here and use it for whatever you 
+// "Yes, you can just copy the code presented here and use it for whatever you
 // like. There won't be any licensing issues. I'm glad you find it helpful."
 // Reference:
 // http://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html

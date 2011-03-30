@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Miville
@@ -53,7 +53,7 @@ class Test_01_Ports_Allocator(unittest.TestCase):
             pass
         else:
             self.fail("Trying to free value %d should have raised an error." % (100))
-            
+
     def test_02_add_many(self):
         a = PortsAllocator(minimum=22000, increment=2, maximum=22010)
         values = a.allocate_many(6)
@@ -70,11 +70,11 @@ class Test_01_Ports_Allocator(unittest.TestCase):
     def test_03_allocate_busy_port(self):
         # let's use a port
         PORT = 31000
-        listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # SOCK_DGRAM ? 
+        listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # SOCK_DGRAM ?
         listener.bind(("localhost", PORT)) # socket.gethostname()
-        
+
         a = PortsAllocator(minimum=PORT, increment=2, maximum=PORT + 100)
         num = a.allocate()
-        self._tst(PORT + 2, num) 
+        self._tst(PORT + 2, num)
         # that should have worked
         listener.close()

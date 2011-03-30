@@ -23,7 +23,7 @@
 #ifndef _GST_LINKABLE_H_
 #define _GST_LINKABLE_H_
 
-#include <vector> 
+#include <vector>
 #include <gst/gst.h>
 #include "except.h"
 #include "util/logWriter.h"
@@ -37,7 +37,7 @@ namespace gstlinkable
     {
         public:
             LinkExcept(const char* log_msg) : Except(log_msg)
-        { 
+        {
             log_ = WARNING;
         }
     };
@@ -50,7 +50,7 @@ namespace gstlinkable
             std::string msg("Failed to link ");
             msg += GST_ELEMENT_NAME(src);
             msg += " to ";
-            msg += GST_ELEMENT_NAME(sink); 
+            msg += GST_ELEMENT_NAME(sink);
             throw LinkExcept(msg.c_str());
         }
     }

@@ -9,9 +9,9 @@ class FakeRTP(object):
     def __init__(self):
         self.last_sent_time = 0
         self.ssrc = 0
-        self.rtp_ts = 143 
-        self.total_packets = 100 
-        self.total_bytes = 800 
+        self.rtp_ts = 143
+        self.total_packets = 100
+        self.total_bytes = 800
         self.session_bw = 1024
 
 class TestRTCPProtocol(unittest.TestCase):
@@ -103,7 +103,7 @@ class TestRTCPProtocol(unittest.TestCase):
 
         res = self.rtcp.send_SDES()
         #print res
-         
+
         #Testing res
 
 
@@ -130,7 +130,7 @@ class TestRTCPProtocol(unittest.TestCase):
         #Testing res
         assert(len(self.rtcp.members_table)==1), \
             self.fail("Problem deleting members after SSRC timeout")
-        
+
         for ssrc in self.rtcp.members_table:
             assert(ssrc==424242), \
                 self.fail("Wrong member erase after SSRC timeout")
@@ -168,14 +168,14 @@ class TestRTCPProtocol(unittest.TestCase):
         self.rtcp.check_ssrc(ssrc, ("192.168.0.1", 44001), "SR", "bonjour")
         self.rtcp.check_ssrc(ssrc, ("192.168.0.1", 44000), "DATA", "bonjour")
 
-        
+
         self.rtcp.check_ssrc(ssrc, ("192.168.0.2", 44000), "SDES", "coucou")
         #Test nb_collision var
 
         self.rtcp.check_ssrc(ssrc, ("192.168.0.2", 44000), "DATA", "coucou")
         #Test nb_loop var
 
-         
+
     def test_check_ssrc_3(self):
         #Use cases:
         #conflicting addr
@@ -214,7 +214,7 @@ class TestRTCPProtocol(unittest.TestCase):
         bytes = packet_to_test.encode()
         res = self.rtcp.checksum(bytes)
         assert(res==1), self.fail("Wrong checksum for BYE packet")
-        
+
 
         arg_list = (self.rtcp.rtp.ssrc, self.rtcp.rtp.rtp_ts, \
                 self.rtcp.rtp.total_packets, \

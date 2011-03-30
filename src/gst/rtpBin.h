@@ -55,13 +55,13 @@ class RtpBin : private boost::noncopyable
         std::string sessionName_;
         static std::map<int, RtpBin*> sessions_;
         virtual void subParseSourceStats(_GstStructure *stats) = 0;
-        void printStatsVal(const std::string &idStr, const char *key, const std::string &type, 
+        void printStatsVal(const std::string &idStr, const char *key, const std::string &type,
                 const std::string &formatStr, _GstStructure *stats);
         bool printStats_;
         static int createSinkSocket(const char *hostname, int port);
         static int createSourceSocket(int port);
         void startPrintStatsCallback();
-    
+
     private:
         static const int REPORTING_PERIOD_MS = 1000;
         static int printStatsCallback(void * rtpbin);

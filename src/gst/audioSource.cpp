@@ -31,19 +31,19 @@
 
 #include <iostream>
 
-/// Constructor 
+/// Constructor
 AudioSource::AudioSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
     pipeline_(pipeline),
     config_(config),
     source_(0)
 {}
 
-/// Destructor 
+/// Destructor
 AudioSource::~AudioSource()
 {
 }
 
-/// Constructor 
+/// Constructor
 AudioTestSource::AudioTestSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
 AudioSource(pipeline, config),
 capsfilter_(pipeline_.makeElement("capsfilter", 0))
@@ -69,8 +69,8 @@ GstElement *AudioTestSource::srcElement()
 
 const int AudioFileSource::LOOP_INFINITE = -1;
 
-/// Constructor 
-AudioFileSource::AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config) : 
+/// Constructor
+AudioFileSource::AudioFileSource(Pipeline &pipeline, const AudioSourceConfig &config) :
     AudioSource(pipeline, config), BusMsgHandler(&pipeline), audioconvert_(0), loopCount_(0)
 {
     if (not config_.locationExists())
@@ -90,7 +90,7 @@ void AudioFileSource::loop(int nTimes)
     loopCount_ = nTimes;
 }
 
-/// Handles EOS signal from bus, which may mean repeating playback of the file 
+/// Handles EOS signal from bus, which may mean repeating playback of the file
 bool AudioFileSource::handleBusMsg(_GstMessage *msg)
 {
     if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
@@ -117,15 +117,15 @@ void AudioFileSource::restartPlayback()
 }
 
 
-/// Destructor 
+/// Destructor
 AudioFileSource::~AudioFileSource()
 {
     FileSource::releaseAudio(config_.location());
 }
 
 
-/// Constructor 
-AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
+/// Constructor
+AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
     AudioSource(pipeline, config),
     capsfilter_(pipeline_.makeElement("capsfilter", 0)),
     audioconvert_(pipeline_.makeElement("audioconvert", 0))
@@ -140,9 +140,9 @@ AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConf
     gstlinkable::link(audioconvert_, capsfilter_);
 }
 
-/// Constructor 
-AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
-    AudioSource(pipeline, config), 
+/// Constructor
+AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
+    AudioSource(pipeline, config),
     capsfilter_(pipeline_.makeElement("capsfilter", 0)),
     audioconvert_(pipeline_.makeElement("audioconvert", 0))
 {
@@ -155,7 +155,7 @@ AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceCo
     gstlinkable::link(audioconvert_, capsfilter_);
 }
 
-/// Constructor 
+/// Constructor
 AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
     AudioSource(pipeline, config),
     capsfilter_(pipeline_.makeElement("capsfilter", 0)),
@@ -193,9 +193,9 @@ void AudioJackSource::disableAutoConnect()
 }
 
 
-/// Constructor 
-AudioDvSource::AudioDvSource(const Pipeline &pipeline, const AudioSourceConfig &config) : 
-    AudioSource(pipeline, config), 
+/// Constructor
+AudioDvSource::AudioDvSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
+    AudioSource(pipeline, config),
     queue_(0),
     audioconvert_(0)
 {
@@ -208,7 +208,7 @@ AudioDvSource::AudioDvSource(const Pipeline &pipeline, const AudioSourceConfig &
 }
 
 
-/// Destructor 
+/// Destructor
 AudioDvSource::~AudioDvSource()
 {
     Dv1394::Instance(pipeline_)->unsetAudioSink();

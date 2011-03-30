@@ -35,7 +35,7 @@ class RTPControl(Singleton):
         #Creating RTP
         self._create_rtp_socket(cookie, session)
         return cookie
-        
+
     def del_session(self, cookie):
         rtp, o = self.currentRecordings[cookie]
         rtp.stopSendingAndReceiving()
@@ -53,7 +53,7 @@ class RTPControl(Singleton):
     def _create_rtp_socket(self, cookie, session):
 
         #Init RTPProtocol
-        rtp = RTPProtocol(self, cookie, session.payload, 
+        rtp = RTPProtocol(self, cookie, session.payload,
                           session.jitter_buffer_size, verbose=session.verbose)
 
         #Creating socket
@@ -72,25 +72,25 @@ class RTPControl(Singleton):
 
     def incoming_rtp(self, cookie, timestamp, packet,
                      read_recovery_journal = 0):
-        """Function called by RTPProtocol when incoming 
+        """Function called by RTPProtocol when incoming
         data coming out from jitter buffer
         """
         rtp, session = self.currentRecordings[cookie]
         session.incoming_rtp(cookie, timestamp, packet,
                              read_recovery_journal)
 
-	
+
     def send_empty_packet(self, cookie, chunk):
-        #Selecting RTP session 
+        #Selecting RTP session
         rtp, session = self.currentRecordings[cookie]
 
         #sending silent packet with recovery journal
         rtp.handle_data(session.payload, 0 , chunk, 1)
         self.last_send = time.time()
 
-            
+
     def send_data_packet(self, cookie, data, ts):
-        #Selecting RTP session 
+        #Selecting RTP session
         rtp, session = self.currentRecordings[cookie]
         rtp.handle_data(session.payload, ts , data, 0)
         self.last_send = time.time()
@@ -113,10 +113,10 @@ class RTPControl(Singleton):
         pass
 
     def drop_connection(self, cookie):
-        #Selecting RTP session 
+        #Selecting RTP session
         rtp, session = self.currentRecordings[cookie]
         session.drop_connection()
-        
+
 
     def get_session(self, cookie):
         rtp, session = self.currentRecordings[cookie]
@@ -126,5 +126,5 @@ class RTPControl(Singleton):
         self.cookies += 1
         return "cookie%s" % (self.cookies,)
 
-    
+
 

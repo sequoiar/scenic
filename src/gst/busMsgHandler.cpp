@@ -27,8 +27,8 @@
 #include "pipeline.h"
 
 
-/** 
-* Abstract interface which requires its implementors to provide 
+/**
+* Abstract interface which requires its implementors to provide
 * functionality to handle messages posted on the bus. Variation on
 * the Observer and Chain of Responsibility patterns.
 */
@@ -48,11 +48,11 @@ void BusMsgHandler::setPipeline(Pipeline *pipeline)
         pipeline_ = pipeline;
         pipeline_->subscribe(this);
     }
-    else 
+    else
         LOG_WARNING("Pipeline has already been initialized");
 }
 
-BusMsgHandler::~BusMsgHandler() 
+BusMsgHandler::~BusMsgHandler()
 {
     // FIXME: not clean, but at least this way if we go down out of order due to siginit
     // we don't recreate the pipeline just to remove ourselves

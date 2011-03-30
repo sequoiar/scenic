@@ -7,8 +7,8 @@ Created: August 28, 2008
 Purpose: A signal/slot implementation
 Source: http://code.activestate.com/recipes/576477/
 
-A Signal calls all the callbacks registered in its slots whenever it state 
-changes. 
+A Signal calls all the callbacks registered in its slots whenever it state
+changes.
 """
 
 from weakref import WeakValueDictionary
@@ -81,6 +81,6 @@ if __name__ == "__main__":
     model.changed.clear() # remove all listeners
     model.set_value(40)
 
-    # To disconnect : 
+    # To disconnect :
     # model.changed.disconnect(view1.model_changed)
 

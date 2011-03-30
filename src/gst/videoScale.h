@@ -30,7 +30,7 @@
 class Pipeline;
 class _GstElement;
 
-/** 
+/**
  *  A filter that scales video to a specified resolution.
  */
 

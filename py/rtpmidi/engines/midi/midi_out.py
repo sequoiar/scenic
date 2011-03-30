@@ -33,7 +33,7 @@ OUTPUT = 1
 VERBOSE = 0
 
 class MidiOut(object):
-    
+
     def __init__(self, permissif, latency, safe_keyboard=0, verbose=0):
         if verbose:
             global VERBOSE
@@ -107,16 +107,16 @@ class MidiOut(object):
         """
         self.publish_flag = False
         if not self.midi_out is None:
-            #Why a midi problem with send note_off 
+            #Why a midi problem with send note_off
             #(only when closing app ) <- patch it silly man !
             self.send_note_off()
-        
+
     def set_init_time(self):
         """Sync set the difference between local midi time and
         remote midi time in order to apply it to the notes
         """
         self.init_time = pypm.Time()
-    
+
     def get_devices(self):
         """list and set midi device
         """
@@ -134,13 +134,13 @@ class MidiOut(object):
         """
         #check if device exist
         dev_list = [self.midi_device_list[i][0]
-        for i in range(len(self.midi_device_list))]    
+        for i in range(len(self.midi_device_list))]
 
         if device in dev_list :
             self.midi_device = device
 
             if self.midi_out is not None :
-                del self.midi_out # delete old midi device if present 
+                del self.midi_out # delete old midi device if present
             # Initializing midi input stream
             self.midi_out = pypm.Output(self.midi_device, 0)
             if VERBOSE:
@@ -153,54 +153,54 @@ class MidiOut(object):
             print dev_list
         return False
 
-        
+
     def get_device_info(self):
         """print info of the current device
         """
         res  = pypm.GetDeviceInfo(self.midi_device)
         return res
-    
+
 
     def send_note_off(self):
         """send Note Off all pitches and all channels
-        """    
+        """
         midi_time = pypm.Time()
         #127 note off and 16 channels
-        #TODO check problem: portMidi found host error (link to zynadd?) 
+        #TODO check problem: portMidi found host error (link to zynadd?)
         for i in range(NUM_MIDI_CHANS):
             for j in range(MIDI_MAX):
                 self.midi_out.Write([[[NOTE_OFF + i,j,0],0]])
-        
-#Permisive Mode => joue toutes les notes meme si en retard de qq 
-#milisecond en affichant 
+
+#Permisive Mode => joue toutes les notes meme si en retard de qq
+#milisecond en affichant
 #un erreur style xrun dans le fichier de log
 
     def play_midi_note(self):
         """PlayMidi Note
-           Separate midi infos to choose the good function for 
+           Separate midi infos to choose the good function for
            the good action
         """
         #getting time
         midi_time = pypm.Time()
 
         #getting notes
-        midi_notes = self.playing_buffer.get_data(midi_time - self.latency, 
+        midi_notes = self.playing_buffer.get_data(midi_time - self.latency,
                           self.tolerance)
 
         self.nb_notes += len(midi_notes)
 
         if self.safe_k:
             midi_notes = self.safe_keyboard.check(midi_notes)
-        
+
             if self.permissif :
-                #Building list of lates notes in order to log it    
+                #Building list of lates notes in order to log it
                 new_list = [midi_notes[i][1]
                 for i in range(len(midi_notes))
                 if (midi_time > (midi_notes[i][1] + self.latency))]
 
                 if (len(new_list) > 0) :
                     self.nb_xrun += 1
-        
+
             if VERBOSE:
                 line = "OUTPUT: time=" + str(midi_time)
                 line += "ms  can't play in time , "
@@ -211,15 +211,15 @@ class MidiOut(object):
                 print line
 
             note_filtered = midi_notes
-    
+
         else:
         # filter note off program change for notes that are late
         # if mode non permissif is on skip late notes except
         # note off, notes with velocitiy 0 or program change
             note_filtered = [midi_notes[i] for i in range(len(midi_notes))
             if midi_notes[i][1] + self.latency >= midi_time
-            or ( midi_notes[i][0][0] == PROGRAM_CHANGE 
-                 or midi_notes[i][0][2] == 0 
+            or ( midi_notes[i][0][0] == PROGRAM_CHANGE
+                 or midi_notes[i][0][2] == 0
                  or midi_notes[i][0][0] == NOTE_OFF)]
 
             if (len(note_filtered) < len(midi_notes)):
@@ -231,7 +231,7 @@ class MidiOut(object):
                     calc = ( midi_time - ( self.latency + midi_notes[0][1] ))
                     line += str(calc) + " ms"
                     print line
-    
+
         #Playing note on the midi device
         self.midi_out.Write(midi_notes)
 
@@ -239,7 +239,7 @@ class MidiOut(object):
         """Polling function for midi out"""
         def_p = defer.Deferred()
     # put in local scope to improve performance
-        midi_cmd_list = self.midi_cmd_list 
+        midi_cmd_list = self.midi_cmd_list
         play_midi_note = self.play_midi_note
 
         while self.publish_flag :
@@ -257,11 +257,11 @@ class MidiOut(object):
             if self.playing_buffer.len() > 0:
                 current_time = pypm.Time()
                 #if the first is in time
-                #12 correspond to the polling interval on the 
-                #test machine and the jitter of thread 
-                #switching ( to test on others computers with 
+                #12 correspond to the polling interval on the
+                #test machine and the jitter of thread
+                #switching ( to test on others computers with
                 #diff set up)
-                #The problem is that scheduler taking time to 
+                #The problem is that scheduler taking time to
                 #switch between process
                 if ((self.playing_buffer.buffer[0][1] + self.latency - self.tolerance) <= current_time):
                     reactor.callInThread(play_midi_note)
@@ -269,10 +269,10 @@ class MidiOut(object):
 
             # don't hog the cpu
             time.sleep(0.001)
-    
+
 
         return def_p
 
-            
+
     def __del__(self):
             self.terminate = 1

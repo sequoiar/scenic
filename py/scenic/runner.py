@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -59,29 +59,29 @@ def moo():
     This image is:
     Copyright (C) 2003, Vijay Kumar
     Permission is granted to copy, distribute and/or modify this image under the terms either:
-    
+
     * the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version, or
     * the GNU Free Documentation License, Version 1.1 or any later version published by the Free Software Foundation; with the no Invariant Sections, with no Front-Cover Texts and with no Back-Cover Texts.
     """
     print("""
-    _-`````-,           ,- '- .    
-  .'   .- - |          | - .   `.  
- /.'  /                     `.   \ 
+    _-`````-,           ,- '- .
+  .'   .- - |          | - .   `.
+ /.'  /                     `.   \
 :/   :      _...   ..._      ``   :
 ::   :     /._ .`:'_.._\.    ||   :
 ::    `._ ./  ,`  :    \ . _.''   .
-`:.      |   |  -.  \-. \|_       / 
-  \:._ _/  ..'  .@)  \@) ` `\ ,.'  
-     _/,--'       .- .\,-.`--`.    
-       ,'/''     (( \ `  )     
-        /'/'  \    `-'  (      
-         '/''  `._,-----'      
-          ''/'    .,---'       
-           ''/'      ;:            
-             ''/''  ''/        
-               ''/''/''        
-                 '/'/'         
-                  `;               
+`:.      |   |  -.  \-. \|_       /
+  \:._ _/  ..'  .@)  \@) ` `\ ,.'
+     _/,--'       .- .\,-.`--`.
+       ,'/''     (( \ `  )
+        /'/'  \    `-'  (
+         '/''  `._,-----'
+          ''/'    .,---'
+           ''/'      ;:
+             ''/''  ''/
+               ''/''/''
+                 '/'/'
+                  `;
     """)
 
 def run():
@@ -89,7 +89,7 @@ def run():
     Main function of the application
     """
     from scenic import configure
-    
+
     # command line parsing
     parser = OptionParser(usage="%prog", version=str(configure.VERSION), description=configure.DESCRIPTION)
     parser.add_option("-k", "--kiosk", action="store_true", help="Run in kiosk mode")
@@ -101,7 +101,7 @@ def run():
     parser.add_option("-d", "--debug", action="store_true", help="Enables a very verbose logging output with debug level messages. Also add a debug tab in the user interface.")
     parser.add_option("-M", "--moo", action="store_true", help="There is no easter egg in this program")
     (options, args) = parser.parse_args()
-    
+
     if not os.environ.has_key('DISPLAY'):
         print "You need an X11 display to run Scenic."
         sys.exit(1)
@@ -116,10 +116,10 @@ def run():
     else:
         start_logging_to_stdout(level)
     log_file_name = None
-    
+
     from scenic import process
     process.save_environment_variables(os.environ)
-    
+
     if not os.environ.has_key('GTK2_RC_FILES'): # FIXME: is this check needed and desired?
         name = "Darklooks"
         file_name = os.path.join(os.path.join(configure.THEMES_DIR, name, "gtkrc"))
@@ -133,7 +133,7 @@ def run():
     from twisted.internet import error
     from scenic import application
     import gtk
-    
+
     try:
         gtk.gdk.Display(os.environ["DISPLAY"])
     except RuntimeError, e:
@@ -141,15 +141,15 @@ def run():
         log.error(msg)
         print msg
         sys.exit(1)
-        
+
     enable_v4l2_state_saving_restoration = True
     if options.moo:
         moo()
         sys.exit(0)
-    
+
     if options.disable_v4l2_settings_restoration:
         enable_v4l2_state_saving_restoration = False
-    
+
     try:
         app = application.Application(kiosk_mode=options.kiosk, fullscreen=options.fullscreen, enable_debug=options.debug, force_previous_device_settings=enable_v4l2_state_saving_restoration, log_file_name=log_file_name)
         app.start()

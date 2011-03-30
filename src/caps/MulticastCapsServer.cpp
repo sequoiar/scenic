@@ -10,7 +10,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Scenic is distributed in the hope that it will be useful, 
+ * Scenic is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -34,13 +34,13 @@
 #include <boost/lexical_cast.hpp>
 #include "util/sigint.h"
 
-MulticastCapsServer::MulticastCapsServer(const std::string &multicast_address, 
+MulticastCapsServer::MulticastCapsServer(const std::string &multicast_address,
         short multicast_port,
-        const std::string &message) : 
+        const std::string &message) :
     io_service_(),
     endpoint_(boost::asio::ip::address::from_string(multicast_address), multicast_port),
     socket_(io_service_, endpoint_.protocol()),
-    timer_(io_service_), 
+    timer_(io_service_),
     message_(message + std::string(" BYTES SENT: ") + boost::lexical_cast<std::string>(message.length())),
     serverThread_(boost::bind(&boost::asio::io_service::run, &io_service_)),
     done_(false)

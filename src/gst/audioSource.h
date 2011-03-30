@@ -34,7 +34,7 @@ class Pipeline;
 class _GstElement;
 class _GstMessage;
 
-/** 
+/**
  *  Abstract base class from which our audio sources are derived.
  *  Uses template method to define the initialization process that subclasses will have to
  *  implement (in part) and/or override.
@@ -48,15 +48,15 @@ class AudioSource : private boost::noncopyable
 
     protected:
         AudioSource(const Pipeline &pipeline, const AudioSourceConfig &config);
-        
+
         const Pipeline &pipeline_;
-        /// Audio parameter object 
+        /// Audio parameter object
         const AudioSourceConfig &config_;
-        
+
         _GstElement *source_;
 };
 
-/** 
+/**
  *  Concrete AudioSource which gives us an array of sine-wave generating sources.
  *
  *  AudioTestSource generates sine-tones
@@ -71,9 +71,9 @@ class AudioTestSource : public AudioSource
         _GstElement *srcElement();
 };
 
-/** 
+/**
  *  \class AudioFileSource
- *  Concrete AudioSource which provides playback of files. 
+ *  Concrete AudioSource which provides playback of files.
  *
  *  AudioFileSource plays back a file (determined by its AudioSourceConfig object). Depending
  *  on its AudioSourceConfig object, it may loop the file. It implements the BusMsgHandler interface
@@ -101,7 +101,7 @@ class AudioFileSource : public AudioSource, private BusMsgHandler
         static const int LOOP_INFINITE;
 };
 
-/** 
+/**
  *  Concrete AudioSource which captures audio from ALSA
  *  Has caps filter to allow number of channels to be variable.
  */
@@ -118,7 +118,7 @@ class AudioAlsaSource : public AudioSource
         _GstElement *audioconvert_;
 };
 
-/** 
+/**
  *  Concrete AudioSource which captures audio from PulseAudio
  *  Has caps filter to allow number of channels to be variable.
  */
@@ -134,8 +134,8 @@ class AudioPulseSource : public AudioSource
         _GstElement *audioconvert_;
 };
 
-/** 
- *  Concrete AudioSource which captures audio from JACK, 
+/**
+ *  Concrete AudioSource which captures audio from JACK,
  *  and interleaves incoming jack buffers into one multichannel stream.
  */
 
@@ -153,11 +153,11 @@ class AudioJackSource : public AudioSource
 };
 
 
-/** 
+/**
  *  Concrete AudioSource which captures audio from dv device.
  *
- *  This object is tightly coupled with VideoDvSource, as both (if present) will share one source_ GstElement, 
- *  and one dvdemux GstElement. It will look for both of these in the pipeline before trying to instantiate them. 
+ *  This object is tightly coupled with VideoDvSource, as both (if present) will share one source_ GstElement,
+ *  and one dvdemux GstElement. It will look for both of these in the pipeline before trying to instantiate them.
  *  If these GstElement are already present, AudioDvSource will simply store their addresses and link to them, if not
  *  it will create them. DVAudio can only be stereo or 4 channels according to gstreamer.
  */

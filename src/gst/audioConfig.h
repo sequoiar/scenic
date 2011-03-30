@@ -41,14 +41,14 @@ namespace boost
     }
 }
 
-/// Immutable class that is used to parameterize AudioSender objects. 
+/// Immutable class that is used to parameterize AudioSender objects.
 class AudioSourceConfig
 {
     public:
-        
+
         AudioSourceConfig(const boost::program_options::variables_map &options);
         static int maxChannels(const std::string &codec);
-        
+
         const char *source() const;
 
         int numChannels() const;
@@ -62,12 +62,12 @@ class AudioSourceConfig
         const char *location() const;
 
         bool locationExists() const;
-         
+
         AudioSource* createSource(Pipeline &pipeline) const;
         AudioLevel* createLevel(Pipeline &pipeline) const;
         unsigned long long bufferTime() const;
         std::string sourceString() const { return source_; }
-        const char* sourceName() const; 
+        const char* sourceName() const;
 
     private:
         const std::string source_;
@@ -82,12 +82,12 @@ class AudioSourceConfig
         const bool disableAutoConnect_;
 };
 
-///  Immutable class that is used to parametrize AudioReceiver objects.  
+///  Immutable class that is used to parametrize AudioReceiver objects.
 class AudioSinkConfig
 {
     public:
         AudioSinkConfig(const boost::program_options::variables_map &options);
-        
+
         AudioLevel* createLevel(Pipeline &pipeline) const;
         AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }

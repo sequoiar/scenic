@@ -12,7 +12,7 @@ from twisted.internet import defer
 
 class Test_01_SIC_Client_Server(unittest.TestCase):
     """
-    Tests the Server and Receiver 
+    Tests the Server and Receiver
     """
     timeout = 1
 
@@ -29,10 +29,10 @@ class Test_01_SIC_Client_Server(unittest.TestCase):
 
     def _on_client_connected(self, proto):
         self.sender_proto = proto
-    
+
     def _send(self, msg):
         self.sender_proto.send_message(msg)
-    
+
     def _on_received(self, server_protocol, msg):
         self.failUnlessEqual(msg, {"msg": "ping"})
         #print msg
@@ -78,7 +78,7 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
         #print "starting server...."
         self.recv_deferred = None
         return defer.DeferredList([d1, d2])
-        
+
     def _on_received_command(self, msg, addr):
         self.failUnlessEqual(msg, {"msg":"ping"})
         self.recv_deferred.callback(True)
@@ -91,7 +91,7 @@ class Test_02_Scenic_Client_Server(unittest.TestCase):
         self.client.send({"msg": "ping"})
         #deferred.addCallback(_sent)
         #return deferred
-        
+
     def tearDown(self):
         d1 = self.server.close()
         d2 = self.client.disconnect()

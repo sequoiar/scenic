@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -42,7 +42,7 @@ _original_environment_variables = {}
 def save_environment_variables(env):
     """
     Saves the env vars at startup, which does not contain vars we ight override, such as GTK2_RC_FILES
-    
+
     this is used only for processes started using run_once
     """
     global _original_environment_variables
@@ -88,8 +88,8 @@ def run_once(executable, *args):
 class ProcessIO(protocol.ProcessProtocol):
     """
     process IO
-     
-    Its stdout and stderr streams are logged to a file.    
+
+    Its stdout and stderr streams are logged to a file.
 
     Uses the save env vars as scenic, not the _original_environment_variables dict
     """
@@ -105,9 +105,9 @@ class ProcessIO(protocol.ProcessProtocol):
         self.manager._on_connection_made()
 
     def outReceived(self, data):
-        """ 
-        Handoff complete lines to manager. Save the leftover line 
-        for the next time this is called 
+        """
+        Handoff complete lines to manager. Save the leftover line
+        for the next time this is called
         """
         lines = data.splitlines()
         self.manager.stdout_line_signal(self.manager, self.out_leftover + lines[0])
@@ -115,11 +115,11 @@ class ProcessIO(protocol.ProcessProtocol):
             if line != "":
                 self.manager.stdout_line_signal(self.manager, line)
         self.out_leftover = lines[-1]
-    
+
     def errReceived(self, data):
-        """ 
-        Handoff complete lines to manager. Save the leftover line 
-        for the next time this is called 
+        """
+        Handoff complete lines to manager. Save the leftover line
+        for the next time this is called
         """
         lines = data.splitlines()
         self.manager.stderr_line_signal(self.manager, self.err_leftover + lines[0])
@@ -133,18 +133,18 @@ class ProcessIO(protocol.ProcessProtocol):
         if exit_code is None:
             exit_code = reason.value.signal
         self.manager._on_process_ended(exit_code)
-    
+
     def processExited(self, reason):
         self.manager.log("process has exited " + str(reason.value))
-    
+
 class ProcessManager(object):
     """
-    Manages a streamer process. 
+    Manages a streamer process.
     """
     def __init__(self, command=None, identifier=None, env=None):
         """
         @param command: Shell string. The first item is the name of the name of the executable.
-        @param identifier: Any string. 
+        @param identifier: Any string.
         """
         #Used as a file name, so avoid spaces and exotic characters.
         global _original_environment_variables
@@ -165,11 +165,11 @@ class ProcessManager(object):
             self.identifier = "default"
         self.log_level = logging.DEBUG
         self._delayed_kill = None # DelayedCall instance
-        
+
         self.state_changed_signal = sig.Signal()
         self.stdout_line_signal = sig.Signal()
         self.stderr_line_signal = sig.Signal()
-    
+
     def _before_shutdown(self):
         """
         Called before twisted's reactor shutdown.
@@ -179,7 +179,7 @@ class ProcessManager(object):
             msg = "Child still %s. Stopping it before shutdown." % (self.state)
             self.log(msg)
             self.stop()
-    
+
     def is_alive(self):
         """
         Checks if the child is alive.
@@ -197,7 +197,7 @@ class ProcessManager(object):
                 return True
         else:
             return False
-    
+
     def start(self):
         """
         Starts the child process
@@ -212,7 +212,7 @@ class ProcessManager(object):
         if self.command is None or self.command.strip() == "":
             msg = "You must provide a command to be run."
             raise ProcessError(msg)
-        
+
         self.log("$ %s %s" % (self.identifier, str(self.command)), logging.INFO)
         self._child_process = ProcessIO(self)
         self.set_child_state(STATE_STARTING)
@@ -222,12 +222,12 @@ class ProcessManager(object):
         self._process_transport = reactor.spawnProcess(self._child_process, shell, [shell, "-c", "exec %s" % (self.command)], self.env)
         self.pid = self._process_transport.pid
         self.log("Spawned child %s with pid %s." % (self.identifier, self.pid))
-    
+
     def _on_connection_made(self):
         if not STATE_STARTING:
             self.log("Connection made even if we were not starting the child process.", logging.ERROR)
         self.set_child_state(STATE_RUNNING)
-    
+
     def stop(self):
         """
         Stops the child process
@@ -242,15 +242,15 @@ class ProcessManager(object):
                         self._process_transport.signalProcess(signal.SIGKILL)
                     except OSError, e:
                         msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                        log.warning(msg) 
+                        log.warning(msg)
                     except error.ProcessExitedAlready:
                         msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, "SIGKILL")
-                        log.warning(msg) 
+                        log.warning(msg)
                 elif self.state == STATE_STOPPED:
                     msg = "Successfully killed process after least than the %f seconds. State is %s." % (self.time_before_sigkill, self.state)
                     self.log(msg)
             self._delayed_kill = None
-        
+
         # TODO: do callLater calls to check if the process is still running or not.
         #see twisted.internet.process._BaseProcess.reapProcess
         signal_to_send = None
@@ -270,11 +270,11 @@ class ProcessManager(object):
                 self._process_transport.signalProcess(signal_to_send)
             except OSError, e:
                 msg = "Error sending signal %s to process %s. %s" % (signal_to_send, self.identifier, e)
-                log.warning(msg) 
+                log.warning(msg)
             except error.ProcessExitedAlready:
                 if signal_to_send == signal.SIGTERM:
                     msg = "Process %s had already exited while trying to send signal %s." % (self.identifier, signal_to_send)
-                    log.warning(msg) 
+                    log.warning(msg)
             else:
                 if signal_to_send == signal.SIGTERM:
                     self._delayed_kill = reactor.callLater(self.time_before_sigkill, _later_check, self.pid)
@@ -309,7 +309,7 @@ class ProcessManager(object):
         self._process_transport.loseConnection() # close file handles
         self.log("Child exitted with %s" % (exit_code), logging.INFO)
         self.set_child_state(STATE_STOPPED)
-        
+
     def set_child_state(self, new_state):
         """
         Handles state changes.

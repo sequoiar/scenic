@@ -30,17 +30,17 @@
 const int VideoScale::MAX_SCALE;
 
 /** Constructor sets width and height */
-VideoScale::VideoScale(const Pipeline &pipeline, int width, int height) : 
+VideoScale::VideoScale(const Pipeline &pipeline, int width, int height) :
     videoscale_(pipeline.makeElement("videoscale", NULL)),
     capsfilter_(pipeline.makeElement("capsfilter", NULL))
 {
     using namespace boost::assign;
     using std::string;
     using std::vector;
-    GstCaps *videoCaps = 0; 
+    GstCaps *videoCaps = 0;
     GstCaps *tempCaps;
-    
-    static const vector<string> FORMATS = 
+
+    static const vector<string> FORMATS =
         list_of<string>("x-raw-gray")("x-raw-yuv")("x-raw-rgb");
 
     for (vector<string>::const_iterator format = FORMATS.begin();
@@ -48,8 +48,8 @@ VideoScale::VideoScale(const Pipeline &pipeline, int width, int height) :
     {
         std::ostringstream capsStr;
 
-        capsStr << "video/" << *format << ", width=" << width 
-            << ", height=" << height; 
+        capsStr << "video/" << *format << ", width=" << width
+            << ", height=" << height;
         tempCaps = gst_caps_from_string(capsStr.str().c_str());
         if (not videoCaps)
             videoCaps = tempCaps;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -37,8 +37,8 @@ OUTPUT = 1
 class MidiIn(object):
     """
     Midi device input.
-    
-    Manages a single MIDI input (source) device. 
+
+    Manages a single MIDI input (source) device.
     Can list all input devices.
     """
     def __init__(self, client, verbose=0):
@@ -74,12 +74,12 @@ class MidiIn(object):
         Starts polling the selected device.
         One must first select a device !
         @rtype: bool
-        Returns success. 
+        Returns success.
         """
         if self.end_flag :
             if self.midi_in is not None:
                 self.end_flag = False
-                reactor.callInThread(self._polling)   
+                reactor.callInThread(self._polling)
                 return True
             else:
                 line = "INPUT: you have to set a midi device before start "
@@ -89,7 +89,7 @@ class MidiIn(object):
         else:
             line = "INPUT: already sending midi data"
             return False
-        
+
     def stop(self):
         """
         Stops polling the selected device.
@@ -115,7 +115,7 @@ class MidiIn(object):
                 reactor.callInThread(self._get_input)
                 in_activity = True
             if in_activity and ((time.time() * 1000) - last_poll >= self.time_out):
-                #send silent packet after 3ms of inactivity 
+                #send silent packet after 3ms of inactivity
                 self.client.send_silence()
                 in_activity = False
             time.sleep(self.polling_interval)
@@ -142,14 +142,14 @@ class MidiIn(object):
     def set_device(self, device):
         """
         Selects the MIDI device to be polled.
-        
+
         @param device: The device number to choose.
         @type device: int
         @rtype: bool
         @return: Success or not
-        """ 
+        """
         #check if device exist
-        dev_list = [self.midi_device_list[i][0] for i in range(len(self.midi_device_list))]        
+        dev_list = [self.midi_device_list[i][0] for i in range(len(self.midi_device_list))]
         if device in dev_list: # if the number is not in list of input devices
             self.midi_device = device
             if self.midi_in is not None:
@@ -168,17 +168,17 @@ class MidiIn(object):
 
     def _get_input(self):
         """
-        Get input from selected device 
-        """ 
+        Get input from selected device
+        """
         current_time = pypm.Time()
         #Reading Midi Input
         midi_data = self.midi_in.Read(1024)
         if self.verbose:
             print midi_data
         if len(midi_data) > 0:
-            reactor.callFromThread(self.client.send_midi_data, midi_data, current_time)   
+            reactor.callFromThread(self.client.send_midi_data, midi_data, current_time)
 
-    def __del__(self): 
-        #deleting objects 
+    def __del__(self):
+        #deleting objects
         del self.client
         del self.midi_in

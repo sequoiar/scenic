@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Scenic
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -64,7 +64,7 @@ def list_network_interfaces_addresses():
         executable = procutils.which(command_name)[0] # gets the executable
     except IndexError:
         return defer.fail(RuntimeError("Could not find command %s" % (command_name)))
-    deferred = defer.Deferred() 
+    deferred = defer.Deferred()
     d = utils.getProcessOutput(executable, args=args, env=os.environ)
     d.addCallback(_cb, deferred)
     d.addErrback(_eb, deferred)

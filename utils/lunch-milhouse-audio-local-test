@@ -1,7 +1,7 @@
 #!/usr/bin/env lunch
 #
 # This lunch script launches two milhouse processes sending/receiving
-# raw audio test source on localhost. 
+# raw audio test source on localhost.
 #
 
 # commands

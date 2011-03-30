@@ -69,10 +69,10 @@ class Dc1394Handle : private boost::noncopyable {
             }
         }
 
-        ~Dc1394Handle() 
+        ~Dc1394Handle()
         {
             LOG_DEBUG("Destroying dc1394handle");
-            if (camera_ != 0) 
+            if (camera_ != 0)
                 dc1394_camera_free(camera_);
             if (cameras_ != 0)
                 dc1394_camera_free_list(cameras_);
@@ -100,7 +100,7 @@ class Dc1394Handle : private boost::noncopyable {
 
         void printInfo() const;
 
-        int capsToMode(int width, int height, 
+        int capsToMode(int width, int height,
                 const std::string &colourspace, int framerate) const;
 
     private:
@@ -110,9 +110,9 @@ class Dc1394Handle : private boost::noncopyable {
         }
 
         int cameraId_;
-        dc1394_t * dc1394_; 
+        dc1394_t * dc1394_;
         dc1394camera_list_t * cameras_;
-        dc1394camera_t * camera_; 
+        dc1394camera_t * camera_;
 };
 
 
@@ -120,7 +120,7 @@ int dc1394_caps_print_format_vmode_caps(int mode)
 {
     int retval = 0;
 
-    switch (mode) 
+    switch (mode)
     {
 #define PRINT_CASE(x) \
         case (DC1394_VIDEO_MODE_ ##x): \
@@ -161,21 +161,21 @@ int dc1394_caps_print_format_vmode_caps(int mode)
 
 
 /// FIXME: add checks for other framerates
-bool modeIsSupported(int mode, const dc1394video_modes_t &supportedModes, 
+bool modeIsSupported(int mode, const dc1394video_modes_t &supportedModes,
         int framerate, dc1394camera_t *camera)
 {
     bool frameratesMatch = false;
     for (int i = supportedModes.num - 1; i >= 0; --i)
     {
         int m = supportedModes.modes[i];
-        if (m < DC1394_VIDEO_MODE_EXIF) 
+        if (m < DC1394_VIDEO_MODE_EXIF)
         {
             if (m == mode)
             {
                 dc1394framerates_t framerates;
                 dc1394_video_get_supported_framerates(camera,
                         (dc1394video_mode_t) m, &framerates);
-                for (unsigned framerateIdx = 0; 
+                for (unsigned framerateIdx = 0;
                         not frameratesMatch and framerateIdx < framerates.num;
                         ++framerateIdx)
                 {
@@ -221,7 +221,7 @@ bool Dc1394::requiresMoreISOSpeed(int mode)
     }
 }
 
-int Dc1394::capsToMode(int cameraId, int width, int height, 
+int Dc1394::capsToMode(int cameraId, int width, int height,
         const std::string &colourspace, int framerate)
 {
     Dc1394Handle dc(cameraId);
@@ -229,7 +229,7 @@ int Dc1394::capsToMode(int cameraId, int width, int height,
 }
 
 /// FIXME: replace with table-driven method
-int Dc1394Handle::capsToMode(int width, int height, 
+int Dc1394Handle::capsToMode(int width, int height,
         const std::string &colourspace, int framerate) const
 {
     int mode = 0;
@@ -237,7 +237,7 @@ int Dc1394Handle::capsToMode(int width, int height,
     dc1394error_t camerr;
 
     camerr = dc1394_video_get_supported_modes(camera_, &modes);
-    if (camerr != DC1394_SUCCESS) 
+    if (camerr != DC1394_SUCCESS)
         LOG_ERROR("Error getting supported modes\n");
 
 #define RETURN_MODE_FROM_CAPS(WIDTH, HEIGHT, COLOURSPACE)  \
@@ -250,7 +250,7 @@ int Dc1394Handle::capsToMode(int width, int height,
             LOG_DEBUG("Using mode " << mode);   \
             return mode;        \
         }   \
-    } 
+    }
 
     if (colourspace == "yuv")
     {
@@ -295,7 +295,7 @@ int Dc1394Handle::capsToMode(int width, int height,
         if RETURN_MODE_FROM_CAPS(1024, 768, RGB8);
         if RETURN_MODE_FROM_CAPS(1280, 960, RGB8);
         if RETURN_MODE_FROM_CAPS(1600, 1200, RGB8);
-        LOG_WARNING("Colourspace " << colourspace << " and resolution " << 
+        LOG_WARNING("Colourspace " << colourspace << " and resolution " <<
                 width << "x" << height << " are not supported by this camera");
     }
     else
@@ -370,7 +370,7 @@ bool Dc1394::listCameras()
 
     // make sure raw1394 is loaded and read/writeable
     raw1394handle_t tmpHandle = raw1394_new_handle();
-    if (tmpHandle == NULL) 
+    if (tmpHandle == NULL)
     {
         // if module is present but permissions aren't good, print a warning
         // otherwise don't do anything
@@ -397,7 +397,7 @@ bool Dc1394::listCameras()
     }
     else
         raw1394_destroy_handle(tmpHandle);
-    
+
     int nCameras = Dc1394::nCameras();
 
     for (int i = 0; i != nCameras; ++i)
@@ -414,12 +414,12 @@ void Dc1394Handle::printInfo() const
     {
         dc1394video_modes_t modes;
         dc1394framerates_t framerates;
-        LOG_PRINT("\nDC1394 Camera " << cameraId_ << ": " 
+        LOG_PRINT("\nDC1394 Camera " << cameraId_ << ": "
                 << camera_->vendor << " " << camera_->model << std::endl);
         LOG_PRINT("GUID = " << std::hex << guid() << std::endl);
         dc1394error_t camerr = dc1394_video_get_supported_modes(camera_, &modes);
 
-        if (camerr != DC1394_SUCCESS) 
+        if (camerr != DC1394_SUCCESS)
             LOG_ERROR("Error getting supported modes\n");
 
         LOG_PRINT("Supported modes :\n");
@@ -427,7 +427,7 @@ void Dc1394Handle::printInfo() const
         {
             int m = modes.modes[i];
 
-            if (m < DC1394_VIDEO_MODE_EXIF) 
+            if (m < DC1394_VIDEO_MODE_EXIF)
             {
                 if (dc1394_caps_print_format_vmode_caps(m) < 0)
                     LOG_ERROR("attempt to query mode " << m << " failed");

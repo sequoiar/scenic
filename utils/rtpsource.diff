@@ -14,13 +14,13 @@ diff -up gst-plugins-good-0.10.17/gst/rtpmanager/rtpsource.c.orig gst-plugins-go
    RTPSourceStats *stats;
    guint16 expected;
 +  guint64 elapsed;
- 
+
    g_return_val_if_fail (RTP_IS_SOURCE (src), GST_FLOW_ERROR);
    g_return_val_if_fail (GST_IS_BUFFER (buffer), GST_FLOW_ERROR);
 @@ -1055,6 +1057,33 @@ rtp_source_process_rtp (RTPSource * src,
    src->is_sender = TRUE;
    src->validated = TRUE;
- 
+
 +  if (src->prev_ntpnstime) {
 +    elapsed = arrival->ntpnstime - src->prev_ntpnstime;
 +
@@ -46,8 +46,8 @@ diff -up gst-plugins-good-0.10.17/gst/rtpmanager/rtpsource.c.orig gst-plugins-go
 +    GST_LOG ("Reset bitrate measurement");
 +    src->prev_ntpnstime = arrival->ntpnstime;
 +    src->bitrate = 0;
-+  }  
++  }
 +
    GST_LOG ("seq %d, PC: %" G_GUINT64_FORMAT ", OC: %" G_GUINT64_FORMAT,
        seqnr, src->stats.packets_received, src->stats.octets_received);
- 
+

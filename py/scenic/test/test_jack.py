@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Unit tests for the jackd listing.
-""" 
+"""
 #FIXME: this must be run from the py directory. Like this:
 # cd py/
 # trial scenic/test/test_jack.py

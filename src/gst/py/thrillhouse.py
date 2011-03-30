@@ -42,16 +42,16 @@ class Arg(object): # new style!!
         self.address = '127.0.0.1'   # always need this guy
         self.timeout = 1000000000
 #        self.enable_controls = True
-    
+
     def __str__(self):
-        """ Returns a list of this class' data members and their values, 
+        """ Returns a list of this class' data members and their values,
         formatted as command line arguments """
         result = ''
         for key, val in self.__dict__.iteritems():
             if val is True:
                 val = ''  # boolean members don't need values in output string
             # replace underscores from member names with dashes for commandline
-            result = result + ' --' + key.replace('_', '-') + ' ' + str(val) 
+            result = result + ' --' + key.replace('_', '-') + ' ' + str(val)
         return result
 
 
@@ -92,7 +92,7 @@ class VideoRecvArg(VideoArg):
 class AudioSendArg(AudioArg):
     """ Class for audio only sending args """
     def __init__(self):
-        """ Default for audiosrc is 8 channel jackaudiosrc, 
+        """ Default for audiosrc is 8 channel jackaudiosrc,
          the jack input plugin """
         AudioArg.__init__(self)
         self.audiosource = 'jackaudiosrc'
@@ -131,12 +131,12 @@ class MilhouseTests():
 
     @staticmethod
     def countdown(warning):
-        """ Prints a countdown telling the client to start or stop 
+        """ Prints a countdown telling the client to start or stop
             jack, depending on the input warning """
         countdown = 1
         while countdown > 0:
             print 'PLEASE ' + warning + ' JACK SERVER NOW, YOU HAVE ' \
-                + str(countdown) + ' SECONDS' 
+                + str(countdown) + ' SECONDS'
             time.sleep(1)
             countdown -= 1
 
@@ -157,14 +157,14 @@ class MilhouseTests():
     def handle_interrupt(signum, stack):
         """ Handles SIGINT and kills child processes """
         print 'Got interrupt, killing all child processes'
-        try: 
+        try:
             os.kill(PID_RECV, signal.SIGKILL)
         except OSError:
             print "No process with pid " + PID_RECV
         try:
             os.kill(PID_SEND, signal.SIGKILL)
         except OSError:
-            print "No process with pid " + PID_SEND 
+            print "No process with pid " + PID_SEND
         sys.exit(0)
 
     @staticmethod
@@ -199,10 +199,10 @@ class MilhouseTests():
         self.countdown('START')
 
         recv, send = self.argfactory('audio')
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
-            self.run(recv, send) 
-    
+            self.run(recv, send)
+
     def test_03_dv(self):
         """ Test dv inputs """
         self.countdown('START')
@@ -211,7 +211,7 @@ class MilhouseTests():
         send.videosource = 'dv1394src'
         send.audiosource = 'dv1394src'
         self.run(recv, send)
-   
+
     def test_04_alsa(self):
         """ Test with 1-8 channels for alsa with a 5 second timeout """
         self.countdown('STOP')
@@ -219,7 +219,7 @@ class MilhouseTests():
         recv, send = self.argfactory('audio')
         send.audiosource = 'alsasrc'
         recv.audiosink = 'alsasink'
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
 
@@ -230,7 +230,7 @@ class MilhouseTests():
         recv, send = self.argfactory('audio')
         send.audiosource = 'pulsesrc'
         recv.audiosink = 'pulsesink'
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
 
@@ -243,12 +243,12 @@ class MilhouseTests():
         recv, send = self.argfactory('audio')
         send.audiocodec = audiocodec
         recv.audiocodec = audiocodec
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
 
     def test_07_dv_vorbis(self):
-        """ Test with 1-8 channels for vorbis with dv and jack with a 5 
+        """ Test with 1-8 channels for vorbis with dv and jack with a 5
             second timeout """
         self.countdown('START')
 
@@ -257,10 +257,10 @@ class MilhouseTests():
         send.audiocodec = audiocodec
         send.videosource = 'dv1394src'
         recv.audiocodec = audiocodec
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
-    
+
     def test_08_videotestsrc_h264(self):
         """ Test h264 with videotestsrc """
 
@@ -269,15 +269,15 @@ class MilhouseTests():
         videocodec = 'h264'
         send.videocodec = videocodec
         recv.videocodec = videocodec
-        self.run(recv, send) 
-        
+        self.run(recv, send)
+
     def test_12_ximagesink(self):
         """ Test with ximagesink"""
         recv, send = self.argfactory('video')
 
         recv.videosink = 'ximagesink'
         self.run(recv, send)
-    
+
     def test_14_dv1394src_ximagesink(self):
         """ Test dv with ximagesink """
 
@@ -306,7 +306,7 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.videosource = 'videotestsrc'
         self.run(recv, send)
-    
+
     def test_20_rtpjitterbuffer(self):
         """ Test videotestsrc with audio """
 
@@ -331,7 +331,7 @@ class MilhouseTests():
         send.audiocodec = audiocodec
         send.audiosource = 'audiotestsrc'
         recv.audiocodec = audiocodec
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
 
@@ -343,10 +343,10 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.videocodec = videocodec
         recv.videocodec = videocodec
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
-    
+
     def test_24_raw_h263_v4l2src(self):
         """ Test with 8 channels for raw with h263 with a 5 second timeout """
         self.countdown('START')
@@ -360,16 +360,16 @@ class MilhouseTests():
 
     def test_25_h263_v4l2src(self):
         """ Test v4l2src with h263 """
-        
+
         videocodec = 'h263'
         recv, send = self.argfactory('video')
         send.videocodec = videocodec
         recv.videocodec = videocodec
         self.run(recv, send)
-    
+
     def test_26_h263_deinterlace(self):
         """ Test v4l2src with h263 """
-        
+
         videocodec = 'h263'
         recv, send = self.argfactory('video')
         send.videocodec = videocodec
@@ -393,7 +393,7 @@ class MilhouseTests():
         send.audioport = 10000
         send.videoport = 10000
         self.run(recv, send)
-    
+
     def test_29_wrong_channels_mp3(self):
         """ Feed wrong number of channels to milhouse for mp3 """
         recv, send = self.argfactory('audio')
@@ -417,7 +417,7 @@ class MilhouseTests():
         """ Just audio """
         recv, send = self.argfactory('audio')
         self.run(recv, send)
-    
+
     def test_32_raw_audiofile(self):
         """ audiofile, uncompressed  """
         recv, send = self.argfactory('audio')
@@ -427,7 +427,7 @@ class MilhouseTests():
             self.run(recv, send)
         else:
             print "No such file, skipping this test"
-            
+
     def test_33_raw_audiofile_videofile_different(self):
         """ audiofile, sent in raw with different videofile """
         recv, send = self.argfactory('audiovideo')
@@ -456,7 +456,7 @@ class MilhouseTests():
         """ Just v4l2 """
         recv, send = self.argfactory('video')
         self.run(recv, send)
-    
+
 
     def test_36_videofile_only(self):
         """ Just video file """
@@ -474,14 +474,14 @@ class MilhouseTests():
         recv.deinterlace = True
         recv.jitterbuffer = 60
         self.run(recv, send)
-    
+
     def test_38_bufferTime(self):
         """ Test smaller audiobuffer to make sure the corrections is happening """
 
         recv, send = self.argfactory('audiovideo')
         recv.audio_buffer_usec = 11333
         self.run(recv, send)
-    
+
     def test_39_vorbis_audiotestsrc_videotestsrc_h264(self):
         """ Test with 1-8 channels for vorbis with a 5 second timeout """
         self.countdown('START')
@@ -494,10 +494,10 @@ class MilhouseTests():
         send.videocodec = 'h264'
         recv.videocodec = send.videocodec
         recv.jitterbuffer = 30
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
-    
+
     def test_40_vorbis_audiotestsrc_videotestsrc_theora(self):
         """ Test with 1-8 channels for vorbis with a 5 second timeout """
         self.countdown('START')
@@ -509,10 +509,10 @@ class MilhouseTests():
         recv.audiocodec = send.audiocodec
         send.videocodec = 'theora'
         recv.videocodec = send.videocodec
-        for chan in xrange(1, 9): 
+        for chan in xrange(1, 9):
             send.numchannels = chan
             self.run(recv, send)
-    
+
     def test_41_raw_jackaudiosrc_v4l2src_theora(self):
         """ Test with 1-8 channels for raw with a 5 second timeout """
         self.countdown('START')
@@ -524,7 +524,7 @@ class MilhouseTests():
         recv.audiocodec = send.audiocodec
         send.videocodec = 'theora'
         recv.videocodec = send.videocodec
-        for chan in xrange(8, 9): 
+        for chan in xrange(8, 9):
             send.numchannels = chan
             self.run(recv, send)
 
@@ -540,7 +540,7 @@ class MilhouseTests():
         send.videocodec = 'theora'
         recv.videocodec = send.videocodec
         recv.deinterlace = True
-        for chan in xrange(8, 9): 
+        for chan in xrange(8, 9):
             send.numchannels = chan
             self.run(recv, send)
 
@@ -563,33 +563,33 @@ class MilhouseTests():
         recv.videosink = 'ximagesink'
         recv.deinterlace = True
         self.run(recv, send)
-    
+
     def test_46_deinterlace_theora_ximagesink(self):
         """ Test with ximagesink"""
         recv, send = self.argfactory('video')
 
         recv.videosink = 'ximagesink'
-        recv.videocodec = 'theora' 
+        recv.videocodec = 'theora'
         recv.deinterlace = True
         send.videocodec = recv.videocodec
         self.run(recv, send)
-    
+
     def test_47_theora_sharedvideosink(self):
         """ Test with sharedvideosink """
         recv, send = self.argfactory('video')
 
         recv.videosink = 'sharedvideosink'
-        recv.videocodec = 'theora' 
+        recv.videocodec = 'theora'
         recv.shared_video_id = 'shared_memory'
         send.videocodec = recv.videocodec
         self.run(recv, send)
-    
+
     def test_48_theora_sharedvideosink_shared_id(self):
         """ Test with sharedvideosink with id shared_memory1 """
         recv, send = self.argfactory('video')
 
         recv.videosink = 'sharedvideosink'
-        recv.videocodec = 'theora' 
+        recv.videocodec = 'theora'
         recv.shared_video_id = 'shared_memory1'
         send.videocodec = recv.videocodec
         self.run(recv, send)
@@ -599,7 +599,7 @@ class MilhouseTests():
         recv, send = self.argfactory('video')
 
         recv.videosink = 'sharedvideosink'
-        recv.videocodec = 'mpeg4' 
+        recv.videocodec = 'mpeg4'
         send.videocodec = recv.videocodec
         self.run(recv, send)
 
@@ -608,7 +608,7 @@ class MilhouseTests():
         recv, send = self.argfactory('video')
 
         recv.videosink = 'sharedvideosink'
-        recv.videocodec = 'h264' 
+        recv.videocodec = 'h264'
         send.videocodec = recv.videocodec
         self.run(recv, send)
 
@@ -617,7 +617,7 @@ class MilhouseTests():
         recv, send = self.argfactory('video')
 
         recv.videosink = 'sharedvideosink'
-        recv.videocodec = 'h263' 
+        recv.videocodec = 'h263'
         send.videocodec = recv.videocodec
         self.run(recv, send)
 
@@ -625,7 +625,7 @@ class MilhouseTests():
         """ Test with sharedvideosink """
         recv, send = self.argfactory('video')
         recv.videosink = 'sharedvideosink'
-        recv.videocodec = 'theora' 
+        recv.videocodec = 'theora'
         send.videocodec = recv.videocodec
         recv.deinterlace = True
         self.run(recv, send)
@@ -637,4 +637,4 @@ if __name__ == '__main__':
     for test in TESTS:
         print 'TEST: '  + test.__doc__
         test()
-        
+
