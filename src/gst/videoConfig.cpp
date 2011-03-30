@@ -56,7 +56,7 @@ VideoSourceConfig::VideoSourceConfig(const boost::program_options::variables_map
     location_(options["videolocation"].as<std::string>()),
     cameraNumber_(options["camera-number"].as<int>()),
     GUID_(fromString(options["camera-guid"].as<std::string>(), std::hex)),
-    framerate_(options["framerate"].as<int>()),
+    framerate_(options.count("framerate") ? options["framerate"].as<int>() : -1),
     captureWidth_(options["width"].as<int>()),
     captureHeight_(options["height"].as<int>()),
     grayscale_(options["grayscale"].as<bool>()),

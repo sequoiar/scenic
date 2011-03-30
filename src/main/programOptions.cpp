@@ -75,7 +75,7 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("debug,D", po::value<string>()->default_value("info"), "level of logging verbosity (string/int) "
          "(critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6)")
         ("window-title,W", po::value<string>()->default_value("Milhouse"), "title for video window")
-        ("framerate,F", po::value<int>()->default_value(30), "framerate for video (15,30)")
+        ("framerate,F", po::value<int>(), "framerate for video (15,30)")
         ("list-cameras,H", po::bool_switch(), "list connected cameras")
         ("list-v4l2", po::bool_switch(), "list connected V4L2 devices")
         ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture")

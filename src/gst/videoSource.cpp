@@ -49,8 +49,7 @@ std::string VideoSource::defaultSrcCaps() const
 {
     std::ostringstream capsStr;
     capsStr << "video/x-raw-yuv, width=" << config_.captureWidth()
-        << ", height=" << config_.captureHeight() << ", framerate="
-        << config_.framerate() << "000/1001, pixel-aspect-ratio="
+        << ", height=" << config_.captureHeight() << ", pixel-aspect-ratio="
         << config_.pixelAspectRatio();
     return capsStr.str();
 }
@@ -280,7 +279,7 @@ std::string VideoDc1394Source::srcCaps(unsigned int /*framerateIndex*/) const
     {
         colourSpace = *space;
         mode = Dc1394::capsToMode(cameraNumber, config_.captureWidth(),
-                config_.captureHeight(), colourSpace, config_.framerate());
+                config_.captureHeight(), colourSpace, config_.framerate() == -1 ? 30 : config_.framerate());
     }
 
     // vmode takes into account resolution, bpp, depth

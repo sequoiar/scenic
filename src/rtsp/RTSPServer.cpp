@@ -83,13 +83,15 @@ RTSPServer::RTSPServer(const boost::program_options::variables_map &options)
           "video-height", options["height"].as<int>(),
           "video-bitrate", options["videobitrate"].as<int>(),
           "video-codec", options["videocodec"].as<string>().c_str(),
-          "video-framerate", options["framerate"].as<int>(), 1,
           "audio", enableAudio,
           "audio-source", options["audiosource"].as<string>().c_str(),
           "audio-device", options["audiodevice"].as<string>().c_str(),
           "audio-codec", options["audiocodec"].as<string>().c_str(),
           "audio-channels", options["numchannels"].as<int>(),
           NULL);
+
+  if (options.count("framerate"))
+      g_object_set(factory, "video-framerate", options["framerate"].as<int>(), 1, NULL);
 
   mapping = gst_rtsp_server_get_media_mapping (server);
   gst_rtsp_media_mapping_add_factory (mapping, local_url->abspath,
