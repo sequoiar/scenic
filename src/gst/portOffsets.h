@@ -4,7 +4,7 @@
  * http://www.sat.qc.ca
  * All rights reserved.
  *
- * This file is part of [propulse]ART.
+ * This file is part of Scenic.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
