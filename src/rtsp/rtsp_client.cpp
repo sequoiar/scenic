@@ -229,6 +229,8 @@ void RTSPClient::run(int timeToLive)
 {
     /* run */
     pipeline_->start();
+    if (errno == ECONNREFUSED) // warning, something else might have set errno
+        LOG_WARNING("RTSP Server refused connection");
 
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, NULL);
