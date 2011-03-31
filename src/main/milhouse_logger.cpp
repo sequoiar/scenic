@@ -65,7 +65,7 @@ LogLevel MilhouseLogger::argToLogLevel(const std::string &level)
 MilhouseLogger::~MilhouseLogger()
 {
     // end our print thread
-    printQueue_.push("quit:");
+    printQueue_.push("QUIT_SENTINEL:");
     printThread_.join(); // wait for print thread to go out before main thread does
 }
 
@@ -86,7 +86,7 @@ void MilhouseLogger::printMessages()
         printQueue_.wait_and_pop(msg);
 
         /// quit when msg starts with quit:
-        if (msg != "quit:")
+        if (msg != "QUIT_SENTINEL:")
                 std::cout << msg;
         else  // got a sentinel
             done = true;
