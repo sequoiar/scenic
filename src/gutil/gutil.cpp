@@ -25,6 +25,7 @@
 #include <gtk/gtk.h>
 #include "util/log_writer.h"
 #include "util/sigint.h"
+#include <cstring>
 #include "gutil/gutil.h"
 
 int gutil::killMainLoop(gpointer /*data*/)
@@ -69,6 +70,16 @@ void gutil::runMainLoop(int ms)
     gtk_main();
 }
 
+
+bool gutil::has_display()
+{
+    const char * display = getenv("DISPLAY");
+    if (display == NULL or strlen(display) == 0)
+        return false;
+    else
+        return true;
+}
+
 void gutil::init_gst_gtk(int argc, char **argv)
 {
     // must initialise the threading system before using any other GLib funtion
@@ -76,7 +87,7 @@ void gutil::init_gst_gtk(int argc, char **argv)
         g_thread_init (NULL);
 
     gst_init(&argc, &argv);
-    if (getenv("DISPLAY") != NULL)
+    if (has_display())
         gtk_init(&argc, &argv);
     else
         LOG_DEBUG("DISPLAY variable has not been set");

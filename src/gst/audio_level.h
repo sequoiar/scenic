@@ -52,7 +52,7 @@ class AudioLevel : private BusMsgHandler
         void print(const std::vector<double> &rmsValues) const;
 
         _GstElement *level_;
-        bool emitMessages_;
+        bool hasDisplay_;
         std::vector<_GtkWidget *> vumeters_;
 
         AudioLevel(const AudioLevel&);     //No Copy Constructor
