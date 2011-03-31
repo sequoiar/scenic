@@ -52,17 +52,16 @@ class Pipeline : private boost::noncopyable
         unsigned actualSampleRate() const;
         bool isReady() const;
         bool isPaused() const;
-        bool isStopped() const;
+        bool isNull() const;
         void seekTo(gint64 pos);
         bool start() const;
         void pause() const;
         void makeReady() const;
-        bool makeNull() const;
-        void stop() const;
         void quit() const;
         void makeVerbose() const;
 
     private:
+        bool makeNull() const;
         void add(_GstElement * element) const;
         /// Returns our pipeline's bus.
         /// Bus must be unreffed after use!

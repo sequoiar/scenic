@@ -82,8 +82,6 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
     LOG_DEBUG("Running main loop");
     gutil::runMainLoop(options["timeout"].as<int>());
     LOG_DEBUG("main loop has finished");
-
-    pipeline.stop();
 }
 
 
@@ -108,8 +106,6 @@ void Milhouse::runAsSender(const po::variables_map &options, bool enableVideo, b
     pipeline.start();
 
     gutil::runMainLoop(options["timeout"].as<int>());
-
-    pipeline.stop();
 }
 
 
@@ -139,8 +135,6 @@ void Milhouse::runAsLocal(const po::variables_map &options, bool enableVideo, bo
     pipeline.start();
 
     gutil::runMainLoop(options["timeout"].as<int>());
-
-    pipeline.stop();
 }
 
 

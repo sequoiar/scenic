@@ -51,6 +51,7 @@ Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(),
 Pipeline::~Pipeline()
 {
     Dv1394::reset();
+    makeNull();
     LOG_DEBUG("Unreffing pipeline");
     gst_object_unref(GST_OBJECT(pipeline_));
 }
@@ -89,7 +90,7 @@ void translateMessage(GstObject *src, const std::string &errStr)
         return;
     }
 
-    LOG_WARNING(srcName << ":" << errStr);
+    THROW_CRITICAL(srcName << ":" << errStr);
 }
 }
 
@@ -248,7 +249,7 @@ bool Pipeline::isPaused() const
 }
 
 
-bool Pipeline::isStopped() const
+bool Pipeline::isNull() const
 {
     if (GST_STATE(pipeline_) == GST_STATE_NULL)
         return true;
@@ -351,26 +352,8 @@ void Pipeline::pause() const
 
 void Pipeline::quit() const
 {
-    stop();
     gutil::killMainLoop();
 }
-
-
-void Pipeline::stop() const
-{
-    if (isStopped())        // only needs to be stopped once
-        return;
-    else if (pipeline_)
-    {
-        if (not makeNull())
-            LOG_WARNING("Could not set pipeline state to NULL");
-        else
-            LOG_DEBUG("Now stopped/null");
-    }
-    else
-        LOG_WARNING("PIPELINE == 0!");
-}
-
 
 void Pipeline::add(GstElement *element) const
 {

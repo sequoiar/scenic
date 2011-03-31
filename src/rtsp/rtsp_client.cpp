@@ -151,8 +151,6 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpoin
     gst_caps_unref (caps);
 }
 
-static const int USEC_PER_MILLISEC = G_USEC_PER_SEC / 1000.0;
-
 RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
     BusMsgHandler(),
     pipeline_(new Pipeline),
@@ -230,20 +228,13 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
 void RTSPClient::run(int timeToLive)
 {
     /* run */
-    while (!pipeline_->isPlaying() and not signal_handlers::signalFlag())
-    {
-        LOG_INFO("Waiting for rtsp server");
-        pipeline_->start();
-        g_usleep(G_USEC_PER_SEC * 2); // sleep a bit
-    }
+    pipeline_->start();
+
     /* add a timeout to check the interrupted variable */
     g_timeout_add_seconds(5, (GSourceFunc) timeout, NULL);
 
     /* start main loop */
-    if (not signal_handlers::signalFlag())
-        gutil::runMainLoop(timeToLive);
-
-    pipeline_->stop();
+    gutil::runMainLoop(timeToLive);
 
     LOG_DEBUG("Client exitting...\n");
 }
