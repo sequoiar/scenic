@@ -1,1 +1,1 @@
-../../main/milhouse --client
+../../main/milhouse --rtsp-client

@@ -61,6 +61,9 @@ AudioSender::AudioSender(Pipeline &pipeline,
     encoder_(),
     payloader_()
 {
+    std::string title("Sending to ");
+    title += rConfig->remoteHost();
+    level_.reset(audioConfig_->createLevel(pipeline, title));
     validateChannels(*aConfig, *rConfig);
     LOG_DEBUG("Creating audio sender pipeline");
     createPipeline(pipeline);
@@ -70,7 +73,6 @@ void AudioSender::createSource(Pipeline &pipeline)
 {
     source_.reset(audioConfig_->createSource(pipeline));
     assert(source_);
-    level_.reset(audioConfig_->createLevel(pipeline));
     gstlinkable::link(*source_, *level_);
 }
 

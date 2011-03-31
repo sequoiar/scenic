@@ -108,16 +108,16 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 }
 
 /// Factory method that creates an AudioLevel based on this object's socketID
-AudioLevel* AudioSourceConfig::createLevel(Pipeline &pipeline) const
+AudioLevel* AudioSourceConfig::createLevel(Pipeline &pipeline, const std::string &title) const
 {
-    return new AudioLevel(pipeline, numChannels_, socketID_);
+    return new AudioLevel(pipeline, numChannels_, socketID_, title);
 }
 
 /// Fixme: abstract the common stuff into baseclass
 /// Factory method that creates an AudioLevel based on this object's socketID
-AudioLevel* AudioSinkConfig::createLevel(Pipeline &pipeline) const
+AudioLevel* AudioSinkConfig::createLevel(Pipeline &pipeline, const std::string &title) const
 {
-    return new AudioLevel(pipeline, numChannels_, socketID_);
+    return new AudioLevel(pipeline, numChannels_, socketID_, title);
 }
 
 /// Returns c-style string specifying the location (filename)

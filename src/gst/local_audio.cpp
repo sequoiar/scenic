@@ -32,7 +32,7 @@
 LocalAudio::LocalAudio(Pipeline &pipeline,
         const AudioSourceConfig &sourceConfig) :
     source_(sourceConfig.createSource(pipeline)),
-    level_(sourceConfig.createLevel(pipeline))
+    level_(sourceConfig.createLevel(pipeline, "Milhouse"))
 {
     GstElement *fakesink = pipeline.makeElement("fakesink", NULL);
     gstlinkable::link(*source_, *level_);

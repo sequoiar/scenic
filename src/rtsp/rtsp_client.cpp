@@ -214,7 +214,7 @@ RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
         GstElement *capsfilter = pipeline_->makeElement("capsfilter", 0);
         gutil::initAudioCapsFilter(capsfilter, options["numchannels"].as<int>());
         GstElement *audioresample = pipeline_->makeElement("audioresample", 0);
-        audiolevel_.reset(aConfig.createLevel(*pipeline_));
+        audiolevel_.reset(aConfig.createLevel(*pipeline_, "Receiving from " + uri));
         audiosink_.reset(aConfig.createSink(*pipeline_));
 
         gstlinkable::link(queue, audioconvert);

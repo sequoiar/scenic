@@ -48,6 +48,9 @@ AudioReceiver::AudioReceiver(Pipeline &pipeline,
     level_(),
     sink_()
 {
+    std::string title("Receiving from ");
+    title += rConfig->remoteHost();
+    level_.reset(audioConfig_->createLevel(pipeline, title));
     assert(remoteConfig_->hasCodec());
     remoteConfig_->checkPorts();
     createPipeline(pipeline);
@@ -64,7 +67,6 @@ void AudioReceiver::createCodec(Pipeline &pipeline)
 {
     decoder_.reset(remoteConfig_->createAudioDecoder(pipeline, audioConfig_->numChannels()));
     assert(decoder_);
-    level_.reset(audioConfig_->createLevel(pipeline));
     gstlinkable::link(*decoder_, *level_);
 }
 

@@ -42,7 +42,7 @@ class _GtkWidget;
 class AudioLevel : private BusMsgHandler
 {
     public:
-        AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID);
+        AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID, const std::string &title);
         _GstElement *srcElement() { return level_; }
         _GstElement *sinkElement() { return level_; }
         bool handleBusMsg(_GstMessage *msg);

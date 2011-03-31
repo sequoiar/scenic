@@ -34,7 +34,7 @@
 
 /** Constructor sets by default emitMessages to true
  * and message interval to one second */
-AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID) :
+AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow socketID, const std::string &title) :
     BusMsgHandler(&pipeline),
     level_(pipeline.makeElement("level", NULL)),
     emitMessages_(true)
@@ -82,7 +82,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
     else // make a window
     {
         GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-        gtk_window_set_title(GTK_WINDOW(window), "Milhouse");
+        gtk_window_set_title(GTK_WINDOW(window), title.c_str());
 
         // set icon
         std::string iconPath(std::string(PIXMAPS_DIR) + "/scenic.png");
