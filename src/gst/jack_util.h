@@ -25,14 +25,14 @@
 #include <jack/types.h> // for jack_nframes_t
 
 /// Utility functions for jack related issues.
-struct Jack {
-        static void assertReady();
-        static bool is_running();
-        static jack_nframes_t samplerate();
-        static unsigned int framesPerPeriod();
-        static unsigned long long minBufferTime();
-        static unsigned long long safeBufferTime();
-};
+namespace Jack {
+        void assertReady();
+        bool is_running();
+        jack_nframes_t samplerate();
+        unsigned int framesPerPeriod();
+        unsigned long long minBufferTime();
+        unsigned long long safeBufferTime();
+}
 
 #endif //  _JACK_UTILS_H_
 
