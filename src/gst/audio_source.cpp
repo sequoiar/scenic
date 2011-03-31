@@ -111,7 +111,7 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
 void AudioFileSource::restartPlayback()
 {
     const gint64 BEGIN_TIME_NS = 0;
-    BusMsgHandler::pipeline_->seekTo(BEGIN_TIME_NS); // have to specify whose pipeline reference
+    AudioSource::pipeline_.seekTo(BEGIN_TIME_NS); // have to specify whose pipeline reference
     if (loopCount_ > 0)  // avoids endless decrements
         loopCount_--;
 }

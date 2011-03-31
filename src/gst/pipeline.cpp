@@ -413,7 +413,7 @@ void Pipeline::updateListeners(GstMessage *msg)
 }
 
 
-void Pipeline::seekTo(gint64 pos)
+void Pipeline::seekTo(gint64 pos) const
 {
     if (!gst_element_seek(pipeline_, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
                 GST_SEEK_TYPE_SET, pos,

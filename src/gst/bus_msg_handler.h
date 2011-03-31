@@ -41,16 +41,13 @@ class BusMsgHandler : private boost::noncopyable
         /// This method is called by the GstBus listener when it has a new msg.
         virtual bool handleBusMsg(_GstMessage *msg) = 0;
 
-        /**
-         * Destructor */
-
     protected:
         explicit BusMsgHandler(Pipeline *pipeline);
         BusMsgHandler();
         void setPipeline(Pipeline *pipeline);
         virtual ~BusMsgHandler();
+    private:
         Pipeline *pipeline_;
 };
 
 #endif // _BUS_MSG_HANDLER_H_
-

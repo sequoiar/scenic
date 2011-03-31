@@ -53,7 +53,7 @@ class Pipeline : private boost::noncopyable
         bool isReady() const;
         bool isPaused() const;
         bool isNull() const;
-        void seekTo(gint64 pos);
+        void seekTo(gint64 pos) const;
         bool start() const;
         void pause() const;
         void makeReady() const;
