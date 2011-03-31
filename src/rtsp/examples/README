@@ -2,3 +2,13 @@ run the server with:
 ./gst-rtsp-cam rtsp://localhost:8554/test
 run client:
 ./test-client
+
+Alternately, you can test the milhouse rtsp server with
+./server.sh
+and milhouse client:
+./client.sh
+
+You should be able to run other clients, such as vlc, totem and mplayer, with
+vlc rtsp:://localhost:8554/milhouse --rtsp-caching 15
+totem rtsp:://localhost:8554/milhouse
+mplayer rtsp:://localhost:8554/milhouse
