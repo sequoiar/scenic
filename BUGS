@@ -1,11 +1,20 @@
 Milhouse:
     * For Ubuntu 9.04 and later, one must use 127.0.0.1 instead of localhost for local connections
     * Audio test source might use 100% of your CPU power!
+    * rtpL16depay does not work properly prior to gst-plugins-good-0.10.25
+      * Because of this upstream bug
+        https://bugzilla.gnome.org/show_bug.cgi?id=623209
+        raw audio will not work correctly using rtsp since the rtpL16depayloader
+        will not be able to determine how many channels it should have. A
+        workaround where the channels are explicitly set MIGHT be possible.
+        This bug is present in Ubuntu 10.04 (fixed in 10.10).
+
+Scenic:
     * scenic uses 100% of CPU due to pygtk bug on Ubuntu 10.10
         * The bug is described fully here:
-            http://twistedmatrix.com/trac/ticket/4658
-        * The fix has already been applied upstream:
-            https://bugzilla.gnome.org/attachment.cgi?id=179466&action=edit
-        * A workaround until Ubuntu decides to fix this would be to install the
+          http://twistedmatrix.com/trac/ticket/4658
+          The fix has already been applied upstream:
+          https://bugzilla.gnome.org/attachment.cgi?id=179466&action=edit
+          A workaround until Ubuntu decides to fix this would be to install the
           patched version of pygtk:
-            https://bugzilla.gnome.org/show_bug.cgi?id=640738#c8
+          https://bugzilla.gnome.org/show_bug.cgi?id=640738#c8
