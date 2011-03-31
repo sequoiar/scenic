@@ -28,7 +28,7 @@
 ]>
 
 <!-- =============Document Header ============================= -->
-<book id="Manuel d'installation" lang="fr">
+<book id="installation-manual" lang="fr">
 
    &About;
    &Introduction;

@@ -1,4 +1,12 @@
-all: html-local
+SUBDIRS = fig installation user
+docbookdir = $(datadir)/scenic/docbook/en
+docbook_DATA = \
+	glossary.xml \
+	installation-manual.xml \
+	user-manual.xml
+
+EXTRA_DIST = glossary.xml
+
 html-local:
 	mkdir -p html/fig ; cp -r fig/*.png fig/*.jpg html/fig/ ; \
 	for doc in installation-manual user-manual ; \

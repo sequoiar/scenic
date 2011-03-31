@@ -111,6 +111,10 @@ ur Ubuntu 8.04 LTS (Hardy), installez les paquets suivants :</emphasis>
     </para>
     <para>Vous pouvez désormais installer &app; sous Ubuntu 10.04. Téléchargez pour cela le paquet correspondant à l’architecture de votre ordinateur à <ulink url="http://ppa.launchpad.net/sat-metalab/metalab/ubuntu/pool/main/s/scenic/">"Download &app; Package"</ulink>
     </para>
+    <para>En fait, installer Scenic sur Ubuntu Lucid (10.04) est très simple grâce aux paquets qui se trouvent dans l'archive PPA du Metalab de la SAT sur Launchpad. Pour ce faire, il suffit d'entrer les commandes suivantes dans un terminal:</para>
+    <para><userinput>sudo apt-add-repository ppa:sat-metalab/metalab</userinput></para>
+    <para><userinput>sudo apt-get update</userinput></para>
+    <para><userinput>sudo apt-get install scenic</userinput></para>
     <para>Veuillez noter que pour utiliser plus de 8 canaux audio au format RAW, il vous faudra installer notre paquet « &app;-dependency » qui compilera gstreamer.</para>
 
     <para>

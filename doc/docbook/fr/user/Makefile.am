@@ -1,4 +1,4 @@
-userdir = $(datadir)/scenic/docbook/user
+userdir = $(datadir)/scenic/docbook/fr/user
 user_DATA = \
     about.xml \
     advanced-options.xml \

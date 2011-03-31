@@ -90,3 +90,14 @@ src/main/milhouse
 src/vumeter/test/meter
 utils/dc-ctl/dc-ctl
 utils/jack-info/jack-info
+doc/docbook/en/installation-manual.xml
+doc/docbook/en/user-manual.xml
+doc/docbook/fr/installation-manual.xml
+doc/docbook/fr/user-manual.xml
+doc/docbook/en/html/
+doc/docbook/fr/html/
+doc/html/
+doc/pythondocs/
+py/scripts/midistreamc
+py/scripts/scenicc
+
