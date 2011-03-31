@@ -61,27 +61,28 @@ namespace {
 /// Translate error messages into more helpful/detailed info
 void translateMessage(GstObject *src, const std::string &errStr)
 {
+    using std::string;
     // FIXME: somehow this info could be improved by getting details from elsewhere,
     // or at least querying the element responsible for more info
-    std::string srcName = gst_object_get_name(src);
-    if (srcName.find("udpsrc") != std::string::npos) // this comes from a udpsrc
+    string srcName = gst_object_get_name(src);
+    if (srcName.find("udpsrc") != string::npos) // this comes from a udpsrc
     {
-        if (errStr.find("Could not get/set settings from/on resource") != std::string::npos)
+        if (errStr.find("Could not get/set settings from/on resource") != string::npos)
         {
             int port;
             g_object_get(src, "port", &port, NULL);
 
             THROW_CRITICAL(srcName << ":" << errStr << " Port " <<
-                boost::lexical_cast<std::string>(port) << " may be in use by another process.");
+                boost::lexical_cast<string>(port) << " may be in use by another process.");
         }
     }
-    else if (srcName.find("v4l2src") != std::string::npos) // this comes from a v4l2src
+    else if (srcName.find("v4l2src") != string::npos) // this comes from a v4l2src
     {
-        static const std::string v4l2busy("Could not enqueue buffers in device ");
+        static const string v4l2busy("Could not enqueue buffers in device ");
         size_t pos = errStr.find(v4l2busy);
-        if (pos != std::string::npos)
+        if (pos != string::npos)
         {
-            std::string deviceName(errStr.substr(pos + v4l2busy.length(), errStr.length() - v4l2busy.length() - 1));
+            string deviceName(errStr.substr(pos + v4l2busy.length(), errStr.length() - v4l2busy.length() - 1));
             THROW_CRITICAL(srcName << ":" << errStr <<
                  deviceName << " is probably already in use.");
         }
