@@ -23,14 +23,24 @@
 #include <gst/gst.h>
 #include "gst_linkable.h"
 
-void gstlinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks)
+namespace gstlinkable
 {
-    GstIter src;
-    GstIter sink;
-    for (src = sources.begin(), sink = sinks.begin();
-            src != sources.end(), sink != sinks.end();
-            ++src, ++sink)
-        gstlinkable::link(*src, *sink);
+LinkExcept::LinkExcept(const char* log_msg) : Except(log_msg)
+{
+    log_ = WARNING;
+}
+}
+
+void gstlinkable::tryLink(GstElement *src, GstElement *sink)
+{
+    if (not gst_element_link(src, sink))
+    {
+        std::string msg("Failed to link ");
+        msg += GST_ELEMENT_NAME(src);
+        msg += " to ";
+        msg += GST_ELEMENT_NAME(sink);
+        throw LinkExcept(msg.c_str());
+    }
 }
 
 void gstlinkable::link(GstElement *src, GstElement *sink)

@@ -23,7 +23,6 @@
 #ifndef _GST_LINKABLE_H_
 #define _GST_LINKABLE_H_
 
-#include <vector>
 #include <gst/gst.h>
 #include "except.h"
 #include "util/log_writer.h"
@@ -32,31 +31,14 @@ class _GstPad;
 
 namespace gstlinkable
 {
-    typedef std::vector<GstElement *>::iterator GstIter;
     class LinkExcept : public Except
     {
         public:
-            LinkExcept(const char* log_msg) : Except(log_msg)
-        {
-            log_ = WARNING;
-        }
+            LinkExcept(const char *log_msg);
     };
-
-
-    static void tryLink(GstElement *src, GstElement *sink)
-    {
-        if (not gst_element_link(src, sink))
-        {
-            std::string msg("Failed to link ");
-            msg += GST_ELEMENT_NAME(src);
-            msg += " to ";
-            msg += GST_ELEMENT_NAME(sink);
-            throw LinkExcept(msg.c_str());
-        }
-    }
+    void tryLink(GstElement *src, GstElement *sink);
 
     bool link_pads(_GstPad *srcPad, _GstPad *sinkPad);
-    void link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
     void link(GstElement *src, GstElement *sink);
 
     template <typename T>
@@ -75,22 +57,6 @@ namespace gstlinkable
     void link(T &src, U &sink)
     {
         tryLink(src.srcElement(), sink.sinkElement());
-    }
-
-    template <typename T>
-    void link(std::vector<GstElement*> &sources, T &sink)
-    {
-        GstIter src;
-        for (src = sources.begin(); src != sources.end(); ++src)
-            tryLink(*src, sink.sinkElement());
-    }
-
-    template <typename T>
-    void link(T &source, std::vector<GstElement*> &sinks)
-    {
-        GstIter sink;
-        for (sink = sinks.begin(); sink != sinks.end(); ++sink)
-            tryLink(source.srcElement(), *sink);
     }
 }
 
