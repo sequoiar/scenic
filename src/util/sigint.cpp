@@ -28,15 +28,8 @@
 // FIXME: this is shared!!!!
 namespace  {
 volatile bool signal_flag = false;
-} // end anonymous namespace
 
-bool signal_handlers::signalFlag()
-{
-    return signal_flag;
-}
-
-
-static std::string sigToString(int sig)
+std::string sigToString(int sig)
 {
     switch (sig) // no need for breaks, fallthrough is impossible
     {
@@ -55,7 +48,7 @@ static std::string sigToString(int sig)
     }
 }
 
-static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
+void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
 {
     LOG_INFO("Got signal " << sigToString(sig) << ", going down!");
     if (signal_flag)
@@ -70,6 +63,12 @@ static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
     }
     else
         signal_flag = true;
+}
+} // end anonymous namespace
+
+bool signal_handlers::signalFlag()
+{
+    return signal_flag;
 }
 
 void signal_handlers::setHandlers()
@@ -86,4 +85,3 @@ void signal_handlers::setHandlers()
             THROW_ERROR("Cannot register signal " << sigToString(signals[sig])
                     << " handler");
 }
-
