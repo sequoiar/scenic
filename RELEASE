@@ -1,69 +1,52 @@
-Release notes for Scenic 0.6.3
+Release notes for Scenic 0.7.0
 
-This release is the fourth of the stable 0.6 branch. This branch introduces
-many new features developed during 0.5 series. Those features include MIDI
-streaming support and the hability to customize what each peer receives as
-audio and video.
+This release is the first of the unstable 0.7 branch. This branch introduces
+support for RTSP, using the --rtsp-server and --rtsp-client options. It also
+removes deprecated features and offers more reasonable defaults of milhouse.
 
-This version should work with every version in the stable 0.6 series.
+Since this is an unstable branch, there is no guarantee that versions will
+be interoperable (although we will try to make it so).
 
 See the NEWS and ChangeLog files for a complete history of changes.
 
     Upgrading:
-    *   Be sure to uninstall your previous miville or scenic before installing
+    *   Be sure to uninstall your previous scenic before installing
         scenic.
     *   In the older source directory, use "make uninstall" as root to
         uninstall previous installations.
     *   Don't forget to run ldconfig after installation.
-    *   As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
-        again or simply apply the utils/rtpsource.diff patch to
-        gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
-        https://bugzilla.gnome.org/show_bug.cgi?id=611213
-        This fix adds receiver side bitrate estimation. Note that milhouse
-        will function fine without it, as will scenic.
-    *   Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
-        Install them with aptitude.
 
     Backward compatibility:
-        Each release in the 0.4 series should be interoperable with each other.
+        Each release in the 0.7 series may not be interoperable with each other.
 
     Milhouse dependency for Scenic
         Scenic always needs the same version of milhouse, eg. scenic 0.4.5
         needs milhouse 0.4.5
 
     Limitations:
-    *   While milhouse supports many video and audio input types, Scenic only
+    *   While milhouse supports many video and audio input types, scenic only
         supports a subset of them.
-    *   Each release version in the 0.5 branch is considered unstable and will
+    *   Each release version in the 0.7 branch is considered unstable and will
         not be supported in the future. Each version is not interoperable with
-        any other version of the unstable 0.5 branch. Wait for the next release
-        in the 0.6 branch to benefit from long term support of the new features
-        of the 0.5 branch.
+        any other version of the unstable 0.7 branch. Wait for the next release
+        in the 0.8 branch to benefit from long term support of the new features
+        of the 0.7 branch.
 
 New features in milhouse:
-    -Added text overlay
-    -Added gst-version command to print out the current version of the gstreamer
-    library being used.
-    -Added multicast caps negotiation.
-    -avoid flickering on video resize
-    -improvements to SharedVideoBuffer API
-
-New features in scenic:
-    -fixed python packaging
+    -RTSP mode
+    -explicit --disable-video and --disable-audio options.
+    -standalone vumeters (i.e. will render in their own window if no --vumeter-id option is given).
 
 Bug fixes in milhouse:
-    * #589 Add AM_MAINTAINER_MODE to configure.ac
-    * Fixed /man Makefile.am
-    * #594 Be able to write text overlay in milhouse's texture
-    * #576 We get a "Could not generate caps from caps string" error
-    * #592 test and probably fix multicast in milhouse
-    * #577 Add GStreamer version in the detailed status
+    * (none)
 
 Bug fixes in scenic:
     * (none)
 
 HISTORY
 
+    * 2011-04-01: 0.7.0
+         * First release of the 0.7 unstable branch
     * 2010-06-18: 0.6.2
          * Third stable release of the 0.6 stable branch.
     * 2010-06-11: 0.6.1
