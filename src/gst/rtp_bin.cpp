@@ -32,7 +32,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-GstElement *RtpBin::rtpbin_ = 0;
 int RtpBin::sessionCount_ = 0;
 bool RtpBin::destroyed_ = false;
 
@@ -47,9 +46,10 @@ RtpBin::RtpBin(const Pipeline &pipeline, bool printStats) :
     printStats_(printStats)  // 0 based
 {
     // only initialize rtpbin element once per process
+    rtpbin_ = pipeline_.findElementByName("rtpbin");
     if (rtpbin_ == 0)
     {
-        rtpbin_ = pipeline_.makeElement("gstrtpbin", NULL);
+        rtpbin_ = pipeline_.makeElement("gstrtpbin", "rtpbin");
         startPrintStatsCallback();
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
@@ -162,7 +162,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     // get sessions
     for (int sessionId = 0; sessionId < sessionCount_; ++sessionId)
     {
-        g_signal_emit_by_name(rtpbin_, "get-internal-session", sessionId, &session);
+        g_signal_emit_by_name(context->rtpbin_, "get-internal-session", sessionId, &session);
 
         // parse stats of all the sources in the session, this include the internal source
         g_object_get(session, "sources", &arrayOfSources, NULL);
@@ -197,14 +197,11 @@ const char *RtpBin::padStr(const char *padName) const
 RtpBin::~RtpBin()
 {
     unregisterSession();
+    rtpbin_ = 0;
 
     --sessionCount_;
     if (sessionCount_ == 0) // destroy if no streams are present
-    {
-        LOG_DEBUG("No rtp sessions left, destroying rtpbin");
-        rtpbin_ = 0;
         destroyed_ = true;
-    }
     else if (sessionCount_ < 0)
         LOG_WARNING("Rtp session count is somehow less than zero!!!");
 }

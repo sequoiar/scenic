@@ -74,10 +74,6 @@ void Milhouse::runAsReceiver(const po::variables_map &options, bool enableVideo,
 
     pipeline.start();
 
-    /// These options are more like commands, they are dispatched after playback starts
-    if (options.count("jitterbuffer"))
-        RtpReceiver::setLatency(options["jitterbuffer"].as<int>());
-
     LOG_DEBUG("Running main loop");
     gutil::runMainLoop(options["timeout"].as<int>());
     LOG_DEBUG("main loop has finished");

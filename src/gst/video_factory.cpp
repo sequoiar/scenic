@@ -47,7 +47,7 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
     shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec,
-                remoteHost, port, multicastInterface));
+                remoteHost, port, multicastInterface, options["jitterbuffer"].as<int>()));
 
     return shared_ptr<VideoReceiver>(new VideoReceiver(pipeline, vConfig, rConfig));
 }

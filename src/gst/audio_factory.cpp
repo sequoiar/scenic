@@ -74,7 +74,7 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
     std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
     shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, remoteHost, port,
-                multicastInterface));
+                multicastInterface, options["jitterbuffer"].as<int>()));
 
     return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));
 }

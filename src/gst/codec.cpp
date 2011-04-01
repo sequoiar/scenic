@@ -102,8 +102,6 @@ Decoder::~Decoder()
 {
 }
 
-unsigned long long Decoder::minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
-
 VideoEncoder::VideoEncoder(const Pipeline &pipeline, const char *encoder, bool supportsInterlaced) :
     Encoder(pipeline, encoder),
     colorspace_(pipeline_.makeElement("ffmpegcolorspace", NULL)),
@@ -141,16 +139,6 @@ void VideoDecoder::addDeinterlace()
         gstlinkable::link(colorspace_, deinterlace_);
     }
 }
-
-
-/// Increase jitterbuffer size
-void VideoDecoder::adjustJitterBuffer()
-{
-    if (doDeinterlace_)
-        RtpReceiver::setLatency(LONGER_JITTER_BUFFER_MS);
-}
-
-
 
 /// Constructor
 // POSIX specific hardware thread info
@@ -214,14 +202,6 @@ RtpPay* H264Decoder::createDepayloader() const
 {
     return new H264Depay(pipeline_);
 }
-
-
-/// Increase jitterbuffer size
-void H264Decoder::adjustJitterBuffer()
-{
-    RtpReceiver::setLatency(LONGER_JITTER_BUFFER_MS);
-}
-
 
 
 /// Constructor
@@ -395,11 +375,6 @@ VorbisEncoder::VorbisEncoder(const Pipeline &pipeline, int bitrate, double quali
 Pay* VorbisEncoder::createPayloader() const
 {
     return new VorbisPay(pipeline_);
-}
-
-unsigned long long VorbisDecoder::minimumBufferTime()
-{
-    return MIN_BUFFER_USEC;
 }
 
 VorbisDecoder::VorbisDecoder(const Pipeline &pipeline) :
