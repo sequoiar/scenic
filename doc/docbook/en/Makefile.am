@@ -1,5 +1,5 @@
 SUBDIRS = fig installation user
-docbookdir = $(datadir)/scenic/docbook/fr
+docbookdir = $(datadir)/scenic/docbook/en
 docbook_DATA = \
 	glossary.xml \
 	installation-manual.xml \
@@ -15,7 +15,7 @@ html-local:
 		gnome-doc-tool html -o html/$${doc}/$${doc}.html $${doc}.xml ; \
 		sed -i 's!src="fig/!src="../fig/!' html/$${doc}/*.html ; \
 		( cd html/$${doc} ; ln -sf $${doc}.html index.html ) ; \
-	done
+	done 
 
 clean-local:
 	rm -rf html installation-manual.xml user-manual.xml

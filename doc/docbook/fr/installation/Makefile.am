@@ -1,4 +1,4 @@
-installationdir = $(datadir)/scenic/docbook/installation
+installationdir = $(datadir)/scenic/docbook/fr/installation
 installation_DATA = \
 	about.xml \
 	ati-settings.xml \
