@@ -134,7 +134,13 @@ XvImageSink::XvImageSink(Pipeline &pipeline,
 
     GdkWindow *drawingAreaXWindow = gtk_widget_get_window (drawingArea_);
     gulong embed_xid = GDK_WINDOW_XID (drawingAreaXWindow);
-    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY (sink_), embed_xid);
+    // FIXME: this has been deprecated in favour of
+    // gst_x_overlay_set_xwindow_handle as of gst-plugins-base 0.10.31
+#if GST_CHECK_VERSION(0,10,31)
+    gst_x_overlay_set_xwindow_handle(GST_X_OVERLAY (sink_), embed_xid);
+#else
+    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY (sink_), embed_xid);
+#endif
 }
 
 gboolean XvImageSink::onWindowStateEvent(GtkWidget * /*widget*/, GdkEventWindowState *event, gpointer data)
