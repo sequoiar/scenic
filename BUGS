@@ -7,6 +7,7 @@ Milhouse:
         will not be able to determine how many channels it should have. A
         workaround where the channels are explicitly set MIGHT be possible.
         This bug is present in Ubuntu 10.04 (fixed in 10.10).
+    * h263 video does not work on Ubuntu 10.10 (fixed upstream).
 
 Scenic:
     * scenic uses 100% of CPU due to pygtk bug on Ubuntu 10.10
