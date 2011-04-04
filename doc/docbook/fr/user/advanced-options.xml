@@ -61,8 +61,8 @@
   </sect1>
   <sect1 id="user.using-milhouse">
     <title>Utiliser milhouse</title>
-    <para>La ligne de commande milhouse est un puisant outil doté de nombreuses options qui n’ont pas encore été intégrées à &app; GUI. Pour des installations plus complexes que ce que &app; peut supporter à ce jour, il est suggéré d’utiliser <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> comme script de lancement. Vous en trouverez plusieurs exemples dans « trunk/utils/ ». Un coup d’œil à leur page respective dans le manuel vous en apprendra plus sur chacun de ces outils. 
-    <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
+    <para>La ligne de commande milhouse est un puisant outil doté de nombreuses options qui n’ont pas encore été intégrées à &app; GUI. Pour des installations plus complexes que ce que &app; peut supporter à ce jour, il est suggéré d’utiliser <ulink url="http://code.sat.qc.ca/trac/lunch">lunch</ulink> comme script de lancement. Vous en trouverez plusieurs exemples dans « trunk/utils/ ». Un coup d’œil à leur page respective dans le manuel vous en apprendra plus sur chacun de ces outils. 
+    <ulink url="http://code.sat.qc.ca/trac/scenic/browser/trunk/utils">
     trunk/utils/</ulink></para>
     <para>Voici une brève introduction à milhouse, une application pour les flux audio et vidéo sur RTP.</para>
     <para>milhouse est un outil simple capable de beaucoup de choses. Par exemple, il peut dresser la liste des caméras et autres équipements de capture vidéo connectés à votre ordinateur. Il peut également changer les réglages vidéo pour une pièce d’équipement V4L2 (Video4Linux2), tels que les informations sur le standard vidéo et sa position dans la chaine des entrées vidéo. milhouse supporte également les caméras DV et DC cameras, toutes deux faisant appel à ieee1394 (Firewire) pour envoyer leur signal vidéo à l’ordinateur. Ces deux types de caméras ce sont pas supportés à ce jour par l’interface graphique usager &app;. C’est entre autres pour cette raison qu’in utilisateur avancé préférera peut-être utiliser l’outil de lignes de commande milhouse plutôt que l’interface graphique usager &app;.</para>

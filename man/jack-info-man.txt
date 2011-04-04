@@ -8,7 +8,7 @@ Lists the JACK audio ports and their respective latency. Prints the sample rate 
 2010 - Written by Tristan Matthews <tristan@sat.qc.ca>.
 
 [REPORTING BUGS]
-http://svn.sat.qc.ca/trac/scenic
+http://code.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
 Scenic

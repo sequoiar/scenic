@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
-"Report-Msgid-Bugs-To: http://svn.sat.qc.ca/trac/scenic/wiki/BugReport\n"
+"Report-Msgid-Bugs-To: http://code.sat.qc.ca/trac/scenic/wiki/BugReport\n"
 "POT-Creation-Date: 2010-07-27 16:58-0400\n"
 "PO-Revision-Date: 2010-06-22 11:53-0500\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"

@@ -107,7 +107,7 @@
     </para>
     <para>&app; need various package to be installed. You can have
     a detailed view of the required library and dependency on our 
-    <ulink url="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
+    <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
     Library and Package </ulink>page. To install the required these
     libraries and their dependencies run the following command in
     the terminal:</para>

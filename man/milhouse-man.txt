@@ -41,7 +41,7 @@ milhouse --v4l2-input 1
 2008 - Written by Tristan Matthews <tristan@sat.qc.ca> and Koya Charles <koya.charles@gmail.com>.
 
 [REPORTING BUGS]
-http://svn.sat.qc.ca/trac/scenic
+http://code.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
 Scenic
