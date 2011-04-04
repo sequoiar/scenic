@@ -7,6 +7,6 @@ Name: scenic
 Description: shared memory for video streams
 URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
-Requires.private: 
-Libs: -L${libdir}/scenic -lshared_video
+Requires.private:
+Libs: -L${libdir}/scenic -lshared_video @BOOST_THREAD_LIB@
 Cflags: -I${includedir}/scenic
