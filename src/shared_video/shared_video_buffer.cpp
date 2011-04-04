@@ -32,7 +32,6 @@
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/thread/thread_time.hpp>
 
-/// FIXME: doesn't get updated
 double SharedVideoBuffer::ASPECT_RATIO = videosize::WIDTH / videosize::HEIGHT;
 
 using namespace boost::interprocess;
@@ -41,10 +40,6 @@ SharedVideoBuffer::SharedVideoBuffer(int width, int height) : width_(width), hei
     mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false)
 {
     ASPECT_RATIO = width_ / height_;
-}
-
-SharedVideoBuffer::~SharedVideoBuffer()
-{
 }
 
 interprocess_mutex & SharedVideoBuffer::getMutex()
