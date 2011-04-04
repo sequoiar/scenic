@@ -414,7 +414,7 @@ create_video_payloader (GstRTSPCamMediaFactory *factory,
     return NULL;
 
   videosrc = gst_element_factory_make (factory->video_source, NULL);
-  if (g_strcmp0(factory->video_source, "videotestsrc") == 0)
+  if (!g_strcmp0 (factory->video_source, "videotestsrc"))
       g_object_set (videosrc, "is-live", TRUE, NULL);
   else if (factory->video_device) /* don't set device for testsrc */
     g_object_set (videosrc, "device", factory->video_device, NULL);
@@ -496,7 +496,7 @@ create_audio_payloader (GstRTSPCamMediaFactory *factory,
 
     return NULL;
   }
-  else /* FIXME: this is only valid for jackaudiosrc, we should proxy these elements' properties */
+  else if (!g_strcmp0 (factory->audio_source, "jackaudiosrc"))
       g_object_set(audiosrc, "connect", 2, NULL);
 
   audioconvert = gst_element_factory_make ("audioconvert", NULL);

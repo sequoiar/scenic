@@ -48,7 +48,7 @@ void gstlinkable::link(GstElement *src, GstElement *sink)
     tryLink(src, sink);
 }
 
-// with this method, we can find out why pads don't link
+// with this function, we can find out why pads don't link
 // if they fail
 bool gstlinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
 {
