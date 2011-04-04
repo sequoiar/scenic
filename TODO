@@ -1,0 +1,4 @@
+To do in Scenic
+---------------
+
+* Replace shared_video.so by the GStreamer elements shmsrc and shmsink
