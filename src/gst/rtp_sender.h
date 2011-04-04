@@ -23,7 +23,6 @@
 #ifndef _RTP_SENDER_H_
 #define _RTP_SENDER_H_
 
-#include <string>
 #include "rtp_bin.h"
 
 class SenderConfig;
@@ -33,7 +32,7 @@ class _GParamSpec;
 class RtpPay;
 
 class RtpSender
-    : RtpBin
+    : public RtpBin
 {
     public:
         RtpSender(const Pipeline &pipeline) :

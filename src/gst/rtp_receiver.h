@@ -36,7 +36,7 @@ class _GstRtpBin;
 class _GstPad;
 
 class RtpReceiver
-    : RtpBin
+    : public RtpBin
 {
     public:
         RtpReceiver(const Pipeline &pipeline, int latency);
