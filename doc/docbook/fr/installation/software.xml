@@ -88,7 +88,7 @@
     <para>
     <userinput>sudo aptitude upgrade</userinput>
     </para>
-    <para>&app; nécessite l’installation de plusieurs paquets. Une revue détaillée des librairies et dépendances requises sur notre page <ulink url="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage"> "Library and Package" </ulink> Pour installer ces dernières, tapez les commandes suivantes dans un terminal : </para>
+    <para>&app; nécessite l’installation de plusieurs paquets. Une revue détaillée des librairies et dépendances requises sur notre page <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/LibraryPackage"> "Library and Package" </ulink> Pour installer ces dernières, tapez les commandes suivantes dans un terminal : </para>
     <para>
       <emphasis role="strong">For Ubuntu 8.04 LTS (Hardy) install
 ur Ubuntu 8.04 LTS (Hardy), installez les paquets suivants :</emphasis>

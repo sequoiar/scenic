@@ -50,7 +50,7 @@ from scenic.internationalization import _
 
 log = logger.start(name="gui")
 
-ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
+ONLINE_HELP_URL = "http://code.sat.qc.ca/trac/scenic/wiki/Documentation"
 ONE_LINE_DESCRIPTION = _("Telepresence application for live performances and installations") # Copy-pasted from configure.DESCRIPTION, but i18nized.
 ALL_SUPPORTED_SIZE = [ # by milhouse video
     "924x576",
@@ -82,7 +82,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.""")
 
-PROJECT_WEBSITE = "http://svn.sat.qc.ca/trac/scenic"
+PROJECT_WEBSITE = "http://code.sat.qc.ca/trac/scenic"
 
 AUTHORS_LIST = [
     'Alexandre Quessy <alexandre@quessy.net>',

@@ -6,7 +6,7 @@
     <para>Voici une courte liste des équipements utilisés pour un réglage courant de &app;. Notez que ces équipements sont indispensables de chaque côté de la performance distante (en local et en distant). </para>
     <itemizedlist>
       <listitem>
-        <para>Un ordinateur (pour des indications quant au type d’ordinateur à utiliser, veuillez consulter notre manuel d’installation). <ulink url="http://svn.sat.qc.ca/trac/scenic/installation-manual/">Manuel d'installation</ulink></para>
+        <para>Un ordinateur (pour des indications quant au type d’ordinateur à utiliser, veuillez consulter notre manuel d’installation). <ulink url="http://code.sat.qc.ca/trac/scenic/installation-manual/">Manuel d'installation</ulink></para>
       </listitem>
       <listitem>
         <para>1 x carte de capture vidéo supportée par Linux. </para>
@@ -80,7 +80,7 @@
       <title>Équipements supportés. </title>
       <para>&app; est habituellement utilisé avec de nombreux équipements audio, vidéo et MIDI. </para>
       <para>Il est essentiel de vérifier que les équipements utilisés sont supportés par &app; et plus généralement par <application> GNU/Linux</application>. Veuillez vous référer à la page des spécifications équipements pour en savoir plus  propos des équipements supportés. 
-         <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
+         <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/HardwareRequirements">
          Équipements supportés</ulink>
       </para>
       <para>Il est également nécessaire de vous assurer que tous les équipements sont correctement configurés et connectés. </para>
@@ -140,13 +140,13 @@
         <para>Vous pouvez maintenant éteindre l’ordinateur. </para>
       </listitem>
       <listitem>
-        <para>Connectez l’ensemble des équipements et périphériques audio et vidéo en suivant les instructions figurant sur la page sur les réglages des équipements et périphériques.<ulink url="http://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">Réglages des équipements</ulink></para>
+        <para>Connectez l’ensemble des équipements et périphériques audio et vidéo en suivant les instructions figurant sur la page sur les réglages des équipements et périphériques.<ulink url="http://code.sat.qc.ca/trac/scenic/wiki/Hardware%20Setup">Réglages des équipements</ulink></para>
       </listitem>
       <listitem>
         <para>Lors de la connexion des équipements et au cas où vous auriez deux sorties vidéo, il vous faut connecter les deux sorties en question avant de redémarrer le système afin que les deux périphériques soient détectés. </para>
       </listitem>
       <listitem>
-        <para>Configurez et testez ensuite vous équipements audio et vidéo en suivant les instructions figurant sur la page « TestAudiovisualInputOutput »<ulink url="http://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
+        <para>Configurez et testez ensuite vous équipements audio et vidéo en suivant les instructions figurant sur la page « TestAudiovisualInputOutput »<ulink url="http://code.sat.qc.ca/trac/scenic/wiki/TestAudiovisualInputOutput">
         TestAudiovisualInputOutput</ulink></para>
       </listitem>
     </orderedlist>

@@ -23,7 +23,7 @@ Alexandre Quessy <alexandre@quessy.net>
 Tristan Matthews <tristan@sat.qc.ca>
 
 [REPORTING BUGS]
-http://svn.sat.qc.ca/trac/scenic
+http://code.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
 Scenic

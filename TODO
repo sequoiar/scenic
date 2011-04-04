@@ -1,19 +1,19 @@
 General: simplify and refactor stuff in gst/ so that it can be reused in rtsp/
 (where reasonable). Try to reproduce functionality from gst/ in rtsp/.
 
-RTSPServer
-----
-v4l2: use correct aspect ratio.
-add support for dv.
-support multicast.
-add vumeters.
+Future shared video tool
+------------------------
+ * Replace shared_video.so by the GStreamer elements shmsrc and shmsink
 
-RTSPClient
-----
-use fancier overlay like in GtkVideoSink.
-add vumeters.
+RTSPServer
+----------
+ * v4l2: use correct aspect ratio.
+ * add support for dv.
+ * support multicast.
+ * add vumeters.
 
 Done
 ----
-investigate "source" property of uridecodebin: done by handling the notify::source signal
+Investigate "source" property of uridecodebin: done by handling the notify::source signal
 see how we can specify explicitly which ports to use: ""
+
