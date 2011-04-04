@@ -8,5 +8,5 @@ Description: shared memory for video streams
 URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
 Requires.private: 
-Libs: -L${libdir} -lshared_video
+Libs: -L${libdir}/scenic -lshared_video
 Cflags: -I${includedir}/scenic
