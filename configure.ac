@@ -284,11 +284,7 @@ src/gst/Makefile
 src/rtsp/Makefile
 src/rtsp/examples/Makefile
 src/main/Makefile
-<<<<<<< HEAD
-=======
-src/main/test/Makefile
 scenic.pc
->>>>>>> master
 ])
 
 AC_OUTPUT
