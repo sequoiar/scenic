@@ -1,4 +1,4 @@
-pkglib_LTLIBRARIES = libshared_video.la
+lib_LTLIBRARIES = libshared_video.la
  # public header file 
 pkginclude_HEADERS = $(top_srcdir)/src/include/sharedVideoBuffer.h
 
