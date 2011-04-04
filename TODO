@@ -5,15 +5,13 @@ RTSPServer
 ----
 v4l2: use correct aspect ratio.
 add support for dv.
-support multicast.
-add vumeters.
 
 RTSPClient
 ----
-use fancier overlay like in GtkVideoSink.
-add vumeters.
 
 Done
 ----
 investigate "source" property of uridecodebin: done by handling the notify::source signal
 see how we can specify explicitly which ports to use: ""
+add vumeters.
+use fancier overlay like in GtkVideoSink.
