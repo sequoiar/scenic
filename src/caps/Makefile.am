@@ -1,3 +1,5 @@
+SUBDIRS=test
+
 noinst_LTLIBRARIES = libcaps.la
 
 libcaps_la_SOURCES = caps_server.cpp caps_server.h caps_client.cpp caps_client.h \

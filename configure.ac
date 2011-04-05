@@ -277,6 +277,7 @@ src/shared_video/Makefile
 src/vumeter/Makefile
 src/vumeter/test/Makefile
 src/caps/Makefile
+src/caps/test/Makefile
 src/gst/Makefile
 src/rtsp/Makefile
 src/rtsp/examples/Makefile
