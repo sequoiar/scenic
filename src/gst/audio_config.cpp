@@ -88,7 +88,8 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioTestSource(pipeline, *this);
     else if (source_ == "filesrc")
         return new AudioFileSource(pipeline, *this);
-    else if (source_ == "alsasrc" or source_ == "pulsesrc" or source_ == "autoaudiosrc")
+    else if (source_ == "alsasrc" or source_ == "pulsesrc" or
+            source_ == "autoaudiosrc" or source_ == "gconfaudiosrc")
         return new AudioSimpleSource(pipeline, *this);
     else if (source_ == "jackaudiosrc")
     {

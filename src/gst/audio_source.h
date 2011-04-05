@@ -102,7 +102,7 @@ class AudioFileSource : public AudioSource, private BusMsgHandler
 };
 
 /**
- *  Concrete AudioSource which captures audio from ALSA, Pulse or whatever source gstreamer-properties has configured.
+ *  Concrete AudioSource which captures audio from ALSA, Pulse or whatever source gstreamer-properties has configured (autoaudiosrc).
  *  Has caps filter to allow number of channels to be variable.
  */
 
