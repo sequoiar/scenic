@@ -49,39 +49,11 @@ void AudioSink::adjustBufferTime(unsigned long long bufferTime)
 }
 
 /// Constructor
-AudioAlsaSink::AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config) :
+AudioSimpleSink::AudioSimpleSink(Pipeline &pipeline, const AudioSinkConfig &config) :
     aconv_(pipeline.makeElement("audioconvert", NULL)),
     config_(config)
 {
-    sink_ = pipeline.makeElement("alsasink", NULL);
-
-    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
-    if (config_.hasDeviceName())
-        g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
-
-    gstlinkable::link(aconv_, sink_);
-}
-
-/// Constructor
-AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config) :
-    aconv_(pipeline.makeElement("audioconvert", NULL)),
-    config_(config)
-{
-    sink_ = pipeline.makeElement("pulsesink", NULL);
-    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
-    if (config_.hasDeviceName())
-        g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
-
-    gstlinkable::link(aconv_, sink_);
-}
-
-
-/// Constructor
-AudioAutoSink::AudioAutoSink(Pipeline &pipeline, const AudioSinkConfig &config) :
-    aconv_(pipeline.makeElement("audioconvert", NULL)),
-    config_(config)
-{
-    sink_ = pipeline.makeElement("autoaudiosink", NULL);
+    sink_ = pipeline.makeElement(config_.sink(), config_.sinkName());
 
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
@@ -94,7 +66,7 @@ AudioAutoSink::AudioAutoSink(Pipeline &pipeline, const AudioSinkConfig &config) 
 AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) :
     config_(config)
 {
-    sink_ = pipeline.makeElement("jackaudiosink", config_.sinkName());
+    sink_ = pipeline.makeElement(config_.sink(), config_.sinkName());
 
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);

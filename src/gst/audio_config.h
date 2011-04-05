@@ -91,6 +91,7 @@ class AudioSinkConfig
         AudioLevel* createLevel(Pipeline &pipeline, const std::string &title) const;
         AudioSink* createSink(Pipeline &pipeline) const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
+        const char *sink() const;
         const char *sinkName() const;
         const char *deviceName() const;
         int numChannels() const;

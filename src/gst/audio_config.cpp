@@ -171,12 +171,9 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
             result->disableAutoConnect();
         return result;
     }
-    else if (sink_ == "alsasink")
-        return new AudioAlsaSink(pipeline, *this);
-    else if (sink_ == "pulsesink")
-        return new AudioPulseSink(pipeline, *this);
-    else if (sink_ == "autoaudiosink")
-        return new AudioAutoSink(pipeline, *this);
+    else if (sink_ == "alsasink" or sink_ == "pulsesink" or sink_ ==
+            "autoaudiosink" or sink_ == "gconfaudiosink")
+        return new AudioSimpleSink(pipeline, *this);
     else
     {
         THROW_CRITICAL(sink_ << " is an invalid audiosink");
@@ -210,3 +207,10 @@ unsigned long long AudioSinkConfig::bufferTime() const
 {
     return bufferTime_;
 }
+
+/// Returns c-style string specifying the source
+const char *AudioSinkConfig::sink() const
+{
+    return sink_.c_str();
+}
+
