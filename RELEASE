@@ -61,6 +61,7 @@ Bug fixes in milhouse:
     * documentation: Fixed project URL. Updated doc about the Ubuntu PPA.
     * shared_video: added a .pc file for pkg-config.
     * shared_video: do not install non-public libraries
+    * scenic: open french documentation if LANG starts with "fr"
 
 Bug fixes in scenic: 
     * (none)
