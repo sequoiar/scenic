@@ -274,7 +274,7 @@ SimpleVideoSink::SimpleVideoSink(const Pipeline &pipeline, const VideoSinkConfig
     sink_ = pipeline.makeElement(config.sink(), NULL);
 
     // gconfvideosink and autovideosink lack this property
-    if (g_strcmp0(config.sink(), "ximagesink"))
+    if (g_strcmp0(config.sink(), "ximagesink") == 0)
         g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
     if (not config.display().empty())
         g_object_set(sink_, "display", config.display().c_str(), NULL);
