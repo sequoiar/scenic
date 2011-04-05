@@ -40,6 +40,25 @@ New features in milhouse:
 Bug fixes in milhouse:
     * (none)
 
+New features in scenic:
+    -fixed python packaging
+
+Bug fixes in milhouse: 
+    * milhouse: don't call gtk_init unless display has been set
+    * tests: set LANG to C test_vumeter.py: skip test if Gtk cannot open the DISPLAY (not just when DISPLAY is unset). Fixes #598.
+    * shared_video: Add timeouts when we try to acquire locks
+    * shared_video: cleanup memory if we can't acquire lock in 5 seconds
+    * shared_video: exit rather than hanging when we get starved off the shared memory mutex
+    * firereset: call port raw1304_get_port_info
+    * firereset: removed call to get ports which caused stack smashing.
+    * milhouse: print a simple message if no cameras of any kind are found for --list-cameras command
+    * milhouse: (dc1394) exit right away if camera guid is not found
+    * milhouse: (dc1394) display guid in hex when it can be found since this how it was given
+    * documentation: added French manuals and open it if LANG starts with fr in Scenic.
+    * documentation: Fixed project URL. Updated doc about the Ubuntu PPA.
+    * shared_video: added a .pc file for pkg-config.
+    * shared_video: do not install non-public libraries
+
 Bug fixes in scenic:
     * (none)
 
@@ -47,6 +66,8 @@ HISTORY
 
     * 2011-04-01: 0.7.0
          * First release of the 0.7 unstable branch
+    * 2010-07-19: 0.6.3
+         * Fourth stable release of the 0.6 stable branch.
     * 2010-06-18: 0.6.2
          * Third stable release of the 0.6 stable branch.
     * 2010-06-11: 0.6.1
@@ -90,3 +111,4 @@ HISTORY
           * Now using boost1.35
     * 2009-05-08: 0.1.2-rc1
     * 2009-02-10: 0.1.2-a1
+
