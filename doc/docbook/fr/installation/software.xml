@@ -1,0 +1,181 @@
+<chapter id="installation.software-installation">
+  <title>Installation logicielle</title>
+  <para>Une installation de &app; standard exige au moins deux ordinateurs équipés de systèmes d’exploitation linux identiques, des librairies et paquets de développement requis ainsi que la plus récente version du logiciel &app;.</para>
+  <para>Les ordinateurs doivent satisfaire aux exigences minimales suivantes :
+     <link linkend='installation.hardware-requirements'> Pré-requis matériel</link>.
+  </para>
+  <para>Veuillez noter qu’avant de pouvoir utiliser &app;, il vous fait également disposer d’un réseau répondant aux spécifications exigées.
+  <link linkend='installation.network-test'> Spécifications réseau</link>
+  </para>
+  <sect1 id="installation.os-installation">
+    <title>Installation du système d’opération</title>
+    <para>&app; fonctionne sous le système d’opération linux et a été testé avec les distributions de Linux suivantes :</para>
+    <informaltable frame="all">
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry>
+              <para>Distribution</para>
+            </entry>
+            <entry>
+              <para>Statut</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Ubuntu 8.04 LTS (Hardy)</para>
+            </entry>
+            <entry>
+              <para>Entièrement fonctionnelle</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Ubuntu 9.04 (Jaunty)</para>
+            </entry>
+            <entry>
+              <para>Non fonctionnelle</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Ubuntu 9.10 (Karmic)</para>
+            </entry>
+            <entry>
+              <para>Fonctionnelle, distribution la moins testée et documentée</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Ubuntu 10.04 (Lucid)</para>
+            </entry>
+            <entry>
+              <para>Fonctionnelle, toujours en phase de test</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Debian 5.0.4 (Lenny)</para>
+            </entry>
+            <entry>
+              <para>Fonctionnelle, peu testée et en phase de documentation</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>Debian (Squeze)</para>
+            </entry>
+            <entry>
+              <para>Non testée</para>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </informaltable>
+    <para>Pour installer Ubuntu, veuillez suivre les instructions sur la page <ulink url="http://www.ubuntu.com/getubuntu"> "Get
+    Ubuntu" </ulink>
+    </para>
+    <para>Pour installer Debian, veuillez suivre les instructions sur la page <ulink url="http://www.debian.org/distrib/">"Get
+    Debian" </ulink>
+    </para>
+  </sect1>
+  <sect1 id="installation.lib-packages-installation">
+    <title>Installation des librairies et des paquets de développement.</title>
+    <para>Avant de démarrer l’installation de &app;, veuillez effectuer une mise à jour de la distribution de Linux.</para>
+    <para>
+    <userinput>sudo aptitude update</userinput>
+    </para>
+    <para>
+    <userinput>sudo aptitude upgrade</userinput>
+    </para>
+    <para>&app; nécessite l’installation de plusieurs paquets. Une revue détaillée des librairies et dépendances requises sur notre page <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/LibraryPackage"> "Library and Package" </ulink> Pour installer ces dernières, tapez les commandes suivantes dans un terminal : </para>
+    <para>
+      <emphasis role="strong">For Ubuntu 8.04 LTS (Hardy) install
+ur Ubuntu 8.04 LTS (Hardy), installez les paquets suivants :</emphasis>
+    </para>
+    <para>
+<userinput>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev liblame-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect gnome-themes-extra</userinput>
+    </para>
+    <para>Il vous faut télécharger debian sid iperf
+    <ulink url="http://packages.debian.org/sid/iperf">
+    version </ulink> 2.0.4-3 or 2.0.4-4 sur votre bureau et l’installer sur les deux ordinateurs. Double-cliquez sur le paquet pour démarrer le gestionnaire de paquets ou installer le avec dpkgdpkg -i ./iperf_2.0.4-3_i386.deb .
+    </para>
+    <para>
+      <emphasis role="strong">Pour Ubuntu 9.10 (Karmic), installez les paquets suivants :</emphasis>
+    </para>
+    <para>
+            <userinput>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect iperf libmp3lame-dev gnome-themes-extras libboost-dev libboost-thread-dev libboost-system-dev libboost-program-options-dev libasio-dev libboost-iostreams-dev libboost-filesystem-dev</userinput>
+    </para>
+    <para>
+      <emphasis role="strong">Pour Ubuntu 10.04 (Lucid), installez nos paquets &app;</emphasis>
+    </para>
+    <para>Vous pouvez désormais installer &app; sous Ubuntu 10.04. Téléchargez pour cela le paquet correspondant à l’architecture de votre ordinateur à <ulink url="http://ppa.launchpad.net/sat-metalab/metalab/ubuntu/pool/main/s/scenic/">"Download &app; Package"</ulink>
+    </para>
+    <para>En fait, installer Scenic sur Ubuntu Lucid (10.04) est très simple grâce aux paquets qui se trouvent dans l'archive PPA du Metalab de la SAT sur Launchpad. Pour ce faire, il suffit d'entrer les commandes suivantes dans un terminal:</para>
+    <para><userinput>sudo apt-add-repository ppa:sat-metalab/metalab</userinput></para>
+    <para><userinput>sudo apt-get update</userinput></para>
+    <para><userinput>sudo apt-get install scenic</userinput></para>
+    <para>Veuillez noter que pour utiliser plus de 8 canaux audio au format RAW, il vous faudra installer notre paquet « &app;-dependency » qui compilera gstreamer.</para>
+
+    <para>
+      <emphasis role="strong">Pour Debian 5.0.4 (lenny), installez le paquet suivant : </emphasis>
+    </para>
+    <para>
+            <userinput>sudo aptitude -R install qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev bison flex vorbis-tools ffmpeg libxv-dev libiec61883-dev libvorbis-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev libxml2-dev python-twisted doxygen python-setuptools help2man python-simplejson iperf gnome-themes-extras libboost1.35-dev jackd libboost-program-options1.35-dev libboost-thread1.35-dev libboost-system1.35-dev libboost-iostreams1.35-dev libboost-filesystem1.35-dev</userinput>
+    </para>
+    <para>
+      <emphasis role="strong">Veuillez configurer votre noyau Linux temps réel. </emphasis>
+    </para>
+    <para>Une fois celui-ci est installé, exécutez la ligne de commandes suivante (pour faire en sorte que le serveur audio fonctionne en temps réel) :</para>
+        <para>
+        <userinput>sudo su -c 'echo @audio - rtprio 20 &gt;&gt; /etc/security/limits.conf'</userinput>
+        </para>
+        <para>
+        <userinput>sudo su -c 'echo @audio - memlock 250000 &gt;&gt; /etc/security/limits.conf'</userinput>
+        </para>
+    <para>
+      <emphasis role="strong">Veuillez ensuite quitter la session et en ouvrir une nouvelle.</emphasis>
+    </para>
+  </sect1>
+  <sect1 id="installation.midi-component-installationi">
+    <title>Installer les composantes MIDI</title>
+    <para>Les composantes MIDI de &app; sont disponibles avec la sous-version instable (0.5). Vous pouvez plutôt installer &app;0.4.x si vous n’avez pas l’intention de diffuser de signal MIDI, même avec la ligne de commande. </para>
+    <para>Installez le paquet python-portmidi :
+    <ulink url="https://bitbucket.org/aalex/pyportmidi/downloads/">
+    https://bitbucket.org/aalex/pyportmidi/downloads/ </ulink>Note : ce paquet contient des patches non disponibles avec le paquet python inclus avec portmidi. </para>
+  </sect1>
+  <sect1 id="installation.building-scenic">
+    <title>Construire &app; </title>
+    <para>Pour la dernière version de &app;, rendez-vous sur 
+       <ulink url="http://scenic.sat.qc.ca/download">
+       http://scenic.sat.qc.ca/download </ulink>
+    </para>
+    <para>Extraire le fichier</para>
+    <para>
+    <userinput>tar xzj scenic-0.4.x.tar.gz</userinput>
+    <userinput>cd scenic-0.4.x</userinput>
+    </para>
+    <para>Pour Debian 5.0.4 (lenny), il vous faut installer liblame. Ne pas en tenir compte pour les autres distributions.</para>
+    <para>
+    <userinput>./utils/install_lame.sh</userinput>
+    </para>
+    <para>Pour accéder à l’ensemble des fichiers gstreamer et bâtir tous les modules gstreamer depuis le répertoire courant, exécutez :</para>
+    <para>
+    <userinput>./utils/install_gstreamer.sh</userinput>
+    </para>
+    <para>Ce script exécute le script autogen.sh de chaque module, puis <userinput>make et sudo make install</userinput>.
+    </para>
+    <para>Tapez ensuite la commande « ldconfig » :</para>
+    <para>Pour Ubuntu 8.04 LTS (Hardy), il vous faut installer la version de démarrage 1.35. Ne pas en tenir compte pour les autres distributions.</para>
+    <para>
+    <userinput>./utils/boost1_35_for_hardy.sh</userinput>
+    </para>
+    <para>
+      <emphasis role="strong">Compilez ensuite &app; : </emphasis>
+    </para>
+    <para>
+    <userinput>cd scenic</userinput>
+    <userinput>./configure &amp;&amp; make &amp;&amp; sudo make install</userinput>
+    </para>
+  </sect1>
+</chapter>

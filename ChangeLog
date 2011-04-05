@@ -1,3 +1,115 @@
+2010-07-16 19:18  tristan
+
+	* src/gst/sharedVideoSink.cpp: don't lock to remove shared memory
+
+2010-07-15 21:11  tristan
+
+	* src/gst/videoSink.cpp: fixed flickering in video
+
+2010-07-15 21:03  tristan
+
+	* src/gst/textOverlay.cpp: sans serif
+
+2010-07-15 18:58  tristan
+
+	* src/shared_video/sharedVideoBuffer.cpp: SharedVideoBuffer: put
+	  const in front
+
+2010-07-15 18:47  tristan
+
+	* src/gst/sharedVideoSink.cpp: sharedvideobuffer stop pushing in
+	  destructor
+
+2010-07-15 18:18  tristan
+
+	* src/include/sharedVideoBuffer.h,
+	  src/shared_video/sharedVideoBuffer.cpp: return true or false for
+	  condition variable timeouts
+
+2010-07-15 15:49  tristan
+
+	* src/include/sharedVideoBuffer.h,
+	  src/shared_video/sharedVideoBuffer.cpp: Added timeout to shared
+	  video buffer
+
+2010-07-14 22:09  tristan
+
+	* src/gst/localVideo.cpp, src/gst/localVideo.h: fixed text overlay
+	  in localvideo
+
+2010-07-14 20:52  tristan
+
+	* py/scenic/application.py, py/scenic/gui.py,
+	  src/main/milhouse.cpp, src/util/programOptions.cpp: added
+	  milhouse and gstreamer core versions to detailed status
+
+2010-07-14 19:14  tristan
+
+	* src/gst/textOverlay.cpp, src/gst/textOverlay.h: omitted files
+	  added
+
+2010-07-14 19:14  tristan
+
+	* src/gst/Makefile.am, src/gst/videoConfig.cpp,
+	  src/gst/videoConfig.h, src/gst/videoReceiver.cpp,
+	  src/gst/videoReceiver.h, src/util/programOptions.cpp: Added text
+	  overlay, fixes #594
+
+2010-07-14 18:07  tristan
+
+	* ., configure.ac, doc/docbook/user/advanced-options.xml,
+	  src/Makefile.am, src/caps, src/caps/CapsClient.cpp,
+	  src/caps/CapsClient.h, src/caps/CapsServer.cpp,
+	  src/caps/CapsServer.h, src/caps/Makefile.am,
+	  src/caps/MulticastCapsClient.cpp, src/caps/MulticastCapsClient.h,
+	  src/caps/MulticastCapsServer.cpp, src/caps/MulticastCapsServer.h,
+	  src/caps/caps.h, src/caps/capsParser.cpp, src/caps/capsParser.h,
+	  src/gst/Makefile.am, src/gst/audioConfig.cpp,
+	  src/gst/audioFactory.cpp, src/gst/audioSender.cpp,
+	  src/gst/caps.h, src/gst/capsParser.cpp, src/gst/capsParser.h,
+	  src/gst/codec.cpp, src/gst/codec.h, src/gst/remoteConfig.cpp,
+	  src/gst/remoteConfig.h, src/gst/rtpBin.cpp, src/gst/rtpBin.h,
+	  src/gst/videoFactory.cpp, src/gst/videoSender.cpp,
+	  src/main/Makefile.am, src/shared_video/sharedVideoBuffer.cpp,
+	  src/tcp, utils/make_caps.py: merged back branches/multicast into
+	  trunk@6379
+
+2010-07-13 19:27  tristan
+
+	* configure.ac: fixed type
+
+2010-07-06 18:56  mikewoz
+
+	* configure.ac, doc/docbook/installation/audio-video.xml: added
+	  wiki link to AV installation doc
+
+2010-06-22 15:53  alexandre
+
+	* po/fr.po: Fixed two strings that were not translated.
+
+2010-06-22 15:51  tristan
+
+	* man/Makefile.am, po/en.po, po/fr.po, po/scenic.pot: fixed man
+	  Makefile.am
+
+2010-06-21 16:20  tristan
+
+	* configure.ac: use AM_MAINTAINER_MODE, fixes #589
+
+2010-06-18 22:08  tristan
+
+	* ChangeLog, RELEASE: updated changelog and RELEASE
+
+2010-06-18 20:08  tristan
+
+	* py/rtpmidi/Makefile.am, py/rtpmidi/engines/Makefile.am,
+	  py/rtpmidi/engines/midi/Makefile.am,
+	  py/rtpmidi/protocols/Makefile.am,
+	  py/rtpmidi/protocols/rtp/Makefile.am, py/scenic/Makefile.am,
+	  py/scenic/devices/Makefile.am, py/scripts/Makefile.am,
+	  py/scripts/midistream.in, py/scripts/scenic.in: replaced libdir
+	  with pythondir, fixed installation paths for python
+
 2010-06-16 21:39  tristan
 
 	* src/tcp/CapsClient.cpp: renamed variable

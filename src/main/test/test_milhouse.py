@@ -3,7 +3,10 @@ import unittest
 
 class TestMilhouse(unittest.TestCase):
     def test_milhouse_help(self):
-        # Make sure TESTS_ENVIRONMENT has milhouse in path (shouldn't need to be installed)
+        """
+        Looks for an expected string in the output of milhouse --help
+        """
+        # Make sure TESTS_ENVIRONMENT has milhouse in path (shouldn't need to be installed), this is done in Makefile.am
         # redirect stderr to stdout
         proc = subprocess.Popen(['milhouse --help', '"to stdout"'], 
                 shell=True, 
@@ -11,10 +14,9 @@ class TestMilhouse(unittest.TestCase):
                 stdout=subprocess.PIPE)
 
         stdout_value = proc.communicate()[0]
-        print "value is: \n"
-        print stdout_value
 
-        # either camera is not plugged in and we error out correctly, or it is and 
-        # we set the brightness on it
-        assert(stdout_value.find('Exitting Milhouse') != -1)
+        
+        expected_string_in_output = "is a receiver"
+        if stdout_value.find(expected_string_in_output) == -1:
+            self.fail("Did not find expected string %s in milhouse --help output" % (expected_string_in_output))
               

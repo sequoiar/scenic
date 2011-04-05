@@ -24,7 +24,13 @@
 #ifndef _MILHOUSE_H_
 #define _MILHOUSE_H_
 
-#include <boost/program_options.hpp>
+// forward declarations
+namespace boost {
+    namespace program_options {
+        class options_description;
+        class variables_map;
+    }
+}
 
 class Milhouse {
     private:

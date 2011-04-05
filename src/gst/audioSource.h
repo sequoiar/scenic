@@ -22,10 +22,7 @@
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 
-#pragma GCC diagnostic ignored "-pedantic"
-#include <gst/audio/multichannel.h>
 #include <vector>
-#include "gstLinkable.h"
 #include "busMsgHandler.h"
 #include "messageHandler.h"
 
@@ -34,6 +31,8 @@
 // forward declarations
 class AudioSourceConfig;
 class Pipeline;
+class _GstElement;
+class _GstMessage;
 
 /** 
  *  Abstract base class from which our audio sources are derived.
@@ -42,10 +41,11 @@ class Pipeline;
  *  need to have its audio frames interleaved.
  */
 
-class AudioSource : public GstLinkableSource, boost::noncopyable
+class AudioSource : private boost::noncopyable
 {
     public:
-        ~AudioSource();
+        virtual ~AudioSource();
+        virtual _GstElement *srcElement() { return source_; }
 
     protected:
         AudioSource(const Pipeline &pipeline, const AudioSourceConfig &config);
@@ -54,16 +54,12 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
         /// Audio parameter object 
         const AudioSourceConfig &config_;
         
-        GstElement *source_;
+        _GstElement *source_;
 
         /// Caps used by any source with a capsfilter
         virtual std::string getCapsFilterCapsString();
 
-        void initCapsFilter(GstElement* &aconv, GstElement* &capsfilter);
-
-    private:
-        
-        GstElement *srcElement() { return source_; }
+        void initCapsFilter(_GstElement* &aconv, _GstElement* &capsfilter);
 };
 
 /** 
@@ -73,7 +69,7 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
 class InterleavedAudioSource : public AudioSource
 {
     private:
-        class Interleave : public GstLinkableFilter, boost::noncopyable
+        class Interleave : private boost::noncopyable
         {
             public:
                 /** The interleave functionality used to be part of the same class
@@ -84,18 +80,17 @@ class InterleavedAudioSource : public AudioSource
                 Interleave(const Pipeline &pipeline, const AudioSourceConfig &config);
                 ~Interleave();
 
-                GstElement *srcElement() { return interleave_; }
-                GstElement *sinkElement() { return interleave_; }
+                _GstElement *srcElement() { return interleave_; }
+                _GstElement *sinkElement() { return interleave_; }
 
             private:
                 const Pipeline &pipeline_;
-                GstElement *interleave_;
+                _GstElement *interleave_;
                 const AudioSourceConfig &config_;
-                static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
                 void set_channel_layout();
         };
 
-        GstElement *srcElement() { return interleave_.srcElement(); }
+        virtual _GstElement *srcElement() { return interleave_.srcElement(); }
 
     protected:
         InterleavedAudioSource(const Pipeline &pipeline, const AudioSourceConfig &config);
@@ -104,7 +99,7 @@ class InterleavedAudioSource : public AudioSource
 
         /// Object which performs the interleaving of this source's channels 
         Interleave interleave_;
-        std::vector<GstElement*> sources_, aconvs_;
+        std::vector<_GstElement*> sources_, aconvs_;
 };
 
 /** 
@@ -149,13 +144,13 @@ class AudioFileSource : public AudioSource, private BusMsgHandler
     private:
         ~AudioFileSource();
 
-        bool handleBusMsg(GstMessage *msg);
+        bool handleBusMsg(_GstMessage *msg);
 
         void loop(int nTimes);
-        GstElement *srcElement() { return aconv_; }
+        virtual _GstElement *srcElement() { return aconv_; }
 
         void restartPlayback();
-        GstElement *aconv_;
+        _GstElement *aconv_;
         int loopCount_;
         static const int LOOP_INFINITE;
 };
@@ -173,10 +168,10 @@ class AudioAlsaSource : public AudioSource
     private:
         ~AudioAlsaSource();
 
-        GstElement *srcElement() { return capsFilter_; }
+        virtual _GstElement *srcElement() { return capsFilter_; }
 
-        GstElement *capsFilter_;
-        GstElement *aconv_;
+        _GstElement *capsFilter_;
+        _GstElement *aconv_;
 };
 
 /** 
@@ -191,10 +186,10 @@ class AudioPulseSource : public AudioSource
     private:
         ~AudioPulseSource();
 
-        GstElement *srcElement() { return capsFilter_; }
+        virtual _GstElement *srcElement() { return capsFilter_; }
 
-        GstElement *capsFilter_;
-        GstElement *aconv_;
+        _GstElement *capsFilter_;
+        _GstElement *aconv_;
 };
 
 /** 
@@ -211,12 +206,12 @@ class AudioJackSource : public AudioSource, public MessageHandler
         ~AudioJackSource();
 
         bool handleMessage(const std::string &path, const std::string &arguments);
-        GstElement *srcElement() { return queue_; }
+        virtual _GstElement *srcElement() { return queue_; }
         /// Caps used by any source with a capsfilter
         std::string getCapsFilterCapsString();
 
-        GstElement *capsFilter_;
-        GstElement *queue_;
+        _GstElement *capsFilter_;
+        _GstElement *queue_;
 };
 
 
@@ -237,9 +232,9 @@ class AudioDvSource : public AudioSource
     private:
         ~AudioDvSource();
 
-        GstElement *queue_;
-        GstElement *aconv_;
-        GstElement *srcElement() { return aconv_; }
+        _GstElement *queue_;
+        _GstElement *aconv_;
+        virtual _GstElement *srcElement() { return aconv_; }
 };
 
 #endif //_AUDIO_SOURCE_H_

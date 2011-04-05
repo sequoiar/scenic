@@ -23,7 +23,6 @@
 #define _AUDIO_SINK_H_
 
 #include <string>
-#include "gstLinkable.h"
 #include "messageHandler.h"
 
 #include "noncopyable.h"
@@ -34,12 +33,13 @@ class Pipeline;
 class _GstElement;
 
 /** Abstract base class representing a sink for audio streams */
-class AudioSink : public GstLinkableSink, boost::noncopyable
+class AudioSink : private boost::noncopyable
 {
     public:
         AudioSink(Pipeline &pipeline);
+        virtual _GstElement *sinkElement() { return sink_; }
         
-        ~AudioSink();
+        virtual ~AudioSink();
        
         virtual void adjustBufferTime(unsigned long long);
 
@@ -50,7 +50,6 @@ class AudioSink : public GstLinkableSink, boost::noncopyable
 
     private:
         static void FPE_ExceptionHandler(int nSig, int nErrType, int *pnReglist);
-        _GstElement *sinkElement() { return sink_; }
 };
 
 // FIXME: DRY!!! Either merge alsasink and pulsesink or pull out a common base class.

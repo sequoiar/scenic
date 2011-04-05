@@ -23,7 +23,6 @@
 #define _GL_VIDEO_SINK_H_
 
 #include <GL/gl.h>
-#include "gstLinkable.h"
 #include "videoSink.h"
 #include "busMsgHandler.h"
 
@@ -42,7 +41,7 @@ class GLImageSink
 
     private:
         ~GLImageSink();
-        _GstElement *sinkElement() { return sink_; }
+        virtual _GstElement *sinkElement() { return sink_; }
 
         /** 
          * This method resets all of our static variables used for positioning our texture, 

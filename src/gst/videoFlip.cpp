@@ -25,6 +25,7 @@
 #include <map>
 #include "util.h"
 #include "videoFlip.h"
+#include "gstLinkable.h"
 #include "pipeline.h"
 
 /// converts flip method to corresponding

@@ -32,9 +32,10 @@
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
+#include "gstLinkable.h"
 #include "caps/capsParser.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 static void 
 validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
@@ -59,16 +60,16 @@ validateChannels(const AudioSourceConfig &aConfig, const SenderConfig &rConfig)
 
 /// Constructor 
 AudioSender::AudioSender(Pipeline &pipeline,
-        shared_ptr<AudioSourceConfig> aConfig, 
-        shared_ptr<SenderConfig> rConfig) : 
+        const shared_ptr<AudioSourceConfig> &aConfig,
+        const shared_ptr<SenderConfig> &rConfig) :
     SenderBase(rConfig),
-    audioConfig_(aConfig), 
+    audioConfig_(aConfig),
     pipeline_(pipeline),
-    session_(pipeline), 
-    source_(0), 
-    level_(0),
-    encoder_(0), 
-    payloader_(0)
+    session_(pipeline),
+    source_(),
+    level_(),
+    encoder_(),
+    payloader_()
 {
     validateChannels(*aConfig, *rConfig);
     LOG_DEBUG("Creating audio sender pipeline");
@@ -86,25 +87,20 @@ bool AudioSender::checkCaps() const
 
 /// Destructor 
 AudioSender::~AudioSender()
-{
-    delete payloader_;
-    delete encoder_;
-    delete level_;
-    delete source_;
-}
+{}
 
 void AudioSender::createSource(Pipeline &pipeline)
 {
-    source_ = audioConfig_->createSource(pipeline);
+    source_.reset(audioConfig_->createSource(pipeline));
     assert(source_);
-    level_ = audioConfig_->createLevel(pipeline);
+    level_.reset(audioConfig_->createLevel(pipeline));
     if (level_ != 0)
             gstlinkable::link(*source_, *level_);
 }
 
 void AudioSender::createCodec(Pipeline &pipeline)
 {
-    encoder_ = remoteConfig_->createAudioEncoder(pipeline, audioConfig_->bitrate(), audioConfig_->quality());
+    encoder_.reset(remoteConfig_->createAudioEncoder(pipeline, audioConfig_->bitrate(), audioConfig_->quality()));
     assert(encoder_);
     if (level_ != 0)
         gstlinkable::link(*level_, *encoder_);
@@ -115,10 +111,10 @@ void AudioSender::createCodec(Pipeline &pipeline)
 
 void AudioSender::createPayloader()   
 {
-    payloader_ = encoder_->createPayloader();
+    payloader_.reset(encoder_->createPayloader());
     assert(payloader_);
 
     gstlinkable::link(*encoder_, *payloader_);
-    session_.add(payloader_, *remoteConfig_);   
+    session_.add(payloader_.get(), *remoteConfig_);
 }
 

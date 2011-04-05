@@ -21,8 +21,6 @@
 #ifndef _VIDEO_SOURCE_H_
 #define _VIDEO_SOURCE_H_
 
-#include "gstLinkable.h"
-
 #include "noncopyable.h"
 
 #include <string>
@@ -32,12 +30,13 @@ class VideoSourceConfig;
 class _GstElement;
 
 class VideoSource
-    : public GstLinkableSource, boost::noncopyable
+    : private boost::noncopyable
 {
     public:
-        ~VideoSource();
+        virtual ~VideoSource();
         virtual std::string srcCaps(unsigned framerateIndex = 0) const;
         void setCapsFilter(const std::string &srcCaps);
+        virtual _GstElement *srcElement() { return source_; }
 
     protected:
         VideoSource(const Pipeline &pipeline, const VideoSourceConfig &config);
@@ -46,9 +45,6 @@ class VideoSource
         _GstElement *source_;
         _GstElement *capsFilter_;
         std::string defaultSrcCaps() const;
-
-    private:
-        _GstElement *srcElement() { return source_; }
 };
 
 class VideoTestSource
@@ -60,7 +56,7 @@ class VideoTestSource
 
     private:
         ~VideoTestSource();
-        _GstElement *srcElement() { return capsFilter_; }
+        virtual _GstElement *srcElement() { return capsFilter_; }
 };
 
 class VideoFileSource
@@ -71,7 +67,7 @@ class VideoFileSource
 
     private:
         ~VideoFileSource();
-        _GstElement *srcElement() { return identity_; }      
+        virtual _GstElement *srcElement() { return identity_; }      
 
         // FIXME: maybe just use the queue we acquire?
         _GstElement *identity_;
@@ -86,7 +82,7 @@ class VideoDvSource
     private:
         ~VideoDvSource();
         
-        _GstElement *srcElement() { return dvdec_; }
+        virtual _GstElement *srcElement() { return dvdec_; }
 
         _GstElement *queue_, *dvdec_;
 };
@@ -102,7 +98,7 @@ class VideoV4lSource
         std::string deviceStr() const;
         std::string srcCaps(unsigned int framerateIndex = 0) const;
         bool willModifyCaptureResolution() const;
-        _GstElement *srcElement() { return capsFilter_; }
+        virtual _GstElement *srcElement() { return capsFilter_; }
 };
 
 
@@ -114,7 +110,7 @@ class VideoDc1394Source
         VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config);
     private:
         std::string srcCaps(unsigned int framerateIndex = 0) const;
-        _GstElement *srcElement() { return capsFilter_; }
+        virtual _GstElement *srcElement() { return capsFilter_; }
 };
 
 #endif //_VIDEO_SOURCE_H_

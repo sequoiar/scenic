@@ -265,7 +265,7 @@ int RtpBin::createSinkSocket(const char *hostname, int port)
     if (p == NULL) 
     {
         close(sockfd);
-        THROW_ERROR("failed to create socket");
+        THROW_ERROR("failed to create socket for port " << portStr);
     }
 
     freeaddrinfo(servinfo);
@@ -309,7 +309,7 @@ int RtpBin::createSourceSocket(int port)
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                         p->ai_protocol)) == -1) 
         {
-            LOG_WARNING("socket error");
+            LOG_WARNING("socket error for port " << portStr);
             continue;
         }
         else if (p->ai_family == AF_INET)
@@ -332,7 +332,7 @@ int RtpBin::createSourceSocket(int port)
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
         {
             close(sockfd);
-            LOG_WARNING("bind error");
+            LOG_WARNING("bind error for port " << portStr);
             continue;
         }
 
@@ -342,7 +342,7 @@ int RtpBin::createSourceSocket(int port)
     if (p == NULL) 
     {
         close(sockfd);
-        THROW_ERROR("Failed to bind socket");
+        THROW_ERROR("Failed to bind socket for port " << portStr);
     }
 
     freeaddrinfo(servinfo);

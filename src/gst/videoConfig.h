@@ -23,7 +23,12 @@
 #define _VIDEO_CONFIG_H_
 
 #include <string>
-#include <boost/program_options.hpp>
+
+namespace boost {
+    namespace program_options {
+        class variables_map;
+    }
+}
 
 class Pipeline;
 class VideoSource;

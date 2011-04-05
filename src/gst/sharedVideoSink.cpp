@@ -32,11 +32,12 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/thread/thread_time.hpp>
 
 
 using boost::interprocess::shared_memory_object;
 using boost::interprocess::read_write;
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 
 shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory(const std::string &id)
@@ -108,25 +109,32 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         buffer = gst_app_sink_pull_buffer(GST_APP_SINK(elt));
 
         // lock the mutex
-        scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex());
+        const boost::system_time timeout = boost::get_system_time() +
+            boost::posix_time::seconds(5);
+        scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex(), timeout);
+        if (not lock.owns())
+        {
+            /* we don't need the appsink buffer anymore */
+            gst_buffer_unref(buffer);
+            removeSharedMemory(context->id_);
+            LOG_ERROR("Could not acquire shared memory mutex in 5 seconds or less, exitting.");
+        }
 
         // if a buffer has been pushed, wait until the consumer tells us
         // it's consumed it. note that upon waiting the mutex is released and will be
         // reacquired when this process is notified by the consumer.
         context->sharedBuffer_->waitOnConsumer(lock);
 
-        if (context->sharedBuffer_->isPushing())
-        {
-            // push the buffer
-            size = GST_BUFFER_SIZE (buffer);
-            context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
-        }
+        // push the buffer
+        size = GST_BUFFER_SIZE (buffer);
+        context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
 
         context->sharedBuffer_->notifyConsumer();
         // mutex is released here (goes out of scope)
     }
     catch (const interprocess_exception &ex)
     {
+        LOG_WARNING("Got interprocess exception " << ex.what());
         removeSharedMemory(context->id_);
         /* we don't need the appsink buffer anymore */
         gst_buffer_unref(buffer);

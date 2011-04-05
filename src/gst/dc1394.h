@@ -22,12 +22,11 @@
 #ifndef _DC1394_H_
 #define _DC1394_H_
 
-#include <gst/gst.h>
 #include <string>
 
 namespace Dc1394 
 {
-    void listCameras();
+    bool listCameras();
     int capsToMode(int cameraNumber, int width, 
             int height, 
             const std::string &colourspace,

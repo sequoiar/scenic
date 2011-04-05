@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include "util.h"
-#include "gutil.h"
+#include "gtk_utils.h"
 
 #include "dv1394.h"
 #include "busMsgHandler.h"
@@ -51,7 +51,7 @@ Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(),
 Pipeline::~Pipeline()
 {
     Dv1394::reset();
-    LOG_INFO("Unreffing pipeline");
+    LOG_DEBUG("Unreffing pipeline");
     gst_object_unref(GST_OBJECT(pipeline_));
 }
 

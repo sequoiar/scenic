@@ -25,21 +25,27 @@
 #define _AUDIO_FACTORY_H_
 
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <boost/program_options.hpp>
+#include <tr1/memory>
 
 class AudioSender;
 class AudioReceiver;
 class LocalAudio;
-
 class Pipeline;
+
+namespace boost
+{
+    namespace program_options
+    {
+        class variables_map;
+    }
+}
 
 namespace audiofactory
 {
     void printMaxChannels(const std::string &codec);
-    boost::shared_ptr<AudioSender> buildAudioSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
-    boost::shared_ptr<AudioReceiver> buildAudioReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
-    boost::shared_ptr<LocalAudio> buildLocalAudio(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    std::tr1::shared_ptr<AudioSender> buildAudioSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    std::tr1::shared_ptr<AudioReceiver> buildAudioReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    std::tr1::shared_ptr<LocalAudio> buildLocalAudio(Pipeline &pipeline, const boost::program_options::variables_map &options);
 }
 
 #endif // _AUDIO_FACTORY_H_

@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.60)
 # version should always be .1 greater than last tag, unless this is a tag
-AC_INIT(SCENIC, [0.6.3], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])
+AC_INIT(SCENIC, [0.6.4], [http://code.sat.qc.ca/trac/scenic/wiki/BugReport], [scenic], [http://code.sat.qc.ca/trac/scenic])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -67,13 +67,19 @@ fi
 #Trying to set GSTAUDIO using pkg-config
 PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
 if test "x${have_gstreamer_audio}" = "xfalse" ; then
-    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-audio0.10-dev  ])
 fi
 
 #Trying to set GSTAPP using pkg-config
 PKG_CHECK_MODULES(GSTAPP, gstreamer-app-0.10, have_gstreamer_app=true, have_gstreamer_app=false)
 if test "x${have_gstreamer_app}" = "xfalse" ; then
-    AC_MSG_ERROR([missing package:  libgstreamer-plugins-base0.10-dev  ])
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-app0.10-dev  ])
+fi
+
+#Trying to set GSTVIDEO using pkg-config
+PKG_CHECK_MODULES(GSTVIDEO, gstreamer-video-0.10, have_gstreamer_video=true, have_gstreamer_video=false)
+if test "x${have_gstreamer_video}" = "xfalse" ; then
+    AC_MSG_ERROR([missing package:  libgstreamer-plugins-video0.10-dev  ])
 fi
 
 #Trying to set JACK using pkg-config
@@ -103,7 +109,7 @@ if test "x${have_libdc1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing package: libdc1394-2])
 fi
 
-AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
+AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTVIDEO_LIBS $GSTAPP_LIBS")
 
 GNOME_DOC_INIT(0.12.2, , AC_MSG_WARN(["DocBook Documentation will not be converted to HTML."]))
 
@@ -179,6 +185,8 @@ AS_IF([test "x${HAVE_PYMOD_JSON}" = "xno"],
         [AC_MSG_ERROR([The Scenic graphical user interface requires one of json or simplejson])]))
 
 # check for programs
+# TODO: move those checks for programs up. (it should always be second in the configure.ac file)
+# FIXME: some checks should be done at runtime, not build time
 # Maybe $PATH does not contain /sbin
 AC_CHECK_PROG(IFCONFIG, ifconfig, yes, no, "${PATH}:/sbin")
 AS_IF([test "x${IFCONFIG}" = "xno"],
@@ -235,6 +243,7 @@ AS_AC_EXPAND(PKGLIBDIR, $pkglibdir)
 AC_CONFIG_FILES([py/scripts/scenic], [chmod +x py/scripts/scenic])
 AC_CONFIG_FILES([py/scripts/midistream], [chmod +x py/scripts/midistream])
 
+# TODO: indent the following list of files:
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
@@ -244,11 +253,18 @@ data/themes/Makefile
 data/themes/Darklooks/Makefile
 doc/Makefile
 doc/docbook/Makefile
-doc/docbook/fig/Makefile
-doc/docbook/user/Makefile
-doc/docbook/user-manual.xml
-doc/docbook/installation/Makefile
-doc/docbook/installation-manual.xml
+doc/docbook/en/Makefile
+doc/docbook/en/fig/Makefile
+doc/docbook/en/user/Makefile
+doc/docbook/en/user-manual.xml
+doc/docbook/en/installation/Makefile
+doc/docbook/en/installation-manual.xml
+doc/docbook/fr/Makefile
+doc/docbook/fr/fig/Makefile
+doc/docbook/fr/user/Makefile
+doc/docbook/fr/user-manual.xml
+doc/docbook/fr/installation/Makefile
+doc/docbook/fr/installation-manual.xml
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile
@@ -269,7 +285,7 @@ py/scenic/test/Makefile
 py/scripts/Makefile
 src/include/Makefile
 src/util/Makefile
-src/gutil/Makefile
+src/gtk_utils/Makefile
 src/shared_video/Makefile
 src/vumeter/Makefile
 src/vumeter/test/Makefile
@@ -278,6 +294,7 @@ src/gst/Makefile
 src/firereset/Makefile
 src/main/Makefile
 src/main/test/Makefile
+scenic.pc
 ])
 
 AC_OUTPUT

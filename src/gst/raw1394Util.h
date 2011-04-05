@@ -35,10 +35,10 @@ class Raw1394
 {
 public:
 #ifdef CONFIG_IEEE1394
-    static void listCameras();
+    static bool listCameras();
     static bool cameraIsReady();
 #else
-    static void listCameras() {};
+    static bool listCameras() { return false; }
     static bool cameraIsReady() { return false; }
 #endif
 private:

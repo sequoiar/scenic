@@ -26,6 +26,7 @@
 #include <boost/assign.hpp>
 #include <sstream>
 #include "pipeline.h"
+#include "gstLinkable.h"
 
 const int VideoScale::MAX_SCALE;
 

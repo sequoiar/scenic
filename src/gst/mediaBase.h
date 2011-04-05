@@ -23,7 +23,7 @@
 #define _MEDIA_BASE_H_
 
 
-#include <boost/shared_ptr.hpp>
+#include <tr1/memory>
 
 class Pipeline;
 class _GstMessage;
@@ -32,12 +32,12 @@ class SenderConfig;
 class SenderBase 
 {
     public: 
-        SenderBase(boost::shared_ptr<SenderConfig> rConfig);
+        SenderBase(const std::tr1::shared_ptr<SenderConfig> &rConfig);
         virtual ~SenderBase();
         bool capsAreCached() { return checkCaps(); }
 
     protected:
-        boost::shared_ptr<SenderConfig> remoteConfig_;
+        std::tr1::shared_ptr<SenderConfig> remoteConfig_;
         void createPipeline(Pipeline &pipeline);
 
     private:

@@ -24,13 +24,33 @@
 #include "textOverlay.h"
 #include "pipeline.h"
 
+
+// callback to change the text position
+gboolean textPositionCallback(gpointer data)
+{
+    GstElement *textoverlay = static_cast<GstElement*>(data);
+    static int deltay = 0;
+    static int direction = 5;
+    deltay += direction;
+    g_object_set(textoverlay, "deltay", deltay, NULL);
+    if (abs(deltay) > 20)
+        direction = -direction;
+    return TRUE;
+}
+
 /** Constructor sets text */
 TextOverlay::TextOverlay(const Pipeline &pipeline, const std::string &text) : 
     pipeline_(pipeline),
     textoverlay_(pipeline_.makeElement("textoverlay", NULL))
 {
-    g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "sans 50",
-            NULL);
+    if (not text.empty())
+    {
+        g_object_set(textoverlay_, "text", text.c_str(), "font-desc", "sans 50",
+                NULL);
+        g_timeout_add(50 /* ms */, 
+                static_cast<GSourceFunc>(textPositionCallback),
+                textoverlay_);
+    }
 }
 
 /// Destructor 

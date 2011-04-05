@@ -1,4 +1,4 @@
-pkglib_LTLIBRARIES = libgst.la
+noinst_LTLIBRARIES = libgst.la
 
 libgst_la_SOURCES = mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp \

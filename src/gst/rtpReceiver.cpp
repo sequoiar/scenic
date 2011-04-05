@@ -21,7 +21,7 @@
  */
 
 #include "util.h"
-#include "gutil.h"
+#include "gtk_utils.h"
 
 #include <list>
 #include <algorithm>

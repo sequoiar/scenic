@@ -24,7 +24,6 @@
 
 #include <string>
 #include <X11/Xlib.h>
-#include "gstLinkable.h"
 #include "busMsgHandler.h"
 #include "messageHandler.h"
 
@@ -37,11 +36,12 @@ class _GdkEventScroll;
 class _GstElement;
 class _GdkEventWindowState;
 
-class VideoSink : public GstLinkableSink, boost::noncopyable
+class VideoSink : private boost::noncopyable
 {
     public:
         explicit VideoSink(const Pipeline &pipeline) : pipeline_(pipeline), sink_(0) {};
         virtual ~VideoSink() {};
+        virtual _GstElement* sinkElement() { return sink_; }
 
     protected:
         virtual void destroySink();
@@ -97,7 +97,7 @@ class XvImageSink
         bool handleBusMsg(_GstMessage *msg);
 
     private:
-        _GstElement *sinkElement() { return sink_; }
+        virtual _GstElement *sinkElement() { return sink_; }
         ~XvImageSink();
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
@@ -113,7 +113,7 @@ class XImageSink
 
     private:
         ~XImageSink();
-        _GstElement *sinkElement() { return colorspc_; }
+        virtual _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;
 };
 

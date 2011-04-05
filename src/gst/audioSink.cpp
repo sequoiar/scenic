@@ -21,8 +21,10 @@
  */
 
 #include "util.h"
+#include <cassert>
 
 #include <gst/gst.h>
+#include <gstLinkable.h>
 #include <signal.h>
 #include "audioSink.h"
 #include "audioConfig.h"

@@ -29,13 +29,13 @@
 #include "portOffsets.h"
 
 #include "busMsgHandler.h"
-#include "caps/CapsServer.h"
 
 class Encoder;
 class Pipeline;
 class VideoEncoder;
 class VideoDecoder;
 class Decoder;
+class CapsServer;
 
 /** 
  *      Immutable class that is used to setup rtp

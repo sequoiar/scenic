@@ -84,7 +84,7 @@ unsigned long long AudioSourceConfig::bufferTime() const
 /// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
 {
-    if (Jack::is_running())
+    if (source_ != "alsasrc" and source_ != "pulsesrc" and Jack::is_running())
         pipeline.updateSampleRate(static_cast<unsigned>(Jack::samplerate()));
     if (source_ == "audiotestsrc")
         return new AudioTestSource(pipeline, *this);

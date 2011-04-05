@@ -40,14 +40,8 @@ class SharedVideoBuffer
 
         unsigned char* pixelsAddress();
         
-        bool isPushing() const;
-        
         void pushBuffer(unsigned char *newBuffer, size_t size);
 
-        void stopPushing();
-       
-        void startPushing();
-        
         void notifyConsumer();
 
         void notifyProducer();
@@ -86,9 +80,6 @@ class SharedVideoBuffer
         // is there a buffer ready to be consumed
         // in our shared memory? 
         bool bufferIn_;
-
-        // has either process signalled that it wants to quit?
-        bool doPush_;
 };
 
 // use in configure.ac like so:

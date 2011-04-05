@@ -23,6 +23,8 @@
 
 #include "util.h"
 #include "videoFactory.h"
+#include <boost/program_options.hpp>
+#include "caps/CapsServer.h"
 #include "videoSender.h"
 #include "videoReceiver.h"
 #include "localVideo.h"
@@ -31,7 +33,7 @@
 #include "remoteConfig.h"
 #include "caps/capsParser.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 namespace po = boost::program_options;
 
 shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, const po::variables_map &options)

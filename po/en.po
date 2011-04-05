@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
-"Report-Msgid-Bugs-To: http://svn.sat.qc.ca/trac/scenic/wiki/BugReport\n"
-"POT-Creation-Date: 2010-06-22 11:25-0400\n"
+"Report-Msgid-Bugs-To: http://code.sat.qc.ca/trac/scenic/wiki/BugReport\n"
+"POT-Creation-Date: 2010-07-27 16:58-0400\n"
 "PO-Revision-Date: 2010-05-13 18:09-0400\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: English\n"
@@ -256,11 +256,11 @@ msgstr ""
 "Error trying to connect to %(ip)s:%(port)s:\n"
 " %(reason)s"
 
-#: py/scenic/gui.py:52
+#: py/scenic/gui.py:54
 msgid "Telepresence application for live performances and installations"
 msgstr ""
 
-#: py/scenic/gui.py:65
+#: py/scenic/gui.py:67
 msgid ""
 "Scenic\n"
 "Copyright (C) 2009 Society for Arts and Technology (SAT)\n"
@@ -298,19 +298,19 @@ msgstr ""
 "You should have received a copy of the GNU General Public License\n"
 "along with Scenic.  If not, see <http://www.gnu.org/licenses/>."
 
-#: py/scenic/gui.py:92
+#: py/scenic/gui.py:94
 msgid "Copyright 2009-2010 Society for Arts and Technology"
 msgstr "Copyright 2009-2010 Society for Arts and Technology"
 
-#: py/scenic/gui.py:191
+#: py/scenic/gui.py:193
 msgid "Automatically accept invitations"
 msgstr "Automatically accept invitations"
 
-#: py/scenic/gui.py:388 data/glade/scenic.glade:1212
+#: py/scenic/gui.py:390 data/glade/scenic.glade:1212
 msgid "Contacts"
 msgstr "Contacts"
 
-#: py/scenic/gui.py:502
+#: py/scenic/gui.py:504
 msgid ""
 "Really quit ?\n"
 "All streaming processes will quit as well."
@@ -318,7 +318,7 @@ msgstr ""
 "Really quit ?\n"
 "All streaming processes will quit as well."
 
-#: py/scenic/gui.py:660
+#: py/scenic/gui.py:662
 msgid ""
 "<b><big>Delete this contact from the list?</big></b>\n"
 "\n"
@@ -328,7 +328,7 @@ msgstr ""
 "\n"
 "Are you sure you want to delete this contact from the list?"
 
-#: py/scenic/gui.py:715
+#: py/scenic/gui.py:717
 msgid ""
 "The address is not valid\n"
 "\n"
@@ -340,7 +340,7 @@ msgstr ""
 "Enter a valid address\n"
 "Example: 192.0.32.10 or example.org"
 
-#: py/scenic/gui.py:736
+#: py/scenic/gui.py:738
 msgid ""
 "<b><big>Shutdown the computer?</big></b>\n"
 "\n"
@@ -350,7 +350,7 @@ msgstr ""
 "\n"
 "Are you sure you want to shutdown the computer now?"
 
-#: py/scenic/gui.py:747
+#: py/scenic/gui.py:749
 msgid ""
 "<b><big>Reboot the computer?</big></b>\n"
 "\n"
@@ -360,7 +360,7 @@ msgstr ""
 "\n"
 "Are you sure you want to reboot the computer now?"
 
-#: py/scenic/gui.py:800
+#: py/scenic/gui.py:802
 msgid ""
 "Could not send info.\n"
 "Check your internet connection."
@@ -368,7 +368,7 @@ msgstr ""
 "Could not send info.\n"
 "Check your internet connection."
 
-#: py/scenic/gui.py:803
+#: py/scenic/gui.py:805
 msgid ""
 "<b><big>Send the settings?</big></b>\n"
 "\n"
@@ -380,93 +380,93 @@ msgstr ""
 "Are you sure you want to send your computer settings to the administrator of "
 "scenic?"
 
-#: py/scenic/gui.py:1034
+#: py/scenic/gui.py:1036
 msgid "Stop streaming"
 msgstr "Stop streaming"
 
-#: py/scenic/gui.py:1061 data/glade/scenic.glade:3409
+#: py/scenic/gui.py:1063 data/glade/scenic.glade:3409
 msgid "Not connected"
 msgstr "Not connected"
 
-#: py/scenic/gui.py:1085 py/scenic/gui.py:1087 data/glade/scenic.glade:1164
+#: py/scenic/gui.py:1087 py/scenic/gui.py:1089 data/glade/scenic.glade:1164
 msgid "Invite"
 msgstr "Invite"
 
-#: py/scenic/gui.py:1138
+#: py/scenic/gui.py:1140
 #, python-format
 msgid "%(bitrate)2.2f %(prefix)sbits/s"
 msgstr "%(bitrate)2.2f %(prefix)sbits/s"
 
-#: py/scenic/gui.py:1146
+#: py/scenic/gui.py:1148
 #, python-format
 msgid "Audio buffer: %(buffer)d ms"
 msgstr "Audio buffer: %(buffer)d ms"
 
-#: py/scenic/gui.py:1154 py/scenic/gui.py:1198
+#: py/scenic/gui.py:1156 py/scenic/gui.py:1200
 #, python-format
 msgid "%(width)dx%(height)d %(codec)s"
 msgstr "%(width)dx%(height)d %(codec)s"
 
-#: py/scenic/gui.py:1161 py/scenic/gui.py:1189
+#: py/scenic/gui.py:1163 py/scenic/gui.py:1191
 #, python-format
 msgid "Jitter: %(jitter)d ns"
 msgstr "Jitter: %(jitter)d ns"
 
-#: py/scenic/gui.py:1165
+#: py/scenic/gui.py:1167
 #, python-format
 msgid "Packet loss: %(packetloss)2.2f%%"
 msgstr "Packet loss: %(packetloss)2.2f%%"
 
-#: py/scenic/gui.py:1168
+#: py/scenic/gui.py:1170
 #, python-format
 msgid "Packets lost: %(packetslost)d"
 msgstr "Packets lost: %(packetslost)d"
 
-#: py/scenic/gui.py:1173 py/scenic/gui.py:1235 py/scenic/gui.py:1240
+#: py/scenic/gui.py:1175 py/scenic/gui.py:1237 py/scenic/gui.py:1242
 msgid "Disabled"
 msgstr "Disabled"
 
-#: py/scenic/gui.py:1180 py/scenic/gui.py:1215
+#: py/scenic/gui.py:1182 py/scenic/gui.py:1217
 #, python-format
 msgid "%(numchannels)d-channel %(codec)s"
 msgstr "%(numchannels)d-channel %(codec)s"
 
-#: py/scenic/gui.py:1193 py/scenic/gui.py:1208 py/scenic/gui.py:1224
+#: py/scenic/gui.py:1195 py/scenic/gui.py:1210 py/scenic/gui.py:1226
 msgid "Disabled."
 msgstr "Disabled."
 
-#: py/scenic/gui.py:1204
+#: py/scenic/gui.py:1206
 #, python-format
 msgid "Display: %(display)s"
 msgstr "Display: %(display)s"
 
-#: py/scenic/gui.py:1206
+#: py/scenic/gui.py:1208
 msgid "Fullscreen is enabled."
 msgstr "Fullscreen is enabled."
 
-#: py/scenic/gui.py:1231
+#: py/scenic/gui.py:1233
 msgid "Receiving MIDI"
 msgstr "Receiving MIDI"
 
-#: py/scenic/gui.py:1233
+#: py/scenic/gui.py:1235
 #, python-format
 msgid "Jitter buffer: %(jitterbuffer)d ms"
 msgstr "Jitter buffer: %(jitterbuffer)d ms"
 
-#: py/scenic/gui.py:1237
+#: py/scenic/gui.py:1239
 msgid "Sending MIDI"
 msgstr "Sending MIDI"
 
-#: py/scenic/gui.py:1271
+#: py/scenic/gui.py:1273
 #, python-format
 msgid "$ %(command)s"
 msgstr "$ %(command)s"
 
-#: py/scenic/gui.py:1274
+#: py/scenic/gui.py:1276
 msgid "Command lines:"
 msgstr "Command lines:"
 
-#: py/scenic/gui.py:1486
+#: py/scenic/gui.py:1488
 #, python-format
 msgid ""
 "Could not change V4L2 standard from %(current_standard)s to %"
@@ -475,7 +475,7 @@ msgstr ""
 "Could not change V4L2 standard from %(current_standard)s to %"
 "(desired_standard)s for device %(device_name)s."
 
-#: py/scenic/gui.py:1528
+#: py/scenic/gui.py:1530
 #, python-format
 msgid ""
 "Could not change V4L2 input from %(current_input)s to %(desired_input)s for "
@@ -484,38 +484,48 @@ msgstr ""
 "Could not change V4L2 input from %(current_input)s to %(desired_input)s for "
 "device %(device_name)s."
 
-#: py/scenic/gui.py:1652
+#: py/scenic/gui.py:1654
 msgid "<b>Zombie</b>"
 msgstr "<b>Zombie</b>"
 
-#: py/scenic/gui.py:1656 data/glade/scenic.glade:2127
+#: py/scenic/gui.py:1658 data/glade/scenic.glade:2127
 msgid "<b>Running</b>"
 msgstr "<b>Running</b>"
 
-#: py/scenic/gui.py:1660
+#: py/scenic/gui.py:1662
 msgid "<b>Not running</b>"
 msgstr "<b>Not running</b>"
 
-#: py/scenic/gui.py:1746
+#: py/scenic/gui.py:1748
 msgid "YES"
 msgstr ""
 
-#: py/scenic/gui.py:1748
+#: py/scenic/gui.py:1750
 msgid "NO"
 msgstr ""
 
-#: py/scenic/gui.py:1754
+#: py/scenic/gui.py:1756
 msgid "MIDI is supported..."
-msgstr ""
-
-#: py/scenic/gui.py:1757
-#, python-format
-msgid "Video codec %(codec)s is supported..."
 msgstr ""
 
 #: py/scenic/gui.py:1759
 #, python-format
+msgid "Video codec %(codec)s is supported..."
+msgstr ""
+
+#: py/scenic/gui.py:1761
+#, python-format
 msgid "Audio codec %(codec)s is supported..."
+msgstr ""
+
+#: py/scenic/gui.py:1771
+#, python-format
+msgid "Milhouse version: %s\n"
+msgstr ""
+
+#: py/scenic/gui.py:1772
+#, python-format
+msgid "Gstreamer Core Library version: %s\n"
 msgstr ""
 
 #: py/scenic/preview.py:62

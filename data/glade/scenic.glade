@@ -4411,7 +4411,7 @@ PAL</property>
   <widget class="GtkWindow" id="status_window">
     <property name="width_request">320</property>
     <property name="height_request">320</property>
-    <property name="title" translatable="yes">Detailled Status</property>
+    <property name="title" translatable="yes">Detailed Status</property>
     <child>
       <widget class="GtkScrolledWindow" id="scrolledwindow1">
         <property name="visible">True</property>

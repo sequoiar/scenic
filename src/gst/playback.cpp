@@ -24,7 +24,7 @@
 #include "util.h"
 
 #include "pipeline.h"
-#include "gutil.h"
+#include "gtk_utils.h"
 
 
 Playback::Playback(const Pipeline &pipeline) : pipeline_(pipeline)

@@ -24,6 +24,7 @@
 #include "util.h"
 
 #include "audioFactory.h"
+#include <boost/program_options.hpp>
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "localAudio.h"
@@ -31,9 +32,10 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "caps/capsParser.h"
+#include "caps/CapsServer.h"
 #include "pipeline.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 namespace po = boost::program_options;
 
 void audiofactory::printMaxChannels(const std::string &codec)
@@ -69,7 +71,7 @@ shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, c
 
     std::string codec(options["audiocodec"].as<std::string>());
     std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for #143
+    // FIXME: temporary workaround for ticket #143
     if (remoteHost == "localhost")
         remoteHost = "127.0.0.1";
     int port = options["audioport"].as<int>();

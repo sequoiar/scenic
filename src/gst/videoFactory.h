@@ -24,8 +24,13 @@
 #ifndef _VIDEO_FACTORY_H_
 #define _VIDEO_FACTORY_H_
 
-#include <boost/shared_ptr.hpp>
-#include <boost/program_options.hpp>
+#include <tr1/memory>
+
+namespace boost {
+    namespace program_options {
+        class variables_map;
+    }
+}
 
 class Pipeline;
 class VideoSender;
@@ -34,9 +39,9 @@ class LocalVideo;
 
 namespace videofactory
 {
-    boost::shared_ptr<VideoReceiver> buildVideoReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
-    boost::shared_ptr<VideoSender> buildVideoSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
-    boost::shared_ptr<LocalVideo> buildLocalVideo(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    std::tr1::shared_ptr<VideoReceiver> buildVideoReceiver(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    std::tr1::shared_ptr<VideoSender> buildVideoSender(Pipeline &pipeline, const boost::program_options::variables_map &options);
+    std::tr1::shared_ptr<LocalVideo> buildLocalVideo(Pipeline &pipeline, const boost::program_options::variables_map &options);
 }
 
 #endif // _VIDEO_FACTORY_H_

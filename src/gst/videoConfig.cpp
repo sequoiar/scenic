@@ -149,9 +149,12 @@ int VideoSourceConfig::listCameras()
 {
     try  // catch exceptions here because we're dealing with devices
     {
-        v4l2util::listCameras();
-        Dc1394::listCameras();
-        Raw1394::listCameras();
+        bool foundCameras = false;
+        foundCameras |= v4l2util::listCameras();
+        foundCameras |= Dc1394::listCameras();
+        foundCameras |= Raw1394::listCameras();
+        if (not foundCameras)
+            LOG_PRINT("No cameras found" << std::endl);
     }
     catch (ErrorExcept &e)
     {
@@ -164,7 +167,8 @@ int VideoSourceConfig::listV4lDevices()
 {
     try  // catch exceptions here because we're dealing with devices
     {
-        v4l2util::listCameras();
+        if (not v4l2util::listCameras())
+            LOG_PRINT("No v4l2 devices found" << std::endl);
     }
     catch (ErrorExcept &e)
     {

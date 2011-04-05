@@ -50,7 +50,7 @@ from scenic.internationalization import _
 
 log = logger.start(name="gui")
 
-ONLINE_HELP_URL = "http://svn.sat.qc.ca/trac/scenic/wiki/Documentation"
+ONLINE_HELP_URL = "http://code.sat.qc.ca/trac/scenic/wiki/Documentation"
 ONE_LINE_DESCRIPTION = _("Telepresence application for live performances and installations") # Copy-pasted from configure.DESCRIPTION, but i18nized.
 ALL_SUPPORTED_SIZE = [ # by milhouse video
     "924x576",
@@ -82,7 +82,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Scenic.  If not, see <http://www.gnu.org/licenses/>.""")
 
-PROJECT_WEBSITE = "http://svn.sat.qc.ca/trac/scenic"
+PROJECT_WEBSITE = "http://code.sat.qc.ca/trac/scenic"
 
 AUTHORS_LIST = [
     'Alexandre Quessy <alexandre@quessy.net>',
@@ -1562,13 +1562,28 @@ class Gui(object):
         """
         log.info("Menu item 'Quit' chosen")
         self._confirm_and_quit()
+
+    def _expand_docbook_path_with_locale(self):
+        """
+        Appends the locale dir name to docbook path if found.
+        """
+        lang = "en"
+        try:
+            lang = os.environ["LANG"].split("_")[0].split(".")[0]
+        except KeyError, e:
+            log.error('Key %s is missing in environment variables' % (e))
+        path = os.path.join(configure.DOCBOOK_DIR, lang)
+        if os.path.isdir(path):
+            return path
+        else:
+            return os.path.join(configure.DOCBOOK_DIR, "en")
     
     def on_installation_manual_menu_item_activated(self, unused_menu_item):
         """
         Opens the docbook doc
         """
         log.info("Menu item 'Installatin manual' chosen")
-        docbook_file = os.path.join(configure.DOCBOOK_DIR, "installation-manual.xml")
+        docbook_file = os.path.join(self._expand_docbook_path_with_locale(), "installation-manual.xml")
         process.run_once("yelp", docbook_file)
     
     def on_help_menu_item_activated(self, unused_menu_item):
@@ -1576,7 +1591,7 @@ class Gui(object):
         Opens the docbook doc
         """
         log.info("Menu item 'User manual' chosen")
-        docbook_file = os.path.join(configure.DOCBOOK_DIR, "user-manual.xml")
+        docbook_file = os.path.join(self._expand_docbook_path_with_locale(), "user-manual.xml")
         process.run_once("yelp", docbook_file)
 
     def on_status_menu_item_activated(self, unused_menu_item):

@@ -20,9 +20,10 @@
  *
  */
 
+#include "localVideo.h"
 #include "util.h"
 
-#include "localVideo.h"
+#include "gstLinkable.h"
 #include <boost/shared_ptr.hpp>
 #include "pipeline.h"
 
@@ -35,22 +36,28 @@
 
 #include "dv1394.h"
 
-using boost::shared_ptr;
+using std::tr1::shared_ptr;
 
 /// Constructor
 LocalVideo::LocalVideo(Pipeline &pipeline, 
-        shared_ptr<VideoSourceConfig> sourceConfig, 
-        shared_ptr<VideoSinkConfig> sinkConfig) : 
+        const shared_ptr<VideoSourceConfig> &sourceConfig,
+        const shared_ptr<VideoSinkConfig> &sinkConfig) :
     pipeline_(pipeline),
     sourceConfig_(sourceConfig),
     sinkConfig_(sinkConfig),
-    source_(sourceConfig_->createSource(pipeline_)), 
+    source_(),
     colourspace_(0),
-    videoscale_(sinkConfig_->createVideoScale(pipeline_)),
-    textoverlay_(0),
-    videoflip_(sinkConfig_->flipMethod() != "none" ? sinkConfig_->createVideoFlip(pipeline_) : 0),
-    sink_(sinkConfig_->createSink(pipeline_))
+    videoscale_(),
+    textoverlay_(),
+    videoflip_(),
+    sink_()
 {
+    source_.reset(sourceConfig_->createSource(pipeline_));
+    videoscale_.reset(sinkConfig_->createVideoScale(pipeline_));
+    videoflip_.reset(sinkConfig_->createVideoFlip(pipeline_));
+    textoverlay_.reset(sinkConfig_->createTextOverlay(pipeline));
+    sink_.reset(sinkConfig_->createSink(pipeline_));
+
     // dc1394src needs an extra colourspace converter if not being encoded or flipped
     // FIXME: maybe it just needs a capsfilter?
     if (sourceConfig_->sourceString() == "dc1394src" and videoflip_ == 0)
@@ -78,31 +85,10 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
             }
         }
     }
-
-    if (sinkConfig_->hasText())
-        textoverlay_ = sinkConfig_->createTextOverlay(pipeline);
     
-    if (videoflip_ != 0)
-    {
-        if (textoverlay_ == 0)
-            gstlinkable::link(*videoscale_, *videoflip_);
-        else
-        {
-            gstlinkable::link(*videoscale_, *textoverlay_);
-            gstlinkable::link(*textoverlay_, *videoflip_);
-        }
-        gstlinkable::link(*videoflip_, *sink_);
-    }
-    else
-    {
-        if (textoverlay_ == 0)
-            gstlinkable::link(*videoscale_, *sink_);
-        else
-        {
-            gstlinkable::link(*videoscale_, *textoverlay_);
-            gstlinkable::link(*textoverlay_, *sink_);
-        }
-    }
+    gstlinkable::link(*videoscale_, *textoverlay_);
+    gstlinkable::link(*textoverlay_, *videoflip_);
+    gstlinkable::link(*videoflip_, *sink_);
 
     /// FIXME: hack for dv1394src
     if (sourceConfig_->sourceString() == "dv1394src")
@@ -112,10 +98,6 @@ LocalVideo::LocalVideo(Pipeline &pipeline,
 /// Destructor 
 LocalVideo::~LocalVideo()
 {
-    delete sink_;
     pipeline_.remove(&colourspace_);
-    delete videoflip_;
-    delete videoscale_;
-    delete source_;
 }
 

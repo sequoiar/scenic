@@ -9,28 +9,31 @@ class TestJackInfo(unittest.TestCase):
             Check that jack-info prints backend, device, name, nperiods, period, pid, rate
         """
         # redirect stderr to stdout
-        proc = subprocess.Popen(['jack-info', '"to stdout"'], 
+        proc = subprocess.Popen(['../jack-info', '"to stdout"'], 
                 shell=True, 
                 stderr=subprocess.STDOUT,
                 stdout=subprocess.PIPE)
 
         stdout_value = proc.communicate()[0]
-        info = {}
+        if "not found" in stdout_value:
+            self.fail("jack-info is not in PATH")
+
+        info_retrieved = {} # data retrived from child's STDOUT
         # parse output of jack-info into dict (stripping the ":" from the key name
-        expected = ['buffer-size', 'samplerate']
+        expected_keys = ['buffer-size', 'samplerate']
         for line in stdout_value.splitlines():
             if "JACK server not running" in line:
-                print "JACK server not running"
+                print("JACK server not running. ")
                 return
-            for key in expected:
-                if key in line:
-                    key = line.split()[0][0:-1]
-                    value = line.split()[1]
-                    info[key] = value
-                    print "%s: %s" % (key, str(value))
+            for key in expected_keys:
+                if line.startswith(key):
+                    key = line.split()[0][0:-1] # first word
+                    value = line.split()[1] # 2nd word
+                    info_retrieved[key] = value # store to data retrieved
+                    # print("%s: %s" % (key, str(value)))
 
-        for key in expected:
-            assert(key in info.iterkeys())
-        
+        for key in expected_keys:
+            if key not in info_retrieved.iterkeys():
+                self.fail("Key %s was not found in jack-info output. Its output is: \n%s" % (key, stdout_value))
         # check for correct number of lines
         #assert(len(info) == len(expected))

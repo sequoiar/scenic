@@ -194,7 +194,8 @@ bool Raw1394::cameraIsReady()
     return true;
 }
 
-void Raw1394::listCameras() 
+/// Returns true if one or more cameras were found
+bool Raw1394::listCameras() 
 {
     using std::vector;
     using std::string;
@@ -205,6 +206,7 @@ void Raw1394::listCameras()
         for (vector<string>::const_iterator iter = devices.begin(); iter != devices.end(); ++iter)
             LOG_PRINT("    " << *iter << std::endl);
     }
+    return not devices.empty();
 }
 #endif
 
