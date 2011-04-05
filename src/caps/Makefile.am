@@ -1,4 +1,4 @@
-pkglib_LTLIBRARIES = libcaps.la
+noinst_LTLIBRARIES = libcaps.la
 
 libcaps_la_SOURCES = CapsServer.cpp CapsServer.h CapsClient.cpp CapsClient.h \
                      MulticastCapsServer.cpp MulticastCapsServer.h \
