@@ -88,8 +88,8 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioTestSource(pipeline, *this);
     else if (source_ == "filesrc")
         return new AudioFileSource(pipeline, *this);
-    else if (source_ == "alsasrc")
-        return new AudioAlsaSource(pipeline, *this);
+    else if (source_ == "alsasrc" or source_ == "pulsesrc" or source_ == "autoaudiosrc")
+        return new AudioSimpleSource(pipeline, *this);
     else if (source_ == "jackaudiosrc")
     {
         Jack::assertReady();
@@ -100,10 +100,6 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
     }
     else if (source_ == "dv1394src")
         return new AudioDvSource(pipeline, *this);
-    else if (source_ == "pulsesrc")
-        return new AudioPulseSource(pipeline, *this);
-    else if (source_ == "autoaudiosrc")
-        return new AudioAutoSource(pipeline, *this);
     else
         THROW_ERROR(source_ << " is an invalid audiosource");
     return 0;

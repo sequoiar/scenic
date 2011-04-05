@@ -125,44 +125,13 @@ AudioFileSource::~AudioFileSource()
 
 
 /// Constructor
-AudioAlsaSource::AudioAlsaSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
+AudioSimpleSource::AudioSimpleSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
     AudioSource(pipeline, config),
     capsfilter_(pipeline_.makeElement("capsfilter", 0)),
     audioconvert_(pipeline_.makeElement("audioconvert", 0))
 {
     source_ = pipeline_.makeElement(config_.source(), NULL);
 
-    if (config_.hasDeviceName())
-        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
-
-    gutil::initAudioCapsFilter(capsfilter_, config_.numChannels());
-    gstlinkable::link(source_, audioconvert_);
-    gstlinkable::link(audioconvert_, capsfilter_);
-}
-
-/// Constructor
-AudioAutoSource::AudioAutoSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
-    AudioSource(pipeline, config),
-    capsfilter_(pipeline_.makeElement("capsfilter", 0)),
-    audioconvert_(pipeline_.makeElement("audioconvert", 0))
-{
-    source_ = pipeline_.makeElement(config_.source(), NULL);
-
-    if (config_.hasDeviceName())
-        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
-
-    gutil::initAudioCapsFilter(capsfilter_, config_.numChannels());
-    gstlinkable::link(source_, audioconvert_);
-    gstlinkable::link(audioconvert_, capsfilter_);
-}
-
-/// Constructor
-AudioPulseSource::AudioPulseSource(const Pipeline &pipeline, const AudioSourceConfig &config) :
-    AudioSource(pipeline, config),
-    capsfilter_(pipeline_.makeElement("capsfilter", 0)),
-    audioconvert_(pipeline_.makeElement("audioconvert", 0))
-{
-    source_ = pipeline_.makeElement(config_.source(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
