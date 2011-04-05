@@ -13,3 +13,28 @@ The streaming is done over RTP with the GStreamer multimedia framework. Users ca
 
 See http://code.sat.qc.ca/trac/scenic/
 
+Instructions
+------------
+
+    Upgrading:
+    *   Be sure to uninstall your previous scenic before installing
+        scenic.
+    *   In the older source directory, use "make uninstall" as root to
+        uninstall previous installations.
+    *   Don't forget to run ldconfig after installation.
+
+    Backward compatibility:
+        Each release in the 0.7 series may not be interoperable with each other.
+
+    Milhouse dependency for Scenic
+        Scenic always needs the same version of milhouse, eg. scenic 0.4.5
+        needs milhouse 0.4.5
+
+    Limitations:
+    *   While milhouse supports many video and audio input types, scenic only
+        supports a subset of them.
+    *   Each release version in the 0.7 branch is considered unstable and will
+        not be supported in the future. Each version is not interoperable with
+        any other version of the unstable 0.7 branch. Wait for the next release
+        in the 0.8 branch to benefit from long term support of the new features
+        of the 0.7 branch.

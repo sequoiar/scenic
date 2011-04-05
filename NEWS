@@ -1,7 +1,100 @@
 
 This files lists RELEASE notes since Scenic version 0.4.
 
+HISTORY
+-------
+
+    * 2011-04-01: 0.7.0
+         * First release of the 0.7 unstable branch
+    * 2010-07-19: 0.6.3
+         * Fourth stable release of the 0.6 stable branch.
+    * 2010-06-18: 0.6.2
+         * Third stable release of the 0.6 stable branch.
+    * 2010-06-11: 0.6.1
+         * Second stable release of the 0.6 stable branch.
+         * Disabled audio test source, since it might use 100% of the CPU
+    * 2010-06-10: 0.6
+          * First stable release of the 0.6 stable branch.
+          * MIDI support officially supported
+          * Allows to fine tune what audio/video/MIDI each peer receives.
+    * 2010-06-02: 0.5.11
+          * Second release candidate for the 0.6 stable branch.
+    * 2010-05-27: 0.5.10
+          * First release candidate for the 0.6 stable branch.
+    * 2010-05-25: 0.5.9
+    * 2010-05-19: 0.5.8
+    * 2010-05-17: 0.5.6
+    * 2010-05-17: 0.5.5
+    * 2010-05-10: 0.5.4
+    * 2010-05-07: 0.5.3
+    * 2010-05-07: 0.5.2
+    * 2010-05-17: 0.5.1
+    * 2010-04-12: 0.5
+          * First unstable release of the 0.5 development branch.
+    * 2010-04-08: 0.4.5
+    * 2010-03-16: 0.4.4
+    * 2010-03-09: 0.4.3
+    * 2010-03-01: 0.4.2
+    * 2010-02-19: 0.4.1
+    * 2010-02-17: 0.4
+          * Dropped the Web interface and now using GTK+
+          * First stable release of the stable branch 0.4
+    * 2010-01-28: 0.3.6
+    * 2010-01-21: 0.3.5
+    * 2010-01-11: 0.3.4
+    * 2010-01-04: 0.3.3
+    * 2009-12-23: 0.3.2
+    * 2009-12-10: 0.3.1
+    * 2009-11-27: 0.3
+    * 2009-10-14: 0.2
+    * 2009-05-08: 0.1.3-a1
+          * Now using boost1.35
+    * 2009-05-08: 0.1.2-rc1
+    * 2009-02-10: 0.1.2-a1
+
 ----------------------------------------------------------------------
+
+Release notes for Scenic 0.7.0
+
+This release is the first of the unstable 0.7 branch. This branch introduces
+support for RTSP, using the --rtsp-server and --rtsp-client options. It also
+removes deprecated features and offers more reasonable defaults of milhouse.
+
+Since this is an unstable branch, there is no guarantee that versions will
+be interoperable (although we will try to make it so).
+
+New features in milhouse:
+    -RTSP mode
+    -explicit --disable-video and --disable-audio options.
+    -standalone vumeters (i.e. will render in their own window if no --vumeter-id option is given).
+
+Bug fixes in milhouse:
+    * (none)
+
+New features in scenic:
+    -fixed python packaging
+
+Bug fixes in milhouse: 
+    * milhouse: don't call gtk_init unless display has been set
+    * tests: set LANG to C test_vumeter.py: skip test if Gtk cannot open the DISPLAY (not just when DISPLAY is unset). Fixes #598.
+    * shared_video: Add timeouts when we try to acquire locks
+    * shared_video: cleanup memory if we can't acquire lock in 5 seconds
+    * shared_video: exit rather than hanging when we get starved off the shared memory mutex
+    * firereset: call port raw1304_get_port_info
+    * firereset: removed call to get ports which caused stack smashing.
+    * milhouse: print a simple message if no cameras of any kind are found for --list-cameras command
+    * milhouse: (dc1394) exit right away if camera guid is not found
+    * milhouse: (dc1394) display guid in hex when it can be found since this how it was given
+    * documentation: added French manuals and open it if LANG starts with fr in Scenic.
+    * documentation: Fixed project URL. Updated doc about the Ubuntu PPA.
+    * shared_video: added a .pc file for pkg-config.
+    * shared_video: do not install non-public libraries
+
+Bug fixes in scenic:
+    * (none)
+
+----------------------------------------------------------------------
+
 Release notes for Scenic 0.6.3
 
 This release is the fourth of the stable 0.6 branch. This branch introduces
