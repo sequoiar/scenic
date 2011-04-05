@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
 "Report-Msgid-Bugs-To: http://code.sat.qc.ca/trac/scenic/wiki/BugReport\n"
-"POT-Creation-Date: 2010-07-27 16:58-0400\n"
+"POT-Creation-Date: 2011-04-05 14:52-0400\n"
 "PO-Revision-Date: 2010-06-22 11:53-0500\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: French\n"
@@ -493,46 +493,46 @@ msgstr ""
 "La tentative de changer l'entrée vidéo de %(current_input)s à %"
 "(desired_input)s pour l'appareil %(device_name)s a échoué."
 
-#: py/scenic/gui.py:1654
+#: py/scenic/gui.py:1669
 msgid "<b>Zombie</b>"
 msgstr "<b>Zombie</b>"
 
-#: py/scenic/gui.py:1658 data/glade/scenic.glade:2127
+#: py/scenic/gui.py:1673 data/glade/scenic.glade:2127
 msgid "<b>Running</b>"
 msgstr "Actif"
 
-#: py/scenic/gui.py:1662
+#: py/scenic/gui.py:1677
 msgid "<b>Not running</b>"
 msgstr "Inactif"
 
-#: py/scenic/gui.py:1748
+#: py/scenic/gui.py:1763
 msgid "YES"
 msgstr "OUI"
 
-#: py/scenic/gui.py:1750
+#: py/scenic/gui.py:1765
 msgid "NO"
 msgstr "NON"
 
-#: py/scenic/gui.py:1756
+#: py/scenic/gui.py:1771
 msgid "MIDI is supported..."
 msgstr "MIDI est supporté..."
 
-#: py/scenic/gui.py:1759
+#: py/scenic/gui.py:1774
 #, python-format
 msgid "Video codec %(codec)s is supported..."
 msgstr "Le codec vidéo %(codec)s est supporté..."
 
-#: py/scenic/gui.py:1761
+#: py/scenic/gui.py:1776
 #, python-format
 msgid "Audio codec %(codec)s is supported..."
 msgstr "Le codec audio %(codec)s est supporté..."
 
-#: py/scenic/gui.py:1771
+#: py/scenic/gui.py:1786
 #, python-format
 msgid "Milhouse version: %s\n"
 msgstr ""
 
-#: py/scenic/gui.py:1772
+#: py/scenic/gui.py:1787
 #, python-format
 msgid "Gstreamer Core Library version: %s\n"
 msgstr ""
@@ -663,7 +663,7 @@ msgid "View informations about Scenic features on your system."
 msgstr ""
 "Voir des informations sur les fonctionnalités de Scenic sur votre système."
 
-#: data/glade/scenic.glade:757
+#: data/glade/scenic.glade:757 data/glade/scenic.glade:4414
 msgid "Detailed Status"
 msgstr "Détails"
 
@@ -981,9 +981,8 @@ msgstr "Débogage"
 msgid "Details"
 msgstr "Détails"
 
-#: data/glade/scenic.glade:4414
-msgid "Detailled Status"
-msgstr "Détails"
+#~ msgid "Detailled Status"
+#~ msgstr "Détails"
 
 #~ msgid "Error : Could not find the Glade file %(filename)s. Exitting."
 #~ msgstr ""

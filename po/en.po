@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Scenic 0.5.2\n"
 "Report-Msgid-Bugs-To: http://code.sat.qc.ca/trac/scenic/wiki/BugReport\n"
-"POT-Creation-Date: 2010-07-27 16:58-0400\n"
+"POT-Creation-Date: 2011-04-05 14:52-0400\n"
 "PO-Revision-Date: 2010-05-13 18:09-0400\n"
 "Last-Translator: Alexandre Quessy <alexandre@quessy.net>\n"
 "Language-Team: English\n"
@@ -484,46 +484,46 @@ msgstr ""
 "Could not change V4L2 input from %(current_input)s to %(desired_input)s for "
 "device %(device_name)s."
 
-#: py/scenic/gui.py:1654
+#: py/scenic/gui.py:1669
 msgid "<b>Zombie</b>"
 msgstr "<b>Zombie</b>"
 
-#: py/scenic/gui.py:1658 data/glade/scenic.glade:2127
+#: py/scenic/gui.py:1673 data/glade/scenic.glade:2127
 msgid "<b>Running</b>"
 msgstr "<b>Running</b>"
 
-#: py/scenic/gui.py:1662
+#: py/scenic/gui.py:1677
 msgid "<b>Not running</b>"
 msgstr "<b>Not running</b>"
 
-#: py/scenic/gui.py:1748
+#: py/scenic/gui.py:1763
 msgid "YES"
 msgstr ""
 
-#: py/scenic/gui.py:1750
+#: py/scenic/gui.py:1765
 msgid "NO"
 msgstr ""
 
-#: py/scenic/gui.py:1756
+#: py/scenic/gui.py:1771
 msgid "MIDI is supported..."
 msgstr ""
 
-#: py/scenic/gui.py:1759
+#: py/scenic/gui.py:1774
 #, python-format
 msgid "Video codec %(codec)s is supported..."
 msgstr ""
 
-#: py/scenic/gui.py:1761
+#: py/scenic/gui.py:1776
 #, python-format
 msgid "Audio codec %(codec)s is supported..."
 msgstr ""
 
-#: py/scenic/gui.py:1771
+#: py/scenic/gui.py:1786
 #, python-format
 msgid "Milhouse version: %s\n"
 msgstr ""
 
-#: py/scenic/gui.py:1772
+#: py/scenic/gui.py:1787
 #, python-format
 msgid "Gstreamer Core Library version: %s\n"
 msgstr ""
@@ -654,7 +654,7 @@ msgstr "_File"
 msgid "View informations about Scenic features on your system."
 msgstr ""
 
-#: data/glade/scenic.glade:757
+#: data/glade/scenic.glade:757 data/glade/scenic.glade:4414
 #, fuzzy
 msgid "Detailed Status"
 msgstr "Details"
@@ -998,10 +998,9 @@ msgstr "Debug"
 msgid "Details"
 msgstr "Details"
 
-#: data/glade/scenic.glade:4414
 #, fuzzy
-msgid "Detailled Status"
-msgstr "Details"
+#~ msgid "Detailled Status"
+#~ msgstr "Details"
 
 #~ msgid "Error : Could not find the Glade file %(filename)s. Exitting."
 #~ msgstr "Error : Could not find the Glade file %(filename)s. Exitting."

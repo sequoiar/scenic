@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: scenic 0.6.4\n"
 "Report-Msgid-Bugs-To: http://code.sat.qc.ca/trac/scenic/wiki/BugReport\n"
-"POT-Creation-Date: 2010-07-27 16:58-0400\n"
+"POT-Creation-Date: 2011-04-05 14:52-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -399,46 +399,46 @@ msgid ""
 "device %(device_name)s."
 msgstr ""
 
-#: py/scenic/gui.py:1654
+#: py/scenic/gui.py:1669
 msgid "<b>Zombie</b>"
 msgstr ""
 
-#: py/scenic/gui.py:1658 data/glade/scenic.glade:2127
+#: py/scenic/gui.py:1673 data/glade/scenic.glade:2127
 msgid "<b>Running</b>"
 msgstr ""
 
-#: py/scenic/gui.py:1662
+#: py/scenic/gui.py:1677
 msgid "<b>Not running</b>"
 msgstr ""
 
-#: py/scenic/gui.py:1748
+#: py/scenic/gui.py:1763
 msgid "YES"
 msgstr ""
 
-#: py/scenic/gui.py:1750
+#: py/scenic/gui.py:1765
 msgid "NO"
 msgstr ""
 
-#: py/scenic/gui.py:1756
+#: py/scenic/gui.py:1771
 msgid "MIDI is supported..."
 msgstr ""
 
-#: py/scenic/gui.py:1759
+#: py/scenic/gui.py:1774
 #, python-format
 msgid "Video codec %(codec)s is supported..."
 msgstr ""
 
-#: py/scenic/gui.py:1761
+#: py/scenic/gui.py:1776
 #, python-format
 msgid "Audio codec %(codec)s is supported..."
 msgstr ""
 
-#: py/scenic/gui.py:1771
+#: py/scenic/gui.py:1786
 #, python-format
 msgid "Milhouse version: %s\n"
 msgstr ""
 
-#: py/scenic/gui.py:1772
+#: py/scenic/gui.py:1787
 #, python-format
 msgid "Gstreamer Core Library version: %s\n"
 msgstr ""
@@ -563,7 +563,7 @@ msgstr ""
 msgid "View informations about Scenic features on your system."
 msgstr ""
 
-#: data/glade/scenic.glade:757
+#: data/glade/scenic.glade:757 data/glade/scenic.glade:4414
 msgid "Detailed Status"
 msgstr ""
 
@@ -878,8 +878,4 @@ msgstr ""
 
 #: data/glade/scenic.glade:4065
 msgid "Details"
-msgstr ""
-
-#: data/glade/scenic.glade:4414
-msgid "Detailled Status"
 msgstr ""
