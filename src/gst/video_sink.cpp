@@ -266,20 +266,23 @@ XvImageSink::~XvImageSink()
 }
 
 // FIXME: this should be refactored to use the xoverlay interface/gtk stuff if possible
-XImageSink::XImageSink(const Pipeline &pipeline, const std::string &display) :
+SimpleVideoSink::SimpleVideoSink(const Pipeline &pipeline, const VideoSinkConfig &config) :
     VideoSink(),
     colorspace_(pipeline.makeElement("ffmpegcolorspace", NULL))
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
-    sink_ = pipeline.makeElement("ximagesink", NULL);
-    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
-    if (not display.empty())
-        g_object_set(sink_, "display", display.c_str(), NULL);
+    sink_ = pipeline.makeElement(config.sink(), NULL);
+
+    // gconfvideosink and autovideosink lack this property
+    if (g_strcmp0(config.sink(), "ximagesink"))
+        g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
+    if (not config.display().empty())
+        g_object_set(sink_, "display", config.display().c_str(), NULL);
 
     gstlinkable::link(colorspace_, sink_);
 }
 
-GstElement *XImageSink::sinkElement()
+GstElement *SimpleVideoSink::sinkElement()
 {
     return colorspace_;
 }

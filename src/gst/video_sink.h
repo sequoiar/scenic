@@ -80,11 +80,11 @@ class XvImageSink
                 void *data);
 };
 
-class XImageSink
+class SimpleVideoSink
 : public VideoSink
 {
     public:
-        XImageSink(const Pipeline &pipeline, const std::string &display);
+        SimpleVideoSink(const Pipeline &pipeline, const VideoSinkConfig &config);
 
     private:
         virtual _GstElement *sinkElement();

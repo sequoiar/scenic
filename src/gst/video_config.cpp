@@ -280,8 +280,9 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
             xv->toggleFullscreen();
         result = xv;
     }
-    else if (sink_ == "ximagesink")
-        result = new XImageSink(pipeline, display_);
+    else if (sink_ == "ximagesink" or sink_ == "gconfvideosink" or sink_ ==
+            "autovideosink")
+        result = new SimpleVideoSink(pipeline, *this);
     else if (sink_ == "sharedvideosink")
         result = new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
     else
