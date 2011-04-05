@@ -1,4 +1,4 @@
-pkglib_LTLIBRARIES= libgtk_utils.la
+noinst_LTLIBRARIES= libgtk_utils.la
 
 libgtk_utils_la_SOURCES = gtk_utils.cpp \
                      gtk_utils.h \
