@@ -102,6 +102,8 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioDvSource(pipeline, *this);
     else if (source_ == "pulsesrc")
         return new AudioPulseSource(pipeline, *this);
+    else if (source_ == "autoaudiosrc")
+        return new AudioAutoSource(pipeline, *this);
     else
         THROW_ERROR(source_ << " is an invalid audiosource");
     return 0;
@@ -176,6 +178,8 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
         return new AudioAlsaSink(pipeline, *this);
     else if (sink_ == "pulsesink")
         return new AudioPulseSink(pipeline, *this);
+    else if (sink_ == "autoaudiosink")
+        return new AudioAutoSink(pipeline, *this);
     else
     {
         THROW_CRITICAL(sink_ << " is an invalid audiosink");

@@ -118,6 +118,18 @@ class AudioAlsaSource : public AudioSource
         _GstElement *audioconvert_;
 };
 
+class AudioAutoSource : public AudioSource
+{
+    public:
+        AudioAutoSource(const Pipeline &pipeline, const AudioSourceConfig &config);
+
+    private:
+        virtual _GstElement *srcElement() { return capsfilter_; }
+
+        _GstElement *capsfilter_;
+        _GstElement *audioconvert_;
+};
+
 /**
  *  Concrete AudioSource which captures audio from PulseAudio
  *  Has caps filter to allow number of channels to be variable.

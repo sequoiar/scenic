@@ -63,6 +63,21 @@ class AudioAlsaSink : public AudioSink
         const AudioSinkConfig &config_;
 };
 
+/// Concrete AudioSink class representing a sink to the ALSA interface
+class AudioAutoSink : public AudioSink
+{
+    public:
+        AudioAutoSink(Pipeline &pipeline, const AudioSinkConfig &config);
+
+    private:
+        /** Returns this AudioAlsaSink's sink, which is an audioconverter, as
+         * raw-audio conversion happens before audio is output to ALSA */
+        _GstElement *sinkElement() { return aconv_; }
+        _GstElement *aconv_;
+
+        const AudioSinkConfig &config_;
+};
+
 /// Concrete AudioSink class representing a sink to the Pulse interface
 class AudioPulseSink : public AudioSink
 {

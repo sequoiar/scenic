@@ -75,6 +75,21 @@ AudioPulseSink::AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config
     gstlinkable::link(aconv_, sink_);
 }
 
+
+/// Constructor
+AudioAutoSink::AudioAutoSink(Pipeline &pipeline, const AudioSinkConfig &config) :
+    aconv_(pipeline.makeElement("audioconvert", NULL)),
+    config_(config)
+{
+    sink_ = pipeline.makeElement("autoaudiosink", NULL);
+
+    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
+    if (config_.hasDeviceName())
+        g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
+
+    gstlinkable::link(aconv_, sink_);
+}
+
 /// Constructor
 AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) :
     config_(config)
