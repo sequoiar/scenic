@@ -1,6 +1,6 @@
-Release notes for Scenic 0.6.3
+Release notes for Scenic 0.6.4
 
-This release is the fourth of the stable 0.6 branch. This branch introduces
+This release is the fifth of the stable 0.6 branch. This branch introduces
 many new features developed during 0.5 series. Those features include MIDI 
 streaming support and the hability to customize what each peer receives as 
 audio and video. 
@@ -60,6 +60,7 @@ Bug fixes in milhouse:
     * documentation: added French manuals and open it if LANG starts with fr in Scenic.
     * documentation: Fixed project URL. Updated doc about the Ubuntu PPA.
     * shared_video: added a .pc file for pkg-config.
+    * shared_video: do not install non-public libraries
 
 Bug fixes in scenic: 
     * (none)
