@@ -36,23 +36,15 @@ class _GstRtpBin;
 class _GstPad;
 
 class RtpReceiver
-    : RtpBin
+    : public RtpBin
 {
     public:
-        RtpReceiver(const Pipeline &pipeline) :
-            RtpBin(pipeline),
-            rtp_receiver_(0),
-            depayloader_(0),
-            recv_rtp_sink_(0),
-            send_rtcp_src_(0),
-            recv_rtcp_sink_(0) {}
+        RtpReceiver(const Pipeline &pipeline, int latency);
         ~RtpReceiver();
         void setCaps(const char* capsStr);
 
         void add(RtpPay * depayloader, const ReceiverConfig & config);
-        static void enableControl();
-        static void updateLatencyCb(_GtkWidget *scale);
-        static void setLatency(int latency);
+        void setLatency(int latency);
         static const int MIN_LATENCY = 1; // ms
         static const int INIT_LATENCY = 50;   // ms
         static const int MAX_LATENCY = 5000; // ms
@@ -61,6 +53,7 @@ class RtpReceiver
         virtual void subParseSourceStats(_GstStructure *stats);
         static _GstPad *getMatchingDepayloaderSinkPad(const std::string &srcMediaType);
         static std::string getMediaType(_GstPad *pad);
+        static int updateLatencyCb(void *data);
         static void onPadAdded(_GstElement * rtpbin, _GstPad * srcPad, void *data);
         static void onSenderTimeout(_GstElement * /* rtpbin */, unsigned /* session */, unsigned /* ssrc */, void * /*data*/);
 
@@ -70,6 +63,7 @@ class RtpReceiver
         _GstPad *send_rtcp_src_;
         _GstPad *recv_rtcp_sink_;
         static std::list<_GstElement *> depayloaders_;
+        int latency_;
 };
 
 #endif // _RTP_RECEIVER_H_

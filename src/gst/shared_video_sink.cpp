@@ -31,7 +31,7 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/thread/thread_time.hpp>
+#include <boost/thread/thread_time.hpp> // for system_time
 
 
 using boost::interprocess::shared_memory_object;

@@ -113,7 +113,6 @@ main(int argc, char **argv)
   loop = g_main_loop_new (NULL, FALSE);
 
   server = gst_rtsp_server_new ();
-  gst_rtsp_server_set_port (server, local_url->port);
 
   factory = gst_rtsp_cam_media_factory_new ();
   g_object_set (factory, "video-device", video_device,

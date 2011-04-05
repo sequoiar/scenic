@@ -101,13 +101,15 @@ class ReceiverConfig : public RemoteConfig
         ReceiverConfig(const std::string &codec,
                 const std::string &remoteHost,
                 int port,
-                const std::string &multicastInterface);
+                const std::string &multicastInterface,
+                int latency);
 
         VideoDecoder* createVideoDecoder(const Pipeline &pipeline, bool doDeinterlace) const;
         Decoder* createAudioDecoder(const Pipeline &pipeline, int numChannels) const;
 
         const char *multicastInterface() const { return multicastInterface_.c_str(); }
         const char *caps() const { return caps_.c_str(); }
+        int latency() const { return latency_; }
         bool capsMatchCodec() const;
         bool hasMulticastInterface() const { return multicastInterface_ != ""; }
         // This method will block while waiting for caps
@@ -117,6 +119,7 @@ class ReceiverConfig : public RemoteConfig
         static bool isSupportedCodec(const std::string &codec);
         const std::string multicastInterface_;
         std::string caps_;
+        const int latency_;
 };
 
 #endif // _REMOTE_CONFIG_H_

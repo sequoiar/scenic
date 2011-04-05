@@ -41,7 +41,7 @@ AudioReceiver::AudioReceiver(Pipeline &pipeline,
         const shared_ptr<ReceiverConfig> &rConfig) :
     audioConfig_(aConfig),
     remoteConfig_(rConfig),
-    session_(pipeline),
+    session_(pipeline, remoteConfig_->latency()),
     gotCaps_(false),
     depayloader_(),
     decoder_(),
@@ -93,9 +93,6 @@ void AudioReceiver::createSink(Pipeline &pipeline)
     assert(gotCaps_);
     if (not remoteConfig_->capsMatchCodec())
         THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
-
-    if (decoder_->adjustsBufferTime())
-        sink_->adjustBufferTime(decoder_->minimumBufferTime()); // increase jitterbuffer as needed
 }
 
 /// Used to set this AudioReceiver's RtpReceiver's caps

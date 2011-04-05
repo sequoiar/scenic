@@ -1,4 +1,4 @@
-pkglib_LTLIBRARIES= libutil.la
+noinst_LTLIBRARIES= libutil.la
 # needed by libshared_video
 pkginclude_HEADERS = $(top_srcdir)/src/include/video_size.h
 

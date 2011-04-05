@@ -25,13 +25,16 @@ def is_codec_supported(codec):
     """
     _elements = {
         "mp3": ["lamemp3enc", "mp3parse", "mad"],
+        "raw": ["rtpL16pay", "rtpL16depay"],
+        "vorbis": ["vorbisenc", "vorbisdec"],
         "theora": ["theoraenc", "theoradec"],
-        "h263": ["ffenc_h263p"],
-        "h264": ["x264enc"],
-        "mpeg4": ["ffenc_mpeg4"]
+        "h263": ["ffenc_h263p", "ffdec_h263"],
+        "h264": ["x264enc", "ffdec_h264"],
+        "mpeg4": ["ffenc_mpeg4", "ffdec_mpeg4"]
         }
     if not _elements.has_key(codec):
-        return True
+        log.warning("Codec %s is NOT supported." % (codec))
+        return False
     else:
         needed = _elements[codec]
         ret = True

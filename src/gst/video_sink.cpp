@@ -137,7 +137,7 @@ XvImageSink::XvImageSink(Pipeline &pipeline,
     // FIXME: this has been deprecated in favour of
     // gst_x_overlay_set_xwindow_handle as of gst-plugins-base 0.10.31
 #if GST_CHECK_VERSION(0,10,31)
-    gst_x_overlay_set_xwindow_handle(GST_X_OVERLAY (sink_), embed_xid);
+    gst_x_overlay_set_window_handle(GST_X_OVERLAY (sink_), embed_xid);
 #else
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY (sink_), embed_xid);
 #endif

@@ -43,13 +43,11 @@ class Pipeline : private boost::noncopyable
 
         bool isAlive() { return pipeline_ == 0; }
         _GstElement *makeElement(const char *factoryName, const char *elementName) const;
-        _GstElement *findElementByName(const char *elementName);
+        _GstElement *findElementByName(const char *elementName) const;
         void subscribe(BusMsgHandler *obj);
         void unsubscribe(BusMsgHandler *obj);
 
-        void updateSampleRate(unsigned newRate);
         bool isPlaying() const;
-        unsigned actualSampleRate() const;
         bool isReady() const;
         bool isPaused() const;
         bool isNull() const;
@@ -59,6 +57,7 @@ class Pipeline : private boost::noncopyable
         void makeReady() const;
         void quit() const;
         void makeVerbose() const;
+        bool latencyUpdated() const { return latencyUpdated_; }
 
     private:
         bool makeNull() const;
@@ -75,6 +74,7 @@ class Pipeline : private boost::noncopyable
         std::set<BusMsgHandler*> handlers_;
         unsigned sampleRate_;
         static const unsigned int SAMPLE_RATE = 48000;
+        bool latencyUpdated_;
 };
 
 #endif // _PIPELINE_H_

@@ -66,9 +66,6 @@ class Decoder : private boost::noncopyable
         virtual ~Decoder();
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type
         virtual RtpPay* createDepayloader() const = 0;
-        virtual void adjustJitterBuffer() {}; // buy default, do nothing
-        virtual bool adjustsBufferTime() { return false; }
-        virtual unsigned long long minimumBufferTime();
         virtual _GstElement *srcElement() { return decoder_; }
         virtual _GstElement *sinkElement() { return decoder_; }
 
@@ -97,7 +94,6 @@ class VideoDecoder : public Decoder
 {
     public:
         VideoDecoder(const Pipeline &pipeline, const char *decoder, bool doDeinterlace);
-        virtual void adjustJitterBuffer();
         virtual _GstElement *srcElement()
         {
             if (!doDeinterlace_)
@@ -111,7 +107,6 @@ class VideoDecoder : public Decoder
         bool doDeinterlace_;
         _GstElement *colorspace_;
         _GstElement *deinterlace_;
-        static const unsigned long long LONGER_JITTER_BUFFER_MS = 60;
 };
 
 /// Encoder that encodes raw video into H.264 using the x264 encoder
@@ -132,7 +127,6 @@ class H264Decoder : public VideoDecoder {
         H264Decoder(const Pipeline &pipeline, bool doDeinterlace);
     private:
         RtpPay* createDepayloader() const;
-        void adjustJitterBuffer();
 };
 
 
@@ -251,8 +245,6 @@ class VorbisDecoder : public Decoder
 {
     public:
         VorbisDecoder(const Pipeline &pipeline);
-        bool adjustsBufferTime() { return true; }
-        unsigned long long minimumBufferTime();
     private:
         RtpPay* createDepayloader() const;
         static const unsigned long long MIN_BUFFER_USEC = 100000;

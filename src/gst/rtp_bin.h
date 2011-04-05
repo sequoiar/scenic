@@ -46,7 +46,7 @@ class RtpBin : private boost::noncopyable
         void registerSession(const std::string &codec);
         void unregisterSession();
         const Pipeline &pipeline_;
-        static _GstElement *rtpbin_;
+        _GstElement *rtpbin_;
         static bool destroyed_;
         static int sessionCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;

@@ -16,8 +16,6 @@ dnl "too old" which might happen accidentally, especially when using a VCS
 dnl such as when building debian packages
 AM_MAINTAINER_MODE([enable])
 
-AC_SUBST([BUILD_TIME], ["`date +%F\ %T\ %Z`"])
-
 # Check for C and C++ compilers
 AC_PROG_CXX
 AC_PROG_CC
@@ -30,7 +28,6 @@ AM_GNU_GETTEXT([external])
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/ioctl.h unistd.h linux/videodev2.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

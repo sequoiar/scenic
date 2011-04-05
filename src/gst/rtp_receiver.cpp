@@ -36,6 +36,20 @@
 
 std::list<GstElement *> RtpReceiver::depayloaders_;
 
+RtpReceiver::RtpReceiver(const Pipeline &pipeline, int latency) :
+    RtpBin(pipeline),
+    rtp_receiver_(0),
+    depayloader_(0),
+    recv_rtp_sink_(0),
+    send_rtcp_src_(0),
+    recv_rtcp_sink_(0),
+    latency_(latency)
+{
+    // try to update the latency every two seconds until the pipeline
+    // has successfully configured the new latency
+    g_timeout_add(2000, static_cast<GSourceFunc>(updateLatencyCb), this);
+}
+
 RtpReceiver::~RtpReceiver()
 {
     // find this->depayloader in the static list of depayloaders
@@ -58,14 +72,32 @@ RtpReceiver::~RtpReceiver()
         gst_object_unref(recv_rtcp_sink_);
 }
 
+gboolean RtpReceiver::updateLatencyCb(gpointer data)
+{
+    RtpReceiver *context = static_cast<RtpReceiver*>(data);
+    if (not context->pipeline_.latencyUpdated() and context->latency_ != INIT_LATENCY)
+    {
+        context->setLatency(context->latency_);
+        return TRUE; // call again
+    }
+    else
+        return FALSE; // don't call again
+}
+
 
 void RtpReceiver::setLatency(int latency)
 {
     assert(rtpbin_);
     if (latency < MIN_LATENCY or latency > MAX_LATENCY)
-        THROW_ERROR("Cannot set rtpbin latency to " << latency << ", must be in range "
+    {
+        LOG_WARNING("Cannot set rtpbin latency to " << latency << ", must be in range "
                 << MIN_LATENCY << " to " << MAX_LATENCY);
-    g_object_set(G_OBJECT(rtpbin_), "latency", latency, NULL);
+    }
+    else
+    {
+        LOG_DEBUG("Setting latency to " << latency << " ms");
+        g_object_set(G_OBJECT(rtpbin_), "latency", latency, NULL);
+    }
 }
 
 
@@ -79,15 +111,15 @@ void RtpReceiver::setCaps(const char *capsStr)
     caps = gst_caps_from_string(capsStr);
     if (caps == 0)
         THROW_ERROR("Could not generate caps from caps string\n\"" << capsStr <<
-            "\"\nThere is potentially a Gstreamer version mismatch between "
-            "this host and the sender host");
+                "\"\nThere is potentially a Gstreamer version mismatch between "
+                "this host and the sender host");
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
 
     gst_caps_unref(caps);
 }
 
 
-void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /* data*/)
+void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /*data*/)
 {
     // don't look at the full name
     static const std::string expectedPadPrefix = "recv_rtp_src";

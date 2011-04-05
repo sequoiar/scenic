@@ -16,4 +16,4 @@ Done
 ----
 Investigate "source" property of uridecodebin: done by handling the notify::source signal
 see how we can specify explicitly which ports to use: ""
-
+use fancier overlay like in GtkVideoSink.

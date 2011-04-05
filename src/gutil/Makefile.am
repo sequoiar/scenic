@@ -1,4 +1,4 @@
-pkglib_LTLIBRARIES= libgutil.la
+noinst_LTLIBRARIES= libgutil.la
 
 libgutil_la_SOURCES = gutil.cpp \
                       gutil.h

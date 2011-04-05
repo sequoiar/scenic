@@ -53,11 +53,13 @@ int doioctl(int fd, long request, void *data, const std::string &name)
 std::string getStandard(int fd)
 {
     using namespace boost::assign;
-    std::string result;
+    using std::map;
+    using std::string;
+    string result;
     v4l2_std_id std;
 
     // map of format codes
-    static std::map<std::string, unsigned long long> FORMATS = map_list_of
+    static map<string, unsigned long long> FORMATS = map_list_of
         ("PAL", 0xfff)
         ("NTSC", 0xf000)
         ("SECAM", 0xff0000)
@@ -65,7 +67,7 @@ std::string getStandard(int fd)
 
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0)
     {
-        std::map<std::string, unsigned long long>::const_iterator iter;
+        map<string, unsigned long long>::const_iterator iter;
         for (iter = FORMATS.begin(); iter != FORMATS.end() and result == ""; ++iter)
             if (std & (*iter).second)    // true if current format matches this iter's key
                 result = (*iter).first; // save the actual standard
@@ -179,17 +181,18 @@ std::string getDriverInfo(int fd, const std::string &device)
 
 std::string getInputName(int fd)
 {
-    std::string result;
+    using std::string;
+    string result;
     int input;
     v4l2_input vin;		/* list_inputs */
     memset(&vin, 0, sizeof(vin));
 
     if (doioctl(fd, VIDIOC_G_INPUT, &input, "VIDIOC_G_INPUT") == 0)
     {
-        result += boost::lexical_cast<std::string>(input);
+        result += boost::lexical_cast<string>(input);
         vin.index = input;
         if (ioctl(fd, VIDIOC_ENUMINPUT, &vin) >= 0)
-            result += " (" + boost::lexical_cast<std::string>(vin.name) + ")";
+            result += " (" + boost::lexical_cast<string>(vin.name) + ")";
     }
 
     return result;
@@ -201,10 +204,11 @@ void setCaptureFormat(int fd, v4l2_format format)
     doioctl(fd, VIDIOC_S_FMT, &format, "VIDIOC_S_FMT");
 }
 
-typedef std::vector<std::string> DeviceList;
 #ifdef HAVE_BOOST_FILESYSTEM
+typedef std::vector<std::string> DeviceList;
 DeviceList getDevices()
 {
+    using std::string;
     namespace fs = boost::filesystem;
 
     fs::path full_path("/dev/");
@@ -222,9 +226,9 @@ DeviceList getDevices()
     {
         try
         {
-            std::string pathString(dir_itr->path().string());
-            if (pathString.find("video") != std::string::npos)  // devices matching video
-                if (pathString.find("1394") == std::string::npos)   // that don't contain 1394
+            string pathString(dir_itr->path().string());
+            if (pathString.find("video") != string::npos)  // devices matching video
+                if (pathString.find("1394") == string::npos)   // that don't contain 1394
                     deviceList.push_back(pathString);
         }
         catch (const std::exception & ex)
@@ -264,7 +268,7 @@ void printSupportedSizes(int fd)
     int oldWidth = format.fmt.pix.width;
     int oldHeight = format.fmt.pix.height;
 
-    for (SizeList::iterator size = sizes.begin(); size != sizes.end(); ++size)
+    for (SizeList::const_iterator size = sizes.begin(); size != sizes.end(); ++size)
     {
         // change some fields
         format.fmt.pix.width = size->first;
@@ -342,12 +346,14 @@ bool v4l2util::checkStandard(const std::string &expected,
         const std::string &device)
 {
     using namespace boost::assign;
+    using std::map;
+    using std::string;
     bool result = false;
     v4l2_std_id std;
     int fd = -1;
 
     // map of format codes
-    static std::map<std::string, unsigned long long> FORMATS = map_list_of
+    static const map<string, unsigned long long> FORMATS = map_list_of
         ("PAL", 0xfff)
         ("NTSC", 0xf000)
         ("SECAM", 0xff0000)
@@ -358,7 +364,7 @@ bool v4l2util::checkStandard(const std::string &expected,
 
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0)
     {
-        std::map<std::string, unsigned long long>::const_iterator iter;
+        map<string, unsigned long long>::const_iterator iter;
         for (iter = FORMATS.begin(); iter != FORMATS.end(); ++iter)
             if (std & (*iter).second)    // true if current format matches this iter's key
             {
@@ -412,10 +418,7 @@ bool v4l2util::isInterlaced(const std::string &device)
             THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
         v4l2_format vfmt = getCaptureFormat(fd);
         close(fd);
-        if (vfmt.fmt.pix.field == V4L2_FIELD_INTERLACED)
-            return true;
-        else
-            return false;
+        return vfmt.fmt.pix.field == V4L2_FIELD_INTERLACED;
     }
     else
     {

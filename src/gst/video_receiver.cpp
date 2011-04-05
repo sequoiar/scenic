@@ -39,7 +39,7 @@ VideoReceiver::VideoReceiver(Pipeline &pipeline,
         const shared_ptr<ReceiverConfig> &rConfig) :
     videoConfig_(vConfig),
     remoteConfig_(rConfig),
-    session_(pipeline),
+    session_(pipeline, remoteConfig_->latency()),
     depayloader_(),
     decoder_(),
     textoverlay_(),
@@ -98,7 +98,6 @@ void VideoReceiver::createSink(Pipeline &pipeline)
     assert(gotCaps_);
     if (not remoteConfig_->capsMatchCodec())
         THROW_CRITICAL("Incoming caps don't match expected codec " << remoteConfig_->codec());
-    decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed
 }
 
 /// Used to set this VideoReceiver's RtpReceiver's caps

@@ -23,7 +23,6 @@
 #include "pipeline.h"
 #include "util/log_writer.h"
 #include <gst/gst.h>
-#include <gtk/gtk.h>
 #include <cstring>
 #include <string>
 #include <algorithm>
@@ -38,8 +37,7 @@
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
 
-Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(),
-    sampleRate_(SAMPLE_RATE)
+Pipeline::Pipeline() : pipeline_(gst_pipeline_new("pipeline")), handlers_(), latencyUpdated_(false)
 {
     /* watch for messages on the pipeline's bus (note that this will only
      *      work like this when a GLib main loop is running) */
@@ -152,7 +150,12 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
                 LOG_DEBUG("Latency change, recalculating latency for pipeline");
                 // when pipeline latency is changed, this msg is posted on the bus. we then have
                 // to explicitly tell the pipeline to recalculate its latency
-                if (!gst_bin_recalculate_latency (GST_BIN_CAST (context->pipeline_)))
+                if (gst_bin_recalculate_latency (GST_BIN_CAST (context->pipeline_)) == TRUE)
+                {
+                    LOG_DEBUG("Reconfigured latency.");
+                    context->latencyUpdated_ = true;
+                }
+                else
                     LOG_WARNING("Could not reconfigure latency.");
                 break;
             }
@@ -165,6 +168,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 }
 
 
+namespace {
 void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gchar **excluded_props)
 {
     GValue value; /* the important thing is that value.type = 0 */
@@ -210,6 +214,7 @@ void deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gc
         LOG_WARNING("Parameter " << pspec->name << " not readable in " << name << ".");
         g_free (name);
     }
+}
 }
 
 
@@ -366,11 +371,11 @@ GstBus* Pipeline::getBus() const
     return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
 }
 
-GstElement *Pipeline::findElementByName(const char *elementName)
+GstElement *Pipeline::findElementByName(const char *elementName) const
 {
     GstElement *element = gst_bin_get_by_name(GST_BIN(pipeline_), elementName);
     if (element == 0)
-        LOG_WARNING("No element named " << elementName);
+        LOG_DEBUG("No element named " << elementName);
 
     return element;
 }
@@ -421,17 +426,3 @@ void Pipeline::seekTo(gint64 pos) const
         THROW_ERROR("Seek failed!");
     }
 }
-
-
-void Pipeline::updateSampleRate(unsigned newRate)
-{
-    LOG_INFO("Updating sample rate to " << newRate);
-    sampleRate_ = newRate;
-}
-
-
-unsigned Pipeline::actualSampleRate() const
-{
-    return sampleRate_;
-}
-
