@@ -275,7 +275,7 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
     VideoSink *result = 0;
     if (sink_ == "xvimagesink")
     {
-        XvImageSink *xv = new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_, title_);
+        XvImageSink *xv = new XvImageSink(pipeline, *this);
         if (startInFullscreen_)
             xv->toggleFullscreen();
         result = xv;

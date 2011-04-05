@@ -20,6 +20,7 @@
  */
 
 #include <gst/interfaces/xoverlay.h>
+#include "video_config.h"
 #include "gst_linkable.h"
 #include "video_sink.h"
 #include "pipeline.h"
@@ -60,14 +61,10 @@ void makeWidgetBlack(GtkWidget *widget)
 }
 
 XvImageSink::XvImageSink(Pipeline &pipeline,
-        int width,
-        int height,
-        unsigned long xid,
-        const std::string &display,
-        const std::string &title) :
+        const VideoSinkConfig &config) :
     VideoSink(),
-    xid_(xid),
-    isFullscreen_(false),
+    xid_(config.xid()),
+    isFullscreen_(config.fullscreen()),
     window_(hasWindow() ? gtk_window_new(GTK_WINDOW_TOPLEVEL) : 0),
     drawingArea_(gtk_drawing_area_new()),
 	vbox_(hasWindow() ? gtk_vbox_new(FALSE, 0) : 0),
@@ -81,20 +78,22 @@ XvImageSink::XvImageSink(Pipeline &pipeline,
     // Make drawing area black by default, since it's used for video
     makeWidgetBlack(drawingArea_);
 
-    sink_ = pipeline.makeElement("xvimagesink", NULL);
+    sink_ = pipeline.makeElement(config.sink(), NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
-    if (not display.empty())
+    if (not config.display().empty())
     {
-        g_object_set(sink_, "display", display.c_str(), NULL);
-        updateDisplay(display);
+        g_object_set(sink_, "display", config.display().c_str(), NULL);
+        updateDisplay(config.display());
     }
 
     gtk_widget_set_double_buffered(drawingArea_, FALSE);
     if (hasWindow())
     {
-        gtk_window_set_title(GTK_WINDOW(window_), title.c_str());
-        LOG_DEBUG("Setting default window size to " << width << "x" << height);
-        gtk_window_set_default_size(GTK_WINDOW(window_), width, height);
+        gtk_window_set_title(GTK_WINDOW(window_), config.title());
+        LOG_DEBUG("Setting default window size to " << config.effectiveDisplayWidth()
+                << "x" << config.effectiveDisplayHeight());
+        gtk_window_set_default_size(GTK_WINDOW(window_), config.effectiveDisplayWidth(),
+                config.effectiveDisplayHeight());
         gtk_box_pack_start(GTK_BOX(hbox_), vbox_, TRUE, TRUE, 0);
         gtk_box_pack_start(GTK_BOX(vbox_), drawingArea_, TRUE, TRUE, 0);
 
@@ -266,8 +265,7 @@ XvImageSink::~XvImageSink()
     }
 }
 
-
-// FIXME: this should be refactored to use the xoverlay interface/gtk stuff
+// FIXME: this should be refactored to use the xoverlay interface/gtk stuff if possible
 XImageSink::XImageSink(const Pipeline &pipeline, const std::string &display) :
     VideoSink(),
     colorspace_(pipeline.makeElement("ffmpegcolorspace", NULL))

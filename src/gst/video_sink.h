@@ -28,6 +28,7 @@
 #include "noncopyable.h"
 
 class Pipeline;
+class VideoSinkConfig;
 class _GtkWidget;
 class _GdkEventKey;
 class _GdkEventScroll;
@@ -49,8 +50,7 @@ class XvImageSink
 : public VideoSink
 {
     public:
-        XvImageSink(Pipeline &pipeline, int width, int height,
-                unsigned long xid, const std::string &display, const std::string &title);
+        XvImageSink(Pipeline &pipeline, const VideoSinkConfig &config);
         void toggleFullscreen();
 
     private:
@@ -79,7 +79,6 @@ class XvImageSink
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
 };
-
 
 class XImageSink
 : public VideoSink
