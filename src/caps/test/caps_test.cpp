@@ -21,26 +21,44 @@
  *
  */
 
+#include <gst/gst.h>
 #include <string>
 #include <iostream>
 #include <tr1/memory>
 #include "caps/caps_server.h"
 #include "caps/caps_client.h"
 
-int main()
+int main(int argc, char **argv)
 {
-    const std::string testCaps("THESE ARE SOME CAPS");
-    std::tr1::shared_ptr<CapsServer> capsServer(new TcpCapsServer(10000, testCaps));
+    gst_init(&argc, &argv);
+    int result;
+    GstCaps *sendCaps;
+    GstCaps *receivedCaps;
+    sendCaps = gst_caps_new_simple ("video/x-raw-yuv",
+            "format", GST_TYPE_FOURCC, GST_MAKE_FOURCC ('I', '4', '2', '0'),
+            "framerate", GST_TYPE_FRACTION, 25, 1,
+            "pixel-aspect-ratio", GST_TYPE_FRACTION, 1, 1,
+            "width", G_TYPE_INT, 320,
+            "height", G_TYPE_INT, 240,
+            NULL);
+    const std::string testCapsStr(gst_caps_to_string(sendCaps));
+    std::tr1::shared_ptr<CapsServer> capsServer(new TcpCapsServer(10000, testCapsStr));
     CapsClient capsClient("127.0.0.1", "10000");
-    std::string receivedCaps(capsClient.getCaps());
-    if (receivedCaps == testCaps)
+    const std::string receivedCapsStr(capsClient.getCaps());
+    receivedCaps = gst_caps_from_string(receivedCapsStr.c_str());
+
+    if (gst_caps_is_equal(sendCaps, receivedCaps))
     {
-        std::cerr << "Received caps match expected caps" << std::endl;
-        return 0;
+        std::cerr << "Received caps match sent caps" << std::endl;
+        result = 0;
     }
     else
     {
-        std::cerr << "Received caps do not match expected caps" << std::endl;
-        return 1;
+        std::cerr << "Received caps do not match sent caps" << std::endl;
+        result = 1;
     }
+    gst_caps_unref(sendCaps);
+    gst_caps_unref(receivedCaps);
+
+    return result;
 }
