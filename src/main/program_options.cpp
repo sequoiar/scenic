@@ -100,7 +100,7 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("gst-version", po::bool_switch(), "prints the version number of the GStreamer (core) library currently installed")
         ("rtsp-server", po::bool_switch(), "run in RTSP server mode")
         ("rtsp-client", po::bool_switch(), "run in RTSP client mode")
-        ("port-range", po::value<string>(), "client port range that can be used to receive RTP and RTCP data (RTSP-mode only) (e.g. 3000-3005)")
+        ("port-range", po::value<string>(), "client port range that can be used to receive RTP and RTCP data (rtsp-client only) (e.g. 3000-3005)")
         ("disable-video", po::bool_switch(), "run without video")
         ("disable-audio", po::bool_switch(), "run without audio")
         ;

@@ -1,19 +1,19 @@
 <chapter id="user.advanced-options">
   <title>Advanced options</title>
-  <para>In this chapter, we will explain miscellaneous options and
+  <para>In this chapter, we will explain various options and
   features that power users might want to use.</para>
   <sect1 id="user.kiosk-mode">
     <title>Using &app; in kiosk mode</title>
     <para>Kiosk mode is useful when &app; is the only software that
-    runs at startup. It contains a system tab with buttons for
+    runs at system startup. It contains a system tab with buttons for
     tasks such as upgrading the Debian or Ubuntu packages, and
     rebooting the computer.</para>
     <para>To launch &app; in kiosk mode, use the "--kiosk" flag
-    from a terminal. It is best used with the "--fullscreen"
+    from a terminal. One might want to start it with the "--fullscreen"
     flag.</para>
   </sect1>
   <sect1 id="user.debug-mode">
-    <title>Activating the debug mode</title>
+    <title>Activating debug mode</title>
     <para>&app; supports a wide variety of devices and libraries.
     The tradeoff for this greater flexibility is a greater number
     of potential pitfalls, which may be difficult to troubleshoot.
@@ -38,7 +38,7 @@
     <userinput>scenic --debug</userinput>
     </para>
     <para>You can now see more detailed information about what
-    happens under the hood of &app;. You can copy some of this text
+    happens internally in &app;. You can copy some of this text
     to the clipboard in order to paste it into an email to the
     &app; developers. In the
     <application>Terminal</application>that comes with
@@ -57,12 +57,12 @@
     <orderedlist>
       <listitem>
          <para>
-         dc-ctl: Controls DC ieee1394 (Firewire) cameras.
+         dc-ctl: Controls 1394 IIDC (Firewire) cameras.
          </para>
       </listitem>
       <listitem>
          <para>
-            midistream: Streams MIDI notes and controls over RTP.
+            midistream: Streams MIDI notes and control messages over RTP.
          </para>
       </listitem>
       <listitem>
@@ -72,12 +72,13 @@
       </listitem>
       <listitem>
          <para>
-            milhouse: Streams audio and video over RTP.
+            milhouse: Backend for scenic which streams audio and video over RTP. Usable via
+            a command-line interface.
          </para>
       </listitem>
       <listitem>
          <para>
-            firereset: Resets a ieee1394 (Firewire) bus.
+            firereset: Resets the ieee1394 (Firewire) bus.
          </para>
       </listitem>
       <listitem>
@@ -86,9 +87,9 @@
          </para>
       </listitem>
     </orderedlist>
-    <para>See their manual page for more informations. For example,
+    <para>See their manual pages for more informations. For example,
     to read the manual page of
-    <application>Milhouse</application>, type "man milhouse" in a
+    <application>milhouse</application>, type "man milhouse" in a
     terminal. Press the
     <keycombo>
       <keycap>Up</keycap>
@@ -103,30 +104,30 @@
     <userinput>man milhouse</userinput>
     </para>
     <para>The next section is dedicated to the
-    <application>Milhouse</application>command-line
+    <application>milhouse</application>command-line
     streamer.</para>
   </sect1>
   <sect1 id="user.using-milhouse">
     <title>Using
-    <application>Milhouse</application></title>
-    <para>The <application>milhouse</application> command line application is a powerful tool with many
-    options not implemented yet in the Scenic GUI. For more complex
-    setups than what Scenic can currently support, we suggest you
+    <application>milhouse</application></title>
+    <para>The <application>milhouse</application> command line application is a powerful tool with extra
+    functionality that is not yet available via the &app; GUI. For more complex
+    setups than what &app; can currently support, we suggest you
     use
-    <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> as a
+    <ulink url="http://code.sat.qc.ca/trac/lunch">lunch</ulink> as a
     launching script. Look at some examples in
-    <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
-    trunk/utils/</ulink>. You should look at the manual page of
-    both these tools to know more about them.</para>
+    <ulink url="http://code.sat.qc.ca/trac/scenic/browser/utils">
+    </ulink>. You should look at the manual pages for
+    both of these tools to know more about them.</para>
     <para>Here is a quick introduction to using
     <application>milhouse</application>, an application for
     audio-video streaming over RTP.</para>
     <para>
-    The <application>milhouse</application> application is a simple tool
-    that can do a lot of things. For example, it can list the cameras and video
+    <application>Milhouse</application> is not only useful for streaming,
+    but also for other common multimedia configuration tasks. For example, it can list the cameras and video
     capture devices found on your computer. It can also change
     video settings for a V4L2 (Video4Linux2) device, such as its
-    video standard and its selected video input number.
+    video standard (NTSC,PAL,etc.) and its selected video input number.
     <application>Milhouse</application> also supports DV cameras and
     DC cameras, two kinds of cameras using ieee1394 (Firewire) to
     send their digital video signal to the computer. These two
@@ -136,24 +137,25 @@
     <application>milhouse</application> instead of
     the &app; graphical user interface.</para>
     <para>Above all,
-    <application>Milhouse</application> is an audio-video streamer.
-    Its main purpose is to transmit digital video and audio signals
-    over the Internet. As a streamer, it can be used in one of two
-    it modes: as a sender or a receiver. To choose, simply
-    give it the command-line option "--receiver" or
-    "--sender".</para>
+    <application>milhouse</application> is an audio-video streamer.
+    Its main purpose is to transmit video and audio
+    over IP. As a streamer, it can be used in one of four
+    modes: sender, receiver, rtsp-server, or rtsp-client. To choose, simply
+    give it the corresponding command-line option: "--receiver",
+    "--sender", "--rtsp-server" or "--rtsp-client".</para>
     </sect1>
     <sect1 id="user.milhouse-send-receive">
       <title>Using
       <application>milhouse</application> as a sender or a
       receiver</title>
       <para>To create a streaming session with
-      <application>Milhouse</application>, you must launch a sender
-      and a receiver. You must give each of them the IP address of
-      the other one. That is what the "--address" command line
-      option is for.</para>
+      <application>milhouse</application>, you should start by launching a sender
+      and a receiver. You must give each process the IP address of
+      its remote peer, i.e. the host TO which a "sender" sends, or the host FROM which
+      a "receiver" receives. This is done with the "--address" command line
+      option.</para>
       <para>If you want to stream audio, the sender is the one that
-      captures the audio signal from its audio source. You must
+      captures the audio from its audio input. You must
       choose a value for its "--audiosource" option. If omitted,
       the default is "jackaudiosrc", for the JACK audio server. Another
       common value is "audiotestsrc", a test source that generates
@@ -177,7 +179,8 @@
       <title>Launch the receivers</title>
       <para>Here is a short explanation on how to start the
       milhouse receivers to receive audio and video streams.</para>
-      <para>Set the local_machine display</para>
+      <para>Make sure the JACK server is running. We recommend using qjackctl to start and configure JACK.</para>
+      <para>Set the local_machine display environment variable (if necessary)</para>
       <para>
       <userinput>export DISPLAY=:0.0</userinput>
       </para>
@@ -185,10 +188,10 @@
       parameters:</para>
       <para>
       <userinput>
-milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
+      milhouse --receiver --address remote_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
       </userinput>
       </para>
-      <para>Set the remote_machine display</para>
+      <para>Set the remote_machine display environment variable (if necessary)</para>
       <para>
       <userinput>export DISPLAY=:0.0</userinput>
       </para>
@@ -196,27 +199,28 @@ milhouse --receiver --address remote_ip_address --videosink xvimagesink --videoc
       following parameters:</para>
       <para>
       <userinput>
-milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
+      milhouse --receiver --address local_ip_address --videosink xvimagesink --videocodec mpeg4 --videoport 10030 --audiosink jackaudiosink --audiocodec raw --audioport 10000 --numchannels 2
       </userinput>
       </para>
     </sect1>
     <sect1 id="user.milhouse-senders">
       <title>Launch the senders</title>
       <para>The next step is to launch the milhouse sender
-      processes. of course, that should be on a different
+      processes. Of course, that should be on a different
       computer.</para>
+      <para>Again, make sure the JACK server is running.</para>
       <para>Execute this command on the local machine with the following
       parameters:</para>
       <para>
       <userinput>
-milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
-</userinput>
-</para>
+      milhouse --sender --address remote_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
+      </userinput>
+      </para>
       <para>Execute this command on the remote machine with the following
       parameters:</para>
       <para>
       <userinput>
-milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
+      milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 10030 --videosource v4l2src --audiosource jackaudiosrc --audiocodec raw -c 2 --audioport 10000
       </userinput>
       </para>
       <para>A video window displaying the live video stream should
@@ -224,12 +228,13 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
       holding down the -alt- key and dragging the window. Pressing
       'f' or escape will toggle fullscreen mode.</para>
       <para>You should also see the audio connections appear in
-      qjackctl. The outputs are now routable to your speakers or
+      qjackctl in the "Connections" window (which will appear upon clicking "Connect").
+      The outputs are now routable to your speakers or
       other applications.</para>
       <para>You should now have video and audio input fully working
       on both sides.</para>
       <para>To stop milhouse type control-c in the terminal from which it
-      was started or type control-q in the video window.</para>
+      was started or type control-q in the video window, or simply close the video window.</para>
     </sect1>
   <sect1 id="user.milhouse-help">
     <title>Milhouse Help</title>
@@ -624,9 +629,37 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
       </tgroup>
     </informaltable>
   </sect1>
+  <sect1 id="user.RTSP">
+    <title>RTSP</title>
+    <para>The milhouse application can also be used in RTSP scenarios. This is a more recent
+    development and is still considered experimental. It consists of starting an rtsp-server
+    (instead of a sender) and one or more rtsp-clients. This is not intended for high-load usage;
+    the server should not be used for broadcast on a public IP address.
+    </para>
+    <para>A simple example of an RTSP setup:</para>
+    <para>Server:</para>
+    <para>
+    <userinput>milhouse --rtsp-server --address 10.10.10.209 --videosource v4l2src --audiosource jackaudiosrc --numchannels 8</userinput>
+    </para>
+    <para>Receivers:</para>
+    <para>
+    <userinput>milhouse --rtsp-client --address 10.10.10.209 --numchannels 8</userinput>
+    </para>
+    <para>Note that the address argument takes on a slightly different meaning
+    in this context. It is the address FROM which the server will serve content
+    (i.e. that host machine's IP address). For the client, it is the address of
+    the machine that will serve it content. The server need not know the address
+    of any clients. Optionally, if the user would like the client to use a specific
+    set of ports for RTP rather than negotiating them automatically, this should
+    be done with the "port-range" argument (client-side only):
+    </para>
+    <para>
+    <userinput>milhouse --rtsp-client --address 10.10.10.209 --port-range 10000-10010</userinput>
+    </para>
+  </sect1>
   <sect1 id="user.Multicast">
     <title>Multicast</title>
-    <para>The milhouse command can also be used in multicast scenarios.
+    <para>The milhouse application can also be used in multicast scenarios.
     All the same options apply as before, only two things need changing:
     <orderedlist>
     <listitem>Both the sender (who will stream audio and/or video to multiple
@@ -639,16 +672,20 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
     </para>
     <para>A simple example of a multicast setup:</para>
     <para>Sender:</para>
-    <para>milhouse -s --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</para>
+    <para>
+      <userinput>milhouse -s --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</userinput>
+    </para>
     <para>Receivers:</para>
-    <para>milhouse -r --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</para>
+    <para>
+      <userinput>milhouse -r --videoport 10000 --audioport 11000 --address 239.0.0.0 --multicast-interface eth0</userinput>
+    </para>
   </sect1>
   <sect1 id="user.other-uses">
     <title>Other uses</title>
     <para>The milhouse command can also be used to change some
     properties of a V4L2 video device, such as the resolution and
-    the video standard. The milhouse command should exit
-    immediately once done.</para>
+    the video standard. The milhouse command will then exit
+    immediately.</para>
     <para>To change the video standard to NTSC:</para>
     <para>
     <userinput>milhouse --v4l2-standard NTSC</userinput>
