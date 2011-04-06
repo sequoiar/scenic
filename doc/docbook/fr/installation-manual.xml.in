@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
    <!ENTITY legal SYSTEM "installation/legal.xml">
    <!ENTITY appversion "@PACKAGE_VERSION@">
@@ -19,7 +19,7 @@
    <!ENTITY Edirol_FA101 SYSTEM "installation/edirol-fa101-settings.xml">
    <!ENTITY Glossary SYSTEM "glossary.xml">
    <!-- Information about the entities
-       The legal.xml file contains legal information, there is no need to edit the file. 
+       The legal.xml file contains legal information, there is no need to edit the file.
        Use the appversion entity to specify the version of the application.
        Use the manrevision entity to specify the revision number of this manual.
        Use the date entity to specify the release date of this manual.
@@ -41,4 +41,4 @@
    &Ati_Settings;
    &Edirol_FA101;
    &Glossary;
-</book>   
+</book>

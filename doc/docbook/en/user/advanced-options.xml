@@ -24,7 +24,7 @@
     <orderedlist>
       <listitem>
          <para>
-            Choose the 
+            Choose the
             <menuchoice>
               <guimenu>Application</guimenu>
               <guimenuitem>Accessories</guimenuitem>
@@ -40,10 +40,10 @@
     <para>You can now see more detailed information about what
     happens under the hood of &app;. You can copy some of this text
     to the clipboard in order to paste it into an email to the
-    &app; developers. In the 
-    <application>Terminal</application>that comes with 
+    &app; developers. In the
+    <application>Terminal</application>that comes with
     <application>Ubuntu GNU/Linux</application>, you can copy the
-    selected text by pressing 
+    selected text by pressing
     <keycombo>
       <keycap>Ctrl</keycap>
       <keycap>Shift</keycap>
@@ -87,67 +87,67 @@
       </listitem>
     </orderedlist>
     <para>See their manual page for more informations. For example,
-    to read the manual page of 
+    to read the manual page of
     <application>Milhouse</application>, type "man milhouse" in a
-    terminal. Press the 
+    terminal. Press the
     <keycombo>
       <keycap>Up</keycap>
-    </keycombo>and 
+    </keycombo>and
     <keycombo>
       <keycap>Down</keycap>
-    </keycombo>arrows to scroll up and down. Press 
+    </keycombo>arrows to scroll up and down. Press
     <keycombo>
       <keycap>Q</keycap>
     </keycombo>to quit the manual page reader.</para>
     <para>
     <userinput>man milhouse</userinput>
     </para>
-    <para>The next section is dedicated to the 
+    <para>The next section is dedicated to the
     <application>Milhouse</application>command-line
     streamer.</para>
   </sect1>
   <sect1 id="user.using-milhouse">
-    <title>Using 
+    <title>Using
     <application>Milhouse</application></title>
     <para>The <application>milhouse</application> command line application is a powerful tool with many
     options not implemented yet in the Scenic GUI. For more complex
-    setups than what Scenic can currently support, we suggest you 
-    use 
+    setups than what Scenic can currently support, we suggest you
+    use
     <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> as a
-    launching script. Look at some examples in 
+    launching script. Look at some examples in
     <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
     trunk/utils/</ulink>. You should look at the manual page of
     both these tools to know more about them.</para>
-    <para>Here is a quick introduction to using 
+    <para>Here is a quick introduction to using
     <application>milhouse</application>, an application for
     audio-video streaming over RTP.</para>
     <para>
-    The <application>milhouse</application> application is a simple tool 
+    The <application>milhouse</application> application is a simple tool
     that can do a lot of things. For example, it can list the cameras and video
     capture devices found on your computer. It can also change
     video settings for a V4L2 (Video4Linux2) device, such as its
-    video standard and its selected video input number. 
+    video standard and its selected video input number.
     <application>Milhouse</application> also supports DV cameras and
     DC cameras, two kinds of cameras using ieee1394 (Firewire) to
     send their digital video signal to the computer. These two
     camera types are not yet supported by the &app; graphical
     user interface. This is one of the reasons why an advanced user
-    might prefer to use 
+    might prefer to use
     <application>milhouse</application> instead of
     the &app; graphical user interface.</para>
-    <para>Above all, 
+    <para>Above all,
     <application>Milhouse</application> is an audio-video streamer.
     Its main purpose is to transmit digital video and audio signals
-    over the Internet. As a streamer, it can be used in one of two 
+    over the Internet. As a streamer, it can be used in one of two
     it modes: as a sender or a receiver. To choose, simply
     give it the command-line option "--receiver" or
     "--sender".</para>
     </sect1>
     <sect1 id="user.milhouse-send-receive">
-      <title>Using 
+      <title>Using
       <application>milhouse</application> as a sender or a
       receiver</title>
-      <para>To create a streaming session with 
+      <para>To create a streaming session with
       <application>Milhouse</application>, you must launch a sender
       and a receiver. You must give each of them the IP address of
       the other one. That is what the "--address" command line
@@ -169,8 +169,8 @@
       the audio - the "--audiosink" argument - and specify the
       audio and video codecs, like for the sender (or use the
       defaults listed in milhouse --help).</para>
-      <para>We will create a 
-      <application>milhouse</application> sender and receiver on two separate computers.</para> 
+      <para>We will create a
+      <application>milhouse</application> sender and receiver on two separate computers.</para>
 
     </sect1>
     <sect1 id="user.milhouse-receivers">
@@ -629,9 +629,9 @@ milhouse --sender --address local_ip_address --videocodec mpeg4 --videoport 1003
     <para>The milhouse command can also be used in multicast scenarios.
     All the same options apply as before, only two things need changing:
     <orderedlist>
-    <listitem>Both the sender (who will stream audio and/or video to multiple 
-        receivers) and each of the receivers need to specify the 
-        --multicast-interface argument, which specifies which network 
+    <listitem>Both the sender (who will stream audio and/or video to multiple
+        receivers) and each of the receivers need to specify the
+        --multicast-interface argument, which specifies which network
         interface to use.</listitem>
     <listitem>A multicast address must be used for the --address argument, preferably
     in the range 239.0.0.0/8, which is intended for private or locally administered multicast domains (see <ulink url="http://tools.ietf.org/html/rfc2365">RFC 2365</ulink>).</listitem>

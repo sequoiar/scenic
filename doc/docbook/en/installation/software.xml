@@ -4,11 +4,11 @@
   computers with identical linux operating systems, the required
   libraries and development packages, and a build of the most
   recent release of the &app; software.</para>
-  <para>The computers must meet these 
+  <para>The computers must meet these
      <link linkend='installation.hardware-requirements'>minimum
      requirements </link>.
   </para>
-  <para>Note that prior to using &app; you also need to meet the 
+  <para>Note that prior to using &app; you also need to meet the
   <link linkend='installation.network-test'>required network
   specification </link>
   </para>
@@ -84,12 +84,12 @@
       </tgroup>
     </informaltable>
     <para>To install Ubuntu, please follow the instructions found
-    on the 
+    on the
     <ulink url="http://www.ubuntu.com/getubuntu">Get
     Ubuntu </ulink>page.
     </para>
     <para>To install Debian, please follow the instructions found
-    on the 
+    on the
     <ulink url="http://www.debian.org/distrib/">Get
     Debian </ulink>page.
     </para>
@@ -106,7 +106,7 @@
     <userinput>sudo aptitude upgrade</userinput>
     </para>
     <para>&app; need various package to be installed. You can have
-    a detailed view of the required library and dependency on our 
+    a detailed view of the required library and dependency on our
     <ulink url="http://svn.sat.qc.ca/trac/scenic/wiki/LibraryPackage">
     Library and Package </ulink>page. To install the required these
     libraries and their dependencies run the following command in
@@ -118,7 +118,7 @@
     <para>
 <userinput>sudo aptitude -R install linux-rt linux-headers-rt qjackctl build-essential subversion cvs git-core automake libtool libgtk2.0-dev libjack-dev python-dev libglu1-mesa-dev libavc1394-dev libraw1394-dev gettext gtk-doc-tools libbz2-dev liboil0.3-dev libglew1.5-dev ivtv-utils bison flex x264 vorbis-tools ffmpeg libx264-dev libxv-dev libiec61883-dev libvorbis-dev liblame-dev libasound2-dev libpulse-dev libdv4-dev libid3tag0-dev libmad0-dev python-gtk2-dev lame libxml2-dev python-twisted python-nevow doxygen libtheora-dev python-setuptools help2man python-simplejson python-pexpect gnome-themes-extra</userinput>
     </para>
-    <para>You must download the debian sid iperf 
+    <para>You must download the debian sid iperf
     <ulink url="http://packages.debian.org/sid/iperf">
     version </ulink> 2.0.4-3 or 2.0.4-4 on your desktop and install
     it on both computers. Double click on the package to start the
@@ -176,7 +176,7 @@
     you don't want to stream midi, even with the command
     line.
     </para>
-    <para>Install the python-portmidi package: 
+    <para>Install the python-portmidi package:
     <ulink url="https://bitbucket.org/aalex/pyportmidi/downloads/">
     https://bitbucket.org/aalex/pyportmidi/downloads/ </ulink>Note:
     this package contains patches unavailable with the python
@@ -185,7 +185,7 @@
   </sect1>
   <sect1 id="installation.building-scenic">
     <title>Building &app; </title>
-    <para>To get the latest &app; version, go to 
+    <para>To get the latest &app; version, go to
        <ulink url="http://scenic.sat.qc.ca/download">
        http://scenic.sat.qc.ca/download </ulink>
     </para>

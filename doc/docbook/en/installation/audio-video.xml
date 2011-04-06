@@ -1,7 +1,7 @@
 <chapter id="installation.av-configuration">
   <title>System Audio and Video Configuration</title>
   <para>First verify that you have all required dependencies at our
-  
+
   <link linkend='installation.software-installation'>Software
   Installation </link>page</para>
   <sect1 id="installation.av-transmission">
@@ -31,16 +31,16 @@
     <sect2 id="installation.video-output">
 
       <title>System Video Output</title>
-     <para> Video output usally mean using a graphic card</para> 
+     <para> Video output usally mean using a graphic card</para>
       <para> It is really important to configure the video ouput the right way if not, you will find yourself in front of a black screen</para>
 
-    <para>For nvidia graphic card follow our 
+    <para>For nvidia graphic card follow our
     <link linkend="installation.nvidia-settings">Nvidia setting page</link>.
-    </para> 
+    </para>
 
-    <para>For ati graphic card follow our 
+    <para>For ati graphic card follow our
      <link linkend="installation.ati-settings">Ati setting page</link>.
-    </para> 
+    </para>
    </sect2>
 
     <sect2 id="installation.video-input">
@@ -52,9 +52,9 @@
     latency requirements.</para>
     <para>
       <emphasis role="strong">Video4Linux</emphasis>
-    </para> 
-    <para>Plug in the video camera, for this, refer to our 
-       <link linkend='installation.hardware-requirements'>Hardware Setup 
+    </para>
+    <para>Plug in the video camera, for this, refer to our
+       <link linkend='installation.hardware-requirements'>Hardware Setup
        Page</link>
     </para>
     <para>Now we will modify our video settings for your specific
@@ -86,9 +86,9 @@
     <para>
     <userinput>echo "raw1394" | sudo tee -a /etc/modules</userinput>
     </para>
-    <para>See 
+    <para>See
     <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
-    this bug report </ulink> and 
+    this bug report </ulink> and
     <ulink url="https://help.ubuntu.com/community/Firewire">
     this community documentation </ulink> for further information.
     </para>
@@ -172,7 +172,7 @@
   <sect1 id="installation.audio-settings">
     <title>System Audio Settings</title>
     <para>First verify that you have an appropriate sound card on
-    our 
+    our
     <link linkend='installation.hardware-requirements'>Hardware
     Requirements </link>.</para>
     <sect2 id="installation.firewire-sound-card">
@@ -456,7 +456,7 @@ card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
    type hw;
    card M2496;
 }
-ctl.m2496 { 
+ctl.m2496 {
    type hw;
    card M2496;
 }</screen>

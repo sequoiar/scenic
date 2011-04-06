@@ -12,7 +12,7 @@
     <orderedlist>
       <listitem>
          <para>
-            Choisir 
+            Choisir
             <menuchoice>
               <guimenu>Application</guimenu>
               <guimenuitem>Accessories</guimenuitem>
@@ -61,7 +61,7 @@
   </sect1>
   <sect1 id="user.using-milhouse">
     <title>Utiliser milhouse</title>
-    <para>La ligne de commande milhouse est un puisant outil doté de nombreuses options qui n’ont pas encore été intégrées à &app; GUI. Pour des installations plus complexes que ce que &app; peut supporter à ce jour, il est suggéré d’utiliser <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> comme script de lancement. Vous en trouverez plusieurs exemples dans « trunk/utils/ ». Un coup d’œil à leur page respective dans le manuel vous en apprendra plus sur chacun de ces outils. 
+    <para>La ligne de commande milhouse est un puisant outil doté de nombreuses options qui n’ont pas encore été intégrées à &app; GUI. Pour des installations plus complexes que ce que &app; peut supporter à ce jour, il est suggéré d’utiliser <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch</ulink> comme script de lancement. Vous en trouverez plusieurs exemples dans « trunk/utils/ ». Un coup d’œil à leur page respective dans le manuel vous en apprendra plus sur chacun de ces outils.
     <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
     trunk/utils/</ulink></para>
     <para>Voici une brève introduction à milhouse, une application pour les flux audio et vidéo sur RTP.</para>
@@ -74,7 +74,7 @@
       <para>Pour envoyer un flux audio, le transmetteur est celui qui capte le signal audio à sa source. Il faut choisir une valeur pour l’option « --audiosource ». « jackaudiosrc » est celle du serveur audio JACK. Une autre valeur commune est « audiotestsrc », une source test qui génère de simples notes. </para>
       <para>Pour envoyer un flux vidéo, il vous faut spécifier une source vidéo à l’attention du récepteur en utilisant son option « --videosource ». « v4l2src » est une valeur commune pour toute source en V4L2. Dans ce cas, vous voudrez peut-être spécifier un équipement vidéo tel que « /dev/video0 » en utilisant l’option « --videodevice ». « videotestsrc » est une autre valeur commune, utile pour des tests avec des barres de couleur.</para>
       <para>Du côté du récepteur, il faut spécifier une sortie pour l’audio – « --audiosink » - et les codec audio et vidéo, tout comme pour l’émetteur (ou utiliser les valeurs par défaut proposées dans « milhouse –help »).</para>
-      <para>Nous créerons un émetteur et un récepteur milhouse sur deux ordinateurs distincts. </para> 
+      <para>Nous créerons un émetteur et un récepteur milhouse sur deux ordinateurs distincts. </para>
 
     </sect1>
     <sect1 id="user.milhouse-receivers">

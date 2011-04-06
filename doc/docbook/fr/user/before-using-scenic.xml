@@ -79,7 +79,7 @@
     <sect2 id="user.supported-devices">
       <title>Équipements supportés. </title>
       <para>&app; est habituellement utilisé avec de nombreux équipements audio, vidéo et MIDI. </para>
-      <para>Il est essentiel de vérifier que les équipements utilisés sont supportés par &app; et plus généralement par <application> GNU/Linux</application>. Veuillez vous référer à la page des spécifications équipements pour en savoir plus  propos des équipements supportés. 
+      <para>Il est essentiel de vérifier que les équipements utilisés sont supportés par &app; et plus généralement par <application> GNU/Linux</application>. Veuillez vous référer à la page des spécifications équipements pour en savoir plus  propos des équipements supportés.
          <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
          Équipements supportés</ulink>
       </para>
