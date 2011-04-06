@@ -15,6 +15,7 @@ dnl we use this to avoid causing normal builds to regenerate autotools if
 dnl "too old" which might happen accidentally, especially when using a VCS
 dnl such as when building debian packages
 AM_MAINTAINER_MODE([enable])
+AC_SUBST([BUILD_TIME], ["`date +%F\ %T\ %Z`"])
 
 # Check for C and C++ compilers
 AC_PROG_CXX
