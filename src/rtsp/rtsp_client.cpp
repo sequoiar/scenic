@@ -132,14 +132,14 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpoin
     RTSPClient *context = static_cast<RTSPClient*>(data);
     GstCaps *caps = gst_pad_get_caps (newPad);
     const gchar *mime = gst_structure_get_name (gst_caps_get_structure (caps, 0));
-    if (g_strrstr (mime, "video"))
+    if (g_str_has_prefix (mime, "video"))
     {
         if (context->enableVideo_)
             context->linkNewPad(newPad, caps, "video_queue");
         else
             LOG_WARNING("Got video stream even though we've disabled video");
     }
-    else if (g_strrstr (mime, "audio"))
+    else if (g_str_has_prefix (mime, "audio"))
     {
         if (context->enableAudio_)
             context->linkNewPad(newPad, caps, "audio_queue");
