@@ -24,7 +24,6 @@
 #include <gst/gst.h>
 #include <string>
 #include <iostream>
-#include <tr1/memory>
 #include "caps/caps_server.h"
 #include "caps/caps_client.h"
 
@@ -42,7 +41,7 @@ int main(int argc, char **argv)
             "height", G_TYPE_INT, 240,
             NULL);
     const std::string testCapsStr(gst_caps_to_string(sendCaps));
-    std::tr1::shared_ptr<CapsServer> capsServer(new TcpCapsServer(10000, testCapsStr));
+    TcpCapsServer capsServer(10000, testCapsStr);
     CapsClient capsClient("127.0.0.1", "10000");
     const std::string receivedCapsStr(capsClient.getCaps());
     receivedCaps = gst_caps_from_string(receivedCapsStr.c_str());
