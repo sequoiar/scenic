@@ -1,5 +1,5 @@
 SUBDIRS = docbook
-EXTRA_DIST=footer.html header.html doxygen.css epydoc.css Doxyfile
+EXTRA_DIST=footer.html header.html doxygen.css epydoc.css Doxyfile.in
 
 html-local: doxygen epydoc
 

@@ -252,6 +252,7 @@ doc/docbook/fr/user/Makefile
 doc/docbook/fr/user-manual.xml
 doc/docbook/fr/installation/Makefile
 doc/docbook/fr/installation-manual.xml
+doc/Doxyfile
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile
