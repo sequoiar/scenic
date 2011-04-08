@@ -124,7 +124,7 @@ int main (int argc, char *argv[])
     gst_init(&argc, &argv);
     Client client;
 
-    client.pipeline = gst_parse_launch("uridecodebin uri=rtsp://localhost:8554/test name=decode ! queue ! ffmpegcolorspace ! timeoverlay halignment=right ! xvimagesink decode. ! queue ! audioconvert ! autoaudiosink", 0);
+    client.pipeline = gst_parse_launch("uridecodebin uri=rtsp://127.0.0.1:8554/test name=decode ! queue ! ffmpegcolorspace ! timeoverlay halignment=right ! xvimagesink decode. ! queue ! audioconvert ! autoaudiosink", 0);
 
     // add bus call
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(client.pipeline));
