@@ -24,7 +24,7 @@
 
 #include <string>
 
-namespace Dc1394
+namespace dc1394
 {
     bool listCameras();
     int capsToMode(int cameraNumber, int width,

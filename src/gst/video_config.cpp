@@ -142,7 +142,7 @@ int VideoSourceConfig::listCameras()
     {
         bool foundCameras = false;
         foundCameras |= v4l2util::listCameras();
-        foundCameras |= Dc1394::listCameras();
+        foundCameras |= dc1394::listCameras();
         foundCameras |= Raw1394::listCameras();
         if (not foundCameras)
             LOG_PRINT("No cameras found" << std::endl);
