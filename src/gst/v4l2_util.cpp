@@ -172,8 +172,8 @@ std::string getDriverInfo(int fd, const std::string &device)
     }
 
     result += "    Driver name   : " +  boost::lexical_cast<std::string>(vcap.driver) + "\n";
-    result += "    Card type     : " + boost::lexical_cast<std::string>(vcap.card) + "\n";
-    result += "    Bus info      : " + boost::lexical_cast<std::string>(vcap.bus_info) + "\n";
+    result += "    Card type     : " +  boost::lexical_cast<std::string>(vcap.card) + "\n";
+    result += "    Bus info      : " +  boost::lexical_cast<std::string>(vcap.bus_info) + "\n";
     result += "    Driver version: " +  boost::lexical_cast<std::string>(vcap.version) + "\n";
 
     return result;
