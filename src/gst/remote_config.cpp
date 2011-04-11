@@ -38,11 +38,13 @@ const int RemoteConfig::PORT_MAX = 65000;
 
 std::set<int> RemoteConfig::usedPorts_;
 
+// FIXME: localhost forced to 127.0.0.1:
+// temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
 RemoteConfig::RemoteConfig(const std::string &codec__,
         const std::string &remoteHost__,
         int port__) :
     codec_(codec__),
-    remoteHost_(remoteHost__),
+    remoteHost_(remoteHost__ == "localhost" ? "127.0.0.1" : remoteHost__),
     port_(port__)
 {}
 
@@ -314,14 +316,15 @@ void ReceiverConfig::receiveCaps()
         THROW_ERROR("Codec " << codec_ << " is not supported");
 
     // this blocks
-    LOG_DEBUG("Creating new caps client to get caps from " << remoteHost_);
     if (multicastInterface_.empty())
     {
+        LOG_DEBUG("Creating new caps client to get caps from " << remoteHost_);
         CapsClient capsClient(remoteHost_, boost::lexical_cast<std::string>(capsPort()));
         caps_ = capsClient.getCaps();
     }
     else
     {
+        LOG_DEBUG("Creating new multicast caps client to get caps from " << remoteHost_);
         // multicast version, FIXME io_service should be created in MulticastCapsClient
         // 0.0.0.0 is ipv4, 0::0 is ipv6, TODO fix for ipv6
         boost::asio::io_service io_service;
