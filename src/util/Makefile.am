@@ -1,7 +1,4 @@
 noinst_LTLIBRARIES= libutil.la
-# needed by libshared_video
-pkginclude_HEADERS = $(top_srcdir)/src/include/videoSize.h
-
 libutil_la_SOURCES = logWriter.cpp sigint.cpp \
 					 programOptions.cpp $(top_srcdir)/src/include/programOptions.h \
 					$(top_srcdir)/src/include/util.h \

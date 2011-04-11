@@ -18,6 +18,25 @@ AM_MAINTAINER_MODE([enable])
 
 AC_SUBST([BUILD_TIME], ["`date +%F\ %T\ %Z`"])
 
+# Define these substitions here to keep all version information in one place.
+# For information on how to properly maintain the library version information,
+# refer to the libtool manual, section "Updating library version information":
+# http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+# see http://sourceware.org/autobook/autobook/autobook_91.html
+# format is [current:revision:age]
+# libtool versioning is different than the project's versioning. It's for the ABI and API.
+# It's in the form "current:revision:age" where:
+#  * current: Increment when the interface changes. (and set revision to 0)
+#  * revision: Increment when the implementation changes, but not the interface.
+#  * age: Backward-compatible with how many interface numbers.
+AC_SUBST([SHAREDVIDEO_SO_VERSION], [0:0:0])
+
+# The version of the API. Should be major.minor and not change until not backward-compatible
+AC_SUBST([SHAREDVIDEO_API_VERSION], [0.6])
+
+
+
+
 # Check for C and C++ compilers
 AC_PROG_CXX
 AC_PROG_CC
@@ -294,7 +313,7 @@ src/gst/Makefile
 src/firereset/Makefile
 src/main/Makefile
 src/main/test/Makefile
-scenic.pc
+shared-video-${SHAREDVIDEO_API_VERSION}.pc:shared-video.pc.in
 ])
 
 AC_OUTPUT

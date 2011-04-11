@@ -27,7 +27,11 @@
 #include "videoSize.h"
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
-
+/**
+ * Video buffer that exists in shared memory used to transmit video between processes.
+ * 
+ * Useful to access a video stream received using Scenic's Milhouse into any C++ program.
+ */
 class SharedVideoBuffer
 {
     public:
