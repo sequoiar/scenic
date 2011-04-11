@@ -74,13 +74,17 @@ void RtpBin::printStatsVal(const std::string &idStr,
         const std::string &formatStr,
         GstStructure *stats)
 {
-    std::string paramStr;
+    using std::string;
+    using boost::lexical_cast;
+
+    string paramStr;
+
     if (type == "guint64")
     {
         if (G_VALUE_HOLDS_UINT64(gst_structure_get_value(stats, key)))
         {
             guint64 val = g_value_get_uint64(gst_structure_get_value(stats, key));
-            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+            paramStr += formatStr + lexical_cast<string>(val);
         }
     }
     else if (type == "guint32")
@@ -88,7 +92,7 @@ void RtpBin::printStatsVal(const std::string &idStr,
         if (G_VALUE_HOLDS_UINT(gst_structure_get_value(stats, key)))
         {
             guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
-            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+            paramStr += formatStr + lexical_cast<string>(val);
         }
     }
     else if (type == "gint32")
@@ -96,7 +100,7 @@ void RtpBin::printStatsVal(const std::string &idStr,
         if (G_VALUE_HOLDS_INT(gst_structure_get_value(stats, key)))
         {
             gint32 val = g_value_get_int(gst_structure_get_value(stats, key));
-            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+            paramStr += formatStr + lexical_cast<string>(val);
         }
     }
     else if (type == "boolean")
@@ -104,7 +108,7 @@ void RtpBin::printStatsVal(const std::string &idStr,
         if (G_VALUE_HOLDS_BOOLEAN(gst_structure_get_value(stats, key)))
         {
             gboolean val = g_value_get_boolean(gst_structure_get_value(stats, key));
-            paramStr += formatStr + boost::lexical_cast<std::string>(val);
+            paramStr += formatStr + lexical_cast<string>(val);
         }
     }
     else

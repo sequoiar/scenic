@@ -104,8 +104,8 @@ void RtpReceiver::setLatency(int latency)
 void RtpReceiver::setCaps(const char *capsStr)
 {
     GstCaps *caps;
-    if (std::string("") == capsStr)
-        THROW_ERROR("Cannot set rtp receiver caps to empty string");
+    if (capsStr and strlen(capsStr) == 0)
+        THROW_ERROR("Cannot set RTP receiver caps to empty string");
     else
         LOG_DEBUG("Got caps string " << capsStr);
     caps = gst_caps_from_string(capsStr);
@@ -121,13 +121,13 @@ void RtpReceiver::setCaps(const char *capsStr)
 
 void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /*data*/)
 {
+    gchar *pad_name = gst_pad_get_name(srcPad);
     // don't look at the full name
-    static const std::string expectedPadPrefix = "recv_rtp_src";
     if (gst_pad_is_linked(srcPad))
         LOG_DEBUG("Pad is already linked");
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
         LOG_DEBUG("Pad is not a source");
-    else if (std::string(gst_pad_get_name(srcPad)).compare(0, expectedPadPrefix.length(), expectedPadPrefix))
+    else if (!g_str_has_prefix(pad_name, "recv_rtp_src"))
         LOG_DEBUG("Wrong pad");
     else
     {
@@ -148,6 +148,7 @@ void RtpReceiver::onPadAdded(GstElement *  /*rtpbin*/, GstPad * srcPad, void * /
 
         LOG_INFO("New " << srcMediaType << " stream connected");
     }
+    g_free(pad_name);
 }
 
 
