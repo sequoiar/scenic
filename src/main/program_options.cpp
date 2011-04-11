@@ -21,7 +21,6 @@
  */
 
 #include "program_options.h"
-#include "video_size.h"
 
 namespace po = boost::program_options;
 
@@ -78,8 +77,8 @@ po::options_description ProgramOptions::createDefaultOptions()
         ("framerate,F", po::value<int>(), "framerate for video (15,30)")
         ("list-cameras,H", po::bool_switch(), "list connected cameras")
         ("list-v4l2", po::bool_switch(), "list connected V4L2 devices")
-        ("width,N", po::value<int>()->default_value(videosize::WIDTH), "width for video capture")
-        ("height,Y", po::value<int>()->default_value(videosize::HEIGHT), "height for video capture")
+        ("width,N", po::value<int>()->default_value(640), "width for video capture")
+        ("height,Y", po::value<int>()->default_value(480), "height for video capture")
         ("display-width,P", po::value<int>(), "width for video on display"
          "(scales output video width)")
         ("display-height,Q", po::value<int>(), "height for video "
