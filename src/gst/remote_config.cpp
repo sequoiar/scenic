@@ -192,10 +192,12 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
     return result;
 }
 
-static const std::vector<std::string> AUDIO_CODECS =
+namespace {
+const std::vector<std::string> AUDIO_CODECS =
 boost::assign::list_of<std::string>("raw")("mp3")("vorbis")("celt");
-static const std::vector<std::string> VIDEO_CODECS =
+const std::vector<std::string> VIDEO_CODECS =
 boost::assign::list_of<std::string>("mpeg4")("h264")("h263")("theora");
+} // end anonymous namespace
 
 /// FIXME: this method and the one below it need a list of codecs, should only have one
 std::string RemoteConfig::codecMediaType() const
@@ -217,14 +219,12 @@ std::string RemoteConfig::identifier() const
     return codecMediaType() + "_" + codec_;
 }
 
-
 bool ReceiverConfig::isSupportedCodec(const std::string &codec)
 {
     bool result = std::find(AUDIO_CODECS.begin(), AUDIO_CODECS.end(), codec) != AUDIO_CODECS.end()
         or std::find(VIDEO_CODECS.begin(), VIDEO_CODECS.end(), codec) != VIDEO_CODECS.end();
     return result;
 }
-
 
 ReceiverConfig::ReceiverConfig(const std::string &codec__,
         const std::string &remoteHost__,
