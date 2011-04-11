@@ -113,8 +113,6 @@ if test "x${have_libdc1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing package: libdc1394-2])
 fi
 
-AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTVIDEO_LIBS $GSTAPP_LIBS")
-
 GNOME_DOC_INIT(0.12.2, , AC_MSG_WARN(["DocBook Documentation will not be converted to HTML."]))
 
 dnl check for python
@@ -283,6 +281,7 @@ src/gst/Makefile
 src/rtsp/Makefile
 src/rtsp/examples/Makefile
 src/main/Makefile
+src/main/test/Makefile
 ])
 
 AC_OUTPUT

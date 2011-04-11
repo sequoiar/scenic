@@ -151,16 +151,14 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpoin
     gst_caps_unref (caps);
 }
 
-RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
-    BusMsgHandler(),
-    pipeline_(new Pipeline),
+RTSPClient::RTSPClient(const boost::program_options::variables_map &options, Pipeline *pipeline) :
+    BusMsgHandler(pipeline),
     portRange_(""),
     latency_(options["jitterbuffer"].as<int>()),
     enableVideo_(not options["disable-video"].as<bool>()),
     enableAudio_(not options["disable-audio"].as<bool>())
 {
     using std::string;
-    BusMsgHandler::setPipeline(pipeline_.get()); // this is how we subscribe to the pipeline's bus messages
 
     if (options["debug"].as<string>() == "gst-debug")
         pipeline_->makeVerbose();

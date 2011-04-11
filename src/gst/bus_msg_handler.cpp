@@ -37,20 +37,6 @@ BusMsgHandler::BusMsgHandler(Pipeline *pipeline) : pipeline_(pipeline)
     pipeline_->subscribe(this);
 }
 
-BusMsgHandler::BusMsgHandler() : pipeline_(0)
-{}
-
-void BusMsgHandler::setPipeline(Pipeline *pipeline)
-{
-    if (pipeline_ == 0)
-    {
-        pipeline_ = pipeline;
-        pipeline_->subscribe(this);
-    }
-    else
-        LOG_WARNING("Pipeline has already been initialized");
-}
-
 BusMsgHandler::~BusMsgHandler()
 {
     // FIXME: not clean, but at least this way if we go down out of order due to siginit

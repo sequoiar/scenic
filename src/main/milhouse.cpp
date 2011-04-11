@@ -41,7 +41,8 @@ namespace po = boost::program_options;
 void Milhouse::runAsRTSPClient(const po::variables_map &options)
 {
     LOG_DEBUG("Running as RTSP client");
-    RTSPClient client(options);
+    Pipeline pipeline; // Pipeline will go out of scope last
+    RTSPClient client(options, &pipeline);
     client.run(options["timeout"].as<int>());
 }
 

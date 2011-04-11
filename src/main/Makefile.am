@@ -1,3 +1,5 @@
+SUBDIRS=test
+
 bin_PROGRAMS = milhouse
 
 milhouse_SOURCES = main.cpp milhouse.cpp milhouse_logger.cpp milhouse_logger.h \
@@ -6,7 +8,7 @@ milhouse_SOURCES = main.cpp milhouse.cpp milhouse_logger.cpp milhouse_logger.h \
 #FIXME GLIB_CFLAGS only here because pipeline.h has include glib/gtypes.h, also GDK flags because of audioSender.h->audioLevel.h
 milhouse_CPPFLAGS = $(GLIB_CFLAGS) -I$(top_srcdir)/src/include -I$(top_srcdir)/src
 
-milhouse_LDADD = $(ALL_GST_LIBS) $(JACK_LIBS) \
+milhouse_LDADD = $(GST_LIBS) $(GSTAUDIO_LIBS) $(GSTVIDEO_LIBS) $(JACK_LIBS) \
 		$(GTK_LIBS) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) \
 		$(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(LIBDC1394_LIBS) \
         $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_FILESYSTEM_LIB) $(GST_RTSP_SERVER_LIBS) \
