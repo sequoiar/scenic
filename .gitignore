@@ -103,4 +103,4 @@ doc/pythondocs/
 py/scripts/midistreamc
 py/scripts/scenicc
 src/caps/test/caps_test
-
+src/main/test/check_pipeline
