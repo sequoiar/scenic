@@ -116,6 +116,7 @@ class Dc1394Handle : private boost::noncopyable {
 };
 
 
+/** Pretty-printer for dc1394 vmodes */
 int dc1394_caps_print_format_vmode_caps(int mode)
 {
     int retval = 0;
