@@ -25,7 +25,7 @@
 #include "pipeline.h"
 
 
-// callback to change the text position
+// callback to animate the text position
 gboolean textPositionCallback(gpointer data)
 {
     GstElement *textoverlay = static_cast<GstElement*>(data);

@@ -24,23 +24,17 @@
 #include <cmath> // for std::fabs
 #include <sstream> // for ostringstream
 
-#include <gst/gst.h>
-#include <gst/audio/multichannel.h>
 #include "util/log_writer.h"
 #include "gutil/gutil.h"
 
 #include "gst_linkable.h"
 
-#include <boost/thread/thread.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/assign.hpp>
 
 #include "codec.h"
 #include "jack_util.h"
 #include "rtp_pay.h"
 #include "pipeline.h"
-
-#include "rtp_receiver.h"
 
 /// Constructor
 Encoder::Encoder(const Pipeline &pipeline, const char *encoder) :
