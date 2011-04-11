@@ -184,7 +184,7 @@ std::vector<std::string> getDeviceList()
 } // end anonymous namespace
 
 
-bool Raw1394::cameraIsReady()
+bool raw1394::cameraIsReady()
 {
     std::vector<std::string> devices(getDeviceList());
 
@@ -198,7 +198,7 @@ bool Raw1394::cameraIsReady()
 }
 
 /// Returns true if one or more cameras were found
-bool Raw1394::listCameras()
+bool raw1394::listCameras()
 {
     using std::vector;
     using std::string;

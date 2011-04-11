@@ -43,7 +43,7 @@ Dv1394::Dv1394(const Pipeline &pipeline) :
     audioSink_(0),
     videoSink_(0)
 {
-    if (!Raw1394::cameraIsReady())
+    if (!raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
 
     // setting this to false leads to lower latency and less

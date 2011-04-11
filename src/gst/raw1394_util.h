@@ -29,7 +29,7 @@
 #include <libraw1394/raw1394.h>
 #endif
 
-class Raw1394
+class raw1394
 {
 public:
 #ifdef CONFIG_IEEE1394
