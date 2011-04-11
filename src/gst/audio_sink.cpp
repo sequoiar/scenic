@@ -73,10 +73,10 @@ AudioJackSink::AudioJackSink(Pipeline &pipeline, const AudioSinkConfig &config) 
     // use auto-forced connect mode if available
     g_object_set(G_OBJECT(sink_), "connect", 2, NULL);
 
-    if (config_.bufferTime() < Jack::safeBufferTime())
+    if (config_.bufferTime() < jack::safeBufferTime())
     {
-        LOG_WARNING("Buffer time " << config_.bufferTime() << " is too low, using " << Jack::safeBufferTime() << " instead");
-        g_object_set(G_OBJECT(sink_), "buffer-time", Jack::safeBufferTime(), NULL);
+        LOG_WARNING("Buffer time " << config_.bufferTime() << " is too low, using " << jack::safeBufferTime() << " instead");
+        g_object_set(G_OBJECT(sink_), "buffer-time", jack::safeBufferTime(), NULL);
     }
     else
         g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);

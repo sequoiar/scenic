@@ -24,7 +24,7 @@
 #include "util/log_writer.h"
 #include "jack_util.h"
 
-bool Jack::is_running()
+bool jack::is_running()
 {
     jack_client_t *client;
     jack_status_t status;
@@ -92,7 +92,7 @@ bool Jack::is_running()
 }
 
 
-jack_nframes_t Jack::samplerate()
+jack_nframes_t jack::samplerate()
 {
     if (!is_running())
         THROW_ERROR("JACK server not running, cannot get sample rate.");
@@ -108,16 +108,16 @@ jack_nframes_t Jack::samplerate()
 
 
 /// Check that jack is running
-void Jack::assertReady()
+void jack::assertReady()
 {
-    if (!Jack::is_running())
+    if (not is_running())
         THROW_CRITICAL("Jack is not running");
 }
 
 
-unsigned int Jack::framesPerPeriod()
+unsigned int jack::framesPerPeriod()
 {
-    if (!is_running())
+    if (not is_running())
         THROW_ERROR("JACK server not running, cannot compare sample rates.");
 
     jack_client_t *client;
@@ -130,13 +130,13 @@ unsigned int Jack::framesPerPeriod()
 }
 
 // DEPENDS ON sample rate and frames per period, doesn't appear to depend on periods per buffer
-unsigned long long Jack::minBufferTime()
+unsigned long long jack::minBufferTime()
 {
     const unsigned long long USECS_PER_SEC = 1000000LL;
     return  ((framesPerPeriod() / static_cast<float>(samplerate())) * USECS_PER_SEC);
 }
 
-unsigned long long Jack::safeBufferTime()
+unsigned long long jack::safeBufferTime()
 {
     return minBufferTime();
 }

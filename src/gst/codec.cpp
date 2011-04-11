@@ -478,7 +478,7 @@ RtpPay* MadDecoder::createDepayloader() const
 namespace {
 int maxRawChannels()
 {
-    if (not Jack::is_running())
+    if (not jack::is_running())
     {
         LOG_WARNING("Jack is not running");
         return INT_MAX;

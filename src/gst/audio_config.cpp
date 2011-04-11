@@ -93,7 +93,7 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioSimpleSource(pipeline, *this);
     else if (source_ == "jackaudiosrc")
     {
-        Jack::assertReady();
+        jack::assertReady();
         AudioJackSource *result = new AudioJackSource(pipeline, *this);
         if (disableAutoConnect_)
             result->disableAutoConnect();
@@ -165,7 +165,7 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")
     {
-        Jack::assertReady();
+        jack::assertReady();
         AudioJackSink * result = new AudioJackSink(pipeline, *this);
         if (disableAutoConnect_)
             result->disableAutoConnect();

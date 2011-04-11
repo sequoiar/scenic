@@ -154,10 +154,10 @@ AudioJackSource::AudioJackSource(const Pipeline &pipeline, const AudioSourceConf
     // setup capsfilter
     gutil::initAudioCapsFilter(capsfilter_, config_.numChannels());
 
-    if (config_.bufferTime() < Jack::safeBufferTime())
+    if (config_.bufferTime() < jack::safeBufferTime())
     {
-        LOG_WARNING("Buffer time " << config_.bufferTime() << " is too low, using " << Jack::safeBufferTime() << " instead");
-        g_object_set(G_OBJECT(source_), "buffer-time", Jack::safeBufferTime(), NULL);
+        LOG_WARNING("Buffer time " << config_.bufferTime() << " is too low, using " << jack::safeBufferTime() << " instead");
+        g_object_set(G_OBJECT(source_), "buffer-time", jack::safeBufferTime(), NULL);
     }
     else
         g_object_set(G_OBJECT(source_), "buffer-time", config_.bufferTime(), NULL);
