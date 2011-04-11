@@ -49,8 +49,9 @@ std::string MulticastCapsClient::getCaps()
     socket_.bind(listen_endpoint);
 
     // Join the multicast group.
-    try {
-    socket_.set_option(boost::asio::ip::multicast::join_group(multicastAddress_));
+    try
+    {
+        socket_.set_option(boost::asio::ip::multicast::join_group(multicastAddress_));
     }
     catch (const boost::system::system_error& error)
     {
@@ -84,8 +85,6 @@ std::string MulticastCapsClient::getCaps()
         if (capsEnd != std::string::npos)
             done = true;
     }
-    //std::string retVal((std::istreambuf_iterator<char>(&buf)),
-     //       std::istreambuf_iterator<char>());
     return result.substr(0, capsEnd);
 }
 
