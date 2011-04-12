@@ -1,6 +1,6 @@
-Release notes for Scenic 0.6.5
+Release notes for Scenic 0.6.6
 
-This release is the sixth of the stable 0.6 branch. This branch introduces
+This release is part of the 0.6 stable series. This series introduces
 many new features developed during 0.5 series. Those features include MIDI 
 streaming support and the hability to customize what each peer receives as 
 audio and video. 
@@ -50,10 +50,12 @@ Bug fixes in milhouse:
     * (none)
 
 Bug fixes in scenic: 
-    * Fixed packaging of the shared_video library with a pkg-config file. Use `pkg-config --cflags --libs shared-video-0.6`.
+    * (none)
 
 HISTORY
 
+    * 2011-04-12: 0.6.5
+         * Another stable release in the 0.6 stable series.
     * 2011-04-05: 0.6.4
          * Fifth stable release of the 0.6 stable branch.
     * 2010-07-19: 0.6.3

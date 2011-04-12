@@ -1,5 +1,18 @@
-
 This files lists RELEASE notes since Scenic version 0.4.
+
+----------------------------------------------------------------------
+
+Release notes for Scenic 0.6.5
+
+This release is the sixth of the stable 0.6 branch. This branch introduces
+many new features developed during 0.5 series. Those features include MIDI 
+streaming support and the hability to customize what each peer receives as 
+audio and video. 
+
+This version should work with every version in the stable 0.6 series. 
+
+Bug fixes in scenic: 
+    * Fixed packaging of the shared_video library with a pkg-config file. Use `pkg-config --cflags --libs shared-video-0.6`.
 
 ----------------------------------------------------------------------
 

@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.60)
 # version should always be .1 greater than last tag, unless this is a tag
-AC_INIT(SCENIC, [0.6.5], [http://code.sat.qc.ca/trac/scenic/wiki/BugReport], [scenic], [http://code.sat.qc.ca/trac/scenic])
+AC_INIT(SCENIC, [0.6.6], [http://code.sat.qc.ca/trac/scenic/wiki/BugReport], [scenic], [http://code.sat.qc.ca/trac/scenic])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
