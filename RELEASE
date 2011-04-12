@@ -50,7 +50,7 @@ Bug fixes in milhouse:
     * (none)
 
 Bug fixes in scenic: 
-    * (none)
+    * Fixed packaging of the shared_video library with a pkg-config file. Use `pkg-config --cflags --libs shared-video-0.6`.
 
 HISTORY
 

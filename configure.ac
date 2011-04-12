@@ -34,9 +34,6 @@ AC_SUBST([SHAREDVIDEO_SO_VERSION], [0:0:0])
 # The version of the API. Should be major.minor and not change until not backward-compatible
 AC_SUBST([SHAREDVIDEO_API_VERSION], [0.6])
 
-
-
-
 # Check for C and C++ compilers
 AC_PROG_CXX
 AC_PROG_CC
