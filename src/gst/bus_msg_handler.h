@@ -43,7 +43,6 @@ class BusMsgHandler : private boost::noncopyable
 
     protected:
         explicit BusMsgHandler(Pipeline *pipeline);
-        BusMsgHandler();
         virtual ~BusMsgHandler();
         Pipeline *pipeline_;
 };

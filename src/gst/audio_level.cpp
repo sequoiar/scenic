@@ -77,7 +77,7 @@ AudioLevel::AudioLevel(Pipeline &pipeline, int numChannels, GdkNativeWindow sock
             gtk_widget_show_all(plug);
             LOG_DEBUG("Created plug with ID: " << static_cast<unsigned int>(gtk_plug_get_id(GTK_PLUG(plug))));
         }
-        else // make a window
+        else // ...or make a window
         {
             GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
             gtk_window_set_title(GTK_WINDOW(window), title.c_str());
