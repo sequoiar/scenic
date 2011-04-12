@@ -44,7 +44,6 @@ class Dv1394 : private boost::noncopyable
 
     private:
         Dv1394(const Pipeline &pipeline);
-        ~Dv1394();
         const Pipeline &pipeline_;
 
         _GstElement *dv1394src_;

@@ -32,8 +32,8 @@
 #include "video_config.h"
 
 #include "dv1394.h"
-#include "dc1394.h"
-#include "v4l2_util.h"
+#include "devices/dc1394.h"
+#include "devices/v4l2_util.h"
 
 #include "file_source.h"
 

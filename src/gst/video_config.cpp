@@ -32,9 +32,9 @@
 #include "shared_video_sink.h"
 
 // for list cameras
-#include "dc1394.h"
-#include "v4l2_util.h"
-#include "raw1394_util.h"
+#include "devices/dc1394.h"
+#include "devices/v4l2_util.h"
+#include "devices/raw1394_util.h"
 
 
 unsigned long long fromString(const std::string& s,

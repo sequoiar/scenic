@@ -20,10 +20,9 @@
  *
  */
 
-#include <gst/gst.h>
 #include <cassert>
 #include "dv1394.h"
-#include "raw1394_util.h"
+#include "devices/raw1394_util.h"
 #include "gst_linkable.h"
 #include "pipeline.h"
 
@@ -58,11 +57,6 @@ Dv1394::Dv1394(const Pipeline &pipeline) :
             G_CALLBACK(Dv1394::cb_new_src_pad),
             static_cast<gpointer>(this));
 }
-
-Dv1394::~Dv1394()
-{
-}
-
 
 /// FIXME: this is crazy annoying, solution is for this not to be a singleton
 Dv1394 * Dv1394::Instance(const Pipeline &pipeline)

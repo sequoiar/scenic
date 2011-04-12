@@ -14,6 +14,7 @@ milhouse_LDADD = $(GST_LIBS) $(GSTAUDIO_LIBS) $(GSTVIDEO_LIBS) $(JACK_LIBS) \
         $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) $(BOOST_FILESYSTEM_LIB) $(GST_RTSP_SERVER_LIBS) \
         $(top_builddir)/src/gst/libgst.la  \
         $(top_builddir)/src/caps/libcaps.la \
+        $(top_builddir)/src/devices/libdevices.la \
         $(top_builddir)/src/util/libutil.la \
         $(top_builddir)/src/gutil/libgutil.la \
         $(top_builddir)/src/shared_video/libshared_video.la \
