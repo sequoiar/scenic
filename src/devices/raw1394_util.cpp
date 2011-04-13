@@ -20,25 +20,23 @@
  *
  */
 
+#include "raw1394_util.h"
 #include <cerrno>
 #include <cstring>
 #include <string>
 #include <vector>
 #include "util/log_writer.h"
-#ifdef CONFIG_IEEE1394
+
+#include <libraw1394/raw1394.h>
 #include <libavc1394/avc1394.h>
 #include <libavc1394/rom1394.h>
-#endif
-#include "raw1394_util.h"
 
 #define MOTDCT_SPEC_ID    0x00005068
-
 
 /** Open the raw1394 device and get a handle.
  *
  * \return number of ports found
  */
-#ifdef CONFIG_IEEE1394
 
 namespace {
 int raw1394_get_num_ports()
@@ -211,5 +209,3 @@ bool raw1394::listCameras()
     }
     return not devices.empty();
 }
-#endif
-

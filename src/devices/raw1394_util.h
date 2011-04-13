@@ -23,22 +23,10 @@
 #ifndef _RAW1394UTIL_H_
 #define _RAW1394UTIL_H_
 
-#include "config.h"
-
-#ifdef CONFIG_IEEE1394
-#include <libraw1394/raw1394.h>
-#endif
-
-class raw1394
+namespace raw1394
 {
-public:
-#ifdef CONFIG_IEEE1394
-    static bool listCameras();
-    static bool cameraIsReady();
-#else
-    static bool listCameras() { return false; }
-    static bool cameraIsReady() { return false; }
-#endif
-};
+    bool listCameras();
+    bool cameraIsReady();
+}
 
 #endif // RAW1394UTIL_H
