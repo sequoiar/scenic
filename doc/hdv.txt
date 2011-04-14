@@ -1,0 +1,17 @@
+HDV
+---
+
+Reliably encoding video from an hdv1394src depends on the robustness of the
+mpegts demuxers in GStreamer (currently in gst-plugins-bad). I haven't had any
+luck with hdv1394src->encoder pipelines on Ubuntu 10.04. I've managed playback
+only, with:
+
+gst-launch hdv1394src ! queue ! decodebin name=d ! queue ! xvimagesink \
+                                               d. ! queue ! alsasink
+
+capture to a file would be with
+
+gst-launch hdv1394src ! queue ! filesink location=mydump.ts
+
+Note that HDV adds about 2 and a half seconds delay (just at the input), before 
+encoding.

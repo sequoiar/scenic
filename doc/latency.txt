@@ -1,0 +1,37 @@
+Latency
+-------
+
+See gstreamer0.10/docs/design/part-latency.txt for more detailed information.
+
+As far as milhouse is concerned, the important settings to tune are:
+
+ - audio-buffer (sender and receiver). This controls the size of the audio ringbuffer
+   in each of our GStreamer pipeline that the audio-backend will write to (in the case
+   of capture) or read from (in the case of playback). Reducing this setting too 
+   significantly can lead to unpredictable performance.
+   See gst-plugins-base0.10-0.10.30/docs/design-audiosinks.txt
+
+ - jitterbuffer (receiver only). This controls the size of the RTP jitterbuffer(s).
+   Jitter is the variation in interarrival latency for incoming RTP packets. A packet
+   will arrive slightly faster or slower than the packet that preceded it. The
+   jitterbuffer serves to smooth this variation so that media streams can be
+   depayloaded, decoded and played as if they'd arrived precisely on time. Obviously,
+   if there is a lot of jitter, it is preferable to have a larger buffer. However,
+   this adds more latency.
+
+Otherwise, it's important to have a decent sound card and configure your JACK server
+to have the minimum stable settings (i.e. few xruns). Latency will largely depend on
+the quality of the network connection between the two sites. This can be evaluated
+with tools such as iperf and smokeping. Reliable audio hardware is also key. With 
+cheap, builtin-audio, one can expect latencies of at least 60-80 ms on a LAN.
+
+A measure of roundtrip latency can be obtained using jack_delay. Simply start a milhouse
+receiver and sender on each host, then start jack_delay on the first host. In qjackctl
+(or with jack.plumbing) connect jack_delay to the milhouse sender, and the milhouse
+receiver to jack_delay. On the other machine, connect the milhouse receiver directly
+into the milhouse sender.
+
+Machine A                               Machine B
+---------                               ---------
+jack_delay----->milhouse             milhouse----->milhouse
+milhouse------->jack_delay
