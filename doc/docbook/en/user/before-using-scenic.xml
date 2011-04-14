@@ -10,7 +10,7 @@
     <para>This is a quick list of the equipement used for a basic setup. Note that you need equipement on both side (local and distant.)</para>
     <itemizedlist>
       <listitem>
-        <para>One computer, for indications on what  kind of computer may be used, please refer to our <ulink url="http://svn.sat.qc.ca/trac/scenic/installation-manual/"> Installation Manual </ulink></para>
+        <para>One computer, for indications on what  kind of computer may be used, please refer to our <ulink url="http://code.sat.qc.ca/trac/scenic/installation-manual/"> Installation Manual </ulink></para>
       </listitem>
       <listitem>
         <para>1 x video capture card supported under Linux.</para>
@@ -98,7 +98,7 @@
          It is really important to verify that you have
          devices that are supported by &app; and more generally by <application> GNU/Linux</application>. Please refer to
          our
-         <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/HardwareRequirements">
+         <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/HardwareRequirements">
          Hardware Requirements</ulink> page to know more about supported devices.
       </para>
       <para>It is also necessary to make sure that all devices
@@ -174,8 +174,13 @@
         <para>Now you can turn off the computer.</para>
       </listitem>
       <listitem>
+<<<<<<< HEAD
         <para>Connect all the audio and video device following our
         <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">
+=======
+        <para>Connect all the audio and video device following our 
+        <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/Hardware%20Setup">
+>>>>>>> 85e935a43e399ff7e3a7120da24f950c5769b4a7
         Hardware Setup</ulink> page.</para>
       </listitem>
       <listitem>
@@ -186,8 +191,13 @@
       </listitem>
       <listitem>
         <para>Next, configure and test your audio and video
+<<<<<<< HEAD
         following our
         <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
+=======
+        following our 
+        <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/TestAudiovisualInputOutput">
+>>>>>>> 85e935a43e399ff7e3a7120da24f950c5769b4a7
         TestAudiovisualInputOutput</ulink> page.</para>
       </listitem>
     </orderedlist>

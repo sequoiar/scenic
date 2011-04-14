@@ -43,7 +43,7 @@ To obtain a visual representation of the currently running GStreamer pipeline, s
 2008 - Written by Tristan Matthews <le.businessman@gmail.com> and Koya Charles <koya.charles@gmail.com>.
 
 [REPORTING BUGS]
-http://svn.sat.qc.ca/trac/scenic
+http://code.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
 Scenic

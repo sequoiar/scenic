@@ -2,13 +2,13 @@
   <title>Scenic in command line</title>
   <para>The use of Scenic in command line is a powerful tool with
   many options not implemented yet in the Scenic GUI. The actual
-  name of Scenic commandline is "milhouse". For more complex setup
-  than what Scenic can currently support, we suggest you to use
-  <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch </ulink>as a
+  name of Scenic commandline is "milhouse". For a more complex setup
+  than what Scenic can currently support, we suggest you use
+  <ulink url="http://code.sat.qc.ca/trac/lunch">lunch </ulink>as a
   launching script. Look at some examples in
-  <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
+  <ulink url="http://code.sat.qc.ca/trac/scenic/browser/trunk/utils">
   trunk/utils/ </ulink>. You should look at the manual page of both
-  these tools to know more about them.</para>
+  of these tools to know more about them.</para>
   <sect1 id="installation.cmdline-sound-server">
     <title>Start the sound server</title>
     <para>The sound server is an application used to manage the

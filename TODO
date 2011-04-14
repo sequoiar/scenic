@@ -1,17 +1,22 @@
 General: simplify and refactor stuff in gst/ so that it can be reused in rtsp/
 (where reasonable). Try to reproduce functionality from gst/ in rtsp/.
 
+Short term objectives
+---------------------
+ * merge tmatth/0.7 into team/master
+ * document why a HDV proto is not possible
+ * document cumulated latency
+ * shmsink prototype
+ * DV tests
+ * port pkg-config and libtool packaging improvments from 0.6 to 0.7
+
+Future shared video tool
+------------------------
+ * Replace shared_video.so by the GStreamer elements shmsrc and shmsink
+
 RTSPServer
-----
-v4l2: use correct aspect ratio.
-add support for dv.
-
-RTSPClient
-----
-
-Done
-----
-investigate "source" property of uridecodebin: done by handling the notify::source signal
-see how we can specify explicitly which ports to use: ""
-add vumeters.
-use fancier overlay like in GtkVideoSink.
+----------
+ * v4l2: use correct aspect ratio.
+ * add support for dv.
+ * support multicast.
+ * add vumeters.

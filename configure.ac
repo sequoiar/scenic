@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.60)
 # version should always be .1 greater than last tag, unless this is a tag
-AC_INIT(SCENIC, [0.7.1], [http://svn.sat.qc.ca/trac/scenic/wiki/BugReport])
+AC_INIT(SCENIC, [0.7.1], [http://code.sat.qc.ca/trac/scenic/wiki/BugReport], [scenic], [http://code.sat.qc.ca/trac/scenic])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/main/milhouse.cpp])
 AC_CONFIG_MACRO_DIR([m4])
@@ -248,6 +248,7 @@ doc/docbook/fr/user/Makefile
 doc/docbook/fr/user-manual.xml
 doc/docbook/fr/installation/Makefile
 doc/docbook/fr/installation-manual.xml
+doc/Doxyfile
 man/Makefile
 utils/Makefile
 utils/dc-ctl/Makefile
@@ -280,6 +281,7 @@ src/rtsp/Makefile
 src/rtsp/examples/Makefile
 src/main/Makefile
 src/main/test/Makefile
+scenic.pc
 ])
 
 AC_OUTPUT

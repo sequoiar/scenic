@@ -1,5 +1,5 @@
 SUBDIRS = docbook
-EXTRA_DIST=footer.html header.html doxygen.css epydoc.css Doxyfile
+EXTRA_DIST=footer.html header.html doxygen.css epydoc.css Doxyfile.in
 
 html-local: doxygen epydoc
 
@@ -12,7 +12,7 @@ epydoc:
 		else \
 			epydoc  --html \
 					--output pythondocs \
-					--url http://svn.sat.qc.ca/trac/scenic/ \
+					--url http://code.sat.qc.ca/trac/scenic/ \
 					--name Scenic \
 					--verbose \
 					--simple-term \

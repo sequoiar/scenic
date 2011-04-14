@@ -3,10 +3,10 @@
   <para>The use of &app; in command line is a powerful tool with
   many options not implemented yet in the &app; GUI. The actual
   name of &app; commandline is "milhouse". For more complex setup
-  than what &app; can currently support, we suggest you to use
-  <ulink url="http://svn.sat.qc.ca/trac/lunch">lunch </ulink>as a
-  launching script. Look at some examples in
-  <ulink url="http://svn.sat.qc.ca/trac/miville/browser/trunk/utils">
+  than what &app; can currently support, we suggest you to use 
+  <ulink url="http://code.sat.qc.ca/trac/lunch">lunch </ulink>as a
+  launching script. Look at some examples in 
+  <ulink url="http://code.sat.qc.ca/trac/scenic/browser/trunk/utils">
   trunk/utils/ </ulink>. You should look at the manual page of both
   these tools to know more about them.</para>
   <sect1 id="installation.cmdline-sound-server">

@@ -8,7 +8,7 @@ dc-ctl [options]
 2009 - Written by Tristan Matthews <tristan@sat.qc.ca>.
 
 [REPORTING BUGS]
-http://svn.sat.qc.ca/trac/scenic
+http://code.sat.qc.ca/trac/scenic
 
 [COPYRIGHT]
 Scenic
