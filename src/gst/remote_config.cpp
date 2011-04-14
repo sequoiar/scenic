@@ -150,7 +150,7 @@ void SenderConfig::sendCaps()
         capsServer_.reset(new TcpCapsServer(capsPort(), message_));
     else
     {
-        LOG_DEBUG("USING MULTICAST!");
+        LOG_DEBUG("Using multicast");
         capsServer_.reset(new MulticastCapsServer(remoteHost_, capsPort(), message_));
     }
 }

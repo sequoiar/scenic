@@ -20,6 +20,12 @@
 // along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/** @file
+ * VideoReceiver component.
+ * Creates and links a "depayloader ! decoder ! videsink" pipeline and adds it
+ * to an RTP session.
+ */
+
 #ifndef _VIDEO_RECEIVER_H_
 #define _VIDEO_RECEIVER_H_
 

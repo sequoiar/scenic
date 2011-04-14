@@ -1,4 +1,4 @@
-/* videoFactory.h
+/*
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -19,6 +19,11 @@
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
+ */
+
+/** @file
+ * videofactory component.
+ * Helper functions to create VideoReceiver, VideoSender or LocalVideo objects.
  */
 
 #ifndef _VIDEO_FACTORY_H_

@@ -78,7 +78,7 @@ class AudioSourceConfig
         const std::string location_;
         const int numChannels_;
         const unsigned long long bufferTime_;
-        GdkNativeWindow socketID_;
+        const GdkNativeWindow socketID_;
         const bool disableAutoConnect_;
 };
 
@@ -102,7 +102,7 @@ class AudioSinkConfig
         const std::string sinkName_;
         const std::string deviceName_;
         const unsigned long long bufferTime_;
-        GdkNativeWindow socketID_;
+        const GdkNativeWindow socketID_;
         const int numChannels_;
         const bool disableAutoConnect_;
 };

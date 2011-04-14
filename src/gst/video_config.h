@@ -111,7 +111,7 @@ class VideoSinkConfig
     private:
         bool resolutionIsInverted() const;
         const std::string sink_;
-        bool doDeinterlace_;
+        const bool doDeinterlace_;
         const std::string sharedVideoId_;
         const int displayWidth_;
         const int displayHeight_;

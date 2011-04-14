@@ -19,6 +19,11 @@
 // along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/** @file
+ * The VideoSink component. 
+ * Wraps video output elements.
+ */
+
 #ifndef _VIDEO_SINK_H_
 #define _VIDEO_SINK_H_
 
