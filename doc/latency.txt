@@ -25,11 +25,11 @@ the quality of the network connection between the two sites. This can be evaluat
 with tools such as iperf and smokeping. Reliable audio hardware is also key. With 
 cheap, builtin-audio, one can expect latencies of at least 60-80 ms on a LAN.
 
-A measure of roundtrip latency can be obtained using jack_delay. Simply start a milhouse
-receiver and sender on each host, then start jack_delay on the first host. In qjackctl
-(or with jack.plumbing) connect jack_delay to the milhouse sender, and the milhouse
-receiver to jack_delay. On the other machine, connect the milhouse receiver directly
-into the milhouse sender.
+A rough measure of roundtrip latency can be obtained using jack_delay. Simply start
+a milhouse receiver and sender on each host, then start jack_delay on the first host.
+In qjackctl (or with jack.plumbing) connect jack_delay to the milhouse sender, and the
+milhouse receiver to jack_delay. On the other machine, connect the milhouse receiver
+directly into the milhouse sender.
 
 Machine A                               Machine B
 ---------                               ---------
