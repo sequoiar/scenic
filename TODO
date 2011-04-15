@@ -6,13 +6,16 @@ Short term objectives
  * merge tmatth/0.7 into team/master...done.
  * document why HDV may not be useful for scenic...done.
  * document cumulated latency...done.
- * shmsink prototype
- * DV tests
+ * shmsink prototype...done (https://github.com/tmatth/gst-prototypes/tree/master/shm)
+ * DV tests...not possible (no functioning dv camera).
  * port pkg-config and libtool packaging improvments from 0.6 to 0.7
 
-Future shared video tool
+Future of shared video component
 ------------------------
- * Replace shared_video.so by the GStreamer elements shmsrc and shmsink
+ * Replace shared_video.so by the GStreamer elements shmsrc and shmsink, these
+ offer more flexibility and robustness compared to our ad-hoc boost::shared mem
+ approach.
+ * This means SPIN will need to (optionally) depend on GStreamer to use shared video.
 
 RTSPServer
 ----------
