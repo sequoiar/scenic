@@ -102,5 +102,6 @@ doc/html/
 doc/pythondocs/
 py/scripts/midistreamc
 py/scripts/scenicc
-scenic.pc
+scenic*.pc
+shared-video*.pc
 doc/Doxyfile
