@@ -1,4 +1,4 @@
-Release notes for Scenic 0.6.6
+Release notes for Scenic 0.6.6 (2011-04-26)
 
 This release is part of the 0.6 stable series. This series introduces
 many new features developed during 0.5 series. Those features include MIDI 
@@ -50,7 +50,7 @@ Bug fixes in milhouse:
     * (none)
 
 Bug fixes in scenic: 
-    * (none)
+    * Pass SO_VERSION as LDFLAGS to libs
 
 HISTORY
 
