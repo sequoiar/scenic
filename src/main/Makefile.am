@@ -22,7 +22,7 @@ milhouse_LDADD = $(ALL_GST_LIBS) $(JACK_LIBS) \
         $(top_builddir)/src/caps/libcaps.la \
         $(top_builddir)/src/util/libutil.la \
         $(top_builddir)/src/gtk_utils/libgtk_utils.la \
-        $(top_builddir)/src/shared_video/libshared_video.la \
+        $(top_builddir)/src/shared_video/libshared_video-@SHAREDVIDEO_API_VERSION@.la \
         $(top_builddir)/src/vumeter/libvumeter.la
 
 clean-local:
