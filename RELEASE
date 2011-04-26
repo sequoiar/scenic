@@ -17,7 +17,7 @@ Bug fixes in milhouse:
     * (none)
 
 Bug fixes in scenic: 
-    * (none)
+    * Fixed a bad file name for a shared library in build system
 
 HISTORY
 
