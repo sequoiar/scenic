@@ -13,3 +13,35 @@ The streaming is done over RTP with the GStreamer multimedia framework. Users ca
 
 See http://code.sat.qc.ca/trac/scenic/
 
+See the NEWS and ChangeLog files for a complete history of changes.
+
+    Upgrading:
+    *   Be sure to uninstall your previous scenic before installing
+        scenic.
+    *   In the older source directory, use "make uninstall" as root to
+        uninstall previous installations.
+    *   Don't forget to run ldconfig after installation.
+    *   As of 0.4.2 and later, you may want to run ./utils/install_gstreamer.sh
+        again or simply apply the utils/rtpsource.diff patch to
+        gst-plugins-good-0.10.17, then recompile and reinstall it. Refer to
+        https://bugzilla.gnome.org/show_bug.cgi?id=611213
+        This fix adds receiver side bitrate estimation. Note that milhouse
+        will function fine without it, as will scenic.
+    *   Since 0.4, Scenic needs python-simplejson and gnome-themes-extras.
+        Install them with aptitude. 
+
+    Backward compatibility:
+        Each release in the 0.4 series should be interoperable with each other.
+
+    Milhouse dependency for Scenic
+        Scenic always needs the same version of milhouse, eg. scenic 0.4.5
+        needs milhouse 0.4.5
+
+    Limitations:
+    *   While milhouse supports many video and audio input types, Scenic only 
+        supports a subset of them. 
+    *   Each release version in the 0.5 branch is considered unstable and will 
+        not be supported in the future. Each version is not interoperable with 
+        any other version of the unstable 0.5 branch. Wait for the next release 
+        in the 0.6 branch to benefit from long term support of the new features 
+        of the 0.5 branch.
