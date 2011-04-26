@@ -37,5 +37,3 @@ class TestJackInfo(unittest.TestCase):
                 self.fail("Key %s was not found in jack-info output. Its output is: \n%s" % (key, stdout_value))
         # check for correct number of lines
         #assert(len(info) == len(expected))
-    # FIXME: We should fix this test
-    test_jack_info.skip = "This test cast does not work in pbuilder."
