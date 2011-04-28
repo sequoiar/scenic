@@ -88,11 +88,12 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
         return new AudioTestSource(pipeline, *this);
     else if (source_ == "filesrc")
         return new AudioFileSource(pipeline, *this);
-    else if (source_ == "alsasrc")
-        return new AudioAlsaSource(pipeline, *this);
+    else if (source_ == "alsasrc" or source_ == "pulsesrc" or
+            source_ == "autoaudiosrc" or source_ == "gconfaudiosrc")
+        return new AudioSimpleSource(pipeline, *this);
     else if (source_ == "jackaudiosrc")
     {
-        Jack::assertReady();
+        jack::assertReady();
         AudioJackSource *result = new AudioJackSource(pipeline, *this);
         if (disableAutoConnect_)
             result->disableAutoConnect();
@@ -100,8 +101,6 @@ AudioSource* AudioSourceConfig::createSource(Pipeline &pipeline) const
     }
     else if (source_ == "dv1394src")
         return new AudioDvSource(pipeline, *this);
-    else if (source_ == "pulsesrc")
-        return new AudioPulseSource(pipeline, *this);
     else
         THROW_ERROR(source_ << " is an invalid audiosource");
     return 0;
@@ -166,16 +165,15 @@ AudioSink* AudioSinkConfig::createSink(Pipeline &pipeline) const
 {
     if (sink_ == "jackaudiosink")
     {
-        Jack::assertReady();
+        jack::assertReady();
         AudioJackSink * result = new AudioJackSink(pipeline, *this);
         if (disableAutoConnect_)
             result->disableAutoConnect();
         return result;
     }
-    else if (sink_ == "alsasink")
-        return new AudioAlsaSink(pipeline, *this);
-    else if (sink_ == "pulsesink")
-        return new AudioPulseSink(pipeline, *this);
+    else if (sink_ == "alsasink" or sink_ == "pulsesink" or sink_ ==
+            "autoaudiosink" or sink_ == "gconfaudiosink")
+        return new AudioSimpleSink(pipeline, *this);
     else
     {
         THROW_CRITICAL(sink_ << " is an invalid audiosink");
@@ -209,3 +207,10 @@ unsigned long long AudioSinkConfig::bufferTime() const
 {
     return bufferTime_;
 }
+
+/// Returns c-style string specifying the source
+const char *AudioSinkConfig::sink() const
+{
+    return sink_.c_str();
+}
+

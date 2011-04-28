@@ -38,11 +38,13 @@ const int RemoteConfig::PORT_MAX = 65000;
 
 std::set<int> RemoteConfig::usedPorts_;
 
+// FIXME: localhost forced to 127.0.0.1:
+// temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
 RemoteConfig::RemoteConfig(const std::string &codec__,
         const std::string &remoteHost__,
         int port__) :
     codec_(codec__),
-    remoteHost_(remoteHost__),
+    remoteHost_(remoteHost__ == "localhost" ? "127.0.0.1" : remoteHost__),
     port_(port__)
 {}
 
@@ -148,7 +150,7 @@ void SenderConfig::sendCaps()
         capsServer_.reset(new TcpCapsServer(capsPort(), message_));
     else
     {
-        LOG_DEBUG("USING MULTICAST!");
+        LOG_DEBUG("Using multicast");
         capsServer_.reset(new MulticastCapsServer(remoteHost_, capsPort(), message_));
     }
 }
@@ -190,10 +192,12 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
     return result;
 }
 
-static const std::vector<std::string> AUDIO_CODECS =
+namespace {
+const std::vector<std::string> AUDIO_CODECS =
 boost::assign::list_of<std::string>("raw")("mp3")("vorbis")("celt");
-static const std::vector<std::string> VIDEO_CODECS =
+const std::vector<std::string> VIDEO_CODECS =
 boost::assign::list_of<std::string>("mpeg4")("h264")("h263")("theora");
+} // end anonymous namespace
 
 /// FIXME: this method and the one below it need a list of codecs, should only have one
 std::string RemoteConfig::codecMediaType() const
@@ -215,14 +219,12 @@ std::string RemoteConfig::identifier() const
     return codecMediaType() + "_" + codec_;
 }
 
-
 bool ReceiverConfig::isSupportedCodec(const std::string &codec)
 {
     bool result = std::find(AUDIO_CODECS.begin(), AUDIO_CODECS.end(), codec) != AUDIO_CODECS.end()
         or std::find(VIDEO_CODECS.begin(), VIDEO_CODECS.end(), codec) != VIDEO_CODECS.end();
     return result;
 }
-
 
 ReceiverConfig::ReceiverConfig(const std::string &codec__,
         const std::string &remoteHost__,
@@ -314,14 +316,15 @@ void ReceiverConfig::receiveCaps()
         THROW_ERROR("Codec " << codec_ << " is not supported");
 
     // this blocks
-    LOG_DEBUG("Creating new caps client to get caps from " << remoteHost_);
     if (multicastInterface_.empty())
     {
+        LOG_DEBUG("Creating new caps client to get caps from " << remoteHost_);
         CapsClient capsClient(remoteHost_, boost::lexical_cast<std::string>(capsPort()));
         caps_ = capsClient.getCaps();
     }
     else
     {
+        LOG_DEBUG("Creating new multicast caps client to get caps from " << remoteHost_);
         // multicast version, FIXME io_service should be created in MulticastCapsClient
         // 0.0.0.0 is ipv4, 0::0 is ipv6, TODO fix for ipv6
         boost::asio::io_service io_service;

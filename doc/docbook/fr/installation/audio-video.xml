@@ -26,15 +26,15 @@
     <sect2 id="installation.video-output">
 
       <title>Sortie vidéo du système</title>
-     <para>La sortie vidéo concerne généralement l’utilisation d’une carte graphique.</para> 
+     <para>La sortie vidéo concerne généralement l’utilisation d’une carte graphique.</para>
       <para>Il est essentiel de configurer la sortie vidéo correctement faute de quoi l’écran demeurera noir.</para>
 
-    <para>Pour les cartes graphiques Nvidia, veuillez suivre les instructions figurant à la page des réglages Nvidia. 
+    <para>Pour les cartes graphiques Nvidia, veuillez suivre les instructions figurant à la page des réglages Nvidia.
     <link linkend="installation.nvidia-settings">Réglages Nvidia</link>.
-    </para> 
+    </para>
 
     <para>Pour les cartes graphiques ATI, veuillez suivre les instructions figurant à la page des réglages ATI.<link linkend="installation.ati-settings">Réglages ATI</link>
-    </para> 
+    </para>
    </sect2>
 
     <sect2 id="installation.video-input">
@@ -42,8 +42,8 @@
     <para>&app; peut effectuer la capture vidéo via une carte de capture vidéo v4l2, une caméra IIDC ou DV (également appelée iLink). Ces dernières ont une latence importante (souvent entre 150 et 250ms) et ne devraient pas servir comme entrée vidéo si une faible latence est désirée. </para>
     <para>
       <emphasis role="strong">Video4Linux</emphasis>
-    </para> 
-    <para>Connectez la caméra. Pour ce faire. Veuillez vous référer à notre page relative à l’installation matérielle. 
+    </para>
+    <para>Connectez la caméra. Pour ce faire. Veuillez vous référer à notre page relative à l’installation matérielle.
        <link linkend='installation.hardware-requirements'>Installastion matérielle</link>
     </para>
     <para>Il s’agit maintenant de modifier vos réglages vidéo en fonction de vos besoins spécifiques.</para>
@@ -69,11 +69,11 @@
     <ulink url="https://bugs.launchpad.net/ubuntu/+source/libdc1394-22/+bug/462453">
     ce rapport de bogue</ulink>
     <ulink url="https://help.ubuntu.com/community/Firewire">
-    et cette documentation </ulink> pour de plus amples renseignements. 
+    et cette documentation </ulink> pour de plus amples renseignements.
     </para>
     <para>Vous pouvez tester la caméra DV avec :</para>
     <para><userinput>gst-launch dv1394src ! dvdemux ! dvdec ! xvimagesink</userinput></para>
-    
+
     <para>Vous pouvez tester la caméra IIDC avec :</para>
     <para><userinput>gst-launch dc1394src ! ffmpegcolorspace ! xvimagesink</userinput></para>
     </sect2>
@@ -405,7 +405,7 @@ card 0: Intel [HDA Intel], device 1: ALC889A Digital [ALC889A Digital]
    type hw;
    card M2496;
 }
-ctl.m2496 { 
+ctl.m2496 {
    type hw;
    card M2496;
 }</screen>

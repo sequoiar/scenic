@@ -32,8 +32,8 @@
 #include "video_config.h"
 
 #include "dv1394.h"
-#include "dc1394.h"
-#include "v4l2_util.h"
+#include "devices/dc1394.h"
+#include "devices/v4l2_util.h"
 
 #include "file_source.h"
 
@@ -235,12 +235,12 @@ std::string VideoV4lSource::srcCaps(unsigned int framerateIndex) const
 VideoDc1394Source::VideoDc1394Source(const Pipeline &pipeline, const VideoSourceConfig &config) :
     VideoSource(config)
 {
-    if (not Dc1394::areCamerasConnected())
+    if (not dc1394::areCamerasConnected())
         THROW_CRITICAL("No dc1394 camera connected");
 
     source_ = pipeline.makeElement(config_.source(), NULL);
     if (config_.hasGUID())
-        g_object_set(G_OBJECT(source_), "camera-number", Dc1394::GUIDToCameraNumber(config_.GUID()), NULL);
+        g_object_set(G_OBJECT(source_), "camera-number", dc1394::GUIDToCameraNumber(config_.GUID()), NULL);
     else if (config_.hasCameraNumber())
         g_object_set(G_OBJECT(source_), "camera-number", config_.cameraNumber(), NULL);
     else
@@ -278,7 +278,7 @@ std::string VideoDc1394Source::srcCaps(unsigned int /*framerateIndex*/) const
     for (ColourspaceList::const_iterator space = spaces.begin(); mode == 0 and space != spaces.end(); ++space)
     {
         colourSpace = *space;
-        mode = Dc1394::capsToMode(cameraNumber, config_.captureWidth(),
+        mode = dc1394::capsToMode(cameraNumber, config_.captureWidth(),
                 config_.captureHeight(), colourSpace, config_.framerate() == -1 ? 30 : config_.framerate());
     }
 
@@ -290,11 +290,11 @@ std::string VideoDc1394Source::srcCaps(unsigned int /*framerateIndex*/) const
                 << colourSpace  << " and resolution "
                 << config_.captureWidth() << "x" << config_.captureHeight());
 
-    if (Dc1394::requiresMoreISOSpeed(mode))
+    if (dc1394::requiresMoreISOSpeed(mode))
     {
         // FIXME: should set to b-mode too
         LOG_DEBUG("Setting iso speed to 800");
-        g_object_set(source_, "iso-speed", Dc1394::MAX_ISO_SPEED, NULL);
+        g_object_set(source_, "iso-speed", dc1394::MAX_ISO_SPEED, NULL);
     }
     return capsStr.str();
 }

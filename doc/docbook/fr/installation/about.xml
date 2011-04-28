@@ -1,10 +1,10 @@
 <bookinfo>
-   <title>Manuel d'installation de &app;  &manrevision;</title>       
-      <copyright> 
-         <year>2009</year> 
-         <year>2010</year> 
-         <holder>Société des arts technologiques</holder> 
-      </copyright> 
+   <title>Manuel d'installation de &app;  &manrevision;</title>
+      <copyright>
+         <year>2009</year>
+         <year>2010</year>
+         <holder>Société des arts technologiques</holder>
+      </copyright>
 <!-- translators: uncomment this
   <copyright>
    <year>2002</year>
@@ -12,60 +12,60 @@
   </copyright>
  -->
 
-<!-- An address can be added to the publisher information.  If a role is 
-     not specified, the publisher/author is the same for all versions of the 
-     document.  
+<!-- An address can be added to the publisher information.  If a role is
+     not specified, the publisher/author is the same for all versions of the
+     document.
 -->
-   <publisher> 
-      <publishername>Société des arts technologiques</publishername> 
-   </publisher> 
+   <publisher>
+      <publishername>Société des arts technologiques</publishername>
+   </publisher>
 
-   <authorgroup> 
-      <author> 
-         <firstname>Philippe</firstname> 
-         <surname>Chevry</surname> 
-         <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
-	         <address><email>scenic-users@sat.qc.ca</email> </address> 
-		   </affiliation> 
-      </author> 
-      <author> 
-		   <firstname>Simon</firstname> 
-		   <surname>Piette</surname> 
-		   <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
-	  		   <address><email>scenic-users@sat.qc.ca</email></address> 
-		   </affiliation> 
+   <authorgroup>
+      <author>
+         <firstname>Philippe</firstname>
+         <surname>Chevry</surname>
+         <affiliation>
+	  		   <orgname>Société des arts technologiques</orgname>
+	         <address><email>scenic-users@sat.qc.ca</email> </address>
+		   </affiliation>
       </author>
-      <author> 
-         <firstname>Alexandre</firstname> 
-         <surname>Quessy</surname> 
-         <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
-	         <address><email>scenic-users@sat.qc.ca</email> </address> 
-		   </affiliation> 
-      </author> 
+      <author>
+		   <firstname>Simon</firstname>
+		   <surname>Piette</surname>
+		   <affiliation>
+	  		   <orgname>Société des arts technologiques</orgname>
+	  		   <address><email>scenic-users@sat.qc.ca</email></address>
+		   </affiliation>
+      </author>
+      <author>
+         <firstname>Alexandre</firstname>
+         <surname>Quessy</surname>
+         <affiliation>
+	  		   <orgname>Société des arts technologiques</orgname>
+	         <address><email>scenic-users@sat.qc.ca</email> </address>
+		   </affiliation>
+      </author>
 
-      <author> 
-         <firstname>Tristan</firstname> 
-         <surname>Matthews</surname> 
-         <affiliation> 
-	  		   <orgname>Société des arts technologiques</orgname> 
-	         <address><email>scenic-users@sat.qc.ca</email> </address> 
-		   </affiliation> 
-      </author> 
+      <author>
+         <firstname>Tristan</firstname>
+         <surname>Matthews</surname>
+         <affiliation>
+	  		   <orgname>Société des arts technologiques</orgname>
+	         <address><email>scenic-users@sat.qc.ca</email> </address>
+		   </affiliation>
+      </author>
 
 
 <!-- This is appropriate place for other contributors: translators,
      maintainers,  etc. Commented out by default.
 -->
-     
+
       <othercredit role="translator">
-		<firstname>Hugues</firstname> 
-		<surname>Monfroy</surname> 
-		<affiliation> 
-	  		<orgname>Société des arts technologiques</orgname> 
-	      <address><email>scenic-users@sat.qc.ca</email> </address> 
+		<firstname>Hugues</firstname>
+		<surname>Monfroy</surname>
+		<affiliation>
+	  		<orgname>Société des arts technologiques</orgname>
+	      <address><email>scenic-users@sat.qc.ca</email> </address>
 		</affiliation>
 		<contrib>Traduction française</contrib>
       </othercredit>
@@ -82,17 +82,17 @@
 <!-- For example, if the GNOME desktop release is V2.x, the first version of the manual that -->
 <!-- is written in that desktop timeframe is V2.0, the second version of the manual is V2.1, etc. -->
 <!-- When the desktop release version changes to V3.x, the revision number of the manual changes -->
-<!-- to V3.0, and so on. -->  
+<!-- to V3.0, and so on. -->
    <revhistory>
-      <revision> 
-		<revnumber>&manrevision;</revnumber> 
-		<date>&date;</date> 
-		<revdescription> 
+      <revision>
+		<revnumber>&manrevision;</revnumber>
+		<date>&date;</date>
+		<revdescription>
 	  	   <para role="author">Société des arts technologiques<email>scenic-users@sat.qc.ca</email>
 	  		</para>
 	  		<para role="publisher">Société des arts technologiques</para>
-		</revdescription> 
-      </revision> 
+		</revdescription>
+      </revision>
    </revhistory>
 
    <releaseinfo>Ce manuel d’installation concerne la version &appversion; de &app;.</releaseinfo>
@@ -100,11 +100,11 @@
 <!-- Legal notice and info
 -->
    &legal;
-   <legalnotice> 
-   <title>Commentaires</title> 
+   <legalnotice>
+   <title>Commentaires</title>
       <para>Pour signaler un bogue ou faire une suggestion à propos de l’application &app; ou du présent manuel, suivez les indications figurant à la page de gestion des listes d’envoi aux utilisateurs.  <ulink url="http://mailman.sat.qc.ca/mailman/listinfo/scenic-users"
 	  type="help">&app; Listes d'envoi aux utilisateurs</ulink>.</para>
 <!-- Translators may also add here feedback address for translations -->
    </legalnotice>
-   
-</bookinfo> 
+
+</bookinfo>

@@ -25,7 +25,7 @@
 #include <jack/types.h> // for jack_nframes_t
 
 /// Utility functions for jack related issues.
-namespace Jack {
+namespace jack {
         void assertReady();
         bool is_running();
         jack_nframes_t samplerate();

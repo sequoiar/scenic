@@ -97,7 +97,7 @@
       <para>
          It is really important to verify that you have
          devices that are supported by &app; and more generally by <application> GNU/Linux</application>. Please refer to
-         our 
+         our
          <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/HardwareRequirements">
          Hardware Requirements</ulink> page to know more about supported devices.
       </para>
@@ -142,7 +142,7 @@
         monitor.</para>
       </listitem>
       <listitem>
-        <para>Connect the network cable to the network 
+        <para>Connect the network cable to the network
         interface</para>
       </listitem>
       <listitem>
@@ -174,8 +174,13 @@
         <para>Now you can turn off the computer.</para>
       </listitem>
       <listitem>
+<<<<<<< HEAD
+        <para>Connect all the audio and video device following our
+        <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/Hardware%20Setup">
+=======
         <para>Connect all the audio and video device following our 
         <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/Hardware%20Setup">
+>>>>>>> 85e935a43e399ff7e3a7120da24f950c5769b4a7
         Hardware Setup</ulink> page.</para>
       </listitem>
       <listitem>
@@ -186,8 +191,13 @@
       </listitem>
       <listitem>
         <para>Next, configure and test your audio and video
+<<<<<<< HEAD
+        following our
+        <ulink url="http://svn.sat.qc.ca/trac/miville/wiki/TestAudiovisualInputOutput">
+=======
         following our 
         <ulink url="http://code.sat.qc.ca/trac/scenic/wiki/TestAudiovisualInputOutput">
+>>>>>>> 85e935a43e399ff7e3a7120da24f950c5769b4a7
         TestAudiovisualInputOutput</ulink> page.</para>
       </listitem>
     </orderedlist>
@@ -195,19 +205,19 @@
   </sect1>
   <sect1 id="user.internet-connection">
     <title>Be reached from the Internet</title>
-    <para>To stream with &app;, both peer must make sure their 
+    <para>To stream with &app;, both peer must make sure their
     computer are reachable for the other computer. That means each
     peer must be able to send data to the other peer. </para>
     <para>The easiest way to make this happen, is to have a public
-    IP address, and all ports open to the Internet - with no 
+    IP address, and all ports open to the Internet - with no
     firewall. An other solution would be to use a VPN.</para>
-    <para>If you are using behind a router, one thing that you 
-    can do it to configure your router to forward specific ports 
+    <para>If you are using behind a router, one thing that you
+    can do it to configure your router to forward specific ports
     to the computer running &app;. The port forwarding must be
-    done for both TCP/IP and UDP/IP on the port 17446, as well 
+    done for both TCP/IP and UDP/IP on the port 17446, as well
     as for the whole range of 10000 to at least 11000.</para>
-    <para>The port 17446 is the communication port of &app;. 
-    &app; allocates port number from 10000 and up for the 
+    <para>The port 17446 is the communication port of &app;.
+    &app; allocates port number from 10000 and up for the
     receiving streamers. </para>
   </sect1>
   <sect1 id="user.testing-devices">
@@ -225,7 +235,7 @@
     <title>Lauching the <application>JACK</application> Audio Server</title>
     <para>If you want to stream audio, you must run the <application>JACK</application> audio
     server. There is a simple graphical user interface for <application>JACK</application>
-    that is called <application>JACK Control</application>. 
+    that is called <application>JACK Control</application>.
     You can launch it by choosing the <menuchoice><guimenu>Application</guimenu><guimenuitem>Audio/Video</guimenuitem><guimenuitem>JACK Control</guimenuitem></menuchoice> menu item.</para>
   </sect1>
   <sect1 id="user.launching-scenic">

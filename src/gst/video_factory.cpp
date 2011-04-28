@@ -36,18 +36,13 @@ namespace po = boost::program_options;
 
 shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, const po::variables_map &options)
 {
+    using std::string;
     shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(options));
 
-    std::string codec(options["videocodec"].as<std::string>());
-    std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
-    if (remoteHost == "localhost")
-        remoteHost = "127.0.0.1";
-    int port = options["videoport"].as<int>();
-    std::string multicastInterface(options["multicast-interface"].as<std::string>());
-
-    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec,
-                remoteHost, port, multicastInterface, options["jitterbuffer"].as<int>()));
+    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(options["videocodec"].as<string>(),
+                options["address"].as<string>(), options["videoport"].as<int>(),
+                options["multicast-interface"].as<string>(),
+                options["jitterbuffer"].as<int>()));
 
     return shared_ptr<VideoReceiver>(new VideoReceiver(pipeline, vConfig, rConfig));
 }
@@ -55,17 +50,14 @@ shared_ptr<VideoReceiver> videofactory::buildVideoReceiver(Pipeline &pipeline, c
 
 shared_ptr<VideoSender> videofactory::buildVideoSender(Pipeline &pipeline, const po::variables_map &options)
 {
+    using std::string;
     shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(options));
-    std::string codec(options["videocodec"].as<std::string>());
-    std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
-    if (remoteHost == "localhost")
-        remoteHost = "localhost.localdomain";
-    int port = options["videoport"].as<int>();
-    std::string multicastInterface(options["multicast-interface"].as<std::string>());
 
-    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface));
-    shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, rConfig));
+    shared_ptr<SenderConfig> sConfig(new SenderConfig(pipeline, options["videocodec"].as<string>(),
+                options["address"].as<string>(), options["videoport"].as<int>(),
+                options["multicast-interface"].as<string>()));
+
+    shared_ptr<VideoSender> tx(new VideoSender(pipeline, vConfig, sConfig));
 
     return tx;
 }

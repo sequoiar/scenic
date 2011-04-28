@@ -30,6 +30,7 @@ namespace gutil {
     void runMainLoop(int ms);
     int killMainLoop(void *data = 0);
     void init_gst_gtk(int argc, char **argv);
+    void init_gst(int argc, char **argv);
     void initAudioCapsFilter(_GstElement *capsfilter, int numChannels);
     bool has_display();
 }

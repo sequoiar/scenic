@@ -44,17 +44,14 @@ void audiofactory::printMaxChannels(const std::string &codec)
 
 shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const po::variables_map &options)
 {
+    using std::string;
     shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(options));
 
-    std::string codec(options["audiocodec"].as<std::string>());
-    std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for https://bugzilla.gnome.org/show_bug.cgi?id=595840
-    if (remoteHost == "localhost")
-        remoteHost = "127.0.0.1";
-    int port = options["audioport"].as<int>();
-    std::string multicastInterface(options["multicast-interface"].as<std::string>());
-
-    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline, codec, remoteHost, port, multicastInterface));
+    shared_ptr<SenderConfig> rConfig(new SenderConfig(pipeline,
+                options["audiocodec"].as<string>(),
+                options["address"].as<string>(),
+                options["audioport"].as<int>(),
+                options["multicast-interface"].as<string>()));
 
     shared_ptr<AudioSender> tx(new AudioSender(pipeline, aConfig, rConfig));
 
@@ -63,18 +60,14 @@ shared_ptr<AudioSender> audiofactory::buildAudioSender(Pipeline &pipeline, const
 
 shared_ptr<AudioReceiver> audiofactory::buildAudioReceiver(Pipeline &pipeline, const po::variables_map &options)
 {
+    using std::string;
     shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(options));
 
-    std::string codec(options["audiocodec"].as<std::string>());
-    std::string remoteHost(options["address"].as<std::string>());
-    // FIXME: temporary workaround for ticket #143
-    if (remoteHost == "localhost")
-        remoteHost = "localhost.localdomain";
-    int port = options["audioport"].as<int>();
-    std::string multicastInterface(options["multicast-interface"].as<std::string>());
-
-    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, remoteHost, port,
-                multicastInterface, options["jitterbuffer"].as<int>()));
+    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(options["audiocodec"].as<string>(),
+                options["address"].as<string>(),
+                options["audioport"].as<int>(),
+                options["multicast-interface"].as<string>(),
+                options["jitterbuffer"].as<int>()));
 
     return shared_ptr<AudioReceiver>(new AudioReceiver(pipeline, aConfig, rConfig));
 }
@@ -84,4 +77,3 @@ shared_ptr<LocalAudio> audiofactory::buildLocalAudio(Pipeline &pipeline, const p
     AudioSourceConfig sourceConfig(options);
     return shared_ptr<LocalAudio>(new LocalAudio(pipeline, sourceConfig));
 }
-

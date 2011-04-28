@@ -46,31 +46,18 @@ class AudioSink : private boost::noncopyable
         const static unsigned long long BUFFER_TIME;
 };
 
-// FIXME: DRY!!! Either merge alsasink and pulsesink or pull out a common base class.
-
 /// Concrete AudioSink class representing a sink to the ALSA interface
-class AudioAlsaSink : public AudioSink
+class AudioSimpleSink : public AudioSink
 {
     public:
-        AudioAlsaSink(Pipeline &pipeline, const AudioSinkConfig &config);
+        AudioSimpleSink(Pipeline &pipeline, const AudioSinkConfig &config);
 
     private:
-        /** Returns this AudioAlsaSink's sink, which is an audioconverter, as
-         * raw-audio conversion happens before audio is output to ALSA */
+        /** Returns this AudioSimpleSink's sink, which is an audioconverter, as
+         * raw-audio conversion happens before audio is output */
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *aconv_;
 
-        const AudioSinkConfig &config_;
-};
-
-/// Concrete AudioSink class representing a sink to the Pulse interface
-class AudioPulseSink : public AudioSink
-{
-    public:
-        AudioPulseSink(Pipeline &pipeline, const AudioSinkConfig &config);
-    private:
-        _GstElement *sinkElement() { return aconv_; }
-        _GstElement *aconv_;
         const AudioSinkConfig &config_;
 };
 

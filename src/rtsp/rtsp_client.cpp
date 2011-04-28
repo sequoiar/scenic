@@ -132,14 +132,14 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpoin
     RTSPClient *context = static_cast<RTSPClient*>(data);
     GstCaps *caps = gst_pad_get_caps (newPad);
     const gchar *mime = gst_structure_get_name (gst_caps_get_structure (caps, 0));
-    if (g_strrstr (mime, "video"))
+    if (g_str_has_prefix (mime, "video"))
     {
         if (context->enableVideo_)
             context->linkNewPad(newPad, caps, "video_queue");
         else
             LOG_WARNING("Got video stream even though we've disabled video");
     }
-    else if (g_strrstr (mime, "audio"))
+    else if (g_str_has_prefix (mime, "audio"))
     {
         if (context->enableAudio_)
             context->linkNewPad(newPad, caps, "audio_queue");
@@ -151,16 +151,14 @@ void RTSPClient::onPadAdded(GstElement * /*uridecodebin*/, GstPad *newPad, gpoin
     gst_caps_unref (caps);
 }
 
-RTSPClient::RTSPClient(const boost::program_options::variables_map &options) :
-    BusMsgHandler(),
-    pipeline_(new Pipeline),
+RTSPClient::RTSPClient(const boost::program_options::variables_map &options, Pipeline *pipeline) :
+    BusMsgHandler(pipeline),
     portRange_(""),
     latency_(options["jitterbuffer"].as<int>()),
     enableVideo_(not options["disable-video"].as<bool>()),
     enableAudio_(not options["disable-audio"].as<bool>())
 {
     using std::string;
-    BusMsgHandler::setPipeline(pipeline_.get()); // this is how we subscribe to the pipeline's bus messages
 
     if (options["debug"].as<string>() == "gst-debug")
         pipeline_->makeVerbose();

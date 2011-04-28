@@ -50,7 +50,7 @@ namespace boost {
 class RTSPClient : private BusMsgHandler
 {
     public:
-        RTSPClient(const boost::program_options::variables_map &options);
+        RTSPClient(const boost::program_options::variables_map &options, Pipeline *pipeline);
         void run(int timeout);
     private:
         bool handleBusMsg(_GstMessage *msg);
@@ -59,7 +59,6 @@ class RTSPClient : private BusMsgHandler
         static int timeout();
         static int onNotifySource(_GstElement *uridecodebin, _GParamSpec * /*pspec*/, void *data);
         static void onPadAdded(_GstElement *uridecodebin, _GstPad * newPad, void *data);
-        std::tr1::shared_ptr<Pipeline> pipeline_;
         std::string portRange_;
         int latency_;
         const bool enableVideo_;

@@ -35,7 +35,7 @@
       always have latency. Scenic has been developed to minimize
       this latency but still, by example two musician playing over
       a network will always experience a delay between each
-      other.</para> 
+      other.</para>
       <para>Latency is the time taken for a sent packet of data to
       be received at the other end. It includes the time to encode
       the packet for transmission and transmit it, the time for

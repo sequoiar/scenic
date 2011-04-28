@@ -1,8 +1,9 @@
-// dc1394.h
+
+//
+// Based on raw1394util.h, part of dvgrab available at <http://www.kinodv.org/>
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
-//
 // This file is part of Scenic.
 //
 // Scenic is free software: you can redistribute it and/or modify
@@ -19,24 +20,13 @@
 // along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _DC1394_H_
-#define _DC1394_H_
+#ifndef _RAW1394UTIL_H_
+#define _RAW1394UTIL_H_
 
-#include <string>
-
-namespace Dc1394
+namespace raw1394
 {
     bool listCameras();
-    int capsToMode(int cameraNumber, int width,
-            int height,
-            const std::string &colourspace,
-            int framerate);
-    int GUIDToCameraNumber(unsigned long long GUID);
-    bool requiresMoreISOSpeed(int mode);
-    bool areCamerasConnected();
-    int nCameras();
-    static const int MAX_ISO_SPEED = 800;
+    bool cameraIsReady();
 }
 
-#endif //_DC1394_H_
-
+#endif // RAW1394UTIL_H

@@ -22,7 +22,6 @@
 
 #include <gst/gst.h>
 #include <algorithm>
-#include <sstream>
 #include <list>
 
 #include "pipeline.h"

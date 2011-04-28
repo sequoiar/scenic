@@ -25,20 +25,17 @@
 
 #include <string>
 
-/// FIXME: this should be a real object that only opens a given device ONCE
-class v4l2util
+namespace v4l2util
 {
-    public:
-        static bool checkStandard(const std::string &expected,
-                std::string &actual, const std::string &device);
-        static void setFormatVideo(const std::string &device, int width, int height);
-        static unsigned captureWidth(const std::string &device);
-        static unsigned captureHeight(const std::string &device);
-        static bool listCameras();
-        static bool isInterlaced(const std::string &device);
-        static void setStandard(const std::string &device, const std::string &standard);
-        static void setInput(const std::string &device, int input);
-};
+    bool checkStandard(const std::string &expected,
+            std::string &actual, const std::string &device);
+    void setFormatVideo(const std::string &device, int width, int height);
+    unsigned captureWidth(const std::string &device);
+    unsigned captureHeight(const std::string &device);
+    bool listCameras();
+    bool isInterlaced(const std::string &device);
+    void setStandard(const std::string &device, const std::string &standard);
+    void setInput(const std::string &device, int input);
+}
 
 #endif // _V4L2UTIL_H_
-

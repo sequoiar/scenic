@@ -100,13 +100,18 @@ class VideoSinkConfig
         bool doDeinterlace() const { return doDeinterlace_; }
         std::string flipMethod() const { return flipMethod_; }
         bool hasText() const { return not text_.empty(); }
+        const char * sink() const { return sink_.c_str(); }
+        const char * title() const { return title_.c_str(); }
+        int effectiveDisplayWidth() const;
+        int effectiveDisplayHeight() const;
+        unsigned long xid() const { return xid_; }
+        std::string display() const { return display_; }
+        bool fullscreen() const { return startInFullscreen_; }
 
     private:
         bool resolutionIsInverted() const;
-        int effectiveDisplayWidth() const;
-        int effectiveDisplayHeight() const;
         const std::string sink_;
-        bool doDeinterlace_;
+        const bool doDeinterlace_;
         const std::string sharedVideoId_;
         const int displayWidth_;
         const int displayHeight_;

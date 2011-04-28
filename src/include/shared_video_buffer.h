@@ -24,9 +24,16 @@
 #ifndef _SHARED_VIDEO_BUFFER_H_
 #define _SHARED_VIDEO_BUFFER_H_
 
-#include "video_size.h"
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
+
+namespace videosize
+{
+    const int WIDTH = 640;
+    const int HEIGHT = 480;
+    const int MAX_WIDTH = 1920;
+    const int MAX_HEIGHT = 1080;
+}
 
 class SharedVideoBuffer
 {

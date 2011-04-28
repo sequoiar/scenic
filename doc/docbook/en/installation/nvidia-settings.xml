@@ -39,11 +39,11 @@
         output. Both of these output are from your graphic card.
         One output is going to your monitor and the second is going
         to a projector or a video mixer. As shown in the General
-        Setup part of the 
+        Setup part of the
         <link linkend='installation.hardware-setup'>Hardware Setup </link>page.
         To make this setup we have to configure your xorg.conf with
         the nvidia-settings application situated in
-        System/Administration/Nvidia X Server Settings </para> 
+        System/Administration/Nvidia X Server Settings </para>
         </sect1>
 
         <sect1 id="installation.connecting-video-out">

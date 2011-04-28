@@ -19,6 +19,11 @@
 // along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/** @file
+ * The VideoSink component. 
+ * Wraps video output elements.
+ */
+
 #ifndef _VIDEO_SINK_H_
 #define _VIDEO_SINK_H_
 
@@ -28,6 +33,7 @@
 #include "noncopyable.h"
 
 class Pipeline;
+class VideoSinkConfig;
 class _GtkWidget;
 class _GdkEventKey;
 class _GdkEventScroll;
@@ -49,8 +55,7 @@ class XvImageSink
 : public VideoSink
 {
     public:
-        XvImageSink(Pipeline &pipeline, int width, int height,
-                unsigned long xid, const std::string &display, const std::string &title);
+        XvImageSink(Pipeline &pipeline, const VideoSinkConfig &config);
         void toggleFullscreen();
 
     private:
@@ -80,12 +85,11 @@ class XvImageSink
                 void *data);
 };
 
-
-class XImageSink
+class SimpleVideoSink
 : public VideoSink
 {
     public:
-        XImageSink(const Pipeline &pipeline, const std::string &display);
+        SimpleVideoSink(const Pipeline &pipeline, const VideoSinkConfig &config);
 
     private:
         virtual _GstElement *sinkElement();

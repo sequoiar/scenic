@@ -15,7 +15,7 @@
     soundcard. Choosing which soundcard to use, seleting the input
     and output and defining the audio quality. It usually runs as a
     background process.</para>
-    <para>Follow our 
+    <para>Follow our
     <link linkend='installation.av-configuration'>Audio settings page </link>to
     start the sound server.</para>
   </sect1>

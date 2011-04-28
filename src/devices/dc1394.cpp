@@ -116,6 +116,7 @@ class Dc1394Handle : private boost::noncopyable {
 };
 
 
+/** Pretty-printer for dc1394 vmodes */
 int dc1394_caps_print_format_vmode_caps(int mode)
 {
     int retval = 0;
@@ -201,7 +202,7 @@ bool modeIsSupported(int mode, const dc1394video_modes_t &supportedModes,
 
 
 /// FIXME: have all the modes here and this will also depend on framerate
-bool Dc1394::requiresMoreISOSpeed(int mode)
+bool dc1394::requiresMoreISOSpeed(int mode)
 {
     switch (mode)
     {
@@ -221,7 +222,7 @@ bool Dc1394::requiresMoreISOSpeed(int mode)
     }
 }
 
-int Dc1394::capsToMode(int cameraId, int width, int height,
+int dc1394::capsToMode(int cameraId, int width, int height,
         const std::string &colourspace, int framerate)
 {
     Dc1394Handle dc(cameraId);
@@ -364,7 +365,7 @@ bool isModuleWriteable(const std::string &module)
 
 
 /// Returns true if cameras were found
-bool Dc1394::listCameras()
+bool dc1394::listCameras()
 {
     LOG_DEBUG("listing cameras");
 
@@ -398,7 +399,7 @@ bool Dc1394::listCameras()
     else
         raw1394_destroy_handle(tmpHandle);
 
-    int nCameras = Dc1394::nCameras();
+    int nCameras = dc1394::nCameras();
 
     for (int i = 0; i != nCameras; ++i)
     {
@@ -442,23 +443,23 @@ void Dc1394Handle::printInfo() const
     }
 }
 
-int Dc1394::nCameras()
+int dc1394::nCameras()
 {
     Dc1394Handle dc;
     return dc.nCameras();
 }
 
-bool Dc1394::areCamerasConnected()
+bool dc1394::areCamerasConnected()
 {
     return nCameras() != 0;
 }
 
 
-int Dc1394::GUIDToCameraNumber(unsigned long long GUID)
+int dc1394::GUIDToCameraNumber(unsigned long long GUID)
 {
     int result = -1;
     bool found = false;
-    int nCameras = Dc1394::nCameras();
+    int nCameras = dc1394::nCameras();
 
     for (int i = 0; not found && i != nCameras; ++i)
     {

@@ -15,6 +15,7 @@ dnl we use this to avoid causing normal builds to regenerate autotools if
 dnl "too old" which might happen accidentally, especially when using a VCS
 dnl such as when building debian packages
 AM_MAINTAINER_MODE([enable])
+AC_SUBST([BUILD_TIME], ["`date +%F\ %T\ %Z`"])
 
 # Check for C and C++ compilers
 AC_PROG_CXX
@@ -103,16 +104,11 @@ if test "x${have_libraw1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing package: libraw1394-dev ])
 fi
 
-# FIXME: make this optional
-AC_DEFINE(CONFIG_IEEE1394,[],[Everything in raw1394 is defined from configure])
-
 #Trying to set LIBDC1394 using pkg-config
 PKG_CHECK_MODULES(LIBDC1394, [libdc1394-2], have_libdc1394=true, have_libdc1394=false)
 if test "x${have_libdc1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing package: libdc1394-2])
 fi
-
-AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTVIDEO_LIBS $GSTAPP_LIBS")
 
 GNOME_DOC_INIT(0.12.2, , AC_MSG_WARN(["DocBook Documentation will not be converted to HTML."]))
 
@@ -278,10 +274,13 @@ src/shared_video/Makefile
 src/vumeter/Makefile
 src/vumeter/test/Makefile
 src/caps/Makefile
+src/caps/test/Makefile
+src/devices/Makefile
 src/gst/Makefile
 src/rtsp/Makefile
 src/rtsp/examples/Makefile
 src/main/Makefile
+src/main/test/Makefile
 scenic.pc
 ])
 

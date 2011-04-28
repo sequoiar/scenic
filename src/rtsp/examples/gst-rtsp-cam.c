@@ -104,7 +104,7 @@ main(int argc, char **argv)
     return 1;
   }
 
-  if (gst_rtsp_url_parse (argc != 2 ? "rtsp://localhost:8554/test" : argv[1], &local_url) != GST_RTSP_OK) {
+  if (gst_rtsp_url_parse (argc != 2 ? "rtsp://127.0.0.1:8554/test" : argv[1], &local_url) != GST_RTSP_OK) {
     g_printerr ("invalid rtsp url\n");
 
     return 1;

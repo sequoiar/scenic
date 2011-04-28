@@ -31,7 +31,7 @@ class Pipeline;
 class _GstElement;
 
 /**
- *  A filter that scales video to a specified resolution.
+ *  A filter that flips video to a specified orientation.
  */
 
 class VideoFlip : private boost::noncopyable

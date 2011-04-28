@@ -1,15 +1,15 @@
 <chapter id="installation.hardware-requirements">
   <title>Pré-requis matériel</title>
-  <para>L’utilisation de &app; requiert des équipements spécifiques. Pour des performances et une fiabilité acceptables, un système de téléprésence utilisé dans un contexte de performance en temps réel doit satisfaire à plusieurs standards. Notre équipe teste continuellement équipements, périphériques et pièces d’ordinateur. Cette page est fréquemment mise à jour par l’ajout d’équipements qui satisfont aux besoins de la téléprésence. Pour tout matériel et équipement ne figurant pas dans cette liste, veuillez nous contacter. 
+  <para>L’utilisation de &app; requiert des équipements spécifiques. Pour des performances et une fiabilité acceptables, un système de téléprésence utilisé dans un contexte de performance en temps réel doit satisfaire à plusieurs standards. Notre équipe teste continuellement équipements, périphériques et pièces d’ordinateur. Cette page est fréquemment mise à jour par l’ajout d’équipements qui satisfont aux besoins de la téléprésence. Pour tout matériel et équipement ne figurant pas dans cette liste, veuillez nous contacter.
   </para>
   <sect1 id="installation.good-scenic-experience">
-   <title>Pour une expérience &app; satisfaisante</title>  
-      <para>Il est recommandé de prendre le temps de choisir l’ordinateur et les équipements et périphériques que vous utiliserez. L’achet d’un ordinateur pour linux et des performances audiovisuelles prend du temps et nécessite un minimum de connaissances. Des pièces d’ordinateur et autres équipements connexes apparaissent constamment sur le marché. Pour éviter les problèmes, il est recommandé de ne pas vous précipiter sur n’importe quel ordinateur puissant et rapide disponible près de chez vous. Suivez plutôt chaque étape des instructions  de notre manuel d’installation qui vous guidera quant à l’ensemble des points essentiels pour vous permettre de faire les meilleurs choix possibles. 
-      </para> 
+   <title>Pour une expérience &app; satisfaisante</title>
+      <para>Il est recommandé de prendre le temps de choisir l’ordinateur et les équipements et périphériques que vous utiliserez. L’achet d’un ordinateur pour linux et des performances audiovisuelles prend du temps et nécessite un minimum de connaissances. Des pièces d’ordinateur et autres équipements connexes apparaissent constamment sur le marché. Pour éviter les problèmes, il est recommandé de ne pas vous précipiter sur n’importe quel ordinateur puissant et rapide disponible près de chez vous. Suivez plutôt chaque étape des instructions  de notre manuel d’installation qui vous guidera quant à l’ensemble des points essentiels pour vous permettre de faire les meilleurs choix possibles.
+      </para>
 
       <orderedlist>
          <listitem>
-            <para>Pensez aux objectifs de votre projet et définissez le précisément. S’agit-il d’une installation amateur? Une installation à des fins de test uniquement, une performance artistique devant public, une importante présentation en réseau avec vos futurs partenaires? Chaque projet a ses propres besoins (matériels, financiers et en termes de ressources humaines). Ces besoins définiront les spécifications de l’ordinateur qu’il vous faudra utiliser. 
+            <para>Pensez aux objectifs de votre projet et définissez le précisément. S’agit-il d’une installation amateur? Une installation à des fins de test uniquement, une performance artistique devant public, une importante présentation en réseau avec vos futurs partenaires? Chaque projet a ses propres besoins (matériels, financiers et en termes de ressources humaines). Ces besoins définiront les spécifications de l’ordinateur qu’il vous faudra utiliser.
             </para>
          </listitem>
          <listitem>
@@ -17,7 +17,7 @@
             </para>
          </listitem>
          <listitem>
-            <para>Choisissez au sein de ces 3 catégories quels équipements, périphériques et ordinateur rejoint vos besoins au mieux. Prenez le temps de lire les critiques des équipements en question. Essayer d’identifier des projets similaires au votre et comparez les équipements utilisés. N’hésitez pas à visiter les liens proposés et les conseils prodigués dans la section suivante. N’hésitez pas à nous solliciter, il nous fera plaisir de vous répondre. 
+            <para>Choisissez au sein de ces 3 catégories quels équipements, périphériques et ordinateur rejoint vos besoins au mieux. Prenez le temps de lire les critiques des équipements en question. Essayer d’identifier des projets similaires au votre et comparez les équipements utilisés. N’hésitez pas à visiter les liens proposés et les conseils prodigués dans la section suivante. N’hésitez pas à nous solliciter, il nous fera plaisir de vous répondre.
             </para>
          </listitem>
          <listitem>
@@ -25,14 +25,14 @@
             </para>
          </listitem>
       </orderedlist>
- 
+
   </sect1>
   <sect1 id="installation.computer-specifications">
     <title>Spécifications de l’ordinateur</title>
       <para>Nous vous suggérons fortement de vérifier que votre ordinateur et vos équipements sont compatibles avec linux.
          <ulink url="http://www.linuxhardware.org">
             <citetitle>linuxhardware.org</citetitle>
-         </ulink>Nous recommandons les spécifications suivantes : 
+         </ulink>Nous recommandons les spécifications suivantes :
        </para>
     <table>
       <title>Spécifications pour ordinateur de haute performance</title>
@@ -101,9 +101,9 @@
     <title>Spécifications des équipements vidéo</title>
     <sect2 id="installation.graphic-card">
       <title>Carte graphique</title>
-      <para>La carte graphique gère vos sorties vidéo. Le choix de cette dernière dépend donc de l’utilisation que vous voulez faire de &app;. Nous ne supportons à ce jour que la carte vidéo Nvidia. Certaines cartes ATI éprouvent des problèmes avec l’extension Xvideo. Avant de choisir votre carte vidéo, déterminez la distribution et la version de votre système linux. Certaines cartes graphiques peuvent ne fonctionner qu’avec certaines versions du système d’exploitation. Avant d’acheter votre carte graphique, vérifiez sur la page Nvidia unix que l’équipement que vous convoitez est supporté non seulement par la distribution de linux que vous utilisez mais également par sa version spécifique. 
+      <para>La carte graphique gère vos sorties vidéo. Le choix de cette dernière dépend donc de l’utilisation que vous voulez faire de &app;. Nous ne supportons à ce jour que la carte vidéo Nvidia. Certaines cartes ATI éprouvent des problèmes avec l’extension Xvideo. Avant de choisir votre carte vidéo, déterminez la distribution et la version de votre système linux. Certaines cartes graphiques peuvent ne fonctionner qu’avec certaines versions du système d’exploitation. Avant d’acheter votre carte graphique, vérifiez sur la page Nvidia unix que l’équipement que vous convoitez est supporté non seulement par la distribution de linux que vous utilisez mais également par sa version spécifique.
       </para>
-      <para>Il vous faut définir le type de sortie vidéo dont vous aurez besoin. Celle-ci est généralement envoyée vers un mixeur vidéo, un projecteur vidéo, un moniteur ou tout autre périphérique d’affichage. Le tableau ci-dessous dresse la liste des différents types de sortie possibles selon la carte graphique.  
+      <para>Il vous faut définir le type de sortie vidéo dont vous aurez besoin. Celle-ci est généralement envoyée vers un mixeur vidéo, un projecteur vidéo, un moniteur ou tout autre périphérique d’affichage. Le tableau ci-dessous dresse la liste des différents types de sortie possibles selon la carte graphique.
       </para>
       <table>
         <title>Types de sorties de carte graphique</title>
@@ -421,7 +421,7 @@
             <entry>6</entry>
             <entry>2.6 ms</entry>
 
-            <entry><para> Voir page : 
+            <entry><para> Voir page :
               <link linkend="installation.fa101-settings">
                 Edirol FA-66 page
               </link></para>

@@ -104,4 +104,7 @@ py/scripts/midistreamc
 py/scripts/scenicc
 scenic*.pc
 shared-video*.pc
+src/caps/test/caps_test
+src/main/test/check_pipeline
+scenic.pc
 doc/Doxyfile

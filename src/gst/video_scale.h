@@ -21,6 +21,11 @@
  *
  */
 
+/** @file
+ * The VideoScale component.
+ * Wraps and capsfilters the GStreamer videoscale element.
+ */
+
 #ifndef _VIDEO_SCALE_H_
 #define _VIDEO_SCALE_H_
 

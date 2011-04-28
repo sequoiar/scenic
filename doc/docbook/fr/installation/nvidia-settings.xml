@@ -28,7 +28,7 @@
             <para>Vous constaterez alors que  les pilotes sont activés et disponibles après un redémarrage. </para>
           </listitem>
         </itemizedlist>
-        <para>Le standard est d’avoir deux sorties vidéo issues de votre carte graphique. Une sortie se dirige vers votre moniteur et la seconde vers un projecteur ou un mixeur vidéo (tel qu’illustré dans la partie installation générale de la page installation matérielle). Pour une installation similaire, il faut configurer votre xorg.conf avec l’application des réglages Nvidia située dans « System/Administration/Nvidia X Server Settings » <link linkend='installation.hardware-setup'>Réglage de l'équipement</link></para> 
+        <para>Le standard est d’avoir deux sorties vidéo issues de votre carte graphique. Une sortie se dirige vers votre moniteur et la seconde vers un projecteur ou un mixeur vidéo (tel qu’illustré dans la partie installation générale de la page installation matérielle). Pour une installation similaire, il faut configurer votre xorg.conf avec l’application des réglages Nvidia située dans « System/Administration/Nvidia X Server Settings » <link linkend='installation.hardware-setup'>Réglage de l'équipement</link></para>
         </sect1>
         <sect1 id="installation.connecting-video-out">
         <title>Connexion physique de la sortie vidéo</title>

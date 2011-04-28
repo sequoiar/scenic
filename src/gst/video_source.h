@@ -18,6 +18,11 @@
 // along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/** @file
+ * The VideoSource component. 
+ * Wraps video capture elements.
+ */
+
 #ifndef _VIDEO_SOURCE_H_
 #define _VIDEO_SOURCE_H_
 
@@ -99,8 +104,6 @@ class VideoV4lSource
         bool willModifyCaptureResolution() const;
         virtual _GstElement *srcElement() { return capsFilter_; }
 };
-
-
 
 class VideoDc1394Source
     : public VideoSource

@@ -20,10 +20,9 @@
  *
  */
 
-#include <gst/gst.h>
 #include <cassert>
 #include "dv1394.h"
-#include "raw1394_util.h"
+#include "devices/raw1394_util.h"
 #include "gst_linkable.h"
 #include "pipeline.h"
 
@@ -43,7 +42,7 @@ Dv1394::Dv1394(const Pipeline &pipeline) :
     audioSink_(0),
     videoSink_(0)
 {
-    if (!Raw1394::cameraIsReady())
+    if (!raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
 
     // setting this to false leads to lower latency and less
@@ -58,11 +57,6 @@ Dv1394::Dv1394(const Pipeline &pipeline) :
             G_CALLBACK(Dv1394::cb_new_src_pad),
             static_cast<gpointer>(this));
 }
-
-Dv1394::~Dv1394()
-{
-}
-
 
 /// FIXME: this is crazy annoying, solution is for this not to be a singleton
 Dv1394 * Dv1394::Instance(const Pipeline &pipeline)
@@ -117,23 +111,28 @@ void Dv1394::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gpoin
 {
     GstElement *sinkElement;
     Dv1394 *context = static_cast<Dv1394*>(data);
-
-    if (std::string("video") == gst_pad_get_name(srcPad))
+    GstCaps *caps = gst_pad_get_caps (srcPad);
+    const gchar *mime = gst_structure_get_name(gst_caps_get_structure (caps, 0));
+    if (g_str_has_prefix(mime, "video"))
     {
         LOG_DEBUG("Got video stream from DV");
+        gst_caps_unref(caps);
         if (context->videoSink_ == 0)
             return; // possible to get video streams from dv without wanting them
         sinkElement = context->videoSink_;
     }
-    else if (std::string("audio") == gst_pad_get_name(srcPad))
+    else if (g_str_has_prefix(mime, "audio"))
     {
         LOG_DEBUG("Got audio stream from DV");
+        gst_caps_unref(caps);
         if (context->audioSink_ == 0)
             return; // possible to get audio streams from dv with wanting them
         sinkElement = context->audioSink_;
     }
-    else {
-        LOG_DEBUG("Ignoring unknown stream from DV");
+    else
+    {
+        LOG_DEBUG("Ignoring unknown " << mime << " stream from DV");
+        gst_caps_unref(caps);
         return;
     }
 

@@ -9,9 +9,9 @@
      proposed in our list, please contact us.
   </para>
   <sect1 id="installation.good-scenic-experience">
-   <title>For a good &app; experience</title>  
+   <title>For a good &app; experience</title>
       <para>You need to take the time to choose your computer and related devices. Buying a computer for linux, and specifically for audio-video performance requires time and knowledge. Computer parts and devices are constantly changing. Please do not rush your self to quickly buy the fastest and big high end computer sold by your favorite next corner computer store. Chances are you gone have problems. Unstead, follow every steps of our installation manual. It will guide you on everything you need to know to make good choices.
-      </para> 
+      </para>
 
       <orderedlist>
          <listitem>
@@ -35,7 +35,7 @@
             </para>
          </listitem>
       </orderedlist>
- 
+
   </sect1>
   <sect1 id="installation.computer-specifications">
     <title>Computer Specifications</title>
@@ -435,7 +435,7 @@
         <tbody>
           <row>
             <entry>Edirol FA101</entry>
-            <entry>Supported 
+            <entry>Supported
             </entry>
             <entry>Good Multipurpose Soundcard</entry>
             <entry>Firewire</entry>
@@ -455,7 +455,7 @@
             <entry>6</entry>
             <entry>2.6 ms</entry>
 
-            <entry><para> Follow our: 
+            <entry><para> Follow our:
               <link linkend="installation.fa101-settings">
                 Edirol FA-66 page
               </link></para>

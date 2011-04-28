@@ -19,12 +19,17 @@
 // along with Scenic.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/** @file
+ * The VideoSender component.
+ * Creates and links a "videosource ! encoder ! payloader" pipeline and adds it
+ * to an RTP session.
+ */
+
 #ifndef _VIDEO_SENDER_H_
 #define _VIDEO_SENDER_H_
 
 #include "media_base.h"
 #include "rtp_sender.h"
-#include "bus_msg_handler.h"
 
 #include "noncopyable.h"
 
@@ -34,7 +39,6 @@ class VideoSourceConfig;
 class VideoSource;
 class VideoEncoder;
 class Pay;
-class _GstMessage;
 
 class VideoSender
     : public SenderBase, private boost::noncopyable

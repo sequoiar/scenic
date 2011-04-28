@@ -32,9 +32,9 @@
 #include "shared_video_sink.h"
 
 // for list cameras
-#include "dc1394.h"
-#include "v4l2_util.h"
-#include "raw1394_util.h"
+#include "devices/dc1394.h"
+#include "devices/v4l2_util.h"
+#include "devices/raw1394_util.h"
 
 
 unsigned long long fromString(const std::string& s,
@@ -142,8 +142,8 @@ int VideoSourceConfig::listCameras()
     {
         bool foundCameras = false;
         foundCameras |= v4l2util::listCameras();
-        foundCameras |= Dc1394::listCameras();
-        foundCameras |= Raw1394::listCameras();
+        foundCameras |= dc1394::listCameras();
+        foundCameras |= raw1394::listCameras();
         if (not foundCameras)
             LOG_PRINT("No cameras found" << std::endl);
     }
@@ -275,15 +275,17 @@ VideoSink * VideoSinkConfig::createSink(Pipeline &pipeline) const
     VideoSink *result = 0;
     if (sink_ == "xvimagesink")
     {
-        XvImageSink *xv = new XvImageSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), xid_, display_, title_);
+        XvImageSink *xv = new XvImageSink(pipeline, *this);
         if (startInFullscreen_)
             xv->toggleFullscreen();
         result = xv;
     }
-    else if (sink_ == "ximagesink")
-        result = new XImageSink(pipeline, display_);
+    else if (sink_ == "ximagesink" or sink_ == "gconfvideosink" or sink_ ==
+            "autovideosink")
+        result = new SimpleVideoSink(pipeline, *this);
     else if (sink_ == "sharedvideosink")
-        result = new SharedVideoSink(pipeline, effectiveDisplayWidth(), effectiveDisplayHeight(), sharedVideoId_);
+        result = new SharedVideoSink(pipeline, effectiveDisplayWidth(),
+                effectiveDisplayHeight(), sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid videosink");
 

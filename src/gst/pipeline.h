@@ -72,8 +72,6 @@ class Pipeline : private boost::noncopyable
 
         _GstElement *pipeline_;
         std::set<BusMsgHandler*> handlers_;
-        unsigned sampleRate_;
-        static const unsigned int SAMPLE_RATE = 48000;
         bool latencyUpdated_;
 };
 
