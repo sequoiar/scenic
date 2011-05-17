@@ -1,0 +1,24 @@
+#!/usr/bin/env lunch
+
+remote = "10.10.10.91"
+local = "10.10.10.92"
+
+# Send from local to remote
+# remote <<----- local
+# add_command("milhouse -s --address %(peer)s --videoport 40000 --videocodec h263 --framerate 15 --videosource videotestsrc" % {"peer" : remote})
+# add_command("milhouse -r --address %(peer)s --videoport 40000 --videocodec h263 --videosink xvimagesink" % {"peer" : local})
+
+
+
+# Send from remote to local
+# remote ----->> local
+add_command("milhouse -s --address %(peer)s --videoport 50000 --videocodec h263 --framerate 15 --videosource videotestsrc" % {"peer" : local}, host=remote)
+add_command("milhouse -r --address %(peer)s --videoport 50000 --videocodec h263 --videosink xvimagesink" % {"peer" : remote})
+
+# milhouse --version
+add_command("milhouse --version", host=remote, respawn=False)
+add_command("milhouse --version", respawn=False, sleep_after=10)
+
+add_command("netstat --listening --numeric --program | grep milhouse", host=remote, respawn=False)
+add_command("netstat --listening --numeric --program | grep milhouse", respawn=False)
+
