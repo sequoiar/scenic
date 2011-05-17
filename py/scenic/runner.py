@@ -116,6 +116,7 @@ def run():
     else:
         start_logging_to_stdout(level)
     log_file_name = None
+# FIXME: why are we setting log_file_name to Null before passing it to the Application contructor?
 
     from scenic import process
     process.save_environment_variables(os.environ)
